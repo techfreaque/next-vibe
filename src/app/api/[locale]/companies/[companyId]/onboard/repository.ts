@@ -27,7 +27,7 @@ import { CoaSetupRepository } from "@/app/api/[locale]/chart-of-accounts/setup/r
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
 import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { taxRates } from "@/app/api/[locale]/tax/db";
 import { seedDefaultTaxRates } from "@/app/api/[locale]/tax/seeds";
 import type { CountryLanguage } from "@/i18n/core/config";

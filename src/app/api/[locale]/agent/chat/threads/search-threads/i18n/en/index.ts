@@ -4,6 +4,13 @@
 
 export const translations = {
   category: "Chat",
+  enums: {
+    threadStatus: {
+      active: "Active",
+      archived: "Archived",
+      deleted: "Deleted",
+    },
+  },
   tags: {
     threads: "Threads",
   },

@@ -55,6 +55,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",
+  timeoutMs: 0,
   icon: "image",
   category: "ai",
   subCategory: "Generation",

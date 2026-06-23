@@ -17,9 +17,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 

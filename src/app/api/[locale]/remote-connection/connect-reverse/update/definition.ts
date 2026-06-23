@@ -1,0 +1,142 @@
+/**
+ * Reverse Connection Update
+ * PATCH — called by the initiating instance to mirror syncScope changes to the
+ * other side. The remote updates its reverse entry's syncScope to match.
+ * Cloud-only constraint: cloud cannot initiate; only local instances call this.
+ */
+
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { SyncScopeSchema } from "../../db";
+import { scopedTranslation } from "./i18n";
+
+const ReverseUpdateWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.ReverseConnectionUpdateWidget,
+  })),
+);
+
+const { PATCH } = createEndpoint({
+  scopedTranslation,
+  method: Methods.PATCH,
+  path: ["remote-connection", "connect-reverse", "update"],
+  allowedRoles: [UserRole.ADMIN] as const,
+
+  title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
+  description: "patch.description" as const,
+  icon: "refresh-cw" as const,
+  category: "devTools",
+  subCategory: "remoteInstances",
+  tags: ["tags.remoteConnection" as const],
+
+  fields: customWidgetObject({
+    render: ReverseUpdateWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
+      instanceId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z.string().min(1).max(32),
+      }),
+      syncScope: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "patch.syncScope.label" as const,
+        description: "patch.syncScope.description" as const,
+        schema: SyncScopeSchema.optional(),
+      }),
+      updated: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.boolean(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
+    },
+  },
+
+  successTypes: {
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
+  },
+
+  examples: {
+    requests: {
+      default: {
+        instanceId: "hermes",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: true,
+          chat: false,
+        },
+      },
+    },
+    responses: {
+      default: {
+        updated: true,
+      },
+    },
+  },
+});
+
+export type ReverseUpdatePatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type ReverseUpdatePatchResponseOutput =
+  typeof PATCH.types.ResponseOutput;
+
+const definitions = { PATCH } as const;
+export default definitions;

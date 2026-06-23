@@ -3,9 +3,9 @@
  * React hooks for interacting with the lead search API
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { JwtPayloadType } from "../../user/auth/types";
 import leadSearchEndpoints from "./definition";

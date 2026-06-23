@@ -7,6 +7,19 @@ export const translations = {
     MALE: "Male voice",
     FEMALE: "Female voice",
   },
+  enums: {
+    viewMode: {
+      linear: "Linear",
+      threaded: "Threaded",
+      flat: "Flat",
+      debug: "Debug",
+    },
+    provider: {
+      AUTO: "Auto",
+      BRAVE: "Brave",
+      KAGI: "Kagi",
+    },
+  },
   get: {
     title: "Settings",
     titleShort: "Chat Settings",

@@ -15,30 +15,6 @@
  */
 export async function getClientRouteHandler(path: string): Promise<any | null> {
   switch (path) {
-    case "agent_chat_favorites_GET":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/route-client")
-      ).GET;
-    case "agent_chat_favorites_create_POST":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/create/route-client")
-      ).POST;
-    case "agent_chat_favorites_id_DELETE":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/[id]/route-client")
-      ).DELETE;
-    case "agent_chat_favorites_id_GET":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/[id]/route-client")
-      ).GET;
-    case "agent_chat_favorites_id_PATCH":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/[id]/route-client")
-      ).PATCH;
-    case "agent_chat_favorites_reorder_POST":
-      return (
-        await import("@/app/api/[locale]/agent/chat/favorites/reorder/route-client")
-      ).POST;
     case "agent_chat_folder-contents_rootFolderId_GET":
       return (
         await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route-client")
@@ -99,6 +75,30 @@ export async function getClientRouteHandler(path: string): Promise<any | null> {
       return (
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/route-client")
       ).GET;
+    case "agent_skills_favorites_GET":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/route-client")
+      ).GET;
+    case "agent_skills_favorites_create_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/create/route-client")
+      ).POST;
+    case "agent_skills_favorites_id_DELETE":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+      ).DELETE;
+    case "agent_skills_favorites_id_GET":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+      ).GET;
+    case "agent_skills_favorites_id_PATCH":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+      ).PATCH;
+    case "agent_skills_favorites_reorder_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/reorder/route-client")
+      ).POST;
     default:
       return null;
   }

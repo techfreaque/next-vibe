@@ -1,6 +1,18 @@
 export const translations = {
   title: "Journey Variants",
   description: "Manage email journey variant registrations",
+  enums: {
+    campaignType: {
+      leadCampaign: "Lead Campaign",
+      newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      transactional: "Transactional",
+      notification: "Notification",
+      system: "System",
+    },
+  },
   get: {
     title: "Journey Variants",
     titleShort: "Journey Variants",

@@ -809,6 +809,10 @@ export const translations: typeof enTranslations = {
       title: "Status Zadań Importu",
       titleShort: "Zadania importu",
       description: "Wyświetl i monitoruj zadania importu CSV",
+      actions: {
+        refresh: "Odśwież",
+        refreshing: "Odświeżanie...",
+      },
       form: {
         title: "Filtry Zadań",
         description: "Filtruj zadania importu według statusu i paginacji",
@@ -835,6 +839,7 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Zadania Importu",
         description: "Lista zadań importu z ich aktualnym statusem",
+        statusCounts: "Liczniki statusów",
         items: {
           title: "Lista Zadań",
         },
@@ -1370,5 +1375,16 @@ export const translations: typeof enTranslations = {
       referral: "Polecenie",
       csvImport: "Import CSV",
     },
+  },
+  countries: {
+    global: "Globalny",
+    de: "Niemcy",
+    pl: "Polska",
+    us: "Stany Zjednoczone",
+  },
+  languages: {
+    en: "Angielski",
+    de: "Niemiecki",
+    pl: "Polski",
   },
 };

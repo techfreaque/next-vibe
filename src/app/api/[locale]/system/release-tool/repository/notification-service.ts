@@ -3,7 +3,8 @@
  * Send notifications via webhooks (Slack, Discord, Teams, Mattermost, Google Chat, etc.)
  */
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+
 import type {
   NotificationConfig,
   NotificationData,

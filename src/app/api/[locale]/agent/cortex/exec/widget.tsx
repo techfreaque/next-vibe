@@ -12,6 +12,7 @@ import {
   useSearchParams,
   useSilentHistory,
 } from "next-vibe-ui/hooks/use-navigation";
+import { getCurrentUrl } from "next-vibe-ui/lib/location";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
@@ -48,7 +49,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { getCurrentUrl } from "next-vibe-ui/utils/browser";
 import {
   type JSX,
   useCallback,

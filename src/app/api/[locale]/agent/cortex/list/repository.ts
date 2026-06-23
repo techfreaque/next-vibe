@@ -12,7 +12,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
  * Cortex List Repository
  * Lists directory contents from both document workspace and virtual mounts
  */
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,6 +30,7 @@ import {
   normalizeToCanonicalPath,
   VIRTUAL_MOUNTS,
 } from "../repository";
+import type { CortexListResponseOutput } from "./definition";
 import type { CortexListT } from "./i18n";
 
 interface ListParams {

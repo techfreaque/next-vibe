@@ -11,9 +11,9 @@ import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/payment/utils/redirect";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";

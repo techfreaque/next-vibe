@@ -12,8 +12,8 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";

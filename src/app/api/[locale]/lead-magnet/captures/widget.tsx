@@ -1,5 +1,6 @@
 "use client";
 
+import { downloadFile } from "next-vibe-ui/lib/download";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -10,7 +11,6 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { downloadFile } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useRef } from "react";
 

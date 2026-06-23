@@ -26,12 +26,12 @@ import type {
   CategoryDefinition,
   SubcategoryDefinition,
 } from "@/app/api/[locale]/system/help/category-types";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { LiveIndex } from "../shared/live-index";

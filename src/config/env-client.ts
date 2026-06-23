@@ -3,6 +3,7 @@
  */
 
 import { Environment } from "next-vibe/shared/utils/env-util";
+import { getCurrentOrigin } from "next-vibe-ui/lib/location";
 import { z } from "zod";
 
 import { defineEnvClient } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env-client";
@@ -29,7 +30,7 @@ export const {
       .url()
       .default("http://localhost:3000")
       .transform((s) =>
-        isBrowser ? window.location.origin : s.replace(/\/$/, ""),
+        isBrowser ? getCurrentOrigin() : s.replace(/\/$/, ""),
       ),
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",

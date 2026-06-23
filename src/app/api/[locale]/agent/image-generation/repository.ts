@@ -27,7 +27,7 @@ import {
   type ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -35,12 +35,12 @@ import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
 import { DefaultFolderId } from "../chat/config";
-import { buildFavoriteConfig } from "../chat/favorites/repository";
-import { NO_SKILL_ID } from "../chat/skills/constants";
 import {
   checkMediaBalance,
   deductMediaCredits,
 } from "../shared/media-generation";
+import { NO_SKILL_ID } from "../skills/constants";
+import { buildFavoriteConfig } from "../skills/favorites/repository";
 import {
   type ImageGenerationPostRequestOutput,
   type ImageGenerationPostResponseOutput,

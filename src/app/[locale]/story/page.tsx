@@ -11,7 +11,7 @@ import {
   getAvailableProviderCount,
   type ModelCountsByContentLevel,
 } from "@/app/api/[locale]/agent/models/all-models";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";

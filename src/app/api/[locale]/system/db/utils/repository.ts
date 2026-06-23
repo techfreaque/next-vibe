@@ -14,7 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 // Logger will be provided by the route handler
 import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";

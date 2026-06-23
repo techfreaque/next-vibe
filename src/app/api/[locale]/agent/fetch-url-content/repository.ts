@@ -18,7 +18,7 @@ import { z } from "zod";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";

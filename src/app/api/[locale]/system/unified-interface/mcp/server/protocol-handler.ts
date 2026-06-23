@@ -7,6 +7,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -17,7 +18,6 @@ import {
   type IDefinitionsRegistry,
 } from "../../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../../shared/endpoints/permissions/registry";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
 import { endpointToMCPTool } from "../converter";
 import { MCPRegistry, mcpRegistry } from "../registry";

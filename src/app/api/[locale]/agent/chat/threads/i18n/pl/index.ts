@@ -4,6 +4,13 @@ export const translations: typeof enTranslations = {
   tags: {
     threads: "Wątki",
   },
+  enums: {
+    threadStatus: {
+      active: "Aktywny",
+      archived: "Zarchiwizowany",
+      deleted: "Usunięty",
+    },
+  },
   errors: {
     count_failed: "Nie udało się pobrać liczby konwersacji: {{error}}",
   },
@@ -372,6 +379,7 @@ export const translations: typeof enTranslations = {
       public: "Publiczne czaty",
       incognito: "Czaty incognito",
       background: "Wątki w tle",
+      remote: "Czaty zdalne",
     },
   },
 };

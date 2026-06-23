@@ -12,7 +12,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";

@@ -8,8 +8,8 @@
 import "server-only";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
+import type { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

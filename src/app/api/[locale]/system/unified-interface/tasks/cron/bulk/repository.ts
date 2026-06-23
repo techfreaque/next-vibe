@@ -15,7 +15,7 @@ import {
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { TaskOwner } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   cronTasks,

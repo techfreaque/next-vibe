@@ -1,5 +1,6 @@
 "use client";
 
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -10,7 +11,6 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
 

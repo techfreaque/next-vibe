@@ -19,9 +19,9 @@ import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settin
 import { contactFragment } from "@/app/api/[locale]/contact/system-prompt/prompt";
 import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt/prompt";
 import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt/prompt";
-import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
+import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/prompt";
 import { remoteInstancesFragment, sshConnectionsFragment, systemContextFragment } from "@/app/api/[locale]/remote-connection/system-prompt/prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
+import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt/prompt";
 import { webFragment } from "@/app/api/[locale]/agent/search/system-prompt/prompt";
 
 // Server loaders - from each module's system-prompt/server.ts
@@ -30,9 +30,9 @@ import { loadCodingAgentSettingData } from "@/app/api/[locale]/agent/chat/settin
 import { loadContactData } from "@/app/api/[locale]/contact/system-prompt/server";
 import { loadCortexData } from "@/app/api/[locale]/agent/cortex/system-prompt/server";
 import { loadDesktopData } from "@/app/api/[locale]/desktop/system-prompt/server";
-import { loadFavoritesData } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/server";
+import { loadFavoritesData } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/server";
 import { loadRemoteInstancesData } from "@/app/api/[locale]/remote-connection/system-prompt/server";
-import { loadSkillData } from "@/app/api/[locale]/agent/chat/skills/system-prompt/server";
+import { loadSkillData } from "@/app/api/[locale]/agent/skills/system-prompt/server";
 import { loadWebData } from "@/app/api/[locale]/agent/search/system-prompt/server";
 
 /**

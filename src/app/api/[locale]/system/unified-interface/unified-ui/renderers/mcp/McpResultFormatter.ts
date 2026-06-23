@@ -10,7 +10,7 @@ import React from "react";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";

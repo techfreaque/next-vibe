@@ -14,7 +14,7 @@ import {
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
 import type { BraveT } from "./i18n";
@@ -29,7 +29,6 @@ interface SearchResult {
   age?: string;
   source?: string;
 }
-
 interface BraveWebResult {
   title: string;
   url: string;
@@ -40,7 +39,6 @@ interface BraveWebResult {
     src: string;
   };
 }
-
 interface BraveNewsResult {
   title: string;
   url: string;
@@ -48,7 +46,6 @@ interface BraveNewsResult {
   age: string;
   source: string;
 }
-
 interface BraveSearchApiResponse {
   web?: {
     results: BraveWebResult[];

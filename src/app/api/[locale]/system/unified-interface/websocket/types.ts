@@ -4,7 +4,7 @@
  * Used by server (emitter), client (hooks), and endpoint definitions.
  */
 
-import type { z } from "zod";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 

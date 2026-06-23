@@ -14,11 +14,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../config";
-import { ThreadStatus } from "../../enum";
+import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import {
   getFoldersForRoot,
   getThreadsForFolder,

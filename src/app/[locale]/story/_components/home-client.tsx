@@ -1,12 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { getElementById } from "next-vibe-ui/lib/dom";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  getCurrentUrl,
-  getElementById,
-  silentReplaceState,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    country: {
+      AT: "Österreich (AT)",
+      DE: "Deutschland (DE)",
+      XX: "Generisch (XX)",
+    },
+  },
   tags: {
     companies: "unternehmen",
     onboard: "einrichten",

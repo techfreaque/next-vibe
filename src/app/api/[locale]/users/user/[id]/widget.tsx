@@ -5,6 +5,7 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
@@ -35,7 +36,6 @@ import { UuidFieldWidget } from "next-vibe-ui/unified/form-fields/uuid-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, { useCallback, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

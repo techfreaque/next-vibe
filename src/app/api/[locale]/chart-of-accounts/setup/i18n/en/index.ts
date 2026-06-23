@@ -1,4 +1,11 @@
 export const translations = {
+  enums: {
+    country: {
+      AT: "AT — ÖKR",
+      DE: "DE — SKR03",
+      XX: "XX — IFRS Generic",
+    },
+  },
   post: {
     title: "Initialize Chart of Accounts",
     titleShort: "Setup",

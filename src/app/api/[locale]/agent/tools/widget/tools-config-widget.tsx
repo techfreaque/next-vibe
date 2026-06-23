@@ -44,8 +44,8 @@ import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constant
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { HelpToolMetadataSerialized } from "@/app/api/[locale]/system/help/definition";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 // ─── Types ──────────────────────────────────────────────────────────────────

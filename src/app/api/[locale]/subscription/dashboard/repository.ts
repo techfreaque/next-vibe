@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

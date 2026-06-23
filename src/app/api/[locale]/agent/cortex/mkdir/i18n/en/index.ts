@@ -1,4 +1,13 @@
 export const translations = {
+  enums: {
+    viewType: {
+      calendar: "Calendar",
+      grid: "Grid",
+      kanban: "Kanban",
+      list: "List",
+      wiki: "Wiki",
+    },
+  },
   post: {
     title: "New Folder",
     titleShort: "New Folder",

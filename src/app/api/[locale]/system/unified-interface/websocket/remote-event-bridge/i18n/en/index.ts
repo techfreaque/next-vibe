@@ -8,7 +8,7 @@ export const translations = {
       title: "Remote Event Bridge",
       titleShort: "Event Bridge",
       description:
-        "Receive and republish remote peer events (endpoint-event, live-message-event, sync-event). Called via HTTP by direct-http peers or dispatched via reverse-WS onRemoteEvent.",
+        "Receive and republish remote peer events (endpoint-event, live-message-event). Called via HTTP by direct-http peers or dispatched via reverse-WS onRemoteEvent.",
       eventName: {
         label: "Event Name",
         description: "The wire event type to process",

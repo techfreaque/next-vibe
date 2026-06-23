@@ -41,7 +41,7 @@ import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db/index";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";

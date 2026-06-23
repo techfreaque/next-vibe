@@ -29,7 +29,7 @@ import {
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

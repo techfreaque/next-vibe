@@ -12,8 +12,8 @@ import {
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { LoggerMetadata } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { LoggerMetadata } from "@/app/api/[locale]/system/logger/types";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { stockLevels, stockMovements, warehouses } from "../db";

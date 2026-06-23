@@ -29,26 +29,26 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
+import {
+  isFiltersSelection,
+  isManualSelection,
+} from "@/app/api/[locale]/agent/skills/create/definition";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
   type FavoriteConfig,
-} from "@/app/api/[locale]/agent/chat/favorites/db";
+} from "@/app/api/[locale]/agent/skills/favorites/db";
 import {
   buildFavoriteConfig,
   resolveFavoriteConfig,
-} from "@/app/api/[locale]/agent/chat/favorites/repository";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import {
-  isFiltersSelection,
-  isManualSelection,
-} from "@/app/api/[locale]/agent/chat/skills/create/definition";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+} from "@/app/api/[locale]/agent/skills/favorites/repository";
+import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

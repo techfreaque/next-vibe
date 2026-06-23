@@ -13,12 +13,12 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
 import type { DefaultFolderId } from "../config";
-import { ThreadStatus } from "../enum";
+import { ThreadStatus, ThreadStreamingState } from "../enum";
 import {
   createIncognitoThread,
   deleteThread,
@@ -98,7 +98,7 @@ export class ChatThreadsRepositoryClient {
           canModerate: false,
           canDelete: true,
           canManagePermissions: false,
-          streamingState: "idle" as const,
+          streamingState: ThreadStreamingState.IDLE,
           createdAt: new Date(thread.createdAt),
           updatedAt: new Date(thread.updatedAt),
         })),

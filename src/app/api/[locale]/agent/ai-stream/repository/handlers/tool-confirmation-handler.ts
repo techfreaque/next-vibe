@@ -12,13 +12,14 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -28,7 +29,7 @@ import { db } from "../../../../system/db";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
-import { ChatMessageRole } from "../../../chat/enum";
+import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";
 import { walkToLeafMessage } from "../core/branch-utils";

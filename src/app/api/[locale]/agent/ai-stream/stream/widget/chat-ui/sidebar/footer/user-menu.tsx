@@ -7,7 +7,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";

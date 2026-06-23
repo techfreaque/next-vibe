@@ -25,12 +25,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  LoopLocationSchema,
-  SyncScopeSchema,
-  ThreadMirrorModeSchema,
-  ToolSourceSchema,
-} from "../db";
+import { SyncScopeSchema, TransportModeSchema } from "../db";
 import { scopedTranslation } from "./i18n";
 
 const RemoteConnectionByIdWidget = lazyWidget(() =>

@@ -31,6 +31,7 @@ import {
   LeadSource,
   LeadStatus,
   LeadStatusDB,
+  LeadStatusOptions,
 } from "../enum";
 import { LEADS_SEARCH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

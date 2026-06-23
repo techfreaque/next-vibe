@@ -1,0 +1,25 @@
+/**
+ * Skill Report Route Handler
+ * POST /agent/skills/[id]/report
+ */
+
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+import definitions from "./definition";
+import { SkillReportRepository } from "./repository";
+
+export const { POST, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.POST]: {
+    email: undefined,
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      SkillReportRepository.submitReport(
+        urlPathParams,
+        data,
+        user,
+        logger,
+        locale,
+      ),
+  },
+});

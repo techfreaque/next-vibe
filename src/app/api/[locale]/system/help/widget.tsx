@@ -14,6 +14,14 @@ import {
 } from "next-vibe-ui/hooks/use-navigation";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
+import { addWindowListener } from "next-vibe-ui/lib/dom";
+import {
+  getCurrentOrigin,
+  getCurrentPathname,
+  getCurrentSearch,
+  historyBack,
+} from "next-vibe-ui/lib/location";
+import { getScreenWidth } from "next-vibe-ui/lib/screen";
 import { storage } from "next-vibe-ui/lib/storage";
 import { Badge } from "next-vibe-ui/ui/badge";
 import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
@@ -81,12 +89,6 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import {
-  getCurrentOrigin,
-  getCurrentPathname,
-  getCurrentSearch,
-  getScreenWidth,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import {
   createContext,
@@ -105,11 +107,11 @@ import {
   getDefaultToolIdsForUser,
   getDefaultWebPinnedIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
-import favoriteByIdDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import favoritesListDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import settingsDefinition from "@/app/api/[locale]/agent/chat/settings/definition";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import favoriteByIdDefinition from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
+import favoritesListDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
 import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import {
   ADMIN_GROUPS,

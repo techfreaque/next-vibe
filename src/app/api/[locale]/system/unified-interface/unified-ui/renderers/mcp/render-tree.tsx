@@ -2,9 +2,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import type { JSX } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { queryClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

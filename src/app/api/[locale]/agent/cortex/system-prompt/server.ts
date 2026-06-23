@@ -3,8 +3,8 @@ import "server-only";
 import type { ModelMessage } from "ai";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/prompt";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { languageConfig } from "@/i18n";

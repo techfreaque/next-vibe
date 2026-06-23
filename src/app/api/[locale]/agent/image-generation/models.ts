@@ -3,11 +3,6 @@ import { z } from "zod";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { ChatModelId, chatModelOptionsIndex } from "../ai-stream/models";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-} from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
@@ -24,10 +19,16 @@ import {
   type ModelProviderConfigImageBased,
   type ModelProviderConfigTokenBased,
 } from "../models/models";
+import type { FiltersModelSelection } from "../models/selection";
 import {
   filtersSelectionSchema,
   sharedFilterPropsSchema,
 } from "../models/selection";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+} from "../skills/enum";
 
 export enum ImageGenModelId {
   FLUX_PRO = "flux-pro",
@@ -1331,21 +1332,32 @@ export function getImageGenModelForProvider(
 // IMAGE GEN MODEL SELECTION SCHEMA
 // ============================================================
 
-export const imageGenModelSelectionSchema = z.discriminatedUnion(
-  "selectionType",
-  [
-    z
-      .object({
-        selectionType: z.literal(ModelSelectionType.MANUAL),
-        manualModelId: z.enum(ImageGenModelId),
-      })
-      .merge(sharedFilterPropsSchema),
-    filtersSelectionSchema,
-  ],
-);
-export type ImageGenModelSelection = z.infer<
-  typeof imageGenModelSelectionSchema
+const imageGenManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(ImageGenModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type ImageGenManualModelSelection = z.infer<
+  typeof imageGenManualModelSelectionSchema
 >;
+
+/**
+ * Image-gen selection — a manual pick or a filter-based selection.
+ *
+ * Explicit union + `z.ZodType<...>` annotation pins `z.output` to the named type
+ * so consumers resolve it shallowly instead of re-deriving the discriminated union
+ * (which exceeds TS's instantiation-depth limit and collapses to `{}`).
+ */
+export type ImageGenModelSelection =
+  | ImageGenManualModelSelection
+  | FiltersModelSelection;
+
+export const imageGenModelSelectionSchema: z.ZodType<ImageGenModelSelection> =
+  z.discriminatedUnion("selectionType", [
+    imageGenManualModelSelectionSchema,
+    filtersSelectionSchema,
+  ]);
 
 export function filterImageGenModels(
   selection: ImageGenModelSelection | null | undefined,

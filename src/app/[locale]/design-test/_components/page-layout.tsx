@@ -1,6 +1,7 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
+import { querySelector } from "next-vibe-ui/lib/dom";
 import { Button } from "next-vibe-ui/ui/button";
 import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
@@ -18,7 +19,6 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { SidebarLayout } from "next-vibe-ui/ui/sidebar";
 import { Toaster } from "next-vibe-ui/ui/sonner";
 import { H1, H4, Large, P } from "next-vibe-ui/ui/typography";
-import { querySelector } from "next-vibe-ui/utils/browser";
 import { useState } from "react";
 
 import { platform } from "@/config/env-client";

@@ -4,7 +4,7 @@
 
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   SpacingSize,

@@ -34,15 +34,15 @@ export function OverviewPageClient({
 
   const navigationOverride = useMemo(
     () => ({
-      push: (
-        endpoint: CreateApiEndpointAny,
-        options: Parameters<UseNavigationStackReturn["push"]>[1],
-        nativePush: UseNavigationStackReturn["push"],
+      push: <TEndpoint extends CreateApiEndpointAny>(
+        endpoint: TEndpoint,
+        options?: Parameters<UseNavigationStackReturn["push"]>[1],
+        nativePush?: UseNavigationStackReturn["push"],
       ): void => {
         const tab = PATH_TO_TAB[endpoint.path.slice(0, 2).join("/")];
         if (tab) {
           router.push(`/${locale}/subscription/${tab}`);
-        } else {
+        } else if (nativePush) {
           nativePush(endpoint, options);
         }
       },

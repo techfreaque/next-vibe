@@ -6,14 +6,16 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { downloadBinaryFile } from "next-vibe-ui/lib/download";
+import { getMicrophoneStream, getUserAgent } from "next-vibe-ui/lib/media";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
@@ -66,7 +68,7 @@ function getDevicePlatform():
   if (typeof navigator === "undefined") {
     return "generic";
   }
-  const ua = navigator.userAgent;
+  const ua = getUserAgent();
   // iOS check must come before Mac check (iPad reports as Macintosh with touch)
   if (
     /iPhone|iPad|iPod/.test(ua) ||
@@ -404,7 +406,7 @@ export function useEdenAISpeech({
   }, [logger, submitAudioFiles]);
 
   /** Download all saved chunks concatenated as a single file */
-  const downloadSavedAudio = useCallback((): void => {
+  const downloadSavedAudio = useCallback(async (): Promise<void> => {
     const audioFiles = savedAudioFilesRef.current;
     if (!audioFiles?.length) {
       logger.warn("STT: downloadSavedAudio called but no saved audio");
@@ -419,14 +421,11 @@ export function useEdenAISpeech({
           ? "wav"
           : "webm";
     const blob = new Blob(audioFiles, { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `recording-${Date.now()}.${ext}`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const filename = `recording-${Date.now()}.${ext}`;
+    const arrayBuf = await blob.arrayBuffer();
+    downloadBinaryFile(filename, new Uint8Array(arrayBuf), mimeType);
     logger.debug("STT: Audio downloaded", {
-      fileName: a.download,
+      fileName: filename,
       chunks: audioFiles.length,
       size: blob.size,
     });
@@ -441,7 +440,13 @@ export function useEdenAISpeech({
       silenceStartRef.current = null;
 
       logger.debug("STT: Requesting microphone access");
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await getMicrophoneStream();
+      if (!stream) {
+        const errorMsg = t("hooks.stt.no-microphone");
+        setError(errorMsg);
+        onError?.(errorMsg);
+        return;
+      }
       streamRef.current = stream;
 
       // Set up AnalyserNode for RMS-based silence detection

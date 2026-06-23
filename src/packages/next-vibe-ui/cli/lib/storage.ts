@@ -68,3 +68,53 @@ export const storage: Storage = {
     return Promise.resolve();
   },
 };
+
+// ─── Sync localStorage helpers (CLI: file-backed) ─────────────────────────────
+
+export function getLocalItem(key: string): string | null {
+  try {
+    const path = keyPath(key);
+    if (!existsSync(path)) {
+      return null;
+    }
+    const raw = readFileSync(path, "utf-8");
+    const parsed = JSON.parse(raw) as { value: string };
+    return parsed.value;
+  } catch {
+    return null;
+  }
+}
+
+export function setLocalItem(key: string, value: string): void {
+  try {
+    ensureDir();
+    writeFileSync(keyPath(key), JSON.stringify({ value }), "utf-8");
+  } catch {
+    // Silent
+  }
+}
+
+export function removeLocalItem(key: string): void {
+  try {
+    const path = keyPath(key);
+    if (existsSync(path)) {
+      unlinkSync(path);
+    }
+  } catch {
+    // Silent
+  }
+}
+
+// ─── Sync sessionStorage helpers (CLI: same as local, no true session concept) ─
+
+export function getSessionItem(key: string): string | null {
+  return getLocalItem(key);
+}
+
+export function setSessionItem(key: string, value: string): void {
+  setLocalItem(key, value);
+}
+
+export function removeSessionItem(key: string): void {
+  removeLocalItem(key);
+}

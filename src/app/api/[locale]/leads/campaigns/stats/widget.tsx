@@ -35,7 +35,7 @@ import React from "react";
 
 import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

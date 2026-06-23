@@ -2,9 +2,9 @@ import type { Path } from "react-hook-form";
 import type z from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";

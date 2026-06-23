@@ -119,6 +119,7 @@ export const translations: typeof enTranslations = {
             background: "Hintergrund",
             private: "Privat",
             shared: "Geteilt",
+            public: "Öffentlich",
             incognito: "Inkognito (kein Speicher)",
           },
         },
@@ -216,6 +217,13 @@ export const translations: typeof enTranslations = {
     rootFolderId: {
       label: "Hauptordner",
       description: "Hauptordner-Kontext für die Nachricht",
+      options: {
+        private: "Privat",
+        shared: "Geteilt",
+        public: "Öffentlich",
+        incognito: "Inkognito (keine Speicherung)",
+        background: "Hintergrund",
+      },
     },
     subFolderId: {
       label: "Unterordner",
@@ -285,6 +293,8 @@ export const translations: typeof enTranslations = {
         user: "Benutzer",
         assistant: "Assistent",
         system: "System",
+        tool: "Werkzeug",
+        error: "Fehler",
       },
     },
     model: {
@@ -363,6 +373,47 @@ export const translations: typeof enTranslations = {
       label: "Dateianhänge",
       description:
         "An die Nachricht angehängte Dateien (Bilder, Dokumente, etc.)",
+    },
+    instanceId: {
+      label: "Instanz-ID",
+      description: "Remote-Instanz-ID für WS-Provider-Relay",
+    },
+    threadMirrorMode: {
+      label: "Thread-Spiegelungsmodus",
+      description:
+        "Bestimmt, welche Seite den Thread persistiert (both/local/cloud/none)",
+    },
+    tools: {
+      title: "Remote-Tool-Schemas",
+      description: "Tool-Spezifikationen vom Aufrufer für den Provider",
+      name: {
+        label: "Tool-Name",
+        description: "Eindeutiger Tool-Bezeichner",
+      },
+      toolDescription: {
+        label: "Beschreibung",
+        description: "Was das Tool tut",
+      },
+      parameters: {
+        label: "Parameter",
+        description: "JSON-Schema für Tool-Parameter",
+      },
+    },
+    folderPath: {
+      label: "Ordnerpfad",
+      description: "Unterordner-Hierarchie unter BACKGROUND/<instanceId>",
+    },
+    confirmationOverrides: {
+      title: "Bestätigungs-Overrides",
+      description: "Tool-spezifische Bestätigungsanforderungen vom Aufrufer",
+      toolId: {
+        label: "Tool-ID",
+        description: "Tool-Alias oder vollständiger Name",
+      },
+      requiresConfirmation: {
+        label: "Bestätigung erforderlich",
+        description: "Ob dieses Tool eine Benutzerbestätigung benötigt",
+      },
     },
     enabledToolIds: {
       label: "Aktivierte Tool-IDs",

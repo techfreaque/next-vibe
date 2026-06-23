@@ -10,7 +10,12 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -23,11 +28,6 @@ import {
   clearDirtyFlags,
   updateLiveIndex,
 } from "../../../generators/shared/live-index";
-import {
-  formatCount,
-  formatDuration,
-  formatGenerator,
-} from "../../shared/logger/formatters";
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";

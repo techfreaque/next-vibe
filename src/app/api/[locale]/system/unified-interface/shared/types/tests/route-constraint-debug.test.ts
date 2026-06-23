@@ -150,7 +150,7 @@ type GenericEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string>
+  EndpointEventsMap<string, string>
 >;
 
 type Test6_1_GenericEndpointExtendsAny =
@@ -168,7 +168,7 @@ type SpecificEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string>
+  EndpointEventsMap<string, string>
 >;
 
 type Test6_2_SpecificEndpointExtendsAny =

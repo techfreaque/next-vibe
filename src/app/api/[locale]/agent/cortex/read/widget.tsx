@@ -5,6 +5,7 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -22,7 +23,6 @@ import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";

@@ -12,7 +12,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { InfraT } from "../../i18n";
 import { scaleDeploymentInCluster } from "../../shared/pulumi/app";

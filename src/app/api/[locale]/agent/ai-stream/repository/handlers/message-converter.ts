@@ -16,8 +16,8 @@ import type {
   ErrorResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 

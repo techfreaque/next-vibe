@@ -40,7 +40,7 @@ import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import type { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import {

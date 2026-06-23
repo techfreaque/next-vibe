@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { EmailSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-sending/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 

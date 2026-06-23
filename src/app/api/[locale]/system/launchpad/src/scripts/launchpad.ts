@@ -4,8 +4,8 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";

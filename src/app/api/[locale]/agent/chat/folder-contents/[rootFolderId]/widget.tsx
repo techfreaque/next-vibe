@@ -85,7 +85,10 @@ import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import {
+  NEW_MESSAGE_ID,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";

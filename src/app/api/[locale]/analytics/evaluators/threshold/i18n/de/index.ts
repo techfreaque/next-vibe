@@ -2,6 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    op: { gt: ">", lt: "<", gte: ">=", lte: "<=", eq: "==" },
+  },
   post: {
     title: "Schwellenwert",
     titleShort: "Schwelle",

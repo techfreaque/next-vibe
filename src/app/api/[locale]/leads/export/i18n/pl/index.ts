@@ -203,4 +203,15 @@ export const translations: typeof enTranslations = {
     os: "System Operacyjny",
     referralCode: "Kod Polecający",
   },
+  countries: {
+    global: "Globalny",
+    de: "Niemcy",
+    pl: "Polska",
+    us: "Stany Zjednoczone",
+  },
+  languages: {
+    en: "Angielski",
+    de: "Niemiecki",
+    pl: "Polski",
+  },
 };

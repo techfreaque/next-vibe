@@ -774,4 +774,15 @@ export const translations = {
       description: "The lead has been successfully deleted",
     },
   },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
 };

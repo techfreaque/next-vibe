@@ -25,8 +25,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DefaultFolderId } from "../../config";
-import { ThreadStatus, ThreadStatusOptions } from "../../enum";
+import { DefaultFolderId, rootFolderIdOptions } from "../../config";
+import {
+  ThreadStatus,
+  ThreadStatusOptions,
+  ThreadStreamingState,
+  ThreadStreamingStateDB,
+} from "../../enum";
 import threadsDefinitions from "../definition";
 import { scopedTranslation } from "./i18n";
 
@@ -150,6 +155,7 @@ const { GET } = createEndpoint({
         label: "get.rootFolderId.label" as const,
         description: "get.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       rolesView: responseArrayOptionalField(scopedTranslation, {
@@ -191,6 +197,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.response.thread.published.content" as const,
         schema: z.boolean(),
+      }),
+      streamingState: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.streamingState.content" as const,
+        schema: z.enum(ThreadStreamingStateDB),
+        hidden: true,
       }),
     },
   }),
@@ -273,6 +285,7 @@ const { GET } = createEndpoint({
         rolesModerate: null,
         rolesAdmin: null,
         published: false,
+        streamingState: ThreadStreamingState.IDLE,
       },
     },
   },
@@ -322,6 +335,7 @@ const { PATCH } = createEndpoint({
         label: "patch.rootFolderId.label" as const,
         description: "patch.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
 
@@ -462,6 +476,61 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description",
   },
 
+  // This op owns its `thread-updated` event. `requestFields` carry the edits the
+  // user submitted; `fields: ["updatedAt"]` adds the new timestamp. The client
+  // onEvent merges those into the matching thread in the sidebar list cache;
+  // remoteEvent relays the same edit cross-instance, where the route's
+  // onRemoteEvent re-applies the update. The thread id rides on urlPathParams.
+  events: {
+    "thread-updated": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
+      operation: "merge" as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["title", "folderId", "status", "rootFolderId"] as const,
+      fields: ["updatedAt"] as const,
+      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+        const threadId = urlPathParams.threadId;
+        if (!threadId || !partial.rootFolderId) {
+          return;
+        }
+        const rootFolderId = partial.rootFolderId;
+        const [{ apiClient }, threadsDefinition] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("../definition"),
+        ]);
+        apiClient.updateEndpointData(
+          threadsDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                threads: old.data.threads.map((thread) =>
+                  thread.id === threadId
+                    ? {
+                        ...thread,
+                        title: partial.title ?? thread.title,
+                        folderId: partial.folderId ?? thread.folderId,
+                        status: partial.status ?? thread.status,
+                        updatedAt: partial.updatedAt ?? thread.updatedAt,
+                      }
+                    : thread,
+                ),
+              },
+            };
+          },
+          { requestData: { rootFolderId, subFolderId: null } },
+        );
+        void queryClient;
+      },
+    },
+  },
+
   // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
@@ -539,6 +608,7 @@ const { DELETE } = createEndpoint({
         label: "delete.rootFolderId.label" as const,
         description: "delete.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       folderId: responseField(scopedTranslation, {
@@ -613,6 +683,49 @@ const { DELETE } = createEndpoint({
     description: "delete.success.description",
   },
 
+  // This op owns its `thread-deleted` event. `requestFields: ["rootFolderId"]`
+  // carries the sidebar bucket; the thread id rides on `urlPathParams.threadId`. The
+  // client onEvent removes the thread from the sidebar list cache; remoteEvent
+  // relays the delete cross-instance, where the route's onRemoteEvent removes it.
+  events: {
+    "thread-deleted": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
+      operation: "merge" as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["rootFolderId"] as const,
+      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+        const threadId = urlPathParams.threadId;
+        if (!threadId || !partial.rootFolderId) {
+          return;
+        }
+        const rootFolderId = partial.rootFolderId;
+        const [{ apiClient }, threadsDefinition] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("../definition"),
+        ]);
+        apiClient.updateEndpointData(
+          threadsDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                threads: old.data.threads.filter((t) => t.id !== threadId),
+              },
+            };
+          },
+          { requestData: { rootFolderId, subFolderId: null } },
+        );
+        void queryClient;
+      },
+    },
+  },
+
   // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
@@ -658,6 +771,13 @@ export type ThreadDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type ThreadDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 export type ThreadDeleteUrlParamsTypeOutput =
   typeof DELETE.types.UrlVariablesOutput;
+
+/** Inferred payload of the `thread-updated` event (edits + updatedAt). */
+export type ThreadUpdatedEventPayload =
+  (typeof PATCH.types.EventPayloads)["thread-updated"];
+/** Inferred payload of the `thread-deleted` event (rootFolderId). */
+export type ThreadDeletedEventPayload =
+  (typeof DELETE.types.EventPayloads)["thread-deleted"];
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;

@@ -34,8 +34,6 @@ import { PublicFeedRepository } from "@/app/api/[locale]/agent/chat/public-feed/
 import type { ChatSettingsGetResponseOutput } from "@/app/api/[locale]/agent/chat/settings/definition";
 import { scopedTranslation as settingsScopedTranslation } from "@/app/api/[locale]/agent/chat/settings/i18n";
 import { ChatSettingsRepository } from "@/app/api/[locale]/agent/chat/settings/repository";
-import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import type { MessageListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
 import type { PathGetResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
@@ -46,10 +44,12 @@ import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[thr
 import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/skills/[id]/definition";
+import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";

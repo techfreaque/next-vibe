@@ -141,6 +141,26 @@ const { PATCH } = createEndpoint({
     },
   }),
 
+  // This op owns its `node-written` event. `requestFields` carry the edit the
+  // user submitted; the peer's onRemoteEvent re-runs editFile. Server-only — no
+  // client cache to update, so clientDelivery: false.
+  events: {
+    "node-written": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: [
+        "path",
+        "find",
+        "replace",
+        "startLine",
+        "endLine",
+        "newContent",
+      ] as const,
+      syncDomain: "documents" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "patch.errors.validation.title" as const,

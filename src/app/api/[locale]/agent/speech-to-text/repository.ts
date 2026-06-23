@@ -28,7 +28,7 @@ import {
   type SttModelSelection,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
@@ -40,7 +40,7 @@ import {
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
-import { ModelSelectionType } from "../chat/skills/enum";
+import { ModelSelectionType } from "../skills/enum";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import {
   scopedTranslation as sttScopedTranslation,

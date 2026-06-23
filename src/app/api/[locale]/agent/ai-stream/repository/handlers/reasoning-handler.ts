@@ -3,7 +3,7 @@
  */
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { MessageDbWriter } from "../core/message-db-writer";
 

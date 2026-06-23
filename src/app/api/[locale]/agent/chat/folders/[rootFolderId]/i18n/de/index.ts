@@ -5,6 +5,15 @@ export const translations: typeof enTranslations = {
   tags: {
     folders: "Ordner",
   },
+  enums: {
+    userRole: {
+      public: "Öffentlich",
+      customer: "Kunde",
+      partnerAdmin: "Partner-Administrator",
+      partnerEmployee: "Partner-Mitarbeiter",
+      admin: "Administrator",
+    },
+  },
   widget: {
     config: {
       foldersShort: {

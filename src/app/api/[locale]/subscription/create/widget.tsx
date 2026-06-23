@@ -1,5 +1,6 @@
 "use client";
 
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
@@ -43,7 +44,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

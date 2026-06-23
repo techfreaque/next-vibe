@@ -40,6 +40,8 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { addWindowListener } from "next-vibe-ui/lib/dom";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card } from "next-vibe-ui/ui/card";
@@ -93,7 +95,6 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { addWindowListener, copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, {
   useCallback,
   useEffect,

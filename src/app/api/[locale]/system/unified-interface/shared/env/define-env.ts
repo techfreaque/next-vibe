@@ -133,9 +133,8 @@ function getDecryptedEnv(): NodeJS.ProcessEnv {
   return _decryptedEnv;
 }
 
+import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
 import { defaultLocale } from "@/i18n/core/config";
-
-import { envValidationLogger } from "./validation-logger";
 
 /** Concrete env var value type — all env vars resolve to one of these primitives. */
 export type EnvValue = string | number | boolean | undefined;

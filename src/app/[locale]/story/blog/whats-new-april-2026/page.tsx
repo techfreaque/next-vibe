@@ -9,7 +9,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
+import { getAvailableSkillCount } from "@/app/api/[locale]/agent/skills/config";
 import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";

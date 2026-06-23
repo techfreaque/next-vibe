@@ -3,6 +3,8 @@
 import { success } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils";
+import { getElementById, querySelector } from "next-vibe-ui/lib/dom";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
@@ -17,12 +19,6 @@ import {
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
-import {
-  getCurrentUrl,
-  getElementById,
-  querySelector,
-  silentReplaceState,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -48,15 +44,15 @@ import {
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import characterDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -227,19 +223,27 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   );
 
   // Build FavoriteConfig for public users from localStorage
-  const favoriteConfig = useMemo((): FavoriteConfig | null => {
+  const [favoriteConfig, setFavoriteConfig] = useState<FavoriteConfig | null>(
+    null,
+  );
+  useEffect(() => {
     if (!user.isPublic) {
-      return null;
+      setFavoriteConfig(null);
+      return;
     }
     const activeFavId = effectiveSettings.activeFavoriteId;
     if (!activeFavId) {
-      return null;
+      setFavoriteConfig(null);
+      return;
     }
-    const stored = ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId);
-    if (!stored) {
-      return null;
-    }
-    return ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored);
+    void ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId).then(
+      (stored) =>
+        setFavoriteConfig(
+          stored
+            ? ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored)
+            : null,
+        ),
+    );
   }, [user.isPublic, effectiveSettings.activeFavoriteId]);
 
   // Resolve voiceId from favoriteConfig for TTS playback
@@ -628,11 +632,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
             const resolvedLeaf = data.resolvedLeafMessageId;
             if (resolvedLeaf) {
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                url.searchParams.set("message", resolvedLeaf);
-                window.history.replaceState(null, "", url.toString());
-              }
+              const url = new URL(getCurrentUrl());
+              url.searchParams.set("message", resolvedLeaf);
+              silentReplaceState(url.toString());
               setLeafMessageId(resolvedLeaf);
             }
           }
@@ -713,7 +715,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   );
   // Memoized callback: scroll to message when reference is clicked (flat view)
   const handleFlatMessageClick = useCallback((messageId: string): void => {
-    const element = document.querySelector(
+    const element = querySelector(
       `#${CSS.escape(`${DOM_IDS.MESSAGE_PREFIX}${messageId}`)}`,
     );
     element?.scrollIntoView({
@@ -929,7 +931,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     };
 
     // Observe the messages content div (grows as messages stream in or expand)
-    const content = document.getElementById(DOM_IDS.MESSAGES_CONTENT);
+    const content = getElementById(DOM_IDS.MESSAGES_CONTENT);
     const observer = new ResizeObserver(snapIfSticky);
     if (content) {
       observer.observe(content);

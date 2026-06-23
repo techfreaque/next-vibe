@@ -7,7 +7,7 @@
  * Tests the complete scoped translation system with REAL endpoints:
  * 1. Global keys - NO assertions, just raw strings that should be valid TranslationKey
  * 2. Scoped keys - using actual contact endpoint scopedT
- * 3. Invalid key detection - compile errors when translationsKeyTypesafety = true
+ * 3. Invalid key detection
  * 4. Type inference through the entire chain
  *
  * These are COMPILE-TIME tests - they fail during typecheck if types break.
@@ -412,10 +412,14 @@ testR_fn(testF_scoped, {
 // END PROGRESSIVE TESTS - Run bun check to see where errors appear
 // ============================================================================
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 const genericScopedTranslation = {
   ScopedTranslationKey: "" as string,
-  scopedT: (_locale: CountryLanguage): { t: (key: string) => TranslatedKeyType } => ({
+  scopedT: (
+    _locale: CountryLanguage,
+  ): { t: (key: string) => TranslatedKeyType } => ({
     t: (key: string): TranslatedKeyType => key as TranslatedKeyType,
   }),
 };
@@ -610,20 +614,9 @@ const globalEndpointWithAllErrorTypes = createEndpoint({
 });
 
 // ============================================================================
-// PART 2: GLOBAL KEYS - INVALID USAGE (when translationsKeyTypesafety = true)
+// PART 2: GLOBAL KEYS - INVALID USAGE
 // ============================================================================
 
-/**
- * Test 2: Invalid global keys should cause errors when translationsKeyTypesafety = true
- * When translationsKeyTypesafety = false (default), these compile fine (keys are just strings)
- * When translationsKeyTypesafety = true, these should cause TypeScript errors
- *
- * NOTE: The @ts-expect-error directives below are commented out because they only
- * work when translationsKeyTypesafety = true. When that flag is false (default),
- * any string is accepted for translation keys.
- */
-
-// Invalid title key - only errors when translationsKeyTypesafety = true
 const globalEndpointInvalidTitle = createEndpoint({
   scopedTranslation: genericScopedTranslation,
   method: Methods.POST,
@@ -650,7 +643,7 @@ const globalEndpointInvalidTitle = createEndpoint({
   },
 });
 
-// Invalid widget label - using requestField so error appears at the label property.
+// Invalid widget label — DistributiveOmit fix preserves NoInfer<TKey> on label, so this errors.
 const globalEndpointInvalidWidgetLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -671,6 +664,7 @@ const globalEndpointInvalidWidgetLabel = createEndpoint({
       name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        // @ts-expect-error - Invalid field label key
         label: "invalid.widget.label.does.not.exist",
         columns: 12,
         schema: z.string(),
@@ -1057,10 +1051,9 @@ const scopedEndpointInvalidSuccessDescription = createEndpoint({
 // PART 5: FIELD WIDGET TRANSLATION KEY TESTS
 // ============================================================================
 
-// Invalid TEXT field label key
-// NOTE: requestField does NOT enforce translation key validation at the property level.
-// Invalid label keys in requestField do not produce compile errors here.
-// Use requestField to get property-level key validation (see Test 6A).
+// Invalid TEXT field label key — uses genericST (ScopedTranslationKey: string), so no type error.
+// This tests that when a generic string type is passed, keys are unconstrained.
+// When typed scopedTranslation is passed instead, the invalid key errors (see scopedEndpointInvalidEmailFieldLabel).
 const scopedEndpointInvalidTextFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1129,9 +1122,7 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
   },
 });
 
-// Invalid TEXT field placeholder key
-// Note: With scoped field utilities, field-level key validation is NOT done at compile time.
-// Use objectField and requestField for scoped contexts.
+// Invalid TEXT field placeholder key — uses scopedTranslation, so invalid key errors at property level.
 const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1168,8 +1159,7 @@ const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   },
 });
 
-// Invalid EMAIL field label key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid EMAIL field label key — DistributiveOmit preserves NoInfer<TKey> on label.
 const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1190,6 +1180,7 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
       email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
+        // @ts-expect-error - Invalid email field label key
         label: "invalid.email.field.label.key",
         columns: 12,
         schema: z.string().email(),
@@ -1206,8 +1197,7 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
   },
 });
 
-// Invalid TEXTAREA field description key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid TEXTAREA field description key — DistributiveOmit preserves NoInfer<TKey> on description.
 const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1229,6 +1219,7 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.message.label",
+        // @ts-expect-error - Invalid textarea field description key
         description: "invalid.textarea.field.description.key",
         columns: 12,
         schema: z.string(),
@@ -1245,8 +1236,7 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
   },
 });
 
-// Invalid PASSWORD field helpText key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid PASSWORD field helpText key — DistributiveOmit preserves NoInfer<TKey> on helpText.
 const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1268,6 +1258,7 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "form.fields.name.label",
+        // @ts-expect-error - Invalid password field helpText key
         helpText: "invalid.password.field.helptext.key",
         columns: 12,
         schema: z.string(),
@@ -1284,8 +1275,7 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
   },
 });
 
-// Invalid SELECT field option label key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid SELECT field option label key — DistributiveOmit preserves NoInfer<TKey> on option labels.
 const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1307,8 +1297,8 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.name.label",
-        // NOTE: option labels in requestField are NOT validated at the property level.
         options: [
+          // @ts-expect-error - Invalid select option label key
           { label: "invalid.select.option.label.key", value: "active" },
         ],
         columns: 12,
@@ -1370,8 +1360,7 @@ const scopedEndpointInvalidContainerDescription = objectField(
   },
 );
 
-// Invalid NUMBER field label key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid NUMBER field label key — DistributiveOmit preserves NoInfer<TKey> on label.
 const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1392,6 +1381,7 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
       amount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
+        // @ts-expect-error - Invalid number field label key
         label: "invalid.number.field.label.key",
         columns: 12,
         schema: z.number(),
@@ -1406,8 +1396,7 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
   },
 });
 
-// Invalid BOOLEAN field label key
-// Note: Field-level validation not done at compile time for scoped contexts
+// Invalid BOOLEAN field label key — DistributiveOmit preserves NoInfer<TKey> on label.
 const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1428,6 +1417,7 @@ const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
       active: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
+        // @ts-expect-error - Invalid boolean field label key
         label: "invalid.boolean.field.label.key",
         columns: 12,
         schema: z.boolean(),
@@ -1462,7 +1452,6 @@ const scopedEndpointInvalidDateFieldLabel = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      // NOTE: requestField does NOT enforce key validation at the property level.
       date: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
@@ -1482,7 +1471,7 @@ const scopedEndpointInvalidDateFieldLabel = createEndpoint({
   },
 });
 
-// Invalid MULTISELECT field option label key
+// Invalid MULTISELECT field option label key — DistributiveOmit preserves NoInfer<TKey> on option labels.
 const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1504,8 +1493,8 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "form.fields.name.label",
-        // NOTE: option labels in requestField are NOT validated at the property level.
         options: [
+          // @ts-expect-error - Invalid multiselect option label key
           { label: "invalid.multiselect.option.label.key", value: "admin" },
         ],
         columns: 12,
@@ -1528,25 +1517,17 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
 // ============================================================================
 
 /**
- * ROOT CAUSE: Field helper functions don't know what TKey type to validate against!
- *
- * Current flow:
- * 1. requestField accepts WidgetConfig<string> - any string is valid
- * 2. It infers TKey from the widget config's keys
- * 3. Returns PrimitiveField<..., TKey, ...>
- * 4. When passed to createEndpoint, it validates TKey extends TScopedTranslationKey
- * 5. ERROR appears at fields assignment, NOT at the label property
- *
- * Problem: By the time we validate against TScopedTranslationKey, the widget config
- * has already been created with an invalid key.
- *
- * Solution needed: Field helpers need to receive TKey as a constrained type parameter
- * so the widget config validates WHEN IT'S CREATED.
+ * Field helpers take scopedTranslation as the first arg to constrain TKey.
+ * When a typed scopedTranslation is passed (ScopedTranslationKey is a literal union),
+ * invalid keys error at the property level (label, description, placeholder, helpText, option labels).
+ * When genericST is passed (ScopedTranslationKey: string), any key is accepted.
  */
 
 // ---------------------------------------------------------------------------
 // Test 6A: Scoped field helpers validate against scopedTranslation.ScopedTranslationKey
-// Pass scopedTranslation as first arg to enable validation
+// Pass scopedTranslation as first arg. DistributiveOmit preserves NoInfer<TKey> on ALL
+// key-bearing properties (label, placeholder, description, helpText, option labels).
+// Invalid key on ANY property errors at that property's level.
 // ---------------------------------------------------------------------------
 const test6A_validField = requestField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
@@ -1559,42 +1540,41 @@ const test6A_validField = requestField(scopedTranslation, {
 const test6A_invalidField = requestField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
+  label: "form.fields.name.label",
+  // @ts-expect-error - Invalid placeholder key
+  placeholder: "invalid.key",
+  columns: 12,
+  schema: z.string(),
+});
+
+// ---------------------------------------------------------------------------
+// Test 6B: No validation when using genericST (ScopedTranslationKey: string)
+// Both valid and invalid keys are accepted because the key type is `string`
+// ---------------------------------------------------------------------------
+const test6B_validField = requestField(genericST, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXT,
+  label: "form.fields.name.label",
+  columns: 12,
+  schema: z.string(),
+});
+
+// genericST has ScopedTranslationKey: string, so any key is valid — no error expected.
+const test6B_invalidField = requestField(genericST, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXT,
   label: "invalid.key",
   columns: 12,
   schema: z.string(),
 });
 
 // ---------------------------------------------------------------------------
-// Test 6B: Validation happens when assigning to constrained type
-// When we try to assign a field to UnifiedField<ContactTranslationKey>,
-// TypeScript validates that the field's TKey matches ContactTranslationKey
-// ---------------------------------------------------------------------------
-const test6B_validField = requestField(genericST, {
-  type: WidgetType.FORM_FIELD,
-  fieldType: FieldDataType.TEXT,
-  label: "form.fields.name.label", // Valid key
-  columns: 12,
-  schema: z.string(),
-});
-
-// NOTE: requestField does NOT enforce translation key validation at the property level.
-// The label "invalid.key" does not produce a compile error here - no @ts-expect-error needed.
-const test6B_invalidField = requestField(genericST, {
-  type: WidgetType.FORM_FIELD,
-  fieldType: FieldDataType.TEXT,
-  label: "invalid.key", // requestField does not validate this key at property level
-  columns: 12,
-  schema: z.string(),
-});
-
-// ---------------------------------------------------------------------------
-// Test 6C: objectField validation
-// objectField uses global TranslationKey - container title must be a global key.
-// "form.label" is a scoped contact key, NOT a global key - use a global key here.
+// Test 6C: No validation when using genericST
+// Both valid and invalid keys accepted — key type is string
 // ---------------------------------------------------------------------------
 const test6C_validObject = objectField(genericST, {
   type: WidgetType.CONTAINER,
-  title: "app.common.active", // Valid global key
+  title: "app.common.active",
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { request: "data", response: true },
@@ -1602,18 +1582,17 @@ const test6C_validObject = objectField(genericST, {
     name: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "app.common.filter", // Valid global key
+      label: "app.common.filter",
       columns: 12,
       schema: z.string(),
     }),
   },
 });
 
-// NOTE: requestField does NOT enforce key validation at the property level inside objectField either.
-// Child label keys in requestField are not validated - no @ts-expect-error needed.
+// genericST has ScopedTranslationKey: string, so any key is valid — no error expected.
 const test6C_invalidObject = objectField(genericST, {
   type: WidgetType.CONTAINER,
-  title: "app.common.active", // Valid global key
+  title: "app.common.active",
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { request: "data", response: true },
@@ -1621,9 +1600,22 @@ const test6C_invalidObject = objectField(genericST, {
     name: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "bad.invalid.key.xyz", // requestField does not validate this at property level
+      label: "bad.invalid.key.xyz",
       columns: 12,
       schema: z.string(),
     }),
   },
+});
+
+// ---------------------------------------------------------------------------
+// TEST NoInfer verification: invalid label with typed scopedTranslation
+// DistributiveOmit fix: label NOW constrains TKey via NoInfer<TKey> — invalid label errors.
+// ---------------------------------------------------------------------------
+const _testLabelErrors = requestField(scopedTranslation, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXT,
+  // @ts-expect-error - DistributiveOmit fix: invalid label now errors (NoInfer<TKey> preserved)
+  label: "invalid.label.testing",
+  columns: 12,
+  schema: z.string(),
 });

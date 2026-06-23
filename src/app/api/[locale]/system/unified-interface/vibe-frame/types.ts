@@ -447,19 +447,8 @@ export interface VibeFrameGlobalConfig {
 // Mirrors widget-engine WidgetEngineContext pattern exactly.
 
 declare global {
-  interface Window {
-    /**
-     * Declarative config set by the host page before loading the script.
-     * After init the property is replaced by a getter/setter backed by
-     * the internal config signal, so mutations stay reactive.
-     */
-    vibeFrameConfig?: VibeFrameGlobalConfig;
-    /**
-     * The public VibeFrame API exposed for imperative use after the script loads.
-     * Also available as `import { VibeFrame } from "next-vibe/vibe-frame"`.
-     */
-    VibeFrame?: VibeFramePublicAPI;
-  }
+  var vibeFrameConfig: VibeFrameGlobalConfig | undefined;
+  var VibeFrame: VibeFramePublicAPI | undefined;
 }
 
 /** Shape of the public VibeFrame API exposed on window */

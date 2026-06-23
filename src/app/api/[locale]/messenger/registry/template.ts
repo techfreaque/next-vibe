@@ -9,8 +9,8 @@ import type {
 import type { JSX, ReactElement } from "react";
 import type { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";

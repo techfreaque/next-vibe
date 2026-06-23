@@ -6,7 +6,8 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+
 import type {
   PackageJson,
   ReleaseConfig,

@@ -25,9 +25,6 @@ import {
   type VideoVisionModelId,
   type VideoVisionModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
-import type { SkillVariant } from "@/app/api/[locale]/agent/chat/skills/config";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
@@ -42,6 +39,9 @@ import {
   type MusicGenModelOption,
   type MusicGenModelSelection,
 } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SkillVariant } from "@/app/api/[locale]/agent/skills/config";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
+import type { ChatFavorite } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import {
   getBestSttModel,

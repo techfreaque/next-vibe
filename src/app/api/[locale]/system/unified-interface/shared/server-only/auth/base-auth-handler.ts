@@ -3,10 +3,10 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
 
 /**

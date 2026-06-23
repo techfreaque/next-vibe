@@ -8,12 +8,12 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
 import type { IDefinitionsRegistry } from "../../shared/endpoints/definitions/registry";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { MCPRegistry } from "../registry";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";

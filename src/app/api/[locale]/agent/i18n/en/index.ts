@@ -2028,6 +2028,12 @@ export const translations = {
         action: {
           label: "Action",
           description: "Action to perform (start/stop/toggle)",
+          options: {
+            start: "Start",
+            stop: "Stop",
+            toggle: "Toggle",
+            status: "Status",
+          },
         },
         provider: {
           label: "Provider",

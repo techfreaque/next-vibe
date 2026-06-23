@@ -63,12 +63,6 @@ export const translations: typeof enTranslations = {
       label: "ID leada",
       description: "ID leada zdalnej instancji (ustawiane automatycznie)",
     },
-    transportMode: {
-      label: "Tryb transportu",
-      description:
-        "Sposób komunikacji tej instancji ze zdalną. reverse-ws: stałe połączenie wychodzące (zalecane). ws-provider: zdalna instancja obsługuje pętlę wnioskowania AI.",
-      default: "reverse-ws (domyślny)",
-    },
     isInferenceProvider: {
       label: "Użyj jako dostawca wnioskowania",
       description:
@@ -77,15 +71,7 @@ export const translations: typeof enTranslations = {
     syncScope: {
       label: "Zakres synchronizacji",
       description: "Które dane są synchronizowane przez to połączenie.",
-      memories: "Wspomnienia",
-      documents: "Dokumenty",
-      skills: "Umiejętności",
-      favorites: "Ulubione",
-      threads: "Wątki",
-      chat: "Chat",
-      defaultNote: "Domyślnie wszystko wyłączone. Włącz po połączeniu.",
     },
-    advancedSettings: "Ustawienia zaawansowane",
     credentialWarning:
       "Twoje dane logowania trafiają bezpośrednio z przeglądarki do serwera zdalnego. Jednak token przechowywany tutaj daje operatorowi tego serwera pełny dostęp do twojego zdalnego konta - może robić wszystko co ty. Łącz się tylko na serwerach, którym w pełni ufasz.",
     actions: {

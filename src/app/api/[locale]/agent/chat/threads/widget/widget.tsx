@@ -78,6 +78,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 
 import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
+import { ThreadStreamingState } from "../../enum";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
@@ -120,7 +121,7 @@ function ThreadRow({
   const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
-  const isThreadStreaming = thread.streamingState !== "idle";
+  const isThreadStreaming = thread.streamingState !== ThreadStreamingState.IDLE;
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);

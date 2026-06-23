@@ -23,10 +23,10 @@ import type { SearchBarWidgetConfig } from "next-vibe-ui/unified/interactive/sea
 import type { SubmitButtonWidgetConfig } from "next-vibe-ui/unified/interactive/submit-button/types";
 import { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { EndpointLogger } from "../logger/endpoint";
 import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
@@ -1169,9 +1169,9 @@ export function generateResponseSchema<F>(
 export function widgetField<
   TScopedTranslation extends ScopedTranslationType,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends Omit<
+  const TUIConfig extends DistributiveOmit<
     DisplayOnlyWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TUsage,
       "widget"
     >,
@@ -1202,12 +1202,12 @@ interface ScopedTranslationType<TKey extends string = string> {
 export function arrayField<
   TScopedTranslation extends ScopedTranslationType,
   TChild extends AnyChildrenConstrain<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<TUsage>
   >,
   TUsage extends FieldUsageConfig,
   const TUIConfig extends ArrayWidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     TUsage,
     "array",
     TChild
@@ -1238,12 +1238,12 @@ export function objectOptionalField<
   TScopedTranslation extends ScopedTranslationType,
   TFieldUsageConfig extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<TFieldUsageConfig>
   >,
-  const TUIConfig extends Omit<
+  const TUIConfig extends DistributiveOmit<
     ObjectWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TFieldUsageConfig,
       "object-optional",
       TChildren
@@ -1271,12 +1271,12 @@ export function objectUnionField<
   TUsage extends FieldUsageConfig,
   TDiscriminator extends string,
   const TVariants extends UnionObjectWidgetConfigConstrain<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<TUsage>
   >,
-  const TUIConfig extends Omit<
+  const TUIConfig extends DistributiveOmit<
     ObjectUnionWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TUsage,
       TVariants
     >,
@@ -1310,12 +1310,12 @@ export function objectUnionField<
 export function requestDataArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType,
   TChild extends ArrayChildConstraint<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >,
-  const TUIConfig extends Omit<
+  const TUIConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       { request: "data"; response?: never },
       "array-optional",
       TChild
@@ -1345,6 +1345,16 @@ export function requestDataArrayOptionalField<
 // ============================================================================
 
 /**
+ * Distributive Omit — distributes over union members rather than collapsing the union.
+ * Required for preserving translation key constraints through Omit<FormFieldWidgetConfig, ...>.
+ * Regular Omit<UnionType, Keys> merges all union members into an intersection, losing
+ * the per-member NoInfer<TKey> constraints on label/placeholder/description/helpText.
+ */
+type DistributiveOmit<T, K extends PropertyKey> = T extends T
+  ? Omit<T, K>
+  : never;
+
+/**
  * Scoped request field creator
  * Used with scoped translations for type-safe translation keys
  * Accepts all form field widgets - type safety is enforced by individual widget configs
@@ -1352,9 +1362,9 @@ export function requestDataArrayOptionalField<
 export function requestField<
   TScopedTranslation extends ScopedTranslationType,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request: "data"; response?: never }
     >,
@@ -1384,9 +1394,9 @@ export function requestField<
 export function searchBarField<
   TScopedTranslation extends ScopedTranslationType,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     SearchBarWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request: "data"; response?: never },
       "primitive"
@@ -1417,9 +1427,9 @@ export function searchBarField<
 export function responseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     RequestResponseWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request?: never; response: true },
       "primitive"
@@ -1448,9 +1458,9 @@ export function responseField<
 export function requestResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request: "data" }
     >,
@@ -1478,9 +1488,9 @@ export function requestResponseField<
 export function requestUrlPathParamsField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request: "urlPathParams"; response?: never }
     >,
@@ -1508,9 +1518,9 @@ export function requestUrlPathParamsField<
 export function requestUrlPathParamsResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TSchema,
       { request: "urlPathParams" }
     >,
@@ -1540,12 +1550,12 @@ export function requestUrlPathParamsResponseField<
 export function responseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       { request?: never; response: true },
       "array-optional",
       TChild
@@ -1579,13 +1589,13 @@ export function responseArrayOptionalField<
 export function objectField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TUsage extends FieldUsageConfig,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     ObjectWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       TUsage,
       "object",
       ObjectChildrenConstraint<
-        TScopedTranslation["ScopedTranslationKey"],
+        NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
         FieldUsageConfig
       >
     >,
@@ -1608,12 +1618,12 @@ export function objectField<
 export function responseArrayField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       { request?: never; response: true },
       "array",
       TChild
@@ -1641,12 +1651,12 @@ export function responseArrayField<
 export function requestDataArrayField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    TScopedTranslation["ScopedTranslationKey"],
+    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >,
-  const TConfig extends Omit<
+  const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
       { request: "data"; response?: never },
       "array",
       TChild

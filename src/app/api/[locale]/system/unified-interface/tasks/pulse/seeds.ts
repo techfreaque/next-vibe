@@ -15,7 +15,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { PulseExecutionStatus } from "../enum";
 import { pulseExecutions } from "./db";

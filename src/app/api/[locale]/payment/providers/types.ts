@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type Stripe from "stripe";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
 import type { ProductIds } from "../../products/repository-client";

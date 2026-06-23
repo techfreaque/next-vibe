@@ -1,0 +1,207 @@
+/**
+ * Favorites Database Schema
+ * Database tables for user favorites (character + model settings combos)
+ */
+
+import { relations } from "drizzle-orm";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import type {
+  AudioVisionModelSelection,
+  ImageVisionModelSelection,
+  VideoVisionModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { users } from "@/app/api/[locale]/user/db";
+
+import type { ToolConfigItem } from "../../chat/settings/definition";
+
+/**
+ * Favorites Table
+ * Stores user favorites (character + model settings combos)
+ * Users can have multiple favorites for the same character with different settings
+ * skillId can be null for model-only setups
+ */
+export const chatFavorites = pgTable(
+  "chat_favorites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Human-readable slug (unique per user, auto-generated from skill+variant or customVariantName)
+    slug: text("slug").notNull().default(""),
+
+    // Owner
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    // Skill reference
+    // Note: DB column is "character_id", mapped to skillId in code
+    skillId: text("character_id").notNull(),
+
+    // Variant reference - null means "no variant / skill default"
+    variantId: text("variant_id"),
+
+    // Custom variant display name (overrides skill variant's default name)
+    customVariantName: text("custom_variant_name"),
+
+    // Custom icon (emoji or icon identifier)
+    customIcon: text("custom_icon").$type<IconKey>(),
+
+    // Voice model selection (null = cascade to skill → user settings → system default)
+    voiceModelSelection: jsonb(
+      "voice_model_selection",
+    ).$type<VoiceModelSelection>(),
+
+    // STT model selection (null = cascade to user settings → system default)
+    sttModelSelection: jsonb("stt_model_selection").$type<SttModelSelection>(),
+
+    // Vision model selections per modality (null = cascade to user settings → system default)
+    imageVisionModelSelection: jsonb(
+      "image_vision_model_selection",
+    ).$type<ImageVisionModelSelection>(),
+    videoVisionModelSelection: jsonb(
+      "video_vision_model_selection",
+    ).$type<VideoVisionModelSelection>(),
+    audioVisionModelSelection: jsonb(
+      "audio_vision_model_selection",
+    ).$type<AudioVisionModelSelection>(),
+
+    // Image/music/video gen model selections (null = cascade to skill → user settings → system default)
+    imageGenModelSelection: jsonb(
+      "image_gen_model_selection",
+    ).$type<ImageGenModelSelection>(),
+    musicGenModelSelection: jsonb(
+      "music_gen_model_selection",
+    ).$type<MusicGenModelSelection>(),
+    videoGenModelSelection: jsonb(
+      "video_gen_model_selection",
+    ).$type<VideoGenModelSelection>(),
+
+    // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
+    modelSelection: jsonb("model_selection").$type<ChatModelSelection>(),
+    position: integer("position").notNull(),
+    color: text("color"),
+
+    // Auto-compacting token threshold (null = fall through to character/settings default)
+    compactTrigger: integer("compact_trigger"),
+
+    // Memory budget in chars (null = inherit from skill → user settings; overrides for this favorite)
+    memoryLimit: integer("memory_limit"),
+
+    // Tool configuration - null = fall through to character/settings default
+    availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+    pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
+    // Additional tool blocks on top of skill defaults
+    deniedTools: jsonb("denied_tools").$type<ToolConfigItem[] | null>(),
+
+    // User-level prompt customization - appended to skill's systemPrompt
+    promptAppend: text("prompt_append"),
+
+    // Sub-agent favorite override: which favorite config sub-agents spawned by this favorite inherit
+    // null = task isolation (sub-agents get skill systemPrompt + companionPrompt only, no user favorites)
+    // set = sub-agents inherit that favorite's model + tool config (power-user override)
+    subAgentFavoriteId: uuid("sub_agent_favorite_id"),
+
+    // Usage stats
+    useCount: integer("use_count").default(0).notNull(),
+    lastUsedAt: timestamp("last_used_at"),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userSlugIdx: unique("chat_favorites_user_slug_idx").on(
+      table.userId,
+      table.slug,
+    ),
+  }),
+);
+
+/**
+ * Relations
+ */
+export const chatFavoritesRelations = relations(chatFavorites, ({ one }) => ({
+  user: one(users, {
+    fields: [chatFavorites.userId],
+    references: [users.id],
+  }),
+}));
+
+/**
+ * Schema for selecting favorites
+ */
+export const selectChatFavoriteSchema = createSelectSchema(chatFavorites, {
+  customIcon: iconSchema.nullable(),
+});
+
+/**
+ * Schema for inserting favorites
+ */
+export const insertChatFavoriteSchema = createInsertSchema(chatFavorites, {
+  customIcon: iconSchema.nullable(),
+});
+
+export type ChatFavorite = typeof chatFavorites.$inferSelect;
+export type NewChatFavorite = typeof chatFavorites.$inferInsert;
+
+/**
+ * Config subset of ChatFavorite - everything the server needs for cascade resolution.
+ */
+export type FavoriteConfig = Pick<
+  ChatFavorite,
+  | "id"
+  | "skillId"
+  | "modelSelection"
+  | "voiceModelSelection"
+  | "sttModelSelection"
+  | "imageVisionModelSelection"
+  | "videoVisionModelSelection"
+  | "audioVisionModelSelection"
+  | "imageGenModelSelection"
+  | "musicGenModelSelection"
+  | "videoGenModelSelection"
+  | "availableTools"
+  | "pinnedTools"
+  | "deniedTools"
+  | "compactTrigger"
+  | "memoryLimit"
+  | "promptAppend"
+>;
+
+export const FAVORITE_CONFIG_COLUMNS = {
+  id: chatFavorites.id,
+  skillId: chatFavorites.skillId,
+  modelSelection: chatFavorites.modelSelection,
+  voiceModelSelection: chatFavorites.voiceModelSelection,
+  sttModelSelection: chatFavorites.sttModelSelection,
+  imageVisionModelSelection: chatFavorites.imageVisionModelSelection,
+  videoVisionModelSelection: chatFavorites.videoVisionModelSelection,
+  audioVisionModelSelection: chatFavorites.audioVisionModelSelection,
+  imageGenModelSelection: chatFavorites.imageGenModelSelection,
+  musicGenModelSelection: chatFavorites.musicGenModelSelection,
+  videoGenModelSelection: chatFavorites.videoGenModelSelection,
+  availableTools: chatFavorites.availableTools,
+  pinnedTools: chatFavorites.pinnedTools,
+  deniedTools: chatFavorites.deniedTools,
+  compactTrigger: chatFavorites.compactTrigger,
+  memoryLimit: chatFavorites.memoryLimit,
+  promptAppend: chatFavorites.promptAppend,
+} as const;

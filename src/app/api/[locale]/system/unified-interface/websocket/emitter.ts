@@ -11,10 +11,9 @@
 
 import "server-only";
 
-import type { z } from "zod";
-
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,

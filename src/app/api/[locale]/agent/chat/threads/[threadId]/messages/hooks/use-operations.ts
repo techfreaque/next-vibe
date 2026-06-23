@@ -18,9 +18,9 @@ import { answerAsAI as answerAsAIOp } from "@/app/api/[locale]/agent/ai-stream/s
 import { branchMessage as branchMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/branch-message";
 import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/retry-message";
 import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 

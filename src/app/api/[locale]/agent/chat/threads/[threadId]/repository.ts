@@ -15,10 +15,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../db";
 import {
@@ -26,12 +26,13 @@ import {
   canUpdateThread,
   canViewThread,
 } from "../../permissions/permissions";
-import threadsDefinitions from "../definition";
-import type {
-  ThreadDeleteResponseOutput,
-  ThreadGetResponseOutput,
-  ThreadPatchRequestOutput,
-  ThreadPatchResponseOutput,
+import threadsByIdDefinitions, {
+  type ThreadDeletedEventPayload,
+  type ThreadDeleteResponseOutput,
+  type ThreadGetResponseOutput,
+  type ThreadPatchRequestOutput,
+  type ThreadPatchResponseOutput,
+  type ThreadUpdatedEventPayload,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -114,6 +115,7 @@ export class ThreadByIdRepository {
         rolesModerate: thread.rolesModerate,
         rolesAdmin: thread.rolesAdmin,
         published: thread.published,
+        streamingState: thread.streamingState ?? null,
       });
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
@@ -134,6 +136,7 @@ export class ThreadByIdRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    relayed: boolean,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -203,25 +206,21 @@ export class ThreadByIdRepository {
         threadId: updatedThread.id,
       });
 
-      // Emit WS events so all open tabs update the thread in their lists immediately
-      const emitThreads = createEndpointEmitter(
-        threadsDefinitions.GET,
-        logger,
-        user,
-      );
-      emitThreads("thread-updated", {
-        threads: [
-          {
-            id: updatedThread.id,
-            title: updatedThread.title,
-            folderId: updatedThread.folderId,
-            status: updatedThread.status,
-            preview: updatedThread.preview,
-            rootFolderId: updatedThread.rootFolderId,
-            updatedAt: updatedThread.updatedAt,
-          },
-        ],
-      });
+      // This op owns its `thread-updated` event: the edits the user submitted
+      // (requestFields) + updatedAt. The client onEvent merges them into the
+      // sidebar list cache; cross-instance (remoteEvent) the peer re-applies the
+      // update. Suppressed when applying a relayed edit (avoids re-relay ping-pong).
+      if (!relayed) {
+        createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+          threadId: updatedThread.id,
+        })("thread-updated", {
+          title: updatedThread.title,
+          folderId: updatedThread.folderId,
+          status: updatedThread.status,
+          rootFolderId: updatedThread.rootFolderId,
+          updatedAt: updatedThread.updatedAt,
+        });
+      }
       if (updatedThread.rootFolderId) {
         const { default: folderContentsDefinitions } =
           await import("../../folder-contents/[rootFolderId]/definition");
@@ -267,6 +266,7 @@ export class ThreadByIdRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    relayed: boolean,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -380,12 +380,15 @@ export class ThreadByIdRepository {
       })();
 
       // Emit WS events so all open tabs remove the thread from their lists immediately
-      const emitThreads = createEndpointEmitter(
-        threadsDefinitions.GET,
-        logger,
-        user,
-      );
-      emitThreads("thread-deleted", { threads: [{ id: threadId }] });
+      // This op owns its `thread-deleted` event: the rootFolderId bucket
+      // (requestFields); the thread id rides on urlPathParams. The client onEvent
+      // removes it from the sidebar list cache; cross-instance (remoteEvent) the
+      // peer re-applies the delete. Suppressed when applying a relayed delete.
+      if (!relayed && deletedThread.rootFolderId) {
+        createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
+          threadId,
+        })("thread-deleted", { rootFolderId: deletedThread.rootFolderId });
+      }
       if (deletedThread.rootFolderId) {
         const { default: folderContentsDefinitions } =
           await import("../../folder-contents/[rootFolderId]/definition");
@@ -414,6 +417,59 @@ export class ThreadByIdRepository {
         message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `thread-updated`: re-run the update on this
+   * instance with the relayed edits. Reuses updateThread with relayed: true so the
+   * event is not relayed back. The thread id rides on the event's urlPathParams.
+   */
+  static async applyRemoteThreadUpdate(
+    payload: ThreadUpdatedEventPayload,
+    threadId: string,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const { updatedAt: _updatedAt, ...data } = payload;
+    void _updatedAt;
+    const result = await this.updateThread(
+      data,
+      threadId,
+      user,
+      defaultLocale,
+      logger,
+      true,
+    );
+    if (!result.success) {
+      logger.error("Failed to apply remote thread update", {
+        message: result.message,
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `thread-deleted`: re-run the delete on this
+   * instance. Reuses deleteThread with relayed: true. The id rides on urlPathParams.
+   */
+  static async applyRemoteThreadDelete(
+    payload: ThreadDeletedEventPayload,
+    threadId: string,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    void payload;
+    const result = await this.deleteThread(
+      threadId,
+      user,
+      defaultLocale,
+      logger,
+      true,
+    );
+    if (!result.success) {
+      logger.error("Failed to apply remote thread delete", {
+        message: result.message,
       });
     }
   }

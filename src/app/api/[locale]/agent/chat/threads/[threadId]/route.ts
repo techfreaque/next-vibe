@@ -31,6 +31,15 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         locale,
         logger,
       ),
+    onRemoteEvent: {
+      "thread-updated": (payload, ctx) =>
+        ThreadByIdRepository.applyRemoteThreadUpdate(
+          payload,
+          ctx.urlPathParams.threadId,
+          ctx.user,
+          ctx.logger,
+        ),
+    },
   },
   [Methods.DELETE]: {
     email: undefined,
@@ -41,5 +50,14 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         locale,
         logger,
       ),
+    onRemoteEvent: {
+      "thread-deleted": (payload, ctx) =>
+        ThreadByIdRepository.applyRemoteThreadDelete(
+          payload,
+          ctx.urlPathParams.threadId,
+          ctx.user,
+          ctx.logger,
+        ),
+    },
   },
 });

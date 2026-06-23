@@ -27,7 +27,8 @@ import {
   getDefaultToolIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { invalidateUnbottledCache } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import loginEndpoints, {
@@ -41,10 +42,9 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import registerEndpoints from "../connect-reverse/definition";
 import { remoteConnections, SyncScopeSchema } from "../db";
-import registerEndpoints from "../register/definition";
 import { RemoteConnectionRepository } from "../repository";
-import { invalidateUnbottledCache } from "../transport";
 import type {
   RemoteConnectPostRequestInput,
   RemoteConnectPostResponseOutput,

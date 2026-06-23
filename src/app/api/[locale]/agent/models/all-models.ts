@@ -16,7 +16,6 @@ import {
   type ImageVisionModelOption,
   type VideoVisionModelOption,
 } from "../ai-stream/vision-models";
-import { ContentLevel } from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import {
   imageGenModelDefinitions,
@@ -26,6 +25,7 @@ import {
   musicGenModelDefinitions,
   musicGenModelOptions,
 } from "../music-generation/models";
+import { ContentLevel } from "../skills/enum";
 import { sttModelDefinitions, sttModelOptions } from "../speech-to-text/models";
 import { ttsModelDefinitions, ttsModelOptions } from "../text-to-speech/models";
 import {

@@ -924,6 +924,14 @@ export const translations: typeof enTranslations = {
           description: "URL do zaÅadowania na nowej stronie",
           placeholder: "WprowadÅº URL",
         },
+        replacePage: {
+          label: "Zastąp stronę",
+          description: "Zamknij istniejące strony przed otwarciem nowej",
+        },
+        background: {
+          label: "Tło",
+          description: "Otwórz stronę bez przenoszenia na pierwszy plan",
+        },
         timeout: {
           label: "Limit czasu",
           description:

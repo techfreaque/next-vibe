@@ -11,7 +11,7 @@ import {
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

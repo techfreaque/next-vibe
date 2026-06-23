@@ -4,7 +4,8 @@
  * One shared chrome-devtools-mcp process per Bun server instance.
  * Session ID = String(process.pid) - stable for the server lifetime, unique per instance.
  *
- * A session owns N Chrome tabs (pages). `new_page` accumulates pages, `close_page`
+ * A session owns N Chrome tabs (pages). `new_page` replaces the session's pages by default
+ * (replacePage=true), or accumulates when replacePage=false. `close_page`
  * removes the active page and falls back to a remaining one, `select_page` switches
  * the active page within the session. CDP target IDs are stable across MCP restarts;
  * MCP integer page IDs reset on each restart and are re-resolved from CDP targets.
@@ -32,7 +33,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -924,12 +925,39 @@ export class BrowserRepository {
         const isNewPage = mcpToolName === "new_page";
         const isClosePage = mcpToolName === "close_page";
 
-        // ── new_page: its own session initializer. Accumulates pages. ──────
+        // ── new_page: its own session initializer. ──────────────────────────
+        // replacePage=true (default): close all existing session pages first,
+        // then open a fresh one — one tab per session.
+        // replacePage=false: accumulate pages (add another tab regardless).
+        // Either way, other sessions are never touched.
         if (isNewPage) {
           const url =
             typeof parsedArgs["url"] === "string"
               ? parsedArgs["url"]
               : "about:blank";
+          const replacePage = parsedArgs["replacePage"] !== false;
+
+          if (replacePage) {
+            const existing = sessions.get(sessionId);
+            if (existing && existing.pages.length > 0) {
+              const cdpTargets = await listCDPTargets();
+              const alivePages = await reconcilePages(
+                existing,
+                mcp,
+                cdpTargets,
+              );
+              for (const p of alivePages) {
+                await closeCDPTab(p.cdpTargetId);
+              }
+              sessions.delete(sessionId);
+              saveSessions(sessions);
+              logger.info(
+                "[Browser] replacePage=true: closed existing session pages",
+                { sessionId, count: alivePages.length },
+              );
+            }
+          }
+
           const page = await openPage(sessionId, url, mcp, logger);
           if (!page) {
             return fail({

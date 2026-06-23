@@ -9,10 +9,11 @@ import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import { enableMcpSilentMode } from "@/app/api/[locale]/system/logger/debug";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
-import { enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -25,7 +26,6 @@ import {
   DefinitionsRegistry,
   type IDefinitionsRegistry,
 } from "../shared/endpoints/definitions/registry";
-import { createEndpointLogger } from "../shared/logger/server-logger";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as cliScopedTranslation } from "./i18n";
 // environment must be imported BEFORE @/config/constants - it sets NODE_ENV=production

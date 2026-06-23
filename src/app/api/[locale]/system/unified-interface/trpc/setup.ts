@@ -7,9 +7,8 @@ import { initTRPC } from "@trpc/server";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { ZodError } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { EndpointLogger } from "../shared/logger/endpoint";
 
 /**
  * tRPC Context - minimal context passed to all procedures

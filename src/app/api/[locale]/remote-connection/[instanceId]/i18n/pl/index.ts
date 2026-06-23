@@ -39,14 +39,6 @@ export const translations: typeof enTranslations = {
       skills: "Umiejętności",
       favorites: "Ulubione",
       threads: "Wątki",
-      chat: "Chat",
-    },
-    liveSync: {
-      title: "Sync wydarzeń na żywo",
-      description:
-        "Zdarzenia w czasie rzeczywistym przekazywane między połączonymi instancjami.",
-      chatEvents: "Wiadomości czatu",
-      liveOnlyBadge: "Tylko relay na żywo",
     },
     cortexSection: "Cortex",
     cortexDescription: "Przeglądaj wspólny system plików tego połączenia.",
@@ -137,6 +129,11 @@ export const translations: typeof enTranslations = {
       label: "Tryb transportu",
       description:
         "Jak to połączenie komunikuje się. reverse-ws: stały wychodzący WS (otwiera się natychmiast po zapisie). direct-http: bezpośrednie wywołania HTTP. ws-provider: zdalna instancja uruchamia pętlę AI. cloud-only: brak połączenia wychodzącego.",
+      options: {
+        reverseWs: "Reverse WS",
+        directHttp: "Bezpośredni HTTP",
+        cloudOnly: "Tylko chmura",
+      },
     },
     isInferenceProvider: {
       label: "Dostawca wnioskowania",
@@ -148,21 +145,6 @@ export const translations: typeof enTranslations = {
       description:
         "Nadpisanie administratora: kieruj wszystkie strumienie AI przez to połączenie, pomijając koszt i reguły użytkowników. Tylko jedno naraz.",
     },
-    loopLocation: {
-      label: "Lokalizacja pętli AI",
-      description:
-        "Gdzie działa pętla wnioskowania AI. Klient: lokalny komputer. Serwer: zdalna instancja.",
-    },
-    threadMirrorMode: {
-      label: "Przechowywanie wątków",
-      description:
-        "Gdzie przechowywane są wątki z folderu tego połączenia. Chmura / Lokalnie / Oba / Brak.",
-    },
-    toolSource: {
-      label: "Źródło narzędzi",
-      description:
-        "Które narzędzia są dostępne w strumieniach AI. Lokalne / Zdalne / Oba.",
-    },
     syncScope: {
       label: "Zakres synchronizacji",
       description:
@@ -172,7 +154,6 @@ export const translations: typeof enTranslations = {
       skills: "Umiejętności",
       favorites: "Ulubione",
       threads: "Wątki",
-      chat: "Zdarzenia czatu",
     },
     reconnectNow: {
       label: "Połącz ponownie",

@@ -17,6 +17,8 @@ import type {
   UTCTimestamp,
 } from "lightweight-charts";
 import { cn } from "next-vibe/shared/utils";
+import { getRootCssVar } from "next-vibe-ui/lib/css-vars";
+import { observeRootMutations } from "next-vibe-ui/lib/dom";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -33,10 +35,6 @@ import {
   useWidgetOnSubmit,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import {
-  getRootCssVar,
-  observeRootMutations,
-} from "next-vibe-ui/utils/browser";
 import React, {
   useCallback,
   useEffect,

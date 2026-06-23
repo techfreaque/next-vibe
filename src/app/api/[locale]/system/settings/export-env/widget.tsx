@@ -5,6 +5,8 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { downloadFile } from "next-vibe-ui/lib/download";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Check } from "next-vibe-ui/ui/icons/Check";
@@ -15,7 +17,6 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { copyToClipboard, downloadFile } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -2,6 +2,13 @@ export const translations = {
   tags: {
     threads: "Threads",
   },
+  enums: {
+    threadStatus: {
+      active: "Active",
+      archived: "Archived",
+      deleted: "Deleted",
+    },
+  },
   errors: {
     count_failed: "Failed to get conversation count: {{error}}",
   },
@@ -369,6 +376,7 @@ export const translations = {
       public: "Public Chats",
       incognito: "Incognito Chats",
       background: "Background Threads",
+      remote: "Remote Chats",
     },
   },
 };

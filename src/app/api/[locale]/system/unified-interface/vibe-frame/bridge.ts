@@ -15,6 +15,34 @@
  * Mirrors the widget-engine OutsideBridge / InsideBridge architecture exactly.
  */
 
+import {
+  getRawCookieString,
+  setRawCookieString,
+} from "next-vibe-ui/lib/cookies";
+import {
+  addWindowListener,
+  getScrollX,
+  getScrollY,
+  scrollToPosition,
+} from "next-vibe-ui/lib/dom";
+import {
+  assignUrl,
+  getCurrentSearch,
+  getCurrentUrl,
+  openWithTarget,
+  replaceUrl,
+  silentReplaceState,
+} from "next-vibe-ui/lib/location";
+import { getScreenHeight, getScreenWidth } from "next-vibe-ui/lib/screen";
+import {
+  getLocalItem,
+  getSessionItem,
+  removeLocalItem,
+  removeSessionItem,
+  setLocalItem,
+  setSessionItem,
+} from "next-vibe-ui/lib/storage";
+
 import type {
   BridgeAction,
   BridgeResponse,
@@ -37,7 +65,8 @@ import {
 
 function getCookieAction(payload: PayloadFor<"getCookie">): string | null {
   try {
-    const value = document.cookie
+    const cookieStr = getRawCookieString();
+    const value = cookieStr
       .split("; ")
       .find((row) => row.startsWith(`${payload.name}=`));
     return value ? decodeURIComponent(value.split("=")[1] || "") : null;
@@ -70,7 +99,7 @@ function setCookieAction(payload: PayloadFor<"setCookie">): boolean {
     if (payload.options?.sameSite) {
       cookieString += `; SameSite=${payload.options.sameSite}`;
     }
-    document.cookie = cookieString;
+    setRawCookieString(cookieString);
     return true;
   } catch {
     return false;
@@ -86,7 +115,7 @@ function deleteCookieAction(payload: PayloadFor<"deleteCookie">): boolean {
     if (payload.options?.path) {
       cookieString += `; path=${payload.options.path}`;
     }
-    document.cookie = cookieString;
+    setRawCookieString(cookieString);
     return true;
   } catch {
     return false;
@@ -95,10 +124,11 @@ function deleteCookieAction(payload: PayloadFor<"deleteCookie">): boolean {
 
 function getAllCookiesAction(): CookieData[] {
   try {
-    if (!document.cookie) {
+    const cookieStr = getRawCookieString();
+    if (!cookieStr) {
       return [];
     }
-    return document.cookie
+    return cookieStr
       .split(";")
       .map((c) => c.trim())
       .filter((c) => c.length > 0)
@@ -117,8 +147,10 @@ function getAllCookiesAction(): CookieData[] {
 
 function getStorageAction(payload: PayloadFor<"getStorage">): string | null {
   try {
-    const store = payload.type === "session" ? sessionStorage : localStorage;
-    return store.getItem(payload.key);
+    if (payload.type === "session") {
+      return getSessionItem(payload.key);
+    }
+    return getLocalItem(payload.key);
   } catch {
     return null;
   }
@@ -126,8 +158,11 @@ function getStorageAction(payload: PayloadFor<"getStorage">): string | null {
 
 function setStorageAction(payload: PayloadFor<"setStorage">): boolean {
   try {
-    const store = payload.type === "session" ? sessionStorage : localStorage;
-    store.setItem(payload.key, payload.value);
+    if (payload.type === "session") {
+      setSessionItem(payload.key, payload.value);
+    } else {
+      setLocalItem(payload.key, payload.value);
+    }
     return true;
   } catch {
     return false;
@@ -136,8 +171,11 @@ function setStorageAction(payload: PayloadFor<"setStorage">): boolean {
 
 function removeStorageAction(payload: PayloadFor<"removeStorage">): boolean {
   try {
-    const store = payload.type === "session" ? sessionStorage : localStorage;
-    store.removeItem(payload.key);
+    if (payload.type === "session") {
+      removeSessionItem(payload.key);
+    } else {
+      removeLocalItem(payload.key);
+    }
     return true;
   } catch {
     return false;
@@ -172,7 +210,7 @@ function getStorageKeysAction(payload: PayloadFor<"getStorageKeys">): string[] {
 
 function getUrlParamsAction(): Record<string, string> {
   try {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(getCurrentSearch());
     const result: Record<string, string> = {};
     params.forEach((value, key) => {
       result[key] = value;
@@ -185,11 +223,11 @@ function getUrlParamsAction(): Record<string, string> {
 
 function setUrlParamsAction(payload: PayloadFor<"setUrlParams">): boolean {
   try {
-    const url = new URL(window.location.href);
+    const url = new URL(getCurrentUrl());
     Object.entries(payload.params).forEach(([key, value]) => {
       url.searchParams.set(key, value);
     });
-    window.history.replaceState({}, "", url.toString());
+    silentReplaceState(url.toString());
     return true;
   } catch {
     return false;
@@ -197,17 +235,17 @@ function setUrlParamsAction(payload: PayloadFor<"setUrlParams">): boolean {
 }
 
 function getUrlAction(): string {
-  return window.location.href;
+  return getCurrentUrl();
 }
 
 function navigateAction(payload: PayloadFor<"navigate">): boolean {
   try {
     if (payload.target) {
-      window.open(payload.url, payload.target);
+      openWithTarget(payload.url, payload.target);
     } else if (payload.replace) {
-      window.location.replace(payload.url);
+      replaceUrl(payload.url);
     } else {
-      window.location.href = payload.url;
+      assignUrl(payload.url);
     }
     return true;
   } catch {
@@ -216,22 +254,18 @@ function navigateAction(payload: PayloadFor<"navigate">): boolean {
 }
 
 function getWindowSizeAction(): { width: number; height: number } {
-  return { width: window.innerWidth, height: window.innerHeight };
+  return { width: getScreenWidth(), height: getScreenHeight() };
 }
 
 function getScrollPositionAction(): { x: number; y: number } {
-  return { x: window.scrollX, y: window.scrollY };
+  return { x: getScrollX(), y: getScrollY() };
 }
 
 function setScrollPositionAction(
   payload: PayloadFor<"setScrollPosition">,
 ): boolean {
   try {
-    window.scrollTo({
-      left: payload.x,
-      top: payload.y,
-      behavior: payload.behavior ?? "auto",
-    });
+    scrollToPosition(payload.x, payload.y, payload.behavior ?? "auto");
     return true;
   } catch {
     return false;
@@ -239,14 +273,14 @@ function setScrollPositionAction(
 }
 
 function getViewportInfoAction(): ResponseFor<"getViewportInfo"> {
-  const w = window.innerWidth;
+  const w = getScreenWidth();
   const deviceType: "desktop" | "mobile" | "tablet" =
     w < 768 ? "mobile" : w < 1024 ? "tablet" : "desktop";
   return {
     width: w,
-    height: window.innerHeight,
-    scrollX: window.scrollX,
-    scrollY: window.scrollY,
+    height: getScreenHeight(),
+    scrollX: getScrollX(),
+    scrollY: getScrollY(),
     deviceType,
   };
 }
@@ -347,7 +381,7 @@ export function createParentBridge(options: {
     }
   }
 
-  window.addEventListener("message", handleMessage);
+  const removeMessageListener = addWindowListener("message", handleMessage);
 
   return {
     send(message: ParentToFrameMessage): void {
@@ -355,7 +389,7 @@ export function createParentBridge(options: {
       iframe.contentWindow?.postMessage(message, targetOrigin);
     },
     destroy(): void {
-      window.removeEventListener("message", handleMessage);
+      removeMessageListener();
     },
   };
 }
@@ -440,14 +474,14 @@ export function createFrameBridge(options: {
     }
   }
 
-  window.addEventListener("message", handleMessage);
+  const removeMessageListener = addWindowListener("message", handleMessage);
 
   return {
     send(message: FrameToParentMessage): void {
-      window.parent.postMessage(message, "*");
+      parent.postMessage(message, "*");
     },
     destroy(): void {
-      window.removeEventListener("message", handleMessage);
+      removeMessageListener();
     },
   };
 }
@@ -472,21 +506,21 @@ export function checkDisplayFrequency(
   switch (frequency) {
     case "once-per-session": {
       try {
-        return !sessionStorage.getItem(key);
+        return !getSessionItem(key);
       } catch {
         return true;
       }
     }
     case "once-per-user": {
       try {
-        return !localStorage.getItem(key);
+        return !getLocalItem(key);
       } catch {
         return true;
       }
     }
     case "once-per-day": {
       try {
-        const lastShown = localStorage.getItem(key);
+        const lastShown = getLocalItem(key);
         if (!lastShown) {
           return true;
         }
@@ -497,7 +531,7 @@ export function checkDisplayFrequency(
     }
     case "once-per-week": {
       try {
-        const lastShown = localStorage.getItem(key);
+        const lastShown = getLocalItem(key);
         if (!lastShown) {
           return true;
         }
@@ -528,7 +562,7 @@ export function recordDisplay(
   switch (frequency) {
     case "once-per-session":
       try {
-        sessionStorage.setItem(key, now);
+        setSessionItem(key, now);
       } catch {
         /* ignore */
       }
@@ -537,7 +571,7 @@ export function recordDisplay(
     case "once-per-day":
     case "once-per-week":
       try {
-        localStorage.setItem(key, now);
+        setLocalItem(key, now);
       } catch {
         /* ignore */
       }

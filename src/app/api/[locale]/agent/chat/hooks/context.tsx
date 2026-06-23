@@ -14,12 +14,12 @@ import { createContext, useContext, useMemo } from "react";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 
+import type { SkillGetResponseOutput } from "../../skills/[id]/definition";
 import { DefaultFolderId } from "../config";
 import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
 import type { PublicFeedGetResponseOutput } from "../public-feed/definition";
 import type { ChatSettingsGetResponseOutput } from "../settings/definition";
-import type { SkillGetResponseOutput } from "../skills/[id]/definition";
 import type { MessageListResponseOutput } from "../threads/[threadId]/messages/definition";
 import type { PathGetResponseOutput } from "../threads/[threadId]/messages/path/definition";
 import type { ThreadListResponseOutput } from "../threads/definition";

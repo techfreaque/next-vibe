@@ -11,8 +11,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../user/auth/types";

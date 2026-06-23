@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { SkillVariantData } from "@/app/api/[locale]/agent/chat/skills/db";
+import type { SkillVariantData } from "@/app/api/[locale]/agent/skills/db";
 import { and, eq, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
@@ -17,18 +17,18 @@ import { parseError } from "next-vibe/shared/utils";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import {
   SkillOwnershipType,
   SkillStatus,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+} from "@/app/api/[locale]/agent/skills/enum";
 import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { configScopedTranslation } from "@/config/i18n";

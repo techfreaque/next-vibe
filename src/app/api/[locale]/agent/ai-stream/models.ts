@@ -2,11 +2,6 @@ import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-} from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
@@ -21,9 +16,15 @@ import {
   type ModelOptionTokenBased,
 } from "../models/models";
 import {
+  type FiltersModelSelection,
   filtersSelectionSchema,
   sharedFilterPropsSchema,
 } from "../models/selection";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+} from "../skills/enum";
 
 export enum ChatModelId {
   GPT_5_5 = "gpt-55",

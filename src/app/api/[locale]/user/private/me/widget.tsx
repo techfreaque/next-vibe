@@ -1,5 +1,6 @@
 "use client";
 
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -44,7 +45,6 @@ import { MarkdownTextareaFieldWidget } from "next-vibe-ui/unified/form-fields/ma
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import {
   type JSX,
   useCallback,
@@ -60,9 +60,9 @@ import {
   ProfileBio,
   ProfileSocialPills,
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
-import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
-import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import skillsDef from "@/app/api/[locale]/agent/skills/definition";
+import { SkillOwnershipType } from "@/app/api/[locale]/agent/skills/enum";
 import creditsDef from "@/app/api/[locale]/credits/definition";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
 import referralDef from "@/app/api/[locale]/referral/definition";

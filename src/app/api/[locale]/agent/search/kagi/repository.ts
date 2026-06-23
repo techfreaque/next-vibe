@@ -14,7 +14,7 @@ import {
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type {
   KagiSearchGetRequestOutput,
@@ -27,7 +27,6 @@ interface KagiFastGPTReference {
   url: string;
   snippet?: string;
 }
-
 interface KagiFastGPTResponse {
   meta: { id: string; node: string; ms: number; api_balance: number | null };
   data: {

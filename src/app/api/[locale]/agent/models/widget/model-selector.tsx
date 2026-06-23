@@ -55,15 +55,6 @@ import {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import {
-  CONTENT_DISPLAY,
-  INTELLIGENCE_DISPLAY,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  ModelSortFieldOptions,
-  PRICE_DISPLAY,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
@@ -91,6 +82,15 @@ import {
   MusicGenModelId,
   musicGenModelOptions,
 } from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  ModelSortFieldOptions,
+  PRICE_DISPLAY,
+} from "@/app/api/[locale]/agent/skills/enum";
 import {
   filterSttModels,
   getBestSttModel,

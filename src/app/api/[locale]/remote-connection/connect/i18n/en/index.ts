@@ -7,12 +7,10 @@ export const translations = {
     signInDescription: "Sign in to connect to a remote account.",
     adminOnlyDescription:
       "Creating outbound connections requires admin access. If you were connected by a remote instance, your connections are visible above.",
-    // Customer benefits (non-admin)
     benefit1:
       "Memories sync automatically - everything you teach the AI here carries over",
     benefit2: "Access cloud AI models and tools from your local instance",
     benefit3: "Context travels with you across devices",
-    // Admin benefits
     adminBenefit1: "Memories sync bidirectionally, automatically",
     adminBenefit2:
       "Cloud AI discovers and runs your local tools (SSH, files, code execution)",
@@ -64,13 +62,6 @@ export const translations = {
       label: "Lead ID",
       description: "Lead ID from the remote instance (set automatically)",
     },
-    // ── Advanced settings (admin only) ───────────────────────────────────────
-    transportMode: {
-      label: "Transport Mode",
-      description:
-        "How this instance connects to the remote. reverse-ws: persistent outbound connection (recommended). ws-provider: remote runs AI inference loop.",
-      default: "reverse-ws (default)",
-    },
     isInferenceProvider: {
       label: "Use as Inference Provider",
       description:
@@ -79,15 +70,7 @@ export const translations = {
     syncScope: {
       label: "Sync Scope",
       description: "Which data syncs over this connection.",
-      memories: "Memories",
-      documents: "Documents",
-      skills: "Skills",
-      favorites: "Favorites",
-      threads: "Threads",
-      chat: "Chat",
-      defaultNote: "All disabled by default. Enable after connecting.",
     },
-    advancedSettings: "Advanced Settings",
     credentialWarning:
       "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account - they can do anything you can do there. Only connect on servers you fully trust.",
     actions: {

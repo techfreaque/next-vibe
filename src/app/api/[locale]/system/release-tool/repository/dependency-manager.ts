@@ -13,9 +13,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type {
   PackageJson,
   PackageManager,

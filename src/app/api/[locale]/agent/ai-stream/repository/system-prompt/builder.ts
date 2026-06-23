@@ -17,7 +17,7 @@ import "server-only";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { loadAllPromptFragments } from "@/app/api/[locale]/system/generated/prompt-fragments-server";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

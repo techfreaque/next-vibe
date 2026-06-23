@@ -18,7 +18,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 

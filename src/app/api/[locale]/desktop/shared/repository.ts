@@ -24,7 +24,7 @@ import {
 import { v4 as uuid } from "uuid";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { DesktopT } from "../i18n";
 

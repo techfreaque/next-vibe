@@ -7,7 +7,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 

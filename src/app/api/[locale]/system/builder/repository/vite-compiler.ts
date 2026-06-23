@@ -29,10 +29,10 @@ import {
 import {
   maybeColorize,
   semantic,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { serverFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
-import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/colors";
+import { serverFileLog } from "@/app/api/[locale]/system/logger/file";
+import { createNextjsFormatter } from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";

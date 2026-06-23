@@ -1,11 +1,11 @@
 "use client";
 
 import { getCookie } from "next-vibe-ui/lib/cookies";
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import { useCallback, useRef, useState } from "react";
 
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";

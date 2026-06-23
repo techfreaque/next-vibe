@@ -5,9 +5,9 @@
 
 "use client";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import taskEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import { endpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

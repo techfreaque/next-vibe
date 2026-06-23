@@ -4,11 +4,11 @@ import {
   getAllSeedModuleNames,
   getSeedModule,
 } from "@/app/api/[locale]/system/generated/seeds";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatDatabase,
   formatDuration,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (

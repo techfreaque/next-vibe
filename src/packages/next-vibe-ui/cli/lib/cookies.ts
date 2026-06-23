@@ -87,3 +87,13 @@ export async function getAllCookies(): Promise<Record<string, string>> {
     return {};
   }
 }
+
+// ─── Sync raw cookie access (CLI: not applicable, no document.cookie) ────────
+
+export function getRawCookieString(): string {
+  return ""; // no document.cookie in CLI — use getCookie() (async) instead
+}
+
+export function setRawCookieString(value: string): void {
+  void value;
+}

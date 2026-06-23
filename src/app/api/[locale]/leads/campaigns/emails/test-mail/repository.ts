@@ -18,7 +18,7 @@ import { contactClientRepository } from "@/app/api/[locale]/contact/repository-c
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";

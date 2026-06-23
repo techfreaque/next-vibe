@@ -1,4 +1,11 @@
 export const translations = {
+  enums: {
+    country: {
+      AT: "Austria (AT)",
+      DE: "Germany (DE)",
+      XX: "Generic (XX)",
+    },
+  },
   tags: { companies: "companies", onboard: "onboard", setup: "setup" },
   post: {
     title: "Onboard Company",

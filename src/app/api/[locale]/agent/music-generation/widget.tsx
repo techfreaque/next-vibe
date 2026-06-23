@@ -26,7 +26,6 @@ import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-butt
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
@@ -35,6 +34,7 @@ import {
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";

@@ -1,4 +1,18 @@
 export const translations = {
+  enums: {
+    companyType: {
+      b2b: "B2B",
+      b2c: "B2C",
+      individual: "Individual",
+    },
+    companyMemberRole: {
+      owner: "Owner",
+      admin: "Admin",
+      member: "Member",
+      accountant: "Accountant",
+      viewer: "Viewer",
+    },
+  },
   tags: {
     companies: "Companies",
     list: "List",

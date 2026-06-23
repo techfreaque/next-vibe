@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { ChatMessage } from "../../../../db";
 

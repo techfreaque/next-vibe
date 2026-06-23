@@ -4,7 +4,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { assignUrl } from "next-vibe-ui/utils/browser";
+import { assignUrl } from "next-vibe-ui/lib/location";
 
 /**
  * Handles redirect to payment provider checkout

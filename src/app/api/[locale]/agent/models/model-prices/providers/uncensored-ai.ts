@@ -15,7 +15,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import { ApiProvider } from "../../models";

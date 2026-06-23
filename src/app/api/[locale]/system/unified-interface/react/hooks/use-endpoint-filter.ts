@@ -4,7 +4,7 @@
 
 import { useMemo } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";

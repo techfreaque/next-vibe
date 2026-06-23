@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -23,6 +23,7 @@ import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import { isValidPath, normalizePath } from "../repository";
+import type { CortexSearchResponseOutput } from "./definition";
 import type { CortexSearchT } from "./i18n";
 
 /** Weight for FTS vs vector scoring (FTS 0.4, Vector 0.6) */

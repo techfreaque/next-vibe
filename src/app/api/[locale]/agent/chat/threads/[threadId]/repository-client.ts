@@ -13,12 +13,12 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../../shared/utils";
 import { DefaultFolderId } from "../../config";
-import { ThreadStatus } from "../../enum";
+import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import {
   deleteThread,
   loadIncognitoState,
@@ -83,6 +83,7 @@ export class ChatThreadByIdRepositoryClient {
         rolesModerate: null,
         rolesAdmin: null,
         published: false as boolean,
+        streamingState: ThreadStreamingState.IDLE,
       });
     } catch (error) {
       logger.error("Failed to get incognito thread", parseError(error));

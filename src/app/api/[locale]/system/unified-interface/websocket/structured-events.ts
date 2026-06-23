@@ -7,11 +7,14 @@
  */
 
 import type { QueryClient } from "@tanstack/react-query";
+import type { z } from "zod";
 
+import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { EndpointLogger } from "../shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 // ============================================================================
 // DEEP PARTIAL - used only internally by cache-merger

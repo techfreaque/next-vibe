@@ -75,14 +75,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../chat/config";
-import { ChatMessageRole } from "../../chat/enum";
-import type { FavoriteCard } from "../../chat/favorites/definition";
+import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
 import type { EnabledTool } from "../../chat/hooks/store";
 import {
   ChatNavigationProvider,
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
+import type { FavoriteCard } from "../../skills/favorites/definition";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import cancelEndpoints from "../cancel/definition";
 import { WidgetChatInput } from "../stream/widget/chat-input";

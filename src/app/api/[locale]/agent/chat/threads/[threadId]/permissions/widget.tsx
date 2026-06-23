@@ -11,7 +11,7 @@ import { useCallback, useMemo } from "react";
 
 import threadPermissionsDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/i18n";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { type EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

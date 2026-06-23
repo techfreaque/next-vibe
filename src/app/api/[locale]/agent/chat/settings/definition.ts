@@ -537,6 +537,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       update: {
+        selectedModel: ChatModelId.CLAUDE_SONNET_4_5,
         ttsAutoplay: true,
       },
     },

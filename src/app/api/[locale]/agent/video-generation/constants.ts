@@ -6,7 +6,7 @@ import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "../chat/skills/enum";
+} from "../skills/enum";
 import type { VideoGenModelSelection } from "../video-generation/models";
 import { VideoGenModelId } from "./models";
 

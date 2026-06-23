@@ -5,6 +5,8 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { downloadBinaryFile } from "next-vibe-ui/lib/download";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
@@ -31,10 +33,6 @@ import {
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import {
-  copyToClipboard,
-  downloadBinaryFile,
-} from "next-vibe-ui/utils/browser";
 import React, { useCallback, useState } from "react";
 
 import { MimeType } from "@/app/api/[locale]/leads/enum";

@@ -820,6 +820,10 @@ export const translations: typeof enTranslations = {
       title: "Import-Jobs Status",
       titleShort: "Importaufträge",
       description: "CSV-Import-Jobs auflisten und überwachen",
+      actions: {
+        refresh: "Aktualisieren",
+        refreshing: "Wird aktualisiert...",
+      },
       form: {
         title: "Job-Filter",
         description: "Import-Jobs nach Status und Paginierung filtern",
@@ -846,6 +850,7 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Import-Jobs",
         description: "Liste der Import-Jobs mit ihrem aktuellen Status",
+        statusCounts: "Statusübersicht",
         items: {
           title: "Jobs-Liste",
         },
@@ -1397,5 +1402,16 @@ export const translations: typeof enTranslations = {
       referral: "Empfehlung",
       csvImport: "CSV-Import",
     },
+  },
+  countries: {
+    global: "Global",
+    de: "Deutschland",
+    pl: "Polen",
+    us: "Vereinigte Staaten",
+  },
+  languages: {
+    en: "Englisch",
+    de: "Deutsch",
+    pl: "Polnisch",
   },
 };

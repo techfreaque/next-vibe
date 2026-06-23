@@ -19,7 +19,7 @@ import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { configScopedTranslation } from "@/config/i18n";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 

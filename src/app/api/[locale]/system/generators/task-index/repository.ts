@@ -17,12 +17,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { LiveIndex } from "../shared/live-index";
 import {

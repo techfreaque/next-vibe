@@ -1,5 +1,14 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
+  enums: {
+    viewType: {
+      calendar: "Kalendarz",
+      grid: "Siatka",
+      kanban: "Kanban",
+      list: "Lista",
+      wiki: "Wiki",
+    },
+  },
   post: {
     title: "Nowy folder",
     titleShort: "Nowy folder",

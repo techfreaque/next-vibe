@@ -27,10 +27,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { leads } from "@/app/api/[locale]/leads/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";
 import { DefaultFolderId } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
@@ -44,17 +45,13 @@ import {
   canViewThread,
 } from "../permissions/permissions";
 import type {
+  ThreadCreatedEventPayload,
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
   ThreadListRequestOutput,
   ThreadListResponseOutput,
 } from "./definition";
 import { scopedTranslation, type ThreadsT } from "./i18n";
-
-interface EnsureThreadResult {
-  threadId: string;
-  isNew: boolean;
-}
 
 /**
  * Threads Repository - Static class pattern
@@ -169,7 +166,7 @@ export class ThreadsRepository {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
-  }): Promise<ResponseType<EnsureThreadResult>> {
+  }): Promise<ResponseType<{ threadId: string; isNew: boolean }>> {
     logger.debug("ensureThread called", {
       threadId,
       rootFolderId,
@@ -748,6 +745,37 @@ export class ThreadsRepository {
           createdAt: new Date(),
           updatedAt: new Date(),
         };
+      } else if (
+        data.rootFolderId === DefaultFolderId.PRIVATE ||
+        data.rootFolderId === DefaultFolderId.REMOTE
+      ) {
+        // Creating thread in PRIVATE or REMOTE root — virtual folder owned by this user
+        folder = {
+          id: `${data.rootFolderId}-root`,
+          userId: userIdentifier,
+          leadId: null,
+          rootFolderId: data.rootFolderId as
+            | DefaultFolderId.PRIVATE
+            | DefaultFolderId.REMOTE,
+          name:
+            data.rootFolderId === DefaultFolderId.PRIVATE
+              ? "Private"
+              : "Remote",
+          icon: null,
+          color: null,
+          parentId: null,
+          expanded: true,
+          sortOrder: 0,
+          pinned: false,
+          rolesView: [],
+          rolesManage: [],
+          rolesCreateThread: [],
+          rolesPost: [],
+          rolesModerate: [],
+          rolesAdmin: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
       }
 
       // Check if user has permission to create thread in this folder
@@ -857,6 +885,38 @@ export class ThreadsRepository {
         message: t("errors.count_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for the `thread-created` event: re-run create on this
+   * instance with the relayed inputs. Reuses createThread so there is one path.
+   */
+  static async applyRemoteThreadCreate(
+    payload: ThreadCreatedEventPayload,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const result = await this.createThread(
+      {
+        id: payload.id,
+        title: payload.title,
+        rootFolderId: payload.rootFolderId,
+        subFolderId: null,
+        model: DEFAULT_CHAT_MODEL_ID,
+        character: undefined,
+        systemPrompt: undefined,
+      },
+      user,
+      t,
+      logger,
+      defaultLocale,
+    );
+    if (!result.success) {
+      logger.error("Failed to apply remote thread create", {
+        message: result.message,
       });
     }
   }

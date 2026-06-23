@@ -11,8 +11,8 @@ import { useCallback } from "react";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { type TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useEndpointCreate } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint-create";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

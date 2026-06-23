@@ -15,7 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";

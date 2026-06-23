@@ -60,8 +60,6 @@ export function RestrictedSyntaxTestComponent(): React.ReactElement {
   );
 }
 
-
-
 // ============================================================================
 // TEST 1: unknown type (SHOULD ERROR)
 // ============================================================================

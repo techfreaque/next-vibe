@@ -14,13 +14,13 @@ import { join } from "node:path";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { formatLogPrefix } from "@/app/api/[locale]/system/logger/create-logger";
 import {
   appendRawToServerLog,
   truncateClientLogs,
   truncateServerLog,
   writeServerLogOfflineHint,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+} from "@/app/api/[locale]/system/logger/file";
 import {
   createNextjsFormatter,
   formatActionCommand,
@@ -34,8 +34,8 @@ import {
   formatStartup,
   formatTask,
   formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UnifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";

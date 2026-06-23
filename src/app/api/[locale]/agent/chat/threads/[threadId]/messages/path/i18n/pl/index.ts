@@ -5,6 +5,16 @@ export const translations: typeof enTranslations = {
   tags: {
     messages: "Wiadomości",
   },
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      background: "Wątki w tle",
+      remote: "Czaty zdalne",
+    },
+  },
   get: {
     title: "Pobierz ścieżkę konwersacji",
     titleShort: "Ścieżka wiadomości",

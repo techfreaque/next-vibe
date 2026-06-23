@@ -8,7 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) =>
+    handler: ({ data, user, locale, logger, t }) =>
       CortexMoveRepository.moveNode({
         userId: user.id,
         user,
@@ -18,5 +18,9 @@ export const { POST, tools } = endpointsHandler({
         logger,
         t,
       }),
+    onRemoteEvent: {
+      "node-moved": (payload, ctx) =>
+        CortexMoveRepository.applyRemoteMove(payload, ctx.user, ctx.logger),
+    },
   },
 });

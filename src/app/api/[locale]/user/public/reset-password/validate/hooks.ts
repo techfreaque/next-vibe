@@ -4,7 +4,7 @@
 
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import resetPasswordValidateEndpoint from "./definition";

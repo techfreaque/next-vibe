@@ -25,7 +25,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { ActivityType, UserAssociation } from "../../../leads/enum";
 import { EngagementLevel } from "../../../leads/tracking/engagement/enum";

@@ -2,6 +2,23 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Chat",
+  enums: {
+    threadStatus: {
+      active: "Aktiv",
+      archived: "Archiviert",
+      deleted: "Gelöscht",
+    },
+  },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Geteilte Chats",
+      public: "Öffentliche Chats",
+      incognito: "Inkognito Chats",
+      background: "Hintergrund-Threads",
+      remote: "Remote-Chats",
+    },
+  },
   tags: {
     threads: "Threads",
   },
@@ -71,6 +88,9 @@ export const translations: typeof enTranslations = {
         },
         published: {
           content: "Veröffentlicht",
+        },
+        streamingState: {
+          content: "Streaming-Zustand",
         },
         searchVector: {
           content: "Suchvektor",
@@ -323,11 +343,26 @@ export const translations: typeof enTranslations = {
       description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
     response: {
-      success: {
-        content: "Löschung erfolgreich",
+      userId: {
+        content: "Besitzer",
       },
-      deletedId: {
-        content: "Gelöschte Thread-ID",
+      title: {
+        content: "Titel",
+      },
+      folderId: {
+        content: "Ordner",
+      },
+      status: {
+        content: "Status",
+      },
+      preview: {
+        content: "Vorschau",
+      },
+      createdAt: {
+        content: "Erstellt",
+      },
+      updatedAt: {
+        content: "Aktualisiert",
       },
     },
     errors: {

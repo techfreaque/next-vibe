@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { AuthRepository } from "../../auth/repository";
@@ -172,7 +172,7 @@ export class SignupRepository {
         if (skillId && /^[0-9a-f-]{36}$/i.test(skillId)) {
           // UUID skillId - look up the skill owner in customSkills
           const { customSkills } =
-            await import("@/app/api/[locale]/agent/chat/skills/db");
+            await import("@/app/api/[locale]/agent/skills/db");
           const [skill] = await dbInstance
             .select({ userId: customSkills.userId })
             .from(customSkills)
@@ -259,9 +259,9 @@ export class SignupRepository {
       if (data.localFavorites && data.localFavorites.length > 0) {
         try {
           const { FavoritesCreateRepository } =
-            await import("@/app/api/[locale]/agent/chat/favorites/create/repository");
+            await import("@/app/api/[locale]/agent/skills/favorites/create/repository");
           const { scopedTranslation: favoritesCreateScopedTranslation } =
-            await import("@/app/api/[locale]/agent/chat/favorites/create/i18n");
+            await import("@/app/api/[locale]/agent/skills/favorites/create/i18n");
           const { t: favT } = favoritesCreateScopedTranslation.scopedT(locale);
           const userJwt: JwtPayloadType = {
             id: userData.id,

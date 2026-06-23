@@ -11,7 +11,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";

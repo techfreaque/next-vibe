@@ -11,7 +11,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 
-import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "../../../system/logger/types";
 import { logProviderRequest } from "./shared/debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {

@@ -180,6 +180,7 @@ export const translations: typeof enTranslations = {
       text: "Transkrybowany tekst",
       provider: "Użyty dostawca",
       confidence: "Wynik pewności",
+      creditCost: "Użyte kredyty",
     },
     errors: {
       unauthorized: {

@@ -24,7 +24,7 @@ import type {
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -35,7 +35,7 @@ import {
   type MessageMetadata,
   type ToolCall,
 } from "../../../chat/db";
-import { ChatMessageRole } from "../../../chat/enum";
+import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";

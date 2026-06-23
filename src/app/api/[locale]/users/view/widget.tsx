@@ -5,6 +5,7 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Button } from "next-vibe-ui/ui/button";
 import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
 import { Div } from "next-vibe-ui/ui/div";
@@ -49,7 +50,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -1191,7 +1191,7 @@ function FavoritesTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+    void import("@/app/api/[locale]/agent/skills/favorites/definition").then(
       (mod) => {
         setDef(mod.default);
         return undefined;
@@ -1233,12 +1233,10 @@ function SkillsTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/agent/chat/skills/definition").then(
-      (mod) => {
-        setDef(mod.default);
-        return undefined;
-      },
-    );
+    void import("@/app/api/[locale]/agent/skills/definition").then((mod) => {
+      setDef(mod.default);
+      return undefined;
+    });
     return <LoadingBlock />;
   }
 

@@ -21,7 +21,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
@@ -37,7 +37,6 @@ import {
   closeProdDb,
   connectToHermes,
   disconnectFromHermes,
-  resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
@@ -56,7 +55,6 @@ describe(
     let testUser: JwtPrivatePayloadType;
     let mainFavoriteId: string;
     let testSubFolderId: string;
-    let _prodAdminToken: string | null = null;
     let _prodUserId: string | null = null;
     let setupError: string | null = null;
 
@@ -119,7 +117,6 @@ describe(
         await connectToHermes(testUser, LOCAL_DEV_URL);
 
         _prodUserId = await resolveProdUserId();
-        _prodAdminToken = await resolveProdAdminToken(LOCAL_DEV_URL);
 
         // Force cloud-only: no outbound dialling, execute-tool returns UNAVAILABLE immediately
         await db
@@ -142,21 +139,20 @@ describe(
       }
 
       // Reset transportMode on hermes before disconnecting (best-effort)
-      if (_prodAdminToken) {
+      if (testUser) {
         try {
-          await fetch(
-            `${LOCAL_DEV_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                // eslint-disable-next-line i18next/no-literal-string
-                Authorization: `Bearer ${_prodAdminToken}`,
-              },
-              body: JSON.stringify({ transportMode: "cloud-only" }),
-              signal: AbortSignal.timeout(5_000),
-            },
-          );
+          const { sendTestRequest } =
+            await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+          const connByIdDef = (
+            await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+          ).default;
+          await sendTestRequest({
+            endpoint: connByIdDef.PATCH,
+            data: { transportMode: "cloud-only" },
+            urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
+            user: testUser,
+            instanceId: HERMES_INSTANCE_ID,
+          });
         } catch {
           /* best-effort */
         }

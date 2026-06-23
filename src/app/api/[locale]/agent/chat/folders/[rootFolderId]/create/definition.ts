@@ -28,6 +28,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId, isDefaultFolderId } from "../../../config";
+import { ThreadStreamingState } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
 const FolderCreateContainer = lazyWidget(() =>

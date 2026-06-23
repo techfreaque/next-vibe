@@ -1,5 +1,11 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
+  enums: {
+    paymentProvider: {
+      stripe: "Stripe",
+      nowpayments: "NowPayments",
+    },
+  },
   post: {
     title: "Kup kredyty",
     titleShort: "Kup kredyty",

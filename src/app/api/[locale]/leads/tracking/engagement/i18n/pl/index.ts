@@ -266,6 +266,29 @@ export const translations: typeof enTranslations = {
       low: "Niski",
       none: "Brak",
     },
+    engagementTypes: {
+      emailOpen: "Otwarcie e-maila",
+      emailClick: "Klikni\u0119cie w e-mailu",
+      websiteVisit: "Odwiedziny strony",
+      formSubmit: "Wys\u0142anie formularza",
+      leadAttribution: "Przypisanie leada",
+    },
+    emailCampaignStage: {
+      notStarted: "Nie rozpocz\u0119to",
+      initial: "Pocz\u0105tkowy",
+      followup1: "Kontynuacja 1",
+      followup2: "Kontynuacja 2",
+      followup3: "Kontynuacja 3",
+      nurture: "Piel\u0119gnacja",
+      reactivation: "Reaktywacja",
+    },
+    leadSource: {
+      website: "Strona internetowa",
+      socialMedia: "Social media",
+      emailCampaign: "Kampania e-mail",
+      referral: "Polecenie",
+      csvImport: "Import CSV",
+    },
   },
   error: {
     default:

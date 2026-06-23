@@ -24,7 +24,7 @@ import { sql } from "drizzle-orm";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 /**
  * Walk forward from `startId` through the latest child chain until we

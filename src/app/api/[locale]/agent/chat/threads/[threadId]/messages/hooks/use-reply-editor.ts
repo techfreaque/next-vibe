@@ -11,7 +11,7 @@ import type {
 } from "next-vibe-ui/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 export interface UseReplyEditorOptions {
   parentMessageId: string;

@@ -19,7 +19,7 @@ export async function getSeedModule(
     case "[rootFolderId]":
       return (await import("../../agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
     case "skills":
-      return (await import("../../agent/chat/skills/seeds")) as EnvironmentSeeds;
+      return (await import("../../agent/skills/seeds")) as EnvironmentSeeds;
     case "chart-of-accounts":
       return (await import("../../chart-of-accounts/seeds")) as EnvironmentSeeds;
     case "companies":

@@ -3,6 +3,21 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Kolejka kampanii",
   description: "Leady aktualnie aktywne w kampaniach e-mail",
+  enums: {
+    campaignType: {
+      leadCampaign: "Kampania leadów",
+      newsletter: "Newsletter",
+      signupNurture: "Pielęgnacja rejestracji",
+      retention: "Retencja",
+      winback: "Odzyskanie",
+      transactional: "Transakcyjny",
+      notification: "Powiadomienie",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "Wszystkie",
+    },
+  },
   get: {
     title: "Kolejka kampanii",
     titleShort: "Kolejka kampanii",

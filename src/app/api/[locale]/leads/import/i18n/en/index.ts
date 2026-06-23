@@ -799,6 +799,10 @@ export const translations = {
       title: "Import Jobs Status",
       titleShort: "Import Jobs",
       description: "List and monitor CSV import jobs",
+      actions: {
+        refresh: "Refresh",
+        refreshing: "Refreshing...",
+      },
       form: {
         title: "Job Filters",
         description: "Filter import jobs by status and pagination",
@@ -825,6 +829,7 @@ export const translations = {
       response: {
         title: "Import Jobs",
         description: "List of import jobs with their current status",
+        statusCounts: "Status Counts",
         items: {
           title: "Jobs List",
         },
@@ -1358,5 +1363,16 @@ export const translations = {
       referral: "Referral",
       csvImport: "CSV Import",
     },
+  },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
   },
 };

@@ -19,13 +19,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import {
   decryptEnvValue,
   isEncryptedValue,
   loadOrCreateKey,
 } from "@/app/api/[locale]/system/unified-interface/shared/env/env-crypto";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ExportEnvResponseOutput } from "./definition";
 import type { ExportEnvT } from "./i18n";

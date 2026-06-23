@@ -19,7 +19,7 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,20 +28,20 @@ import { DefaultFolderId } from "../../chat/config";
 import type { MessageMetadata } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import {
-  chatFavorites,
-  FAVORITE_CONFIG_COLUMNS,
-  type FavoriteConfig,
-} from "../../chat/favorites/db";
-import { NO_SKILL_ID } from "../../chat/skills/constants";
-import {
-  isFiltersSelection,
-  isManualSelection,
-} from "../../chat/skills/create/definition";
 import { isUuid, parseSkillId } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
+import { NO_SKILL_ID } from "../../skills/constants";
+import {
+  isFiltersSelection,
+  isManualSelection,
+} from "../../skills/create/definition";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "../../skills/favorites/db";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
@@ -269,7 +269,7 @@ export async function resolveFavorite(
 
   // No favorite-level selection: resolve from the skill's variant
   if (skill !== NO_SKILL_ID) {
-    const { SkillsRepository } = await import("../../chat/skills/repository");
+    const { SkillsRepository } = await import("../../skills/repository");
     const skillResult = await SkillsRepository.getSkillById(
       { id: skill },
       user,

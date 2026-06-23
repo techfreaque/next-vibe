@@ -22,14 +22,11 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Lock } from "next-vibe-ui/ui/icons/Lock";
 import { P } from "next-vibe-ui/ui/typography";
 import {
   useWidgetLocale,
-  useWidgetLogger,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
@@ -40,11 +37,7 @@ import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/wid
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { SyncProviderInfo } from "@/app/api/[locale]/remote-connection/sync-providers/definition";
-import syncProvidersDefinitions from "@/app/api/[locale]/remote-connection/sync-providers/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type definitions from "./definition";

@@ -1,5 +1,22 @@
 export const translations = {
   category: "Chat",
+  enums: {
+    threadStatus: {
+      active: "Active",
+      archived: "Archived",
+      deleted: "Deleted",
+    },
+  },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Shared Chats",
+      public: "Public Chats",
+      incognito: "Incognito Chats",
+      background: "Background Threads",
+      remote: "Remote Chats",
+    },
+  },
   tags: {
     threads: "Threads",
   },
@@ -69,6 +86,9 @@ export const translations = {
         },
         published: {
           content: "Published",
+        },
+        streamingState: {
+          content: "Streaming State",
         },
         searchVector: {
           content: "Search Vector",
@@ -320,11 +340,26 @@ export const translations = {
       description: "Root folder of the thread (used for client routing)",
     },
     response: {
-      success: {
-        content: "Deletion Success",
+      userId: {
+        content: "Owner",
       },
-      deletedId: {
-        content: "Deleted Thread ID",
+      title: {
+        content: "Title",
+      },
+      folderId: {
+        content: "Folder",
+      },
+      status: {
+        content: "Status",
+      },
+      preview: {
+        content: "Preview",
+      },
+      createdAt: {
+        content: "Created",
+      },
+      updatedAt: {
+        content: "Updated",
       },
     },
     errors: {

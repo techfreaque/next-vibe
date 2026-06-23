@@ -11,6 +11,21 @@ export const translations: typeof enTranslations = {
       public: "Publiczny",
       background: "W tle",
       incognito: "Incognito",
+      remote: "Zdalny",
+    },
+  },
+  enums: {
+    userRole: {
+      public: "Publiczny",
+      customer: "Klient",
+      partnerAdmin: "Administrator partnera",
+      partnerEmployee: "Pracownik partnera",
+      admin: "Administrator",
+    },
+    threadStatus: {
+      active: "Aktywny",
+      archived: "Zarchiwizowany",
+      deleted: "Usunięty",
     },
   },
   get: {

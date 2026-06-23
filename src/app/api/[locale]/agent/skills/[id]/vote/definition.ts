@@ -1,0 +1,213 @@
+/**
+ * Skill Vote API Definition
+ * POST /agent/skills/[id]/vote
+ *
+ * Toggle-upvote a community skill. Idempotent:
+ *  - If not voted → insert vote, increment vote_count
+ *  - If already voted → delete vote, decrement vote_count
+ * Auto-upgrades trust_level to VERIFIED when vote_count >= threshold.
+ */
+
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  backButton,
+  customWidgetObject,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { SKILL_VOTE_ALIAS } from "../../constants";
+import skillsListDefinition from "../../definition";
+import { scopedTranslation } from "./i18n";
+
+const SkillVoteContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillVoteContainer })),
+);
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["agent", "chat", "skills", "[id]", "vote"],
+  aliases: [SKILL_VOTE_ALIAS],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
+  description: "post.description" as const,
+  icon: "thumbs-up",
+  category: "ai",
+  subCategory: "skillsCommunity",
+  tags: ["tags.skills"],
+
+  fields: customWidgetObject({
+    render: SkillVoteContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      id: requestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: skillsListDefinition.GET,
+        labelField: "name",
+        label: "post.title" as const,
+        description: "post.description" as const,
+        hidden: true,
+        schema: z.string(),
+      }),
+
+      voted: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.voted.content" as const,
+        schema: z.boolean(),
+      }),
+
+      voteCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.voteCount.content" as const,
+        schema: z.number().int().nonnegative(),
+      }),
+
+      trustLevel: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.trustLevel.content" as const,
+        schema: z.string(),
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "post.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "post.button.vote" as const,
+        loadingText: "post.button.loading" as const,
+        icon: "thumbs-up",
+        variant: "outline",
+        className: "ml-auto",
+        usage: { request: "urlPathParams" },
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
+    },
+  },
+
+  // Client-only event — vote metrics (voteCount/trustLevel) are instance-local,
+  // never relayed cross-instance. The onEvent patches them into the list card.
+  events: {
+    "skill-voted": {
+      operation: "merge" as const,
+      fields: ["voteCount", "trustLevel"] as const,
+      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+        const skillId = urlPathParams.id;
+        if (!skillId) {
+          return;
+        }
+        const [{ apiClient }, skillsDefinition] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("../../definition"),
+        ]);
+        apiClient.updateEndpointData(
+          skillsDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                sections: old.data.sections.map((section) => ({
+                  ...section,
+                  skills: section.skills.map((sk) =>
+                    sk.skillId === skillId
+                      ? {
+                          ...sk,
+                          voteCount: partial.voteCount ?? sk.voteCount,
+                          trustLevel: partial.trustLevel ?? sk.trustLevel,
+                        }
+                      : sk,
+                  ),
+                })),
+              },
+            };
+          },
+        );
+        void queryClient;
+      },
+    },
+  },
+
+  successTypes: {
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
+  },
+
+  examples: {
+    urlPathParams: {
+      default: { id: "code-reviewer" },
+    },
+    responses: {
+      default: {
+        voted: true,
+        voteCount: 5,
+        trustLevel: "enums.trustLevel.community",
+      },
+    },
+  },
+});
+
+export const endpoints = { POST };
+
+export type SkillVotePostResponseOutput = typeof POST.types.ResponseOutput;
+
+export default endpoints;

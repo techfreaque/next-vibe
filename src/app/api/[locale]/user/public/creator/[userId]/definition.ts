@@ -26,7 +26,7 @@ import {
   SkillCategoryDB,
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+} from "@/app/api/[locale]/agent/skills/enum";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { UserRole } from "../../../user-roles/enum";
 import { scopedTranslation } from "./i18n";

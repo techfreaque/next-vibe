@@ -201,4 +201,15 @@ export const translations = {
     os: "OS",
     referralCode: "Referral Code",
   },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
 };

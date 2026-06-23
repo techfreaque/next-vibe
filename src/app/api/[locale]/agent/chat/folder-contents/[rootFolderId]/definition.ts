@@ -42,7 +42,11 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../config";
-import { ThreadStatusDB, ThreadStatusOptions } from "../../enum";
+import {
+  ThreadStatusDB,
+  ThreadStatusOptions,
+  ThreadStreamingStateDB,
+} from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 const FolderContentsWidget = lazy(() =>

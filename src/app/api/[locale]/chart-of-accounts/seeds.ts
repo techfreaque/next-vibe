@@ -10,7 +10,7 @@ import { and, eq } from "drizzle-orm";
 
 import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { accountNodes, coaTemplateNodes, coaTemplates } from "./db";
 import { AccountSubtype, AccountType } from "./enum";

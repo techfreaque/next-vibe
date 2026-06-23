@@ -53,6 +53,7 @@ export function NotSelfClosing(): React.ReactElement {
     <div>
       <br></br>
       <img src="test.png" alt="test"></img>
+
       <input type="text"></input>
       <hr></hr>
     </div>

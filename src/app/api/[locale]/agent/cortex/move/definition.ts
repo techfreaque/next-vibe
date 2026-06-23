@@ -105,6 +105,19 @@ const { POST } = createEndpoint({
     },
   }),
 
+  // This op owns its `node-moved` event. `requestFields` carry the move the user
+  // submitted; the peer's onRemoteEvent re-runs moveNode. Server-only — no client
+  // cache to update, so clientDelivery: false.
+  events: {
+    "node-moved": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["from", "to"] as const,
+      syncDomain: "documents" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "post.errors.validation.title" as const,

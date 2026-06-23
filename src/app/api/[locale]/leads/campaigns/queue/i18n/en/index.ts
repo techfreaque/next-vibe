@@ -1,6 +1,21 @@
 export const translations = {
   title: "Campaign Queue",
   description: "Leads currently active in email campaigns",
+  enums: {
+    campaignType: {
+      leadCampaign: "Lead Campaign",
+      newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      transactional: "Transactional",
+      notification: "Notification",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "All",
+    },
+  },
   get: {
     title: "Campaign Queue",
     titleShort: "Campaign Queue",

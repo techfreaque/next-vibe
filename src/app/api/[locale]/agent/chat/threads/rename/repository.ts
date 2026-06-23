@@ -15,14 +15,14 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../db";
 import { canUpdateThread } from "../../permissions/permissions";
-import threadsDefinitions from "../definition";
+import threadsByIdDefinitions from "../[threadId]/definition";
 import type {
   ThreadRenameRequestOutput,
   ThreadRenameResponseOutput,
@@ -119,24 +119,18 @@ export class ThreadRenameRepository {
         threadId: updatedThread.id,
       });
 
-      // Emit WS events so open tabs reflect the change immediately
-      const emitThreads = createEndpointEmitter(
-        threadsDefinitions.GET,
-        logger,
-        user,
-      );
-      emitThreads("thread-updated", {
-        threads: [
-          {
-            id: updatedThread.id,
-            title: updatedThread.title,
-            folderId: updatedThread.folderId,
-            status: updatedThread.status,
-            preview: updatedThread.preview,
-            rootFolderId: updatedThread.rootFolderId,
-            updatedAt: updatedThread.updatedAt,
-          },
-        ],
+      // Rename is a thread update — emit the [threadId] PATCH `thread-updated`
+      // event (the changed fields the user submitted + updatedAt). The client
+      // onEvent merges them into the sidebar list cache; cross-instance the peer
+      // re-applies the update.
+      createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+        threadId: updatedThread.id,
+      })("thread-updated", {
+        title: updatedThread.title,
+        folderId: updatedThread.folderId,
+        status: updatedThread.status,
+        rootFolderId: updatedThread.rootFolderId,
+        updatedAt: updatedThread.updatedAt,
       });
 
       if (updatedThread.rootFolderId) {

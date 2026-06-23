@@ -5,6 +5,15 @@ export const translations: typeof enTranslations = {
   tags: {
     folders: "Foldery",
   },
+  enums: {
+    userRole: {
+      public: "Publiczny",
+      customer: "Klient",
+      partnerAdmin: "Administrator partnera",
+      partnerEmployee: "Pracownik partnera",
+      admin: "Administrator",
+    },
+  },
 
   patch: {
     title: "Aktualizuj folder",

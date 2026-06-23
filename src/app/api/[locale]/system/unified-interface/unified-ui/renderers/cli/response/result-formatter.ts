@@ -11,6 +11,7 @@ import React from "react";
 
 import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -18,7 +19,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
 import { EXECUTE_TOOL_ALIAS } from "../../../../execute-tool/constants";
-import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";

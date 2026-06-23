@@ -18,7 +18,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { hasCustomDirective } from "@/app/api/[locale]/system/unified-interface/shared/utils/custom-directive";
 import type { CountryLanguage } from "@/i18n/core/config";
 

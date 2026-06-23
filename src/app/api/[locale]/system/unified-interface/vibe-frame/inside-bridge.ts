@@ -2,7 +2,7 @@
  * Vibe Frame - Inside Bridge
  *
  * Runs inside the iframe (loaded by vibe-frame-hydrate.js or similar).
- * Provides window.bridgeCall for widget code to call privileged parent APIs:
+ * Provides globalThis.bridgeCall for widget code to call privileged parent APIs:
  * cookies, storage, URL info, navigation, etc.
  *
  * Mirrors widget-engine inside-bridge-base.ts exactly.
@@ -11,10 +11,12 @@
  *   <script src="/vibe-frame/vibe-frame-inside-bridge.js"></script>
  *   <script>
  *     // Now available:
- *     window.bridgeCall("getCookie", { name: "session" }).then(console.log);
- *     window.bridgeCall("navigate", { url: "https://example.com" });
+ *     globalThis.bridgeCall("getCookie", { name: "session" }).then(console.log);
+ *     globalThis.bridgeCall("navigate", { url: "https://example.com" });
  *   </script>
  */
+
+import { addWindowListener, onDOMReady } from "next-vibe-ui/lib/dom";
 
 import type {
   BridgeAction,
@@ -35,26 +37,19 @@ interface PendingRequest {
 
 const pendingRequests = new Map<string, PendingRequest>();
 
-// ─── Window Augmentation ──────────────────────────────────────────────────────
+// ─── Global Augmentation ──────────────────────────────────────────────────────
 
 declare global {
-  interface Window {
-    /** Whether the inside bridge has been initialized */
-    vfBridgeInitialized: boolean;
-    /** Whether a successful BRIDGE_RESPONSE has been received from parent */
-    vfBridgeConnected: boolean;
-    /** The frame ID assigned by the parent (set by hydration script) */
-    vfFrameId: string;
-    /** Call a privileged parent API via postMessage request-response */
-    bridgeCall: typeof bridgeCall;
-    /** Shorthand for trackInteraction / logMessage actions */
-    bridgeLog: typeof bridgeLog;
-  }
+  var vfBridgeInitialized: boolean;
+  var vfBridgeConnected: boolean;
+  var vfFrameId: string;
+  var bridgeCall: typeof bridgeCallFn;
+  var bridgeLog: typeof bridgeLogFn;
 }
 
-window.vfBridgeInitialized = false;
-window.vfBridgeConnected = false;
-window.vfFrameId = window.vfFrameId || "";
+globalThis.vfBridgeInitialized = false;
+globalThis.vfBridgeConnected = false;
+globalThis.vfFrameId = globalThis.vfFrameId ?? "";
 
 // ─── Message Handler ──────────────────────────────────────────────────────────
 
@@ -71,8 +66,8 @@ function handleMessage(event: MessageEvent): void {
   }
 
   // Mark as connected on first successful response
-  if (!window.vfBridgeConnected) {
-    window.vfBridgeConnected = true;
+  if (!globalThis.vfBridgeConnected) {
+    globalThis.vfBridgeConnected = true;
   }
 
   clearTimeout(pending.timeout);
@@ -86,16 +81,19 @@ function handleMessage(event: MessageEvent): void {
 }
 
 function initBridge(): void {
-  if (window.vfBridgeInitialized) {
+  if (globalThis.vfBridgeInitialized) {
     return;
   }
-  window.addEventListener("message", handleMessage);
-  window.vfBridgeInitialized = true;
+  addWindowListener(
+    "message",
+    handleMessage as (e: WindowEventMap["message"]) => void,
+  );
+  globalThis.vfBridgeInitialized = true;
 }
 
 // ─── bridgeCall ───────────────────────────────────────────────────────────────
 
-async function bridgeCall<T extends BridgeAction>(
+async function bridgeCallFn<T extends BridgeAction>(
   action: T,
   payload: PayloadFor<T>,
 ): Promise<ResponseFor<T>> {
@@ -106,7 +104,7 @@ async function bridgeCall<T extends BridgeAction>(
 
     const timeout = setTimeout(() => {
       pendingRequests.delete(requestId);
-      window.vfBridgeConnected = false;
+      globalThis.vfBridgeConnected = false;
       reject(new Error(`Bridge timeout: ${action}`));
     }, 3000);
 
@@ -120,12 +118,12 @@ async function bridgeCall<T extends BridgeAction>(
       type: "BRIDGE_CALL",
       action,
       requestId,
-      frameId: window.vfFrameId,
+      frameId: globalThis.vfFrameId,
       payload,
     };
 
     try {
-      window.parent.postMessage(call, "*");
+      parent.postMessage(call, "*");
     } catch (error) {
       clearTimeout(timeout);
       pendingRequests.delete(requestId);
@@ -140,10 +138,10 @@ async function bridgeCall<T extends BridgeAction>(
 
 // ─── bridgeLog ────────────────────────────────────────────────────────────────
 
-const bridgeLog = async <T extends "logMessage" | "trackInteraction">(
+const bridgeLogFn = async <T extends "logMessage" | "trackInteraction">(
   action: T,
   payload: PayloadFor<T>,
-): Promise<boolean> => bridgeCall(action, payload) as Promise<boolean>;
+): Promise<boolean> => bridgeCallFn(action, payload) as Promise<boolean>;
 
 // ─── First Paint Tracking ────────────────────────────────────────────────────
 
@@ -154,17 +152,13 @@ function trackFirstPaint(): void {
     return;
   }
   firstPaintTracked = true;
-  void bridgeLog("trackInteraction", { data: { action: "first-paint" } });
+  void bridgeLogFn("trackInteraction", { data: { action: "first-paint" } });
 }
 
-// ─── Expose on Window ────────────────────────────────────────────────────────
+// ─── Expose on globalThis ────────────────────────────────────────────────────
 
-window.bridgeCall = bridgeCall;
-window.bridgeLog = bridgeLog;
+globalThis.bridgeCall = bridgeCallFn;
+globalThis.bridgeLog = bridgeLogFn;
 
-// Track first paint immediately
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", trackFirstPaint);
-} else {
-  trackFirstPaint();
-}
+// Track first paint - onDOMReady fires immediately if DOM ready, or on DOMContentLoaded
+onDOMReady(trackFirstPaint);

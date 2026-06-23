@@ -8,8 +8,8 @@
  */
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";

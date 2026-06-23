@@ -6,6 +6,15 @@ export const translations: typeof enTranslations = {
     threads: "Wątki",
     permissions: "Uprawnienia",
   },
+  enums: {
+    userRole: {
+      public: "Publiczny",
+      customer: "Klient",
+      partnerAdmin: "Administrator partnera",
+      partnerEmployee: "Pracownik partnera",
+      admin: "Administrator",
+    },
+  },
   dialog: {
     title: "Uprawnienia wątku: {{threadTitle}}",
   },

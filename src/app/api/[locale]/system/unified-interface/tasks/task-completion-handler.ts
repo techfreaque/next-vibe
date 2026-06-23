@@ -20,11 +20,11 @@ import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[local
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   CallbackMode,
   type CallbackModeValue,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

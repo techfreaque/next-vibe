@@ -20,7 +20,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";

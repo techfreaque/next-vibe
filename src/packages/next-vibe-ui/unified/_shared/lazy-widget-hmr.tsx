@@ -64,11 +64,11 @@ export function HmrWrapper({
         (mod.default as AnyComponent & { __vibeWidgetModuleId?: string })
           .__vibeWidgetModuleId;
 
-      if (!moduleId || typeof window === "undefined") {
+      if (!moduleId) {
         return;
       }
 
-      const byFile = window.__vibeWidgetByFile;
+      const byFile = globalThis.__vibeWidgetByFile;
       if (!byFile) {
         return;
       }

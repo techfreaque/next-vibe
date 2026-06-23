@@ -80,6 +80,13 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "post.fields.op.label",
         description: "post.fields.op.description",
+        options: [
+          { value: ">", label: "enums.op.gt" as const },
+          { value: "<", label: "enums.op.lt" as const },
+          { value: ">=", label: "enums.op.gte" as const },
+          { value: "<=", label: "enums.op.lte" as const },
+          { value: "==", label: "enums.op.eq" as const },
+        ],
         schema: z.enum([">", "<", ">=", "<=", "=="]),
         columns: 6,
       }),

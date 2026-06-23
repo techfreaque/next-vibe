@@ -40,8 +40,8 @@ import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/defi
 import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

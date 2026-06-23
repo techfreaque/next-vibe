@@ -23,7 +23,7 @@ import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config"
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 

@@ -48,17 +48,17 @@ import {
   triggerHermesPull,
   unregisterDevFromHermes,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
-import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-provider";
+import { skillsSyncProvider } from "@/app/api/[locale]/agent/skills/sync-provider";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import {
   buildSyncPayloads,
   collectCursors,
   ensureProvidersRegistered,
   type SyncProvider,
-} from "@/app/api/[locale]/remote-connection/sync-provider";
+} from "@/app/api/[locale]/remote-connection/sync/provider";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
@@ -99,18 +99,7 @@ async function pollUntil<T>(
 
 /** Check if hermes is reachable - used to conditionally skip live sync tests */
 async function isHermesReachable(): Promise<boolean> {
-  try {
-    const resp = await fetch(`${LOCAL_DEV_URL}/api/en-US/user/public/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "noop@noop", password: "noop" }),
-      signal: AbortSignal.timeout(3000),
-    });
-    // 400/401 = server is up (auth failed), that's fine
-    return resp.status < 500;
-  } catch {
-    return false;
-  }
+  return isServerRunning(LOCAL_DEV_URL, HERMES_DEV_PID_FILE_PATH);
 }
 
 /**

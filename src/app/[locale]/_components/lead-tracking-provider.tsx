@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  getCurrentUrl,
-  getReferrer,
-  getUserAgent,
-} from "next-vibe-ui/utils/browser";
+import { getReferrer } from "next-vibe-ui/lib/dom";
+import { getCurrentUrl } from "next-vibe-ui/lib/location";
+import { getUserAgent } from "next-vibe-ui/lib/media";
 import { useEffect, useRef } from "react";
 
 import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";

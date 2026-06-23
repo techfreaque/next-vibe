@@ -1,6 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import {
+  copyImageToClipboard,
+  copyToClipboard,
+} from "next-vibe-ui/lib/clipboard";
+import { downloadFromUrl } from "next-vibe-ui/lib/download";
 import { Audio } from "next-vibe-ui/ui/audio";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -12,11 +17,6 @@ import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import { Video } from "next-vibe-ui/ui/video";
-import {
-  copyImageToClipboard,
-  copyToClipboard,
-  downloadFromUrl,
-} from "next-vibe-ui/utils/browser";
 import {
   type JSX,
   memo,
@@ -34,14 +34,14 @@ import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/strea
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
+import { useSkill } from "@/app/api/[locale]/agent/skills/[id]/hooks";
 import {
   processMessageGroupForCopy,
   processMessageGroupForTTS,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -232,55 +232,24 @@ function MediaActions({
 
   const handleCopy = useCallback((): void => {
     if (type === "image") {
-      // Copy image bytes to clipboard
-      void fetch(url)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const mimeType = blob.type || "image/png";
-          const item = new ClipboardItem({ [mimeType]: blob });
-          return navigator.clipboard.write([item]);
-        })
-        .then(
-          () => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-            return undefined;
-          },
-          () => {
-            // Fallback to URL copy if ClipboardItem not supported
-            void navigator.clipboard.writeText(url).then(
-              () => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-                return undefined;
-              },
-              () => undefined,
-            );
-          },
-        );
+      void copyImageToClipboard(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return undefined;
+      });
     } else {
-      // For audio/video just copy the URL
-      void navigator.clipboard.writeText(url).then(
-        () => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          return undefined;
-        },
-        () => undefined,
-      );
+      void copyToClipboard(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return undefined;
+      });
     }
   }, [url, type]);
 
   const handleDownload = useCallback((): void => {
     const ext = type === "image" ? "jpg" : type === "audio" ? "mp3" : "mp4";
     const filename = `generated-${type}-${Date.now()}.${ext}`;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    downloadFromUrl(filename, url);
   }, [url, type]);
 
   const copyLabel = copied

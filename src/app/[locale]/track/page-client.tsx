@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import type React from "react";
 
 import { scopedTranslation } from "@/app/[locale]/track/i18n";

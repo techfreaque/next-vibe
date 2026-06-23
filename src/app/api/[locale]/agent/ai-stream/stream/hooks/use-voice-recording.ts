@@ -7,7 +7,7 @@
 import { useCallback, useMemo, useRef } from "react";
 
 import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

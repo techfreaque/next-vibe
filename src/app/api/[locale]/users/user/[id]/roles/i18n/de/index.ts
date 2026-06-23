@@ -161,4 +161,21 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  enums: {
+    userRole: {
+      public: "Öffentlich",
+      customer: "Kunde",
+      partnerAdmin: "Partner-Administrator",
+      partnerEmployee: "Partner-Mitarbeiter",
+      admin: "Administrator",
+      cliOff: "CLI Deaktiviert",
+      cliAuthBypass: "CLI Auth Bypass",
+      aiToolOff: "KI-Tool Deaktiviert",
+      webOff: "Web Deaktiviert",
+      mcpOff: "MCP Deaktiviert",
+      mcpVisible: "MCP Sichtbar",
+      productionOff: "Produktion Deaktiviert",
+      skillOff: "Skill Deaktiviert",
+    },
+  },
 };

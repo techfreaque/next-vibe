@@ -1,6 +1,18 @@
 export const translations = {
   title: "Campaign Stats",
   description: "Email campaign performance statistics",
+  enums: {
+    emailJourneyVariantFilter: {
+      all: "All",
+      uncensoredConvert: "Uncensored Convert",
+      sideHustle: "Side Hustle",
+      quietRecommendation: "Quiet Recommendation",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      newsletterMay2026: "Newsletter May 2026",
+    },
+  },
   get: {
     title: "Campaign Stats",
     titleShort: "Campaign Stats",

@@ -222,6 +222,7 @@ const { PATCH } = createEndpoint({
       default: {
         fields: {
           name: "Acme GmbH Updated",
+          type: CompanyType.B2B,
           email: "new@acme.example.com",
         },
       },

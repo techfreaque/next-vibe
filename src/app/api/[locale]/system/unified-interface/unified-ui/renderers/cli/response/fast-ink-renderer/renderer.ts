@@ -22,7 +22,7 @@ import {
   LegacyRoot,
 } from "react-reconciler/constants.js";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;

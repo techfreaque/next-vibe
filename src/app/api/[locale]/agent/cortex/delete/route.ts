@@ -8,7 +8,7 @@ export const { DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.DELETE]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) =>
+    handler: ({ data, user, locale, logger, t }) =>
       CortexDeleteRepository.deleteNode({
         userId: user.id,
         user,
@@ -18,5 +18,9 @@ export const { DELETE, tools } = endpointsHandler({
         logger,
         t,
       }),
+    onRemoteEvent: {
+      "node-deleted": (payload, ctx) =>
+        CortexDeleteRepository.applyRemoteDelete(payload, ctx.user, ctx.logger),
+    },
   },
 });

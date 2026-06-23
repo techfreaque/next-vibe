@@ -50,11 +50,12 @@ function estimateInputTokensFromMessages(
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { ThreadStreamingState } from "../../../chat/enum";
 import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import {

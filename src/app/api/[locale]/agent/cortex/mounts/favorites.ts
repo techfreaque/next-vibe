@@ -13,8 +13,8 @@ import "server-only";
  */
 import { and, count as drizzleCount, eq } from "drizzle-orm";
 
-import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 import { db } from "@/app/api/[locale]/system/db";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";

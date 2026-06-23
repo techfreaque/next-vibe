@@ -5,7 +5,7 @@
  * on any website. Zero React dependency.
  *
  * Architecture mirrors widget-engine-browser.ts + OutsideBridge:
- *  - Config signal as source of truth: mutating window.vibeFrameConfig re-syncs frames
+ *  - Config signal as source of truth: mutating globalThis.vibeFrameConfig re-syncs frames
  *  - Reactive config: updating serverUrl, theme, data re-sends to iframe
  *  - Federated: each integration can point to a different serverUrl
  *  - Full trigger system (immediate, scroll, time, exit-intent, click, hover, viewport)
@@ -17,7 +17,7 @@
  *
  * Declarative usage (script-tag):
  *   <script>
- *     window.vibeFrameConfig = {
+ *     globalThis.vibeFrameConfig = {
  *       serverUrl: "https://unbottled.ai",
  *       integrations: [{ endpoint: "contact_POST", target: "#form" }],
  *     };
@@ -25,11 +25,20 @@
  *   <script src="https://unbottled.ai/vibe-frame/vibe-frame.js"></script>
  *
  * Reactive update (after init):
- *   window.vibeFrameConfig.serverUrl = "https://other.com"; // re-syncs frames
+ *   globalThis.vibeFrameConfig.serverUrl = "https://other.com"; // re-syncs frames
  *
  * Imperative usage (still available):
  *   VibeFrame.mount({ serverUrl, endpoint, target });
  */
+
+import {
+  appendToBody,
+  createElement,
+  onDOMReady,
+  querySelector,
+} from "next-vibe-ui/lib/dom";
+import { getCurrentOrigin } from "next-vibe-ui/lib/location";
+import { getLanguage } from "next-vibe-ui/lib/media";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -68,7 +77,7 @@ interface ManagedFrame {
 const frames = new Map<string, ManagedFrame>();
 
 // ─── Config Signal ────────────────────────────────────────────────────────────
-// Single source of truth. window.vibeFrameConfig is replaced with a
+// Single source of truth. globalThis.vibeFrameConfig is replaced with a
 // getter/setter proxy backed by this value after init - mirrors widget-engine
 // WidgetEnginePostInitContext.pweConfigSignal pattern.
 
@@ -106,10 +115,10 @@ function initContext(cfg: VibeFrameGlobalConfig): boolean {
   initialized = true;
   setConfig(cfg);
 
-  // Replace window.vibeFrameConfig with a getter/setter proxy so that any
-  // mutation on the host page (e.g. window.vibeFrameConfig.serverUrl = "...")
+  // Replace globalThis.vibeFrameConfig with a getter/setter proxy so that any
+  // mutation on the host page (e.g. globalThis.vibeFrameConfig.serverUrl = "...")
   // flows through setConfig and triggers subscribers.
-  Object.defineProperty(window, "vibeFrameConfig", {
+  Object.defineProperty(globalThis, "vibeFrameConfig", {
     get(): VibeFrameGlobalConfig | undefined {
       return configSignal;
     },
@@ -144,7 +153,7 @@ async function waitForElement(selector: string): Promise<Element | null> {
   let delay = 50;
 
   while (Date.now() - start < ELEMENT_WAIT_TIMEOUT) {
-    const el = document.querySelector(selector);
+    const el = querySelector(selector);
     if (el) {
       return el;
     }
@@ -206,7 +215,9 @@ function mountWithTrigger(
   });
 
   // Stub instance - held by host while waiting for trigger
-  const iframe = document.createElement("iframe");
+  // oxlint-disable-next-line react/iframe-missing-sandbox -- sandbox set via setAttribute on next line
+  const iframe = createElement("iframe");
+  iframe.setAttribute("sandbox", DEFAULT_SANDBOX);
   const stub = createStubInstance(frameId, iframe, () => {
     triggerCleanup();
     realInstance?.destroy();
@@ -216,7 +227,7 @@ function mountWithTrigger(
   frames.set(frameId, {
     instance: stub,
     bridge: null,
-    container: document.createElement("div"),
+    container: createElement("div"),
     triggerCleanup,
     config,
     display,
@@ -234,7 +245,8 @@ function mountImmediate(
   const locale = config.locale ?? detectLocale();
 
   // Build iframe (src set async after config API call)
-  const iframe = document.createElement("iframe");
+  // oxlint-disable-next-line react/iframe-missing-sandbox -- sandbox set via setAttribute below
+  const iframe = createElement("iframe");
   iframe.id = frameId;
   iframe.title = config.endpoint;
   iframe.setAttribute("sandbox", config.sandbox ?? DEFAULT_SANDBOX);
@@ -245,7 +257,7 @@ function mountImmediate(
   }
 
   // Container + DOM insertion (async for inline to wait for target element)
-  let container: HTMLElement = document.createElement("div");
+  let container: HTMLElement = createElement("div");
   const serverOrigin = new URL(config.serverUrl).origin;
 
   // Bridge - listens to vf: and BRIDGE_CALL messages from this iframe
@@ -261,7 +273,7 @@ function mountImmediate(
     bridge.send({
       type: "vf:init",
       frameId,
-      origin: window.location.origin,
+      origin: getCurrentOrigin(),
       theme: config.theme ?? "system",
       locale,
       cssVars: config.cssVars ?? {},
@@ -356,8 +368,8 @@ async function insertInline(
     const el = await waitForElement(targetSpec);
     if (!el) {
       // Fallback: attach to body so frame still mounts
-      const fallback = document.createElement("div");
-      document.body.appendChild(fallback);
+      const fallback = createElement("div");
+      appendToBody(fallback);
       scheduleIdle(() => fallback.appendChild(iframe));
       return fallback;
     }
@@ -374,17 +386,17 @@ function insertOverlay(
   config: FrameMountConfig,
   display: FrameDisplayMode,
 ): HTMLElement {
-  const overlay = document.createElement("div");
+  const overlay = createElement("div");
   overlay.className = `vf-overlay vf-overlay--${display}`;
   overlay.style.cssText =
     "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;";
 
-  const dialog = document.createElement("div");
+  const dialog = createElement("div");
   dialog.className = `vf-dialog vf-dialog--${display}`;
   dialog.style.cssText = getDialogStyles(display);
 
   // Close button
-  const closeBtn = document.createElement("button");
+  const closeBtn = createElement("button");
   closeBtn.className = "vf-close";
   closeBtn.innerHTML = "&times;";
   closeBtn.style.cssText =
@@ -405,7 +417,7 @@ function insertOverlay(
   dialog.appendChild(closeBtn);
   dialog.appendChild(iframe);
   overlay.appendChild(dialog);
-  document.body.appendChild(overlay);
+  appendToBody(overlay);
 
   return overlay;
 }
@@ -571,7 +583,7 @@ async function fetchFrameConfig(
 }
 
 function detectLocale(): CountryLanguage {
-  const lang = navigator.language;
+  const lang = getLanguage();
   if (lang.includes("-")) {
     return lang as CountryLanguage;
   }
@@ -592,7 +604,14 @@ function createStubInstance(
   iframe?: HTMLIFrameElement,
   onDestroy?: () => void,
 ): VibeFrameInstance {
-  const el = iframe ?? document.createElement("iframe");
+  const el =
+    iframe ??
+    ((): HTMLIFrameElement => {
+      // oxlint-disable-next-line react/iframe-missing-sandbox -- sandbox set via setAttribute on next line
+      const i = createElement("iframe");
+      i.setAttribute("sandbox", DEFAULT_SANDBOX);
+      return i;
+    })();
   return {
     id: frameId,
     iframe: el,
@@ -625,7 +644,7 @@ function mountBatch(
 }
 
 // ─── Auto-Init from Global Config ────────────────────────────────────────────
-// Reads window.vibeFrameConfig, mounts all integrations, then installs the
+// Reads globalThis.vibeFrameConfig, mounts all integrations, then installs the
 // getter/setter proxy so future mutations stay reactive.
 
 function mountFromConfig(cfg: VibeFrameGlobalConfig): void {
@@ -643,7 +662,7 @@ function mountFromConfig(cfg: VibeFrameGlobalConfig): void {
 }
 
 function autoInit(): void {
-  const raw = window.vibeFrameConfig;
+  const raw = globalThis.vibeFrameConfig;
   if (!raw) {
     return;
   }
@@ -655,7 +674,7 @@ function autoInit(): void {
 
   mountFromConfig(raw);
 
-  // Subscribe to future config replacements (window.vibeFrameConfig = newObj)
+  // Subscribe to future config replacements (globalThis.vibeFrameConfig = newObj)
   subscribeConfig((next) => {
     // Destroy all existing frames and re-mount from the new config
     destroyAll();
@@ -708,19 +727,13 @@ export const VibeFrame: VibeFramePublicAPI = {
 // ─── Window Exposure ─────────────────────────────────────────────────────────
 // Typed via `declare global { interface Window }` in types.ts - no cast needed.
 
-if (typeof window !== "undefined") {
-  window.VibeFrame = VibeFrame;
+globalThis.VibeFrame = VibeFrame;
 
-  // Auto-init: read window.vibeFrameConfig that host page set before this script.
-  // If readyState is still "loading", wait for DOMContentLoaded so that target
-  // elements exist in the DOM when inline frames try to mount.
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", autoInit);
-  } else {
-    // Async/deferred script - DOM already ready
-    scheduleIdle(autoInit);
-  }
-}
+// Auto-init: read globalThis.vibeFrameConfig that host page set before this script.
+// onDOMReady fires immediately if DOM is ready, or waits for DOMContentLoaded.
+onDOMReady(() => {
+  scheduleIdle(autoInit);
+});
 
 // ─── Exported for ESM package use (embed-package.ts re-exports) ──────────────
 // ─── Exported for ESM package use (embed-package.ts re-exports) ──────────────

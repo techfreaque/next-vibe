@@ -1,9 +1,9 @@
+import type { ImageGenModelSelection } from "../image-generation/models";
 import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "../chat/skills/enum";
-import type { ImageGenModelSelection } from "../image-generation/models";
+} from "../skills/enum";
 import { ImageGenModelId } from "./models";
 
 /**

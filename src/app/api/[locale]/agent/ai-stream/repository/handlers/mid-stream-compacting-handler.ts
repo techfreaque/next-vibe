@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { type ChatModelId, getChatModelById } from "../../models";

@@ -5,15 +5,15 @@
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatModelOptions } from "../../ai-stream/models";
-import { IntelligenceLevelDB } from "../../chat/skills/enum";
 import { imageGenModelOptions } from "../../image-generation/models";
 import { musicGenModelOptions } from "../../music-generation/models";
+import { IntelligenceLevelDB } from "../../skills/enum";
 import { sttModelOptions } from "../../speech-to-text/models";
 import { ttsModelOptions } from "../../text-to-speech/models";
 import { videoGenModelOptions } from "../../video-generation/models";

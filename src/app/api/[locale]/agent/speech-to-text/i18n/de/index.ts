@@ -181,6 +181,7 @@ export const translations: typeof enTranslations = {
       text: "Transkribierter Text",
       provider: "Verwendeter Anbieter",
       confidence: "Konfidenzwert",
+      creditCost: "Verwendete Credits",
     },
     errors: {
       unauthorized: {

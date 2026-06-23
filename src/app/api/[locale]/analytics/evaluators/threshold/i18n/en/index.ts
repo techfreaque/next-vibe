@@ -1,5 +1,14 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    op: {
+      gt: ">",
+      lt: "<",
+      gte: ">=",
+      lte: "<=",
+      eq: "==",
+    },
+  },
   post: {
     title: "Threshold",
     titleShort: "Threshold",

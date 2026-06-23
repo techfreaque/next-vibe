@@ -18,7 +18,7 @@ import { campaignSchedulerService } from "@/app/api/[locale]/leads/campaigns/ema
 import { leads } from "@/app/api/[locale]/leads/db";
 import { LeadStatus } from "@/app/api/[locale]/leads/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { newsletterSubscriptions } from "../../db";

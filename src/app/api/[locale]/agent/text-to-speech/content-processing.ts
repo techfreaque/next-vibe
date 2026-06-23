@@ -6,8 +6,8 @@
 import { getTranslatorFromEndpoint } from "next-vibe-ui/unified/_shared/field-helpers";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";

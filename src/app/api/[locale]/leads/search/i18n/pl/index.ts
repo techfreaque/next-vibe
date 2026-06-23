@@ -116,4 +116,19 @@ export const translations: typeof enTranslations = {
     statusBounced: "Odrzucony",
     statusInvalid: "Nieprawidłowy",
   },
+  enums: {
+    leadStatus: {
+      new: "Nowy",
+      pending: "Oczekujący",
+      campaignRunning: "Kampania w toku",
+      websiteUser: "Użytkownik strony",
+      newsletterSubscriber: "Subskrybent newslettera",
+      inContact: "W kontakcie",
+      signedUp: "Zarejestrowany",
+      subscriptionConfirmed: "Subskrypcja potwierdzona",
+      unsubscribed: "Wypisany",
+      bounced: "Niedostarczony",
+      invalid: "Nieprawidłowy",
+    },
+  },
 };

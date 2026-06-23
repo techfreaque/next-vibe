@@ -124,6 +124,19 @@ const { POST } = createEndpoint({
     },
   }),
 
+  // This op owns its `node-written` event. `requestFields` carry the write the
+  // user submitted; the peer's onRemoteEvent re-runs writeFile. Server-only — no
+  // client cache to update, so clientDelivery: false.
+  events: {
+    "node-written": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["path", "content", "createParents"] as const,
+      syncDomain: "documents" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "post.errors.validation.title" as const,

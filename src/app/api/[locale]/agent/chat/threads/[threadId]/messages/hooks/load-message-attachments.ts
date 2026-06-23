@@ -7,7 +7,7 @@ import {
   base64ToFile,
   urlToFile,
 } from "@/app/api/[locale]/agent/chat/incognito/file-utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 export async function loadMessageAttachments(
   message: ChatMessage,

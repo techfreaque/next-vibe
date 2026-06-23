@@ -7,6 +7,17 @@ export const translations: typeof enTranslations = {
     jobs: "Jobs",
     list: "Liste",
   },
+  status: {
+    get: {
+      actions: {
+        refresh: "Aktualisieren",
+        refreshing: "Wird aktualisiert...",
+      },
+      response: {
+        statusCounts: "Statusübersicht",
+      },
+    },
+  },
 
   get: {
     title: "Import-Jobs Status",

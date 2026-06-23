@@ -6,6 +6,7 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
@@ -70,7 +71,6 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

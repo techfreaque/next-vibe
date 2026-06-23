@@ -68,14 +68,6 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
-import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
-import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
-import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/chat/skills/config";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
@@ -85,6 +77,14 @@ import {
   SearchProviderOptions,
 } from "@/app/api/[locale]/agent/search/enum";
 import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
+import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
+import { useFavoriteCreate } from "@/app/api/[locale]/agent/skills/favorites/create/hooks";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/skills/favorites/definition";
+import favoritesEndpoint from "@/app/api/[locale]/agent/skills/favorites/definition";
+import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/skills/favorites/favorite-select-context";
+import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import taskExecuteEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/execute/definition";

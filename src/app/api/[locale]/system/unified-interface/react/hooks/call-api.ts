@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";

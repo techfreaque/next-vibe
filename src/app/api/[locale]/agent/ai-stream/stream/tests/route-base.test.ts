@@ -54,27 +54,21 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ContentLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import {
-  ImageGenModelId,
-  type ImageGenModelSelection,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/skills/enum";
 import { contacts } from "@/app/api/[locale]/contact/db";
 import { ContactSubject } from "@/app/api/[locale]/contact/enum";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -82,12 +76,7 @@ import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
-import {
-  ChatModelId,
-  type ChatModelOption,
-  chatModelOptionsIndex,
-} from "../../models";
-import { runHeadlessAiStream } from "../../repository/headless";
+import { ChatModelId } from "../../models";
 import {
   normalizeFetchCacheFixtures,
   patchFetchCacheFixtures,
@@ -103,7 +92,6 @@ import {
   toolResultRecord,
   waitForThreadIdle,
 } from "../../testing/headless-test-runner";
-import { scopedTranslation } from "../i18n";
 
 // ── Mode configuration ────────────────────────────────────────────────────────
 

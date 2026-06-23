@@ -10,7 +10,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useRef } from "react";
 
 import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { useVoiceModeStore } from "./voice-mode/store";
 import { type VadConfig, VoiceActivityDetector } from "./voice-mode/vad";

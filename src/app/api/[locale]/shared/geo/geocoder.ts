@@ -1,7 +1,7 @@
 import { parseError } from "next-vibe/shared/utils";
-import { getGeolocation } from "next-vibe-ui/utils/browser";
+import { getGeolocation } from "next-vibe-ui/lib/media";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { Coordinates } from "./coordinates";
 

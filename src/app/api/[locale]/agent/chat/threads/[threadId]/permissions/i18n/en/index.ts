@@ -4,6 +4,15 @@ export const translations = {
     threads: "Threads",
     permissions: "Permissions",
   },
+  enums: {
+    userRole: {
+      public: "Public",
+      customer: "Customer",
+      partnerAdmin: "Partner Admin",
+      partnerEmployee: "Partner Employee",
+      admin: "Admin",
+    },
+  },
   dialog: {
     title: "Thread Permissions: {{threadTitle}}",
   },

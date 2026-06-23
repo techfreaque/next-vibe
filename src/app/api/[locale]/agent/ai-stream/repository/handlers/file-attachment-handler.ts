@@ -11,7 +11,7 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { db } from "../../../../system/db";
 import { chatMessages } from "../../../chat/db";

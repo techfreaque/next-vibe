@@ -5,6 +5,24 @@ export const translations = {
   endpointCategories: {
     ai: "AI",
   },
+  enums: {
+    modelType: {
+      text: "Text",
+      image: "Image",
+      video: "Video",
+      audio: "Audio",
+    },
+    content: {
+      mainstream: "Mainstream",
+      open: "Open",
+      uncensored: "Uncensored",
+    },
+    intelligence: {
+      quick: "Quick",
+      smart: "Smart",
+      brilliant: "Brilliant",
+    },
+  },
   get: {
     title: "Models",
     titleShort: "AI Models",

@@ -40,14 +40,6 @@ export const translations: typeof enTranslations = {
       skills: "Skills",
       favorites: "Favoriten",
       threads: "Threads",
-      chat: "Chat",
-    },
-    liveSync: {
-      title: "Live-Ereignissync",
-      description:
-        "Echtzeitereignisse werden zwischen verbundenen Instanzen übertragen.",
-      chatEvents: "Chat-Nachrichten",
-      liveOnlyBadge: "Nur Live-Relay",
     },
     cortexSection: "Cortex",
     cortexDescription: "Gemeinsames Dateisystem dieser Verbindung durchsuchen.",
@@ -140,6 +132,11 @@ export const translations: typeof enTranslations = {
       label: "Transportmodus",
       description:
         "Wie diese Verbindung kommuniziert. reverse-ws: persistente ausgehende WS (öffnet sofort beim Speichern). direct-http: direkte HTTP-Aufrufe. ws-provider: Remote führt KI-Loop aus. cloud-only: keine ausgehende Verbindung.",
+      options: {
+        reverseWs: "Reverse WS",
+        directHttp: "Direkt HTTP",
+        cloudOnly: "Nur Cloud",
+      },
     },
     isInferenceProvider: {
       label: "Inferenz-Provider",
@@ -151,21 +148,6 @@ export const translations: typeof enTranslations = {
       description:
         "Admin-Override: Alle KI-Streams durch diese Verbindung leiten, unabhängig von Kosten oder Benutzerregeln. Nur eine Verbindung gleichzeitig.",
     },
-    loopLocation: {
-      label: "KI-Loop-Standort",
-      description:
-        "Wo der KI-Inferenz-Loop läuft. Client: lokaler Rechner übernimmt den Loop. Server: Remote-Instanz übernimmt ihn.",
-    },
-    threadMirrorMode: {
-      label: "Thread-Speicherung",
-      description:
-        "Wo Threads im Ordner dieser Verbindung gespeichert werden. Cloud: nur Cloud. Lokal: nur lokal. Beide: gespiegelt. Keine: kein Speicher.",
-    },
-    toolSource: {
-      label: "Tool-Quelle",
-      description:
-        "Welche Tools in KI-Streams dieser Verbindung verfügbar sind. Lokal: eigene Tools. Remote: nur Remote-Tools. Beide: zusammengeführt.",
-    },
     syncScope: {
       label: "Sync-Umfang",
       description:
@@ -175,7 +157,6 @@ export const translations: typeof enTranslations = {
       skills: "Skills",
       favorites: "Favoriten",
       threads: "Threads",
-      chat: "Chat-Ereignisse",
     },
     reconnectNow: {
       label: "Jetzt neu verbinden",

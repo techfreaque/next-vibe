@@ -16,7 +16,7 @@ import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -32,10 +32,6 @@ import type { VideoGenerationT } from "./i18n";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
 
-interface MediaGenStreamContext {
-  threadId?: string | undefined;
-}
-
 export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
@@ -46,7 +42,9 @@ export class VideoGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: VideoGenerationT,
-    streamContext: MediaGenStreamContext,
+    streamContext: {
+      threadId?: string;
+    },
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {

@@ -11,9 +11,6 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import {
   formatConfig,
   formatDuration,
@@ -25,7 +22,10 @@ import {
   formatStartup,
   formatSuccess,
   formatWarning,
-} from "../../unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type {
   GitInfo,
   GitOpsConfig,

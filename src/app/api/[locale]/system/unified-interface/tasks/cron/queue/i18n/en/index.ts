@@ -1,4 +1,28 @@
 export const translations = {
+  priority: {
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    background: "Background",
+  },
+  taskCategory: {
+    development: "Development",
+    build: "Build",
+    watch: "Watch",
+    generator: "Generator",
+    test: "Test",
+    maintenance: "Maintenance",
+    database: "Database",
+    system: "System",
+    monitoring: "Monitoring",
+    leadManagement: "Lead Management",
+  },
+  hiddenFilter: {
+    visible: "Visible",
+    hidden: "Hidden",
+    all: "All",
+  },
   category: "API Endpoint",
   tags: {
     tasks: "Tasks",

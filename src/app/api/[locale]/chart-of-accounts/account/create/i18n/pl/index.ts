@@ -1,6 +1,42 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    accountType: {
+      ASSET: "Aktywa",
+      LIABILITY: "Zobowiązania",
+      EQUITY: "Kapitał własny",
+      REVENUE: "Przychody",
+      EXPENSE: "Koszty",
+    },
+    accountSubtype: {
+      CURRENT_ASSET: "Aktywa obrotowe",
+      FIXED_ASSET: "Aktywa trwałe",
+      BANK: "Bank",
+      CASH: "Gotówka",
+      ACCOUNTS_RECEIVABLE: "Należności",
+      INVENTORY: "Zapasy",
+      PREPAID: "Przedpłaty",
+      ACCOUNTS_PAYABLE: "Zobowiązania handlowe",
+      VAT_PAYABLE: "VAT należny",
+      VAT_RECEIVABLE: "VAT naliczony",
+      ACCRUED_LIABILITY: "Rezerwy",
+      SHORT_TERM_DEBT: "Dług krótkoterminowy",
+      LONG_TERM_DEBT: "Dług długoterminowy",
+      SHARE_CAPITAL: "Kapitał zakładowy",
+      RETAINED_EARNINGS: "Zyski zatrzymane",
+      REVENUE_SALES: "Przychody ze sprzedaży",
+      REVENUE_SERVICE: "Przychody z usług",
+      COGS: "Koszt własny sprzedaży",
+      PAYROLL: "Wynagrodzenia",
+      RENT: "Czynsz",
+      UTILITIES: "Media",
+      OPEX: "Koszty operacyjne",
+      FINANCIAL_INCOME: "Przychody finansowe",
+      FINANCIAL_EXPENSE: "Koszty finansowe",
+      TAX_EXPENSE: "Podatek dochodowy",
+    },
+  },
   post: {
     title: "Utwórz konto",
     titleShort: "Nowe konto",

@@ -3,9 +3,9 @@
  * Type guards, retry logic, and helper functions
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type {
   PackageJson,
   ParsedVersion,

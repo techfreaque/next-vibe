@@ -10,7 +10,7 @@ import type { JSX } from "react";
 
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { HelpGetResponseOutput } from "@/app/api/[locale]/system/help/definition";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

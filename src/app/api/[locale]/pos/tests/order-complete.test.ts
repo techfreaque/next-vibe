@@ -18,8 +18,8 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";

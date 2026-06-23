@@ -9,6 +9,7 @@ import { Environment } from "next-vibe/shared/utils";
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe-ui/lib/request";
 
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -17,7 +18,6 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { LeadAuthRepository } from "../../../leads/auth/repository";
 import { leads } from "../../../leads/db";
 import { db } from "../../db";
-import { createEndpointLogger } from "../../unified-interface/shared/logger/server-logger";
 import { frameExchangeTokens } from "../../unified-interface/vibe-frame/db";
 import { shouldSkipPath } from "../utils";
 

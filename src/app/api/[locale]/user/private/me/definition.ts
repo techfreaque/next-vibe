@@ -12,7 +12,7 @@ import {
   SkillCategoryDB,
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+} from "@/app/api/[locale]/agent/skills/enum";
 import { leadId } from "@/app/api/[locale]/leads/types";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";

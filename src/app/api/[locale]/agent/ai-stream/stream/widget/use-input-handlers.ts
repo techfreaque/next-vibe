@@ -9,7 +9,7 @@ import { useCallback, useMemo, useRef } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useChatInputStore } from "../hooks/input-store";

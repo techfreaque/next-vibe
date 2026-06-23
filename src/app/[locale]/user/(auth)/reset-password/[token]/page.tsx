@@ -9,7 +9,7 @@ import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";

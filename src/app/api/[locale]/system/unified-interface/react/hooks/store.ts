@@ -8,8 +8,8 @@ import { z } from "zod";
 import { create } from "zustand";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

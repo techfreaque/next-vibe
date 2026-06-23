@@ -16,7 +16,7 @@ import {
   type HandlerResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -26,18 +26,13 @@ import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
 import type { ChatFileT } from "./i18n";
 
-interface FileResult {
-  buffer: Buffer;
-  contentType: string;
-}
-
 export class ChatFileRepository {
   static async getFile(
     data: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<FileResult> {
+  ): Promise<{ buffer: Buffer; contentType: string }> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       logger.error("File serving only available for filesystem storage");
       return {

@@ -34,7 +34,7 @@ import {
   type SignupT,
 } from "./i18n";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { configScopedTranslation } from "@/config/i18n";
 import { FEATURED_MODELS } from "../../../agent/ai-stream/models";

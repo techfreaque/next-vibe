@@ -3,11 +3,6 @@ import { z } from "zod";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { objectEntries } from "../../shared/utils";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-} from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
@@ -18,10 +13,16 @@ import {
   type ModelDefinition,
   type ModelOptionTtsBased,
 } from "../models/models";
+import type { FiltersModelSelection } from "../models/selection";
 import {
   filtersSelectionSchema,
   sharedFilterPropsSchema,
 } from "../models/selection";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+} from "../skills/enum";
 
 export enum TtsModelId {
   OPENAI_ALLOY = "openai-alloy",

@@ -1,5 +1,6 @@
 "use client";
 
+import { scrollToTop } from "next-vibe-ui/lib/dom";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -13,7 +14,6 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
-import { scrollToTop } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 

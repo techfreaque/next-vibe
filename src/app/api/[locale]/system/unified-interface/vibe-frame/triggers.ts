@@ -6,6 +6,14 @@
  * Framework-agnostic - no React or Preact dependency.
  */
 
+import {
+  addDocumentListener,
+  addWindowListener,
+  getDocumentScrollHeight,
+  getScrollY,
+} from "next-vibe-ui/lib/dom";
+import { getScreenHeight, getScreenWidth } from "next-vibe-ui/lib/screen";
+
 import type { FrameTriggerConfig } from "./types";
 
 // ─── Trigger State ────────────────────────────────────────────────────────────
@@ -32,9 +40,9 @@ let sharedState: TriggerState = {
   keys: 0,
   exit: false,
   viewport: {
-    w: window.innerWidth,
-    h: window.innerHeight,
-    mobile: window.innerWidth < 768,
+    w: getScreenWidth(),
+    h: getScreenHeight(),
+    mobile: getScreenWidth() < 768,
   },
 };
 
@@ -49,57 +57,40 @@ function initSharedState(): void {
 
   // Scroll
   let scrollTimeout: ReturnType<typeof setTimeout>;
-  window.addEventListener(
-    "scroll",
-    () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const scrollHeight =
-          document.documentElement.scrollHeight - window.innerHeight;
-        if (scrollHeight > 0) {
-          sharedState = {
-            ...sharedState,
-            scroll: Math.round((window.scrollY / scrollHeight) * 100),
-          };
-        }
-      }, 100);
-    },
-    { passive: true },
-  );
+  addWindowListener("scroll", () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollHeight = getDocumentScrollHeight() - getScreenHeight();
+      if (scrollHeight > 0) {
+        sharedState = {
+          ...sharedState,
+          scroll: Math.round((getScrollY() / scrollHeight) * 100),
+        };
+      }
+    }, 100);
+  });
 
   // Clicks
-  window.addEventListener(
-    "click",
-    () => {
-      sharedState = { ...sharedState, clicks: sharedState.clicks + 1 };
-    },
-    { passive: true },
-  );
+  addWindowListener("click", () => {
+    sharedState = { ...sharedState, clicks: sharedState.clicks + 1 };
+  });
 
   // Mouse moves (debounced)
   let moveTimeout: ReturnType<typeof setTimeout>;
-  window.addEventListener(
-    "mousemove",
-    () => {
-      clearTimeout(moveTimeout);
-      moveTimeout = setTimeout(() => {
-        sharedState = { ...sharedState, moves: sharedState.moves + 1 };
-      }, 50);
-    },
-    { passive: true },
-  );
+  addWindowListener("mousemove", () => {
+    clearTimeout(moveTimeout);
+    moveTimeout = setTimeout(() => {
+      sharedState = { ...sharedState, moves: sharedState.moves + 1 };
+    }, 50);
+  });
 
   // Keys
-  window.addEventListener(
-    "keydown",
-    () => {
-      sharedState = { ...sharedState, keys: sharedState.keys + 1 };
-    },
-    { passive: true },
-  );
+  addWindowListener("keydown", () => {
+    sharedState = { ...sharedState, keys: sharedState.keys + 1 };
+  });
 
   // Exit intent - mouse leaves through top of viewport
-  document.addEventListener("mouseleave", (event) => {
+  addDocumentListener("mouseleave", (event) => {
     if (event.clientY <= 0) {
       sharedState = { ...sharedState, exit: true };
     }
@@ -110,13 +101,13 @@ function initSharedState(): void {
     sharedState = {
       ...sharedState,
       viewport: {
-        w: window.innerWidth,
-        h: window.innerHeight,
-        mobile: window.innerWidth < 768,
+        w: getScreenWidth(),
+        h: getScreenHeight(),
+        mobile: getScreenWidth() < 768,
       },
     };
   };
-  window.addEventListener("resize", updateViewport, { passive: true });
+  addWindowListener("resize", updateViewport);
 
   // Time - updated every second
   setInterval(() => {
@@ -189,10 +180,9 @@ function scrollTrigger(percent: number, callback: () => void): () => void {
   const interval = setInterval(check, 200);
 
   // Check immediately (page may already be scrolled)
-  const scrollHeight =
-    document.documentElement.scrollHeight - window.innerHeight;
+  const scrollHeight = getDocumentScrollHeight() - getScreenHeight();
   if (scrollHeight > 0) {
-    const current = Math.round((window.scrollY / scrollHeight) * 100);
+    const current = Math.round((getScrollY() / scrollHeight) * 100);
     if (current >= percent) {
       fired = true;
       clearInterval(interval);
@@ -226,8 +216,7 @@ function exitIntentTrigger(callback: () => void): () => void {
     }
   }
 
-  document.addEventListener("mouseleave", onMouseLeave);
-  return () => document.removeEventListener("mouseleave", onMouseLeave);
+  return addDocumentListener("mouseleave", onMouseLeave);
 }
 
 // ─── Click Trigger ───────────────────────────────────────────────────────────
@@ -244,8 +233,7 @@ function clickTrigger(selector: string, callback: () => void): () => void {
     }
   }
 
-  document.addEventListener("click", onClick);
-  return () => document.removeEventListener("click", onClick);
+  return addDocumentListener("click", onClick);
 }
 
 // ─── Hover Trigger ───────────────────────────────────────────────────────────
@@ -268,8 +256,7 @@ function hoverTrigger(selector: string, callback: () => void): () => void {
     }
   }
 
-  document.addEventListener("mouseover", onMouseEnter);
-  return () => document.removeEventListener("mouseover", onMouseEnter);
+  return addDocumentListener("mouseover", onMouseEnter);
 }
 
 // ─── Viewport Trigger ────────────────────────────────────────────────────────
@@ -312,6 +299,5 @@ function viewportTrigger(
   }
 
   const handler = (): void => check();
-  window.addEventListener("resize", handler, { passive: true });
-  return () => window.removeEventListener("resize", handler);
+  return addWindowListener("resize", handler);
 }

@@ -4,6 +4,8 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { getCurrentOrigin } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -20,7 +22,6 @@ import {
   useWidgetSelector,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { copyToClipboard, getCurrentOrigin } from "next-vibe-ui/utils/browser";
 import { useCallback, useState } from "react";
 
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";

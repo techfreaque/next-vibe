@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import inquirer from "inquirer";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";

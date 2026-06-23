@@ -26,7 +26,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DefaultFolderId } from "../../../../config";
+import { DefaultFolderId, rootFolderIdOptions } from "../../../../config";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../enum";
 import threadsDefinitions from "../../../definition";
 import { scopedTranslation } from "./i18n";
@@ -123,6 +123,7 @@ const { GET } = createEndpoint({
         label: "get.rootFolderId.label" as const,
         description: "get.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
 
@@ -300,6 +301,7 @@ const { PATCH } = createEndpoint({
         label: "patch.rootFolderId.label" as const,
         description: "patch.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       content: requestField(scopedTranslation, {
@@ -506,12 +508,7 @@ const { DELETE } = createEndpoint({
         label: "delete.rootFolderId.label" as const,
         description: "delete.rootFolderId.description" as const,
         columns: 6,
-        options: [
-          { value: DefaultFolderId.PRIVATE, label: "Private" },
-          { value: DefaultFolderId.SHARED, label: "Shared" },
-          { value: DefaultFolderId.PUBLIC, label: "Public" },
-          { value: DefaultFolderId.INCOGNITO, label: "Incognito" },
-        ],
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
 

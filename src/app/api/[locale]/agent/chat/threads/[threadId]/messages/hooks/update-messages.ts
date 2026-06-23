@@ -14,10 +14,10 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ChatMessageRole } from "../../../../enum";
+import { ChatMessageRole, ThreadStreamingState } from "../../../../enum";
 import messagesDefinition from "../definition";
 
 // ─── Core write ───────────────────────────────────────────────────────────────
@@ -35,7 +35,9 @@ function writeMessages(
       const existing = old?.success ? old.data.messages : [];
       const updated = updater(existing);
       return success({
-        streamingState: old?.success ? old.data.streamingState : "idle",
+        streamingState: old?.success
+          ? old.data.streamingState
+          : ThreadStreamingState.IDLE,
         backgroundTasks: old?.success ? old.data.backgroundTasks : [],
         messages: updated,
       });

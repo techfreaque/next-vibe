@@ -10,7 +10,7 @@ import { storage } from "next-vibe-ui/lib/storage";
 
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import { ThreadStatus } from "../enum";
+import { ThreadStatus, ThreadStreamingState } from "../enum";
 
 /**
  * Storage keys

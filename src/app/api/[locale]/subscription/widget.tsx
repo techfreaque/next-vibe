@@ -5,6 +5,7 @@
 
 "use client";
 
+import { assignUrl, getCurrentOrigin } from "next-vibe-ui/lib/location";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -27,7 +28,6 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { assignUrl, getCurrentOrigin } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";

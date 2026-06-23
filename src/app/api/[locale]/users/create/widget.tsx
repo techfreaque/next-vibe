@@ -5,6 +5,7 @@
 
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -25,7 +26,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, { useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

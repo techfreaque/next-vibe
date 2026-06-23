@@ -12,14 +12,14 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

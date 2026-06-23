@@ -60,8 +60,8 @@ const { POST } = createEndpoint({
   defaultWebPinned: [UserRole.ADMIN] as const,
   aliases: [CODING_AGENT_ALIAS, "claude-code", "claude", "open-code"],
 
-  // No stream timeout - sessions can run indefinitely
-  streamTimeoutMs: 0,
+  // No timeout - sessions can run indefinitely
+  timeoutMs: 0,
 
   cli: {
     firstCliArgKey: "prompt",

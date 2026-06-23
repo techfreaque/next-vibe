@@ -315,4 +315,32 @@ export const translations = {
       },
     },
   },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
+  enums: {
+    userRole: {
+      public: "Public",
+      customer: "Customer",
+      partnerAdmin: "Partner Admin",
+      partnerEmployee: "Partner Employee",
+      admin: "Admin",
+      cliOff: "CLI Disabled",
+      cliAuthBypass: "CLI Auth Bypass",
+      aiToolOff: "AI Tool Disabled",
+      webOff: "Web Disabled",
+      mcpOff: "MCP Disabled",
+      mcpVisible: "MCP Visible",
+      productionOff: "Production Disabled",
+      skillOff: "Skill Disabled",
+    },
+  },
 };

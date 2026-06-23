@@ -6,7 +6,7 @@
  * - "redis" adapter: Redis PUBLISH/SUBSCRIBE (multi-instance)
  */
 
-import type { WsWireMessage } from "../types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /** The payload type flowing through the pub/sub layer (matches WsWireMessage["data"]) */
 export type PubSubMessageData = WsWireMessage["data"];

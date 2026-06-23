@@ -23,7 +23,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

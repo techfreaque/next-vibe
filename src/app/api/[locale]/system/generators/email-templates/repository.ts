@@ -17,13 +17,13 @@ import type {
   EmailTemplateDefinitionAny,
   TemplateCachedMetadata,
 } from "@/app/api/[locale]/messenger/registry/template";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { LiveIndex } from "../shared/live-index";
 import {

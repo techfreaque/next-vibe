@@ -28,12 +28,12 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";

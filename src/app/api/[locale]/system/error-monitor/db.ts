@@ -19,7 +19,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { LoggerMetadata } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { LoggerMetadata } from "@/app/api/[locale]/system/logger/types";
 
 /** Max characters for the truncated error message */
 export const MAX_MESSAGE_LENGTH = 500;

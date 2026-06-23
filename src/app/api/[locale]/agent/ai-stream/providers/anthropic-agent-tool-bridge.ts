@@ -14,8 +14,8 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /**
  * Tool executor function type - matches CoreTool's execute signature (with options)

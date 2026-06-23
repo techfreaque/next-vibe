@@ -13,7 +13,7 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useMemo } from "react";
 
-import skillDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import skillDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 interface SkillDetailWidgetProps {

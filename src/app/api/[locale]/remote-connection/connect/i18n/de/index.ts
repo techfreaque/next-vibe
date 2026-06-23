@@ -65,12 +65,6 @@ export const translations: typeof enTranslations = {
       label: "Lead-ID",
       description: "Lead-ID der Remote-Instanz (wird automatisch gesetzt)",
     },
-    transportMode: {
-      label: "Verbindungsart",
-      description:
-        "Wie diese Instanz mit der Remote kommuniziert. reverse-ws: persistente ausgehende Verbindung (empfohlen). ws-provider: Remote führt den KI-Inferenz-Loop aus.",
-      default: "reverse-ws (Standard)",
-    },
     isInferenceProvider: {
       label: "Als Inference-Provider nutzen",
       description:
@@ -79,16 +73,7 @@ export const translations: typeof enTranslations = {
     syncScope: {
       label: "Sync-Umfang",
       description: "Welche Daten über diese Verbindung synchronisiert werden.",
-      memories: "Erinnerungen",
-      documents: "Dokumente",
-      skills: "Skills",
-      favorites: "Favoriten",
-      threads: "Threads",
-      chat: "Chat",
-      defaultNote:
-        "Standardmäßig alles deaktiviert. Nach dem Verbinden aktivierbar.",
     },
-    advancedSettings: "Erweiterte Einstellungen",
     credentialWarning:
       "Deine Zugangsdaten gehen direkt von deinem Browser an den Remote-Server. Der hier gespeicherte Token gibt dem Betreiber dieses Servers jedoch vollen Zugriff auf dein Remote-Konto - er kann alles tun, was du dort tun kannst. Verbinde dich nur auf Servern, denen du vollständig vertraust.",
     actions: {

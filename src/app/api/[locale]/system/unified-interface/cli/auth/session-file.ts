@@ -9,9 +9,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { SessionData } from "../../shared/server-only/auth/base-auth-handler";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 

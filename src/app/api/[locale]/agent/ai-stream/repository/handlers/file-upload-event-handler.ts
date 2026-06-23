@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { parseError } from "../../../../shared/utils";
 import type { MessageDbWriter } from "../core/message-db-writer";

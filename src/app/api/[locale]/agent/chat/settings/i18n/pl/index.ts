@@ -9,6 +9,19 @@ export const translations: typeof enTranslations = {
     MALE: "Męski głos",
     FEMALE: "Damski głos",
   },
+  enums: {
+    viewMode: {
+      linear: "Liniowy",
+      threaded: "Wątkowy",
+      flat: "Płaski",
+      debug: "Debug",
+    },
+    provider: {
+      AUTO: "Automatyczny",
+      BRAVE: "Brave",
+      KAGI: "Kagi",
+    },
+  },
   get: {
     title: "Ustawienia",
     titleShort: "Ustawienia chatu",

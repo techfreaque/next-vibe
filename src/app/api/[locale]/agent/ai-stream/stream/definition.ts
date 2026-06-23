@@ -9,8 +9,8 @@ import { z } from "zod";
 import {
   ChatModelId,
   ChatModelIdOptions,
+  chatModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
@@ -24,8 +24,8 @@ import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/co
 import {
   TtsModelId,
   TtsModelIdOptions,
+  voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -45,42 +45,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
-import { DefaultFolderId } from "../../chat/config";
+import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
-import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
+import { ChatMessageRole } from "../../chat/enum";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-const toolConfigItemSchema = z.object({
-  toolId: z.string(),
-  requiresConfirmation: z.boolean(),
-});
-
-/**
- * Zod schema for FavoriteConfig - proper field-driven validation.
- * skillId accepts merged "skillSlug__variantId" format or plain "skillSlug".
- */
-const favoriteConfigSchema = z.object({
-  id: z.string(),
-  /** Merged format: "skillSlug" or "skillSlug__variantId" */
-  skillId: z.string(),
-  modelSelection: chatModelSelectionSchema.nullable(),
-  voiceModelSelection: voiceModelSelectionSchema.nullable(),
-  sttModelSelection: sttModelSelectionSchema.nullable(),
-  imageVisionModelSelection: imageVisionModelSelectionSchema.nullable(),
-  videoVisionModelSelection: videoVisionModelSelectionSchema.nullable(),
-  audioVisionModelSelection: audioVisionModelSelectionSchema.nullable(),
-  imageGenModelSelection: imageGenModelSelectionSchema.nullable(),
-  musicGenModelSelection: musicGenModelSelectionSchema.nullable(),
-  videoGenModelSelection: videoGenModelSelectionSchema.nullable(),
-  availableTools: z.array(toolConfigItemSchema).nullable(),
-  pinnedTools: z.array(toolConfigItemSchema).nullable(),
-  deniedTools: z.array(toolConfigItemSchema).nullable(),
-  compactTrigger: z.number().nullable(),
-  memoryLimit: z.number().nullable(),
-  promptAppend: z.string().nullable(),
-});
 
 const AiStreamWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.AiStreamWidget })),
@@ -157,28 +127,7 @@ const { POST } = createEndpoint({
         label: "post.rootFolderId.label",
         description: "post.rootFolderId.description",
         columns: 3,
-        options: [
-          {
-            value: DefaultFolderId.PRIVATE,
-            label: "chat.config.folders.private" as const,
-          },
-          {
-            value: DefaultFolderId.SHARED,
-            label: "chat.config.folders.shared" as const,
-          },
-          {
-            value: DefaultFolderId.PUBLIC,
-            label: "chat.config.folders.public" as const,
-          },
-          {
-            value: DefaultFolderId.INCOGNITO,
-            label: "chat.config.folders.incognito" as const,
-          },
-          {
-            value: DefaultFolderId.BACKGROUND,
-            label: "chat.config.folders.background" as const,
-          },
-        ],
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       subFolderId: requestField(scopedTranslation, {
@@ -241,7 +190,7 @@ const { POST } = createEndpoint({
         label: "post.role.label",
         description: "post.role.description",
         columns: 4,
-        options: ChatMessageRoleOptions,
+        options: rootFolderIdOptions,
         schema: z.enum(ChatMessageRole).default(ChatMessageRole.USER),
       }),
 
@@ -273,8 +222,52 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "post.favoriteConfig.label",
         description: "post.favoriteConfig.description",
-        columns: 12,
-        schema: favoriteConfigSchema.nullable(),
+        schema: z
+          .object({
+            id: z.string(),
+            skillId: z.string(),
+            modelSelection: chatModelSelectionSchema.nullable(),
+            voiceModelSelection: voiceModelSelectionSchema.nullable(),
+            sttModelSelection: sttModelSelectionSchema.nullable(),
+            imageVisionModelSelection:
+              imageVisionModelSelectionSchema.nullable(),
+            videoVisionModelSelection:
+              videoVisionModelSelectionSchema.nullable(),
+            audioVisionModelSelection:
+              audioVisionModelSelectionSchema.nullable(),
+            imageGenModelSelection: imageGenModelSelectionSchema.nullable(),
+            musicGenModelSelection: musicGenModelSelectionSchema.nullable(),
+            videoGenModelSelection: videoGenModelSelectionSchema.nullable(),
+            availableTools: z
+              .array(
+                z.object({
+                  toolId: z.string(),
+                  requiresConfirmation: z.boolean(),
+                }),
+              )
+              .nullable(),
+            pinnedTools: z
+              .array(
+                z.object({
+                  toolId: z.string(),
+                  requiresConfirmation: z.boolean(),
+                }),
+              )
+              .nullable(),
+            deniedTools: z
+              .array(
+                z.object({
+                  toolId: z.string(),
+                  requiresConfirmation: z.boolean(),
+                }),
+              )
+              .nullable(),
+            compactTrigger: z.number().nullable(),
+            memoryLimit: z.number().nullable(),
+            promptAppend: z.string().nullable(),
+          })
+          .nullable()
+          .optional(),
       }),
       toolConfirmations: requestDataArrayOptionalField(
         scopedTranslation,
@@ -375,7 +368,23 @@ const { POST } = createEndpoint({
         requestField(scopedTranslation, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.FILE,
-          schema: z.instanceof(File),
+          // Accept both browser File objects (normal UI) and base64 wire format
+          // (from remote relay POST bodies sent by stream-relay.ts).
+          schema: z.union([
+            z.instanceof(File),
+            z
+              .object({
+                filename: z.string().min(1),
+                mimeType: z.string().min(1),
+                data: z.string().min(1),
+              })
+              .transform(
+                (att) =>
+                  new File([Buffer.from(att.data, "base64")], att.filename, {
+                    type: att.mimeType,
+                  }),
+              ),
+          ]),
         }),
       ),
 
@@ -445,6 +454,110 @@ const { POST } = createEndpoint({
           }),
         },
       }),
+
+      // === WS-PROVIDER / REMOTE RELAY FIELDS ===
+      // These fields are only used when the request comes from a remote relay caller
+      // (e.g. Atlas relaying to Hermes). Normal chat requests leave them undefined.
+      instanceId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.instanceId.label",
+        description: "post.instanceId.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      tools: requestDataArrayOptionalField(
+        scopedTranslation,
+        {
+          type: WidgetType.CONTAINER,
+          title: "post.tools.title",
+          description: "post.tools.description",
+        },
+        objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { request: "data" },
+          children: {
+            name: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.tools.name.label",
+              description: "post.tools.name.description",
+              columns: 4,
+              schema: z.string().min(1),
+            }),
+            description: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.tools.toolDescription.label",
+              description: "post.tools.toolDescription.description",
+              columns: 4,
+              schema: z.string(),
+            }),
+            parameters: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label: "post.tools.parameters.label",
+              description: "post.tools.parameters.description",
+              columns: 4,
+              schema: z.record(z.string(), z.unknown()),
+            }),
+          },
+        }),
+      ),
+      folderPath: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.folderPath.label",
+        description: "post.folderPath.description",
+        columns: 6,
+        schema: z.array(z.string()).optional(),
+      }),
+      threadMirrorMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.threadMirrorMode.label",
+        description: "post.threadMirrorMode.description",
+        columns: 6,
+        schema: z.enum(["both", "local", "cloud", "none"]).optional(),
+      }),
+      systemPrompt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "post.systemPrompt.label",
+        description: "post.systemPrompt.description",
+        placeholder: "post.systemPrompt.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      confirmationOverrides: requestDataArrayOptionalField(
+        scopedTranslation,
+        {
+          type: WidgetType.CONTAINER,
+          title: "post.confirmationOverrides.title",
+          description: "post.confirmationOverrides.description",
+        },
+        objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { request: "data" },
+          children: {
+            toolId: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.confirmationOverrides.toolId.label",
+              description: "post.confirmationOverrides.toolId.description",
+              schema: z.string(),
+            }),
+            requiresConfirmation: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label: "post.confirmationOverrides.requiresConfirmation.label",
+              description:
+                "post.confirmationOverrides.requiresConfirmation.description",
+              schema: z.boolean(),
+            }),
+          },
+        }),
+      ),
 
       // === TIMEZONE (for cache-stable timestamps) ===
       timezone: requestField(scopedTranslation, {
@@ -573,7 +686,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false },
+        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
       },
@@ -593,7 +706,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false },
+        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
       },
@@ -613,7 +726,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false },
+        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
       },

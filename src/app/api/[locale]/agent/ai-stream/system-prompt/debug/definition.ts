@@ -7,8 +7,8 @@ import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import skillsDefinitions from "@/app/api/[locale]/agent/chat/skills/definition";
 import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
+import skillsDefinitions from "@/app/api/[locale]/agent/skills/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

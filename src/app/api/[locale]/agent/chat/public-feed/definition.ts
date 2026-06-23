@@ -25,6 +25,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 
 const PublicFeedContainer = lazy(() =>
@@ -183,7 +184,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content:
                 "get.response.items.item.streamingState.content" as const,
-              schema: z.enum(["idle", "streaming", "aborting", "waiting"]),
+              schema: z.enum(ThreadStreamingStateDB),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

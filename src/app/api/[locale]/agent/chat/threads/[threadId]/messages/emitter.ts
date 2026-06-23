@@ -20,17 +20,18 @@
 
 import "server-only";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  ThreadStatus,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
-  broadcastLiveMessageEvent,
   createBatchingEmitter,
+  createEndpointEmitter,
 } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 

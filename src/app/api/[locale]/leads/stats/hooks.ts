@@ -7,8 +7,8 @@
 
 import { useCallback, useMemo } from "react";
 
+import { type EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import type {

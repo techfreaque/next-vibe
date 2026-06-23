@@ -62,8 +62,6 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
@@ -76,6 +74,8 @@ import {
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
 import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";

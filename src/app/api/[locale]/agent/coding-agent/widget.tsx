@@ -53,10 +53,10 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

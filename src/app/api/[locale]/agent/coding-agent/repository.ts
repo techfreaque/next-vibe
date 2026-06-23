@@ -33,8 +33,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
@@ -70,11 +70,6 @@ export interface ProviderConfig {
 
 // ── Terminal detection (shared) ────────────────────────────────────────────────
 
-interface TerminalEmulator {
-  bin: string;
-  buildArgs: (cliArgs: string[]) => string[];
-}
-
 function commandExists(cmd: string): boolean {
   try {
     execSync(`command -v ${cmd}`, { stdio: "ignore" });
@@ -87,6 +82,11 @@ function commandExists(cmd: string): boolean {
 function buildShellCommand(bin: string, args: string[], cwd: string): string {
   const escaped = args.map((a) => `'${a.replace(/'/g, "'\\''")}'`);
   return `cd '${cwd.replace(/'/g, "'\\''")}' && ${bin} ${escaped.join(" ")}`;
+}
+
+export interface TerminalEmulator {
+  bin: string;
+  buildArgs: (cliArgs: string[]) => string[];
 }
 
 function detectTerminal(logger: EndpointLogger): TerminalEmulator | undefined {
@@ -404,19 +404,24 @@ export async function runCodingAgent(
     });
   }
 
-  // Path 3: CLI/cron - no revival.
-  // If the provider supports task context injection (e.g. claude-code), reaching here
-  // means we have no taskId to inject - the spawned process can't call complete-task.
-  // Return an error so the caller knows the session can't be tracked.
+  // Path 3: Headless fallback — no escalateToTask, no cronTaskId.
+  // Remote execution (direct-http / goroutine) runs in a headless context without
+  // a streaming revival channel. Fall back to batch mode so the result can be
+  // returned synchronously. This handles interactiveMode=true calls from a remote
+  // AI that can't open a real interactive terminal anyway.
   if (provider.injectTaskContext) {
-    logger.error(
-      "Interactive mode requires a taskId (escalateToTask or cronTaskId) but none was provided",
+    logger.info(
+      "Interactive mode: no escalateToTask or cronTaskId — falling back to batch",
       { bin: provider.bin },
     );
-    return fail({
-      message: t("codingAgent.run.post.errors.internal.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
+    return runBatch(
+      provider,
+      provider.batchArgs(data),
+      cwd,
+      timeoutMs,
+      logger,
+      t,
+    );
   }
 
   // Provider doesn't support task context (e.g. TUI tools) - spawn without revival.

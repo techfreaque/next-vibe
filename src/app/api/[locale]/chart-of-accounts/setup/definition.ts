@@ -64,9 +64,9 @@ const { POST } = createEndpoint({
         placeholder: "post.country.placeholder" as const,
         columns: 12,
         options: [
-          { value: "AT", label: "AT — ÖKR" },
-          { value: "DE", label: "DE — SKR03" },
-          { value: "XX", label: "XX — IFRS Generic" },
+          { value: "AT", label: "enums.country.AT" as const },
+          { value: "DE", label: "enums.country.DE" as const },
+          { value: "XX", label: "enums.country.XX" as const },
         ],
         schema: z.enum(CountryDB),
       }),

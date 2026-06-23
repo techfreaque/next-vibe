@@ -45,16 +45,16 @@ import {
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   SkillCategory,
   SkillOwnershipType,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+} from "@/app/api/[locale]/agent/skills/enum";
+import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
@@ -1277,7 +1277,7 @@ describe("Cortex Mount: /skills", () => {
     // Create a test skill so the /skills mount has something to list/read
     // IMPORTANT: slug must be deterministic (not timestamp-based) so fixture replay works
     const { customSkills: customSkillsTable } =
-      await import("@/app/api/[locale]/agent/chat/skills/db");
+      await import("@/app/api/[locale]/agent/skills/db");
     testSkillSlug = "cortex-test-skill-fixture";
     const [inserted] = await db
       .insert(customSkillsTable)
@@ -1325,7 +1325,7 @@ describe("Cortex Mount: /skills", () => {
       return;
     }
     const { customSkills: customSkillsTable } =
-      await import("@/app/api/[locale]/agent/chat/skills/db");
+      await import("@/app/api/[locale]/agent/skills/db");
     await db
       .delete(customSkillsTable)
       .where(eq(customSkillsTable.id, testSkillId));

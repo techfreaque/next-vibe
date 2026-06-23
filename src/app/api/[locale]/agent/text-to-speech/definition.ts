@@ -6,10 +6,7 @@
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  TtsModelId,
-  TtsModelIdOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

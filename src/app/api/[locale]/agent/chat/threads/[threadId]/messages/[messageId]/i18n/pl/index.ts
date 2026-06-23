@@ -5,6 +5,27 @@ export const translations: typeof enTranslations = {
   tags: {
     messages: "Wiadomości",
   },
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      background: "Wątki w tle",
+      remote: "Czaty zdalne",
+    },
+  },
+  chat: {
+    enums: {
+      role: {
+        user: "Użytkownik",
+        assistant: "Asystent",
+        system: "System",
+        tool: "Narzędzie",
+        error: "Błąd",
+      },
+    },
+  },
   get: {
     title: "Pobierz wiadomość",
     titleShort: "Wiadomość",

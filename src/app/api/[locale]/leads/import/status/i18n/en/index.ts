@@ -5,6 +5,17 @@ export const translations = {
     jobs: "Jobs",
     list: "List",
   },
+  status: {
+    get: {
+      actions: {
+        refresh: "Refresh",
+        refreshing: "Refreshing...",
+      },
+      response: {
+        statusCounts: "Status Counts",
+      },
+    },
+  },
 
   get: {
     title: "Import Jobs Status",

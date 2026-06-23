@@ -15,13 +15,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { stripProjectRoot } from "../shared/utils";
 import type { GeneratorsEnvT } from "./i18n";
@@ -488,7 +488,7 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
 import type { EnvExample, EnvRecord } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
-import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
 // Import env modules
@@ -654,7 +654,7 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
-import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
 // Import client env modules

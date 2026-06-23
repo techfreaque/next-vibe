@@ -1,10 +1,10 @@
 "use client";
 
+import { triggerPrint } from "next-vibe-ui/lib/dom";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Printer } from "next-vibe-ui/ui/icons/Printer";
 import { Span } from "next-vibe-ui/ui/span";
-import { triggerPrint } from "next-vibe-ui/utils/browser";
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -2,6 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Chat",
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      background: "Wątki w tle",
+      remote: "Czaty zdalne",
+    },
+  },
   tags: {
     messages: "Wiadomości",
   },

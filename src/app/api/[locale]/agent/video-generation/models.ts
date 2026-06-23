@@ -2,11 +2,6 @@ import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-} from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import { type Modality, ModelUtility } from "../models/enum";
 import {
@@ -20,10 +15,16 @@ import {
   type ModelOptionVideoBased,
   type ModelProviderConfigVideoBased,
 } from "../models/models";
+import type { FiltersModelSelection } from "../models/selection";
 import {
   filtersSelectionSchema,
   sharedFilterPropsSchema,
 } from "../models/selection";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+} from "../skills/enum";
 
 export enum VideoGenModelId {
   WAN_2_7_T2V = "wan-2-7-t2v",
@@ -1144,21 +1145,30 @@ export function getVideoGenModelForProvider(
 // VIDEO GEN MODEL SELECTION SCHEMA
 // ============================================================
 
-export const videoGenModelSelectionSchema = z.discriminatedUnion(
-  "selectionType",
-  [
-    z
-      .object({
-        selectionType: z.literal(ModelSelectionType.MANUAL),
-        manualModelId: z.enum(VideoGenModelId),
-      })
-      .merge(sharedFilterPropsSchema),
-    filtersSelectionSchema,
-  ],
-);
-export type VideoGenModelSelection = z.infer<
-  typeof videoGenModelSelectionSchema
+const videoGenManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(VideoGenModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type VideoGenManualModelSelection = z.infer<
+  typeof videoGenManualModelSelectionSchema
 >;
+
+/**
+ * Video-gen selection — explicit union + `z.ZodType<...>` annotation pins
+ * `z.output` to the named type so consumers resolve it shallowly instead of
+ * re-deriving the discriminated union (exceeds TS's instantiation-depth limit).
+ */
+export type VideoGenModelSelection =
+  | VideoGenManualModelSelection
+  | FiltersModelSelection;
+
+export const videoGenModelSelectionSchema: z.ZodType<VideoGenModelSelection> =
+  z.discriminatedUnion("selectionType", [
+    videoGenManualModelSelectionSchema,
+    filtersSelectionSchema,
+  ]);
 
 export function filterVideoGenModels(
   selection: VideoGenModelSelection | null | undefined,

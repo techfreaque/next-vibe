@@ -5,6 +5,27 @@ export const translations: typeof enTranslations = {
   tags: {
     messages: "Nachrichten",
   },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Geteilte Chats",
+      public: "Öffentliche Chats",
+      incognito: "Inkognito Chats",
+      background: "Hintergrund-Threads",
+      remote: "Remote-Chats",
+    },
+  },
+  chat: {
+    enums: {
+      role: {
+        user: "Benutzer",
+        assistant: "Assistent",
+        system: "System",
+        tool: "Tool",
+        error: "Fehler",
+      },
+    },
+  },
   get: {
     title: "Nachricht abrufen",
     titleShort: "Nachricht",

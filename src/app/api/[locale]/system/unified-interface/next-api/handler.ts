@@ -19,6 +19,7 @@ import {
   isStreamingResponse,
   type ResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import {
   parseRequestBody,
   parseSearchParams,
@@ -37,7 +38,6 @@ import {
   type ApiHandlerOptions,
   createGenericHandler,
 } from "../shared/endpoints/route/handler";
-import { createEndpointLogger } from "../shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Methods } from "../shared/types/enums";
 import { Platform } from "../shared/types/platform";

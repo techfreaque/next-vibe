@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    country: {
+      AT: "AT — ÖKR",
+      DE: "DE — SKR03",
+      XX: "XX — MSSF Ogólny",
+    },
+  },
   post: {
     title: "Inicjalizacja planu kont",
     titleShort: "Konfiguracja",

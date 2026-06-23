@@ -1,8 +1,8 @@
 "use client";
 
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { P } from "next-vibe-ui/ui/typography";
-import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

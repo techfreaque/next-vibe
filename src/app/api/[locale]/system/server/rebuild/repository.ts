@@ -25,7 +25,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { VibeCheckRepository } from "@/app/api/[locale]/system/check/vibe-check/repository";
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import { GenerateAllRepository } from "@/app/api/[locale]/system/generators/generate-all/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 

@@ -3,7 +3,7 @@
  * Defines endpoints for listing and creating messages in a thread
  */
 
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -33,9 +33,13 @@ import {
 import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DefaultFolderId } from "../../../config";
+import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
 import type { MessageMetadata } from "../../../db";
-import { ChatMessageRole } from "../../../enum";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+  ThreadStreamingStateDB,
+} from "../../../enum";
 import threadsDefinitions from "../../definition";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -74,6 +78,8 @@ const { GET } = createEndpoint({
     // assistant placeholder when real server message arrives (same parentId).
     // Also: persist the confirmed message to localStorage for incognito.
     "message-created": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: {
         messages: [
           "id",
@@ -175,6 +181,8 @@ const { GET } = createEndpoint({
     // ── content-done ─────────────────────────────────────────────────────────
     // onEvent: persist the final message content to localStorage for incognito.
     "content-done": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: { messages: ["id", "content", "metadata"] as const },
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
@@ -206,6 +214,8 @@ const { GET } = createEndpoint({
     // ── tool-result ──────────────────────────────────────────────────────────
     // onEvent: persist tool result metadata to localStorage for incognito.
     "tool-result": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: { messages: ["id", "metadata"] as const },
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
@@ -214,6 +224,8 @@ const { GET } = createEndpoint({
     // ── tool-result-updated ──────────────────────────────────────────────────
     // onEvent: persist updated tool result metadata to localStorage for incognito.
     "tool-result-updated": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: { messages: ["id", "metadata"] as const },
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
@@ -224,6 +236,8 @@ const { GET } = createEndpoint({
     // onEvent: clear ?message= URL param so the active branch resets to latest.
     // Also: persist the error message to localStorage for incognito.
     error: {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: {
         messages: [
           "id",
@@ -356,6 +370,8 @@ const { GET } = createEndpoint({
 
     // ── tokens-updated ───────────────────────────────────────────────────────
     "tokens-updated": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: { messages: ["id", "metadata"] as const },
       operation: "merge" as const,
     },
@@ -380,6 +396,8 @@ const { GET } = createEndpoint({
     // onEvent: clear pending-create state. isStreaming in input.tsx is now derived
     // from the cache streamingState field, so no nav store update needed here.
     "stream-finished": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: {
         streamingState: true as const,
       },
@@ -417,6 +435,8 @@ const { GET } = createEndpoint({
     // Framework merges streamingState on messages cache.
     // Sidebar caches (threads + folder-contents) are updated via their own channels.
     "streaming-state-changed": {
+      remoteEvent: true,
+      syncDomain: "chat" as const,
       fields: ["streamingState"] as const,
       operation: "merge" as const,
     },
@@ -507,6 +527,7 @@ const { GET } = createEndpoint({
         label: "get.rootFolderId.label" as const,
         description: "get.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
         includeInCacheKey: true,
       }),
@@ -522,7 +543,7 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       streamingState: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        schema: z.enum(["idle", "streaming", "waiting", "aborting"]),
+        schema: z.enum(ThreadStreamingStateDB),
       }),
       backgroundTasks: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -677,7 +698,7 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        streamingState: "idle" as const,
+        streamingState: ThreadStreamingState.IDLE,
         backgroundTasks: [],
         messages: [
           {
@@ -814,6 +835,7 @@ const { POST } = createEndpoint({
         label: "post.rootFolderId.label" as const,
         description: "post.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       id: requestField(scopedTranslation, {

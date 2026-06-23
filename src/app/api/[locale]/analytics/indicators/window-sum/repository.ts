@@ -24,8 +24,8 @@ export class WindowSumIndicatorRepository {
     }
     return points.map((point, i) => {
       const start = Math.max(0, i - size + 1);
-      const window = points.slice(start, i + 1).map((p) => p.value);
-      const value = window.reduce((a, b) => a + b, 0);
+      const dataWindow = points.slice(start, i + 1).map((p) => p.value);
+      const value = dataWindow.reduce((a, b) => a + b, 0);
       return { timestamp: point.timestamp, value };
     });
   }

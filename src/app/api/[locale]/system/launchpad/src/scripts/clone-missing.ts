@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { join } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { LaunchpadT } from "../../i18n";
 import type { LaunchpadConfig } from "../types/types.js";

@@ -36,10 +36,7 @@ export const { POST, tools } = endpointsHandler({
           raw: payload,
           executedByInstance: ctx.instanceId,
           logger: ctx.logger,
-          localUserId:
-            "id" in ctx.user && typeof ctx.user.id === "string"
-              ? ctx.user.id
-              : undefined,
+          localUserId: ctx.user.id,
         }),
       "tool-execute-result": async (payload, ctx) =>
         RouteExecuteRepository.handleToolResult(payload, ctx.logger),

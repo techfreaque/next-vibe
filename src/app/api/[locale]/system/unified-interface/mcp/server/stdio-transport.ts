@@ -7,7 +7,8 @@ import * as readline from "node:readline";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "../../shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+
 import type { JsonRpcRequest, JsonRpcResponse } from "../types";
 
 /**

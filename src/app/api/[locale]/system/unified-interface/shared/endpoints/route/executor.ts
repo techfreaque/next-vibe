@@ -22,13 +22,13 @@ import {
   isStreamingResponse,
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
-import type { EndpointLogger } from "../../logger/endpoint";
 import { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
 import type { GenericHandlerBase } from "./handler";

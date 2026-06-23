@@ -8,7 +8,7 @@
 import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { extractSchemaDefaults } from "./utils";
 

@@ -4,7 +4,7 @@
  */
 
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";

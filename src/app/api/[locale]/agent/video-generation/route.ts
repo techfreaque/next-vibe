@@ -32,9 +32,9 @@ export const { POST, tools } = endpointsHandler({
           return undefined;
         }
         const { resolveFavoriteConfig } =
-          await import("@/app/api/[locale]/agent/chat/favorites/repository");
+          await import("@/app/api/[locale]/agent/skills/favorites/repository");
         const { resolveSkillVariant } =
-          await import("@/app/api/[locale]/agent/chat/skills/resolver");
+          await import("@/app/api/[locale]/agent/skills/resolver");
         const userId =
           !ctx.user.isPublic && "id" in ctx.user ? ctx.user.id : undefined;
         const fav = await resolveFavoriteConfig(

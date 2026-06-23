@@ -2,6 +2,18 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Kampagnen-Statistiken",
   description: "E-Mail-Kampagnen Leistungsstatistiken",
+  enums: {
+    emailJourneyVariantFilter: {
+      all: "Alle",
+      uncensoredConvert: "Unzensiert konvertieren",
+      sideHustle: "Nebenprojekt",
+      quietRecommendation: "Stille Empfehlung",
+      signupNurture: "Anmelde-Nurturing",
+      retention: "Kundenbindung",
+      winback: "Rückgewinnung",
+      newsletterMay2026: "Newsletter Mai 2026",
+    },
+  },
   get: {
     title: "Kampagnen-Statistiken",
     titleShort: "Kampagnenstatistiken",

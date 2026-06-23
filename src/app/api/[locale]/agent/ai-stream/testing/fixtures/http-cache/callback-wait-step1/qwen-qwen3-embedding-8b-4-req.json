@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----2d07faca-48ed-4e6a-a78c-a0001acb596c.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The user wants me to say exactly: \"BRANCH_RESPONSE STEP_OK\"</think> BRANCH_RESPONSE STEP_OK",
+    "input": "Generate an image: wait-for-task-test",
     "encoding_format": "float"
   }
 }

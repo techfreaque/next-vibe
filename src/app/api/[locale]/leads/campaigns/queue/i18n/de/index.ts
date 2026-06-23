@@ -3,6 +3,21 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Kampagnen-Warteschlange",
   description: "Leads, die aktuell in E-Mail-Kampagnen aktiv sind",
+  enums: {
+    campaignType: {
+      leadCampaign: "Lead-Kampagne",
+      newsletter: "Newsletter",
+      signupNurture: "Anmelde-Nurturing",
+      retention: "Kundenbindung",
+      winback: "Rückgewinnung",
+      transactional: "Transaktional",
+      notification: "Benachrichtigung",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "Alle",
+    },
+  },
   get: {
     title: "Kampagnen-Warteschlange",
     titleShort: "Kampagnenwarteschlange",

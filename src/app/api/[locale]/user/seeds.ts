@@ -7,7 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { hashPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";

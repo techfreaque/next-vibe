@@ -10,6 +10,21 @@ export const translations = {
       public: "Public",
       background: "Background",
       incognito: "Incognito",
+      remote: "Remote",
+    },
+  },
+  enums: {
+    userRole: {
+      public: "Public",
+      customer: "Customer",
+      partnerAdmin: "Partner Admin",
+      partnerEmployee: "Partner Employee",
+      admin: "Admin",
+    },
+    threadStatus: {
+      active: "Active",
+      archived: "Archived",
+      deleted: "Deleted",
     },
   },
   get: {

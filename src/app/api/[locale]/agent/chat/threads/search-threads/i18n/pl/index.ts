@@ -6,6 +6,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Chat",
+  enums: {
+    threadStatus: {
+      active: "Aktywny",
+      archived: "Zarchiwizowany",
+      deleted: "Usunięty",
+    },
+  },
   tags: {
     threads: "Wątki",
   },

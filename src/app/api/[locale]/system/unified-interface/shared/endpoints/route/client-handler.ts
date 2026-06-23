@@ -6,10 +6,10 @@
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 
 /**

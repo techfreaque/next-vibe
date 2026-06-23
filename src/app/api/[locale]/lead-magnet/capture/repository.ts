@@ -13,7 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -2,7 +2,7 @@ import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "../chat/skills/enum";
+} from "../skills/enum";
 import type { ChatModelSelection } from "./models";
 import { ChatModelId } from "./models";
 import type {

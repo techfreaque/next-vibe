@@ -10,7 +10,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

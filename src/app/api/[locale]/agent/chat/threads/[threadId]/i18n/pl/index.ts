@@ -2,6 +2,23 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Chat",
+  enums: {
+    threadStatus: {
+      active: "Aktywny",
+      archived: "Zarchiwizowany",
+      deleted: "Usunięty",
+    },
+  },
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      background: "Wątki w tle",
+      remote: "Czaty zdalne",
+    },
+  },
   tags: {
     threads: "Wątki",
   },
@@ -72,6 +89,9 @@ export const translations: typeof enTranslations = {
         },
         published: {
           content: "Opublikowany",
+        },
+        streamingState: {
+          content: "Stan strumieniowania",
         },
         searchVector: {
           content: "Wektor wyszukiwania",
@@ -324,11 +344,26 @@ export const translations: typeof enTranslations = {
         "Folder główny wątku (używany do routingu po stronie klienta)",
     },
     response: {
-      success: {
-        content: "Usunięcie pomy śl ne",
+      userId: {
+        content: "Właściciel",
       },
-      deletedId: {
-        content: "ID usuniętego wątku",
+      title: {
+        content: "Tytuł",
+      },
+      folderId: {
+        content: "Folder",
+      },
+      status: {
+        content: "Status",
+      },
+      preview: {
+        content: "Podgląd",
+      },
+      createdAt: {
+        content: "Utworzono",
+      },
+      updatedAt: {
+        content: "Zaktualizowano",
       },
     },
     errors: {

@@ -13,20 +13,20 @@
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-// Fragment objects - only fragments with client.ts hooks (used in buildLines below)
+// Fragment objects - from each module's system-prompt/prompt.ts
 import { contactFragment } from "@/app/api/[locale]/contact/system-prompt/prompt";
 import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt/prompt";
-import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
+import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/prompt";
 import { remoteInstancesFragment, sshConnectionsFragment, systemContextFragment } from "@/app/api/[locale]/remote-connection/system-prompt/prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
+import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt/prompt";
 import { webFragment } from "@/app/api/[locale]/agent/search/system-prompt/prompt";
 
 // Client hooks - from each module's system-prompt/client.ts
 import { useContactData } from "@/app/api/[locale]/contact/system-prompt/client";
 import { useDesktopData } from "@/app/api/[locale]/desktop/system-prompt/client";
-import { useFavoritesData } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/client";
+import { useFavoritesData } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/client";
 import { useRemoteInstancesData } from "@/app/api/[locale]/remote-connection/system-prompt/client";
-import { useSkillData } from "@/app/api/[locale]/agent/chat/skills/system-prompt/client";
+import { useSkillData } from "@/app/api/[locale]/agent/skills/system-prompt/client";
 import { useWebData } from "@/app/api/[locale]/agent/search/system-prompt/client";
 
 /**

@@ -9,7 +9,7 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { musicGenModelDefinitions } from "../../../music-generation/models";

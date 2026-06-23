@@ -19,11 +19,11 @@ import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
-import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import {
   SkillCategory,
   SkillOwnershipType,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+} from "@/app/api/[locale]/agent/skills/enum";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";

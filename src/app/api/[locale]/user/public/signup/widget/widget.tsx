@@ -27,7 +27,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/app/api/[locale]/referral/lead/current/definition";

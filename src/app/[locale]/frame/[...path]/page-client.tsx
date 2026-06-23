@@ -8,11 +8,9 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { setRootCssVar } from "next-vibe-ui/lib/css-vars";
+import { getDocumentScrollHeight } from "next-vibe-ui/lib/dom";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  getDocumentScrollHeight,
-  setRootCssVar,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

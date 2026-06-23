@@ -24,7 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DefaultFolderId } from "../../../../config";
+import { DefaultFolderId, rootFolderIdOptions } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
 import threadsDefinitions from "../../../definition";
@@ -113,6 +113,7 @@ const { GET } = createEndpoint({
         label: "get.rootFolderId.label" as const,
         description: "get.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       leafMessageId: requestField(scopedTranslation, {

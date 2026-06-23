@@ -181,7 +181,7 @@ export function getEnvAvailability(): AgentEnvAvailability {
  */
 export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
   const { RemoteTransport } =
-    await import("@/app/api/[locale]/remote-connection/transport");
+    await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport");
   const { hasSystem, forceSystem } =
     await RemoteTransport.getInstanceInferenceState();
   return {

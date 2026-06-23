@@ -42,18 +42,21 @@ import {
   chatThreads,
   type ToolCall,
 } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { NO_SKILL_ID } from "../../chat/skills/constants";
 import { parseSkillId } from "../../chat/slugify";
 import { getInstanceAvailability } from "../../env-availability";
+import { NO_SKILL_ID } from "../../skills/constants";
 import { walkToLeafMessage } from "../repository/core/branch-utils";
 import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
 import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";

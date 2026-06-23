@@ -12,7 +12,7 @@ import { headers } from "next-vibe-ui/lib/headers";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { NextResponse } from "next-vibe-ui/lib/request";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 

@@ -7,6 +7,7 @@
 
 "use client";
 
+import { addWindowListener } from "next-vibe-ui/lib/dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type {
@@ -41,7 +42,7 @@ export function useFrameBridge(
   onMessageRef.current = onMessage;
 
   const send = useCallback((message: FrameToParentMessage): void => {
-    window.parent.postMessage(message, "*");
+    parent.postMessage(message, "*");
   }, []);
 
   useEffect(() => {
@@ -66,15 +67,13 @@ export function useFrameBridge(
       onMessageRef.current?.(msg);
     }
 
-    window.addEventListener("message", handleMessage);
+    const cleanup = addWindowListener("message", handleMessage);
     setReady(true);
 
     // Notify parent that we're ready
     send({ type: "vf:ready", frameId });
 
-    return (): void => {
-      window.removeEventListener("message", handleMessage);
-    };
+    return cleanup;
   }, [frameId, send]);
 
   return { send, ready, lastMessage };

@@ -6,15 +6,15 @@
 "use client";
 
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { getElementById } from "next-vibe-ui/lib/dom";
 import { Div } from "next-vibe-ui/ui/div";
 import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { getElementById } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

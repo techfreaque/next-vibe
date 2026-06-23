@@ -15,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import { users } from "@/app/api/[locale]/user/db";
 
 import { LeadMagnetCaptureStatus, LeadMagnetCaptureStatusDB } from "./enum";

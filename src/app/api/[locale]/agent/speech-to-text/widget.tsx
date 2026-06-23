@@ -1,5 +1,6 @@
 "use client";
 
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -26,15 +27,14 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useRef, useState } from "react";
 
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
 import { DEFAULT_STT_MODEL_ID } from "./constants";
 import type definition from "./definition";
@@ -140,7 +140,7 @@ export function SpeechToTextContainer(): JSX.Element {
     if (!text) {
       return;
     }
-    void navigator.clipboard.writeText(text).then(() => {
+    void copyToClipboard(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;

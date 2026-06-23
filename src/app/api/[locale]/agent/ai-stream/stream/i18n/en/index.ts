@@ -116,6 +116,7 @@ export const translations = {
             background: "Background",
             private: "Private",
             shared: "Shared",
+            public: "Public",
             incognito: "Incognito (no storage)",
           },
         },
@@ -244,6 +245,13 @@ export const translations = {
     rootFolderId: {
       label: "Root Folder",
       description: "Root folder context for the message",
+      options: {
+        private: "Private",
+        shared: "Shared",
+        public: "Public",
+        incognito: "Incognito (no storage)",
+        background: "Background",
+      },
     },
     subFolderId: {
       label: "Subfolder",
@@ -315,6 +323,8 @@ export const translations = {
         user: "User",
         assistant: "Assistant",
         system: "System",
+        tool: "Tool",
+        error: "Error",
       },
     },
     model: {
@@ -416,6 +426,51 @@ export const translations = {
     attachments: {
       label: "File Attachments",
       description: "Files attached to the message (images, documents, etc.)",
+    },
+    instanceId: {
+      label: "Instance ID",
+      description: "Remote instance ID for WS-provider relay",
+    },
+    threadMirrorMode: {
+      label: "Thread Mirror Mode",
+      description:
+        "Controls which side persists the thread (both/local/cloud/none)",
+    },
+    tools: {
+      title: "Remote Tool Schemas",
+      description:
+        "Tool specs from the caller for the provider to expose via execute-tool",
+      name: {
+        label: "Tool Name",
+        description: "Unique tool identifier",
+      },
+      toolDescription: {
+        label: "Description",
+        description: "What the tool does",
+      },
+      parameters: {
+        label: "Parameters",
+        description: "JSON Schema for tool parameters",
+      },
+    },
+    folderPath: {
+      label: "Folder Path",
+      description:
+        "Sub-folder hierarchy to create under BACKGROUND/<instanceId> on the provider",
+    },
+    confirmationOverrides: {
+      title: "Confirmation Overrides",
+      description:
+        "Per-tool confirmation requirements from the caller's favorite/skill",
+      toolId: {
+        label: "Tool ID",
+        description: "Tool alias or full name",
+      },
+      requiresConfirmation: {
+        label: "Requires Confirmation",
+        description:
+          "Whether this tool requires user confirmation before executing",
+      },
     },
     response: {
       title: "Stream Response",

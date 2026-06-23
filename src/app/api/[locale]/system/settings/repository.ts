@@ -18,13 +18,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ZodTypeAny } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import {
   encryptEnvValue,
   isEncryptedValue,
   loadOrCreateKey,
 } from "@/app/api/[locale]/system/unified-interface/shared/env/env-crypto";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
   SystemSettingsGetResponseOutput,

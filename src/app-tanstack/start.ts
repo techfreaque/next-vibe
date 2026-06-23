@@ -10,7 +10,7 @@ import { createMiddleware, createStart } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
 
-import { serverFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import { serverFileLog } from "@/app/api/[locale]/system/logger/file";
 
 // ANSI helpers (inline - avoid importing heavy logger chain at middleware level)
 const C = {

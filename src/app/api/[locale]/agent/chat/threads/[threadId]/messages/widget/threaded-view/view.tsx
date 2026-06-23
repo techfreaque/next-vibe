@@ -21,11 +21,11 @@ import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useSkill } from "../../../../../skills/[id]/hooks";
+import { useSkill } from "../../../../../../skills/[id]/hooks";
 import type messagesDefinition from "../../definition";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";

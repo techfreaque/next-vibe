@@ -2,6 +2,8 @@
 
 import { success } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { getCurrentUrl, openInNewTab } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -20,18 +22,13 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Input } from "next-vibe-ui/ui/input";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import {
-  copyToClipboard,
-  getCurrentUrl,
-  openInNewTab,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -82,7 +79,7 @@ export function ThreadShareDialog({
   /* eslint-enable i18next/no-literal-string */
 
   const handleCopy = useCallback((): void => {
-    void navigator.clipboard.writeText(threadUrl).then(() => {
+    void copyToClipboard(threadUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;

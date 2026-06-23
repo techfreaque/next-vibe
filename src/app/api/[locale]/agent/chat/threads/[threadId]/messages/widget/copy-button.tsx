@@ -1,6 +1,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   DropdownMenu,
@@ -10,11 +11,10 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
@@ -63,7 +63,7 @@ export function CopyButton({
         textToCopy = content || "";
       }
 
-      await navigator.clipboard.writeText(textToCopy);
+      await copyToClipboard(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), TIMING.COPY_FEEDBACK_DURATION);
     } catch (error) {

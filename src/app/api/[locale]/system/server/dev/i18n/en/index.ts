@@ -1,6 +1,11 @@
 export const translations = {
   category: "Server Management",
-
+  enum: {
+    framework: {
+      next: "Next.js",
+      tanstack: "TanStack/Vite",
+    },
+  },
   post: {
     title: "Dev",
     titleShort: "Dev Server",

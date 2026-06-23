@@ -8,7 +8,7 @@
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
-import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
 // Import client env modules
@@ -29,9 +29,9 @@ import {
 } from "../../payment/env-client";
 
 // Platform detection (will be set at runtime)
-const isServer = typeof window === "undefined";
+const isServer = typeof globalThis.document === "undefined";
 const isReactNative = false;
-const isBrowser = !isServer && typeof window !== "undefined" && !!window.document;
+const isBrowser = !isServer;
 
 const platform = {
   isServer,

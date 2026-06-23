@@ -10,7 +10,7 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 

@@ -2,7 +2,7 @@ import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "../chat/skills/enum";
+} from "../skills/enum";
 import type { SttModelSelection } from "../speech-to-text/models";
 import { SttModelId } from "./models";
 

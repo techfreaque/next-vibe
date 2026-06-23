@@ -6,12 +6,12 @@
  */
 
 import { useToast } from "next-vibe-ui/hooks/use-toast";
-import { assignUrl } from "next-vibe-ui/utils/browser";
+import { assignUrl } from "next-vibe-ui/lib/location";
 import { useCallback } from "react";
 
 import definitions from "@/app/api/[locale]/credits/definition";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";

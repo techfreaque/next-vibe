@@ -7,12 +7,12 @@
 
 import { useCallback, useMemo } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type {
   EndpointReturn,
   FormAlertState,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, type CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/types";

@@ -5,14 +5,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { reloadPage } from "next-vibe-ui/utils/browser";
+import type { EndpointLogger } from "next-vibe/system/logger/types";
+import { reloadPage } from "next-vibe-ui/lib/location";
 
 import { getEndpoint as globalGetEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";

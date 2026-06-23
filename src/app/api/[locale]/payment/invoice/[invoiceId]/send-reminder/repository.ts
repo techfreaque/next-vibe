@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { userNotes } from "@/app/api/[locale]/user/db";
 import { UserNoteType } from "@/app/api/[locale]/user/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

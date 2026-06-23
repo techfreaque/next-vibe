@@ -1,6 +1,9 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { getElementById } from "next-vibe-ui/lib/dom";
+import { getCurrentUrl } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
@@ -14,11 +17,6 @@ import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
-import {
-  copyToClipboard,
-  getCurrentUrl,
-  getElementById,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
@@ -315,14 +313,12 @@ export function ThreadedMessageActions({
         variant="ghost"
         size="unset"
         onClick={(): void => {
-          const element = document.getElementById(`thread-msg-${message.id}`);
+          const element = getElementById(`thread-msg-${message.id}`);
           element?.scrollIntoView({
             behavior: "smooth",
             block: "center",
           });
-          void navigator.clipboard.writeText(
-            `${getCurrentUrl()}#thread-msg-${message.id}`,
-          );
+          void copyToClipboard(`${getCurrentUrl()}#thread-msg-${message.id}`);
         }}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
         title={t("widget.threadedView.actions.copyPermalink")}
@@ -348,9 +344,7 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={(): void => {
-            const element = document.getElementById(
-              `thread-msg-${message.parentId}`,
-            );
+            const element = getElementById(`thread-msg-${message.parentId}`);
             element?.scrollIntoView({
               behavior: "smooth",
               block: "center",

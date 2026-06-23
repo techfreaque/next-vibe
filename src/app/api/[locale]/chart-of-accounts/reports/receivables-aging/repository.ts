@@ -18,7 +18,7 @@ import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { paymentInvoices } from "@/app/api/[locale]/payment/db";
 import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

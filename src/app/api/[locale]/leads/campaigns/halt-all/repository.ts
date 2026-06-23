@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { emailCampaigns, leads } from "../../db";
 import { LeadStatus } from "../../enum";

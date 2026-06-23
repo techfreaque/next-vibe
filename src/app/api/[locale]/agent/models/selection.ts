@@ -6,6 +6,8 @@ import type {
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import type { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -13,9 +15,7 @@ import {
   ModelSortDirection,
   ModelSortField,
   PriceLevel,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
-import type { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import type { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+} from "@/app/api/[locale]/agent/skills/enum";
 import type { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";

@@ -24,7 +24,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ContentLevel, IntelligenceLevel } from "../../chat/skills/enum";
+import {
+  ContentLevel,
+  ContentLevelOptions,
+  IntelligenceLevel,
+  IntelligenceLevelOptions,
+} from "../../skills/enum";
 import { MODEL_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

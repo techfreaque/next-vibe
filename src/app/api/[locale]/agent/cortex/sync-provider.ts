@@ -8,7 +8,7 @@ import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db
 import {
   type SyncProvider,
   toStandardCursor,
-} from "@/app/api/[locale]/remote-connection/sync-provider";
+} from "@/app/api/[locale]/remote-connection/sync/provider";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "./db";

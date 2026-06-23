@@ -5,7 +5,10 @@
 
 import { z } from "zod";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootFolderIdOptions,
+} from "@/app/api/[locale]/agent/chat/config";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -122,6 +125,7 @@ const { POST } = createEndpoint({
         label: "post.rootFolderId.label" as const,
         description: "post.rootFolderId.description" as const,
         columns: 6,
+        options: rootFolderIdOptions,
         schema: z.enum(DefaultFolderId),
       }),
       vote: requestField(scopedTranslation, {

@@ -958,6 +958,14 @@ export const translations: typeof enTranslations = {
           description: "URL, die in der neuen Seite geladen werden soll",
           placeholder: "URL eingeben",
         },
+        replacePage: {
+          label: "Seite ersetzen",
+          description: "Vorhandene Seiten vor dem Öffnen der neuen schließen",
+        },
+        background: {
+          label: "Hintergrund",
+          description: "Seite öffnen ohne sie in den Vordergrund zu bringen",
+        },
         timeout: {
           label: "Zeitlimit",
           description: "Maximale Wartezeit in Millisekunden (0 für Standard)",

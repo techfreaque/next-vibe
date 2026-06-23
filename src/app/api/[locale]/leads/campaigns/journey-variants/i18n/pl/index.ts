@@ -2,6 +2,18 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Warianty journey",
   description: "Zarządzaj rejestracjami wariantów journey e-mail",
+  enums: {
+    campaignType: {
+      leadCampaign: "Kampania leadów",
+      newsletter: "Newsletter",
+      signupNurture: "Pielęgnacja rejestracji",
+      retention: "Retencja",
+      winback: "Odzyskanie",
+      transactional: "Transakcyjny",
+      notification: "Powiadomienie",
+      system: "System",
+    },
+  },
   get: {
     title: "Warianty journey",
     titleShort: "Warianty journey",

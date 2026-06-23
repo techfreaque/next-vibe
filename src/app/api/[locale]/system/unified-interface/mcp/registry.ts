@@ -11,7 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

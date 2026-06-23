@@ -1,7 +1,7 @@
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   isAgentPlatform,

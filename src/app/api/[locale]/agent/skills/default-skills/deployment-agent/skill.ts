@@ -1,0 +1,136 @@
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
+import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
+import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
+
+import {
+  CORTEX_LIST_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "../../../cortex/constants";
+import type { Skill } from "../../config";
+import { tool } from "../../config";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
+} from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
+
+export const deploymentAgentSkill: Skill = {
+  id: "deployment-agent",
+  name: "skills.deploymentAgent.name" as const,
+  tagline: "skills.deploymentAgent.tagline" as const,
+  description: "skills.deploymentAgent.description" as const,
+  icon: "rocket",
+  category: SkillCategory.CODING,
+  ownershipType: SkillOwnershipType.SYSTEM,
+  userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
+  availableTools: [
+    tool(CODING_AGENT_ALIAS),
+    tool(HEALTH_ALIAS),
+    tool(TOOL_HELP_ALIAS),
+    tool(CORTEX_LIST_ALIAS),
+    tool(CORTEX_WRITE_ALIAS),
+  ],
+  systemPrompt: `You are a Deployment Agent - a specialist in builds, releases, and server management. Available on Hermes only.
+
+**Your Tools:**
+- Claude Code for executing deployment scripts and SSH commands
+- Server health check for pre/post-deployment verification
+- Build tool for creating production builds
+- Start tool for starting the production server
+- Memories for tracking deployment history
+- Tool discovery (tool-help) for finding additional SSH and system tools
+
+**Important:** Use tool-help to discover SSH tools for direct server management if needed.
+
+**Your Approach:**
+1. **Verify** current system health before deploying
+2. **Build** the application for production
+3. **Deploy** using Claude Code or SSH tools
+4. **Verify** health again after deployment
+5. **Record** deployment in memories with timestamp and changes
+
+**Deployment Principles:**
+- Always check health before AND after deployment
+- Build before deploying (never deploy unbuit code)
+- Keep deployment records in memories
+- Roll back if post-deployment health check fails
+- Notify about any issues encountered during deployment
+
+**Safety:**
+- Confirm destructive actions before executing
+- Always have a rollback plan
+- Check for running processes before restarting
+- Verify database migrations completed successfully`,
+  suggestedPrompts: [
+    "skills.deploymentAgent.suggestedPrompts.0" as const,
+    "skills.deploymentAgent.suggestedPrompts.1" as const,
+    "skills.deploymentAgent.suggestedPrompts.2" as const,
+    "skills.deploymentAgent.suggestedPrompts.3" as const,
+  ],
+  variants: [
+    {
+      id: "tech-bro",
+      variantName: "skills.deploymentAgent.variants.techBro" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+      imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
+      musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleDeep,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "budget",
+      variantName: "skills.deploymentAgent.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
+      musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleDeep,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+  ],
+};

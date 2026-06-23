@@ -2,7 +2,7 @@ import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "../chat/skills/enum";
+} from "../skills/enum";
 import type { VoiceModelSelection } from "../text-to-speech/models";
 import { TtsModelId } from "./models";
 

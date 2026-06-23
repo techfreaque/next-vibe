@@ -13,9 +13,11 @@
  * type safety from the endpoint definition.
  */
 
+import { getCurrentHost, getCurrentProtocol } from "next-vibe-ui/lib/location";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+
 import type {
   EventHandler,
   WsClientMessage,

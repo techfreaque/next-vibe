@@ -8,7 +8,7 @@
 
 "use client";
 
-import { getCurrentOrigin } from "next-vibe-ui/utils/browser";
+import { getCurrentOrigin } from "next-vibe-ui/lib/location";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 

@@ -12,16 +12,16 @@ import type { JSX } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/skills/[id]/definition";
+import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -268,8 +268,7 @@ export async function tanstackLoader({
     const { db } = await import("@/app/api/[locale]/system/db");
     const { leadMagnetConfigs } =
       await import("@/app/api/[locale]/lead-magnet/db");
-    const { customSkills } =
-      await import("@/app/api/[locale]/agent/chat/skills/db");
+    const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
     const { eq } = await import("drizzle-orm");
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

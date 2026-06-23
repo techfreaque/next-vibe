@@ -20,13 +20,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { formatLogPrefix } from "@/app/api/[locale]/system/logger/create-logger";
 import {
   appendRawToServerLog,
   truncateClientLogs,
   truncateServerLog,
   writeServerLogOfflineHint,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+} from "@/app/api/[locale]/system/logger/file";
 import {
   createNextjsFormatter,
   formatConfig,
@@ -38,8 +38,8 @@ import {
   formatStartup,
   formatTask,
   formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";

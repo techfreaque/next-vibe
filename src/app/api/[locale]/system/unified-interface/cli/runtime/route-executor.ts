@@ -15,9 +15,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
-import type { RemoteCallData } from "@/app/api/[locale]/remote-connection/dispatch";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { RemoteCallData } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -46,7 +47,6 @@ import {
   RouteExecutionExecutor,
 } from "../../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Platform } from "../../shared/types/platform";
 import type { CliResultFormatter as CliResultFormatterType } from "../../unified-ui/renderers/cli/response/result-formatter";

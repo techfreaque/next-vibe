@@ -163,3 +163,28 @@ export async function getAllCookies(): Promise<Record<string, string>> {
     return {};
   }
 }
+
+// ─── Sync raw cookie access ───────────────────────────────────────────────────
+// Use these only in low-level bridge/protocol code that requires synchronous
+// access with full cookie option control (e.g. iframe bridge protocol).
+
+/**
+ * Read the raw browser cookie string synchronously.
+ * Returns empty string on server or if document is unavailable.
+ */
+export function getRawCookieString(): string {
+  if (typeof document === "undefined") {
+    return "";
+  }
+  return document.cookie;
+}
+
+/**
+ * Write a raw cookie string synchronously (assigns to document.cookie).
+ * Each assignment sets or updates one cookie per browser spec.
+ */
+export function setRawCookieString(value: string): void {
+  if (typeof document !== "undefined") {
+    document.cookie = value;
+  }
+}

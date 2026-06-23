@@ -3,6 +3,27 @@ export const translations = {
   tags: {
     messages: "Messages",
   },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Shared Chats",
+      public: "Public Chats",
+      incognito: "Incognito Chats",
+      background: "Background Threads",
+      remote: "Remote Chats",
+    },
+  },
+  chat: {
+    enums: {
+      role: {
+        user: "User",
+        assistant: "Assistant",
+        system: "System",
+        tool: "Tool",
+        error: "Error",
+      },
+    },
+  },
   get: {
     title: "Get Message",
     titleShort: "Message",

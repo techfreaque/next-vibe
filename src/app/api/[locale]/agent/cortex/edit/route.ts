@@ -8,7 +8,7 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) =>
+    handler: ({ data, user, locale, logger, t }) =>
       CortexEditRepository.editFile({
         userId: user.id,
         user,
@@ -22,5 +22,9 @@ export const { PATCH, tools } = endpointsHandler({
         logger,
         t,
       }),
+    onRemoteEvent: {
+      "node-written": (payload, ctx) =>
+        CortexEditRepository.applyRemoteEdit(payload, ctx.user, ctx.logger),
+    },
   },
 });

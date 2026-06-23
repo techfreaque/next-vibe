@@ -1,9 +1,9 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import {
   type AuthContext,
   BaseAuthHandler,

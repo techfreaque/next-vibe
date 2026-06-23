@@ -1,6 +1,30 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  priority: {
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    background: "Hintergrund",
+  },
+  taskCategory: {
+    development: "Entwicklung",
+    build: "Build",
+    watch: "Überwachung",
+    generator: "Generator",
+    test: "Test",
+    maintenance: "Wartung",
+    database: "Datenbank",
+    system: "System",
+    monitoring: "Monitoring",
+    leadManagement: "Lead-Verwaltung",
+  },
+  hiddenFilter: {
+    visible: "Sichtbar",
+    hidden: "Versteckt",
+    all: "Alle",
+  },
   category: "API Endpunkt",
   tags: {
     tasks: "Tasks",

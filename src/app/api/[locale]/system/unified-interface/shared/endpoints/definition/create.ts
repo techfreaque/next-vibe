@@ -23,6 +23,7 @@ import type {
   CategoryKey,
   SubCategoryKey,
 } from "@/app/api/[locale]/system/generated/category-registry";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
@@ -54,7 +55,6 @@ import type {
   ComputeEventPayloads,
   EndpointEventsMap,
 } from "../../../websocket/structured-events";
-import type { EndpointLogger } from "../../logger/endpoint";
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }

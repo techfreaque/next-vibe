@@ -10,6 +10,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { openInNewTab } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
@@ -25,7 +26,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
-import { openInNewTab } from "next-vibe-ui/utils/browser";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
@@ -35,13 +35,13 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { FavoriteCard } from "../../../chat/favorites/definition";
-import { FavoriteSelectProvider } from "../../../chat/favorites/favorite-select-context";
 import { useChatSettings } from "../../../chat/settings/hooks";
+import type { FavoriteCard } from "../../../skills/favorites/definition";
+import { FavoriteSelectProvider } from "../../../skills/favorites/favorite-select-context";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";

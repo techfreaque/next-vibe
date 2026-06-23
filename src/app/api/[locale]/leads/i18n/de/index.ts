@@ -5387,4 +5387,15 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  countries: {
+    global: "Global",
+    de: "Deutschland",
+    pl: "Polen",
+    us: "Vereinigte Staaten",
+  },
+  languages: {
+    en: "Englisch",
+    de: "Deutsch",
+    pl: "Polnisch",
+  },
 };

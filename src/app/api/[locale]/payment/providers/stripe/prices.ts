@@ -14,7 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
 import { getEnvAvailability } from "../../../agent/env-availability";

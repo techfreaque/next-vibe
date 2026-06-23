@@ -1,5 +1,6 @@
 "use client";
 
+import { getElementById } from "next-vibe-ui/lib/dom";
 import { Br } from "next-vibe-ui/ui/br";
 import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Button } from "next-vibe-ui/ui/button";
@@ -13,7 +14,6 @@ import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
-import { getElementById } from "next-vibe-ui/utils/browser";
 import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 

@@ -53,10 +53,15 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { FavoriteConfig } from "../skills/favorites/db";
 import type { TtsModelId } from "../text-to-speech/models";
 import type { DefaultFolderId } from "./config";
-import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
-import type { FavoriteConfig } from "./favorites/db";
+import {
+  ChatMessageRoleDB,
+  ThreadStatusDB,
+  ThreadStreamingState,
+  ThreadStreamingStateDB,
+} from "./enum";
 
 /**
  * Thread metadata structure

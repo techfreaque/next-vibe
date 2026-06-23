@@ -39,27 +39,21 @@ export const LanguagesArr = ["de", "pl", "en"] as const;
  * Countries Options for select fields
  * Maps country codes to translation keys for UI display
  */
-export const CountriesOptions: Array<{
-  value: string;
-  label: ConfigTranslationKey;
-}> = [
-  { value: Countries.GLOBAL, label: "countries.global" },
-  { value: Countries.DE, label: "countries.de" },
-  { value: Countries.PL, label: "countries.pl" },
-  { value: Countries.US, label: "countries.us" },
+export const CountriesOptions = [
+  { value: Countries.GLOBAL, label: "countries.global" as const },
+  { value: Countries.DE, label: "countries.de" as const },
+  { value: Countries.PL, label: "countries.pl" as const },
+  { value: Countries.US, label: "countries.us" as const },
 ];
 
 /**
  * Languages Options for select fields
  * Maps language codes to translation keys for UI display
  */
-export const LanguagesOptions: Array<{
-  value: string;
-  label: ConfigTranslationKey;
-}> = [
-  { value: Languages.EN, label: "languages.en" },
-  { value: Languages.DE, label: "languages.de" },
-  { value: Languages.PL, label: "languages.pl" },
+export const LanguagesOptions = [
+  { value: Languages.EN, label: "languages.en" as const },
+  { value: Languages.DE, label: "languages.de" as const },
+  { value: Languages.PL, label: "languages.pl" as const },
 ];
 
 /**

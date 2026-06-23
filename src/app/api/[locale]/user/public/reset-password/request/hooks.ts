@@ -8,7 +8,7 @@
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useMemo, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { FormAlertState } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import type { ApiFormReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
 import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";

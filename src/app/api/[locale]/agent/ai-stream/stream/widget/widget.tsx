@@ -34,7 +34,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import {
+  NEW_MESSAGE_ID,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import publicFeedDefinition from "@/app/api/[locale]/agent/chat/public-feed/definition";

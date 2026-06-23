@@ -10,8 +10,8 @@ import "server-only";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
+import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
 import type { EnvExample, EnvRecord } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
-import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
 // Import env modules

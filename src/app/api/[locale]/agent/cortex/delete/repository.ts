@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -10,9 +10,10 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
@@ -25,17 +26,8 @@ import {
   normalizePath,
   normalizeToCanonicalPath,
 } from "../repository";
-import type { CortexDeleteT } from "./i18n";
-
-interface DeleteParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  recursive?: boolean;
-  logger: EndpointLogger;
-  t: CortexDeleteT;
-}
+import deleteDefinitions from "./definition";
+import { type CortexDeleteT, scopedTranslation } from "./i18n";
 
 export class CortexDeleteRepository {
   static async deleteNode({
@@ -46,8 +38,26 @@ export class CortexDeleteRepository {
     recursive = false,
     logger,
     t,
-  }: DeleteParams): Promise<
-    ResponseType<{ responsePath: string; nodesDeleted: number }>
+    relayed = false,
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    recursive?: boolean;
+    logger: EndpointLogger;
+    t: CortexDeleteT;
+    /**
+     * True when invoked from a cross-instance applier (the delete was already
+     * performed on the origin and relayed here). Suppresses the `node-deleted`
+     * emit so the event is not relayed back, preventing an infinite ping-pong.
+     */
+    relayed?: boolean;
+  }): Promise<
+    ResponseType<{
+      responsePath: string;
+      nodesDeleted: number;
+    }>
   > {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
@@ -56,6 +66,16 @@ export class CortexDeleteRepository {
         message: t("delete.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
+    }
+
+    // Filesystem backend for preview-mode admin
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
+    if (!user.isPublic && !isVirtualWritable(path)) {
+      const { isFilesystemMode } = await import("../fs-provider");
+      if (isFilesystemMode(user)) {
+        const { fsDeleteNode } = await import("../fs-provider/fs-delete");
+        return fsDeleteNode(path, recursive ?? false, { t });
+      }
     }
 
     // Virtual writable mount - delegate to mount handler
@@ -123,47 +143,40 @@ export class CortexDeleteRepository {
     }
 
     try {
-      // Soft-delete: mark isDeleted=true + bump updatedAt so tombstone propagates to
-      // connected remote instances via WS push. Hard-delete deferred until propagated.
-      const deletedAt = new Date();
-      const result = await db
-        .update(cortexNodes)
-        .set({ isDeleted: true, updatedAt: deletedAt })
+      const deletedRows = await db
+        .delete(cortexNodes)
         .where(
           and(
             eq(cortexNodes.userId, userId),
-            or(
-              eq(cortexNodes.path, path),
-              sql`${cortexNodes.path} LIKE ${`${path}/%`}`,
-            ),
+            sql`(${cortexNodes.path} = ${path} OR ${cortexNodes.path} LIKE ${`${path}/%`})`,
           ),
-        );
+        )
+        .returning({ path: cortexNodes.path });
 
-      const nodesDeleted = result.rowCount ?? 0;
-      logger.info(
-        `Cortex soft-delete: ${path} (${nodesDeleted} nodes marked deleted)`,
-      );
+      const nodesDeleted = deletedRows.length;
+      logger.info(`Cortex delete: ${path} (${nodesDeleted} nodes)`);
 
-      // WS-push sync: broadcast tombstone to connected remote instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const providerKey = path.startsWith("/memories")
-            ? "memories"
-            : "documents";
-          const syncPayloads = await serializeProviders(
-            [providerKey],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort
-        }
-      })();
+      // Disk write-through: remove from disk
+      try {
+        const { deleteFromDisk } = await import("../fs-provider/fs-sync");
+        await deleteFromDisk(path);
+      } catch {
+        // Best-effort
+      }
+
+      // This op owns its `node-deleted` event: the delete the user submitted
+      // (requestFields). The peer's onRemoteEvent re-runs deleteNode. Server-only.
+      // Suppressed when applying a relayed delete (avoids re-relay ping-pong).
+      if (!relayed) {
+        createEndpointEmitter(
+          deleteDefinitions.DELETE,
+          logger,
+          user,
+        )("node-deleted", {
+          path,
+          recursive,
+        });
+      }
 
       return success({ responsePath: path, nodesDeleted });
     } catch (error) {
@@ -171,6 +184,33 @@ export class CortexDeleteRepository {
       return fail({
         message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `node-deleted`: re-run the delete on this instance
+   * with the relayed inputs. Reuses deleteNode so there is one code path.
+   */
+  static async applyRemoteDelete(
+    payload: { path: string; recursive?: boolean },
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const result = await this.deleteNode({
+      userId: user.id,
+      user,
+      locale: defaultLocale,
+      path: payload.path,
+      recursive: payload.recursive,
+      logger,
+      t,
+      relayed: true,
+    });
+    if (!result.success) {
+      logger.error("Failed to apply remote cortex delete", {
+        message: result.message,
       });
     }
   }

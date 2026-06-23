@@ -40,7 +40,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../chat/config";
-import { SKILL_CREATOR_ID } from "../../chat/skills/constants";
+import { SKILL_CREATOR_ID } from "../../skills/constants";
 import { scopedTranslation } from "../stream/i18n";
 import { AI_RUN_ALIAS } from "./constants";
 const AiRunWidget = lazyWidget(() =>
@@ -88,6 +88,7 @@ const { POST } = createEndpoint({
   },
   dynamicCredits: ({ response }) => response?.creditCost ?? undefined,
   defaultExpanded: true,
+  timeoutMs: 0,
 
   icon: "sparkles",
   category: "ai",

@@ -18,8 +18,8 @@ import { allGraphSeeds } from "@/app/api/[locale]/system/generated/graph-seeds-i
 import {
   maybeColorize,
   semantic,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+} from "@/app/api/[locale]/system/logger/colors";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { pipelineGraphs } from "./db";
 import { GraphOwnerType } from "./enum";

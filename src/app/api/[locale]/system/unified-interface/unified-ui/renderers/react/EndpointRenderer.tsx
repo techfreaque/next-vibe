@@ -40,6 +40,7 @@ import type {
   ContentBlock,
   ResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -49,7 +50,6 @@ import {
   useNavigationStack,
   type UseNavigationStackReturn,
 } from "../../../react/hooks/use-navigation-stack";
-import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";

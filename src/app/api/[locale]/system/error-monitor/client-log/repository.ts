@@ -8,9 +8,9 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import { persistErrorLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/error-persist";
-import { clientFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
-import { isFileLoggingEnabled } from "@/config/debug";
+import { persistErrorLog } from "@/app/api/[locale]/system/logger/db-persist";
+import { isFileLoggingEnabled } from "@/app/api/[locale]/system/logger/debug";
+import { clientFileLog } from "@/app/api/[locale]/system/logger/file";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {

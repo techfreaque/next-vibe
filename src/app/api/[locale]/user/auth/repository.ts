@@ -17,7 +17,7 @@ import {
 import { Environment, parseError } from "next-vibe/shared/utils";
 import { redirect } from "next-vibe-ui/lib/redirect";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   BEARER_LEAD_ID_SEPARATOR,

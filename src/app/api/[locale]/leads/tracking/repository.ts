@@ -17,7 +17,7 @@ import type { NextRequest } from "next-vibe-ui/lib/request";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
   getCountryFromLocale,

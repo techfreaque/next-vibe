@@ -11,10 +11,10 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import { type JSX, useCallback, useMemo, useState } from "react";
 
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/chat/skills/widget";
-import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
+import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/skills/widget";
+import skillsDef from "@/app/api/[locale]/agent/skills/definition";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
+import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import {
   useWidgetLocale,

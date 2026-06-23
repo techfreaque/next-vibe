@@ -29,22 +29,22 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
-import favoritesDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import {
-  COMPANION_SKILLS,
-  DEFAULT_SKILLS,
-} from "@/app/api/[locale]/agent/chat/skills/config";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import {
   formatSkillId,
   parseSkillId,
 } from "@/app/api/[locale]/agent/chat/slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import {
+  COMPANION_SKILLS,
+  DEFAULT_SKILLS,
+} from "@/app/api/[locale]/agent/skills/config";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
+import { useFavoriteCreate } from "@/app/api/[locale]/agent/skills/favorites/create/hooks";
+import favoritesDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";

@@ -8,8 +8,9 @@ import "server-only";
 
 import type { NextRequest } from "next-vibe-ui/lib/request";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+
 import { parseError } from "../../../shared/utils";
-import type { EndpointLogger } from "../shared/logger/endpoint";
 
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure

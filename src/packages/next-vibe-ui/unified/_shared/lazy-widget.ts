@@ -33,38 +33,33 @@ export type CliComponent = AnyComponent & {
 export type UpdateCallback = (newDefault: AnyComponent) => void;
 
 declare global {
-  interface Window {
-    __vibeWidgetHmr?: (
-      moduleId: string,
-      newModule: Record<string, AnyComponent>,
-    ) => void;
-    __vibeWidgetByFile?: Map<string, Set<UpdateCallback>>;
-  }
+  var __vibeWidgetHmr:
+    | ((moduleId: string, newModule: Record<string, AnyComponent>) => void)
+    | undefined;
+  var __vibeWidgetByFile: Map<string, Set<UpdateCallback>> | undefined;
 }
 
 export function ensureGlobals(): void {
-  if (typeof window === "undefined") {
+  if (typeof globalThis.__vibeWidgetByFile !== "undefined") {
     return;
   }
-  if (!window.__vibeWidgetByFile) {
-    window.__vibeWidgetByFile = new Map();
-    window.__vibeWidgetHmr = (moduleId, newModule): void => {
-      const cbs = window.__vibeWidgetByFile?.get(moduleId);
-      if (!cbs) {
-        return;
-      }
-      const Component =
-        typeof newModule?.["default"] === "function"
-          ? (newModule["default"] as AnyComponent)
-          : undefined;
-      if (!Component) {
-        return;
-      }
-      for (const cb of cbs) {
-        cb(Component);
-      }
-    };
-  }
+  globalThis.__vibeWidgetByFile = new Map();
+  globalThis.__vibeWidgetHmr = (moduleId, newModule): void => {
+    const cbs = globalThis.__vibeWidgetByFile?.get(moduleId);
+    if (!cbs) {
+      return;
+    }
+    const Component =
+      typeof newModule?.["default"] === "function"
+        ? (newModule["default"] as AnyComponent)
+        : undefined;
+    if (!Component) {
+      return;
+    }
+    for (const cb of cbs) {
+      cb(Component);
+    }
+  };
 }
 
 export function lazyWidget(

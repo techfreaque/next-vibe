@@ -177,6 +177,7 @@ export const translations = {
       text: "Transcribed Text",
       provider: "Provider Used",
       confidence: "Confidence Score",
+      creditCost: "Credits Used",
     },
     errors: {
       unauthorized: {

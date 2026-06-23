@@ -1,5 +1,15 @@
 export const translations = {
   category: "Chat",
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Shared Chats",
+      public: "Public Chats",
+      incognito: "Incognito Chats",
+      background: "Background Threads",
+      remote: "Remote Chats",
+    },
+  },
   tags: {
     messages: "Messages",
   },

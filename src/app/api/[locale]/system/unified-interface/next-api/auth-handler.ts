@@ -9,6 +9,7 @@ import {
 import { Environment, parseError } from "next-vibe/shared/utils";
 import { cookies } from "next-vibe-ui/lib/headers";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
@@ -19,7 +20,6 @@ import { env } from "@/config/env";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as cliScopedTranslation } from "../cli/i18n";
-import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
   type AuthContext,
   BaseAuthHandler,

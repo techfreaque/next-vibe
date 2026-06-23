@@ -14,13 +14,16 @@ import "server-only";
 import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  maybeColorize,
+  semantic,
+} from "@/app/api/[locale]/system/logger/colors";
 import {
   formatDuration,
   formatSense,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
-import { maybeColorize, semantic } from "../../shared/logger/colors";
 import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";
 import { getLatestRun } from "../store/runs";

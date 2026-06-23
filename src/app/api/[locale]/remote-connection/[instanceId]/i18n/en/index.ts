@@ -40,14 +40,6 @@ export const translations = {
       skills: "Skills",
       favorites: "Favorites",
       threads: "Threads",
-      chat: "Chat",
-    },
-    // ── Live sync section ──────────────────────────────────────────────────
-    liveSync: {
-      title: "Live Event Sync",
-      description: "Real-time events relayed across connected instances.",
-      chatEvents: "Chat messages",
-      liveOnlyBadge: "Live relay only",
     },
     // ── Cross-references ───────────────────────────────────────────────────
     cortexSection: "Cortex",
@@ -144,6 +136,11 @@ export const translations = {
       label: "Transport Mode",
       description:
         "How this connection communicates. reverse-ws: persistent outbound WS (opens immediately on save). direct-http: direct HTTP calls. ws-provider: remote runs AI loop. cloud-only: no outbound connection.",
+      options: {
+        reverseWs: "Reverse WS",
+        directHttp: "Direct HTTP",
+        cloudOnly: "Cloud Only",
+      },
     },
     // ── Behavior ────────────────────────────────────────────────────────────
     isInferenceProvider: {
@@ -156,21 +153,6 @@ export const translations = {
       description:
         "Admin override: route ALL AI streams through this connection, bypassing cost and per-user routing rules. One connection at a time.",
     },
-    loopLocation: {
-      label: "AI Loop Location",
-      description:
-        "Where the AI inference loop runs. Client: local machine handles the loop. Server: remote instance handles it.",
-    },
-    threadMirrorMode: {
-      label: "Thread Storage",
-      description:
-        "Where threads created in this connection's folder are stored. Cloud: cloud only. Local: local only. Both: mirrored. None: no storage.",
-    },
-    toolSource: {
-      label: "Tool Source",
-      description:
-        "Which tools are available in AI streams routed to this connection. Local: your local tools. Remote: remote tools only. Both: merge both.",
-    },
     // ── Sync scope ──────────────────────────────────────────────────────────
     syncScope: {
       label: "Sync Scope",
@@ -181,7 +163,6 @@ export const translations = {
       skills: "Skills",
       favorites: "Favorites",
       threads: "Threads",
-      chat: "Chat events",
     },
     reconnectNow: {
       label: "Reconnect Now",

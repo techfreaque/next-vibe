@@ -7,10 +7,7 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  onEventDeleteIncognitoThread,
-  onEventUpdateIncognitoThread,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
+import { onEventUpdateIncognitoThread } from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -31,7 +28,13 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
-import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
+import {
+  ThreadStatus,
+  ThreadStatusDB,
+  ThreadStatusOptions,
+  ThreadStreamingState,
+  ThreadStreamingStateDB,
+} from "../enum";
 import { CHAT_THREADS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -318,7 +321,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.streamingState.content" as const,
-              schema: z.enum(["idle", "streaming", "aborting", "waiting"]),
+              schema: z.enum(ThreadStreamingStateDB),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -435,51 +438,6 @@ const { GET } = createEndpoint({
       }),
     },
     // Emitted by threads/[threadId]/repository.ts on PATCH and DELETE.
-    "thread-updated": {
-      fields: {
-        threads: [
-          "id",
-          "title",
-          "folderId",
-          "status",
-          "preview",
-          "rootFolderId",
-          "updatedAt",
-        ] as const,
-      },
-      operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "requestData",
-        arrayField: "threads",
-        pick: ["title", "folderId", "preview"],
-      }),
-    },
-    "thread-deleted": {
-      fields: { threads: ["id"] as const },
-      operation: "remove" as const,
-      onEvent: onEventDeleteIncognitoThread({
-        source: "requestData",
-        arrayField: "threads",
-      }),
-    },
-    // Thread created - emitted when a new thread is created during streaming.
-    // Ensures the sidebar shows the thread even if the optimistic client-side
-    // update missed the cache (e.g. cache was empty, or another tab/client).
-    "thread-created": {
-      fields: {
-        threads: [
-          "id",
-          "title",
-          "rootFolderId",
-          "folderId",
-          "status",
-          "streamingState",
-          "createdAt",
-          "updatedAt",
-        ] as const,
-      },
-      operation: "merge" as const,
-    },
   },
 
   examples: {
@@ -671,6 +629,77 @@ const { POST } = createEndpoint({
     },
   },
 
+  // This op owns its `thread-created` event. `requestFields` carry the title +
+  // rootFolderId the user submitted (the id rides too); the client onEvent inserts
+  // a fresh thread into the sidebar list cache; remoteEvent relays the create
+  // cross-instance, where the route's onRemoteEvent re-runs createThread.
+  events: {
+    "thread-created": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
+      operation: "merge" as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["id", "title", "rootFolderId"] as const,
+      onEvent: async ({ partial, queryClient, logger }) => {
+        if (!partial.id || !partial.rootFolderId) {
+          return;
+        }
+        const rootFolderId = partial.rootFolderId;
+        const threadId = partial.id;
+        const [{ apiClient }, threadsDefinition] = await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("./definition"),
+        ]);
+        apiClient.updateEndpointData(
+          threadsDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            if (old.data.threads.some((t) => t.id === threadId)) {
+              return old;
+            }
+            type ThreadListItem = (typeof old.data.threads)[number];
+            const now = new Date();
+            const newThread: ThreadListItem = {
+              id: threadId,
+              title: partial.title ?? "",
+              rootFolderId,
+              folderId: null,
+              status: ThreadStatus.ACTIVE,
+              preview: null,
+              pinned: false,
+              archived: false,
+              rolesView: [],
+              rolesEdit: [],
+              rolesPost: [],
+              rolesModerate: [],
+              rolesAdmin: [],
+              canEdit: true,
+              canPost: true,
+              canModerate: false,
+              canDelete: true,
+              canManagePermissions: false,
+              streamingState: ThreadStreamingState.STREAMING,
+              createdAt: now,
+              updatedAt: now,
+            };
+            return {
+              success: true,
+              data: {
+                ...old.data,
+                threads: [newThread, ...old.data.threads],
+              },
+            };
+          },
+          { requestData: { rootFolderId, subFolderId: null } },
+        );
+        void queryClient;
+      },
+    },
+  },
+
   successTypes: {
     title: "post.success.title",
     description: "post.success.description",
@@ -708,6 +737,10 @@ export type ThreadCreateRequestInput = typeof POST.types.RequestInput;
 export type ThreadCreateRequestOutput = typeof POST.types.RequestOutput;
 export type ThreadCreateResponseInput = typeof POST.types.ResponseInput;
 export type ThreadCreateResponseOutput = typeof POST.types.ResponseOutput;
+
+/** Inferred payload of the `thread-created` event (id + title + rootFolderId). */
+export type ThreadCreatedEventPayload =
+  (typeof POST.types.EventPayloads)["thread-created"];
 
 const definitions = { GET, POST } as const;
 export default definitions;

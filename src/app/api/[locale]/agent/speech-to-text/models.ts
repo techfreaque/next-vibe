@@ -2,11 +2,6 @@ import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-} from "../chat/skills/enum";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
@@ -18,10 +13,16 @@ import {
   type ModelOptionSttBased,
   type ModelProviderConfigSttBased,
 } from "../models/models";
+import type { FiltersModelSelection } from "../models/selection";
 import {
   filtersSelectionSchema,
   sharedFilterPropsSchema,
 } from "../models/selection";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+} from "../skills/enum";
 
 export enum SttModelId {
   OPENAI_WHISPER = "openai-whisper",
@@ -169,16 +170,28 @@ export const SttModelIdOptions = Object.values(SttModelId).map((id) => ({
 // STT MODEL SELECTION SCHEMA
 // ============================================================
 
-export const sttModelSelectionSchema = z.discriminatedUnion("selectionType", [
-  z
-    .object({
-      selectionType: z.literal(ModelSelectionType.MANUAL),
-      manualModelId: z.enum(SttModelId),
-    })
-    .merge(sharedFilterPropsSchema),
-  filtersSelectionSchema,
-]);
-export type SttModelSelection = z.infer<typeof sttModelSelectionSchema>;
+const sttManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(SttModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type SttManualModelSelection = z.infer<
+  typeof sttManualModelSelectionSchema
+>;
+
+/**
+ * STT selection — explicit union + `z.ZodType<...>` annotation pins `z.output` to
+ * the named type so consumers resolve it shallowly instead of re-deriving the
+ * discriminated union (exceeds TS's instantiation-depth limit).
+ */
+export type SttModelSelection = SttManualModelSelection | FiltersModelSelection;
+
+export const sttModelSelectionSchema: z.ZodType<SttModelSelection> =
+  z.discriminatedUnion("selectionType", [
+    sttManualModelSelectionSchema,
+    filtersSelectionSchema,
+  ]);
 
 // ============================================================
 // STT MODEL RESOLUTION

@@ -18,7 +18,7 @@ import {
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
 import { getMusicGenModelById } from "@/app/api/[locale]/agent/music-generation/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -27,6 +27,7 @@ import {
   deductMediaCredits,
 } from "../shared/media-generation";
 import {
+  type MusicGenerationMediaGenStreamContext,
   type MusicGenerationPostRequestOutput,
   type MusicGenerationPostResponseOutput,
 } from "./definition";

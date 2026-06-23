@@ -25,8 +25,8 @@ installFetchCache();
 import { eq } from "drizzle-orm";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import favoritesCreateDefinitions from "@/app/api/[locale]/agent/chat/favorites/create/definition";
-import favoritesDefinitions from "@/app/api/[locale]/agent/chat/favorites/definition";
+import favoritesCreateDefinitions from "@/app/api/[locale]/agent/skills/favorites/create/definition";
+import favoritesDefinitions from "@/app/api/[locale]/agent/skills/favorites/definition";
 import remoteConnectionByIdDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
@@ -55,6 +55,7 @@ async function setupDirectConnection(
   _testUser = testUser;
   await disconnectFromHermes(testUser.id);
   await restoreHermesIdentity();
+  await restoreAtlasIdentity();
   await connectToHermes(testUser);
 
   _prodUserId = await resolveProdUserId();

@@ -9,13 +9,13 @@ import {
 import type { JSX } from "react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
-import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import favoritesEndpoint from "@/app/api/[locale]/agent/skills/favorites/definition";
+import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { CountryLanguage } from "@/i18n/core/config";
 

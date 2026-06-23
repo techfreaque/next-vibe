@@ -64,3 +64,13 @@ export async function getAllCookies(): Promise<Record<string, string>> {
     return {};
   }
 }
+
+// ─── Sync raw cookie access (Native: no-op, no document.cookie) ───────────────
+
+export function getRawCookieString(): string {
+  return ""; // no document.cookie on native
+}
+
+export function setRawCookieString(value: string): void {
+  void value;
+}

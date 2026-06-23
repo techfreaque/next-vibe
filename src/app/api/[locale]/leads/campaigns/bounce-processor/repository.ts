@@ -24,7 +24,7 @@ import {
 } from "@/app/api/[locale]/messenger/messages/db";
 import { SpecialFolderType as ImapSpecialUseType } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   cronTasks,

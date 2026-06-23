@@ -5,19 +5,22 @@
 
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
+import {
+  ThreadStatus,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

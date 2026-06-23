@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 
 import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";

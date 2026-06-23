@@ -2008,6 +2008,12 @@ export const translations: typeof enTranslations = {
         action: {
           label: "Akcja",
           description: "Akcja do wykonania (start/stop/toggle)",
+          options: {
+            start: "Start",
+            stop: "Stop",
+            toggle: "Przełącz",
+            status: "Status",
+          },
         },
         provider: {
           label: "Dostawca",

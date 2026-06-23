@@ -15,9 +15,9 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import type { z } from "zod";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type {
   DeleteRequest,

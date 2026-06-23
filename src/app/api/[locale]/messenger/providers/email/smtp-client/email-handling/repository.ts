@@ -16,7 +16,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";

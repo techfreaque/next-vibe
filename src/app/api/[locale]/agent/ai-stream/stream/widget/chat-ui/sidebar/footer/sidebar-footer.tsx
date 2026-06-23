@@ -28,7 +28,7 @@ import type { JSX } from "react";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

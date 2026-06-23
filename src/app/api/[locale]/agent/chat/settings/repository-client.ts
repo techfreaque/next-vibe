@@ -11,7 +11,7 @@ import { storage } from "next-vibe-ui/lib/storage";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "../../../system/logger/types";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 import { type ChatModelId, getBestChatModel } from "../../ai-stream/models";
@@ -45,7 +45,7 @@ export class ChatSettingsRepositoryClient {
     availability: AgentEnvAvailability,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     try {
-      const settings = this.loadLocalSettings(user, availability);
+      const settings = await this.loadLocalSettings(user, availability);
       logger.debug("Loaded settings from localStorage");
       return success(settings);
     } catch (error) {
@@ -67,7 +67,7 @@ export class ChatSettingsRepositoryClient {
     availability: AgentEnvAvailability,
   ): Promise<ResponseType<never>> {
     try {
-      this.updateLocalSettings(data, user, availability);
+      await this.updateLocalSettings(data, user, availability);
       return success();
     } catch (error) {
       logger.error(
@@ -123,15 +123,15 @@ export class ChatSettingsRepositoryClient {
   /**
    * Load settings from localStorage - merges stored overrides with defaults
    */
-  static loadLocalSettings(
+  static async loadLocalSettings(
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
-  ): ChatSettingsGetResponseOutput {
+  ): Promise<ChatSettingsGetResponseOutput> {
     if (typeof window === "undefined") {
       return this.getDefaults(user, availability);
     }
 
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = await storage.getItem(STORAGE_KEY);
     if (!stored) {
       return this.getDefaults(user, availability);
     }
@@ -207,11 +207,11 @@ export class ChatSettingsRepositoryClient {
   /**
    * Save settings to localStorage - only stores values different from defaults
    */
-  static saveLocalSettings(
+  static async saveLocalSettings(
     settings: ChatSettingsGetResponseOutput,
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
-  ): void {
+  ): Promise<void> {
     if (typeof window === "undefined") {
       return;
     }
@@ -279,21 +279,21 @@ export class ChatSettingsRepositoryClient {
     }
 
     if (Object.keys(overrides).length === 0) {
-      localStorage.removeItem(STORAGE_KEY);
+      await storage.removeItem(STORAGE_KEY);
     } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+      await storage.setItem(STORAGE_KEY, JSON.stringify(overrides));
     }
   }
 
   /**
    * Update settings in localStorage - merges updates with current and saves only non-defaults
    */
-  static updateLocalSettings(
+  static async updateLocalSettings(
     updates: Partial<ChatSettingsUpdateRequestOutput>,
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
-  ): ChatSettingsGetResponseOutput {
-    const current = this.loadLocalSettings(user, availability);
+  ): Promise<ChatSettingsGetResponseOutput> {
+    const current = await this.loadLocalSettings(user, availability);
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
       selectedSkill: updates.selectedSkill ?? current.selectedSkill,
@@ -371,18 +371,18 @@ export class ChatSettingsRepositoryClient {
       autopilotTaskId: current.autopilotTaskId,
     };
 
-    this.saveLocalSettings(updated, user, availability);
+    await this.saveLocalSettings(updated, user, availability);
     return updated;
   }
 
   /**
    * Clear settings from localStorage
    */
-  static clearLocalSettings(): void {
+  static async clearLocalSettings(): Promise<void> {
     if (typeof window === "undefined") {
       return;
     }
-    localStorage.removeItem(STORAGE_KEY);
+    await storage.removeItem(STORAGE_KEY);
   }
 
   /**
@@ -404,7 +404,8 @@ export class ChatSettingsRepositoryClient {
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
     const settingsDefinition = await import("./definition");
-    const favoritesDefinition = await import("../favorites/definition");
+    const favoritesDefinition =
+      await import("../../skills/favorites/definition");
 
     // Optimistic update 1: Update settings
     apiClient.updateEndpointData(

@@ -10,6 +10,7 @@ import type { z } from "zod";
 
 import type {
   CreateApiEndpoint,
+  InferRequestOutput,
   InferResponseOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";

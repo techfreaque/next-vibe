@@ -1,6 +1,20 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    companyType: {
+      b2b: "B2B",
+      b2c: "B2C",
+      individual: "Osoba fizyczna",
+    },
+    companyMemberRole: {
+      owner: "Właściciel",
+      admin: "Administrator",
+      member: "Członek",
+      accountant: "Księgowy",
+      viewer: "Obserwator",
+    },
+  },
   tags: {
     companies: "Firmy",
     create: "Utwórz",

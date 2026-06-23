@@ -112,4 +112,19 @@ export const translations = {
     statusBounced: "Bounced",
     statusInvalid: "Invalid",
   },
+  enums: {
+    leadStatus: {
+      new: "New",
+      pending: "Pending",
+      campaignRunning: "Campaign Running",
+      websiteUser: "Website User",
+      newsletterSubscriber: "Newsletter Subscriber",
+      inContact: "In Contact",
+      signedUp: "Signed Up",
+      subscriptionConfirmed: "Subscription Confirmed",
+      unsubscribed: "Unsubscribed",
+      bounced: "Bounced",
+      invalid: "Invalid",
+    },
+  },
 };

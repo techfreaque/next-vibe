@@ -1,5 +1,5 @@
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { ApiFormReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 

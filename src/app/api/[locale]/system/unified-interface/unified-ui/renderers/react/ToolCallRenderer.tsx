@@ -19,6 +19,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import {
   Collapsible,
@@ -37,7 +38,6 @@ import {
   Icon,
   type IconKey,
 } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -46,10 +46,10 @@ import { useForm } from "react-hook-form";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import { type EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { endpoints as dismissTaskEndpoints } from "@/app/api/[locale]/system/unified-interface/execute-tool/dismiss-task/definition";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

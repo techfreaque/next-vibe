@@ -6,6 +6,24 @@ export const translations: typeof enTranslations = {
   endpointCategories: {
     ai: "AI",
   },
+  enums: {
+    modelType: {
+      text: "Tekst",
+      image: "Obraz",
+      video: "Wideo",
+      audio: "Audio",
+    },
+    content: {
+      mainstream: "Główny nurt",
+      open: "Otwarty",
+      uncensored: "Bez cenzury",
+    },
+    intelligence: {
+      quick: "Szybki",
+      smart: "Inteligentny",
+      brilliant: "Genialny",
+    },
+  },
   get: {
     title: "Modele",
     titleShort: "Modele AI",

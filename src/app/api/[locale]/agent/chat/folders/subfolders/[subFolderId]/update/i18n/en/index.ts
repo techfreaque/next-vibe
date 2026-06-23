@@ -3,6 +3,15 @@ export const translations = {
   tags: {
     folders: "Folders",
   },
+  enums: {
+    userRole: {
+      public: "Public",
+      customer: "Customer",
+      partnerAdmin: "Partner Admin",
+      partnerEmployee: "Partner Employee",
+      admin: "Admin",
+    },
+  },
 
   patch: {
     title: "Update Folder",

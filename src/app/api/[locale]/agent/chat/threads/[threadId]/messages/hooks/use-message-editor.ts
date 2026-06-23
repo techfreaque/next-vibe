@@ -18,7 +18,7 @@ import {
   saveDraft,
 } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-input-autosave";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { loadMessageAttachments } from "./load-message-attachments";
 

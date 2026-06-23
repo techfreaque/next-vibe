@@ -99,6 +99,19 @@ const { DELETE } = createEndpoint({
     },
   }),
 
+  // This op owns its `node-deleted` event. `requestFields` carry the delete the
+  // user submitted; the peer's onRemoteEvent re-runs deleteNode. Server-only — no
+  // client cache to update, so clientDelivery: false.
+  events: {
+    "node-deleted": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["path", "recursive"] as const,
+      syncDomain: "documents" as const,
+    },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "delete.errors.validation.title" as const,

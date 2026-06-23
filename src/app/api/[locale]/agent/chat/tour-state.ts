@@ -1,19 +1,21 @@
 "use client";
 
+import {
+  getLocalItem,
+  removeLocalItem,
+  setLocalItem,
+} from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import type { StorageValue } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 interface TourState {
   isActive: boolean;
   modelSelectorOpen: boolean;
   modelSelectorOnboarding: boolean;
-  // Set to true when the selector onboarding finishes (companion + usecases steps done)
   onboardingComplete: boolean;
-  // The favorite ID of the first companion added during onboarding (for the joyride "meet your companion" step)
   onboardingCompanionId: string | null;
-  // Current tour step index (for coordination)
   currentStepIndex: number;
-  // Callback to advance tour (set by welcome-tour)
   advanceTour: (() => void) | null;
   setTourActive: (active: boolean) => void;
   setModelSelectorOpen: (open: boolean) => void;
@@ -59,17 +61,34 @@ export const useTourState = create<TourState>()(
     {
       name: "ai-chat-tour-state",
       version: 2,
-      // Only persist what's needed across refresh - not transient UI state
       partialize: () => ({}),
-      // Avoid "storage is currently unavailable" warnings in non-browser envs (CLI)
-      storage:
-        typeof window !== "undefined"
-          ? undefined // default localStorage
-          : {
-              getItem: (): null => null,
-              setItem: (): void => undefined,
-              removeItem: (): void => undefined,
-            },
+      storage: {
+        getItem: (key: string): StorageValue<TourState> | null => {
+          try {
+            const raw = getLocalItem(key);
+            if (!raw) {
+              return null;
+            }
+            return JSON.parse(raw) as StorageValue<TourState>;
+          } catch {
+            return null;
+          }
+        },
+        setItem: (key: string, value: StorageValue<TourState>): void => {
+          try {
+            setLocalItem(key, JSON.stringify(value));
+          } catch {
+            // ignore
+          }
+        },
+        removeItem: (key: string): void => {
+          try {
+            removeLocalItem(key);
+          } catch {
+            // ignore
+          }
+        },
+      },
     },
   ),
 );

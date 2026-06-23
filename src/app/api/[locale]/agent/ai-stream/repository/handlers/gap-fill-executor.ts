@@ -29,18 +29,25 @@ import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availabi
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
+import type { ModelOptionTokenBased } from "@/app/api/[locale]/agent/models/models";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessage } from "../../../chat/db";
-import type { ChatModelOption } from "../../models";
+import type { ChatModelId, ChatModelOption } from "../../models";
+import type {
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "../../vision-models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import {
   type BridgeContext,
+  type MessageVariant,
   ModalityResolver,
 } from "../core/modality-resolver";
 import { ProviderFactory } from "../core/provider-factory";
@@ -478,7 +485,6 @@ export class GapFillExecutor {
       user,
       availability,
     );
-
     if (!visionModel) {
       logger.warn(
         "[GapFill] No image vision model configured, skipping image bridge",
@@ -782,7 +788,6 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
       user,
       availability,
     );
-
     if (!videoVisionModel) {
       logger.warn(
         "[GapFill] No video vision model configured, skipping video bridge",

@@ -7,10 +7,10 @@ import { parseError } from "next-vibe/shared/utils";
 import { hasChildren } from "next-vibe-ui/unified/_shared/type-guards";
 import type { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { SchemaUIHandler } from "../../unified-ui/renderers/cli/response/schema-handler";
 

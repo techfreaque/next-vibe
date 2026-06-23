@@ -64,8 +64,8 @@ import React, {
 } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";

@@ -56,3 +56,35 @@ export const syncStorage = {
     // No-op sync storage
   },
 };
+
+// ─── Sync localStorage helpers (Native: no-op, use AsyncStorage instead) ─────
+
+export function getLocalItem(key: string): string | null {
+  void key;
+  return null;
+}
+
+export function setLocalItem(key: string, value: string): void {
+  void key;
+  void value;
+}
+
+export function removeLocalItem(key: string): void {
+  void key;
+}
+
+// ─── Sync sessionStorage helpers (Native: no-op) ──────────────────────────────
+
+export function getSessionItem(key: string): string | null {
+  void key;
+  return null;
+}
+
+export function setSessionItem(key: string, value: string): void {
+  void key;
+  void value;
+}
+
+export function removeSessionItem(key: string): void {
+  void key;
+}

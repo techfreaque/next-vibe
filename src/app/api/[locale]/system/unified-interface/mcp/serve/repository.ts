@@ -8,12 +8,12 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
 import type { IDefinitionsRegistry } from "../../shared/endpoints/definitions/registry";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { MCPRegistry } from "../registry";
 import { MCPServer } from "../server/server";
 import type { MCPServeResponseInput } from "./definition";

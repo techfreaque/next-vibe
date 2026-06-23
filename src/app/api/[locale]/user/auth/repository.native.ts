@@ -12,7 +12,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { AuthContext } from "@/app/api/[locale]/system/unified-interface/shared/server-only/auth/base-auth-handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";

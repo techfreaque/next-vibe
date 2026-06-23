@@ -6,7 +6,7 @@
 import { existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { scopedTranslation } from "../i18n";
 

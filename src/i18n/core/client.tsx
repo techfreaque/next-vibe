@@ -4,6 +4,7 @@ import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { setCookie } from "next-vibe-ui/lib/cookies";
+import { getDocumentLang, setDocumentLang } from "next-vibe-ui/lib/css-vars";
 import { storage } from "next-vibe-ui/lib/storage";
 import {
   createContext,
@@ -188,11 +189,9 @@ export function TranslationProvider({
       }
 
       // Update document language for accessibility (web only)
-      if (typeof document !== "undefined") {
-        const newLocale = savedLocale ?? currentLocale;
-        if (newLocale !== document.documentElement.lang) {
-          document.documentElement.lang = newLocale;
-        }
+      const newLocale = savedLocale ?? currentLocale;
+      if (newLocale !== getDocumentLang()) {
+        setDocumentLang(newLocale);
       }
     }
     void initializeLocale();

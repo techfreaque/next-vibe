@@ -14,11 +14,12 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import { UserPermissionRole } from "../../../user/user-roles/enum";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
@@ -32,21 +33,8 @@ import {
   normalizeToCanonicalPath,
   parseFrontmatter,
 } from "../repository";
-import type { CortexEditT } from "./i18n";
-
-interface EditParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  find?: string;
-  replace?: string;
-  startLine?: number;
-  endLine?: number;
-  newContent?: string;
-  logger: EndpointLogger;
-  t: CortexEditT;
-}
+import editDefinitions from "./definition";
+import { type CortexEditT, scopedTranslation } from "./i18n";
 
 export class CortexEditRepository {
   static async editFile({
@@ -61,7 +49,26 @@ export class CortexEditRepository {
     newContent,
     logger,
     t,
-  }: EditParams): Promise<
+    relayed = false,
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    find?: string;
+    replace?: string;
+    startLine?: number;
+    endLine?: number;
+    newContent?: string;
+    logger: EndpointLogger;
+    t: CortexEditT;
+    /**
+     * True when invoked from a cross-instance applier (the edit was already
+     * performed on the origin and relayed here). Suppresses the `node-written`
+     * emit so the event is not relayed back, preventing an infinite ping-pong.
+     */
+    relayed?: boolean;
+  }): Promise<
     ResponseType<{
       responsePath: string;
       size: number;
@@ -76,6 +83,24 @@ export class CortexEditRepository {
         message: t("patch.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
+    }
+
+    // Filesystem backend for preview-mode admin
+    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
+    if (!user.isPublic && !isVirtualWritable(path)) {
+      const { isFilesystemMode } = await import("../fs-provider");
+      if (isFilesystemMode(user)) {
+        const { fsEditFile } = await import("../fs-provider/fs-edit");
+        return fsEditFile({
+          path,
+          find,
+          replace,
+          startLine,
+          endLine,
+          newContent,
+          t,
+        });
+      }
     }
 
     // Virtual writable mount - read via mount, apply edit, write back via mount
@@ -179,6 +204,14 @@ export class CortexEditRepository {
 
     logger.info(`Cortex edit: ${path} (${replacements} replacements)`);
 
+    // Disk write-through for documents
+    try {
+      const { syncToDisk } = await import("../fs-provider/fs-sync");
+      await syncToDisk(path, content);
+    } catch {
+      // Best-effort
+    }
+
     // Queue background re-embedding for semantic search
     if (node.id) {
       const { queueEmbedding } = await import("../embeddings/auto-embed");
@@ -191,26 +224,23 @@ export class CortexEditRepository {
       });
     }
 
-    // WS-push sync: broadcast to connected remote instances
-    void (async (): Promise<void> => {
-      try {
-        const { serializeProviders } =
-          await import("@/app/api/[locale]/remote-connection/sync-provider");
-        const { broadcastSyncNotify } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-        const providerKey = path.startsWith("/memories")
-          ? "memories"
-          : "documents";
-        const syncPayloads = await serializeProviders(
-          [providerKey],
-          userId,
-          logger,
-        );
-        broadcastSyncNotify(userId, syncPayloads, logger);
-      } catch {
-        // Best-effort: cron fallback handles missed syncs
-      }
-    })();
+    // This op owns its `node-written` event: the edit the user submitted
+    // (requestFields). The peer's onRemoteEvent re-runs editFile. Server-only.
+    // Suppressed when applying a relayed edit (avoids re-relay ping-pong).
+    if (!relayed) {
+      createEndpointEmitter(
+        editDefinitions.PATCH,
+        logger,
+        user,
+      )("node-written", {
+        path,
+        find,
+        replace,
+        startLine,
+        endLine,
+        newContent,
+      });
+    }
 
     return success({
       responsePath: path,
@@ -266,12 +296,11 @@ export class CortexEditRepository {
     // Read current content via virtual mount
     const { resolveVirtualRead, resolveVirtualWrite } =
       await import("../mounts/resolver");
-    const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
     const current = await resolveVirtualRead(
       userId,
       path,
       mountPrefix,
-      isAdmin,
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
       locale,
     );
     if (!current) {
@@ -348,5 +377,43 @@ export class CortexEditRepository {
       replacements,
       updatedAt: new Date().toISOString(),
     });
+  }
+
+  /**
+   * Cross-instance applier for `node-written`: re-run the edit on this instance
+   * with the relayed inputs. Reuses editFile so there is one code path.
+   */
+  static async applyRemoteEdit(
+    payload: {
+      path: string;
+      find?: string;
+      replace?: string;
+      startLine?: number;
+      endLine?: number;
+      newContent?: string;
+    },
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const result = await this.editFile({
+      userId: user.id,
+      user,
+      locale: defaultLocale,
+      path: payload.path,
+      find: payload.find,
+      replace: payload.replace,
+      startLine: payload.startLine,
+      endLine: payload.endLine,
+      newContent: payload.newContent,
+      logger,
+      t,
+      relayed: true,
+    });
+    if (!result.success) {
+      logger.error("Failed to apply remote cortex edit", {
+        message: result.message,
+      });
+    }
   }
 }

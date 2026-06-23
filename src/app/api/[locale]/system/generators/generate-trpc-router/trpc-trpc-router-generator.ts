@@ -14,16 +14,16 @@ declare const process: {
 import fs from "node:fs";
 import path from "node:path";
 
-import { findRouteFiles } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
-
-import { parseError } from "../../../shared/utils";
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
-} from "../../unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { findRouteFiles } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
+
+import { parseError } from "../../../shared/utils";
 import { stripProjectRoot } from "../shared/utils";
 
 // RouteFileStructure represents a route module with HTTP method handlers

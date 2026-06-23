@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----482a6a48-4dd8-4b0c-930e-5a4633c7a93c.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think>The result contains a tools array with 25 entries, which is >= 1. The inner result is well-formed. STEP_OK </thin…",
+    "input": "Generate an image: wakeup-test",
     "encoding_format": "float"
   }
 }

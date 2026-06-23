@@ -6,10 +6,7 @@
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  MusicGenModelId,
-  MusicGenModelIdOptions,
-} from "@/app/api/[locale]/agent/music-generation/models";
+import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,

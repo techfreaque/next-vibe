@@ -1,10 +1,11 @@
 "use client";
 
+import { getSessionItem, setSessionItem } from "next-vibe-ui/lib/storage";
 import { createContext, type JSX, type ReactNode, useMemo } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { createClientLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/client-logger";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createClientLogger } from "@/app/api/[locale]/system/logger/client";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { setWsLogger } from "@/app/api/[locale]/system/unified-interface/websocket/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -13,12 +14,12 @@ export const LoggerContext = createContext<EndpointLogger | null>(null);
 /** Stable per-tab ID stored in sessionStorage - new tab = new ID, refresh = same ID */
 function getOrCreateTabId(): string {
   try {
-    const existing = sessionStorage.getItem("vibe-tab-id");
+    const existing = getSessionItem("vibe-tab-id");
     if (existing) {
       return existing;
     }
     const id = crypto.randomUUID();
-    sessionStorage.setItem("vibe-tab-id", id);
+    setSessionItem("vibe-tab-id", id);
     return id;
   } catch {
     // SSR or storage unavailable - use a one-off ID (won't persist but won't crash)

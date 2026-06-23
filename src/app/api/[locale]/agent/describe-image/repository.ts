@@ -21,18 +21,18 @@ import {
   ModalityResolver,
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
-import {
-  chatFavorites,
-  FAVORITE_CONFIG_COLUMNS,
-} from "@/app/api/[locale]/agent/chat/favorites/db";
-import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+} from "@/app/api/[locale]/agent/skills/favorites/db";
+import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

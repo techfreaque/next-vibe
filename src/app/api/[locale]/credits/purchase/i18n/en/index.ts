@@ -1,4 +1,10 @@
 export const translations = {
+  enums: {
+    paymentProvider: {
+      stripe: "Stripe",
+      nowpayments: "NowPayments",
+    },
+  },
   post: {
     title: "Purchase Credits",
     titleShort: "Buy Credits",

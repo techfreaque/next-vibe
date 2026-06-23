@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  assignUrl,
+  getCurrentUrl,
+  silentReplaceState,
+} from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
@@ -23,11 +28,6 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import {
-  assignUrl,
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 

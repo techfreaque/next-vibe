@@ -12,7 +12,7 @@ import type {
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useEffect, useRef } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import {

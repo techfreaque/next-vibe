@@ -2029,6 +2029,12 @@ export const translations: typeof enTranslations = {
         action: {
           label: "Aktion",
           description: "Auszuführende Aktion (start/stop/toggle)",
+          options: {
+            start: "Starten",
+            stop: "Stoppen",
+            toggle: "Umschalten",
+            status: "Status",
+          },
         },
         provider: {
           label: "Anbieter",

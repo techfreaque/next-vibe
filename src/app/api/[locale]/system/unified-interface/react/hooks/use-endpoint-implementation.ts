@@ -5,8 +5,8 @@ import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { EndpointReadOptions } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   DeleteRequest,
@@ -213,6 +213,7 @@ export function useEndpoint<
     logger,
     read?.cacheKey,
     user,
+    locale,
   );
 
   // Use the appropriate operation based on endpoint type

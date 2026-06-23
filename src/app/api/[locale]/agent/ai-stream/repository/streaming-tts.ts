@@ -19,7 +19,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
 import { ErrorResponseTypes } from "@/app/api/[locale]/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";

@@ -912,6 +912,14 @@ export const translations = {
           description: "URL to load in the new page",
           placeholder: "Enter URL",
         },
+        replacePage: {
+          label: "Replace Page",
+          description: "Close existing pages before opening the new one",
+        },
+        background: {
+          label: "Background",
+          description: "Open page without bringing it to the front",
+        },
         timeout: {
           label: "Timeout",
           description: "Maximum wait time in milliseconds (0 for default)",

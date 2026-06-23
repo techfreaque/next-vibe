@@ -2,9 +2,9 @@
  * Production-ready debug utilities for CLI performance monitoring and resource cleanup
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { mcpSilentMode } from "@/config/debug";
+import { mcpSilentMode } from "@/app/api/[locale]/system/logger/debug";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { binaryStartTime } from "../run-cli";

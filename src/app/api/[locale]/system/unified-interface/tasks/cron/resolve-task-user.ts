@@ -16,7 +16,7 @@ import { eq } from "drizzle-orm";
 
 import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";

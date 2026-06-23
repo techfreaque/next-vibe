@@ -49,7 +49,7 @@ type TestEndpoint = CreateApiEndpoint<
   readonly ["enums.userRole.admin"],
   string,
   typeof testEndpoint_field,
-  EndpointEventsMap<string>
+  EndpointEventsMap<string, string>
 >;
 
 // Test if it's assignable
@@ -67,7 +67,7 @@ type TestEndpoint2 = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string>
+  EndpointEventsMap<string, string>
 >;
 
 type Test2 = TestEndpoint2 extends CreateApiEndpointAny ? "PASS" : "FAIL";

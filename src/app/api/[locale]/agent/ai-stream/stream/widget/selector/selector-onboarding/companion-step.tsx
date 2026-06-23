@@ -14,8 +14,8 @@ import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18
 import {
   COMPANION_SKILLS,
   type Skill,
-} from "@/app/api/[locale]/agent/chat/skills/config";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
+} from "@/app/api/[locale]/agent/skills/config";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 

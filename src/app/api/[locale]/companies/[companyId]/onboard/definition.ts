@@ -64,9 +64,9 @@ const { POST } = createEndpoint({
         placeholder: "post.country.placeholder" as const,
         columns: 12,
         options: [
-          { value: "AT", label: "Austria (AT)" },
-          { value: "DE", label: "Germany (DE)" },
-          { value: "XX", label: "Generic (XX)" },
+          { value: "AT", label: "enums.country.AT" as const },
+          { value: "DE", label: "enums.country.DE" as const },
+          { value: "XX", label: "enums.country.XX" as const },
         ],
         schema: z.enum(["AT", "DE", "XX"]),
       }),

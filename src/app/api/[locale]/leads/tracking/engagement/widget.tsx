@@ -5,6 +5,7 @@
 
 "use client";
 
+import { openInNewTab } from "next-vibe-ui/lib/location";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -23,7 +24,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { openInNewTab } from "next-vibe-ui/utils/browser";
 import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

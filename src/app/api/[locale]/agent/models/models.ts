@@ -10,18 +10,6 @@ import type {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../ai-stream/vision-models";
-import {
-  ContentLevelDB,
-  type ContentLevelValue,
-  IntelligenceLevelDB,
-  type IntelligenceLevelValue,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  PriceLevel,
-  PriceLevelDB,
-} from "../chat/skills/enum";
-import type { SkillsT } from "../chat/skills/i18n";
 import type { AgentEnvAvailability } from "../env-availability";
 import type { AgentTranslationKey } from "../i18n";
 import type {
@@ -32,6 +20,18 @@ import type {
   MusicGenModelId,
   MusicGenModelOption,
 } from "../music-generation/models";
+import {
+  ContentLevelDB,
+  type ContentLevelValue,
+  IntelligenceLevelDB,
+  type IntelligenceLevelValue,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  PriceLevel,
+  PriceLevelDB,
+} from "../skills/enum";
+import type { SkillsT } from "../skills/i18n";
 import type { SttModelId, SttModelOption } from "../speech-to-text/models";
 import type { TtsModelId, TtsModelOption } from "../text-to-speech/models";
 import type {

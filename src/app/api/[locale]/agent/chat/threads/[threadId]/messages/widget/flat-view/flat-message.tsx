@@ -1,13 +1,14 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
+import { getElementById } from "next-vibe-ui/lib/dom";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { copyToClipboard, getElementById } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 
@@ -22,11 +23,11 @@ import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useSkill } from "../../../../../skills/[id]/hooks";
+import { useSkill } from "../../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
@@ -438,7 +439,7 @@ export const FlatMessage = memo(function FlatMessage({
           size="unset"
           className="text-primary hover:text-primary/80 text-xs font-semibold cursor-pointer hover:underline"
           onClick={(): void => {
-            void navigator.clipboard.writeText(`>>${postNum}`);
+            void copyToClipboard(`>>${postNum}`);
           }}
           title={t("widget.flatView.clickToCopyRef")}
         >
@@ -540,7 +541,7 @@ export const FlatMessage = memo(function FlatMessage({
                   variant="ghost"
                   size="unset"
                   onClick={() => {
-                    const element = document.getElementById(`${parentPostNum}`);
+                    const element = getElementById(`${parentPostNum}`);
                     element?.scrollIntoView({
                       behavior: "smooth",
                       block: "center",
@@ -771,7 +772,7 @@ export const FlatMessage = memo(function FlatMessage({
                   variant="ghost"
                   size="unset"
                   onClick={() => {
-                    const element = document.getElementById(`${replyPostNum}`);
+                    const element = getElementById(`${replyPostNum}`);
                     element?.scrollIntoView({
                       behavior: "smooth",
                       block: "center",
@@ -861,7 +862,7 @@ export const FlatMessage = memo(function FlatMessage({
               variant="ghost"
               size="unset"
               onClick={(): void => {
-                void navigator.clipboard.writeText(`>>${postNum}`);
+                void copyToClipboard(`>>${postNum}`);
               }}
               className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
               title={t("widget.flatView.actions.copyReference")}

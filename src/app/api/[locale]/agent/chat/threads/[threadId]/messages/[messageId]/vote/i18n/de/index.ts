@@ -4,6 +4,16 @@ export const translations: typeof enTranslations = {
   tags: {
     messages: "Nachrichten",
   },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Geteilte Chats",
+      public: "Öffentliche Chats",
+      incognito: "Inkognito Chats",
+      background: "Hintergrund-Threads",
+      remote: "Remote-Chats",
+    },
+  },
   post: {
     title: "Nachricht bewerten",
     titleShort: "Nachricht bewerten",

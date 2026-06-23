@@ -8,8 +8,8 @@
 
 "use client";
 
+import { getScreenWidth } from "next-vibe-ui/lib/screen";
 import { storage } from "next-vibe-ui/lib/storage";
-import { getScreenWidth } from "next-vibe-ui/utils/browser";
 import { create } from "zustand";
 
 const STORAGE_KEY = "sidebar-collapsed";

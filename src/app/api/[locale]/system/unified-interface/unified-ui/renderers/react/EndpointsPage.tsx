@@ -20,6 +20,7 @@ import { PickerProvider } from "next-vibe-ui/unified/_shared/picker-context";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type {
   OptionsOptional,
@@ -32,7 +33,6 @@ import {
   NavigationStackProvider,
   useNavigationStack,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { NavigationStackEntry } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -193,7 +193,7 @@ function EndpointsPageInternal<
   user,
   _disableNavigationStack = false,
   forceMethod,
-  navigationOverride,
+  navigationOverride: navigationOverrideRaw,
   disabled,
   responseOnly,
   platform,
@@ -224,7 +224,23 @@ function EndpointsPageInternal<
       canGoBack: navigationCanGoBack,
       current: navigationCurrent,
     };
-    return navigationOverride ? { ...base, ...navigationOverride } : base;
+    if (!navigationOverrideRaw) {
+      return base;
+    }
+    const overridePush = navigationOverrideRaw.push;
+    const wrappedPush = overridePush
+      ? <TEndpoint extends CreateApiEndpointAny>(
+          ep: TEndpoint,
+          options?: Parameters<typeof navigationPush>[1],
+        ): void => {
+          overridePush(ep, options, navigationPush);
+        }
+      : navigationPush;
+    return {
+      ...base,
+      ...navigationOverrideRaw,
+      push: wrappedPush,
+    } as ReturnType<typeof useNavigationStack>;
   }, [
     navigationOverrideRaw,
     navigationStack,
@@ -730,7 +746,7 @@ function EndpointsPageInternal<
                 disabled={true}
                 responseOnly={responseOnly}
                 platform={platform}
-                navigationOverride={navigationOverride}
+                navigationOverride={finalNavigation}
               />
             )}
             {!disabled && isGetEndpoint && endpointState.read && (
@@ -757,7 +773,7 @@ function EndpointsPageInternal<
                 user={user}
                 responseOnly={responseOnly}
                 platform={platform}
-                navigationOverride={navigationOverride}
+                navigationOverride={finalNavigation}
               />
             )}
             {!disabled &&
@@ -788,7 +804,7 @@ function EndpointsPageInternal<
                   user={user}
                   responseOnly={responseOnly}
                   platform={platform}
-                  navigationOverride={navigationOverride}
+                  navigationOverride={finalNavigation}
                 />
               )}
             {!disabled && isDeleteEndpoint && endpointState.delete && (
@@ -808,7 +824,7 @@ function EndpointsPageInternal<
                 user={user}
                 responseOnly={responseOnly}
                 platform={platform}
-                navigationOverride={navigationOverride}
+                navigationOverride={finalNavigation}
               />
             )}
           </>
