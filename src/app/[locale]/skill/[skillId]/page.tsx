@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const userResponse = await UserRepository.getUserByAuth(
     {
@@ -106,7 +106,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<SkillLandingPageData | null> {
   const { locale, skillId } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const userResponse = await UserRepository.getUserByAuth(
     {

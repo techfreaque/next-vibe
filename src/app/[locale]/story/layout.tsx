@@ -43,7 +43,7 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<Omit<SiteLayoutData, "children">> {
   const { locale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const user = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER],

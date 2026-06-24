@@ -76,7 +76,12 @@ export function useLocalStorageRead<T, TEndpoint extends CreateApiEndpointAny>(
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver(endpoint.requestSchema)
+      ? zodResolver<
+          RequestType,
+          // oxlint-disable-next-line no-explicit-any
+          any,
+          RequestType
+        >(endpoint.requestSchema)
       : undefined,
     defaultValues: (options.initialState ?? {}) as RequestType,
   });
@@ -223,7 +228,12 @@ export function useLocalStorageCreate<T>(
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver(endpoint.requestSchema)
+      ? zodResolver<
+          RequestType,
+          // oxlint-disable-next-line no-explicit-any
+          any,
+          RequestType
+        >(endpoint.requestSchema)
       : undefined,
     defaultValues: (options.autoPrefillData ??
       options.defaultValues ??
@@ -379,7 +389,14 @@ export function useLocalStorageDelete<T>(
 
   // Create form instance for localStorage mode (similar to API mode)
   const form = useForm<RequestType>({
-    resolver: endpoint ? zodResolver(endpoint.requestSchema) : undefined,
+    resolver: endpoint
+      ? zodResolver<
+          RequestType,
+          // oxlint-disable-next-line no-explicit-any
+          any,
+          RequestType
+        >(endpoint.requestSchema)
+      : undefined,
     defaultValues: {} as RequestType,
   });
 

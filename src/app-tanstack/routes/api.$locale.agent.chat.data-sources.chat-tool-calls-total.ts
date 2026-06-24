@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/chat/data-sources/chat-tool-calls-total/route"),
+      () =>
+        import("@/app/api/[locale]/agent/chat/data-sources/chat-tool-calls-total/route"),
     ),
   },
 });

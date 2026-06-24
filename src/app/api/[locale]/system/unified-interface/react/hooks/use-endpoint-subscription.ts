@@ -82,10 +82,25 @@ export function useEndpointSubscription(
     }
 
     const resolvedParams = urlPathParamsRef.current ?? {};
-    const pathChannel = buildWsChannel(endpoint.path, resolvedParams);
+    const pathChannel = buildWsChannel(
+      endpoint,
+      resolvedParams,
+      requestDataRef.current,
+      logger,
+    );
     const userChannel = userId ? buildUserChannel(userId) : undefined;
 
-    function handleEvent(eventName: string, wirePayload: WidgetData): void {
+    /**
+     * Dispatch a received event to cache-merger + onEvent.
+     * envelope is provided for __event__ protocol (carries responseData,
+     * requestData, urlPathParams from the emitter). For per-event-name legacy
+     * protocol, envelope is absent and wirePayload IS the full response data.
+     */
+    function handleEvent(
+      eventName: string,
+      wirePayload: WidgetData,
+      envelope?: AnyEndpointEventEnvelope,
+    ): void {
       const declaration = endpoint?.events?.[eventName];
       if (!declaration) {
         logger.warn(
@@ -126,8 +141,10 @@ export function useEndpointSubscription(
       if (declaration.onEvent && currentUser) {
         void declaration.onEvent({
           responseData: wirePayload,
-          requestData: requestDataRef.current,
-          urlPathParams: resolvedParams,
+          // Envelope carries the emitter's requestData/urlPathParams — use
+          // those so onEvent gets the event's own context, not the subscriber's.
+          requestData: envelope?.requestData ?? requestDataRef.current,
+          urlPathParams: envelope?.urlPathParams ?? resolvedParams,
           logger,
           cacheKey,
           user: currentUser,
@@ -144,7 +161,12 @@ export function useEndpointSubscription(
         pathChannel,
         "__event__",
         (envelope) => {
-          handleEvent(envelope.eventName, envelope.payload);
+          // responseData is the typed event payload; payload is the legacy field
+          handleEvent(
+            envelope.eventName,
+            envelope.responseData ?? envelope.payload,
+            envelope,
+          );
         },
         locale,
       ),
@@ -173,7 +195,11 @@ export function useEndpointSubscription(
           "__event__",
           (envelope) => {
             if (envelope.channel === pathChannel) {
-              handleEvent(envelope.eventName, envelope.payload);
+              handleEvent(
+                envelope.eventName,
+                envelope.responseData ?? envelope.payload,
+                envelope,
+              );
             }
           },
           locale,

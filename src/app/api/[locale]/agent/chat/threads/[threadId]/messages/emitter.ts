@@ -7,40 +7,19 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import messagesDefinitions from "./definition";
 
-type GET = typeof messagesDefinitions.GET;
-type MessagesEventPayloads = ComputeEventPayloads<
-  GET["types"]["ResponseOutput"],
-  GET["types"]["RequestOutput"],
-  GET["types"]["Events"]
+export type MessagesWsEmit = EmitEventNamed<
+  (typeof messagesDefinitions.GET)["types"]["EventResponsePayloads"],
+  (typeof messagesDefinitions.GET)["types"]["EventRequestPayloads"],
+  (typeof messagesDefinitions.GET)["types"]["EventEmitUrlPayloads"],
+  (typeof messagesDefinitions.GET)["types"]["EventPayloadTypes"]
 >;
-
-/** Typed emit callback for the messages WS channel — fully inferred from the definition. */
-export type MessagesWsEmit = EmitEventNamed<MessagesEventPayloads>;
-
-/** Typed emit callback alias used by stream context and TTS handler. */
-export type WsEmitCallback = MessagesWsEmit;
-
-/**
- * A messages-channel event as a discriminated {name, payload} pair — keeps the
- * event name correlated with its typed payload across the union so a replayed
- * wire event stays type-safe.
- */
-export type MessagesEventInput = {
-  [K in keyof MessagesEventPayloads & string]: {
-    name: K;
-    payload: MessagesEventPayloads[K];
-  };
-}[keyof MessagesEventPayloads & string];
 
 /** Non-batched emitter for the messages channel — for one-shot emits outside streaming. */
 export function createMessagesGetEmitter(
-  threadId: string,
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): MessagesWsEmit {
-  return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
-    threadId,
-  });
+  return createEndpointEmitter(messagesDefinitions.GET, logger, user);
 }
 
 /**
@@ -52,20 +31,13 @@ export function createMessagesGetEmitter(
  * suppressed to break echo loops.
  */
 export function createMessagesEmitter(
-  threadId: string,
   logger: EndpointLogger,
   user: JwtPayloadType,
   options?: { fanOut?: boolean },
 ): MessagesWsEmit {
   const fanOut = options?.fanOut ?? true;
 
-  return createEndpointEmitter(
-    messagesDefinitions.GET,
-    logger,
-    user,
-    { threadId },
-    {
-      fanOut,
-    },
-  );
+  return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
+    fanOut,
+  });
 }

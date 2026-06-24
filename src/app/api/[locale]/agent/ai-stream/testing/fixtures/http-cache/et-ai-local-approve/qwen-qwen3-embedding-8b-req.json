@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Call the cortex-write tool with path='et-approve-probe-1782318303676' and content='APPROVE_GATE_TEST' and callbackMode='approve'. The call should pause waiting for user confirmation (the tool returns waitingForConfirmation=true). Report what you observed. If the call is paused for confirmation, end with STEP_OK. If the tool returned a normal success result immediately (no confirmation gate), end with FAILED: approve mode did not pause.",
+    "encoding_format": "float"
+  }
+}

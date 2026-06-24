@@ -18,7 +18,6 @@ import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { RemoteCallData } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,

@@ -16,17 +16,27 @@
 
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { dispatchRemoteEvent } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/remote-event-registry";
+import { REMOTE_EVENT_NAME } from "@/app/api/[locale]/system/unified-interface/websocket/channel";
+import {
+  publishRemoteEventToHub,
+  type RemoteEventRelayPayload,
+  type RemoteEventWirePayload,
+} from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import { dispatchRemoteEvent } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/registry";
 import type { AnyEndpointEventEnvelope } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type {

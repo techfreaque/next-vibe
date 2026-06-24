@@ -380,6 +380,19 @@ export class CortexEditRepository {
       logger.error("Failed to apply remote cortex edit", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(editDefinitions.PATCH, logger, user, {
+      fanOut: false,
+    })("node-written", {
+      requestData: {
+        path: requestData.path,
+        find: requestData.find,
+        replace: requestData.replace,
+        startLine: requestData.startLine,
+        endLine: requestData.endLine,
+        newContent: requestData.newContent,
+      },
+    });
   }
 }

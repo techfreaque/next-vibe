@@ -358,6 +358,20 @@ export function UserCreateContainer({
             field={children.basicInfo.children.language}
           />
         </Div>
+        <Div className="grid grid-cols-2 gap-3">
+          <MultiSelectFieldWidget
+            fieldName="adminSettings.roles"
+            field={children.adminSettings.children.roles}
+          />
+          <BooleanFieldWidget
+            fieldName="adminSettings.emailVerified"
+            field={children.adminSettings.children.emailVerified}
+          />
+          <BooleanFieldWidget
+            fieldName="adminSettings.isActive"
+            field={children.adminSettings.children.isActive}
+          />
+        </Div>
         <Div className="flex gap-2">
           <FormAlertWidget field={{}} />
           <SubmitButtonWidget<typeof definition.POST> field={{}} />

@@ -93,7 +93,9 @@ async function pollUntil<T>(
   }
   // Test helper: surface a clear timeout. (Not a ResponseType path — this is a
   // vitest helper, where throwing fails the test as intended.)
-  expect(false, `[pollUntil] ${label}: timed out after ${timeoutMs}ms`).toBe(true);
+  expect(false, `[pollUntil] ${label}: timed out after ${timeoutMs}ms`).toBe(
+    true,
+  );
   return undefined as never;
 }
 
@@ -158,11 +160,13 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist for the sync short-circuit test (run vibe seed)",
       ).toBeTruthy();
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       // First exchange: serialize from null → returns each provider's true
       // high-water-mark cursor (derived from the served batch). Feeding THOSE
@@ -201,11 +205,13 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       // Get real cursors
       const localCursors = await collectCursors(adminUser.id);
@@ -245,7 +251,9 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -267,7 +275,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   let adminUser: JwtPrivatePayloadType;
   const TEST_SYNC_ID = randomUUID();
   const TEST_PATH = `/documents/sync-unit-test/sync-test-${Date.now().toString(36)}.md`;
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
 
   beforeAll(async () => {
     const resolved = await resolveTestAdminUser();
@@ -305,7 +313,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU1: inserting a node changes the provider hash",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -344,7 +354,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU2: serializeFromCursor includes the inserted node",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -372,7 +384,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU3: upsertFromJson with explicit payload creates node for target userId",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -430,7 +444,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU4: cursor of fakeProdUserId is the epoch (no nodes) - per-user isolation",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -455,7 +471,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU5: updating a node's content advances its cursor (updatedAt)",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -495,7 +513,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU6: deleting a node advances the cursor",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -541,7 +561,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU7: tombstone payload - upsertFromJson with isDeleted:true removes the node",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -590,7 +612,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
       const synced = await documentsSyncProvider.upsertFromJson(
         tombstoneJson,
         adminUser.id,
-        createEndpointLogger(false, Date.now(), defaultLocale),
+        createEndpointLogger(false, defaultLocale),
       );
       expect(
         synced,
@@ -619,7 +641,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU8: last-writer-wins - older remote payload does NOT overwrite newer local",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -656,7 +680,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
       await documentsSyncProvider.upsertFromJson(
         oldPayload,
         adminUser.id,
-        createEndpointLogger(false, Date.now(), defaultLocale),
+        createEndpointLogger(false, defaultLocale),
       );
 
       // Local content must NOT have been overwritten
@@ -692,7 +716,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
 
 describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   let adminUser: JwtPrivatePayloadType;
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
 
   beforeAll(async () => {
     const resolved = await resolveTestAdminUser();
@@ -707,7 +731,9 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK1: skillsSyncProvider.getCursor returns a stable cursor",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -727,7 +753,9 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK3: skillsSyncProvider.serializeFromCursor returns valid JSON array",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -750,7 +778,9 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK4: each serialized skill has required fields",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -783,7 +813,9 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK5: per-provider isolation - documents change does NOT affect skills cursor",
     async () => {
       if (!adminUser) {
-        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(
+          true,
+        );
         return;
       }
 
@@ -850,7 +882,10 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      expect(false, `[sync-test] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`).toBe(true);
+      expect(
+        false,
+        `[sync-test] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
+      ).toBe(true);
       return;
     }
 
@@ -996,7 +1031,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL3: update content on dev, resync, hermes gets the new version",
     async () => {
-
       const updatedContent = `${TEST_CONTENT}\n\n## Update\n\nThis line was added in SL3.`;
 
       // Update the node on dev
@@ -1046,7 +1080,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL4: delete on dev, resync, hermes removes the node (tombstone)",
     async () => {
-
       // Soft-delete on dev: set isDeleted=true + bump updatedAt (tombstone protocol)
       await db
         .update(cortexNodes)
@@ -1109,7 +1142,10 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      expect(false, `[sync-test/BN] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`).toBe(true);
+      expect(
+        false,
+        `[sync-test/BN] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
+      ).toBe(true);
       return;
     }
 
@@ -1121,7 +1157,10 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
       connectedToHermes = true;
       prodAdminToken = await resolveProdAdminToken();
     } catch (err) {
-      expect(false, `[sync-test/BN] Connection setup failed: ${String(err)}`).toBe(true);
+      expect(
+        false,
+        `[sync-test/BN] Connection setup failed: ${String(err)}`,
+      ).toBe(true);
       return;
     }
   }, 180_000);
@@ -1166,7 +1205,10 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     async () => {
       // BN tests require two separate instances with different user DBs.
       if (!connectedToHermes) {
-        expect(false, "[BN1] Not connected to hermes — beforeAll must have failed").toBe(true);
+        expect(
+          false,
+          "[BN1] Not connected to hermes — beforeAll must have failed",
+        ).toBe(true);
         return;
       }
 
@@ -1230,7 +1272,10 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     "BN2: consecutive pull with same content → no duplicate, content stable",
     async () => {
       if (!connectedToHermes) {
-        expect(false, "[BN2] Not connected to hermes — beforeAll must have failed").toBe(true);
+        expect(
+          false,
+          "[BN2] Not connected to hermes — beforeAll must have failed",
+        ).toBe(true);
         return;
       }
 
@@ -1252,10 +1297,13 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
         async () => {
           const [conn] = await db
             .select({
-              lastSyncedAt: remoteConnectionSchema.remoteConnections.lastSyncedAt,
+              lastSyncedAt:
+                remoteConnectionSchema.remoteConnections.lastSyncedAt,
             })
             .from(remoteConnectionSchema.remoteConnections)
-            .where(eq(remoteConnectionSchema.remoteConnections.userId, devUser.id))
+            .where(
+              eq(remoteConnectionSchema.remoteConnections.userId, devUser.id),
+            )
             .limit(1);
           if (!conn?.lastSyncedAt) {
             return false;
@@ -1287,7 +1335,10 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     "BN3: delete node on hermes, dev pulls, node is gone on atlas",
     async () => {
       if (!connectedToHermes) {
-        expect(false, "[BN3] Not connected to hermes — beforeAll must have failed").toBe(true);
+        expect(
+          false,
+          "[BN3] Not connected to hermes — beforeAll must have failed",
+        ).toBe(true);
         return;
       }
 
@@ -1361,7 +1412,6 @@ describe("Sync: scalability and efficiency", () => {
   it(
     "SC1: getCursor for 1000+ nodes completes in < 2s",
     async () => {
-
       // Insert 20 test nodes (small batch - enough to measure the pattern)
       const batchNodes = [...Array(20).keys()].map((i) => ({
         userId: adminUser.id,
@@ -1422,7 +1472,7 @@ describe("Sync: scalability and efficiency", () => {
   it(
     "SC3: per-provider cursor changes are independent (only changed provider transfers data)",
     async () => {
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
       const initial = await collectCursors(adminUser.id);
 
       // Add a documents node (clean up stale leftovers from prior failed runs first)

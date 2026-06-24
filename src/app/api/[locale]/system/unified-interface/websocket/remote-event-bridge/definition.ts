@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
   // that route's own onRemoteEvent via dispatchRemoteEvent. It must NOT carry
   // remoteEvent:true itself — that would make it re-enter the relay and require
   // its own onRemoteEvent handler. The event exists only to document the wire
-  // frame the connector listens for on system/sync/{userId}.
+  // frame the connector listens for on the remote-event channel.
   //
   // The relay payload is the RemoteEventWirePayload — carried in the envelope's
   // `payload` field. originInstanceId/syncDomain/envelope describe its shape.

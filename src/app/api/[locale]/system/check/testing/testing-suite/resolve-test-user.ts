@@ -22,7 +22,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
     return cached;
   }
 
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const result = await UserRepository.getUserByEmail(
     env.VIBE_ADMIN_USER_EMAIL,
     UserDetailLevel.STANDARD,

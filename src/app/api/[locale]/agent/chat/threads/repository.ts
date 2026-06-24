@@ -891,17 +891,57 @@ export class ThreadsRepository {
   }
 
   /**
+   * Cross-instance applier for `thread-title-updated`: update the title in DB
+   * and re-emit locally (fanOut=false) so this instance's WS clients see it.
+   */
+  static async applyRemoteThreadTitleUpdated(
+    props: RemoteEventHandlerProps<
+      typeof definitions.GET,
+      "thread-title-updated"
+    >,
+  ): Promise<void> {
+    const { responseData, user, logger } = props;
+    const thread = responseData.threads?.[0];
+    if (!thread?.id || !thread.title) {
+      return;
+    }
+    await db
+      .update(chatThreads)
+      .set({ title: thread.title, updatedAt: new Date() })
+      .where(eq(chatThreads.id, thread.id))
+      .catch((err: Error) => {
+        logger.warn(
+          "[threads/repository] thread-title-updated: DB update failed",
+          {
+            threadId: thread.id,
+            error: err.message,
+          },
+        );
+      });
+    const { createEndpointEmitter } =
+      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "thread-title-updated",
+      { responseData: { threads: [{ id: thread.id, title: thread.title }] } },
+    );
+  }
+
+  /**
    * Cross-instance applier for the `thread-created` event: re-run create on this
    * instance with the relayed inputs. Reuses createThread so there is one path.
    */
-  static async applyRemoteThreadCreate({
-    requestData,
-    user,
-    logger,
-  }: RemoteEventHandlerProps<
-    typeof definitions.POST,
-    "thread-created"
-  >): Promise<void> {
+  static async applyRemoteThreadCreate(
+    props: RemoteEventHandlerProps<typeof definitions.POST, "thread-created">,
+  ): Promise<void> {
+    const { user, logger } = props;
+    const parsed = definitions.POST.requestSchema.safeParse(props.requestData);
+    if (!parsed.success) {
+      logger.error("Failed to parse relayed thread-created request data", {
+        error: parsed.error.message,
+      });
+      return;
+    }
+    const requestData = parsed.data;
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const result = await this.createThread(
       {
@@ -922,6 +962,21 @@ export class ThreadsRepository {
       logger.error("Failed to apply remote thread create", {
         message: result.message,
       });
+      return;
     }
+    // Re-emit on the POST channel (fanOut: false) so local WS subscribers on
+    // this instance fire their onEvent and insert the thread into the list cache.
+    const { createEndpointEmitter } =
+      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+    createEndpointEmitter(definitions.POST, logger, user, { fanOut: false })(
+      "thread-created",
+      {
+        requestData: {
+          id: requestData.id,
+          title: requestData.title,
+          rootFolderId: requestData.rootFolderId,
+        },
+      },
+    );
   }
 }

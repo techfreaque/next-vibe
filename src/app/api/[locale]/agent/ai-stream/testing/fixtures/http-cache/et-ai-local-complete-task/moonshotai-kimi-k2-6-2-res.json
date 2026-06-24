@@ -1,0 +1,31 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a10ddae89816e537-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Wed, 24 Jun 2026 18:39:26 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782326365-H6Th3xAyJEvLCvYaIwAM"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"Task 1 succeeded. I got taskId: \\\"local-bg-1782326362883-a9z6ie\\\".\\n\\nNow I need to call `complete-task` with this taskId and response={status:'completed',output:'manual-complete-test'}\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Task 1 succeeded. I got taskId: \\\"local-bg-1782326362883-a9z6ie\\\".\\n\\nNow I need to call `complete-task` with this taskId and response={status:'completed',output:'manual-complete-test'}\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\".\\n\\nBut I don't see `complete-task` in my available tools. Let me check if it exists using `tool-help`.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\".\\n\\nBut I don't see `complete-task` in my available tools. Let me check if it exists using `tool-help`.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:1\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"input\\\":{\\\"toolName\\\":\\\"complete-task\\\"},\\\"toolName\\\":\\\"tool-help\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782326365-H6Th3xAyJEvLCvYaIwAM\",\"object\":\"chat.completion.chunk\",\"created\":1782326365,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":6953,\"completion_tokens\":104,\"total_tokens\":7057,\"cost\":0.0023017,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":5120,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.0023017,\"upstream_inference_prompt_cost\":0.00194706,\"upstream_inference_completions_cost\":0.00035464},\"completion_tokens_details\":{\"reasoning_tokens\":76,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

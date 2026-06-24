@@ -79,7 +79,7 @@ const TEST_FAVORITE: FavoriteConfig = {
 let user: JwtPrivatePayloadType;
 let logLineCountBefore: number;
 let previousDefaultInstanceId: string | undefined;
-const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+const logger = createEndpointLogger(false, defaultLocale);
 
 // ─── Setup / Teardown ────────────────────────────────────────────────────────
 
@@ -263,25 +263,44 @@ describe("headless-client connection registration", () => {
     // remoteInstanceId makes the relay body carry the client's identity so the
     // ws-provider stores the thread as BACKGROUND/headless-client and the AI's
     // system prompt contains "Instance ID: headless-client".
-    expect(conn?.remoteInstanceId, "remoteInstanceId must equal COMPUTER_NAME").toBe(COMPUTER_NAME);
+    expect(
+      conn?.remoteInstanceId,
+      "remoteInstanceId must equal COMPUTER_NAME",
+    ).toBe(COMPUTER_NAME);
     expect(conn?.transportMode).toBe("reverse-ws");
-    expect(conn?.loopLocation, "loopLocation=server routes AI loop through relay").toBe("server");
-    expect(conn?.toolSource, "toolSource=local means atlas builds system prompt with client identity").toBe("local");
-    expect(conn?.threadMirrorMode, "cloud mirror: canonical thread on ws-provider side").toBe("cloud");
+    expect(
+      conn?.loopLocation,
+      "loopLocation=server routes AI loop through relay",
+    ).toBe("server");
+    expect(
+      conn?.toolSource,
+      "toolSource=local means atlas builds system prompt with client identity",
+    ).toBe("local");
+    expect(
+      conn?.threadMirrorMode,
+      "cloud mirror: canonical thread on ws-provider side",
+    ).toBe("cloud");
     expect(conn?.remoteUrl).toBe(ATLAS_URL);
   });
 
   it("selfInstanceId reported by remote-connection/list is headless-client", async () => {
-    const listDef = (await import("@/app/api/[locale]/remote-connection/list/definition")).default;
+    const listDef = (
+      await import("@/app/api/[locale]/remote-connection/list/definition")
+    ).default;
     const result = await sendTestRequest({
       endpoint: listDef.GET,
       data: {},
       user,
     });
-    expect(result.success, result.success ? "" : String(result.message)).toBe(true);
+    expect(result.success, result.success ? "" : String(result.message)).toBe(
+      true,
+    );
     // getLocalInstanceId() returns the isDefault=true row — must be headless-client
     // since beforeAll set it. This is the exact value injected into the AI system prompt.
-    expect(result.success ? result.data.selfInstanceId : undefined, "selfInstanceId must be headless-client").toBe(COMPUTER_NAME);
+    expect(
+      result.success ? result.data.selfInstanceId : undefined,
+      "selfInstanceId must be headless-client",
+    ).toBe(COMPUTER_NAME);
   });
 });
 
@@ -322,13 +341,18 @@ describe("headless-client AI stream via REMOTE folder", () => {
     const aiReplies = messages.filter(
       (m) => m.isAI && m.role === "assistant" && m.content,
     );
-    expect(aiReplies.length, "relay must produce at least 1 assistant message").toBeGreaterThan(0);
+    expect(
+      aiReplies.length,
+      "relay must produce at least 1 assistant message",
+    ).toBeGreaterThan(0);
 
     const reply = aiReplies.at(-1)?.content ?? "";
     expect(reply, "assistant reply must not be empty").not.toBe("");
 
     // The AI copied its own system prompt — assert the identity line directly
-    const instanceIdLine = reply.split("\n").find((l) => l.includes("**Instance ID:**"));
+    const instanceIdLine = reply
+      .split("\n")
+      .find((l) => l.includes("**Instance ID:**"));
     expect(
       instanceIdLine,
       `"**Instance ID:**" line not found in AI reply. Full reply:\n${reply}`,
@@ -374,8 +398,13 @@ describe("headless-client AI stream via REMOTE folder", () => {
       .limit(1);
 
     expect(localRow, "thread row must exist in local DB").toBeDefined();
-    expect(localRow?.rootFolderId, "thread must be in REMOTE root, not BACKGROUND").toBe(DefaultFolderId.REMOTE);
-    expect(localRow?.folderId, "thread must be in the test subfolder").toBe(subFolderId);
+    expect(
+      localRow?.rootFolderId,
+      "thread must be in REMOTE root, not BACKGROUND",
+    ).toBe(DefaultFolderId.REMOTE);
+    expect(localRow?.folderId, "thread must be in the test subfolder").toBe(
+      subFolderId,
+    );
 
     // Only one thread row with this ID — relay must not have created a duplicate
     const allRows = await db
@@ -385,9 +414,17 @@ describe("headless-client AI stream via REMOTE folder", () => {
     expect(allRows.length, "thread must not be duplicated in local DB").toBe(1);
 
     // Thread must have messages (user + assistant) — proves relay completed
-    expect(messages.length, "thread must contain messages after relay").toBeGreaterThan(1);
-    const assistantMsgs = messages.filter((m) => m.isAI && m.role === "assistant");
-    expect(assistantMsgs.length, "must have at least 1 assistant message").toBeGreaterThan(0);
+    expect(
+      messages.length,
+      "thread must contain messages after relay",
+    ).toBeGreaterThan(1);
+    const assistantMsgs = messages.filter(
+      (m) => m.isAI && m.role === "assistant",
+    );
+    expect(
+      assistantMsgs.length,
+      "must have at least 1 assistant message",
+    ).toBeGreaterThan(0);
   }, 90_000);
 
   it("atlas log has no new errors or warnings", () => {
@@ -398,7 +435,8 @@ describe("headless-client AI stream via REMOTE folder", () => {
       if ((e as NodeJS.ErrnoException).code === "ENOENT") {
         // oxlint-disable-next-line restricted-syntax -- dev server must be running for these tests
         throw new Error(
-          "atlas log file .tmp/.atlas.log not found — dev server must be running (vibe dev)", { cause: e },
+          "atlas log file .tmp/.atlas.log not found — dev server must be running (vibe dev)",
+          { cause: e },
         );
       }
       // oxlint-disable-next-line restricted-syntax -- re-throw unexpected read errors

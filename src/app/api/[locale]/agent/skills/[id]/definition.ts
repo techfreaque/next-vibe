@@ -41,7 +41,7 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
-import skillsDefinitions, { type SkillListResponseOutput } from "../definition";
+import type { SkillListResponseOutput } from "../definition";
 import {
   CategoryOptions,
   ContentLevel,
@@ -284,11 +284,10 @@ const { DELETE } = createEndpoint({
       urlPathParamsFields: ["id"] as const,
       onEvent: async ({ urlPathParams, logger }) => {
         const deletedId = urlPathParams.id;
-        const { apiClient } = await import(
-          "@/app/api/[locale]/system/unified-interface/react/hooks/store"
-        );
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         apiClient.updateEndpointData(
-          skillsDefinitions.GET,
+          (await import("../definition")).default.GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -824,7 +823,7 @@ const { PATCH } = createEndpoint({
           getEnvAvailability(),
         );
         apiClient.updateEndpointData(
-          skillsDefinitions.GET,
+          (await import("../definition")).default.GET,
           logger,
           (old) => {
             if (!old?.success) {

@@ -27,7 +27,7 @@ import { RouteExecuteRepository } from "./repository";
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function makeLogger(): ReturnType<typeof createEndpointLogger> {
-  return createEndpointLogger(false, Date.now(), defaultLocale);
+  return createEndpointLogger(false, defaultLocale);
 }
 
 type IncomingProps = Parameters<

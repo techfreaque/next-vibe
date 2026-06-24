@@ -457,10 +457,7 @@ function ToolDetailView({
   onExecute: () => void;
 }): JSX.Element {
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, locale), [locale]);
 
   const [RendererComponent, setRendererComponent] =
     useState<InkEndpointRendererType | null>(null);
@@ -576,10 +573,7 @@ function ResultView({
   onBack: () => void;
 }): JSX.Element {
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, locale), [locale]);
 
   const [RendererComponent, setRendererComponent] =
     useState<InkEndpointRendererType | null>(null);
@@ -748,7 +742,7 @@ function InteractiveHelp({
           input: {},
           user,
           locale,
-          logger: createEndpointLogger(false, Date.now(), locale),
+          logger: createEndpointLogger(false, locale),
           platform,
           streamContext: {
             ...makeHeadlessContext(),

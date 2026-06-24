@@ -1663,7 +1663,14 @@ export class SkillsRepository {
       logger.error("Failed to apply remote skill create", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(createSkillDefinitions.POST, logger, user, {
+      fanOut: false,
+    })("skill-created", {
+      requestData,
+      responseData: { id: result.data.id },
+    });
   }
 
   /**
@@ -1676,6 +1683,7 @@ export class SkillsRepository {
   static async applyRemoteSkillDeleteById({
     urlPathParams,
     logger,
+    user,
   }: RemoteEventHandlerProps<
     (typeof skillIdDefinitions)["DELETE"],
     "skill-deleted"
@@ -1696,7 +1704,13 @@ export class SkillsRepository {
         skillId,
         ...parseError(err),
       });
+      return;
     }
+    createEndpointEmitter(skillIdDefinitions.DELETE, logger, user, {
+      fanOut: false,
+    })("skill-deleted", {
+      urlPathParams: { id: skillId },
+    });
   }
 
   /**
@@ -1708,6 +1722,7 @@ export class SkillsRepository {
     requestData,
     urlPathParams,
     logger,
+    user,
   }: RemoteEventHandlerProps<
     (typeof skillIdDefinitions)["PATCH"],
     "skill-updated"
@@ -1737,6 +1752,13 @@ export class SkillsRepository {
         skillId,
         ...parseError(err),
       });
+      return;
     }
+    createEndpointEmitter(skillIdDefinitions.PATCH, logger, user, {
+      fanOut: false,
+    })("skill-updated", {
+      urlPathParams: { id: skillId },
+      requestData,
+    });
   }
 }

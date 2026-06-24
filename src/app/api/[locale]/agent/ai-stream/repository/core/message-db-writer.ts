@@ -36,7 +36,7 @@ import {
   type ToolCall,
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
-import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";
 

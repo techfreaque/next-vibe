@@ -25,13 +25,10 @@ import type { ServerWebSocket } from "bun";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 
+import { clearLocalBroadcast, registerLocalBroadcast } from "./local-broadcast";
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 import { getPubSubAdapter } from "./pubsub";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
@@ -41,7 +38,7 @@ import type {
   WsConnectionData,
   WsWireMessage,
 } from "./types";
-import type { WsChannelEntry } from "./ws-channel-registry";
+import { authenticateWsRequest, authorizeWsChannel } from "./ws-channel-auth";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -60,10 +57,10 @@ let shuttingDown = false;
  * Broadcast to all subscribers on a channel (no user filter).
  * Used by pub/sub adapters that relay events from other processes.
  */
-export function broadcastLocalToAll<T>(
+export function broadcastLocalToAll(
   channel: string,
   event: string,
-  data: T,
+  data: AnyEndpointEventEnvelope,
 ): void {
   const subscribers = channels.get(channel);
   if (!subscribers || subscribers.size === 0) {
@@ -71,7 +68,7 @@ export function broadcastLocalToAll<T>(
   }
 
   globalSeq++;
-  const message: WsWireMessage<T> = {
+  const message: WsWireMessage = {
     channel,
     event,
     data,
@@ -89,20 +86,8 @@ export function broadcastLocalToAll<T>(
 }
 
 /**
- * Broadcast an event to all LOCAL subscribers of a channel.
- * Access control is enforced at subscribe time (not at broadcast time).
- */
-export function broadcastLocal<T>(
-  channel: string,
-  event: string,
-  data: T,
-): void {
-  broadcastLocalToAll(channel, event, data);
-}
-
-/**
  * Broadcast multiple events to LOCAL subscribers in a single WS frame per socket.
- * More efficient than calling broadcastLocal() N times when emitting a batch.
+ * More efficient than calling broadcastLocalToAll() N times when emitting a batch.
  * Access control is enforced at subscribe time (not at broadcast time).
  */
 export function broadcastLocalBatch(events: WsBatchEvent[]): void {
@@ -149,7 +134,11 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
  * Publish an event through the pub/sub adapter.
  * NOTE: Route handlers should use createEndpointEmitter() from emitter.ts instead.
  */
-export function publish<T>(channel: string, event: string, data: T): void {
+export function publish(
+  channel: string,
+  event: string,
+  data: AnyEndpointEventEnvelope,
+): void {
   getPubSubAdapter().publish(channel, event, data);
 }
 
@@ -158,92 +147,6 @@ export function publish<T>(channel: string, event: string, data: T): void {
  */
 export function getChannelSize(channel: string): number {
   return channels.get(channel)?.size ?? 0;
-}
-
-// ============================================================================
-// CHANNEL AUTHORIZATION (endpoint-driven)
-// ============================================================================
-
-interface ChannelMatcher {
-  pattern: RegExp;
-  paramNames: string[];
-  entry: WsChannelEntry;
-}
-
-let channelMatcherCache: ChannelMatcher[] | null = null;
-
-async function getChannelMatchers(): Promise<ChannelMatcher[]> {
-  if (channelMatcherCache) {
-    return channelMatcherCache;
-  }
-  const { getWsEndpoints } = await import("./ws-channel-registry");
-  const wsEndpoints = await getWsEndpoints();
-  channelMatcherCache = wsEndpoints.map((entry) => {
-    const paramNames: string[] = [];
-    const regexParts = entry.endpoint.path.map((seg) => {
-      if (seg.startsWith("[") && seg.endsWith("]")) {
-        paramNames.push(seg.slice(1, -1));
-        return "([^/]+)";
-      }
-      return seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    });
-    return {
-      pattern: new RegExp(`^${regexParts.join("/")}$`),
-      paramNames,
-      entry,
-    };
-  });
-  return channelMatcherCache;
-}
-
-async function authorizeWsChannel(
-  user: JwtPayloadType,
-  channel: string,
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<boolean> {
-  // User channel is always allowed — scoped to the authenticated user already
-  if (channel.startsWith("user/")) {
-    return true;
-  }
-
-  const matchers = await getChannelMatchers();
-
-  for (const { pattern, paramNames, entry } of matchers) {
-    const match = pattern.exec(channel);
-    if (!match) {
-      continue;
-    }
-
-    const urlPathParams: Record<string, string> = {};
-    paramNames.forEach((name, i) => {
-      urlPathParams[name] = match[i + 1]!;
-    });
-
-    // Role-based check via the permissions registry
-    const { permissionsRegistry } =
-      await import("../shared/endpoints/permissions/registry");
-    const { Platform } = await import("../shared/types/platform");
-    const roleResult = permissionsRegistry.validateEndpointAccess(
-      entry.endpoint,
-      user,
-      Platform.NEXT_PAGE,
-      locale,
-    );
-    if (!roleResult.success) {
-      return false;
-    }
-
-    // Resource-level check declared in the route handler
-    if (entry.canSubscribe) {
-      return entry.canSubscribe({ user, urlPathParams, logger, locale });
-    }
-
-    return true;
-  }
-
-  // No endpoint matched — unknown/system channel, allow
-  return true;
 }
 
 // ============================================================================
@@ -264,9 +167,12 @@ function subscribeToChannel(
   ws.data.channels.add(channel);
 
   if (isNewChannel) {
-    getPubSubAdapter().subscribe(channel, (event, data) => {
-      broadcastLocalToAll(channel, event, data);
-    });
+    getPubSubAdapter().subscribe<AnyEndpointEventEnvelope>(
+      channel,
+      (event, data) => {
+        broadcastLocalToAll(channel, event, data);
+      },
+    );
   }
 }
 
@@ -289,70 +195,6 @@ function unsubscribeFromAll(ws: ServerWebSocket<WsConnectionData>): void {
   for (const channel of ws.data.channels) {
     unsubscribeFromChannel(ws, channel);
   }
-}
-
-// ============================================================================
-// AUTH
-// ============================================================================
-
-/** Parse a single cookie value from a Cookie header string */
-function parseCookieValue(
-  cookieHeader: string,
-  name: string,
-): string | undefined {
-  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-  return match?.[1];
-}
-
-/**
- * Verify JWT and extract userId + leadId from the connection request.
- *
- * Sources (checked in order):
- *   1. httpOnly cookies (browser clients)
- *   2. URL query params ?token=...&leadId=... (server-to-server, e.g. self-hosted relay)
- */
-async function authenticateFromCookies(
-  req: Request,
-  logger: EndpointLogger,
-): Promise<JwtPayloadType | null> {
-  const cookieHeader = req.headers.get("cookie") ?? "";
-  const url = new URL(req.url);
-
-  // Accept token and leadId from query params (used by server-side WS clients
-  // like unbottled-stream-handler which cannot set Cookie headers).
-  const token =
-    parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME) ??
-    url.searchParams.get("token") ??
-    null;
-  const leadId =
-    parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ??
-    url.searchParams.get("leadId") ??
-    null;
-
-  if (!leadId) {
-    return null;
-  }
-
-  if (token) {
-    try {
-      const { AuthRepository } =
-        await import("@/app/api/[locale]/user/auth/repository");
-      const result = await AuthRepository.verifyJwt(token, logger, "en-US");
-
-      if (result.success) {
-        return result.data;
-      }
-    } catch {
-      logger.debug("[WS] JWT verification failed during upgrade");
-    }
-  }
-
-  // Public (unauthenticated) connection
-  return {
-    isPublic: true,
-    leadId,
-    roles: [UserPermissionRole.PUBLIC],
-  };
 }
 
 // ============================================================================
@@ -383,50 +225,6 @@ function trackRequest(method: string, path: string): void {
 /** Extended connection data for proxied WS connections (e.g. Next.js HMR) */
 interface WsConnectionDataWithProxy extends WsConnectionData {
   proxyWs?: WebSocket;
-}
-
-/**
- * Dispatch a tool-execute-request that arrived on an authenticated server-to-server
- * WS (the initiator of a reverse-ws connection sends dispatches over its outbound
- * socket). Delegates to execute-tool's onRemoteEvent handler — same code as the
- * HTTP path, result published back on the hub channel.
- */
-async function handleInboundWireMessage(
-  ws: ServerWebSocket<WsConnectionData>,
-  raw: Partial<WsWireMessage>,
-  logger: EndpointLogger,
-): Promise<void> {
-  const channel = typeof raw.channel === "string" ? raw.channel : null;
-  const event = typeof raw.event === "string" ? raw.event : null;
-  if (!channel || !event) {
-    return;
-  }
-  if (
-    !channel.startsWith("system/tool-dispatch/") ||
-    event !== "tool-execute-request"
-  ) {
-    return;
-  }
-
-  const user = ws.data.user;
-  if (user.isPublic || !("id" in user) || !user.id) {
-    logger.warn(
-      "[WS] tool-execute-request from unauthenticated socket — dropped",
-    );
-    return;
-  }
-
-  const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
-  const { dispatchToolWireEvent } =
-    await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
-  await dispatchToolWireEvent(
-    "tool-execute-request",
-    raw.data,
-    RemoteConnectionRepository.deriveDefaultSelfInstanceId(),
-    user.id,
-    logger,
-  );
 }
 
 /**
@@ -477,17 +275,22 @@ export function startWebSocketServer(
     idleTimeout: 255,
 
     async fetch(req, bunServer): Promise<Response> {
-      // Also disable per-request idle timeout (belt-and-suspenders).
-      // On Bun versions where server.timeout(req, 0) works, this overrides
-      // the server-level 255s back to infinite for long-lived SSE streams.
-      bunServer.timeout(req, 0);
+      // Bun 1.3.x ignores timeout(req, 0) (same bug as idleTimeout: 0 being
+      // ignored at the server level). Use 255 — the uWS max — to keep slow
+      // SSR cold-starts and long-running SSE streams alive.
+      bunServer.timeout(req, 255);
 
       const url = new URL(req.url);
 
       // ── Internal broadcast endpoint - called by Next.js to emit WS events ──
       // Next.js runs in a separate process and can't call broadcastLocal() directly,
       // so it POSTs here and the proxy calls broadcastLocal() in-process.
+      // Restricted to loopback — only this machine's Next.js process may POST here.
       if (url.pathname === "/ws/broadcast" && req.method === "POST") {
+        const remoteIp = bunServer.requestIP(req)?.address ?? "";
+        if (remoteIp !== "127.0.0.1" && remoteIp !== "::1") {
+          return new Response("Forbidden", { status: 403 });
+        }
         try {
           const body = await req.json();
           if (
@@ -507,7 +310,7 @@ export function startWebSocketServer(
               event: string;
               data: WsWireMessage["data"];
             };
-            broadcastLocal(
+            broadcastLocalToAll(
               singleBody.channel,
               singleBody.event,
               singleBody.data,
@@ -562,23 +365,31 @@ export function startWebSocketServer(
         req.headers.get("upgrade")?.toLowerCase() === "websocket"
       ) {
         const channel = url.searchParams.get("channel");
-        const upgradeLocale = url.searchParams.get(
-          "locale",
-        ) as CountryLanguage | null;
+        const localeParam = url.searchParams.get("locale");
+        const upgradeLocale: CountryLanguage | null =
+          localeParam !== null &&
+          Object.values(CountryLanguageValues).includes(
+            localeParam as CountryLanguage,
+          )
+            ? (localeParam as CountryLanguage)
+            : null;
 
-        const user = await authenticateFromCookies(req, logger);
+        const user = await authenticateWsRequest(req, logger);
 
         if (!user) {
           logger.warn("[WS] Rejected upgrade - missing lead_id cookie");
           return new Response("Missing lead_id cookie", { status: 401 });
         }
 
-        if (
-          channel &&
-          upgradeLocale &&
-          !(await authorizeWsChannel(user, channel, logger, upgradeLocale))
-        ) {
-          return new Response("Forbidden", { status: 403 });
+        if (channel) {
+          if (!upgradeLocale) {
+            return new Response("Missing locale", { status: 400 });
+          }
+          if (
+            !(await authorizeWsChannel(user, channel, logger, upgradeLocale))
+          ) {
+            return new Response("Forbidden", { status: 403 });
+          }
         }
 
         const upgraded = bunServer.upgrade(req, {
@@ -934,16 +745,8 @@ export function startWebSocketServer(
               msg.channel,
             );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
-          } else {
-            // Server-to-server wire message (remote-connection channel spec):
-            // the initiator of a reverse-ws connection sends tool-execute-
-            // requests over its outbound WS — this instance is the executor.
-            await handleInboundWireMessage(
-              ws as ServerWebSocket<WsConnectionData>,
-              JSON.parse(rawStr) as Partial<WsWireMessage>,
-              logger,
-            );
           }
+          // Unknown frame types are silently dropped.
         } catch (err) {
           const rawStr =
             typeof raw === "string" ? raw : new TextDecoder().decode(raw);

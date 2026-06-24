@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route"),
+      () =>
+        import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route"),
     ),
   },
 });

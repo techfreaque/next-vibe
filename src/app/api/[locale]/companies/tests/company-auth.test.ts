@@ -31,7 +31,7 @@ const TEST_TIMEOUT = 60_000;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeLogger(): EndpointLogger {
-  return createEndpointLogger(false, Date.now(), defaultLocale);
+  return createEndpointLogger(false, defaultLocale);
 }
 
 async function resolveUserId(email: string): Promise<string | null> {
@@ -60,7 +60,9 @@ describe("CompanyAuthRepository.requireMember", () => {
     const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
     if (!userId) {
       // oxlint-disable-next-line restricted-syntax
-      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      throw new Error(
+        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+      );
     }
     adminUserId = userId;
 
@@ -97,9 +99,9 @@ describe("CompanyAuthRepository.requireMember", () => {
   afterAll(async () => {
     if (testCompanyId) {
       // cascade deletes members
-      await db.delete(companies).where(
-        require("drizzle-orm").eq(companies.id, testCompanyId),
-      );
+      await db
+        .delete(companies)
+        .where(require("drizzle-orm").eq(companies.id, testCompanyId));
     }
   });
 
@@ -117,7 +119,10 @@ describe("CompanyAuthRepository.requireMember", () => {
         defaultLocale,
       );
 
-      expect(result.success, `requireMember failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `requireMember failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.userId).toBe(adminUserId);
         expect(result.data.companyId).toBe(testCompanyId);
@@ -245,9 +250,7 @@ describe("CompanyAuthRepository.requireMember", () => {
       await db
         .update(companyMembers)
         .set({ isActive: false })
-        .where(
-          eq(companyMembers.userId, adminUserId),
-        );
+        .where(eq(companyMembers.userId, adminUserId));
 
       const result = await CompanyAuthRepository.requireMember(
         adminUserId,
@@ -268,9 +271,7 @@ describe("CompanyAuthRepository.requireMember", () => {
       await db
         .update(companyMembers)
         .set({ isActive: true })
-        .where(
-          eq(companyMembers.userId, adminUserId),
-        );
+        .where(eq(companyMembers.userId, adminUserId));
     },
     TEST_TIMEOUT,
   );

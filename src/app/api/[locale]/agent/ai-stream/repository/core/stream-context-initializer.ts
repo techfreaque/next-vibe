@@ -9,7 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
-import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { EmitThreadTitleFn } from "./message-db-writer";
 import { StreamContext } from "./stream-context";
 
@@ -29,7 +29,7 @@ export class StreamContextInitializer {
     isIncognito: boolean;
     logger: EndpointLogger;
     locale: CountryLanguage;
-    wsEmit: WsEmitCallback;
+    wsEmit: MessagesWsEmit;
     emitTitle: EmitThreadTitleFn;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;

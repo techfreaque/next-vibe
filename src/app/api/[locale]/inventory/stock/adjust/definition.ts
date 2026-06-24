@@ -5,8 +5,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import warehouseListDef from "@/app/api/[locale]/inventory/warehouse/list/definition";
-import productCatalogListDef from "@/app/api/[locale]/products/catalog/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -55,7 +53,10 @@ const { POST } = createEndpoint({
         label: "stockAdjust.post.warehouseId.label" as const,
         description: "stockAdjust.post.warehouseId.description" as const,
         schema: z.uuid(),
-        listEndpoint: warehouseListDef.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       productId: requestField(scopedTranslation, {
@@ -64,7 +65,9 @@ const { POST } = createEndpoint({
         label: "stockAdjust.post.productId.label" as const,
         description: "stockAdjust.post.productId.description" as const,
         schema: z.uuid(),
-        listEndpoint: productCatalogListDef.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/products/catalog/list/definition"))
+            .default.GET,
         labelField: "name",
       }),
       quantity: requestField(scopedTranslation, {

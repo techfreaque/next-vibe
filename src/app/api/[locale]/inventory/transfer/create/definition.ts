@@ -5,8 +5,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import companiesListDef from "@/app/api/[locale]/companies/list/definition";
-import warehouseListDef from "@/app/api/[locale]/inventory/warehouse/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -59,7 +57,9 @@ const { POST } = createEndpoint({
         label: "transferCreate.post.companyId.label" as const,
         description: "transferCreate.post.companyId.description" as const,
         schema: z.uuid(),
-        listEndpoint: companiesListDef.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/companies/list/definition")).default
+            .GET,
         labelField: "name",
       }),
       fromWarehouseId: requestField(scopedTranslation, {
@@ -68,7 +68,10 @@ const { POST } = createEndpoint({
         label: "transferCreate.post.fromWarehouseId.label" as const,
         description: "transferCreate.post.fromWarehouseId.description" as const,
         schema: z.uuid(),
-        listEndpoint: warehouseListDef.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       toWarehouseId: requestField(scopedTranslation, {
@@ -77,7 +80,10 @@ const { POST } = createEndpoint({
         label: "transferCreate.post.toWarehouseId.label" as const,
         description: "transferCreate.post.toWarehouseId.description" as const,
         schema: z.uuid(),
-        listEndpoint: warehouseListDef.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       reference: requestField(scopedTranslation, {

@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import listMonitorsDefinitions from "../list-monitors/definition";
 import { DESKTOP_SCREENSHOT_ALIAS } from "./constants";
 
 const TakeScreenshotWidget = lazyWidget(() =>
@@ -95,7 +94,8 @@ const { POST } = createEndpoint({
       monitorName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listMonitorsDefinitions.POST,
+        listEndpoint: async () =>
+          (await import("../list-monitors/definition")).default.POST,
         labelField: "name",
         label: "take-screenshot.form.fields.monitorName.label",
         description: "take-screenshot.form.fields.monitorName.description",

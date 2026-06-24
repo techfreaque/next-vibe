@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import periodListDefinitions from "@/app/api/[locale]/chart-of-accounts/period/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -54,7 +53,10 @@ const { POST } = createEndpoint({
         placeholder: "post.periodId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
-        listEndpoint: periodListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/chart-of-accounts/period/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       closed: responseField(scopedTranslation, {

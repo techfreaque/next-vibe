@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/lead-magnet/providers/salesmanago/route"),
+      () =>
+        import("@/app/api/[locale]/lead-magnet/providers/salesmanago/route"),
     ),
   },
 });

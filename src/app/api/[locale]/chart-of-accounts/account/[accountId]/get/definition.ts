@@ -23,7 +23,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../../../i18n";
-import listDef0 from "../../list/definition";
 
 const CoaAccountGetWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaAccountGetWidget })),
@@ -54,7 +53,8 @@ const { GET } = createEndpoint({
         label: "accountGet.accountId.label",
         description: "accountGet.accountId.description",
         schema: z.string().uuid(),
-        listEndpoint: listDef0.GET,
+        listEndpoint: async () =>
+          (await import("../../list/definition")).default.GET,
         labelField: "name",
       }),
 

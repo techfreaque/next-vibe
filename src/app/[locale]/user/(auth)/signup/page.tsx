@@ -83,7 +83,7 @@ export async function tanstackLoader({
   const refFromUrl = search["ref"] ?? null;
   const skillIdFromUrl = search["skillId"] ?? null;
 
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
 
   // Only redirect if user is authenticated and not a public user

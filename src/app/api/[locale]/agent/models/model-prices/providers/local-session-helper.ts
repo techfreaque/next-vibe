@@ -29,7 +29,7 @@ import { defaultLocale } from "@/i18n/core/config";
 export async function resolveLocalAdminSession(
   remoteUrl: string,
 ): Promise<UnbottledCloudSession | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
 
   const userResult = await UserRepository.getUserByEmail(

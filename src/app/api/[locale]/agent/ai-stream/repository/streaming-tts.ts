@@ -25,7 +25,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { ChatMessageRole } from "../../chat/enum";
-import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
+import type { MessagesWsEmit } from "../../chat/threads/[threadId]/messages/emitter";
 import {
   getBestTtsModel,
   type TtsModelOption,

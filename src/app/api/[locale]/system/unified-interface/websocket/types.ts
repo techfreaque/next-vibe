@@ -21,10 +21,11 @@ import type { AnyEndpointEventEnvelope } from "./structured-events";
 
 /**
  * Message sent over the WebSocket wire (JSON serialized).
- * `data` is the typed event payload, or an `EndpointEventEnvelope` when the
- * event name is `"__event__"` (endpoint events routed via the user channel).
+ * `data` is always an `EndpointEventEnvelope` — the single wire payload type.
  */
-export interface WsWireMessage<T extends AnyEndpointEventEnvelope> {
+export interface WsWireMessage<
+  T extends AnyEndpointEventEnvelope = AnyEndpointEventEnvelope,
+> {
   /** Channel this event belongs to */
   readonly channel: string;
   /** Event name (matches a key in the endpoint's events record, or "__event__") */
@@ -60,6 +61,37 @@ export interface WsWireBatch {
 export type WsWireFrame = WsWireMessage | WsWireBatch;
 
 /**
+ * Parse and structurally validate a raw WS wire frame string.
+ * Returns null on malformed JSON or unrecognized frame shape — callers skip silently.
+ */
+export function parseWsFrame(raw: string): WsWireFrame | null {
+  try {
+    const frame = JSON.parse(raw) as WsWireFrame;
+    if (frame === null || typeof frame !== "object" || Array.isArray(frame)) {
+      return null;
+    }
+    if (
+      "type" in frame &&
+      frame.type === "batch" &&
+      Array.isArray(frame.events)
+    ) {
+      return frame;
+    }
+    if (
+      "channel" in frame &&
+      typeof frame.channel === "string" &&
+      "event" in frame &&
+      typeof frame.event === "string"
+    ) {
+      return frame;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Client→server subscribe/unsubscribe messages.
  */
 export interface WsSubscribeMessage {
@@ -81,15 +113,6 @@ export type WsClientMessage = WsSubscribeMessage | WsUnsubscribeMessage;
 // ============================================================================
 // SERVER-SIDE TYPES
 // ============================================================================
-
-/**
- * Extract the identity key for matching WS connections.
- * userId takes priority; leadId is the fallback for anonymous users.
- * Single source of truth for the matching logic - never inline this elsewhere.
- */
-export function wsIdentityKey(user: JwtPayloadType): string {
-  return user.isPublic ? user.leadId : user.id;
-}
 
 /**
  * Data attached to each WebSocket connection (Bun's ws.data).

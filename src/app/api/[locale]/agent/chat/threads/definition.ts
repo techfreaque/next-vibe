@@ -409,6 +409,8 @@ const { GET } = createEndpoint({
     // Framework merges the partial into the threads array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
     "thread-title-updated": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
       responseFields: { threads: ["id", "title"] as const },
       operation: "merge" as const,
       onEvent: async (ctx) => {
@@ -464,7 +466,6 @@ const { GET } = createEndpoint({
         });
       },
     },
-    // Emitted by threads/[threadId]/repository.ts on PATCH and DELETE.
   },
 
   examples: {
@@ -671,15 +672,13 @@ const { POST } = createEndpoint({
         const rootFolderId =
           requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
         const threadId = requestData.id;
-        const [{ apiClient }, threadsDefinition] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
-          import("./definition"),
-        ]);
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         if (!threadId) {
           return;
         }
         apiClient.updateEndpointData(
-          threadsDefinition.default.GET,
+          GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -767,7 +766,23 @@ export type ThreadCreateResponseOutput = typeof POST.types.ResponseOutput;
 
 /** Inferred payload of the `thread-created` event (id + title + rootFolderId). */
 export type ThreadCreatedEventPayload =
-  (typeof POST.types.EventPayloads)["thread-created"];
+  (typeof POST.types.EventRequestPayloads)["thread-created"];
+
+/** Typed emit callback for the threads GET channel. */
+export type ThreadsGetWsEmit = EmitEventNamed<
+  (typeof GET)["types"]["EventResponsePayloads"],
+  (typeof GET)["types"]["EventRequestPayloads"],
+  (typeof GET)["types"]["EventEmitUrlPayloads"],
+  (typeof GET)["types"]["EventPayloadTypes"]
+>;
+
+/** Typed emit callback for the threads POST channel. */
+export type ThreadsPostWsEmit = EmitEventNamed<
+  (typeof POST)["types"]["EventResponsePayloads"],
+  (typeof POST)["types"]["EventRequestPayloads"],
+  (typeof POST)["types"]["EventEmitUrlPayloads"],
+  (typeof POST)["types"]["EventPayloadTypes"]
+>;
 
 const definitions = { GET, POST } as const;
 export default definitions;

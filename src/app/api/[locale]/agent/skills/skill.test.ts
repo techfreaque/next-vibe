@@ -184,7 +184,7 @@ describe("Skill Creator E2E", () => {
     testUser = await resolveTestAdminUser();
 
     // Safety floor: 500cr before any test
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, defaultLocale);
     const { t: creditT } = creditsScopedTranslation.scopedT(defaultLocale);
     const balResult = await CreditRepository.getCreditBalanceForUser(
       testUser,
@@ -474,7 +474,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
       const skillResult = await SkillsRepository.getSkillById(
         { id: createdSkillId },
         testUser,
@@ -586,7 +586,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
       const { t } = favoritesScopedTranslation.scopedT(defaultLocale);
 
       // ── Verify favorite appears in getFavorites list ──

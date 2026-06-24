@@ -137,7 +137,7 @@ function assertVerdictPass(
 
 /** Ensure test user has at least 500 credits (safety floor) */
 async function ensureCredits(user: JwtPrivatePayloadType): Promise<void> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const { t } = creditsScopedTranslation.scopedT(defaultLocale);
   const result = await CreditRepository.getCreditBalanceForUser(
     user,
@@ -387,7 +387,10 @@ describe("Cortex AI Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -1046,7 +1049,10 @@ describe("Cortex Mount: /threads", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -1337,7 +1343,10 @@ describe("Cortex Mount: /skills", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -1676,7 +1685,10 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -1989,7 +2001,10 @@ describe("Cortex: /documents path operations and edge cases", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -2285,7 +2300,13 @@ describe("Cortex System Prompt Injection", () => {
         })
         .onConflictDoUpdate({
           target: [cortexNodes.userId, cortexNodes.path],
-          set: { content, size, frontmatter, isDeleted: false, updatedAt: new Date() },
+          set: {
+            content,
+            size,
+            frontmatter,
+            isDeleted: false,
+            updatedAt: new Date(),
+          },
         })
         .returning({ id: cortexNodes.id });
       expect(row?.id, `SP setup: failed to upsert ${path}`).toBeTruthy();
@@ -2297,7 +2318,6 @@ describe("Cortex System Prompt Injection", () => {
         ).toBe(true);
       }
     }
-
   }, SP_TIMEOUT);
 
   // ── SP1: loadCortexData returns test-created memories ─────────────────────
@@ -2310,7 +2330,7 @@ describe("Cortex System Prompt Injection", () => {
       }
 
       const { loadCortexData } = await import("./system-prompt/server");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
         user: testUser,
@@ -2384,7 +2404,7 @@ describe("Cortex System Prompt Injection", () => {
 
       const { loadCortexData } = await import("./system-prompt/server");
       const { cortexFragment } = await import("./system-prompt/prompt");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
         user: testUser,
@@ -2449,7 +2469,7 @@ describe("Cortex System Prompt Injection", () => {
       }
 
       const { loadCortexData } = await import("./system-prompt/server");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
         user: testUser,
@@ -2481,7 +2501,7 @@ describe("Cortex System Prompt Injection", () => {
       }
 
       const { loadCortexData } = await import("./system-prompt/server");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       // Query something that should match our test-inserted skills.md
       const data = await loadCortexData({
@@ -2549,7 +2569,7 @@ describe("Cortex System Prompt Injection", () => {
 
       const { loadCortexData } = await import("./system-prompt/server");
       const { cortexFragment } = await import("./system-prompt/prompt");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
         user: testUser,
@@ -2617,7 +2637,7 @@ describe("Cortex System Prompt Injection", () => {
 
       const { loadCortexData } = await import("./system-prompt/server");
       const { cortexFragment } = await import("./system-prompt/prompt");
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
         user: testUser,

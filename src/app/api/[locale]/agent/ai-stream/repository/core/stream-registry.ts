@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, eq, like, ne, sql } from "drizzle-orm";
+import { and, eq, isNull, like, ne, or, sql } from "drizzle-orm";
 
 import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
@@ -192,6 +192,8 @@ export async function clearStreamingState(
   // set "waiting" instead of "idle" so the stop button stays visible.
   // Two sources: local cron tasks (this instance's own background work) and
   // in-flight remote calls (no task rows — see remote-call/spec.md).
+  // DETACH tasks run fire-and-forget — they never revive the thread, so a
+  // still-running DETACH goroutine must NOT keep the thread in "waiting".
   const [activeTask] = await db
     .select({ id: cronTasks.id })
     .from(cronTasks)
@@ -199,6 +201,10 @@ export async function clearStreamingState(
       and(
         eq(cronTasks.wakeUpThreadId, threadId),
         eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
+        or(
+          isNull(cronTasks.wakeUpCallbackMode),
+          ne(cronTasks.wakeUpCallbackMode, "detach"),
+        ),
       ),
     )
     .limit(1);

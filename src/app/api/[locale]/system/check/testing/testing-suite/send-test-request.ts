@@ -59,7 +59,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
 
   try {
     // Create a test logger
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, defaultLocale);
 
     const { RouteExecuteRepository } =
       await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");

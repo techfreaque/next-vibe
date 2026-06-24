@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { BillStatus, BillStatusDB, BillStatusOptions } from "../../../enum";
-import billListDefinitions from "../../list/definition";
 import { scopedTranslation } from "./i18n";
 
 const BillApproveWidgetLazy = lazyWidget(() =>
@@ -53,7 +52,8 @@ const { POST } = createEndpoint({
         description: "post.billId.description" as const,
         hidden: true,
         schema: z.uuid(),
-        listEndpoint: billListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../list/definition")).default.GET,
         labelField: "billNumber",
       }),
 

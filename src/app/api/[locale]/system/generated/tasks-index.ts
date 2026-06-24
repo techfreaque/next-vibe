@@ -22,7 +22,7 @@ import { tasks as taskModule3 } from "../../leads/ip-match-linking/task";
 import { tasks as taskModule4 } from "../../messenger/providers/email/imap-client/sync/task";
 import { tasks as taskModule5 } from "../../newsletter/unsubscribe/task";
 import { tasks as taskModule6 } from "../db/health/task";
-import { tasks as taskModule7 } from "../error-monitor/cleanup/task";
+import { tasks as taskModule7 } from "../logger/error-monitor/cleanup/task";
 import { tasks as taskModule8 } from "../unified-interface/vibe-sense/task";
 import { tasks as taskModule9 } from "../../user/session-cleanup/task";
 import { taskRunners as runnerModule10 } from "../unified-interface/tasks/dev-watcher/task-runner";

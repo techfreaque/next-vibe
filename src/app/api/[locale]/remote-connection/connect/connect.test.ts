@@ -164,7 +164,7 @@ if (_remoteUrl) {
       // transport.ts step 2 traverses folder ancestors back to the REMOTE root
       // and matches the top-level name to a connection's instanceId.
       const { RemoteTransport } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport");
+        await import("@/app/api/[locale]/remote-connection/transport");
       const { createEndpointLogger } =
         await import("@/app/api/[locale]/system/logger/server");
       const target = await RemoteTransport.resolveTarget({
@@ -172,7 +172,7 @@ if (_remoteUrl) {
         folderId: folder.id,
         rootFolderId: DefaultFolderId.REMOTE,
         locale: defaultLocale,
-        logger: createEndpointLogger(false, Date.now(), defaultLocale),
+        logger: createEndpointLogger(false, defaultLocale),
       });
       expect(
         target?.instanceId,

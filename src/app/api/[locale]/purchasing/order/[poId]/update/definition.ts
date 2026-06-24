@@ -6,8 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import orderListDefinitions from "@/app/api/[locale]/purchasing/order/list/definition";
-import vendorListDefinitions from "@/app/api/[locale]/purchasing/vendor/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -68,13 +66,17 @@ const { PATCH } = createEndpoint({
         description: "orderUpdate.patch.poId.description" as const,
         hidden: true,
         schema: z.uuid(),
-        listEndpoint: orderListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/purchasing/order/list/definition"))
+            .default.GET,
         labelField: "poNumber",
       }),
       vendorId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: vendorListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/purchasing/vendor/list/definition"))
+            .default.GET,
         labelField: "name",
         label: "orderUpdate.patch.vendorId.label" as const,
         description: "orderUpdate.patch.vendorId.description" as const,

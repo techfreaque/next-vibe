@@ -1232,7 +1232,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       ).toBe(JSON.stringify(cursorsAfter["skills"]));
 
       // Build payloads with old memories cursor, current skills/documents cursor
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false,   defaultLocale);
       const { syncPayloads } = await buildSyncPayloads(
         {
           documents: cursorsAfter["documents"]!,
@@ -4052,7 +4052,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false,   defaultLocale);
 
       // First serialize from null → each provider's true high-water cursor.
       const first = await buildSyncPayloads({}, devUser.id, logger);
@@ -4087,7 +4087,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false,   defaultLocale);
       const cursors = await collectCursors(devUser.id);
 
       // Fake: documents cursor is stale (epoch), skills+memories current.
@@ -4121,7 +4121,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
         return;
       }
 
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false,   defaultLocale);
       const epoch = { updatedAt: new Date(0).toISOString() };
 
       const { syncPayloads } = await buildSyncPayloads(

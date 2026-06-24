@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -51,7 +50,9 @@ const { POST } = createEndpoint({
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: companiesListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/companies/list/definition")).default
+            .GET,
         labelField: "name",
         label: "vendorCreate.companyId.label" as const,
         description: "vendorCreate.companyId.description" as const,

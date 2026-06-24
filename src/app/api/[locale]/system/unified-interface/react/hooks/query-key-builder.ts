@@ -51,13 +51,10 @@ export type CacheKeyRequestData<TEndpoint extends CreateApiEndpointAny> =
  *
  * Format: prefix-path-method[-urlPathParams][-cacheKeyFields]
  */
-export function buildKey<
-  TEndpoint extends CreateApiEndpointAny,
-  TUrlPathParams,
->(
+export function buildKey<TEndpoint extends CreateApiEndpointAny>(
   prefix: string,
   endpoint: TEndpoint,
-  urlPathParams: TUrlPathParams,
+  urlPathParams: TEndpoint["types"]["UrlVariablesOutput"],
   logger: EndpointLogger,
   requestData: CacheKeyRequestData<TEndpoint>,
 ): string {
@@ -73,7 +70,8 @@ export function buildKey<
     !(
       typeof urlPathParams === "object" &&
       !Array.isArray(urlPathParams) &&
-      Object.keys(urlPathParams as Record<string, TUrlPathParams>).length === 0
+      Object.keys(urlPathParams as TEndpoint["types"]["UrlVariablesOutput"])
+        .length === 0
     )
   ) {
     try {

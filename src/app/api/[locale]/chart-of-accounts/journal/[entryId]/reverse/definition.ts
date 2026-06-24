@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import journalListDefinitions from "@/app/api/[locale]/chart-of-accounts/journal/list/definition";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -55,7 +54,10 @@ const { POST } = createEndpoint({
         placeholder: "journalReverse.entryId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
-        listEndpoint: journalListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/chart-of-accounts/journal/list/definition")
+          ).default.GET,
         labelField: "entryNumber",
       }),
       reversalDate: requestField(scopedTranslation, {

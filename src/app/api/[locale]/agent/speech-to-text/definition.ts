@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
   category: "ai",
   subCategory: "Generation",
   tags: ["hotkey.tags.speech", "hotkey.tags.transcription", "hotkey.tags.ai"],
-
+  timeoutMs: 0,
   fields: customWidgetObject({
     render: SpeechToTextContainer,
     usage: { request: "data", response: true } as const,

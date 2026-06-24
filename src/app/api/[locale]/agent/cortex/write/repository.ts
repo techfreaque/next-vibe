@@ -251,6 +251,16 @@ export class CortexWriteRepository {
       logger.error("Failed to apply remote cortex write", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(writeDefinitions.POST, logger, user, {
+      fanOut: false,
+    })("node-written", {
+      requestData: {
+        path: requestData.path,
+        content: requestData.content,
+        createParents: requestData.createParents,
+      },
+    });
   }
 }

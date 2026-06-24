@@ -1,0 +1,38 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a10dd2c56ddc1d84-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Wed, 24 Jun 2026 18:33:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782326032-Nh9F6vK9TXV3e7GdvycH"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to execute two tasks:\\n1. Call `execute-tool` with `toolName='self-instance-id'`, `callbackMode='detach'`, `input={}`. This should return a taskId immediately.\\n2. Call `dismiss-task\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to execute two tasks:\\n1. Call `execute-tool` with `toolName='self-instance-id'`, `callbackMode='detach'`, `input={}`. This should return a taskId immediately.\\n2. Call `dismiss-task\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"` with `callId=<taskId from task 1>`. The result should have `dismissed=true`.\\n\\nI need to end the response with `STEP_OK` if both calls succeeded, or `FAILED: <reason>` if not.\\n\\n\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"` with `callId=<taskId from task 1>`. The result should have `dismissed=true`.\\n\\nI need to end the response with `STEP_OK` if both calls succeeded, or `FAILED: <reason>` if not.\\n\\n\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"First, I should call `execute-tool` with the specified parameters. Since `callbackMode='detach'`, it will fire-and-forget and return a `{taskId}`. Then I'll need to call `dismiss-task` with that taskId\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"First, I should call `execute-tool` with the specified parameters. Since `callbackMode='detach'`, it will fire-and-forget and return a `{taskId}`. Then I'll need to call `dismiss-task` with that taskId\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\".\\n\\nWait, I don't know if `dismiss-task` is a tool available to me. Let me check the tool catalog. I don't see `dismiss-task` in the provided catalog. Let me check if it's available via `tool-help`\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\".\\n\\nWait, I don't know if `dismiss-task` is a tool available to me. Let me check the tool catalog. I don't see `dismiss-task` in the provided catalog. Let me check if it's available via `tool-help`\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" or if it's an instance-specific tool.\\n\\nActually, let me just try executing the first call first and see what happens.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" or if it's an instance-specific tool.\\n\\nActually, let me just try executing the first call first and see what happens.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:0\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\":\\\"self-instance-id\\\",\\\"callbackMode\\\":\\\"detach\\\",\\\"input\\\":{}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782326032-Nh9F6vK9TXV3e7GdvycH\",\"object\":\"chat.completion.chunk\",\"created\":1782326032,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":6451,\"completion_tokens\":256,\"total_tokens\":6707,\"cost\":0.00513062,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00513062,\"upstream_inference_prompt_cost\":0.00425766,\"upstream_inference_completions_cost\":0.00087296},\"completion_tokens_details\":{\"reasoning_tokens\":227,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

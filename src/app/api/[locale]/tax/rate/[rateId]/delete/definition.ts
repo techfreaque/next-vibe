@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../../../i18n";
-import listDef0 from "../../../rate/list/definition";
 
 const ALLOWED_ROLES = [
   UserRole.ADMIN,
@@ -57,7 +56,8 @@ const { POST } = createEndpoint({
         label: "rate.delete.rateId.label" as const,
         description: "rate.delete.rateId.description" as const,
         schema: z.string().uuid(),
-        listEndpoint: listDef0.GET,
+        listEndpoint: async () =>
+          (await import("../../../rate/list/definition")).default.GET,
         labelField: "name",
       }),
 

@@ -464,33 +464,68 @@ const { GET } = createEndpoint({
     // Framework merges the partial into the items array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
     "thread-title-updated": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
       responseFields: { items: ["id", "title"] as const },
+      urlPathParamsFields: ["rootFolderId"] as const,
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "urlPathParams",
-        arrayField: "items",
-        pick: ["title"],
-      }),
+      onEvent: async (ctx) => {
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
+        if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await updateIncognitoThread(item.id, {
+              title: item.title ?? undefined,
+            });
+          }
+        }
+      },
     },
     "streaming-state-changed": {
       responseFields: { items: ["id", "streamingState"] as const },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "urlPathParams",
-        arrayField: "items",
-        pick: ["streamingState"],
-      }),
+      onEvent: async (ctx) => {
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
+        if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await updateIncognitoThread(item.id, {
+              streamingState: item.streamingState,
+            });
+          }
+        }
+      },
     },
     "stream-finished": {
       responseFields: {
         items: ["id", "streamingState", "preview", "updatedAt"] as const,
       },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "urlPathParams",
-        arrayField: "items",
-        pick: ["streamingState", "preview", "updatedAt"],
-      }),
+      onEvent: async (ctx) => {
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
+        if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await updateIncognitoThread(item.id, {
+              streamingState: item.streamingState,
+              preview: item.preview,
+              updatedAt: item.updatedAt,
+            });
+          }
+        }
+      },
     },
     // Thread CRUD - emitted by threads/[threadId]/repository.ts
     "thread-updated": {
@@ -506,19 +541,40 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "urlPathParams",
-        arrayField: "items",
-        pick: ["title", "folderId", "preview"],
-      }),
+      onEvent: async (ctx) => {
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
+        if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await updateIncognitoThread(item.id, {
+              title: item.title ?? undefined,
+              folderId: item.folderId,
+              preview: item.preview,
+            });
+          }
+        }
+      },
     },
     "thread-deleted": {
       responseFields: { items: ["id"] as const },
       operation: "remove" as const,
-      onEvent: onEventDeleteIncognitoThread({
-        source: "urlPathParams",
-        arrayField: "items",
-      }),
+      onEvent: async (ctx) => {
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
+        if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { deleteThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await deleteThread(item.id);
+          }
+        }
+      },
     },
     // Thread created - emitted by initial-events-handler when a new thread is created
     // during streaming. Ensures the sidebar shows the thread even if the optimistic
@@ -538,24 +594,20 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent({ responseData, requestData, queryClient, cacheKey }) {
+      onEvent(ctx) {
         // The merge operation (above) runs before onEvent and appends new items
         // into ALL folder-contents caches for this rootFolderId, regardless of
         // subFolderId. Remove threads that don't belong in this cache level.
-
-        const items = responseData.items;
-
-        // subFolderId from the cache's request data (null = root level)
-        const subFolderId =
-          (requestData.subFolderId as string | null | undefined) ?? null;
-        // Collect ids of threads that don't belong here
+        const items = ctx.responseData.items;
+        if (!items) {
+          return;
+        }
+        const subFolderId = ctx.requestData.subFolderId ?? null;
         const wrongIds = new Set<string>();
         for (const item of items) {
           if (!item) {
             continue;
           }
-          // Only new threads trigger this issue - if already in cache it was just updated
-          // folderId null/undefined = root level, otherwise subfolder
           const normalizedItemFolder = item.folderId ?? null;
           if (normalizedItemFolder !== subFolderId) {
             wrongIds.add(item.id);
@@ -564,23 +616,30 @@ const { GET } = createEndpoint({
         if (wrongIds.size === 0) {
           return;
         }
-        const existing = queryClient.getQueryData<{
-          success: boolean;
-          data?: { items: (typeof items)[number][] };
-        }>([cacheKey]);
-        if (!existing?.success || !Array.isArray(existing.data?.items)) {
-          return;
-        }
-        const filtered = existing.data.items.filter(
-          (it) => !wrongIds.has(it.id),
+        apiClient.updateEndpointData(
+          // GET is referenced here after module init — safe at runtime, TS ok
+          GET,
+          ctx.logger,
+          (old) => {
+            if (!old?.success || !Array.isArray(old.data?.items)) {
+              return old;
+            }
+            const filtered = old.data.items.filter(
+              (it) => !wrongIds.has(it.id),
+            );
+            if (filtered.length === old.data.items.length) {
+              return old;
+            }
+            return { ...old, data: { ...old.data, items: filtered } };
+          },
+          {
+            urlPathParams: ctx.urlPathParams,
+            requestData: {
+              subFolderId: ctx.requestData.subFolderId,
+              threadIds: ctx.requestData.threadIds,
+            },
+          },
         );
-        if (filtered.length === existing.data.items.length) {
-          return;
-        }
-        queryClient.setQueryData([cacheKey], {
-          ...existing,
-          data: { ...existing.data, items: filtered },
-        });
       },
     },
     // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
@@ -597,18 +656,17 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent({ responseData, requestData, queryClient, cacheKey }) {
-        const items = responseData.items;
+      onEvent(ctx) {
+        const items = ctx.responseData.items;
         if (!items || items.length === 0) {
           return;
         }
-        const subFolderId = requestData.subFolderId ?? null;
+        const subFolderId = ctx.requestData.subFolderId ?? null;
         const wrongIds = new Set<string>();
         for (const item of items) {
           if (!item) {
             continue;
           }
-          // Folders use parentId to indicate which level they belong to
           const normalizedParent = item.parentId ?? null;
           if (normalizedParent !== subFolderId) {
             wrongIds.add(item.id);
@@ -617,23 +675,29 @@ const { GET } = createEndpoint({
         if (wrongIds.size === 0) {
           return;
         }
-        const existing = queryClient.getQueryData<{
-          success: boolean;
-          data?: { items: (typeof items)[number][] };
-        }>([cacheKey]);
-        if (!existing?.success || !Array.isArray(existing.data?.items)) {
-          return;
-        }
-        const filtered = existing.data.items.filter(
-          (it) => !wrongIds.has(it.id),
+        apiClient.updateEndpointData(
+          GET,
+          ctx.logger,
+          (old) => {
+            if (!old?.success || !Array.isArray(old.data?.items)) {
+              return old;
+            }
+            const filtered = old.data.items.filter(
+              (it) => !wrongIds.has(it.id),
+            );
+            if (filtered.length === old.data.items.length) {
+              return old;
+            }
+            return { ...old, data: { ...old.data, items: filtered } };
+          },
+          {
+            urlPathParams: ctx.urlPathParams,
+            requestData: {
+              subFolderId: ctx.requestData.subFolderId,
+              threadIds: ctx.requestData.threadIds,
+            },
+          },
         );
-        if (filtered.length === existing.data.items.length) {
-          return;
-        }
-        queryClient.setQueryData([cacheKey], {
-          ...existing,
-          data: { ...existing.data, items: filtered },
-        });
       },
     },
     "folder-updated": {
@@ -648,15 +712,39 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoFolder({
-        arrayField: "items",
-        pick: ["name", "icon", "color", "sortOrder"],
-      }),
+      onEvent: async (ctx) => {
+        if (ctx.urlPathParams.rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { updateIncognitoFolder } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await updateIncognitoFolder(item.id, {
+              name: item.name ?? undefined,
+              icon: item.icon ?? undefined,
+              color: item.color ?? undefined,
+              sortOrder: item.sortOrder,
+            });
+          }
+        }
+      },
     },
     "folder-deleted": {
       responseFields: { items: ["id"] as const },
       operation: "remove" as const,
-      onEvent: onEventDeleteIncognitoFolder({ arrayField: "items" }),
+      onEvent: async (ctx) => {
+        if (ctx.urlPathParams.rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const { deleteFolder } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        for (const item of ctx.responseData.items ?? []) {
+          if (item?.id) {
+            await deleteFolder(item.id);
+          }
+        }
+      },
     },
   },
 });
@@ -669,6 +757,14 @@ export type FolderContentsResponseInput = typeof GET.types.ResponseInput;
 export type FolderContentsResponseOutput = typeof GET.types.ResponseOutput;
 
 export type FolderContentsItem = FolderContentsResponseOutput["items"][number];
+
+/** Typed emit callback for the folder-contents GET channel. */
+export type FolderContentsGetWsEmit = EmitEventNamed<
+  (typeof GET)["types"]["EventResponsePayloads"],
+  (typeof GET)["types"]["EventRequestPayloads"],
+  (typeof GET)["types"]["EventEmitUrlPayloads"],
+  (typeof GET)["types"]["EventPayloadTypes"]
+>;
 
 const definitions = { GET } as const;
 export default definitions;

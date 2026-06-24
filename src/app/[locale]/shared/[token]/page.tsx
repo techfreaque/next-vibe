@@ -40,7 +40,7 @@ export async function tanstackLoader({
   params,
 }: SharedTokenPageProps): Promise<SharedTokenPageData> {
   const { locale, token } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const { t } = scopedTranslation.scopedT(locale);
   const { t: shareLinksT } = shareLinksScopedTranslation.scopedT(locale);
 

@@ -536,7 +536,10 @@ type Test5_2_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test5_2: Test5_2_Result = "✗ FAIL";
+// Now PASSES: the endpoint type alignment fix (Extract-based schema inference,
+// indeterminate-aware examples/options, `out` variance) makes a concrete
+// CreateApiEndpoint assignable to the abstract one. Previously documented as FAIL.
+const test5_2: Test5_2_Result = "✓ PASS";
 
 // Test 5.2b: Does Test5_2_MixedEndpoint extend CreateApiEndpointAny?
 type Test5_2b_Result = Test5_2_MixedEndpoint extends CreateApiEndpointAny
@@ -703,11 +706,13 @@ type Test7_2_AcceptsAnyEndpoint = (
 ) => void;
 
 // Can we pass the login endpoint to it?
+// Now PASSES: a concrete endpoint is assignable to a function parameter typed as
+// the abstract "any endpoint" after the alignment fix. Previously documented FAIL.
 type Test7_2_Result =
   Test7_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
     ? "✓ PASS"
     : "✗ FAIL";
-const test7_2: Test7_2_Result = "✗ FAIL";
+const test7_2: Test7_2_Result = "✓ PASS";
 
 // ============================================================================
 // LEVEL 8: Test actual hook signatures (current implementation)

@@ -76,7 +76,7 @@ const TEST_TIMEOUT = 60_000;
 async function resolveUser(
   email: string,
 ): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const result = await UserRepository.getUserByEmail(
     email,
     UserDetailLevel.STANDARD,
@@ -122,7 +122,11 @@ async function run<TDef extends CreateApiEndpointAny>(
   // a generic TDef. We cast through the known parameter type to satisfy TypeScript.
   type SendArgs = Parameters<typeof sendTestRequest<TDef>>[0];
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- conditional intersection can't be narrowed for generic TDef; cast is structurally safe
-  const sendArgs = { endpoint: definition, data: input, user } as unknown as SendArgs;
+  const sendArgs = {
+    endpoint: definition,
+    data: input,
+    user,
+  } as unknown as SendArgs;
   const result = await sendTestRequest(sendArgs);
   if (!result.success) {
     return {
@@ -258,7 +262,11 @@ describe("Browser Tools", () => {
   beforeAll(async () => {
     const chromeAvailable = await isChromeAvailable();
     if (!chromeAvailable) {
-      expect(false, "Chrome not available on :9222 — start Chrome with remote debugging (vibe dev) before running browser tests").toBe(true); return;
+      expect(
+        false,
+        "Chrome not available on :9222 — start Chrome with remote debugging (vibe dev) before running browser tests",
+      ).toBe(true);
+      return;
     }
 
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -867,7 +875,7 @@ describe("Browser Tools", () => {
     "B15: serverDefault — MCP platform gets VIBE_PID session (no instanceId in input)",
     { timeout: TEST_TIMEOUT },
     async () => {
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const logger = createEndpointLogger(false, defaultLocale);
 
       // No instanceId in input — field is hidden for MCP, serverDefault injects VIBE_PID
       const result = await RouteExecuteRepository.runInProcessTyped({
@@ -1219,11 +1227,7 @@ describe("Browser Tools", () => {
           testUser,
         );
         expect(r5.success, `B_REPLACE r5: ${r5.error ?? ""}`).toBe(true);
-        await assertTabCount(
-          localBase,
-          1,
-          "B_REPLACE: after r5 (replace 3→1)",
-        );
+        await assertTabCount(localBase, 1, "B_REPLACE: after r5 (replace 3→1)");
 
         const urlAfterReplaceMany = await run(
           evaluateScriptEndpoints.POST,
@@ -1277,7 +1281,10 @@ describe("Browser Tools", () => {
           { url: URL_A1, instanceId: RI_A, replacePage: true },
           testUser,
         );
-        expect(replaceA.success, `B_REPLACE_ISO replaceA: ${replaceA.error ?? ""}`).toBe(true);
+        expect(
+          replaceA.success,
+          `B_REPLACE_ISO replaceA: ${replaceA.error ?? ""}`,
+        ).toBe(true);
         await assertTabCount(
           localBase,
           2,
@@ -1290,7 +1297,9 @@ describe("Browser Tools", () => {
           { function: "() => window.location.href", instanceId: RI_B },
           testUser,
         );
-        expect(bUrl.success, `B_REPLACE_ISO bUrl: ${bUrl.error ?? ""}`).toBe(true);
+        expect(bUrl.success, `B_REPLACE_ISO bUrl: ${bUrl.error ?? ""}`).toBe(
+          true,
+        );
         expect(extractText(bUrl.data)).toContain("example.org");
       } finally {
         await closeTestTabs([RI_A, RI_B], testUser);

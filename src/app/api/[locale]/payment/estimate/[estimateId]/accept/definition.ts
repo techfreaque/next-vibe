@@ -19,7 +19,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import estimateListDefinitions from "../../list/definition";
 import { scopedTranslation } from "./i18n";
 
 const EstimateAcceptWidgetLazy = lazyWidget(() =>
@@ -50,7 +49,8 @@ const { POST } = createEndpoint({
         description: "estimateId.description" as const,
         schema: z.uuid(),
         hidden: true,
-        listEndpoint: estimateListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../list/definition")).default.GET,
         labelField: "estimateNumber",
       }),
 

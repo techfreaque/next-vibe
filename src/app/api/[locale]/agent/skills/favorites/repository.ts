@@ -21,6 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -50,7 +51,7 @@ import {
   formatFavoritesSummary,
 } from "./favorites-formatter";
 import type { FavoritesT } from "./i18n";
-import type reorderDefinitions from "./reorder/definition";
+import reorderDefinitions from "./reorder/definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 import type { SyncedFavorite } from "./sync-provider";
 import type { FavoriteSummaryItem } from "./system-prompt/prompt";
@@ -656,6 +657,11 @@ export class ChatFavoritesRepository {
             and(eq(chatFavorites.userId, userId), eq(chatFavorites.id, fav.id)),
           );
       }
+      createEndpointEmitter(reorderDefinitions.POST, logger, user, {
+        fanOut: false,
+      })("favorites-reordered", {
+        requestData: { positions: requestData.positions },
+      });
     } catch (error) {
       logger.error(
         "Failed to apply remote favorite reorder",

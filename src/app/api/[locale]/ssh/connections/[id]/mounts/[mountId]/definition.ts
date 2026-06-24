@@ -24,7 +24,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import mountsListDefinition from "../list/definition";
 
 const MountDetailWidget = lazyWidget(() =>
   import("../widget").then((m) => ({ default: m.MountDetailWidget })),
@@ -98,7 +97,8 @@ export const { GET } = createEndpoint({
       mountId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: mountsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "detail.fields.mountId.label" as const,
@@ -181,7 +181,8 @@ export const { PATCH } = createEndpoint({
       mountId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: mountsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "detail.fields.mountId.label" as const,
@@ -257,7 +258,8 @@ export const { DELETE } = createEndpoint({
       mountId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: mountsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "detail.fields.mountId.label" as const,

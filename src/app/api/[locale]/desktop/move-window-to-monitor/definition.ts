@@ -21,8 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import listMonitorsDefinitions from "../list-monitors/definition";
-import listWindowsDefinitions from "../list-windows/definition";
 
 const MoveWindowToMonitorWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MoveWindowToMonitorWidget })),
@@ -67,7 +65,8 @@ const { POST } = createEndpoint({
       windowId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listWindowsDefinitions.POST,
+        listEndpoint: async () =>
+          (await import("../list-windows/definition")).default.POST,
         labelField: "title",
         label: "move-window-to-monitor.form.fields.windowId.label",
         description: "move-window-to-monitor.form.fields.windowId.description",
@@ -110,7 +109,8 @@ const { POST } = createEndpoint({
       monitorName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listMonitorsDefinitions.POST,
+        listEndpoint: async () =>
+          (await import("../list-monitors/definition")).default.POST,
         labelField: "name",
         label: "move-window-to-monitor.form.fields.monitorName.label",
         description:

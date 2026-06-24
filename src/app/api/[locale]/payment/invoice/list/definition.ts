@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -23,7 +22,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import listDef1 from "@/app/api/[locale]/users/list/definition";
 
 import { InvoiceStatusDB, InvoiceStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
@@ -58,7 +56,9 @@ const { GET } = createEndpoint({
         label: "companyId.label" as const,
         description: "companyId.description" as const,
         schema: z.string().uuid().optional(),
-        listEndpoint: listDef0.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/companies/list/definition")).default
+            .GET,
         labelField: "name",
       }),
 
@@ -80,7 +80,9 @@ const { GET } = createEndpoint({
         description: "customerId.description" as const,
         columns: 6,
         schema: z.string().uuid().optional(),
-        listEndpoint: listDef1.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "privateName",
       }),
 

@@ -94,7 +94,7 @@ export async function tanstackLoader({
   const { callbackUrl } = await searchParams;
   const { t } = pageT.scopedT(locale);
   const { t: loginT } = loginScopedTranslation.scopedT(locale);
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   // Check if user is already logged in using repository-first pattern
   // Allow both PUBLIC and CUSTOMER roles for login page

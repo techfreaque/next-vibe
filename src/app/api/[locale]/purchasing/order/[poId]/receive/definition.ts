@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import orderListDefinitions from "@/app/api/[locale]/purchasing/order/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -63,7 +62,9 @@ const { POST } = createEndpoint({
         description: "orderReceive.post.poId.description" as const,
         hidden: true,
         schema: z.uuid(),
-        listEndpoint: orderListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/purchasing/order/list/definition"))
+            .default.GET,
         labelField: "poNumber",
       }),
       warehouseId: requestField(scopedTranslation, {

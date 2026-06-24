@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import listWindowsDefinitions from "../list-windows/definition";
 
 const FocusWindowWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FocusWindowWidget })),
@@ -62,7 +61,8 @@ const { POST } = createEndpoint({
       windowId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listWindowsDefinitions.POST,
+        listEndpoint: async () =>
+          (await import("../list-windows/definition")).default.POST,
         labelField: "title",
         label: "focus-window.form.fields.windowId.label",
         description: "focus-window.form.fields.windowId.description",

@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/messenger/data-sources/messenger-total/route"),
+      () =>
+        import("@/app/api/[locale]/messenger/data-sources/messenger-total/route"),
     ),
   },
 });

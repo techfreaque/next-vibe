@@ -3,9 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/agent/ai-stream/cancel",
-)({
+export const Route = createFileRoute("/api/$locale/agent/ai-stream/cancel")({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/agent/ai-stream/cancel/route"),

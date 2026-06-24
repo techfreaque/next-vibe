@@ -27,7 +27,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import path, { join, relative } from "node:path";
+import path, { join, relative, resolve } from "node:path";
 
 // Use POSIX dirname so segment splitting on "/" works on Windows too —
 // node's platform-default dirname returns backslashes which then defeat

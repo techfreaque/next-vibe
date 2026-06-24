@@ -29,7 +29,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_REPORT_ALIAS } from "../../constants";
-import skillsListDefinition from "../../definition";
 import { scopedTranslation } from "./i18n";
 
 const SkillReportContainer = lazyWidget(() =>
@@ -58,7 +57,8 @@ const { POST } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: skillsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "post.title" as const,
         description: "post.description" as const,

@@ -237,7 +237,7 @@ async function fireInteractiveStream(
   userMessageId: string,
   subFolderId: string,
 ): Promise<void> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
   const data: AiStreamPostRequestOutput = {
@@ -259,6 +259,7 @@ async function fireInteractiveStream(
     resumeToken: null,
     timezone: "UTC",
     attachments: null,
+    executionContext: { mode: "local" as const },
   };
 
   const result = await AiStreamRepository.createAiStream({
@@ -291,7 +292,7 @@ async function enqueueSecondMessage(
   queuedMessageId: string,
   subFolderId: string,
 ): Promise<void> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
   const data: AiStreamPostRequestOutput = {
@@ -313,6 +314,7 @@ async function enqueueSecondMessage(
     resumeToken: null,
     timezone: "UTC",
     attachments: null,
+    executionContext: { mode: "local" as const },
   };
 
   const result = await AiStreamRepository.createAiStream({

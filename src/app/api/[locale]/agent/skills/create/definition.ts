@@ -38,7 +38,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
-import skillsDefinitions from "../definition";
 import {
   CATEGORY_CONFIG,
   CategoryOptions,

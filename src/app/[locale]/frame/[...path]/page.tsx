@@ -81,7 +81,7 @@ export async function tanstackLoader({
   }
 
   // Resolve user from session cookies (creates lead if needed)
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const user: JwtPayloadType = await AuthRepository.getAuthMinimalUser(
     [],
     { platform: Platform.NEXT_PAGE, locale },

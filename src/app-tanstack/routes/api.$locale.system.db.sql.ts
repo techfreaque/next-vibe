@@ -3,9 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/system/db/sql",
-)({
+export const Route = createFileRoute("/api/$locale/system/db/sql")({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/system/db/sql/route"),

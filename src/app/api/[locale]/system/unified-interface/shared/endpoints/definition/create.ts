@@ -375,11 +375,7 @@ export interface ApiEndpoint<
    * }
    * ```
    */
-  readonly events?: EndpointEventsMap<
-    InferResponseOutput<TFields>,
-    InferRequestOutput<TFields>,
-    InferUrlVariablesOutput<TFields>
-  >;
+
   // Unified fields for schema generation
   readonly fields: TFields;
 

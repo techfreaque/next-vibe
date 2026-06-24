@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/call-the-generate-image-tool-with----892ce8dc-3de7-4e6f-9d15-3ea51caf6a94.md\n\n# Call the generate_image tool with...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

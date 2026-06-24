@@ -25,7 +25,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import threadsDefinitions from "../../../../definition";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -104,7 +103,8 @@ const { POST } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../../../definition")).default.GET,
         labelField: "title",
         label: "post.threadId.label" as const,
         description: "post.threadId.description" as const,

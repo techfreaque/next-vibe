@@ -475,7 +475,17 @@ export class ThreadByIdRepository {
       logger.error("Failed to apply remote thread update", {
         message: result.message,
       });
+      return;
     }
+    // Re-emit on the PATCH channel (fanOut: false) so local WS subscribers on
+    // this instance fire their onEvent and update the threads list cache.
+    createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+      fanOut: false,
+    })("thread-updated", {
+      urlPathParams: { threadId: urlPathParams.threadId },
+      requestData: props.requestData,
+      responseData: result.data,
+    });
   }
 
   /**
@@ -486,6 +496,7 @@ export class ThreadByIdRepository {
     urlPathParams,
     user,
     logger,
+    requestData,
   }: RemoteEventHandlerProps<
     typeof threadsByIdDefinitions.DELETE,
     "thread-deleted"
@@ -501,7 +512,16 @@ export class ThreadByIdRepository {
       logger.error("Failed to apply remote thread delete", {
         message: result.message,
       });
+      return;
     }
+    // Re-emit on the DELETE channel (fanOut: false) so local WS subscribers on
+    // this instance fire their onEvent and remove the thread from the list cache.
+    createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
+      fanOut: false,
+    })("thread-deleted", {
+      urlPathParams: { threadId: urlPathParams.threadId },
+      requestData: props.requestData,
+    });
   }
 }
 

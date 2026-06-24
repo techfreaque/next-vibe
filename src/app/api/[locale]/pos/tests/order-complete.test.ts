@@ -27,17 +27,8 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { companies, companyMembers } from "../../companies/db";
 import { CompanyMemberRole } from "../../companies/enum";
-import {
-  posOrders,
-  posPayments,
-  posSessions,
-  posTerminals,
-} from "../db";
-import {
-  PosOrderStatus,
-  PosPaymentMethod,
-  PosSessionStatus,
-} from "../enum";
+import { posOrders, posPayments, posSessions, posTerminals } from "../db";
+import { PosOrderStatus, PosPaymentMethod, PosSessionStatus } from "../enum";
 import { PosOrderCompleteRepository } from "../order/[orderId]/complete/repository";
 
 const TEST_TIMEOUT = 60_000;
@@ -45,7 +36,7 @@ const TEST_TIMEOUT = 60_000;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeLogger(): EndpointLogger {
-  return createEndpointLogger(false, Date.now(), defaultLocale);
+  return createEndpointLogger(false, defaultLocale);
 }
 
 async function resolveUserId(email: string): Promise<string | null> {
@@ -79,7 +70,9 @@ describe("POS Order Complete", () => {
     const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
     if (!userId) {
       // oxlint-disable-next-line restricted-syntax
-      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      throw new Error(
+        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+      );
     }
     adminUserId = userId;
 
@@ -154,9 +147,7 @@ describe("POS Order Complete", () => {
       await db.delete(posSessions).where(eq(posSessions.id, testSessionId));
     }
     if (testTerminalId) {
-      await db
-        .delete(posTerminals)
-        .where(eq(posTerminals.id, testTerminalId));
+      await db.delete(posTerminals).where(eq(posTerminals.id, testTerminalId));
     }
     if (testCompanyId) {
       await db.delete(companies).where(eq(companies.id, testCompanyId));
@@ -308,7 +299,10 @@ describe("POS Order Complete", () => {
         defaultLocale,
       );
 
-      expect(result.success, `OC5 failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `OC5 failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.status).toBe(PosOrderStatus.COMPLETED);
       }
@@ -331,7 +325,10 @@ describe("POS Order Complete", () => {
         defaultLocale,
       );
 
-      expect(result.success, `OC6 failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `OC6 failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.id).toBe(orderId);
         expect(result.data.result.status).toBe(PosOrderStatus.COMPLETED);
@@ -361,7 +358,10 @@ describe("POS Order Complete", () => {
         defaultLocale,
       );
 
-      expect(result.success, `OC7 failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `OC7 failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.status).toBe(PosOrderStatus.COMPLETED);
       }
@@ -383,7 +383,10 @@ describe("POS Order Complete", () => {
         defaultLocale,
       );
 
-      expect(result.success, `OC8 failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `OC8 failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.status).toBe(PosOrderStatus.COMPLETED);
       }

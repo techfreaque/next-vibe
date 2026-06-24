@@ -39,7 +39,6 @@ import {
   onEventPersistMessage,
   persistMessageIfIncognito,
 } from "../../../incognito/event-persist";
-import threadsDefinitions from "../../definition";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -78,7 +77,7 @@ const { GET } = createEndpoint({
     // Also: persist the confirmed message to localStorage for incognito.
     "message-created": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: {
         messages: [
           "id",
@@ -182,7 +181,7 @@ const { GET } = createEndpoint({
     // onEvent: persist the final message content to localStorage for incognito.
     "content-done": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: { messages: ["id", "content", "metadata"] } as const,
       urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
@@ -216,7 +215,7 @@ const { GET } = createEndpoint({
     // onEvent: persist tool result metadata to localStorage for incognito.
     "tool-result": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: { messages: ["id", "metadata"] } as const,
       urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
@@ -227,7 +226,7 @@ const { GET } = createEndpoint({
     // onEvent: persist updated tool result metadata to localStorage for incognito.
     "tool-result-updated": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: { messages: ["id", "metadata"] } as const,
       urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
@@ -240,7 +239,7 @@ const { GET } = createEndpoint({
     // Also: persist the error message to localStorage for incognito.
     error: {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: {
         messages: [
           "id",
@@ -375,7 +374,7 @@ const { GET } = createEndpoint({
     // ── tokens-updated ───────────────────────────────────────────────────────
     "tokens-updated": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
     },
@@ -401,7 +400,7 @@ const { GET } = createEndpoint({
     // from the cache streamingState field, so no nav store update needed here.
     "stream-finished": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: {
         streamingState: true as const,
       },
@@ -441,7 +440,7 @@ const { GET } = createEndpoint({
     // Sidebar caches (threads + folder-contents) are updated via their own channels.
     "streaming-state-changed": {
       remoteEvent: true,
-      syncDomain: "chat" as const,
+      syncDomain: "threads" as const,
       responseFields: ["streamingState"] as const,
       urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
@@ -519,7 +518,8 @@ const { GET } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
@@ -828,7 +828,8 @@ const { POST } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "post.threadId.label" as const,
         schema: z.uuid(),

@@ -15,9 +15,9 @@ import type { Redis } from "ioredis";
 import type { AnyEndpointEventEnvelope } from "../structured-events";
 import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
-interface RedisWireMessage<T> {
+interface RedisWireMessage {
   readonly event: string;
-  readonly data: T;
+  readonly data: AnyEndpointEventEnvelope;
 }
 
 export class RedisPubSubAdapter implements PubSubAdapter {
@@ -56,7 +56,7 @@ export class RedisPubSubAdapter implements PubSubAdapter {
       }
 
       try {
-        const parsed = JSON.parse(message) as RedisWireMessage<WidgetData>;
+        const parsed = JSON.parse(message) as RedisWireMessage;
         handler(parsed.event, parsed.data);
       } catch {
         // Malformed message - skip
@@ -64,7 +64,11 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     });
   }
 
-  publish<T>(channel: string, event: string, data: T): void {
+  publish(
+    channel: string,
+    event: string,
+    data: AnyEndpointEventEnvelope,
+  ): void {
     if (!this.publisher) {
       // Queue the connection setup, then publish
       void this.ensureConnected().then(() => {
@@ -76,15 +80,22 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     this.publishSync(channel, event, data);
   }
 
-  private publishSync<T>(channel: string, event: string, data: T): void {
+  private publishSync(
+    channel: string,
+    event: string,
+    data: AnyEndpointEventEnvelope,
+  ): void {
     if (!this.publisher) {
       return;
     }
-    const message: RedisWireMessage<T> = { event, data };
+    const message: RedisWireMessage = { event, data };
     void this.publisher.publish(channel, JSON.stringify(message));
   }
 
-  subscribe<T>(channel: string, handler: PubSubMessageHandler<T>): void {
+  subscribe<T extends AnyEndpointEventEnvelope>(
+    channel: string,
+    handler: PubSubMessageHandler<T>,
+  ): void {
     this.handlers.set(channel, handler as PubSubMessageHandler);
 
     if (!this.subscriber) {

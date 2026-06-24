@@ -231,7 +231,7 @@ export async function resolveDevUser(
   const { eq: eqUser } = await import("drizzle-orm");
   const { UserRoleDB } =
     await import("@/app/api/[locale]/user/user-roles/enum");
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const result = await UserRepository.getUserByEmail(
     email,
     UserDetailLevel.STANDARD,
@@ -692,7 +692,7 @@ export async function restoreHermesIdentity(
   // propagate=false: no live connections to notify yet.
   const adminToken = await resolveProdAdminToken(remoteUrl);
   const resp = await fetch(
-    `${remoteUrl}/api/en-US/remote-connection/self-rename`,
+    `${remoteUrl}/api/en-US/remote-connection/self/rename`,
     {
       method: "PATCH",
       headers: {
@@ -726,7 +726,7 @@ export async function restoreAtlasIdentity(): Promise<void> {
   const { sendTestRequest } =
     await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
   const selfRenameDef = (
-    await import("@/app/api/[locale]/remote-connection/self-rename/definition")
+    await import("@/app/api/[locale]/remote-connection/self/rename/definition")
   ).default;
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {

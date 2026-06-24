@@ -45,6 +45,42 @@ export const GoogleSheetsCredentialsRepository = {
     return creds;
   },
 
+  async saveConfig(
+    userId: string,
+    data: {
+      spreadsheetId: string;
+      sheetTab?: string | null;
+      headline?: string | null;
+      buttonText?: string | null;
+      isActive?: boolean | null;
+    },
+    t: LeadMagnetT,
+  ): ReturnType<typeof saveProviderConfig> {
+    const existing =
+      await GoogleSheetsCredentialsRepository.getCredentials(userId);
+    if (!existing) {
+      return fail({
+        message: t("providers.shared.errors.forbidden.description"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+    return saveProviderConfig(
+      userId,
+      "GOOGLE_SHEETS",
+      {
+        ...existing,
+        googleSheetId: data.spreadsheetId,
+        googleSheetTab: data.sheetTab ?? "",
+      },
+      {
+        listId: data.spreadsheetId,
+        headline: data.headline ?? null,
+        buttonText: data.buttonText ?? null,
+        isActive: data.isActive ?? true,
+      },
+    );
+  },
+
   async saveOAuthCredentials(
     userId: string,
     tokens: {

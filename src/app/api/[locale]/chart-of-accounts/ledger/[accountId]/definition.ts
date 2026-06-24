@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import accountListDefinitions from "@/app/api/[locale]/chart-of-accounts/account/list/definition";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -60,7 +59,10 @@ const { GET } = createEndpoint({
         placeholder: "ledger.accountId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
-        listEndpoint: accountListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/chart-of-accounts/account/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       dateFrom: requestField(scopedTranslation, {

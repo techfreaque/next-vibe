@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/unified-interface/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md/route"),
+      () =>
+        import("@/app/api/[locale]/system/unified-interface/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md/route"),
     ),
   },
 });

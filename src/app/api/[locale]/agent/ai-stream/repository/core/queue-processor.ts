@@ -124,35 +124,38 @@ export async function processNextQueuedMessage(
 
   // Emit message-created with updated parentId so the frontend moves
   // the message to the correct position in the branch tree
-  const wsEmit = createMessagesEmitter(threadId, rootFolderId, logger, user);
+  const wsEmit = createMessagesEmitter(logger, user);
   wsEmit("message-created", {
-    streamingState: "streaming",
-    messages: [
-      {
-        id: queuedMessage.id,
-        threadId,
-        role: ChatMessageRole.USER,
-        isAI: false,
-        content: queuedMessage.content,
-        parentId: resolvedParentId,
-        sequenceId: null,
-        model: null,
-        skill: null,
-        // Explicitly set isQueued: false so the client cache deep-merge clears
-        // the flag (absent keys are not removed by the merge; false overrides true).
-        metadata: { ...cleanMetadata, isQueued: false },
-        createdAt: dequeueNow,
-        updatedAt: dequeueNow,
-        authorId: null,
-        authorName: null,
-        errorType: null,
-        errorCode: null,
-        errorMessage: null,
-        upvotes: 0,
-        downvotes: 0,
-        searchVector: null,
-      },
-    ],
+    urlPathParams: { threadId },
+    responseData: {
+      streamingState: ThreadStreamingState.STREAMING,
+      messages: [
+        {
+          id: queuedMessage.id,
+          threadId,
+          role: ChatMessageRole.USER,
+          isAI: false,
+          content: queuedMessage.content,
+          parentId: resolvedParentId,
+          sequenceId: null,
+          model: null,
+          skill: null,
+          // Explicitly set isQueued: false so the client cache deep-merge clears
+          // the flag (absent keys are not removed by the merge; false overrides true).
+          metadata: { ...cleanMetadata, isQueued: false },
+          createdAt: dequeueNow,
+          updatedAt: dequeueNow,
+          authorId: null,
+          authorName: null,
+          errorType: null,
+          errorCode: null,
+          errorMessage: null,
+          upvotes: 0,
+          downvotes: 0,
+          searchVector: null,
+        },
+      ],
+    },
   });
 
   // Drain the in-memory QueueRegistry entry for this message before starting a
@@ -203,6 +206,7 @@ export async function processNextQueuedMessage(
       },
       audioInput: { file: null },
       timezone: queuedSettings?.timezone ?? "UTC",
+      executionContext: { mode: "local" as const },
     } satisfies AiStreamParams["data"],
     locale,
     logger,

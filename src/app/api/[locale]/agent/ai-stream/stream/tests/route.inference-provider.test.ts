@@ -20,7 +20,7 @@
  * ── Suite B: UNBOTTLED Remote Mode ───────────────────────────────────────────
  * hermes as isInferenceProvider with toolSource='remote', threadMirrorMode='both'.
  * The AI loop, system prompt, and tool belt all live on hermes. Atlas relays
- * the request and mirrors events via HeadlessRelayProcessor.
+ * the request and mirrors events via the standard onRemoteEvent framework.
  * Identical to regular suite from test perspective — same prompts, same
  * assertions — plus T-RELAY (remote wallet decreased) and T-SYS (system prompt
  * from hermes).
@@ -52,7 +52,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { reloadWsProviderConnector } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector";
+import { reloadWsProviderConnector } from "@/app/api/[locale]/system/unified-interface/websocket/connector";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 

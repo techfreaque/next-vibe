@@ -30,7 +30,6 @@ import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { iconSchema } from "../../shared/types/common.schema";
 import { allModelDefinitions } from "../models/all-models";
@@ -46,7 +45,6 @@ import {
   SkillSourceFilterDB,
   SkillTrustLevelDB,
 } from "./enum";
-import createFavoriteDefinitions from "./favorites/create/definition";
 import { scopedTranslation } from "./i18n";
 
 const SkillsListContainer = lazyWidget(() =>
@@ -113,7 +111,9 @@ const { GET } = createEndpoint({
       targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "get.fields.targetUserId.label" as const,
         description: "get.fields.targetUserId.description" as const,
@@ -219,7 +219,8 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
       selectButton: navigateButtonField(scopedTranslation, {
-        targetEndpoint: createFavoriteDefinitions.POST,
+        targetEndpoint: async () =>
+          (await import("./favorites/create/definition")).default.POST,
         extractParams: async () => {
           return {
             data: {

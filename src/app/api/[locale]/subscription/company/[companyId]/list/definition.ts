@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import {
   PaymentProvider,
   PaymentProviderDB,
@@ -55,7 +54,9 @@ const { GET } = createEndpoint({
       companyId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: companiesListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/companies/list/definition")).default
+            .GET,
         labelField: "name",
         label: "get.companyId.label",
         description: "get.companyId.description",

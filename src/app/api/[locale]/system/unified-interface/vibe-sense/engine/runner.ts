@@ -136,7 +136,7 @@ export async function runGraph(
   options?: { readOnly?: boolean; displayResolution?: Resolution },
 ): Promise<GraphRunResult> {
   const readOnly = options?.readOnly ?? false;
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
 
   // Create execution run record (skip for backtests and readOnly data renders)
   let runId: string | null = null;

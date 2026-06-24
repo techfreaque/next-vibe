@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/remote-connection/connect-reverse/update/route"),
+      () =>
+        import("@/app/api/[locale]/remote-connection/connect-reverse/update/route"),
     ),
   },
 });

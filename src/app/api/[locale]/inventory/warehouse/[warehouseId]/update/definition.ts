@@ -5,7 +5,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import warehouseListDefinitions from "@/app/api/[locale]/inventory/warehouse/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -57,7 +56,10 @@ const { PATCH } = createEndpoint({
         description: "warehouseUpdate.patch.warehouseId.description" as const,
         schema: z.uuid(),
         urlPathParam: true,
-        listEndpoint: warehouseListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
+          ).default.GET,
         labelField: "name",
       }),
       name: requestField(scopedTranslation, {

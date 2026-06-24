@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:54f9f7f1 | Posted:Jun 24, 18:33]\n\nUser: You have two tasks. Task 1: Call execute-tool with toolName='self-instance-id', callbackMode='detach', input={}. This returns a taskId immediately. Remember the taskId value. Task 2: After task 1, call dismiss-task with callId=<taskId from task 1>. The result should have dismissed=true. End your response with STEP_OK if both calls succeeded, or FAILED: <reason> if not.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:99d7ae58 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 24, 18:33]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"self-instance-id\",\"input\":{},\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-bg-1782326036097-8um3c3\",\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\"}",
+    "encoding_format": "float"
+  }
+}

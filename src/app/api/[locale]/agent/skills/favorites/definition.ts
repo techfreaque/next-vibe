@@ -31,7 +31,6 @@ import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { FAVORITES_LIST_ALIAS } from "./constants";
@@ -74,7 +73,9 @@ const { GET } = createEndpoint({
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "get.userId.label" as const,
         description: "get.userId.description" as const,

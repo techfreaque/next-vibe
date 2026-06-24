@@ -5,7 +5,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -91,7 +90,9 @@ const { POST } = createEndpoint({
       catalogProductId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: productsListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/products/catalog/list/definition"))
+            .default.GET,
         labelField: "name",
         label: "form.fields.catalogProductId.label" as const,
         description: "form.fields.catalogProductId.description" as const,

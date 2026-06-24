@@ -76,7 +76,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<CreatorPageData> {
   const { locale, userId } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const viewer: JwtPayloadType = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },

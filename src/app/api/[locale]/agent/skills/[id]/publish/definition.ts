@@ -31,7 +31,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_PUBLISH_ALIAS } from "../../constants";
-import skillsListDefinition from "../../definition";
 import {
   SkillOwnershipType,
   SkillStatus,
@@ -65,7 +64,8 @@ const { PATCH } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: skillsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "patch.title" as const,
         description: "patch.description" as const,

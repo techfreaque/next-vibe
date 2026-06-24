@@ -73,6 +73,8 @@ interface FetchCacheSharedState {
   callCounters: Map<string, number>;
   inflightCount: number;
   installed: boolean;
+  /** placeholder → realValue patches applied to fixture content before serving */
+  fixturePatchMap: Map<string, string>;
 }
 const sharedState: FetchCacheSharedState = ((): FetchCacheSharedState => {
   const g = globalThis as { __vibeFetchCacheState?: FetchCacheSharedState };
@@ -82,6 +84,7 @@ const sharedState: FetchCacheSharedState = ((): FetchCacheSharedState => {
     callCounters: new Map<string, number>(),
     inflightCount: 0,
     installed: false,
+    fixturePatchMap: new Map<string, string>(),
   };
   return g.__vibeFetchCacheState;
 })();
@@ -91,10 +94,33 @@ export function getFetchCacheContext(): string {
   return sharedState.currentTestCase;
 }
 
+/**
+ * Register a placeholder→realValue patch applied to fixture content at serve time.
+ * Use when a fixture contains a dynamic value (e.g. taskId) baked in from a previous
+ * run. Call normalizeFetchCacheFixtures first to replace the old value with a placeholder,
+ * then call this after the real value is known so it's substituted before the fixture
+ * is served to the AI SDK.
+ *
+ * Patches are applied in order, persist for the current test, and are cleared by
+ * setFetchCacheContext on the next test.
+ */
+export function registerFixturePatch(
+  placeholder: string,
+  realValue: string,
+): void {
+  sharedState.fixturePatchMap.set(placeholder, realValue);
+}
+
+/** Clear all registered fixture patches (called automatically by setFetchCacheContext). */
+export function clearFixturePatches(): void {
+  sharedState.fixturePatchMap.clear();
+}
+
 /** Call this at the top of each test to scope cache files to that test. */
 export function setFetchCacheContext(testCase: string): void {
   sharedState.currentTestCase = slugify(testCase);
   sharedState.callCounters.clear();
+  sharedState.fixturePatchMap.clear();
   // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
   setClaudeCodeFixtureContext(testCase);
   // Keep WS fixture store in sync (registered by ws-fixture.ts when installed)
@@ -691,28 +717,89 @@ function sseEventsToTickingStream(
 
 // ── Cache hit replay ───────────────────────────────────────────────────────────
 
+function applyFixturePatches(cached: ResFile): ResFile {
+  if (sharedState.fixturePatchMap.size === 0) {
+    return cached;
+  }
+  if (cached.type === "sse") {
+    let events = cached.events;
+    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
+      // Fast path: skip if placeholder not present anywhere in events
+      const hasPlaceholder = events.some((e) => e.includes(placeholder));
+      if (!hasPlaceholder) {
+        continue;
+      }
+      // For SSE tool_call arguments, the placeholder may be split across chunks.
+      // Reconstruct args, patch, re-split using patchSseToolCallArguments.
+      const rawContent = events.join("\n");
+      if (rawContent.includes(placeholder)) {
+        // Try SSE-aware patch first (handles split args)
+        const patchedContent = patchSseToolCallArguments(
+          JSON.stringify({
+            type: "sse",
+            events,
+            url: cached.url,
+            status: cached.status,
+            headers: cached.headers,
+          }),
+          placeholder,
+          realValue,
+        );
+        if (patchedContent !== null) {
+          const parsed = JSON.parse(patchedContent) as { events: string[] };
+          events = parsed.events;
+          continue;
+        }
+        // Fallback: plain string replace (for non-argument occurrences)
+        events = events.map((e) => e.replaceAll(placeholder, realValue));
+      }
+    }
+    return { ...cached, events };
+  }
+  if (cached.type === "json") {
+    let jsonStr = JSON.stringify(cached.body);
+    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
+      if (jsonStr.includes(placeholder)) {
+        jsonStr = jsonStr.replaceAll(placeholder, realValue);
+      }
+    }
+    return { ...cached, body: JSON.parse(jsonStr) as WidgetData };
+  }
+  if (cached.type === "text") {
+    let body = cached.body;
+    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
+      if (body.includes(placeholder)) {
+        body = body.replaceAll(placeholder, realValue);
+      }
+    }
+    return { ...cached, body };
+  }
+  return cached;
+}
+
 function replayFromCache(cached: ResFile): Response {
+  const patched = applyFixturePatches(cached);
   // SSE responses use a pull-based ticking stream to simulate async delivery.
   // This prevents the fixture-replay burst from letting a later LLM step (F3/F4)
   // set waitingForRemoteResult before the for-await loop processes earlier
   // tool-result events (e.g. tool-help:1).
-  if (cached.type === "sse") {
-    return new Response(sseEventsToTickingStream(cached.events), {
-      status: cached.status,
-      headers: cached.headers,
+  if (patched.type === "sse") {
+    return new Response(sseEventsToTickingStream(patched.events), {
+      status: patched.status,
+      headers: patched.headers,
     });
   }
   let bytes: Uint8Array;
-  if (cached.type === "json") {
-    bytes = new TextEncoder().encode(JSON.stringify(cached.body));
-  } else if (cached.type === "binary") {
-    bytes = Uint8Array.from(Buffer.from(cached.body, "base64"));
+  if (patched.type === "json") {
+    bytes = new TextEncoder().encode(JSON.stringify(patched.body));
+  } else if (patched.type === "binary") {
+    bytes = Uint8Array.from(Buffer.from(patched.body, "base64"));
   } else {
-    bytes = new TextEncoder().encode(cached.body);
+    bytes = new TextEncoder().encode(patched.body);
   }
   return new Response(bytesToStream(bytes), {
-    status: cached.status,
-    headers: cached.headers,
+    status: patched.status,
+    headers: patched.headers,
   });
 }
 
@@ -767,11 +854,7 @@ function buildResFile(
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export function installFetchCache(
-  logger: EndpointLogger = createEndpointLogger(
-    false,
-    Date.now(),
-    defaultLocale,
-  ),
+  logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
 ): void {
   if (sharedState.installed) {
     return;

@@ -15,16 +15,20 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import {
+  buildControlChannel,
+  buildControlEnvelope,
+} from "@/app/api/[locale]/system/unified-interface/websocket/channel";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import { invalidateUnbottledCache } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { remoteConnections } from "../db";
+import { ControlEvent, remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import type {
   RemoteConnectionByIdDeleteResponseOutput,
@@ -735,36 +739,37 @@ export class RemoteConnectionInstanceRepository {
       }
     })();
 
-    // Propagate to remote: update their self-identity record
+    // Propagate to remote: update their self-identity record via the typed
+    // remote-dispatch door — routed by instanceId, no hand-rolled URL/auth.
     if (row.token && row.remoteUrl) {
       void (async (): Promise<void> => {
         try {
-          const decryptedToken = RemoteConnectionRepository.decryptToken(
-            row.token as string,
-          );
-          const { LEAD_ID_COOKIE_NAME: COOKIE } =
-            await import("@/config/constants");
-          const selfRenameUrl = `${row.remoteUrl}/api/${locale}/remote-connection/self-rename`;
-          const headers: Record<string, string> = {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${decryptedToken}`,
-          };
-          if (row.leadId) {
-            headers.Cookie = `${COOKIE}=${row.leadId}`;
+          const { RouteExecuteRepository } =
+            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+          const selfRenameDef =
+            await import("@/app/api/[locale]/remote-connection/self/rename/definition");
+          const result = await RouteExecuteRepository.runInProcessTyped({
+            definition: selfRenameDef.default.PATCH,
+            input: { newInstanceId, propagate: false },
+            instanceId,
+            user,
+            locale,
+            logger,
+          });
+          if (result.success) {
+            logger.info("[RENAME] Propagated self-rename to remote", {
+              instanceId,
+              newInstanceId,
+            });
+          } else {
+            logger.warn("[RENAME] Failed to propagate (non-fatal)", {
+              instanceId,
+              error: result.message,
+            });
           }
-          await fetch(selfRenameUrl, {
-            method: "PATCH",
-            headers,
-            body: JSON.stringify({ newInstanceId, propagate: false }),
-            signal: AbortSignal.timeout(10000),
-          });
-          logger.info("[RENAME] Propagated self-rename to remote", {
-            remoteUrl: row.remoteUrl,
-            newInstanceId,
-          });
         } catch (err) {
           logger.warn("[RENAME] Failed to propagate (non-fatal)", {
-            remoteUrl: row.remoteUrl,
+            instanceId,
             error: String(err),
           });
         }

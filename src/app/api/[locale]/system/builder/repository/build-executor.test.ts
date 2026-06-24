@@ -25,11 +25,7 @@ import { buildExecutor } from "./build-executor";
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");
 
 describe("BuildExecutor", () => {
-  const mockLogger: EndpointLogger = createEndpointLogger(
-    true,
-    Date.now(),
-    defaultLocale,
-  );
+  const mockLogger: EndpointLogger = createEndpointLogger(true, defaultLocale);
 
   const mockT: BuilderT = (key) => key as ReturnType<BuilderT>;
 

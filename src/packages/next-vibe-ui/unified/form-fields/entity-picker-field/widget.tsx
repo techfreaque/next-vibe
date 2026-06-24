@@ -32,7 +32,7 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { type JSX, useRef, useState } from "react";
+import { type JSX, useEffect, useRef, useState } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -41,6 +41,19 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { EntityPickerFieldWidgetConfig } from "./types";
+
+/**
+ * The list endpoint may be a direct reference or an async resolver
+ * (`() => import(...).then((m) => m.default.GET)`) used to break static import
+ * cycles between definition files. Normalise to the resolved endpoint object.
+ */
+async function resolveListEndpoint(
+  listEndpoint: CreateApiEndpointAny | (() => Promise<CreateApiEndpointAny>),
+): Promise<CreateApiEndpointAny> {
+  return typeof listEndpoint === "function"
+    ? await listEndpoint()
+    : listEndpoint;
+}
 
 export function EntityPickerFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
@@ -75,6 +88,30 @@ export function EntityPickerFieldWidget<
   // Human-readable label for the selected item (set when user picks from list).
   const [pickedLabel, setPickedLabel] = useState<string | undefined>(undefined);
 
+  // Resolved list endpoint — listEndpoint may be an async resolver used to
+  // break static import cycles, so it's resolved lazily.
+  const [resolvedEndpoint, setResolvedEndpoint] = useState<
+    CreateApiEndpointAny | undefined
+  >(typeof field.listEndpoint === "function" ? undefined : field.listEndpoint);
+
+  const listEndpoint = field.listEndpoint;
+  useEffect((): (() => void) | undefined => {
+    if (typeof listEndpoint !== "function") {
+      setResolvedEndpoint(listEndpoint);
+      return undefined;
+    }
+    let active = true;
+    void resolveListEndpoint(listEndpoint).then((ep) => {
+      if (active) {
+        setResolvedEndpoint(ep);
+      }
+      return ep;
+    });
+    return () => {
+      active = false;
+    };
+  }, [listEndpoint]);
+
   if (initiallyFilledRef.current) {
     return null;
   }
@@ -83,24 +120,29 @@ export function EntityPickerFieldWidget<
   const labelField = field.labelField ?? "name";
 
   const handleOpen = (): void => {
-    navigation.push(field.listEndpoint, {
-      renderInModal: true,
-      pickerCallback: (value: WidgetData) => {
-        const picked = value as Record<string, string>;
-        form?.setValue(name, picked["id"] ?? String(value));
-        const label =
-          picked[labelField] ??
-          picked["name"] ??
-          picked["title"] ??
-          picked["label"];
-        setPickedLabel(label ?? undefined);
-      },
-      pickerLabelField: field.labelField,
+    void resolveListEndpoint(field.listEndpoint).then((ep) => {
+      navigation.push(ep, {
+        renderInModal: true,
+        pickerCallback: (value: WidgetData) => {
+          const picked = value as Record<string, string>;
+          form?.setValue(name, picked["id"] ?? String(value));
+          const label =
+            picked[labelField] ??
+            picked["name"] ??
+            picked["title"] ??
+            picked["label"];
+          setPickedLabel(label ?? undefined);
+        },
+        pickerLabelField: field.labelField,
+      });
+      return ep;
     });
   };
 
   const resolvedLabel = field.label ? tField(field.label) : fieldName;
-  const listToolName = getPreferredToolName(field.listEndpoint);
+  const listToolName = resolvedEndpoint
+    ? getPreferredToolName(resolvedEndpoint)
+    : "";
 
   // MCP / AI: compact hint
   if (isMcp) {

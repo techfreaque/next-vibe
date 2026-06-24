@@ -23,6 +23,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../config";
@@ -32,7 +33,6 @@ import {
   ThreadStreamingState,
   ThreadStreamingStateDB,
 } from "../../enum";
-import threadsDefinitions from "../definition";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -64,7 +64,7 @@ const { GET } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "title",
         label: "get.id.label" as const,
         description: "get.id.description" as const,
@@ -291,6 +291,13 @@ const { GET } = createEndpoint({
   },
 });
 
+// This op owns its `thread-updated` event. `requestFields` carry the edits the
+// user submitted; `fields: ["updatedAt"]` adds the new timestamp. The client
+// onEvent merges those into the matching thread in the sidebar list cache;
+// remoteEvent relays the same edit cross-instance, where the route's
+// onRemoteEvent re-applies the update. The thread id rides on urlPathParams.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line no-explicit-any
 /**
  * Update Thread Endpoint (PATCH)
  * Updates an existing thread
@@ -320,7 +327,7 @@ const { PATCH } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "title",
         label: "patch.id.label" as const,
         description: "patch.id.description" as const,
@@ -476,11 +483,6 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description",
   },
 
-  // This op owns its `thread-updated` event. `requestFields` carry the edits the
-  // user submitted; `fields: ["updatedAt"]` adds the new timestamp. The client
-  // onEvent merges those into the matching thread in the sidebar list cache;
-  // remoteEvent relays the same edit cross-instance, where the route's
-  // onRemoteEvent re-applies the update. The thread id rides on urlPathParams.
   events: {
     "thread-updated": {
       remoteEvent: true as const,
@@ -489,16 +491,15 @@ const { PATCH } = createEndpoint({
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["title", "folderId", "status", "rootFolderId"] as const,
       responseFields: ["updatedAt"] as const,
+      urlPathParamsFields: ["threadId"] as const,
       onEvent: async ({ requestData, responseData, urlPathParams, logger }) => {
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = requestData.rootFolderId;
-        const [{ apiClient }, threadsDefinition] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
-          import("../definition"),
-        ]);
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         apiClient.updateEndpointData(
-          threadsDefinition.default.GET,
+          (await import("../definition")).default.GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -579,7 +580,7 @@ const { DELETE } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "title",
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
@@ -691,16 +692,15 @@ const { DELETE } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["rootFolderId"] as const,
+      urlPathParamsFields: ["threadId"] as const,
       onEvent: async ({ responseData, urlPathParams, logger }) => {
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = responseData.rootFolderId;
-        const [{ apiClient }, threadsDefinition] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
-          import("../definition"),
-        ]);
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         apiClient.updateEndpointData(
-          threadsDefinition.default.GET,
+          (await import("../definition")).default.GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -768,10 +768,26 @@ export type ThreadDeleteUrlParamsTypeOutput =
 
 /** Inferred payload of the `thread-updated` event (edits + updatedAt). */
 export type ThreadUpdatedEventPayload =
-  (typeof PATCH.types.EventPayloads)["thread-updated"];
+  (typeof PATCH.types.EventResponsePayloads)["thread-updated"];
 /** Inferred payload of the `thread-deleted` event (rootFolderId). */
 export type ThreadDeletedEventPayload =
-  (typeof DELETE.types.EventPayloads)["thread-deleted"];
+  (typeof DELETE.types.EventResponsePayloads)["thread-deleted"];
+
+/** Typed emit callback for the threads/[threadId] PATCH channel. */
+export type ThreadsByIdPatchWsEmit = EmitEventNamed<
+  (typeof PATCH)["types"]["EventResponsePayloads"],
+  (typeof PATCH)["types"]["EventRequestPayloads"],
+  (typeof PATCH)["types"]["EventEmitUrlPayloads"],
+  (typeof PATCH)["types"]["EventPayloadTypes"]
+>;
+
+/** Typed emit callback for the threads/[threadId] DELETE channel. */
+export type ThreadsByIdDeleteWsEmit = EmitEventNamed<
+  (typeof DELETE)["types"]["EventResponsePayloads"],
+  (typeof DELETE)["types"]["EventRequestPayloads"],
+  (typeof DELETE)["types"]["EventEmitUrlPayloads"],
+  (typeof DELETE)["types"]["EventPayloadTypes"]
+>;
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;

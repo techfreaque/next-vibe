@@ -25,7 +25,6 @@ import {
 import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { MessageStatus, MessageType } from "../enum";
-import messagesListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
 const EmailDetailContainer = lazyWidget(() =>
@@ -56,7 +55,8 @@ const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: messagesListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "subject",
         label: "fields.id.label",
         description: "fields.id.description",

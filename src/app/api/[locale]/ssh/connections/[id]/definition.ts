@@ -31,7 +31,6 @@ import {
   SshAuthTypeDB,
   SshAuthTypeOptions,
 } from "../../enum";
-import connectionsListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
 const ConnectionDetailContainer = lazyWidget(() =>
@@ -58,7 +57,8 @@ export const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: connectionsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "get.fields.id.label",
@@ -194,7 +194,8 @@ export const { PATCH } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: connectionsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "patch.fields.id.label",
@@ -366,7 +367,8 @@ export const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: connectionsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../list/definition")).default.GET,
         labelField: "name",
         schema: z.string().uuid(),
         label: "delete.fields.id.label",

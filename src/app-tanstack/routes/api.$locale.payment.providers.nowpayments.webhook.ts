@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/payment/providers/nowpayments/webhook/route"),
+      () =>
+        import("@/app/api/[locale]/payment/providers/nowpayments/webhook/route"),
     ),
   },
 });

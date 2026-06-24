@@ -26,9 +26,9 @@ import {
   DEFAULT_REMOTE_TOOL_IDS,
   getDefaultToolIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
+import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { invalidateUnbottledCache } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import loginEndpoints, {

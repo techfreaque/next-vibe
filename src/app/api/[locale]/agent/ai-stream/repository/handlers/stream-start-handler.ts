@@ -13,7 +13,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
-import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { EmitThreadTitleFn } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";
 import { StreamContextInitializer } from "../core/stream-context-initializer";

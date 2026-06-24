@@ -19,7 +19,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
@@ -51,7 +50,10 @@ const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: graphsListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition")
+          ).default.GET,
         labelField: "name",
         label: "get.fields.id.label",
         description: "get.fields.id.description",

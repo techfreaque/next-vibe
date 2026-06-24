@@ -78,7 +78,7 @@ export async function tanstackLoader({
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
 
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   // Check if user is already logged in using repository-first pattern
   const verifiedUserResponse = await UserRepository.getUserByAuth(
     {},

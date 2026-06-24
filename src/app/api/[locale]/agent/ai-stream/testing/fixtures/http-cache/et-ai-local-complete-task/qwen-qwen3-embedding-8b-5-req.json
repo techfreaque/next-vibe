@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/you-have-two-tasks--task-1--call-execute-tool----7a843c56-a318-4e21-ad76-6eed1d04446a.md\n\n# You have two tasks. Task 1: Call execute-tool...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

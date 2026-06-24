@@ -26,7 +26,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import threadsDefinitions from "../../definition";
 import { THREAD_SHARE_LINKS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -56,7 +55,8 @@ const { GET } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
@@ -230,7 +230,8 @@ const { POST } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
@@ -380,7 +381,8 @@ const { PATCH } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
@@ -531,7 +533,8 @@ const { DELETE } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),

@@ -24,7 +24,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatMessageRole } from "../../../../enum";
-import threadsDefinitions from "../../../definition";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -100,7 +99,8 @@ const { GET } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("../../../definition")).default.GET,
         labelField: "title",
         label: "search.get.threadId.label" as const,
         description: "search.get.threadId.description" as const,

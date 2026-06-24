@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/leads/data-sources/leads-website-visits/route"),
+      () =>
+        import("@/app/api/[locale]/leads/data-sources/leads-website-visits/route"),
     ),
   },
 });

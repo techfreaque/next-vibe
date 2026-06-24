@@ -370,46 +370,10 @@ export const translations: typeof enTranslations = {
       label: "Załączniki",
       description: "Pliki załączone do wiadomości (obrazy, dokumenty, itp.)",
     },
-    instanceId: {
-      label: "ID instancji",
-      description: "ID zdalnej instancji dla przekaźnika WS-provider",
-    },
-    threadMirrorMode: {
-      label: "Tryb dublowania wątku",
+    executionContext: {
+      label: "Kontekst wykonania",
       description:
-        "Kontroluje, która strona utrwala wątek (both/local/cloud/none)",
-    },
-    tools: {
-      title: "Schematy zdalnych narzędzi",
-      description: "Specyfikacje narzędzi od wywołującego dla dostawcy",
-      name: {
-        label: "Nazwa narzędzia",
-        description: "Unikalny identyfikator narzędzia",
-      },
-      toolDescription: {
-        label: "Opis",
-        description: "Co robi narzędzie",
-      },
-      parameters: {
-        label: "Parametry",
-        description: "Schemat JSON dla parametrów narzędzia",
-      },
-    },
-    folderPath: {
-      label: "Ścieżka folderu",
-      description: "Hierarchia podfolderów pod BACKGROUND/<instanceId>",
-    },
-    confirmationOverrides: {
-      title: "Nadpisania potwierdzeń",
-      description: "Wymagania potwierdzenia narzędzi od wywołującego",
-      toolId: {
-        label: "ID narzędzia",
-        description: "Alias narzędzia lub pełna nazwa",
-      },
-      requiresConfirmation: {
-        label: "Wymaga potwierdzenia",
-        description: "Czy to narzędzie wymaga potwierdzenia użytkownika",
-      },
+        "Sposób wykonania strumienia: lokalnie, zdalny przekaźnik lub inference-provider. Normalne żądania czatu używają lokalnie (domyślnie).",
     },
     enabledToolIds: {
       label: "ID włączonych narzędzi",

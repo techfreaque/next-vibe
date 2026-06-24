@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -21,7 +20,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
@@ -117,7 +115,9 @@ const { POST } = createEndpoint({
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/list/definition")).default
+            .GET,
         labelField: "email",
         label: "post.leadId.label",
         description: "post.leadId.description",
@@ -160,7 +160,9 @@ const { POST } = createEndpoint({
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "post.userId.label",
         description: "post.userId.description",
@@ -371,7 +373,9 @@ const { GET } = createEndpoint({
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/list/definition")).default
+            .GET,
         labelField: "email",
         label: "get.id.label",
         description: "get.id.description",

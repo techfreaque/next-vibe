@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -51,7 +50,9 @@ const { GET } = createEndpoint({
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/agent/chat/threads/definition"))
+            .default.GET,
         labelField: "title",
         schema: z.uuid(),
       }),

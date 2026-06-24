@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -27,7 +26,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import {
   Countries,
   CountriesOptions,
@@ -90,7 +88,9 @@ const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsSearchDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/search/definition")).default
+            .GET,
         labelField: "email",
         label: "delete.id.label",
         description: "delete.id.description",
@@ -204,7 +204,9 @@ const { PATCH } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsSearchDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/search/definition")).default
+            .GET,
         labelField: "email",
         label: "patch.id.label",
         description: "patch.id.description",
@@ -337,7 +339,9 @@ const { PATCH } = createEndpoint({
       convertedUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "patch.convertedUserId.label",
         description: "patch.convertedUserId.description",
@@ -708,7 +712,9 @@ const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsSearchDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/search/definition")).default
+            .GET,
         labelField: "email",
         label: "get.id.label",
         description: "get.id.description",

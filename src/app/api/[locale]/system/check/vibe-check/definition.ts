@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
   cli: {
     firstCliArgKey: "paths",
   },
-
+  timeoutMs: 0,
   fields: customWidgetObject({
     render: CheckResultWidget,
     usage: { request: "data", response: true } as const,

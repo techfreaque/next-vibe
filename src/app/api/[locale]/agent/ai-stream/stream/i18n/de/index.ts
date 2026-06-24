@@ -377,46 +377,10 @@ export const translations: typeof enTranslations = {
       description:
         "An die Nachricht angehängte Dateien (Bilder, Dokumente, etc.)",
     },
-    instanceId: {
-      label: "Instanz-ID",
-      description: "Remote-Instanz-ID für WS-Provider-Relay",
-    },
-    threadMirrorMode: {
-      label: "Thread-Spiegelungsmodus",
+    executionContext: {
+      label: "Ausführungskontext",
       description:
-        "Bestimmt, welche Seite den Thread persistiert (both/local/cloud/none)",
-    },
-    tools: {
-      title: "Remote-Tool-Schemas",
-      description: "Tool-Spezifikationen vom Aufrufer für den Provider",
-      name: {
-        label: "Tool-Name",
-        description: "Eindeutiger Tool-Bezeichner",
-      },
-      toolDescription: {
-        label: "Beschreibung",
-        description: "Was das Tool tut",
-      },
-      parameters: {
-        label: "Parameter",
-        description: "JSON-Schema für Tool-Parameter",
-      },
-    },
-    folderPath: {
-      label: "Ordnerpfad",
-      description: "Unterordner-Hierarchie unter BACKGROUND/<instanceId>",
-    },
-    confirmationOverrides: {
-      title: "Bestätigungs-Overrides",
-      description: "Tool-spezifische Bestätigungsanforderungen vom Aufrufer",
-      toolId: {
-        label: "Tool-ID",
-        description: "Tool-Alias oder vollständiger Name",
-      },
-      requiresConfirmation: {
-        label: "Bestätigung erforderlich",
-        description: "Ob dieses Tool eine Benutzerbestätigung benötigt",
-      },
+        "Wie dieser Stream ausgeführt wird: lokal, Remote-Relay oder Inference-Provider. Normale Chat-Anfragen verwenden lokal (Standard).",
     },
     enabledToolIds: {
       label: "Aktivierte Tool-IDs",

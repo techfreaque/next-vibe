@@ -39,7 +39,6 @@ export function LoggerProvider({
   const logger = useMemo(() => {
     const l = createClientLogger(
       false,
-      Date.now(),
       locale,
       availability,
       getOrCreateTabId(),

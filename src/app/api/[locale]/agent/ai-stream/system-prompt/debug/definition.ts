@@ -7,8 +7,6 @@ import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import skillsDefinitions from "@/app/api/[locale]/agent/skills/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -98,7 +96,9 @@ const { GET } = createEndpoint({
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/agent/chat/threads/definition"))
+            .default.GET,
         labelField: "title",
         label: "get.fields.threadId.label" as const,
         description: "get.fields.threadId.description" as const,
@@ -107,7 +107,9 @@ const { GET } = createEndpoint({
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: skillsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/agent/skills/definition")).default
+            .GET,
         labelField: "name",
         label: "get.fields.skillId.label" as const,
         description: "get.fields.skillId.description" as const,

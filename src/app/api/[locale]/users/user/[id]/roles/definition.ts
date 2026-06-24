@@ -26,7 +26,6 @@ import {
   UserRole,
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { scopedTranslation } from "./i18n";
 
@@ -57,7 +56,9 @@ const { POST } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "roles.post.id.label" as const,
         description: "roles.post.id.description" as const,
@@ -198,7 +199,9 @@ const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "roles.delete.id.label" as const,
         description: "roles.delete.id.description" as const,

@@ -32,8 +32,13 @@ export interface EntityPickerFieldWidgetConfig<
   TUsage extends FieldUsageConfig,
 > extends BaseFormFieldWidgetConfig<TKey, TUsage, "primitive", TSchema> {
   fieldType: FieldDataType.ENTITY_PICKER;
-  /** The list endpoint — synchronous reference so aliases/path are available immediately */
-  listEndpoint: CreateApiEndpointAny;
+  /**
+   * The list endpoint. Either a direct reference or an async resolver
+   * (`() => import("../list/definition").then((m) => m.default.GET)`) so that
+   * cross-feature references don't create static import cycles between
+   * definition files. Resolved lazily by the widget at render time.
+   */
+  listEndpoint: () => Promise<CreateApiEndpointAny>;
   /**
    * Field name in each list item used as the display label.
    * Falls back to "name" / "title" / "label" / "id".

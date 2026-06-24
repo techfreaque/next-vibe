@@ -3,6 +3,7 @@
  * Defines endpoint for AI-powered streaming chat functionality using OpenAI GPT-4o
  */
 
+import type { JSONSchema7 } from "json-schema";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -16,7 +17,6 @@ import {
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";

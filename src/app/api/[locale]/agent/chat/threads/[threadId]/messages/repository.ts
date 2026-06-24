@@ -21,6 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -43,7 +44,7 @@ import {
   canPostInThread,
   canViewThread,
 } from "../../../permissions/permissions";
-import type definitions from "./definition";
+import definitions from "./definition";
 import {
   type MessageCreateRequestOutput,
   type MessageCreateResponseOutput,
@@ -1014,72 +1015,12 @@ export class MessagesRepository {
   }
 }
 
-// ─── Remote event wire types ───────────────────────────────────────────────────
-// Minimal shapes for WS wire payloads received from a remote AI stream instance.
-// Used by headless-relay-processor.ts and MessagesRemoteRepository.
-
-export interface RemoteMsg {
-  id: string;
-  threadId: string;
-  role: string;
-  content: string | null;
-  parentId: string | null;
-  authorId: string | null;
-  isAI: boolean;
-  model: ChatModelId | null;
-  skill: string | null;
-  sequenceId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  metadata: MessageMetadata | null;
-}
-
-export type MsgCreated = RemoteMsg & {
-  streamingState?: ThreadStreamingState | null;
-};
-
-export interface MsgWithIdContent {
-  id: string;
-  content?: string | null;
-  metadata?: MessageMetadata | null;
-}
-
-const msgSchema: z.ZodType<RemoteMsg> = z.object({
-  id: z.string(),
-  threadId: z.string().optional().default(""),
-  role: z.string().optional().default("assistant"),
-  content: z.string().nullable().optional().default(null),
-  parentId: z.string().nullable().optional().default(null),
-  authorId: z.string().nullable().optional().default(null),
-  isAI: z.boolean().optional().default(false),
-  model: z.nativeEnum(ChatModelId).nullable().optional().default(null),
-  skill: z.string().nullable().optional().default(null),
-  sequenceId: z.string().nullable().optional().default(null),
-  createdAt: z.string().nullable().optional().default(null),
-  updatedAt: z.string().nullable().optional().default(null),
-  metadata: z
-    .record(z.string(), z.unknown())
-    .nullable()
-    .optional()
-    .default(null) as z.ZodType<MessageMetadata | null>,
-});
-
-export const remoteMessagesPayloadSchema = z.object({
-  messages: z.array(msgSchema).optional().default([]),
-  streamingState: z.string().nullable().optional(),
-});
-
-/** Parse the first message from a raw WS wire payload. Used by headless-relay-processor (boundary). */
-export function parseRemoteFirstMsg(
-  raw: WsWireMessage["data"],
-): RemoteMsg | null {
-  const parsed = remoteMessagesPayloadSchema.safeParse(raw);
-  return parsed.success ? (parsed.data.messages[0] ?? null) : null;
-}
-
 export class MessagesRemoteRepository {
   static async applyRemoteMessageCreated({
     responseData,
+    urlPathParams,
+    user,
+    logger,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
     "message-created"
@@ -1090,10 +1031,9 @@ export class MessagesRemoteRepository {
     if (!msgId || !msgThreadId) {
       return;
     }
-    const role = (raw.role ??
-      ChatMessageRole.USER) as (typeof ChatMessageRoleDB)[number];
+    const role = raw.role ?? ChatMessageRole.USER;
     const content = raw.content ?? "";
-    const metadata = (raw.metadata ?? {}) as MessageMetadata;
+    const metadata = raw.metadata ?? {};
     const updatedAt = raw.updatedAt ? new Date(raw.updatedAt) : new Date();
     await db
       .insert(chatMessages)
@@ -1122,10 +1062,17 @@ export class MessagesRemoteRepository {
         .where(eq(chatThreads.id, msgThreadId))
         .catch(() => undefined);
     }
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "message-created",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteError({
     responseData,
+    urlPathParams,
+    user,
+    logger,
   }: RemoteEventHandlerProps<typeof definitions.GET, "error">): Promise<void> {
     const msg = responseData.messages?.[0];
     if (!msg?.id) {
@@ -1142,10 +1089,17 @@ export class MessagesRemoteRepository {
       })
       .where(eq(chatMessages.id, msg.id))
       .catch(() => undefined);
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "error",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteContentDone({
     responseData,
+    urlPathParams,
+    user,
+    logger,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
     "content-done"
@@ -1167,10 +1121,17 @@ export class MessagesRemoteRepository {
         })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "content-done",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteToolResult({
     responseData,
+    urlPathParams,
+    user,
+    logger,
     instanceId,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
@@ -1187,7 +1148,7 @@ export class MessagesRemoteRepository {
       typeof toolCall.result === "object" &&
       !Array.isArray(toolCall.result) &&
       !(toolCall.result instanceof Date)
-        ? (toolCall.result as Record<string, string>)
+        ? toolCall.result
         : null;
     const incomingPending =
       toolCall.status === "pending" ||
@@ -1212,10 +1173,17 @@ export class MessagesRemoteRepository {
         metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "tool-result",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteToolResultUpdated({
     responseData,
+    urlPathParams,
+    user,
+    logger,
     instanceId,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
@@ -1235,10 +1203,17 @@ export class MessagesRemoteRepository {
         metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "tool-result-updated",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteTokensUpdated({
     responseData,
+    urlPathParams,
+    user,
+    logger,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
     "tokens-updated"
@@ -1259,10 +1234,15 @@ export class MessagesRemoteRepository {
         })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "tokens-updated",
+      { urlPathParams, responseData },
+    );
   }
 
   static async applyRemoteStreamFinished({
     urlPathParams,
+    user,
     logger,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
@@ -1279,11 +1259,17 @@ export class MessagesRemoteRepository {
           { threadId, error: err.message },
         );
       });
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "stream-finished",
+      { urlPathParams },
+    );
   }
 
   static async applyRemoteStreamingStateChanged({
     responseData,
     urlPathParams,
+    user,
+    logger,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
     "streaming-state-changed"
@@ -1298,5 +1284,9 @@ export class MessagesRemoteRepository {
       })
       .where(eq(chatThreads.id, threadId))
       .catch(() => undefined);
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "streaming-state-changed",
+      { urlPathParams, responseData },
+    );
   }
 }

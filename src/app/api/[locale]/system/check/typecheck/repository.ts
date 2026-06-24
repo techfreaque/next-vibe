@@ -98,7 +98,66 @@ export class TypecheckRepository {
     exclude: z.array(z.string()).optional(),
   });
 
-  private static readonly execAsync = promisify(exec);
+  /**
+   * Run a shell command, streaming stdout/stderr into memory with NO fixed
+   * buffer cap.
+   *
+   * `exec`/`execFile` allocate a single `maxBuffer` and throw
+   * ERR_CHILD_PROCESS_STDIO_MAXBUFFER the instant output exceeds it — and the
+   * thrown error carries only TRUNCATED output. tsgo/tsc emit far more than a
+   * few MB on a large error cascade, so the old `maxBuffer: 10MB` exec silently
+   * truncated, was misclassified as an "unexpected" error (its code is a string,
+   * not exit code 1/2), and surfaced as a false "0 issues" pass. Streaming via
+   * spawn accumulates the full output and reports the real exit code.
+   */
+  private static runStreaming(
+    command: string,
+    options: {
+      cwd: string;
+      timeoutMs: number;
+      signal?: AbortSignal;
+    },
+  ): Promise<{
+    stdout: string;
+    stderr: string;
+    code: number | null;
+    timedOut: boolean;
+  }> {
+    return new Promise((resolve, reject) => {
+      const child = spawn(command, {
+        cwd: options.cwd,
+        shell: true,
+        signal: options.signal,
+      });
+
+      const stdoutChunks: Buffer[] = [];
+      const stderrChunks: Buffer[] = [];
+      let timedOut = false;
+
+      const timer = setTimeout(() => {
+        timedOut = true;
+        child.kill("SIGTERM");
+      }, options.timeoutMs);
+
+      child.stdout?.on("data", (chunk: Buffer) => stdoutChunks.push(chunk));
+      child.stderr?.on("data", (chunk: Buffer) => stderrChunks.push(chunk));
+
+      child.on("error", (error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+
+      child.on("close", (code) => {
+        clearTimeout(timer);
+        resolve({
+          stdout: Buffer.concat(stdoutChunks).toString("utf8"),
+          stderr: Buffer.concat(stderrChunks).toString("utf8"),
+          code,
+          timedOut,
+        });
+      });
+    });
+  }
   // --------------------------------------------------------
   // Static Private Helpers - Command Configuration
   // --------------------------------------------------------
@@ -923,36 +982,35 @@ export class TypecheckRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
-      const result = await TypecheckRepository.execAsync(command, {
+
+      // Stream output instead of buffering it (see runStreaming): tsc/tsgo can
+      // emit far more than any fixed maxBuffer on a large error cascade.
+      const result = await TypecheckRepository.runStreaming(command, {
         cwd: process.cwd(),
-        timeout: (timeout ?? 900) * 1000,
-        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+        timeoutMs: (timeout ?? 900) * 1000,
         signal,
       });
 
-      logger.debug("[TYPESCRIPT] Command executed successfully");
-      return success({
-        output: [result.stdout, result.stderr].filter(Boolean).join("\n"),
-      });
-    } catch (execError) {
-      // TSC exit codes 1 and 2 mean TypeScript errors were found
-      const hasTypeErrors =
-        execError &&
-        typeof execError === "object" &&
-        "code" in execError &&
-        (execError.code === 1 || execError.code === 2);
+      const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
 
-      if (hasTypeErrors && "stdout" in execError && "stderr" in execError) {
-        const stdout =
-          typeof execError.stdout === "string" ? execError.stdout : "";
-        const stderr =
-          typeof execError.stderr === "string" ? execError.stderr : "";
-        return success({
-          output: [stdout, stderr].filter(Boolean).join("\n"),
+      if (result.timedOut) {
+        logger.error("[TYPESCRIPT] Command timed out");
+        return fail({
+          message: t("errors.internal.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: "TypeScript check timed out" },
         });
       }
 
-      // Other errors are unexpected
+      // Exit code 0 = clean. 1/2 = type errors found, with diagnostics in
+      // stdout. Either way the full output is parsed by the caller — no error
+      // path swallows it (which is what produced the false "0 issues" pass).
+      logger.debug(
+        `[TYPESCRIPT] Command finished with exit code ${result.code ?? "null"}`,
+      );
+      return success({ output });
+    } catch (execError) {
+      // Reaches here only for spawn-level failures (binary missing, aborted).
       const parsedError = parseError(execError);
 
       logger.error(

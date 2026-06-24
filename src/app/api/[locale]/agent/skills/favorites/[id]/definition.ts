@@ -54,12 +54,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "../../../ai-stream/models";
-import skillDefinitions from "../../[id]/definition";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../create/definition";
-import skillsDefinitions from "../../definition";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -71,7 +69,6 @@ import {
   FAVORITE_GET_ALIAS,
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
-import favoritesListDefinition from "../definition";
 import { scopedTranslation } from "./i18n";
 
 const FavoriteEditContainer = lazy(() =>
@@ -198,7 +195,7 @@ const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: favoritesListDefinition.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "name",
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
@@ -634,7 +631,7 @@ const { PATCH } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: favoritesListDefinition.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "name",
         label: "patch.id.label" as const,
         hidden: true,
@@ -940,6 +937,8 @@ const { PATCH } = createEndpoint({
 
         const [
           { apiClient },
+          favoritesDefinition,
+          skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
           { getEnvAvailability },
         ] = await Promise.all([
@@ -1100,7 +1099,7 @@ const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: favoritesListDefinition.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "name",
         label: "get.id.label" as const,
         schema: z.string(),

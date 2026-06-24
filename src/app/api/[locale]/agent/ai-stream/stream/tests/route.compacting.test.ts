@@ -309,7 +309,7 @@ describe("Compacting - context management", () => {
 
     // Top up credits so fixture-cached runs never hit the credit gate.
     // 500cr floor matches route-base.test.ts convention.
-    const creditLogger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const creditLogger = createEndpointLogger(false, defaultLocale);
     const { t: creditT } = creditsScopedTranslation.scopedT(defaultLocale);
     const balanceResult = await CreditRepository.getCreditBalanceForUser(
       testUser,

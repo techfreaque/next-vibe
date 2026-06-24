@@ -162,24 +162,30 @@ export async function pushThreadSync(
     // fans it out through the unified bridge, gated per-connection by
     // syncScope["threads"] and applied on the peer via the [threadId] route's
     // onRemoteEvent (which re-runs updateThread).
-    const { createEndpointEmitter } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-    const { default: threadsByIdDefinitions } =
-      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+    const [{ createEndpointEmitter }, { default: threadsByIdDefinitions }] =
+      await Promise.all([
+        import("@/app/api/[locale]/system/unified-interface/websocket/emitter"),
+        import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition"),
+      ]);
     const user: JwtPrivatePayloadType = {
       id: userId,
       leadId: userId,
       isPublic: false,
       roles: [],
     };
-    createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
-      threadId,
-    })("thread-updated", {
-      title: thread.title,
-      folderId: thread.folderId,
-      status: thread.status,
-      rootFolderId: thread.rootFolderId,
-      updatedAt,
+    createEndpointEmitter(
+      threadsByIdDefinitions.PATCH,
+      logger,
+      user,
+    )("thread-updated", {
+      urlPathParams: { threadId },
+      requestData: {
+        title: thread.title,
+        folderId: thread.folderId,
+        status: thread.status,
+        rootFolderId: thread.rootFolderId,
+      },
+      responseData: { updatedAt },
     });
   } catch (error) {
     logger.debug("[pushThreadSync] best-effort push failed", {

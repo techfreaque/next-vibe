@@ -27,7 +27,7 @@ export async function tanstackLoader({
 
   // In local mode, go straight to chat
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
-    const logger = createEndpointLogger(false, Date.now(), locale);
+    const logger = createEndpointLogger(false, locale);
     const userResponse = await UserRepository.getUserByAuth(
       {
         detailLevel: UserDetailLevel.MINIMAL,
@@ -45,7 +45,7 @@ export async function tanstackLoader({
   }
 
   // Dev and prod: check auth - logged-in users go straight to chat
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,

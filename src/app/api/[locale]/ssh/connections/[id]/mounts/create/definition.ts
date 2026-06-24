@@ -21,7 +21,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import connectionsListDefinition from "../../../list/definition";
 import { scopedTranslation } from "../i18n";
 
 const MountCreateWidget = lazyWidget(() =>
@@ -49,7 +48,8 @@ export const { POST } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: connectionsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../../../list/definition")).default.GET,
         labelField: "label",
         schema: z.string().uuid(),
         label: "create.fields.connectionId.label" as const,

@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -28,7 +27,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
@@ -76,7 +74,9 @@ const { GET } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "id.get.id.label" as const,
         description: "id.get.id.description" as const,
@@ -481,7 +481,9 @@ const { PUT } = createEndpoint({
       id: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "id.put.id.label" as const,
         description: "id.put.id.description" as const,
@@ -551,7 +553,9 @@ const { PUT } = createEndpoint({
       leadId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: leadsListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/leads/list/definition")).default
+            .GET,
         labelField: "email",
         label: "id.put.leadId.label" as const,
         description: "id.put.leadId.description" as const,
@@ -769,7 +773,9 @@ const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: usersListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/users/list/definition")).default
+            .GET,
         labelField: "email",
         label: "id.delete.id.label" as const,
         description: "id.delete.id.description" as const,

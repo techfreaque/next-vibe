@@ -29,7 +29,7 @@ export async function tanstackLoader({
   params,
 }: CortexPageProps): Promise<CortexPageData> {
   const { locale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const user = await AuthRepository.getAuthMinimalUser(
     [UserRole.CUSTOMER, UserRole.ADMIN],

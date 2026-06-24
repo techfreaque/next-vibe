@@ -8,7 +8,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
-import { type WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import { type MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
 
 export interface PendingToolData {
@@ -27,7 +27,7 @@ export class StreamContext {
   /** Centralised, throttled DB writer for all assistant message writes */
   readonly dbWriter: MessageDbWriter;
   /** Typed WS emitter for this thread's messages channel. Use this from all stream handlers. */
-  readonly wsEmit: WsEmitCallback;
+  readonly wsEmit: MessagesWsEmit;
   private readonly logger: EndpointLogger;
   // Pre-generated ASSISTANT message ID (for cache stability)
   // Used only for the FIRST assistant message in a stream
@@ -133,7 +133,7 @@ export class StreamContext {
     logger: EndpointLogger;
     creditsT: ModuleT;
     locale: CountryLanguage;
-    wsEmit: WsEmitCallback;
+    wsEmit: MessagesWsEmit;
     emitTitle: EmitThreadTitleFn;
   }) {
     this.sequenceId = params.sequenceId;

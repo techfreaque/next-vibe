@@ -79,7 +79,7 @@ function reportToServer(
     try {
       const [{ executeMutation }, { POST }] = await Promise.all([
         import("@/app/api/[locale]/system/unified-interface/react/hooks/mutation-executor"),
-        import("@/app/api/[locale]/system/error-monitor/client-log/definition"),
+        import("@/app/api/[locale]/system/logger/error-monitor/client-log/definition"),
       ]);
 
       // Minimal public-user stub - server re-auths from the JWT cookie.

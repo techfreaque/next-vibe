@@ -26,7 +26,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_MODERATION_ALIAS } from "../constants";
-import skillsDefinitions from "../definition";
 import { SkillStatus, SkillStatusDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -239,7 +238,7 @@ const { PATCH } = createEndpoint({
       id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: skillsDefinitions.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "name",
         label: "patch.fields.id.label" as const,
         description: "patch.fields.id.description" as const,

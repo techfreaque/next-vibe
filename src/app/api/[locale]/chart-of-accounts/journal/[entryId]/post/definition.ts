@@ -6,7 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import journalListDefinitions from "@/app/api/[locale]/chart-of-accounts/journal/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -54,7 +53,10 @@ const { POST } = createEndpoint({
         placeholder: "journalPost.entryId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
-        listEndpoint: journalListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/chart-of-accounts/journal/list/definition")
+          ).default.GET,
         labelField: "entryNumber",
       }),
       posted: responseField(scopedTranslation, {

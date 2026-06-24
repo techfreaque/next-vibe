@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route"),
+      () =>
+        import("@/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route"),
     ),
   },
 });

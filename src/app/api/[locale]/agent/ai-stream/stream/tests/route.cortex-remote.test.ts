@@ -425,7 +425,7 @@ if (!_resolvedRemoteUrl) {
               user: testUser,
               locale: defaultLocale,
               platform: Platform.AI,
-              logger: createEndpointLogger(false, Date.now(), defaultLocale),
+              logger: createEndpointLogger(false, defaultLocale),
             });
 
           expect(
@@ -451,7 +451,7 @@ if (!_resolvedRemoteUrl) {
             "Thread must have messages mirrored locally",
           ).toBeGreaterThan(0);
 
-          const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+          const logger = createEndpointLogger(false, defaultLocale);
           logger.info("B2 thread mirror verified", {
             threadId: sharedThreadId,
             messageCount: localMessages.length,

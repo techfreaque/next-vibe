@@ -8,7 +8,8 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/analytics/transformers/field-pick/route"),
+      () =>
+        import("@/app/api/[locale]/analytics/transformers/field-pick/route"),
     ),
   },
 });

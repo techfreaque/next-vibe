@@ -218,7 +218,7 @@ function InkEndpointPage<
     endpoint.DELETE;
 
   // Stable logger - useRef so it doesn't cause re-renders
-  const loggerRef = useRef(createEndpointLogger(debug, Date.now(), locale));
+  const loggerRef = useRef(createEndpointLogger(debug, locale));
   const logger = loggerRef.current;
 
   const { isRawModeSupported } = useStdin();

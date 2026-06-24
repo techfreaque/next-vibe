@@ -255,6 +255,12 @@ export class CortexMoveRepository {
       logger.error("Failed to apply remote cortex move", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(moveDefinitions.POST, logger, user, {
+      fanOut: false,
+    })("node-moved", {
+      requestData: { from: requestData.from, to: requestData.to },
+    });
   }
 }

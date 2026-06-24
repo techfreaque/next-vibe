@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import listWindowsDefinitions from "../list-windows/definition";
 
 const TypeTextWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TypeTextWidget })),
@@ -90,7 +89,8 @@ const { POST } = createEndpoint({
       windowId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listWindowsDefinitions.POST,
+        listEndpoint: async () =>
+          (await import("../list-windows/definition")).default.POST,
         labelField: "title",
         label: "type-text.form.fields.windowId.label",
         description: "type-text.form.fields.windowId.description",

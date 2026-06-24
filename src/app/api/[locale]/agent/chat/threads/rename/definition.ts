@@ -23,7 +23,6 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import threadsDefinitions from "../definition";
 import { scopedTranslation } from "./i18n";
 
 const { PATCH } = createEndpoint({
@@ -53,7 +52,7 @@ const { PATCH } = createEndpoint({
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "title",
         label: "patch.threadId.label" as const,
         description: "patch.threadId.description" as const,

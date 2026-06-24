@@ -64,7 +64,7 @@ export async function tanstackLoader({
   params,
 }: HomePageProps): Promise<StoryPageData> {
   const { locale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const userResponse = await UserRepository.getUserByAuth(
     {

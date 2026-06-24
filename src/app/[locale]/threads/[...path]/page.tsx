@@ -96,7 +96,7 @@ export async function tanstackLoader({
 }: ThreadsPathPageProps): Promise<ThreadsPathPageData> {
   const { locale, path } = await params;
   const resolvedSearchParams = await searchParams;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   // Get authenticated user

@@ -53,7 +53,7 @@ export async function resolveUserAndToken(
   email: string,
   password: string = env.VIBE_ADMIN_USER_PASSWORD,
 ): Promise<{ user: JwtPrivatePayloadType; token: string } | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   const loginDef = (
     await import("@/app/api/[locale]/user/public/login/definition")
   ).default;
@@ -569,7 +569,7 @@ async function fetchFavoriteConfigAndModel(
     )?.id;
   }
   if (!model && skill !== NO_SKILL_ID) {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, defaultLocale);
     const { SkillsRepository } =
       await import("@/app/api/[locale]/agent/skills/repository");
     const { parseSkillId } =

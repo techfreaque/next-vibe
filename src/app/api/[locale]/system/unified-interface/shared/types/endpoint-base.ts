@@ -5,13 +5,14 @@
  * This file must NOT import from widgets/configs.ts
  */
 
-import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
-import type { AnyChildrenConstrain } from "next-vibe-ui/unified/_shared/types";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "next-vibe-ui/unified/_shared/types";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { EndpointEventsMap } from "../../websocket/structured-events";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { UnifiedField } from "./endpoint";
 import type { Methods } from "./enums";
@@ -21,8 +22,9 @@ import type { Methods } from "./enums";
 // ============================================================================
 
 /**
- * Type alias for CreateApiEndpoint - accepts any generic parameters
- * This is a branded type that any CreateApiEndpoint can be assigned to
+ * Type alias for CreateApiEndpoint - accepts any generic parameters.
+ * Uses the widest valid type for each parameter so every concrete endpoint
+ * returned by createEndpoint() is assignable to this.
  */
 export type CreateApiEndpointAny = CreateApiEndpoint<
   Methods,
@@ -34,8 +36,8 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  EndpointEventsMap<any>, // TEvents - accepts both never and any events map; with out (covariant) TEvents, any EndpointEventsMap<X> and never are both subtypes
+  // oxlint-disable-next-line no-explicit-any
+  any, // TEvents — any so both never (no events) and full event maps are assignable
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // RequestInput
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,11 +52,6 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
   any // UrlVariablesOutput
 >;
 
-/**
- * API section type for nested endpoint structure
- * Used in generated endpoints.ts file
- * Accepts CreateApiEndpoint with any type parameters or CreateEndpointReturnInMethod
- */
 export interface ApiSection {
   readonly GET?: CreateApiEndpointAny;
   readonly POST?: CreateApiEndpointAny;

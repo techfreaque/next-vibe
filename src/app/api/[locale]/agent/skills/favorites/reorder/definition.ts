@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { FAVORITES_REORDER_ALIAS } from "../constants";
-import favoritesListDefinition from "../definition";
 import { scopedTranslation } from "./i18n";
 
 /**

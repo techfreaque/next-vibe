@@ -108,7 +108,7 @@ export function createPageWrapperWithImport(
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(false, Date.now(), params.locale),
+      () => createEndpointLogger(false, params.locale),
       [params.locale],
     );
     // Serialize params for stable dependency comparison
@@ -235,7 +235,7 @@ export function createPageWrapper(
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(false, Date.now(), params.locale),
+      () => createEndpointLogger(false, params.locale),
       [params.locale],
     );
     useEffect(() => {
@@ -358,7 +358,7 @@ export function createLayoutWrapper(
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(false, Date.now(), params.locale),
+      () => createEndpointLogger(false, params.locale),
       [params.locale],
     );
 
@@ -422,7 +422,7 @@ export function createLayoutWrapperWithImport(
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(false, Date.now(), params.locale),
+      () => createEndpointLogger(false, params.locale),
       [params.locale],
     );
 

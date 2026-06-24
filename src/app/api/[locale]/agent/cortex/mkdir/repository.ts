@@ -162,6 +162,16 @@ export class CortexMkdirRepository {
       logger.error("Failed to apply remote cortex mkdir", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(mkdirDefinitions.POST, logger, user, {
+      fanOut: false,
+    })("node-written", {
+      requestData: {
+        path: requestData.path,
+        viewType: requestData.viewType,
+        createParents: requestData.createParents,
+      },
+    });
   }
 }

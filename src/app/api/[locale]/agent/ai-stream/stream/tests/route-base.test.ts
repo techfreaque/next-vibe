@@ -1540,7 +1540,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // guarantees the mirror converges even without a live WS push.
             {
               const { getWsConnection } =
-                await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+                await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
               const conn = cfg.systemPromptInstanceId
                 ? getWsConnection(cfg.systemPromptInstanceId)
                 : null;
@@ -4418,20 +4418,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               endpoint: favByIdDefT7.PATCH,
               data: {
                 modelSelection: t7ModelSelection,
-                availableTools: cfg.remoteInstanceId
-                  ? // Remote: execute-tool is the only registered SDK tool, all tools
-                    // route through it. Whitelist execute-tool with requiresConfirmation
-                    // so the AI signals approve via callbackMode=approve.
-                    [{ toolId: confirmToolId, requiresConfirmation: true }]
-                  : // Regular: individual tools each need to be whitelisted. Include
-                    // both tool-help (runs freely) and generate_image (requires confirm).
-                    [
-                      { toolId: "tool-help", requiresConfirmation: false },
-                      {
-                        toolId: confirmToolId,
-                        requiresConfirmation: true,
-                      },
-                    ],
+                availableTools: [
+                  { toolId: confirmToolId, requiresConfirmation: true },
+                ],
               },
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -4589,8 +4578,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
             const confirmResult = confirmStream;
 
-            // Restore the favorite's tool confirmation gate set in T7a so later
-            // tests (and other suites sharing this favorite) see a clean config.
+            // Restore the favorite to its pre-T7a state: clear availableTools whitelist
+            // (null = allow all tools) so later tests see a clean config.
             const favByIdDefT7b = (
               await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
             ).default;

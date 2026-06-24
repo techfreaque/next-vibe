@@ -34,7 +34,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ToolDetailPageData> {
   const { locale, toolPath } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const toolAlias = toolPath.join("/");
 
   const user = await AuthRepository.getAuthMinimalUser(

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Call execute-tool with toolName='tool-help', callbackMode='endLoop', input={}. After receiving the result, attempt to call execute-tool again with the same args. Check: did only ONE execute-tool call run (the loop stopped after the first), and did the first result contain a non-empty tools array? End with STEP_OK if exactly one call ran and result has tools. Or FAILED: <reason> if more than one call ran or result was empty.",
+    "encoding_format": "float"
+  }
+}

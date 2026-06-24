@@ -28,7 +28,7 @@ export async function subscriptionLoader({
   requireAuth,
   searchParams,
 }: LoaderInput): Promise<SubscriptionPageData> {
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   const userResponse = await UserRepository.getUserByAuth(

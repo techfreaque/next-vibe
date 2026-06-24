@@ -54,7 +54,7 @@ export async function tanstackLoader({
   const { locale } = await params;
 
   // Check if user is authenticated (but don't redirect)
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const minimalUser = await AuthRepository.getAuthMinimalUser(
     [UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },

@@ -26,6 +26,7 @@ import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { resolveStreamModelId } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/resolve-stream-model";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   cronTaskExecutions,
@@ -40,38 +41,6 @@ import type {
   AwaitTaskResponseOutput,
 } from "./definition";
 import type { AwaitTaskT } from "./i18n";
-
-async function resolveStreamModelId(
-  streamContext: ToolExecutionContext,
-  user: JwtPayloadType,
-): Promise<string | undefined> {
-  const userId = !user.isPublic ? user.id : undefined;
-  const { resolveFavoriteConfig } =
-    await import("@/app/api/[locale]/agent/skills/favorites/repository");
-  const { resolveSkillVariant } =
-    await import("@/app/api/[locale]/agent/skills/resolver");
-  const { resolveChatModelId } =
-    await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
-  const { parseSkillId } =
-    await import("@/app/api/[locale]/agent/chat/slugify");
-  const { getInstanceAvailability } =
-    await import("@/app/api/[locale]/agent/env-availability");
-
-  const fav = await resolveFavoriteConfig(streamContext.favoriteId, userId);
-  const skill = await resolveSkillVariant(
-    streamContext.skillId,
-    fav ? parseSkillId(fav.skillId).variantId : null,
-  );
-  const availability = await getInstanceAvailability();
-  return (
-    resolveChatModelId(
-      fav?.modelSelection ?? undefined,
-      skill?.modelSelection ?? undefined,
-      user,
-      availability,
-    ) ?? undefined
-  );
-}
 
 export class AwaitTaskRepository {
   static async awaitTask(

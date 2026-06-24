@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
-
+  timeoutMs: 0,
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

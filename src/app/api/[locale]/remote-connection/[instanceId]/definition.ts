@@ -8,7 +8,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import remoteConnectionListDefinitions from "@/app/api/[locale]/remote-connection/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -35,7 +34,9 @@ const RemoteConnectionByIdWidget = lazyWidget(() =>
 const instanceIdField = requestUrlPathParamsField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.ENTITY_PICKER,
-  listEndpoint: remoteConnectionListDefinitions.GET,
+  listEndpoint: async () =>
+    (await import("@/app/api/[locale]/remote-connection/list/definition"))
+      .default.GET,
   labelField: "name",
   label: "get.instanceId.label" as const,
   description: "get.instanceId.description" as const,

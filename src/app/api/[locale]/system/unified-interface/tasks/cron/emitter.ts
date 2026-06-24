@@ -15,6 +15,20 @@ import type { EmitEventNamed } from "../../websocket/structured-events";
 import queueDefinitions from "./queue/definition";
 import tasksDefinitions from "./tasks/definition";
 
+type TaskListEmitter = EmitEventNamed<
+  (typeof tasksDefinitions)["GET"]["types"]["EventResponsePayloads"],
+  (typeof tasksDefinitions)["GET"]["types"]["EventRequestPayloads"],
+  (typeof tasksDefinitions)["GET"]["types"]["EventUrlPayloads"],
+  (typeof tasksDefinitions)["GET"]["types"]["EventPayloadTypes"]
+>;
+
+type TaskQueueEmitter = EmitEventNamed<
+  (typeof queueDefinitions)["GET"]["types"]["EventResponsePayloads"],
+  (typeof queueDefinitions)["GET"]["types"]["EventRequestPayloads"],
+  (typeof queueDefinitions)["GET"]["types"]["EventUrlPayloads"],
+  (typeof queueDefinitions)["GET"]["types"]["EventPayloadTypes"]
+>;
+
 /**
  * Create emitters for both task list and queue channels.
  * Returns a function that broadcasts to both simultaneously.
@@ -23,16 +37,8 @@ export function createTaskEmitters(
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): {
-  emitTaskList: ReturnType<
-    typeof createEndpointEmitter<
-      typeof tasksDefinitions.GET.types.EventPayloads
-    >
-  >;
-  emitTaskQueue: ReturnType<
-    typeof createEndpointEmitter<
-      typeof queueDefinitions.GET.types.EventPayloads
-    >
-  >;
+  emitTaskList: TaskListEmitter;
+  emitTaskQueue: TaskQueueEmitter;
 } {
   return {
     emitTaskList: createEndpointEmitter(tasksDefinitions.GET, logger, user),

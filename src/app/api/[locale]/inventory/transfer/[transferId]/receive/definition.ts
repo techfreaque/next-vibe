@@ -5,7 +5,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import transferListDefinitions from "@/app/api/[locale]/inventory/transfer/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -57,7 +56,10 @@ const { POST } = createEndpoint({
         description: "transferReceive.post.transferId.description" as const,
         schema: z.uuid(),
         urlPathParam: true,
-        listEndpoint: transferListDefinitions.GET,
+        listEndpoint: async () =>
+          (
+            await import("@/app/api/[locale]/inventory/transfer/list/definition")
+          ).default.GET,
         labelField: "id",
       }),
 

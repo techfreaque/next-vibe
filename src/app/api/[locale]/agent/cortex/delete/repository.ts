@@ -197,6 +197,12 @@ export class CortexDeleteRepository {
       logger.error("Failed to apply remote cortex delete", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(deleteDefinitions.DELETE, logger, user, {
+      fanOut: false,
+    })("node-deleted", {
+      requestData: { path: requestData.path, recursive: requestData.recursive },
+    });
   }
 }

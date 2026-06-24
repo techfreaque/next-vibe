@@ -102,7 +102,7 @@ async function pollUntil<T>(
 // ═════════════════════════════════════════════════════════════════════════════
 
 describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
 
   beforeAll(async () => {
     await ensureProvidersRegistered();

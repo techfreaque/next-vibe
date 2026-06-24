@@ -28,7 +28,7 @@ export async function tanstackLoader({
   params,
 }: ThreadsRootPageProps): Promise<never> {
   const { locale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
   const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,

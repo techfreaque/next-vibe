@@ -39,15 +39,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
 import { parseSkillId } from "../../../chat/slugify";
-import skillDefinitions from "../../[id]/definition";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../create/definition";
-import skillsDefinitions from "../../definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../enum";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
-import favoritesListDefinition from "../definition";
 import { scopedTranslation } from "./i18n";
 
 const FavoriteCreateContainer = lazy(() =>
@@ -432,6 +429,9 @@ const { POST } = createEndpoint({
       onEvent: async ({ responseData, requestData, logger, locale, user }) => {
         const [
           { apiClient },
+          favoritesDefinition,
+          charactersDefinition,
+          skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
           { getEnvAvailability },
         ] = await Promise.all([

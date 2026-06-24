@@ -162,6 +162,14 @@ export class SkillPublishRepository {
       logger.error("Failed to apply remote publish", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(publishDefinitions.PATCH, logger, user, {
+      fanOut: false,
+    })("skill-updated", {
+      urlPathParams: { id: urlPathParams.id },
+      requestData,
+      responseData: result.data,
+    });
   }
 }

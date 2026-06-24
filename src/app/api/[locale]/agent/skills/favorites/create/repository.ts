@@ -416,6 +416,13 @@ export class FavoritesCreateRepository {
       logger.error("Failed to apply remote favorite create", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(createDefinitions.POST, logger, user, {
+      fanOut: false,
+    })("favorite-created", {
+      requestData,
+      responseData: { id: result.data.id },
+    });
   }
 }

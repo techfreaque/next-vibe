@@ -6,8 +6,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import catalogListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
-import categoryListDefinitions from "@/app/api/[locale]/products/category/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -57,7 +55,9 @@ const { PATCH } = createEndpoint({
         description: "patch.productId.description",
         hidden: true,
         schema: z.uuid(),
-        listEndpoint: catalogListDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/products/catalog/list/definition"))
+            .default.GET,
         labelField: "name",
       }),
 
@@ -135,7 +135,10 @@ const { PATCH } = createEndpoint({
           categoryId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.ENTITY_PICKER,
-            listEndpoint: categoryListDefinitions.GET,
+            listEndpoint: async () =>
+              (
+                await import("@/app/api/[locale]/products/category/list/definition")
+              ).default.GET,
             labelField: "name",
             label: "patch.categoryId.label",
             description: "patch.categoryId.description",

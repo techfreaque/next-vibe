@@ -7,16 +7,16 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
  */
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 
+import {
+  type AnyRemoteHandlerMap,
+  registerRemoteEventHandlers,
+} from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/registry";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
-import {
-  type AnyRemoteHandlerMap,
-  registerRemoteEventHandlers,
-} from "./remote-event-registry";
 import { endpointHandler } from "./single";
 
 /**

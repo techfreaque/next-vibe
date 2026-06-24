@@ -649,7 +649,14 @@ export class SingleFavoriteRepository {
       logger.error("Failed to apply remote favorite update", {
         message: result.message,
       });
+      return;
     }
+    createEndpointEmitter(favoriteByIdDefinitions.PATCH, logger, user, {
+      fanOut: false,
+    })("favorite-updated", {
+      urlPathParams: { id: urlPathParams.id },
+      requestData,
+    });
   }
 
   /**
@@ -671,5 +678,10 @@ export class SingleFavoriteRepository {
       user.id,
       logger,
     );
+    createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
+      fanOut: false,
+    })("favorite-deleted", {
+      urlPathParams: { id: urlPathParams.id },
+    });
   }
 }

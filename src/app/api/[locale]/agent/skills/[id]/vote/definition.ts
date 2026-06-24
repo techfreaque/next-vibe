@@ -28,7 +28,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_VOTE_ALIAS } from "../../constants";
-import skillsListDefinition from "../../definition";
+import { SkillTrustLevelDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 const SkillVoteContainer = lazyWidget(() =>
@@ -57,7 +57,8 @@ const { POST } = createEndpoint({
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: skillsListDefinition.GET,
+        listEndpoint: async () =>
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "post.title" as const,
         description: "post.description" as const,
@@ -146,6 +147,7 @@ const { POST } = createEndpoint({
     "skill-voted": {
       operation: "merge" as const,
       responseFields: ["voteCount", "trustLevel"] as const,
+      urlPathParamsFields: ["id"] as const,
       onEvent: async ({ responseData, urlPathParams, logger }) => {
         const skillId = urlPathParams.id;
 

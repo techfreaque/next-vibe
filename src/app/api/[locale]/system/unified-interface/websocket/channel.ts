@@ -1,33 +1,36 @@
 /**
- * WebSocket Channel Utilities
+ * WebSocket Channel Key Builder — SINGLE source of truth for WS channel names.
  *
- * Shared channel name builder used by both server-side emitter and client-side hooks.
- * Mirrors React Query's queryKey pattern: the channel is the resolved endpoint path
- * with URL path params substituted.
+ * Uses the same buildKey algorithm as React Query cache keys to guarantee
+ * consistent namespacing. Prefix "ws" distinguishes WS channels from query
+ * cache keys ("query") while the method inclusion prevents same-path endpoints
+ * from colliding.
+ *
+ * Format: ws-path-method[-urlPathParams][-cacheKeyFields]
  */
 
+import type { EndpointLogger } from "../../logger/types";
+import {
+  buildKey,
+  type CacheKeyRequestData,
+} from "../react/hooks/query-key-builder";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
+
 /**
- * Build a WebSocket channel name from an endpoint path and URL path params.
- *
- * Resolves `[paramName]` segments using the provided params object.
- * For endpoints without path params (like `["agent", "ai-stream"]`),
- * pass an additional `scope` to differentiate channels (e.g. threadId).
- *
- * @param path - Endpoint path segments (e.g. ["agent", "chat", "threads", "[threadId]", "messages"])
- * @param urlPathParams - Resolved URL path params (e.g. { threadId: "abc123" })
- * @param scope - Optional additional scope suffix (for endpoints without path params)
- * @returns Channel string like "agent/chat/threads/abc123/messages"
- *
- * @example
- * // Endpoint with path params - params resolve the channel
- * buildWsChannel(["agent", "chat", "threads", "[threadId]", "messages"], { threadId: "abc" })
- * // → "agent/chat/threads/abc/messages"
- *
- * @example
- * // Endpoint without path params - scope adds context
- * buildWsChannel(["agent", "ai-stream"], {}, "thread-abc")
- * // → "agent/ai-stream/thread-abc"
+ * Build the WS channel key for an endpoint instance.
+ * Mirrors the React Query cache key (prefix "ws" instead of "query") so the
+ * same endpoint + params always produces the same channel, with no namespace
+ * collisions between different endpoints sharing a path.
  */
+export function buildWsChannel<TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint,
+  urlPathParams: Record<string, string>,
+  requestData: CacheKeyRequestData<TEndpoint>,
+  logger: EndpointLogger,
+): string {
+  return buildKey("ws", endpoint, urlPathParams, logger, requestData);
+}
+
 /**
  * Build the user-scoped channel for a single-connection-per-tab model.
  * All endpoint events are routed through this channel; the `channel` field

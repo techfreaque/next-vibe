@@ -506,6 +506,31 @@ export function ToolCallRenderer({
     [cancelMutation, toolCall.remoteTaskId, isCancelling],
   );
 
+  const [isDismissing, setIsDismissing] = useState(false);
+  const dismissMutation = useApiMutation(
+    dismissTaskEndpoints.POST,
+    logger,
+    user,
+  );
+
+  const handleDismissTask = useCallback(
+    (e: ButtonMouseEvent): void => {
+      e.stopPropagation();
+      const pendingCallId = toolCall.pendingCallId;
+      if (!pendingCallId || isDismissing) {
+        return;
+      }
+      setIsDismissing(true);
+      void dismissMutation
+        .mutateAsync({ requestData: { callId: pendingCallId } })
+        .then(() => undefined)
+        .catch(() => {
+          setIsDismissing(false);
+        });
+    },
+    [dismissMutation, toolCall.pendingCallId, isDismissing],
+  );
+
   const handleCopyJson = (e: DivMouseEvent): void => {
     e.stopPropagation();
 
@@ -550,7 +575,7 @@ export function ToolCallRenderer({
       payload.error = toolCall.error;
     }
     const text = JSON.stringify(payload, null, 2);
-    void navigator.clipboard.writeText(text).then(() => {
+    void copyToClipboard(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;
@@ -832,9 +857,27 @@ export function ToolCallRenderer({
                   </>
                 )}
               {isWaitingForRemote && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">
-                  {t("widgets.toolCall.status.waitingForRemote")}
-                </Span>
+                <>
+                  <Span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">
+                    {t("widgets.toolCall.status.waitingForRemote")}
+                  </Span>
+                  {toolCall.pendingCallId && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      disabled={isDismissing}
+                      onClick={handleDismissTask}
+                    >
+                      {isDismissing ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        t("widgets.toolCall.actions.runInBackground")
+                      )}
+                    </Button>
+                  )}
+                </>
               )}
               {isConfirmedByUser && !isWakeUpBackground && !isDeniedByUser && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success">
