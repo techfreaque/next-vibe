@@ -23,16 +23,7 @@ For MCP usage, the same endpoint is available as the `check` tool. See [vibe che
 
 See [i18n Patterns](../patterns/i18n.md) for the complete system.
 
-The short version: translation keys map exactly to folder paths. `vibe check` catches missing or wrong keys - **but only if `translationsKeyTypesafety` is enabled**.
-
-In `src/config/debug.ts`:
-
-```typescript
-// Speeds up the typecheck by 100x but disables translation typesafety
-export const translationsKeyTypesafety = false;
-```
-
-When this is `false` (the default), `vibe check` runs fast but won't catch invalid translation keys. Set it to `true` before checking i18n, then set it back - leaving it on makes typecheck extremely slow.
+The short version: translation keys map exactly to folder paths. `vibe check` catches missing or wrong keys.
 
 ---
 

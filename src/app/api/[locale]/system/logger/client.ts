@@ -92,7 +92,7 @@ function reportToServer(
 
       await executeMutation({
         endpoint: POST,
-        logger: createLogger(false, Date.now(), locale),
+        logger: createLogger(false, locale),
         requestData: {
           level,
           message: message.slice(0, 500),
@@ -111,14 +111,12 @@ function reportToServer(
 
 export function createClientLogger(
   debugEnabled = false,
-  startTime: number = Date.now(),
   locale: CountryLanguage,
   availability: AgentEnvAvailability,
   tabId?: string,
 ): EndpointLogger {
   return createLogger(
     debugEnabled,
-    startTime,
     locale,
     (level, message, error, metadata) => {
       reportToServer(

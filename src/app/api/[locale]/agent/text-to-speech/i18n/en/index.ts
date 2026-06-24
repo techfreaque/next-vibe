@@ -1,3 +1,4 @@
+// oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
 import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/en";
 
 export const translations = {
@@ -119,7 +120,7 @@ export const translations = {
       elevenlabsAdam:
         "ElevenLabs Adam - Professional male voice for content creation",
     },
-    names: modelTranslations.models.names,
+    names: modelTranslations.names,
   },
 };
 

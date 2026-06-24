@@ -28,7 +28,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -108,6 +107,12 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "executeTool.post.fields.instanceId.label",
         description: "executeTool.post.fields.instanceId.description",
+        visibleFor: [
+          UserRole.CUSTOMER,
+          UserRole.PARTNER_ADMIN,
+          UserRole.PARTNER_EMPLOYEE,
+          UserRole.ADMIN,
+        ] as const,
         columns: 12,
         schema: z.string().optional(),
       }),
@@ -117,6 +122,12 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "executeTool.post.fields.callbackMode.label",
         description: "executeTool.post.fields.callbackMode.description",
+        visibleFor: [
+          UserRole.CUSTOMER,
+          UserRole.PARTNER_ADMIN,
+          UserRole.PARTNER_EMPLOYEE,
+          UserRole.ADMIN,
+        ] as const,
         columns: 12,
         schema: z
           .enum([
@@ -206,10 +217,25 @@ const { POST } = createEndpoint({
     "tool-execute-request": {
       remoteEvent: true as const,
       clientDelivery: false as const,
+      requestFields: [
+        "callbackMode",
+        "input",
+        "instanceId",
+        "toolName",
+      ] as const,
+      // Roundtrip context: the receiver echoes callId in tool-execute-result so
+      // the requester's pending-call registry resolves. Carried in the envelope
+      // `payload` side-channel, separate from the execution args (requestFields).
+      payloadType: z.object({
+        callId: z.string(),
+        userId: z.string(),
+        locale: z.string(),
+      }),
     },
     "tool-execute-result": {
       remoteEvent: true as const,
       clientDelivery: false as const,
+      responseFields: ["hint", "result", "taskId"] as const,
     },
   },
 
@@ -239,13 +265,13 @@ const { POST } = createEndpoint({
       // Remote execution returns a task ID (async)
       remote: {
         taskId: "task-uuid-here",
-        hint: "Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.",
+        hint: "Result/return will be injected when complete and wakes up the thread. Call await-task only if you need the result before continuing.",
       },
     },
   },
 });
 
-const executeDefinition = { POST };
+const executeDefinition = { POST } as const;
 
 export default executeDefinition;
 

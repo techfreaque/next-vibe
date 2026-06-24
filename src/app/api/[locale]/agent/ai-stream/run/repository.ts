@@ -92,7 +92,7 @@ export class AiStreamRunRepository {
     ResponseType<{
       routeId: string;
       args: Record<string, WidgetData>;
-      data: Record<string, WidgetData>;
+      data: WidgetData;
     }>
   > {
     logger.debug("[AiStreamRun] Executing pre-call", { routeId });
@@ -428,7 +428,7 @@ export class AiStreamRunRepository {
       // Only tool config may differ (sub-agent resolves its own tools above).
       const parentConfig = subAgentOverrideConfig ?? parentFavConfig;
       const headlessFavoriteConfig: FavoriteConfig = buildFavoriteConfig({
-        ...(parentConfig ?? {}),
+        ...parentConfig,
         id: effectiveFavoriteId ?? parentConfig?.id ?? "ai-run",
         skillId: skill ?? parentConfig?.skillId ?? NO_SKILL_ID,
         availableTools: resolvedAvailableTools ?? null,

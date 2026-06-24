@@ -35,7 +35,6 @@ export async function POST(
   const { locale } = await context.params;
   const logger = createEndpointLogger(
     env.NODE_ENV === Environment.DEVELOPMENT,
-    Date.now(),
     locale,
   );
 

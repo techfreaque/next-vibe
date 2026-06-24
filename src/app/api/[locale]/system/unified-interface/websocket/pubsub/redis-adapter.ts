@@ -5,7 +5,6 @@
  * Requires two Redis connections: one for publishing, one for subscribing
  * (Redis requires a dedicated connection in subscribe mode).
  *
- * Wire format: JSON string of { event: string, data: PubSubMessageData }
  *
  * NOTE: This adapter is only loaded when WS_PUBSUB_TYPE=redis.
  * The `ioredis` package must be installed: `bun add ioredis`
@@ -13,12 +12,12 @@
 
 import type { Redis } from "ioredis";
 
-import type { WidgetData } from "../../shared/types/json";
+import type { AnyEndpointEventEnvelope } from "../structured-events";
 import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
-interface RedisWireMessage {
+interface RedisWireMessage<T> {
   readonly event: string;
-  readonly data: PubSubMessageData;
+  readonly data: T;
 }
 
 export class RedisPubSubAdapter implements PubSubAdapter {
@@ -57,7 +56,7 @@ export class RedisPubSubAdapter implements PubSubAdapter {
       }
 
       try {
-        const parsed = JSON.parse(message) as RedisWireMessage;
+        const parsed = JSON.parse(message) as RedisWireMessage<WidgetData>;
         handler(parsed.event, parsed.data);
       } catch {
         // Malformed message - skip
@@ -65,7 +64,7 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     });
   }
 
-  publish(channel: string, event: string, data: PubSubMessageData): void {
+  publish<T>(channel: string, event: string, data: T): void {
     if (!this.publisher) {
       // Queue the connection setup, then publish
       void this.ensureConnected().then(() => {
@@ -77,20 +76,16 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     this.publishSync(channel, event, data);
   }
 
-  private publishSync(
-    channel: string,
-    event: string,
-    data: PubSubMessageData,
-  ): void {
+  private publishSync<T>(channel: string, event: string, data: T): void {
     if (!this.publisher) {
       return;
     }
-    const message: RedisWireMessage = { event, data };
+    const message: RedisWireMessage<T> = { event, data };
     void this.publisher.publish(channel, JSON.stringify(message));
   }
 
-  subscribe(channel: string, handler: PubSubMessageHandler): void {
-    this.handlers.set(channel, handler);
+  subscribe<T>(channel: string, handler: PubSubMessageHandler<T>): void {
+    this.handlers.set(channel, handler as PubSubMessageHandler);
 
     if (!this.subscriber) {
       void this.ensureConnected().then(() => {

@@ -309,7 +309,10 @@ export interface UseWebSocketReturn {
  *
  * @param channel - Channel to subscribe to (e.g. "agent/chat/threads/{threadId}/messages")
  */
-export function useWebSocket(channel: string | null): UseWebSocketReturn {
+export function useWebSocket(
+  channel: string | null,
+  locale: CountryLanguage,
+): UseWebSocketReturn {
   const [connected, setConnected] = useState(
     () => sharedWs?.readyState === WebSocket.OPEN,
   );
@@ -322,7 +325,7 @@ export function useWebSocket(channel: string | null): UseWebSocketReturn {
     }
 
     channelRef.current = channel;
-    const state = getOrCreateChannel(channel);
+    const state = getOrCreateChannel(channel, locale);
 
     // Sync initial state (connection may already be open before mount)
     setConnected(sharedWs?.readyState === WebSocket.OPEN);
@@ -343,7 +346,7 @@ export function useWebSocket(channel: string | null): UseWebSocketReturn {
       connectionListeners.delete(setConnected);
       unsub();
     };
-  }, [channel]);
+  }, [channel, locale]);
 
   const on = useCallback(
     (event: string, handler: WireHandler): (() => void) => {
@@ -354,10 +357,10 @@ export function useWebSocket(channel: string | null): UseWebSocketReturn {
           /* noop */
         };
       }
-      const state = getOrCreateChannel(ch);
+      const state = getOrCreateChannel(ch, locale);
       return addListener(state, event, handler, ch);
     },
-    [],
+    [locale],
   );
 
   return { on, connected, lastEvent };

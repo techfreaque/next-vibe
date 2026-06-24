@@ -1066,8 +1066,11 @@ export class ViteCompiler {
           serverFileLog(line.trimEnd());
         },
         warn(msg: string): void {
-          // Suppress sourcemap warnings for packages that ship without source files
-          if (msg.includes("points to missing source files")) {
+          // drizzle-zod ships sourcemaps pointing outside its package (packaging bug).
+          if (
+            msg.includes("drizzle-zod") &&
+            msg.includes("source file outside its package")
+          ) {
             return;
           }
           this.hasWarned = true;
@@ -1076,7 +1079,10 @@ export class ViteCompiler {
           serverFileLog(line.trimEnd());
         },
         warnOnce(msg: string): void {
-          if (msg.includes("points to missing source files")) {
+          if (
+            msg.includes("drizzle-zod") &&
+            msg.includes("source file outside its package")
+          ) {
             return;
           }
           this.hasWarned = true;
@@ -1826,16 +1832,25 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
             publicPort !== null && publicPort !== undefined
               ? { clientPort: publicPort }
               : true,
+          // Allow sourcemaps from packages that reference source files outside
+          // their own package directory (e.g. drizzle-zod → node_modules/src/).
+          // false = never ignore any sourcemap, serve them all.
+          sourcemapIgnoreList: false,
+          // Pre-transform the SSR entry so the first real request doesn't
+          // pay the cold module-evaluation cost (avoids Suspense boundary
+          // errors and ECONNRESET on the first page load).
+          warmup: {
+            ssrFiles: [`${srcDirectory}/router.tsx`],
+          },
         } as InlineConfig["server"],
         // Use a TanStack-specific cache dir so it doesn't conflict with
         // the Next.js Vite cache in node_modules/.vite/deps/
         cacheDir: resolve(ROOT_DIR, "node_modules/.vite-tanstack"),
         logLevel: "info",
         build: {
-          // drizzle-zod ships sourcemaps with paths pointing outside its own
-          // package directory (e.g. node_modules/src/...). Tell Rollup to skip
-          // sourcemaps for that package entirely so it never tries to resolve
-          // those invalid paths and never emits the warning.
+          // drizzle-zod sourcemaps reference paths outside their package (packaging bug).
+          // Exclude from build output only — dev sourcemaps are still served via
+          // server.sourcemapIgnoreList: false above.
           sourcemapIgnoreList: (relativeSourcePath: string) =>
             relativeSourcePath.includes("drizzle-zod"),
         } as InlineConfig["build"],

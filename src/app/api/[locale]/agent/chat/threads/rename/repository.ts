@@ -123,14 +123,21 @@ export class ThreadRenameRepository {
       // event (the changed fields the user submitted + updatedAt). The client
       // onEvent merges them into the sidebar list cache; cross-instance the peer
       // re-applies the update.
-      createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
-        threadId: updatedThread.id,
-      })("thread-updated", {
-        title: updatedThread.title,
-        folderId: updatedThread.folderId,
-        status: updatedThread.status,
-        rootFolderId: updatedThread.rootFolderId,
-        updatedAt: updatedThread.updatedAt,
+      createEndpointEmitter(
+        threadsByIdDefinitions.PATCH,
+        logger,
+        user,
+      )("thread-updated", {
+        urlPathParams: { threadId: updatedThread.id },
+        requestData: {
+          title: updatedThread.title,
+          folderId: updatedThread.folderId,
+          status: updatedThread.status,
+          rootFolderId: updatedThread.rootFolderId,
+        },
+        responseData: {
+          updatedAt: updatedThread.updatedAt,
+        },
       });
 
       if (updatedThread.rootFolderId) {
@@ -140,20 +147,22 @@ export class ThreadRenameRepository {
           folderContentsDefinitions.GET,
           logger,
           user,
-          { rootFolderId: updatedThread.rootFolderId },
         );
         emitFolderContents("thread-updated", {
-          items: [
-            {
-              id: updatedThread.id,
-              title: updatedThread.title,
-              folderId: updatedThread.folderId,
-              status: updatedThread.status,
-              preview: updatedThread.preview,
-              rootFolderId: updatedThread.rootFolderId,
-              updatedAt: updatedThread.updatedAt,
-            },
-          ],
+          urlPathParams: { rootFolderId: updatedThread.rootFolderId },
+          responseData: {
+            items: [
+              {
+                id: updatedThread.id,
+                title: updatedThread.title,
+                folderId: updatedThread.folderId,
+                status: updatedThread.status,
+                preview: updatedThread.preview,
+                rootFolderId: updatedThread.rootFolderId,
+                updatedAt: updatedThread.updatedAt,
+              },
+            ],
+          },
         });
       }
 

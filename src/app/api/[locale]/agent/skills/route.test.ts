@@ -13,12 +13,13 @@ import { and, eq, like } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+// ── Definition imports ───────────────────────────────────────────────────────
+import { testEndpoint } from "../../system/check/testing/testing-suite/test-endpoint";
 import { isUuid } from "../chat/slugify";
 import { SttModelId } from "../speech-to-text/models";
 import skillSingleEndpoint from "./[id]/definition";
@@ -27,7 +28,6 @@ import skillReportEndpoint from "./[id]/report/definition";
 import skillVoteEndpoint from "./[id]/vote/definition";
 import skillCreateEndpoint from "./create/definition";
 import { customSkills } from "./db";
-// ── Definition imports ───────────────────────────────────────────────────────
 import skillsListEndpoint from "./definition";
 import {
   ContentLevel,

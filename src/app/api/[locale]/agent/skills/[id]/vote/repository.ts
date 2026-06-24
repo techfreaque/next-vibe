@@ -127,11 +127,13 @@ export class SkillVoteRepository {
         })
         .where(eq(customSkills.id, resolvedId));
 
-      createEndpointEmitter(voteDefinitions.POST, logger, user, {
-        id: skill.slug ?? skill.id,
-      })("skill-voted", {
-        voteCount: newVoteCount,
-        trustLevel: newTrustLevel,
+      createEndpointEmitter(
+        voteDefinitions.POST,
+        logger,
+        user,
+      )("skill-voted", {
+        urlPathParams: { id: skill.slug ?? skill.id },
+        responseData: { voteCount: newVoteCount, trustLevel: newTrustLevel },
       });
 
       return success({

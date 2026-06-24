@@ -11,8 +11,8 @@
  *   CN3  — acquireConnection() increments ref-count; idle timer starts on last release;
  *           timer fires → connection closed
  *   CN4  — re-acquire before idle timer fires cancels the timer; connection stays open
- *   CN5  — syncScope filtering: documents=false strips documents from WS sync-event payload
- *   CN6  — syncScope filtering: skills=false strips skills from WS sync-event payload
+ *   CN5  — syncScope filtering: documents=false strips documents from WS remote-event payload
+ *   CN6  — syncScope filtering: skills=false strips skills from WS remote-event payload
  *   CN7  — control "rename": WS message updates remoteConnections.instanceId + renames REMOTE subfolder
  *   CN8  — control "settings-update": WS message updates syncScope in DB
  *   CN9  — reconnect fires after WS close; pull-on-connect re-runs; DB lastSyncedAt updated
@@ -385,7 +385,7 @@ if (_remoteUrl) {
     // ── CN5: syncScope documents=false strips documents from sync ─────────────
 
     it(
-      "CN5: syncScope.documents=false → documents stripped from WS sync-event before apply",
+      "CN5: syncScope.documents=false → documents stripped from WS remote-event before apply",
       async () => {
         // Set syncScope.documents=false on the connection
         await db
@@ -576,7 +576,7 @@ if (_remoteUrl) {
     // ── CN6: syncScope skills=false strips skills ─────────────────────────────
 
     it(
-      "CN6: syncScope.skills=false → skills stripped from WS sync-event before apply",
+      "CN6: syncScope.skills=false → skills stripped from WS remote-event before apply",
       async () => {
         // Set syncScope.skills=false on atlas's connection row for hermes
         await db

@@ -1,3 +1,4 @@
+// oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
 import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/en";
 
 export const translations = {
@@ -274,5 +275,5 @@ export const translations = {
       placeholder: "System default",
     },
   },
-  models: modelTranslations.models,
+  models: { names: modelTranslations.names },
 };

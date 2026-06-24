@@ -50,15 +50,16 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "../../../ai-stream/models";
+import skillDefinitions from "../../[id]/definition";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../create/definition";
+import skillsDefinitions from "../../definition";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -305,7 +306,8 @@ const { DELETE } = createEndpoint({
       remoteEvent: true as const,
       syncDomain: "favorites" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-      onEvent: async ({ urlPathParams, queryClient, logger }) => {
+      urlPathParamsFields: ["id"] as const,
+      onEvent: async ({ urlPathParams, logger }) => {
         const deletedId = urlPathParams.id;
         if (!deletedId) {
           return;
@@ -368,7 +370,6 @@ const { DELETE } = createEndpoint({
             },
           );
         }
-        void queryClient;
       },
     },
   },
@@ -933,20 +934,12 @@ const { PATCH } = createEndpoint({
         "promptAppend",
         "memoryLimit",
       ] as const,
-      onEvent: async ({
-        responseData,
-        urlPathParams,
-        queryClient,
-        logger,
-        locale,
-        user,
-      }) => {
+      urlPathParamsFields: ["id"] as const,
+      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
         const favoriteId = urlPathParams.id;
 
         const [
           { apiClient },
-          favoritesDefinition,
-          skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
           { getEnvAvailability },
         ] = await Promise.all([
@@ -959,7 +952,7 @@ const { PATCH } = createEndpoint({
 
         const availability = getEnvAvailability();
         const { skillId: baseSkillId, variantId } = parseSkillId(
-          responseData.skillId ?? "default",
+          requestData.skillId ?? "default",
         );
 
         // Resolve character display data from the skills [id] cache, if present.
@@ -971,7 +964,7 @@ const { PATCH } = createEndpoint({
         let characterName: string | null = null;
         let characterTagline: string | null = null;
         let characterDescription: string | null = null;
-        let characterModelSelection = responseData.modelSelection ?? null;
+        let characterModelSelection = requestData.modelSelection ?? null;
         if (character?.success) {
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
@@ -980,7 +973,7 @@ const { PATCH } = createEndpoint({
             ? character.data.variants?.find((v) => v.id === variantId)
             : character.data.variants?.[0];
           characterModelSelection =
-            responseData.modelSelection ?? variant?.modelSelection ?? null;
+            requestData.modelSelection ?? variant?.modelSelection ?? null;
         }
 
         apiClient.updateEndpointData(
@@ -1000,20 +993,20 @@ const { PATCH } = createEndpoint({
               ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
                 {
                   id: favoriteId,
-                  skillId: responseData.skillId ?? "default",
-                  customVariantName: responseData.customVariantName ?? null,
+                  skillId: requestData.skillId ?? "default",
+                  customVariantName: requestData.customVariantName ?? null,
                   customIcon: null,
-                  voiceModelSelection: responseData.voiceModelSelection ?? null,
-                  modelSelection: responseData.modelSelection ?? null,
+                  voiceModelSelection: requestData.voiceModelSelection ?? null,
+                  modelSelection: requestData.modelSelection ?? null,
                   position: existing.position,
                 },
                 characterModelSelection,
-                responseData.icon ?? null,
+                requestData.icon ?? null,
                 characterName,
                 characterTagline,
                 characterDescription,
                 null,
-                responseData.voiceModelSelection ?? null,
+                requestData.voiceModelSelection ?? null,
                 locale,
                 user,
                 availability,
@@ -1029,7 +1022,6 @@ const { PATCH } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },
@@ -1442,12 +1434,12 @@ export type FavoriteDeleteUrlVariablesOutput =
 export type FavoriteDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type FavoriteDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
-/** Inferred payload of the `favorite-updated` event (edit config + id). */
+/** Inferred payload of the `favorite-updated` event (request fields submitted by the user). */
 export type FavoriteUpdatedEventPayload =
-  (typeof PATCH.types.EventPayloads)["favorite-updated"];
-/** Inferred payload of the `favorite-deleted` event (the deleted id). */
+  (typeof PATCH.types.EventRequestPayloads)["favorite-updated"];
+/** Inferred payload of the `favorite-deleted` event (no fields — uses urlPathParams). */
 export type FavoriteDeletedEventPayload =
-  (typeof DELETE.types.EventPayloads)["favorite-deleted"];
+  (typeof DELETE.types.EventResponsePayloads)["favorite-deleted"];
 
 const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

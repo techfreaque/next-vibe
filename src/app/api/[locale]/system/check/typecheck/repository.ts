@@ -6,10 +6,9 @@
  * The choice is controlled by the `useTsgo` config option.
  */
 
-import { exec } from "node:child_process";
+import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { promisify } from "node:util";
 
 import { z } from "zod";
 

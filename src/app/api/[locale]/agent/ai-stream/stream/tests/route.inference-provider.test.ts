@@ -282,8 +282,8 @@ async function teardownReverseWs(
 /**
  * PATCH transportMode='reverse-ws' on hermes's atlas row.
  * The PATCH handler calls openConnection() which opens a persistent WS to atlas,
- * subscribes to system/tool-dispatch/{userId}, and re-broadcasts any queued
- * tool-execute-request. Polls chatThreads.streamingState until thread exits 'waiting'.
+ * subscribes to system/sync/{userId} for relayed remote events, and processes any
+ * tool-execute-request via onRemoteEvent. Polls chatThreads.streamingState until thread exits 'waiting'.
  */
 async function runReverseWsPulse(threadId: string): Promise<void> {
   if (!_rwsTestUser) {

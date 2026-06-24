@@ -27,7 +27,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { AnyEndpointEventEnvelope } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
@@ -74,7 +74,11 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        schema: WidgetDataSchema,
+        schema: z.object({
+          originInstanceId: z.string().optional(),
+          syncDomain: z.string().optional(),
+          envelope: z.custom<AnyEndpointEventEnvelope>().optional(),
+        }),
       }),
 
       // ── Response fields ────────────────────────────────────────────────────
@@ -84,10 +88,8 @@ const { POST } = createEndpoint({
       }),
 
       // ── Generic server-event payload fields ────────────────────────────────
-      // One relay event carries ANY route's remoteEvent. These appear only in
-      // the event payload, not in normal HTTP responses. The bridge dispatches
-      // to the target route's onRemoteEvent — the route is the runner; the
-      // payload shape is the target event's own definition fields.
+      // One relay event. The bridge dispatches to the target route's onRemoteEvent.
+      // All 4 event fields travel together inside the envelope — not split here.
       originInstanceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -98,43 +100,27 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
-      endpointPath: responseField(scopedTranslation, {
+      envelope: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.array(z.string()).optional(),
-      }),
-      endpointMethod: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-      urlPathParams: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.record(z.string(), z.string()).optional(),
-      }),
-      endpointEventName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-      endpointPayload: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: WidgetDataSchema.optional(),
+        schema: z.custom<AnyEndpointEventEnvelope>().optional(),
       }),
     },
   }),
 
   // === EVENTS (server-side wire protocol) ===
-  // ONE relay event. The bridge is a generic runner: it receives any route's
-  // remoteEvent from a peer and dispatches it to that route's onRemoteEvent.
-  // There is no per-domain event type — domain (cache, chat, skills, …) is just
-  // the event's declared syncDomain, carried for per-connection
-  // syncScope gating at the sender. No sync-event, no live-message-event.
+  // ONE relay event — a wire-protocol DESCRIPTOR, not a dispatchable remoteEvent.
+  // The bridge IS the generic runner: it receives any route's remoteEvent from a
+  // peer (HTTP receive() or connector.handleRemoteEvent) and dispatches it to
+  // that route's own onRemoteEvent via dispatchRemoteEvent. It must NOT carry
+  // remoteEvent:true itself — that would make it re-enter the relay and require
+  // its own onRemoteEvent handler. The event exists only to document the wire
+  // frame the connector listens for on system/sync/{userId}.
+  //
+  // The relay payload is the RemoteEventWirePayload — carried in the envelope's
+  // `payload` field. originInstanceId/syncDomain/envelope describe its shape.
   events: {
     "remote-event": {
-      remoteEvent: true as const,
       clientDelivery: false as const,
       allowedRoles: [
         UserRole.CUSTOMER,
@@ -142,15 +128,7 @@ const { POST } = createEndpoint({
         UserRole.PARTNER_EMPLOYEE,
         UserRole.ADMIN,
       ] as const,
-      responseFields: [
-        "originInstanceId",
-        "syncDomain",
-        "endpointPath",
-        "endpointMethod",
-        "urlPathParams",
-        "endpointEventName",
-        "endpointPayload",
-      ] as const,
+      responseFields: ["originInstanceId", "syncDomain", "envelope"] as const,
       operation: "merge" as const,
     },
   },

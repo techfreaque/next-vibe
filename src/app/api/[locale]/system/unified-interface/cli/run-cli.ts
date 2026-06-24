@@ -274,11 +274,7 @@ export function runCli({
         }
 
         const debug = options.debug || options.verbose;
-        const logger = createEndpointLogger(
-          debug ?? false,
-          Date.now(),
-          options.locale,
-        );
+        const logger = createEndpointLogger(debug ?? false, options.locale);
         const { t } = cliScopedTranslation.scopedT(options.locale);
         // For MCP, the server sets up its own non-exit error handlers.
         // The CLI's exit-on-error handlers would kill the process on any tool call error.

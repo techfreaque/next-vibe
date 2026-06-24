@@ -19,10 +19,7 @@ import type {
   CreateApiEndpoint,
   EndpointReadOptions,
 } from "../../endpoints/definition/create";
-import {
-  objectField,
-  requestUrlPathParamsField,
-} from "../../field/utils";
+import { objectField, requestUrlPathParamsField } from "../../field/utils";
 import type {
   ExamplesList,
   ExtractInput,
@@ -38,7 +35,9 @@ import type {
 } from "../../types/enums";
 import { FieldDataType, WidgetType } from "../../types/enums";
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 
 // ============================================================================
 // LEVEL 1: Test basic type parameter assignability
@@ -1074,6 +1073,262 @@ const test8_1: Test8_1_Result = "PASS"; // Intersection preserves variance from 
 // Solution: CreateApiEndpointAny should accept MORE GENERAL types that
 // UnifiedField<string, z.ZodTypeAny> specific endpoint can be assigned to
 
+// ============================================================================
+// LEVEL 10: Test with actual createEndpoint-returned value (same as task.ts)
+// ============================================================================
+
+import type cleanupDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/cleanup/definition";
+
+type ActualEndpoint = typeof cleanupDefinitions.POST;
+
+// 10.1: Full assignability
+type Test10_1_Result = ActualEndpoint extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
+const test10_1: Test10_1_Result = "PASS"; // MUST pass
+
+// 10.2: Is types.EventPayloads compatible?
+type Test10_2_Result =
+  ActualEndpoint["types"]["EventPayloadTypes"] extends CreateApiEndpointAny["types"]["EventPayloadTypes"]
+    ? "PASS"
+    : "FAIL";
+const test10_2: Test10_2_Result = "PASS"; // isolate EventPayloads
+
+// 10.3: Is types.EventTypes compatible?
+type Test10_3_Result =
+  ActualEndpoint["types"]["EventTypes"] extends CreateApiEndpointAny["types"]["EventTypes"]
+    ? "PASS"
+    : "FAIL";
+const test10_3: Test10_3_Result = "PASS"; // isolate EventTypes
+
+// 10.4: Is types.Events compatible?
+type Test10_4_Result =
+  ActualEndpoint["types"]["Events"] extends CreateApiEndpointAny["types"]["Events"]
+    ? "PASS"
+    : "FAIL";
+const test10_4: Test10_4_Result = "PASS"; // isolate Events
+
+// 10.5: Is ActualEndpoint["types"]["Events"] actually never?
+type ActualEvents = ActualEndpoint["types"]["Events"];
+type Test10_5_IsNever = [ActualEvents] extends [never]
+  ? "IS_NEVER"
+  : "NOT_NEVER";
+const test10_5: Test10_5_IsNever = "NOT_NEVER"; // Actual stored TStoredEvents — not never since widened
+
+// 10.6: What does CreateApiEndpointAny["types"]["Events"] evaluate to?
+type AnyEvents = CreateApiEndpointAny["types"]["Events"];
+type Test10_6_IsNever = [AnyEvents] extends [never] ? "IS_NEVER" : "NOT_NEVER";
+const test10_6: Test10_6_IsNever = "NOT_NEVER"; // unknown is not never
+
+// 10.7: Test each property of types individually using structural check (tuple wrap prevents distribution)
+type Test10_7a = [ActualEndpoint["types"]["RequestInput"]] extends [
+  CreateApiEndpointAny["types"]["RequestInput"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7a: Test10_7a = "PASS";
+type Test10_7b = [ActualEndpoint["types"]["RequestOutput"]] extends [
+  CreateApiEndpointAny["types"]["RequestOutput"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7b: Test10_7b = "PASS";
+type Test10_7c = [ActualEndpoint["types"]["ResponseOutput"]] extends [
+  CreateApiEndpointAny["types"]["ResponseOutput"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7c: Test10_7c = "PASS";
+type Test10_7d = [ActualEndpoint["types"]["Fields"]] extends [
+  CreateApiEndpointAny["types"]["Fields"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7d: Test10_7d = "PASS";
+type Test10_7e = [ActualEndpoint["types"]["Method"]] extends [
+  CreateApiEndpointAny["types"]["Method"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7e: Test10_7e = "PASS";
+type Test10_7f = [ActualEndpoint["types"]["Events"]] extends [
+  CreateApiEndpointAny["types"]["Events"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7f: Test10_7f = "PASS";
+type Test10_7g = [ActualEndpoint["types"]["EventPayloads"]] extends [
+  CreateApiEndpointAny["types"]["EventPayloads"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7g: Test10_7g = "PASS";
+type Test10_7h = [ActualEndpoint["types"]["EventTypes"]] extends [
+  CreateApiEndpointAny["types"]["EventTypes"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_7h: Test10_7h = "PASS";
+
+// 10.8: Test top-level properties
+type Test10_8a = [ActualEndpoint["method"]] extends [
+  CreateApiEndpointAny["method"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8a: Test10_8a = "PASS";
+type Test10_8b = [ActualEndpoint["allowedRoles"]] extends [
+  CreateApiEndpointAny["allowedRoles"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8b: Test10_8b = "PASS";
+type Test10_8c = [ActualEndpoint["requestSchema"]] extends [
+  CreateApiEndpointAny["requestSchema"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8c: Test10_8c = "PASS";
+type Test10_8d = [ActualEndpoint["responseSchema"]] extends [
+  CreateApiEndpointAny["responseSchema"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8d: Test10_8d = "PASS";
+type Test10_8e = [ActualEndpoint["events"]] extends [
+  CreateApiEndpointAny["events"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8e: Test10_8e = "PASS";
+type Test10_8f = [ActualEndpoint["options"]] extends [
+  CreateApiEndpointAny["options"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_8f: Test10_8f = "PASS";
+
+// 10.9: Check ApiEndpoint base interface compatibility
+type Test10_9a = [ActualEndpoint["title"]] extends [
+  CreateApiEndpointAny["title"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9a: Test10_9a = "PASS";
+type Test10_9b = [ActualEndpoint["description"]] extends [
+  CreateApiEndpointAny["description"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9b: Test10_9b = "PASS";
+type Test10_9c = [ActualEndpoint["fields"]] extends [
+  CreateApiEndpointAny["fields"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9c: Test10_9c = "PASS";
+type Test10_9d = [ActualEndpoint["path"]] extends [CreateApiEndpointAny["path"]]
+  ? "PASS"
+  : "FAIL";
+const test10_9d: Test10_9d = "PASS";
+type Test10_9e = [ActualEndpoint["useClientRoute"]] extends [
+  CreateApiEndpointAny["useClientRoute"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9e: Test10_9e = "PASS";
+type Test10_9f = [ActualEndpoint["statusBadge"]] extends [
+  CreateApiEndpointAny["statusBadge"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9f: Test10_9f = "PASS";
+type Test10_9g = [ActualEndpoint["errorTypes"]] extends [
+  CreateApiEndpointAny["errorTypes"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9g: Test10_9g = "PASS";
+type Test10_9h = [ActualEndpoint["requestUrlPathParamsSchema"]] extends [
+  CreateApiEndpointAny["requestUrlPathParamsSchema"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9h: Test10_9h = "PASS";
+
+// 10.9i: scopedTranslation
+type Test10_9i = [ActualEndpoint["scopedTranslation"]] extends [
+  CreateApiEndpointAny["scopedTranslation"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9i: Test10_9i = "PASS";
+
+// 10.9j: tags
+type Test10_9j = [ActualEndpoint["tags"]] extends [CreateApiEndpointAny["tags"]]
+  ? "PASS"
+  : "FAIL";
+const test10_9j: Test10_9j = "PASS";
+
+// 10.9k: successTypes
+type Test10_9k = [ActualEndpoint["successTypes"]] extends [
+  CreateApiEndpointAny["successTypes"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9k: Test10_9k = "PASS";
+
+// 10.9l: examples
+type Test10_9l = [ActualEndpoint["examples"]] extends [
+  CreateApiEndpointAny["examples"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9l: Test10_9l = "PASS";
+
+// 10.9m: dynamicTitle
+type Test10_9m = [ActualEndpoint["dynamicTitle"]] extends [
+  CreateApiEndpointAny["dynamicTitle"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9m: Test10_9m = "PASS";
+
+// 10.9n: dynamicCredits
+type Test10_9n = [ActualEndpoint["dynamicCredits"]] extends [
+  CreateApiEndpointAny["dynamicCredits"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9n: Test10_9n = "PASS";
+
+// 10.9o: dynamicIcon
+type Test10_9o = [ActualEndpoint["dynamicIcon"]] extends [
+  CreateApiEndpointAny["dynamicIcon"],
+]
+  ? "PASS"
+  : "FAIL";
+const test10_9o: Test10_9o = "PASS";
+
+// 10.10: Assignability of entire ApiEndpoint base portion
+// Note: tsgo is stricter about covariant TFields — this check is skipped
+// (ActualEndpoint IS assignable via CreateApiEndpointAny in test10_1).
+type Test10_10a =
+  ActualEndpoint extends ApiEndpoint<
+    Methods,
+    readonly UserRoleValue[],
+    string,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
+  >
+    ? "PASS"
+    : "FAIL";
+const test10_10a: Test10_10a = "FAIL";
+
 export {
   test1_1,
   test1_2,
@@ -1125,4 +1380,40 @@ export {
   test6_1,
   test7_1,
   test8_1,
+  test10_1,
+  test10_2,
+  test10_3,
+  test10_4,
+  test10_5,
+  test10_6,
+  test10_7a,
+  test10_7b,
+  test10_7c,
+  test10_7d,
+  test10_7e,
+  test10_7f,
+  test10_7g,
+  test10_7h,
+  test10_8a,
+  test10_8b,
+  test10_8c,
+  test10_8d,
+  test10_8e,
+  test10_8f,
+  test10_9a,
+  test10_9b,
+  test10_9c,
+  test10_9d,
+  test10_9e,
+  test10_9f,
+  test10_9g,
+  test10_9h,
+  test10_9i,
+  test10_9j,
+  test10_9k,
+  test10_9l,
+  test10_9m,
+  test10_9n,
+  test10_9o,
+  test10_10a,
 };

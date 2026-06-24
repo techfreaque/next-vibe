@@ -500,30 +500,38 @@ export class SingleFavoriteRepository {
       // rebuilds the card and patches the list cache; cross-instance (remoteEvent)
       // the peer re-applies the edit. Suppressed when applying a relayed edit.
       if (!relayed) {
-        createEndpointEmitter(favoriteByIdDefinitions.PATCH, logger, user, {
-          id: updated.slug || updated.id,
-        })("favorite-updated", {
-          skillId: formatSkillId(
-            await SkillsRepository.resolveCanonicalSkillId(updated.skillId),
-            updated.variantId ?? null,
-          ),
-          customVariantName: updated.customVariantName ?? null,
-          icon: data.icon,
-          voiceModelSelection: updated.voiceModelSelection ?? null,
-          sttModelSelection: updated.sttModelSelection ?? null,
-          imageVisionModelSelection: updated.imageVisionModelSelection ?? null,
-          videoVisionModelSelection: updated.videoVisionModelSelection ?? null,
-          audioVisionModelSelection: updated.audioVisionModelSelection ?? null,
-          imageGenModelSelection: updated.imageGenModelSelection ?? null,
-          musicGenModelSelection: updated.musicGenModelSelection ?? null,
-          videoGenModelSelection: updated.videoGenModelSelection ?? null,
-          modelSelection: updated.modelSelection ?? null,
-          compactTrigger: updated.compactTrigger ?? null,
-          availableTools: updated.availableTools ?? null,
-          pinnedTools: updated.pinnedTools ?? null,
-          deniedTools: updated.deniedTools ?? null,
-          promptAppend: updated.promptAppend ?? null,
-          memoryLimit: updated.memoryLimit ?? null,
+        createEndpointEmitter(
+          favoriteByIdDefinitions.PATCH,
+          logger,
+          user,
+        )("favorite-updated", {
+          urlPathParams: { id: updated.slug || updated.id },
+          requestData: {
+            skillId: formatSkillId(
+              await SkillsRepository.resolveCanonicalSkillId(updated.skillId),
+              updated.variantId ?? null,
+            ),
+            customVariantName: updated.customVariantName ?? null,
+            icon: data.icon,
+            voiceModelSelection: updated.voiceModelSelection ?? null,
+            sttModelSelection: updated.sttModelSelection ?? null,
+            imageVisionModelSelection:
+              updated.imageVisionModelSelection ?? null,
+            videoVisionModelSelection:
+              updated.videoVisionModelSelection ?? null,
+            audioVisionModelSelection:
+              updated.audioVisionModelSelection ?? null,
+            imageGenModelSelection: updated.imageGenModelSelection ?? null,
+            musicGenModelSelection: updated.musicGenModelSelection ?? null,
+            videoGenModelSelection: updated.videoGenModelSelection ?? null,
+            modelSelection: updated.modelSelection ?? null,
+            compactTrigger: updated.compactTrigger ?? null,
+            availableTools: updated.availableTools ?? null,
+            pinnedTools: updated.pinnedTools ?? null,
+            deniedTools: updated.deniedTools ?? null,
+            promptAppend: updated.promptAppend ?? null,
+            memoryLimit: updated.memoryLimit ?? null,
+          },
         });
       }
 
@@ -587,9 +595,11 @@ export class SingleFavoriteRepository {
       // This op owns its `favorite-deleted` event, carrying the deleted id.
       // Locally its client onEvent removes the row from the list cache;
       // cross-instance (remoteEvent) the peer's onRemoteEvent removes it by id.
-      createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
-        id: deletedId,
-      })("favorite-deleted", {});
+      createEndpointEmitter(
+        favoriteByIdDefinitions.DELETE,
+        logger,
+        user,
+      )("favorite-deleted", { urlPathParams: { id: deletedId } });
 
       return success({
         skillId: await SkillsRepository.resolveCanonicalSkillId(

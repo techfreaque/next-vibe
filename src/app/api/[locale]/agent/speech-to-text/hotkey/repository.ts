@@ -15,7 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { AgentT } from "@/app/api/[locale]/agent/i18n";
+import type { SpeechToTextT } from "@/app/api/[locale]/agent/speech-to-text/i18n";
 import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
@@ -59,7 +59,7 @@ export class SttHotkeyRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: AgentT,
+    t: SpeechToTextT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     logger.debug("Handling hotkey action", {
       action: data.action,
@@ -77,7 +77,7 @@ export class SttHotkeyRepository {
           missing: deps.missing.join(", "),
         });
         return fail({
-          message: t("speechToText.hotkey.post.errors.dependenciesMissing"),
+          message: t("hotkey.post.errors.dependenciesMissing"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             missing: deps.missing.join(", "),
@@ -133,7 +133,7 @@ export class SttHotkeyRepository {
         default:
           // No action provided - should not happen from CLI daemon mode
           return fail({
-            message: t("speechToText.hotkey.post.errors.invalidAction"),
+            message: t("hotkey.post.errors.invalidAction"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { action: "none" },
           });
@@ -165,7 +165,7 @@ export class SttHotkeyRepository {
       const errorMessage = parseError(error).message;
 
       return fail({
-        message: t("speechToText.hotkey.post.errors.actionFailed"),
+        message: t("hotkey.post.errors.actionFailed"),
         errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -235,12 +235,12 @@ export class SttHotkeyRepository {
   private static async handleStart(
     session: SpeechHotkeySession,
     logger: EndpointLogger,
-    t: AgentT,
+    t: SpeechToTextT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
       logger.warn("Recording already in progress");
       return fail({
-        message: t("speechToText.hotkey.post.errors.alreadyRecording"),
+        message: t("hotkey.post.errors.alreadyRecording"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -264,14 +264,14 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: AgentT,
+    t: SpeechToTextT,
     tCredits: CreditModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (!session.isRecording) {
       logger.warn("No recording in progress");
       return fail({
-        message: t("speechToText.hotkey.post.errors.notRecording"),
+        message: t("hotkey.post.errors.notRecording"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -319,7 +319,7 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: AgentT,
+    t: SpeechToTextT,
     tCredits: CreditModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {

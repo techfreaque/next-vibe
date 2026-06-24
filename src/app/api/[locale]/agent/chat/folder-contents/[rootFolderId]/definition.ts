@@ -8,15 +8,10 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import {
-  onEventDeleteIncognitoFolder,
-  onEventDeleteIncognitoThread,
-  onEventUpdateIncognitoFolder,
-  onEventUpdateIncognitoThread,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
-import {
   dateSchema,
   iconSchema,
 } from "@/app/api/[locale]/shared/types/common.schema";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -35,6 +30,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import {
   UserPermissionRoleOptions,
   UserRole,
@@ -174,71 +170,71 @@ const { GET } = createEndpoint({
             // Discriminator
             type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.type.content" as const,
+              label: "get.response.items.item.type.content" as const,
               schema: z.enum(["folder", "thread"]),
             }),
             sortOrder: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.sortOrder.content" as const,
+              label: "get.response.items.item.sortOrder.content" as const,
               schema: z.coerce.number(),
             }),
 
             // === Shared fields ===
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.id.content" as const,
+              label: "get.response.items.item.id.content" as const,
               schema: z.uuid(),
             }),
             userId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.userId.content" as const,
+              label: "get.response.items.item.userId.content" as const,
               schema: z.uuid().nullable(),
             }),
             rootFolderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.rootFolderId.content" as const,
+              label: "get.response.items.item.rootFolderId.content" as const,
               schema: z.enum(DefaultFolderId),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.createdAt.content" as const,
+              label: "get.response.items.item.createdAt.content" as const,
               schema: dateSchema,
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.updatedAt.content" as const,
+              label: "get.response.items.item.updatedAt.content" as const,
               schema: dateSchema,
             }),
 
             // === Folder-only fields (nullable for thread items) ===
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.name.content" as const,
+              label: "get.response.items.item.name.content" as const,
               schema: z.string().nullable(),
             }),
             icon: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.icon.content" as const,
+              label: "get.response.items.item.icon.content" as const,
               schema: iconSchema.nullable(),
             }),
             color: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.color.content" as const,
+              label: "get.response.items.item.color.content" as const,
               schema: z.string().nullable(),
             }),
             parentId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.parentId.content" as const,
+              label: "get.response.items.item.parentId.content" as const,
               schema: z.uuid().nullable(),
             }),
             expanded: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.expanded.content" as const,
+              label: "get.response.items.item.expanded.content" as const,
               schema: z.boolean().nullable(),
             }),
             canManage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.canManage.content" as const,
+              label: "get.response.items.item.canManage.content" as const,
               schema: z.boolean().nullable(),
             }),
             canCreateThread: responseField(scopedTranslation, {
@@ -249,12 +245,12 @@ const { GET } = createEndpoint({
             }),
             canModerate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.canModerate.content" as const,
+              label: "get.response.items.item.canModerate.content" as const,
               schema: z.boolean().nullable(),
             }),
             canDelete: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.canDelete.content" as const,
+              label: "get.response.items.item.canDelete.content" as const,
               schema: z.boolean().nullable(),
             }),
             canManagePermissions: responseField(scopedTranslation, {
@@ -316,12 +312,12 @@ const { GET } = createEndpoint({
             // === Thread-only fields (nullable for folder items) ===
             title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.title.content" as const,
+              label: "get.response.items.item.title.content" as const,
               schema: z.string().nullable(),
             }),
             folderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.folderId.content" as const,
+              label: "get.response.items.item.folderId.content" as const,
               schema: z.uuid().nullable(),
             }),
             status: responseField(scopedTranslation, {
@@ -332,36 +328,34 @@ const { GET } = createEndpoint({
             }),
             preview: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.preview.content" as const,
+              label: "get.response.items.item.preview.content" as const,
               schema: z.string().nullable(),
             }),
             pinned: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.pinned.content" as const,
+              label: "get.response.items.item.pinned.content" as const,
               schema: z.boolean().nullable(),
             }),
             archived: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.archived.content" as const,
+              label: "get.response.items.item.archived.content" as const,
               schema: z.boolean().nullable(),
             }),
             canEdit: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.canEdit.content" as const,
+              label: "get.response.items.item.canEdit.content" as const,
               schema: z.boolean().nullable(),
             }),
             canPost: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.canPost.content" as const,
+              label: "get.response.items.item.canPost.content" as const,
               schema: z.boolean().nullable(),
             }),
             streamingState: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.items.item.streamingState.content" as const,
-              schema: z
-                .enum(["idle", "streaming", "aborting", "waiting"])
-                .nullable(),
+              schema: z.enum(ThreadStreamingStateDB),
             }),
             // Share link fields (only populated for SHARED folder threads)
             activeShareCount: responseField(scopedTranslation, {
@@ -372,7 +366,7 @@ const { GET } = createEndpoint({
             }),
             lastSharedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.lastSharedAt.content" as const,
+              label: "get.response.items.item.lastSharedAt.content" as const,
               schema: dateSchema.nullable(),
             }),
             // Thread role arrays (nullable for folder items)
@@ -470,7 +464,7 @@ const { GET } = createEndpoint({
     // Framework merges the partial into the items array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
     "thread-title-updated": {
-      fields: { items: ["id", "title"] as const },
+      responseFields: { items: ["id", "title"] as const },
       operation: "merge" as const,
       onEvent: onEventUpdateIncognitoThread({
         source: "urlPathParams",
@@ -479,7 +473,7 @@ const { GET } = createEndpoint({
       }),
     },
     "streaming-state-changed": {
-      fields: { items: ["id", "streamingState"] as const },
+      responseFields: { items: ["id", "streamingState"] as const },
       operation: "merge" as const,
       onEvent: onEventUpdateIncognitoThread({
         source: "urlPathParams",
@@ -488,7 +482,7 @@ const { GET } = createEndpoint({
       }),
     },
     "stream-finished": {
-      fields: {
+      responseFields: {
         items: ["id", "streamingState", "preview", "updatedAt"] as const,
       },
       operation: "merge" as const,
@@ -500,7 +494,7 @@ const { GET } = createEndpoint({
     },
     // Thread CRUD - emitted by threads/[threadId]/repository.ts
     "thread-updated": {
-      fields: {
+      responseFields: {
         items: [
           "id",
           "title",
@@ -519,7 +513,7 @@ const { GET } = createEndpoint({
       }),
     },
     "thread-deleted": {
-      fields: { items: ["id"] as const },
+      responseFields: { items: ["id"] as const },
       operation: "remove" as const,
       onEvent: onEventDeleteIncognitoThread({
         source: "urlPathParams",
@@ -530,7 +524,7 @@ const { GET } = createEndpoint({
     // during streaming. Ensures the sidebar shows the thread even if the optimistic
     // client-side update missed the cache (e.g. cache was empty, or another tab).
     "thread-created": {
-      fields: {
+      responseFields: {
         items: [
           "id",
           "type",
@@ -544,17 +538,13 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent({ partial, requestData, queryClient, cacheKey }) {
+      onEvent({ responseData, requestData, queryClient, cacheKey }) {
         // The merge operation (above) runs before onEvent and appends new items
         // into ALL folder-contents caches for this rootFolderId, regardless of
         // subFolderId. Remove threads that don't belong in this cache level.
-        if (!cacheKey) {
-          return;
-        }
-        const items = partial.items;
-        if (!items || items.length === 0) {
-          return;
-        }
+
+        const items = responseData.items;
+
         // subFolderId from the cache's request data (null = root level)
         const subFolderId =
           (requestData.subFolderId as string | null | undefined) ?? null;
@@ -595,7 +585,7 @@ const { GET } = createEndpoint({
     },
     // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
     "folder-created": {
-      fields: {
+      responseFields: {
         items: [
           "id",
           "type",
@@ -607,11 +597,8 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
-      onEvent({ partial, requestData, queryClient, cacheKey }) {
-        if (!cacheKey) {
-          return;
-        }
-        const items = partial.items;
+      onEvent({ responseData, requestData, queryClient, cacheKey }) {
+        const items = responseData.items;
         if (!items || items.length === 0) {
           return;
         }
@@ -650,7 +637,7 @@ const { GET } = createEndpoint({
       },
     },
     "folder-updated": {
-      fields: {
+      responseFields: {
         items: [
           "id",
           "name",
@@ -667,7 +654,7 @@ const { GET } = createEndpoint({
       }),
     },
     "folder-deleted": {
-      fields: { items: ["id"] as const },
+      responseFields: { items: ["id"] as const },
       operation: "remove" as const,
       onEvent: onEventDeleteIncognitoFolder({ arrayField: "items" }),
     },

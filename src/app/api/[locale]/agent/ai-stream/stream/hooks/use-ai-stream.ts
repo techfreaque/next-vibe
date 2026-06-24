@@ -22,8 +22,9 @@ import { useCallback, useMemo } from "react";
 
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 
+import { buildWsChannel } from "../../../../system/unified-interface/websocket/channel";
 import { preWarmChannel } from "../../../../system/unified-interface/websocket/client";
-import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";
+import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";
 import { serializeError } from "../../repository/error-utils";
@@ -164,7 +165,7 @@ export function useAIStream(): UseAIStreamReturn {
       });
       return true;
     },
-    [logger, t, streamMutation],
+    [logger, t, streamMutation, locale],
   );
 
   /**

@@ -156,8 +156,7 @@ export class CortexDeleteRepository {
           logger,
           user,
         )("node-deleted", {
-          path,
-          recursive,
+          requestData: { path, recursive },
         });
       }
 

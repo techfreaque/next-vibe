@@ -108,7 +108,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "build",
   "test-files",
   "test-project",
-  "public/vibe-frame/**",
+   "public/vibe-frame/**",
   // Files
   ".DS_Store",
   "thumbs.db",

@@ -56,7 +56,7 @@ const { POST } = createEndpoint({
       subtitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "form.description",
-        variant: "body-lg",
+        variant: "default",
         order: 1,
         usage: { request: "data", response: true },
       }),

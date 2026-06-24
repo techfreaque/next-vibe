@@ -13,18 +13,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+} from "@/app/api/[locale]/system/logger/formatters";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
+  extractNestedPath,
   extractPathKey,
   findFilesRecursively,
   generateAbsoluteImportPath,
@@ -122,6 +123,21 @@ export class RouteHandlersGeneratorRepository {
       );
       await writeGeneratedFile(outputFile, content, data.dryRun);
       await writeGeneratedFile(hotPathsFile, hotPathsContent, data.dryRun);
+
+      // Generate ws-channels.ts alongside route-handlers — one entry per
+      // endpoint method that declares at least one client-delivered event.
+      const wsChannelsFile = outputFile.replace(
+        /\/route-handlers\.ts$/,
+        "/ws-channels.ts",
+      );
+      const { content: wsContent, channelCount } =
+        await RouteHandlersGeneratorRepository.generateWsChannelsContent(
+          validRouteFiles,
+        );
+      await writeGeneratedFile(wsChannelsFile, wsContent, data.dryRun);
+      logger.debug(
+        `Generated ws-channels.ts with ${channelCount} channel entries`,
+      );
 
       const duration = Date.now() - startTime;
 
@@ -402,5 +418,193 @@ ${hotPathEntries.join("\n")}
 };
 `;
     return { content, hotPathsContent, routeCount };
+  }
+
+  /**
+   * Extract methods that declare at least one CLIENT-DELIVERED event from a
+   * definition file.
+   *
+   * An endpoint method qualifies for WS channel authorization when its `events`
+   * map contains at least one event that is delivered to clients — i.e. an event
+   * whose `clientDelivery` flag is NOT `false`. Server-only-event endpoints
+   * (every event flagged `clientDelivery: false`, e.g. execute-tool's tool
+   * dispatch wires, remote-event-bridge, sync) are authorized as system
+   * channels and intentionally excluded here.
+   */
+  private static async extractWsMethodsFromDefinition(
+    routeFile: string,
+  ): Promise<string[]> {
+    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+    try {
+      const definition = (await import(definitionPath)) as {
+        default?: Record<
+          string,
+          {
+            events?: Record<string, { clientDelivery?: false }>;
+          }
+        >;
+      };
+      let defaultExport;
+      try {
+        defaultExport = definition.default;
+      } catch {
+        // Bun plugin race - yield then retry
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        defaultExport = definition.default;
+      }
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      const HTTP_METHODS = [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "HEAD",
+        "OPTIONS",
+      ];
+      const methods: string[] = [];
+      for (const method of Object.keys(defaultExport)) {
+        if (!HTTP_METHODS.includes(method)) {
+          continue;
+        }
+        const events = defaultExport[method]?.events;
+        if (!events || typeof events !== "object") {
+          continue;
+        }
+        // Qualify only when at least one event is delivered to clients.
+        const hasClientEvent = Object.values(events).some(
+          (event) => event?.clientDelivery !== false,
+        );
+        if (hasClientEvent) {
+          methods.push(method);
+        }
+      }
+      return methods;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Generate ws-channels.ts content.
+   *
+   * For every endpoint method that declares a client-delivered event, emits an
+   * entry that:
+   *   - eagerly imports the definition module (lightweight, side-effect-free)
+   *     to read the endpoint object (path + allowedRoles), and
+   *   - lazily wires canSubscribe from the route module (deferred until first
+   *     call) to avoid pulling repositories/DB into WS channel registration.
+   *
+   * Mirrors the lazyCanSubscribe pattern from ws-channel-registry.ts.
+   */
+  private static async generateWsChannelsContent(
+    routeFiles: string[],
+  ): Promise<{ content: string; channelCount: number }> {
+    interface WsChannelTarget {
+      defImport: string;
+      routeImport: string;
+      method: string;
+      defAlias: string;
+    }
+
+    const targets: WsChannelTarget[] = [];
+
+    for (const routeFile of routeFiles) {
+      const methods =
+        await RouteHandlersGeneratorRepository.extractWsMethodsFromDefinition(
+          routeFile,
+        );
+      if (methods.length === 0) {
+        continue;
+      }
+
+      const defImport = generateAbsoluteImportPath(routeFile, "definition");
+      const routeImport = generateAbsoluteImportPath(routeFile, "route");
+      // Build a stable, unique alias from the path segments + method.
+      const segments = extractNestedPath(routeFile);
+      const aliasBase = segments
+        .map((s) => s.replaceAll(/\[|\]/g, "").replaceAll(/[^A-Za-z0-9]/g, "_"))
+        .join("_");
+
+      for (const method of methods) {
+        targets.push({
+          defImport,
+          routeImport,
+          method,
+          defAlias: `${aliasBase}_${method}Def`,
+        });
+      }
+    }
+
+    // Stable order for deterministic output.
+    targets.sort((a, b) => a.defAlias.localeCompare(b.defAlias));
+
+    const channelCount = targets.length;
+
+    const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT";
+    const generatorName = "generators/route-handlers";
+    const header = generateFileHeader(autoGenTitle, generatorName, {
+      "Channels found": channelCount,
+    });
+
+    // Eager definition imports — collected into the Promise.all destructure.
+    const eagerImports = targets
+      .map((target) => `    import("${target.defImport}"),`)
+      .join("\n");
+    const eagerDestructure = targets
+      .map((target) => `    ${target.defAlias},`)
+      .join("\n");
+
+    // Entries: endpoint from the eager def, canSubscribe lazily from the route.
+    const entries = targets
+      .map(
+        (target) => `    {
+      endpoint: ${target.defAlias}.default.${target.method},
+      canSubscribe: lazyCanSubscribe(
+        () => import("${target.routeImport}"),
+        "${target.method}",
+      ),
+    },`,
+      )
+      .join("\n");
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const content = `${header}
+
+/* eslint-disable prettier/prettier */
+
+import {
+  lazyCanSubscribe,
+  type WsChannelEntry,
+} from "../unified-interface/websocket/ws-channel-registry";
+
+/**
+ * Returns every endpoint that exposes a client-subscribable WebSocket channel.
+ *
+ * Definition modules are imported eagerly (lightweight, side-effect-free) to
+ * read the endpoint object (path + allowedRoles). Route modules are imported
+ * lazily via lazyCanSubscribe — only when a channel match needs resource-level
+ * authorization — to avoid circular init errors in the production bundle.
+ */
+export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
+  const [
+${eagerDestructure}
+  ] = await Promise.all([
+${eagerImports}
+  ]);
+
+  return [
+${entries}
+  ];
+}
+`;
+
+    return { content, channelCount };
   }
 }

@@ -168,6 +168,7 @@ export class StreamStartHandler {
         enabled: true,
         availability,
       });
+      ttsHandler.setThreadId(threadId);
       logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {
         voiceSelectionType: voiceMode.voiceModelSelection.selectionType,
         enabled: voiceMode.enabled,

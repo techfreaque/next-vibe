@@ -2,6 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Oferty",
+  enums: {
+    estimateStatus: {
+      DRAFT: "Szkic",
+      SENT: "Wysłana",
+      ACCEPTED: "Zaakceptowana",
+      DECLINED: "Odrzucona",
+      EXPIRED: "Wygasła",
+      CONVERTED: "Przekonwertowana",
+    },
+  },
   tags: {
     payment: "płatność",
     estimate: "oferta",

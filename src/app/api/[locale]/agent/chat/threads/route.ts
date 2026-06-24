@@ -16,6 +16,10 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: async ({ data, user, t, logger, locale }) =>
       ThreadsRepository.listThreads(data, user, t, logger, locale),
     canSubscribe: ({ user }) => !!user.leadId,
+    onRemoteEvent: {
+      "thread-title-updated": (props) =>
+        ThreadsRepository.applyRemoteThreadTitleUpdated(props),
+    },
   },
   [Methods.POST]: {
     email: undefined,

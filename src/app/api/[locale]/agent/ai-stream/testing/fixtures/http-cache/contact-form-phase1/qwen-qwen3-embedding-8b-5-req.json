@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----b3fafb4e-7806-41dd-a463-0117a63d7388.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The user asked me to call both tool-help and generate_image with callbackMode='approve' in a single response. Th…",
+    "encoding_format": "float"
+  }
+}

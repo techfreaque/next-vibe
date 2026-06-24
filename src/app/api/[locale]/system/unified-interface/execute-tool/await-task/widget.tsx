@@ -1,14 +1,3 @@
-/**
- * WaitForTask Widget
- *
- * Renders the target endpoint (originalToolName) with its args and result,
- * exactly like ExecuteToolWidget - but reads from wait-for-task's response fields
- * (originalToolName, originalArgs, result) instead of execute-tool's input/result.
- *
- * The ToolCallRenderer shows distinct "Waiting" / "Complete (wait-for)" badges
- * so the user knows this came via wait-for-task, not a direct execute-tool call.
- */
-
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
@@ -46,7 +35,7 @@ function toRecord(
   return null;
 }
 
-export function WaitForTaskWidget(): JSX.Element {
+export function AwaitTaskWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const t = useWidgetTranslation<typeof definition.POST>();
@@ -83,7 +72,7 @@ export function WaitForTaskWidget(): JSX.Element {
       } else {
         setResolvedEndpoint(null);
         setResolveError(
-          t("waitForTask.post.widget.unknownTool", {
+          t("post.widget.unknownTool", {
             toolName: originalToolName,
           }),
         );
@@ -97,7 +86,6 @@ export function WaitForTaskWidget(): JSX.Element {
     };
   }, [originalToolName, t]);
 
-  // Merged data for EndpointRenderer: originalArgs + result (same as execute-tool)
   const mergedData = useMemo((): Record<string, WidgetData> => {
     if (originalArgs && resultData) {
       return { ...originalArgs, ...resultData };
@@ -127,7 +115,6 @@ export function WaitForTaskWidget(): JSX.Element {
     if (resolvedMethod === "PATCH") {
       return { update: { autoPrefillData: mergedData as never } };
     }
-    // POST or PUT
     return { create: { autoPrefillData: mergedData as never } };
   }, [resolvedMethod, mergedData]);
 
@@ -135,7 +122,7 @@ export function WaitForTaskWidget(): JSX.Element {
     <Div className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-2"}>
       {!originalToolName && (
         <P className="text-sm text-muted-foreground">
-          {t("waitForTask.post.widget.noToolName")}
+          {t("post.widget.noToolName")}
         </P>
       )}
       {resolveError && (
@@ -143,7 +130,7 @@ export function WaitForTaskWidget(): JSX.Element {
       )}
       {originalToolName && !resolvedEndpoint && !resolveError && (
         <P className="text-sm text-muted-foreground">
-          {t("waitForTask.post.widget.resolving")}
+          {t("post.widget.resolving")}
         </P>
       )}
       {resolvedEndpoint && (
@@ -160,6 +147,6 @@ export function WaitForTaskWidget(): JSX.Element {
   );
 }
 
-WaitForTaskWidget.displayName = "WaitForTaskWidget";
+AwaitTaskWidget.displayName = "AwaitTaskWidget";
 
-export default WaitForTaskWidget;
+export default AwaitTaskWidget;

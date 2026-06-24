@@ -30,6 +30,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/task-completion-handler";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   CronTaskStatus,
@@ -56,7 +57,6 @@ import {
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
 import { resolveTaskDisplayName } from "../i18n-utils";
-import { handleTaskCompletion } from "../task-completion-handler";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -618,8 +618,8 @@ export class PulseHealthRepository {
                 },
               ],
             };
-            emitTaskList("task-updated", runningPayload);
-            emitTaskQueue("task-updated", runningPayload);
+            emitTaskList("task-updated", { responseData: runningPayload });
+            emitTaskQueue("task-updated", { responseData: runningPayload });
           }
 
           // Resolve routeId → endpoint path → handler
@@ -872,11 +872,15 @@ export class PulseHealthRepository {
                     },
                   ],
                 };
-                emitTaskList("task-updated", completedPayload);
-                emitTaskQueue("task-updated", completedPayload);
+                emitTaskList("task-updated", {
+                  responseData: completedPayload,
+                });
+                emitTaskQueue("task-updated", {
+                  responseData: completedPayload,
+                });
               }
 
-              // If task has callback context (set by wait-for-task or execute-tool AI path),
+              // If task has callback context (set by await-task or execute-tool AI path),
               // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
               // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
               const taskCallbackMode =
@@ -946,8 +950,8 @@ export class PulseHealthRepository {
                     },
                   ],
                 };
-                emitTaskList("task-updated", failedPayload);
-                emitTaskQueue("task-updated", failedPayload);
+                emitTaskList("task-updated", { responseData: failedPayload });
+                emitTaskQueue("task-updated", { responseData: failedPayload });
               }
             }
           }

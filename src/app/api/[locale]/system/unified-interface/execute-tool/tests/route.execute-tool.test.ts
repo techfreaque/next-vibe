@@ -18,6 +18,7 @@ import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fe
 installFetchCache();
 
 import { eq } from "drizzle-orm";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
@@ -34,10 +35,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { CronTaskStatusValue } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import {
   awaitPendingCallResult,
   completePendingCall,
@@ -45,7 +42,11 @@ import {
   getPendingCall,
   registerPendingCall,
   setPendingCallRevival,
-} from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls";
+} from "@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import type { CronTaskStatusValue } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -254,7 +255,7 @@ describe("Execute-Tool E2E", () => {
     // DETACH must return a taskId (the local cron task created for background execution)
     expect(data.taskId, "DETACH must return a taskId").toBeTruthy();
     expect(typeof data.taskId, "taskId must be a string").toBe("string");
-    // Should include a hint about wait-for-task
+    // Should include a hint about await-task
     expect(data.hint, "DETACH must include a hint string").toBeTruthy();
     // Must NOT return inline result
     expect(data.result, "DETACH must not return inline result").toBeUndefined();
@@ -267,7 +268,7 @@ describe("Execute-Tool E2E", () => {
       finalStatus,
       `DETACH task did not complete within 10s (got ${String(finalStatus)})`,
     ).toBe(CronTaskStatus.COMPLETED);
-  });
+  }, 15000);
 
   // ── ET-LOCAL-WAKE-UP ──────────────────────────────────────────────────────
   // WAKE_UP: returns taskId immediately; task row created RUNNING;
@@ -320,13 +321,13 @@ describe("Execute-Tool E2E", () => {
       finalStatus,
       `WAKE_UP task did not complete within 10s (got ${String(finalStatus)})`,
     ).toBe(CronTaskStatus.COMPLETED);
-  });
+  }, 15000);
 
-  // ── ET-LOCAL-DETACH-THEN-WAIT-FOR-TASK ───────────────────────────────────
-  // DETACH returns taskId. After task completes, wait-for-task returns the result inline.
+  // ── ET-LOCAL-DETACH-THEN-AWAIT-TASK ──────────────────────────────────────
+  // DETACH returns taskId. After task completes, await-task returns the result inline.
   // This is the AI's "I need the result" flow.
 
-  it("ET-LOCAL-DETACH-THEN-WAIT-FOR-TASK: wait-for-task returns completed result after DETACH", async () => {
+  it("ET-LOCAL-DETACH-THEN-AWAIT-TASK: await-task returns completed result after DETACH", async () => {
     setFetchCacheContext("et-local-detach-wait");
 
     const detachResult = await RouteExecuteRepository.runInProcess({
@@ -353,19 +354,19 @@ describe("Execute-Tool E2E", () => {
 
     // Wait for the goroutine to complete the task
     const finalStatus = await pollTaskCompletion(taskId, 10000);
-    expect(finalStatus, "DETACH task must complete before wait-for-task").toBe(
+    expect(finalStatus, "DETACH task must complete before await-task").toBe(
       CronTaskStatus.COMPLETED,
     );
 
-    // Now call wait-for-task — should return the stored result inline
-    const { WaitForTaskRepository } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+    // Now call await-task — should return the stored result inline
+    const { AwaitTaskRepository } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
     const { scopedTranslation: tasksScopedT } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
     const t = tasksScopedT.scopedT(defaultLocale).t;
     const waitCtx = makeHeadlessContext();
 
-    const waitResult = await WaitForTaskRepository.waitForTask(
+    const waitResult = await AwaitTaskRepository.awaitTask(
       { taskId },
       testUser,
       makeLogger(),
@@ -375,7 +376,7 @@ describe("Execute-Tool E2E", () => {
 
     expect(
       waitResult.success,
-      `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+      `await-task failed: ${JSON.stringify(waitResult)}`,
     ).toBe(true);
     if (!waitResult.success) {
       throw new Error(waitResult.message);
@@ -383,12 +384,124 @@ describe("Execute-Tool E2E", () => {
 
     expect(
       waitResult.data.waiting,
-      "wait-for-task on completed task must NOT be waiting",
+      "await-task on completed task must NOT be waiting",
     ).toBe(false);
+    expect(waitResult.data.status, "await-task status must be completed").toBe(
+      CronTaskStatus.COMPLETED,
+    );
+  }, 15000);
+
+  // ── ET-LOCAL-WAKE-UP-THEN-AWAIT-TASK ─────────────────────────────────────
+  // WAKE_UP dispatches to background; after task completes, await-task returns inline.
+
+  it("ET-LOCAL-WAKE-UP-THEN-AWAIT-TASK: await-task intercepts completed result after WAKE_UP", async () => {
+    setFetchCacheContext("et-local-wakeup-await");
+
+    const ctx = {
+      ...makeHeadlessContext(),
+      threadId: `thread-wakeup-await-test-${Date.now()}`,
+    };
+
+    const wakeUpResult = await RouteExecuteRepository.runInProcess({
+      toolName: "tool-help",
+      input: { query: "execute-tool", page: 1, pageSize: 5 },
+      callbackMode: CallbackMode.WAKE_UP,
+      user: testUser,
+      locale: defaultLocale,
+      logger: makeLogger(),
+      streamContext: ctx,
+      platform: Platform.AI,
+    });
+
     expect(
-      waitResult.data.status,
-      "wait-for-task status must be completed",
-    ).toBe(CronTaskStatus.COMPLETED);
+      wakeUpResult.success,
+      `WAKE_UP failed: ${JSON.stringify(wakeUpResult)}`,
+    ).toBe(true);
+    if (!wakeUpResult.success) {
+      throw new Error(wakeUpResult.message);
+    }
+
+    const { taskId } = wakeUpResult.data as { taskId: string; hint: string };
+    expect(taskId, "WAKE_UP must return a taskId").toBeTruthy();
+
+    // Wait for the goroutine to complete the task
+    const finalStatus = await pollTaskCompletion(taskId, 10000);
+    expect(finalStatus, "WAKE_UP task must complete before await-task").toBe(
+      CronTaskStatus.COMPLETED,
+    );
+
+    // Now call await-task — should return the stored result inline
+    const { AwaitTaskRepository } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
+    const { scopedTranslation: tasksScopedT } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
+    const t = tasksScopedT.scopedT(defaultLocale).t;
+
+    const awaitResult = await AwaitTaskRepository.awaitTask(
+      { taskId },
+      testUser,
+      makeLogger(),
+      t,
+      makeHeadlessContext(),
+    );
+
+    expect(
+      awaitResult.success,
+      `await-task failed: ${JSON.stringify(awaitResult)}`,
+    ).toBe(true);
+    if (!awaitResult.success) {
+      throw new Error(awaitResult.message);
+    }
+
+    expect(
+      awaitResult.data.waiting,
+      "await-task on completed WAKE_UP task must NOT be waiting",
+    ).toBe(false);
+    expect(awaitResult.data.status, "await-task status must be completed").toBe(
+      CronTaskStatus.COMPLETED,
+    );
+    expect(
+      awaitResult.data.result,
+      "await-task on completed WAKE_UP task must have a result",
+    ).toBeDefined();
+    expect(
+      awaitResult.data.originalToolName,
+      "await-task must report originalToolName",
+    ).toBeTruthy();
+  }, 15000);
+
+  // ── ET-LOCAL-AWAIT-TASK-NOT-FOUND ─────────────────────────────────────────
+  // Calling await-task with a non-existent taskId must return NOT_FOUND failure.
+
+  it("ET-LOCAL-AWAIT-TASK-NOT-FOUND: await-task with unknown taskId returns NOT_FOUND failure", async () => {
+    setFetchCacheContext("et-local-await-not-found");
+
+    const { AwaitTaskRepository } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
+    const { scopedTranslation: tasksScopedT } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
+    const t = tasksScopedT.scopedT(defaultLocale).t;
+
+    const result = await AwaitTaskRepository.awaitTask(
+      { taskId: `nonexistent-task-id-${Date.now()}` },
+      testUser,
+      makeLogger(),
+      t,
+      makeHeadlessContext(),
+    );
+
+    expect(
+      result.success,
+      "await-task with unknown taskId must return success=false",
+    ).toBe(false);
+    if (result.success) {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      throw new Error("Expected failure but got success");
+    }
+    expect(result.errorType, "error type must be NOT_FOUND").toBe(
+      ErrorResponseTypes.NOT_FOUND,
+    );
+    expect(result.message, "failure must include a message").toBeTruthy();
   });
 
   // ── ET-LOCAL-INVALID-TOOL ─────────────────────────────────────────────────
@@ -1059,7 +1172,7 @@ describe("Execute-Tool E2E", () => {
       // ── ET-REMOTE-DETACH ───────────────────────────────────────────────────
       // Remote DETACH: fire-and-forget, returns { taskId, hint } immediately.
 
-      it("ET-REMOTE-DETACH: remote DETACH returns taskId immediately, hint includes wait-for-task", async () => {
+      it("ET-REMOTE-DETACH: remote DETACH returns taskId immediately, hint includes await-task", async () => {
         requireRemote();
         setFetchCacheContext("et-remote-detach");
 
@@ -1389,10 +1502,10 @@ describe("Execute-Tool E2E", () => {
         ).toBeUndefined();
       });
 
-      // ── ET-REMOTE-DETACH-THEN-WAIT-FOR-TASK ──────────────────────────────
-      // Remote DETACH via explicit instanceId → wait-for-task retrieves result.
+      // ── ET-REMOTE-DETACH-THEN-AWAIT-TASK ─────────────────────────────────
+      // Remote DETACH via explicit instanceId → await-task retrieves result.
 
-      it("ET-REMOTE-DETACH-THEN-WAIT-FOR-TASK: wait-for-task returns completed result after remote DETACH", async () => {
+      it("ET-REMOTE-DETACH-THEN-AWAIT-TASK: await-task returns completed result after remote DETACH", async () => {
         requireRemote();
         setFetchCacheContext("et-remote-detach-wait");
 
@@ -1428,20 +1541,20 @@ describe("Execute-Tool E2E", () => {
         const pendingResult = await awaitPendingCallResult(taskId, 15_000);
         expect(
           pendingResult,
-          "Remote DETACH pending call must complete before wait-for-task",
+          "Remote DETACH pending call must complete before await-task",
         ).not.toBeNull();
         expect(
           pendingResult?.status,
           "Remote DETACH pending call must complete with success",
         ).toBe("completed");
 
-        const { WaitForTaskRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
         const { scopedTranslation: tasksScopedT } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
         const t = tasksScopedT.scopedT(defaultLocale).t;
 
-        const waitResult = await WaitForTaskRepository.waitForTask(
+        const waitResult = await AwaitTaskRepository.awaitTask(
           { taskId },
           testUser,
           makeLogger(),
@@ -1451,7 +1564,7 @@ describe("Execute-Tool E2E", () => {
 
         expect(
           waitResult.success,
-          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
         ).toBe(true);
         if (!waitResult.success) {
           // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -1459,19 +1572,19 @@ describe("Execute-Tool E2E", () => {
         }
         expect(
           waitResult.data.waiting,
-          "wait-for-task on completed remote task must NOT be waiting",
+          "await-task on completed remote task must NOT be waiting",
         ).toBe(false);
         expect(
           waitResult.data.status,
-          "wait-for-task status must be completed",
+          "await-task status must be completed",
         ).toBe(CronTaskStatus.COMPLETED);
       }, 30_000);
 
-      // ── ET-REMOTE-DETACH-PREFIXED-THEN-WAIT-FOR-TASK ─────────────────────
-      // Remote DETACH via prefixed toolName → wait-for-task retrieves result.
+      // ── ET-REMOTE-DETACH-PREFIXED-THEN-AWAIT-TASK ────────────────────────
+      // Remote DETACH via prefixed toolName → await-task retrieves result.
       // Separate code path: prefix splitting happens before instanceId resolution.
 
-      it("ET-REMOTE-DETACH-PREFIXED-THEN-WAIT-FOR-TASK: prefixed DETACH → wait-for-task returns completed result", async () => {
+      it("ET-REMOTE-DETACH-PREFIXED-THEN-AWAIT-TASK: prefixed DETACH → await-task returns completed result", async () => {
         requireRemote();
         setFetchCacheContext("et-remote-detach-prefixed-wait");
 
@@ -1507,20 +1620,20 @@ describe("Execute-Tool E2E", () => {
         const pendingResult = await awaitPendingCallResult(taskId, 15_000);
         expect(
           pendingResult,
-          "Prefixed remote DETACH pending call must complete before wait-for-task",
+          "Prefixed remote DETACH pending call must complete before await-task",
         ).not.toBeNull();
         expect(
           pendingResult?.status,
           "Prefixed remote DETACH pending call must complete with success",
         ).toBe("completed");
 
-        const { WaitForTaskRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
         const { scopedTranslation: tasksScopedT } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
         const t = tasksScopedT.scopedT(defaultLocale).t;
 
-        const waitResult = await WaitForTaskRepository.waitForTask(
+        const waitResult = await AwaitTaskRepository.awaitTask(
           { taskId },
           testUser,
           makeLogger(),
@@ -1530,7 +1643,7 @@ describe("Execute-Tool E2E", () => {
 
         expect(
           waitResult.success,
-          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
         ).toBe(true);
         if (!waitResult.success) {
           // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -1538,11 +1651,87 @@ describe("Execute-Tool E2E", () => {
         }
         expect(
           waitResult.data.waiting,
-          "wait-for-task on completed prefixed remote task must NOT be waiting",
+          "await-task on completed prefixed remote task must NOT be waiting",
         ).toBe(false);
         expect(
           waitResult.data.status,
-          "wait-for-task status must be completed",
+          "await-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 30_000);
+
+      // ── ET-REMOTE-WAKE-UP-THEN-AWAIT-TASK ────────────────────────────────
+      // Remote WAKE_UP via explicit instanceId → await-task retrieves result.
+
+      it("ET-REMOTE-WAKE-UP-THEN-AWAIT-TASK: await-task returns completed result after remote WAKE_UP", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-wakeup-await");
+
+        const wakeUpResult = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.WAKE_UP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          wakeUpResult.success,
+          `Remote WAKE_UP failed: ${JSON.stringify(wakeUpResult)}`,
+        ).toBe(true);
+        if (!wakeUpResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(wakeUpResult.message);
+        }
+
+        const { taskId } = wakeUpResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(taskId, "Remote WAKE_UP must return taskId").toBeTruthy();
+
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Remote WAKE_UP pending call must complete before await-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Remote WAKE_UP pending call must complete with success",
+        ).toBe("completed");
+
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await AwaitTaskRepository.awaitTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "await-task on completed remote WAKE_UP task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "await-task status must be completed",
         ).toBe(CronTaskStatus.COMPLETED);
       }, 30_000);
 
@@ -1756,7 +1945,7 @@ describe("Execute-Tool E2E", () => {
 
       // ── ET-RWS-DETACH ─────────────────────────────────────────────────────
 
-      it("ET-RWS-DETACH: reverse-WS DETACH returns taskId immediately, hint includes wait-for-task", async () => {
+      it("ET-RWS-DETACH: reverse-WS DETACH returns taskId immediately, hint includes await-task", async () => {
         requireReverseWs();
         setFetchCacheContext("et-rws-detach");
 
@@ -2089,10 +2278,10 @@ describe("Execute-Tool E2E", () => {
         ).toBeUndefined();
       }, 60_000);
 
-      // ── ET-RWS-DETACH-THEN-WAIT-FOR-TASK ─────────────────────────────────
-      // Reverse-WS DETACH via explicit instanceId → wait-for-task retrieves result.
+      // ── ET-RWS-DETACH-THEN-AWAIT-TASK ────────────────────────────────────
+      // Reverse-WS DETACH via explicit instanceId → await-task retrieves result.
 
-      it("ET-RWS-DETACH-THEN-WAIT-FOR-TASK: wait-for-task returns completed result after reverse-WS DETACH", async () => {
+      it("ET-RWS-DETACH-THEN-AWAIT-TASK: await-task returns completed result after reverse-WS DETACH", async () => {
         requireReverseWs();
         setFetchCacheContext("et-rws-detach-wait");
 
@@ -2126,20 +2315,20 @@ describe("Execute-Tool E2E", () => {
         const pendingResult = await awaitPendingCallResult(taskId, 15_000);
         expect(
           pendingResult,
-          "Reverse-WS DETACH pending call must complete before wait-for-task",
+          "Reverse-WS DETACH pending call must complete before await-task",
         ).not.toBeNull();
         expect(
           pendingResult?.status,
           "Reverse-WS DETACH pending call must complete with success",
         ).toBe("completed");
 
-        const { WaitForTaskRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
         const { scopedTranslation: tasksScopedT } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
         const t = tasksScopedT.scopedT(defaultLocale).t;
 
-        const waitResult = await WaitForTaskRepository.waitForTask(
+        const waitResult = await AwaitTaskRepository.awaitTask(
           { taskId },
           testUser,
           makeLogger(),
@@ -2149,7 +2338,7 @@ describe("Execute-Tool E2E", () => {
 
         expect(
           waitResult.success,
-          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
         ).toBe(true);
         if (!waitResult.success) {
           // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -2157,19 +2346,19 @@ describe("Execute-Tool E2E", () => {
         }
         expect(
           waitResult.data.waiting,
-          "wait-for-task on completed reverse-WS task must NOT be waiting",
+          "await-task on completed reverse-WS task must NOT be waiting",
         ).toBe(false);
         expect(
           waitResult.data.status,
-          "wait-for-task status must be completed",
+          "await-task status must be completed",
         ).toBe(CronTaskStatus.COMPLETED);
       }, 60_000);
 
-      // ── ET-RWS-DETACH-PREFIXED-THEN-WAIT-FOR-TASK ────────────────────────
-      // Reverse-WS DETACH via prefixed toolName → wait-for-task retrieves result.
+      // ── ET-RWS-DETACH-PREFIXED-THEN-AWAIT-TASK ───────────────────────────
+      // Reverse-WS DETACH via prefixed toolName → await-task retrieves result.
       // Separate code path: prefix splitting happens before instanceId resolution.
 
-      it("ET-RWS-DETACH-PREFIXED-THEN-WAIT-FOR-TASK: prefixed DETACH via reverse-WS → wait-for-task returns completed result", async () => {
+      it("ET-RWS-DETACH-PREFIXED-THEN-AWAIT-TASK: prefixed DETACH via reverse-WS → await-task returns completed result", async () => {
         requireReverseWs();
         setFetchCacheContext("et-rws-detach-prefixed-wait");
 
@@ -2205,20 +2394,20 @@ describe("Execute-Tool E2E", () => {
         const pendingResult = await awaitPendingCallResult(taskId, 15_000);
         expect(
           pendingResult,
-          "Prefixed reverse-WS DETACH pending call must complete before wait-for-task",
+          "Prefixed reverse-WS DETACH pending call must complete before await-task",
         ).not.toBeNull();
         expect(
           pendingResult?.status,
           "Prefixed reverse-WS DETACH pending call must complete with success",
         ).toBe("completed");
 
-        const { WaitForTaskRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
         const { scopedTranslation: tasksScopedT } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
         const t = tasksScopedT.scopedT(defaultLocale).t;
 
-        const waitResult = await WaitForTaskRepository.waitForTask(
+        const waitResult = await AwaitTaskRepository.awaitTask(
           { taskId },
           testUser,
           makeLogger(),
@@ -2228,7 +2417,7 @@ describe("Execute-Tool E2E", () => {
 
         expect(
           waitResult.success,
-          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
         ).toBe(true);
         if (!waitResult.success) {
           // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -2236,11 +2425,87 @@ describe("Execute-Tool E2E", () => {
         }
         expect(
           waitResult.data.waiting,
-          "wait-for-task on completed prefixed reverse-WS task must NOT be waiting",
+          "await-task on completed prefixed reverse-WS task must NOT be waiting",
         ).toBe(false);
         expect(
           waitResult.data.status,
-          "wait-for-task status must be completed",
+          "await-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 60_000);
+
+      // ── ET-RWS-WAKE-UP-THEN-AWAIT-TASK ───────────────────────────────────
+      // Reverse-WS WAKE_UP via explicit instanceId → await-task retrieves result.
+
+      it("ET-RWS-WAKE-UP-THEN-AWAIT-TASK: await-task returns completed result after reverse-WS WAKE_UP", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-wakeup-await");
+
+        const wakeUpResult = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.WAKE_UP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          wakeUpResult.success,
+          `Reverse-WS WAKE_UP failed: ${JSON.stringify(wakeUpResult)}`,
+        ).toBe(true);
+        if (!wakeUpResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(wakeUpResult.message);
+        }
+
+        const { taskId } = wakeUpResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(taskId, "Reverse-WS WAKE_UP must return taskId").toBeTruthy();
+
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Reverse-WS WAKE_UP pending call must complete before await-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Reverse-WS WAKE_UP pending call must complete with success",
+        ).toBe("completed");
+
+        const { AwaitTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await AwaitTaskRepository.awaitTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `await-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "await-task on completed reverse-WS WAKE_UP task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "await-task status must be completed",
         ).toBe(CronTaskStatus.COMPLETED);
       }, 60_000);
 

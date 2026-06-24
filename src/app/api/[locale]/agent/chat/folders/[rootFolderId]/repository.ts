@@ -367,20 +367,22 @@ export class ChatFoldersRepository {
         folderContentsDefinitions.GET,
         logger,
         user,
-        { rootFolderId: newFolder.rootFolderId },
       );
       emitFolderContents("folder-created", {
-        items: [
-          {
-            id: newFolder.id,
-            type: "folder" as const,
-            name: newFolder.name,
-            icon: newFolder.icon,
-            color: newFolder.color,
-            parentId: newFolder.parentId,
-            sortOrder: newFolder.sortOrder,
-          },
-        ],
+        urlPathParams: { rootFolderId: newFolder.rootFolderId },
+        responseData: {
+          items: [
+            {
+              id: newFolder.id,
+              type: "folder" as const,
+              name: newFolder.name,
+              icon: newFolder.icon,
+              color: newFolder.color,
+              parentId: newFolder.parentId,
+              sortOrder: newFolder.sortOrder,
+            },
+          ],
+        },
       });
 
       return success({

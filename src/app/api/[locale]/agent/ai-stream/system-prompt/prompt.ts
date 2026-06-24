@@ -269,8 +269,8 @@ export const toolExecutionControlFragment: SystemPromptFragment<PromptContextDat
 **callbackMode** (optional on every tool, default: omit = synchronous):
 
 - **omit** (default) — synchronous, result inline, loop continues
-- **\`"detach"\`** — fire-and-forget, returns \`{taskId}\`, use \`wait-for-task\` later if needed
-- **\`"wakeUp"\`** — fire-and-forget, result auto-injected when ready, do NOT call \`wait-for-task\`
+- **\`"detach"\`** — fire-and-forget, returns \`{taskId}\`, use \`await-task\` later if needed
+- **\`"wakeUp"\`** — fire-and-forget, result auto-injected when ready, do NOT call \`await-task\`
 - **\`"wait"\`** — block for a remote task
 - **\`"endLoop"\`** — end the entire turn after this batch (use ONLY when fully done)
 - **\`"approve"\`** — pause for user confirmation

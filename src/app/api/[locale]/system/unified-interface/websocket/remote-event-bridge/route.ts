@@ -1,9 +1,8 @@
 /**
  * Remote Event Bridge Route
  *
- * Two paths, same code:
- *   HTTP POST  → handler()         (direct-http peers call this directly)
- *   WS event   → onRemoteEvent     (reverse-WS peers send wire messages)
+ * HTTP POST — direct-http peers POST a remote-event frame here.
+ * Reverse-WS peers are handled directly by connector → RemoteEventBridgeRepository.handleRemoteEvent.
  */
 
 import "server-only";
@@ -19,13 +18,5 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: ({ data, user, logger }) =>
       RemoteEventBridgeRepository.receive(data, user, logger),
-    onRemoteEvent: {
-      "remote-event": ({ responseData, user, logger }) =>
-        RemoteEventBridgeRepository.handleRemoteEvent(
-          responseData,
-          user.id,
-          logger,
-        ),
-    },
   },
 });

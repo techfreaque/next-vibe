@@ -391,7 +391,6 @@ export class ResumeStreamRepository {
                     );
                   createMessagesEmitter(
                     effectiveThreadId,
-                    threadRootFolderId,
                     logger,
                     user,
                   )("streaming-state-changed", {
@@ -490,7 +489,6 @@ export class ResumeStreamRepository {
                 .then(async (result) => {
                   createMessagesEmitter(
                     threadId,
-                    threadRootFolderId,
                     logger,
                     user,
                   )("stream-finished", {
@@ -688,7 +686,6 @@ export class ResumeStreamRepository {
 
             createMessagesEmitter(
               effectiveThreadId,
-              threadRootFolderId,
               logger,
               user,
             )("message-created", {
@@ -722,7 +719,6 @@ export class ResumeStreamRepository {
 
             createMessagesEmitter(
               effectiveThreadId,
-              threadRootFolderId,
               logger,
               user,
             )("tool-result", {
@@ -770,7 +766,6 @@ export class ResumeStreamRepository {
               .then(async (result) => {
                 createMessagesEmitter(
                   threadId,
-                  threadRootFolderId,
                   logger,
                   user,
                 )("stream-finished", {
@@ -825,7 +820,6 @@ export class ResumeStreamRepository {
                   .catch(() => undefined);
                 createMessagesEmitter(
                   effectiveThreadId,
-                  threadRootFolderId,
                   logger,
                   user,
                 )("streaming-state-changed", {
@@ -845,7 +839,6 @@ export class ResumeStreamRepository {
             // Emit TOOL_RESULT WS so the UI bubble updates immediately.
             createMessagesEmitter(
               effectiveThreadId,
-              threadRootFolderId,
               logger,
               user,
             )("tool-result", {
@@ -900,7 +893,6 @@ export class ResumeStreamRepository {
             // Emit tool-result WS so the UI bubble shows the real result.
             createMessagesEmitter(
               effectiveThreadId,
-              threadRootFolderId,
               logger,
               user,
             )("tool-result", {
@@ -1016,7 +1008,6 @@ export class ResumeStreamRepository {
                 .catch(() => undefined);
               createMessagesEmitter(
                 effectiveThreadId,
-                threadRootFolderId,
                 logger,
                 user,
               )("streaming-state-changed", {
@@ -1051,7 +1042,6 @@ export class ResumeStreamRepository {
                 .catch(() => undefined);
               createMessagesEmitter(
                 effectiveThreadId,
-                threadRootFolderId,
                 logger,
                 user,
               )("streaming-state-changed", {
@@ -1060,7 +1050,6 @@ export class ResumeStreamRepository {
             } else {
               createMessagesEmitter(
                 threadId,
-                threadRootFolderId,
                 logger,
                 user,
               )("stream-finished", {
@@ -1151,7 +1140,6 @@ export class ResumeStreamRepository {
             );
           createMessagesEmitter(
             threadId,
-            threadRootFolderId,
             logger,
             user,
           )("streaming-state-changed", {

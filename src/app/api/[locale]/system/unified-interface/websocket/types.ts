@@ -10,10 +10,10 @@
  * event type system; there is no Zod-schema event variant.
  */
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
+import type { AnyEndpointEventEnvelope } from "./structured-events";
 
 // ============================================================================
 // WIRE PROTOCOL
@@ -24,7 +24,7 @@ import type { JwtPayloadType } from "../../../user/auth/types";
  * `data` is the typed event payload, or an `EndpointEventEnvelope` when the
  * event name is `"__event__"` (endpoint events routed via the user channel).
  */
-export interface WsWireMessage<T = WidgetData> {
+export interface WsWireMessage<T extends AnyEndpointEventEnvelope> {
   /** Channel this event belongs to */
   readonly channel: string;
   /** Event name (matches a key in the endpoint's events record, or "__event__") */
@@ -42,7 +42,7 @@ export interface WsWireMessage<T = WidgetData> {
 export interface WsBatchEvent {
   readonly channel: string;
   readonly event: string;
-  readonly data: WsWireMessage["data"];
+  readonly data: AnyEndpointEventEnvelope;
 }
 
 /**

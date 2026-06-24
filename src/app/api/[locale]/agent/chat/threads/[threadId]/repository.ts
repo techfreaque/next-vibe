@@ -210,14 +210,21 @@ export class ThreadByIdRepository {
       // sidebar list cache; cross-instance (remoteEvent) the peer re-applies the
       // update. Suppressed when applying a relayed edit (avoids re-relay ping-pong).
       if (!relayed) {
-        createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
-          threadId: updatedThread.id,
-        })("thread-updated", {
-          title: updatedThread.title,
-          folderId: updatedThread.folderId,
-          status: updatedThread.status,
-          rootFolderId: updatedThread.rootFolderId,
-          updatedAt: updatedThread.updatedAt,
+        createEndpointEmitter(
+          threadsByIdDefinitions.PATCH,
+          logger,
+          user,
+        )("thread-updated", {
+          urlPathParams: { threadId: updatedThread.id },
+          requestData: {
+            title: updatedThread.title,
+            folderId: updatedThread.folderId,
+            status: updatedThread.status,
+            rootFolderId: updatedThread.rootFolderId,
+          },
+          responseData: {
+            updatedAt: updatedThread.updatedAt,
+          },
         });
       }
       if (updatedThread.rootFolderId) {
@@ -227,20 +234,22 @@ export class ThreadByIdRepository {
           folderContentsDefinitions.GET,
           logger,
           user,
-          { rootFolderId: updatedThread.rootFolderId },
         );
         emitFolderContents("thread-updated", {
-          items: [
-            {
-              id: updatedThread.id,
-              title: updatedThread.title,
-              folderId: updatedThread.folderId,
-              status: updatedThread.status,
-              preview: updatedThread.preview,
-              rootFolderId: updatedThread.rootFolderId,
-              updatedAt: updatedThread.updatedAt,
-            },
-          ],
+          urlPathParams: { rootFolderId: updatedThread.rootFolderId },
+          responseData: {
+            items: [
+              {
+                id: updatedThread.id,
+                title: updatedThread.title,
+                folderId: updatedThread.folderId,
+                status: updatedThread.status,
+                preview: updatedThread.preview,
+                rootFolderId: updatedThread.rootFolderId,
+                updatedAt: updatedThread.updatedAt,
+              },
+            ],
+          },
         });
       }
 
@@ -384,9 +393,14 @@ export class ThreadByIdRepository {
       // removes it from the sidebar list cache; cross-instance (remoteEvent) the
       // peer re-applies the delete. Suppressed when applying a relayed delete.
       if (!relayed && deletedThread.rootFolderId) {
-        createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
-          threadId,
-        })("thread-deleted", { rootFolderId: deletedThread.rootFolderId });
+        createEndpointEmitter(
+          threadsByIdDefinitions.DELETE,
+          logger,
+          user,
+        )("thread-deleted", {
+          urlPathParams: { threadId },
+          requestData: { rootFolderId: deletedThread.rootFolderId },
+        });
       }
       if (deletedThread.rootFolderId) {
         const { default: folderContentsDefinitions } =
@@ -395,9 +409,11 @@ export class ThreadByIdRepository {
           folderContentsDefinitions.GET,
           logger,
           user,
-          { rootFolderId: deletedThread.rootFolderId },
         );
-        emitFolderContents("thread-deleted", { items: [{ id: threadId }] });
+        emitFolderContents("thread-deleted", {
+          urlPathParams: { rootFolderId: deletedThread.rootFolderId },
+          responseData: { items: [{ id: threadId }] },
+        });
       }
 
       return success({
@@ -424,18 +440,31 @@ export class ThreadByIdRepository {
    * Cross-instance applier for `thread-updated`: re-run the update on this
    * instance with the relayed edits. Reuses updateThread with relayed: true so the
    * event is not relayed back. The thread id rides on the event's urlPathParams.
+   *
+   * Note: requestData is typed via the endpoint's EventRequestPayloads which resolves
+   * from threadsByIdPatchEvents requestFields: title?, folderId?, status?, rootFolderId.
+   * We parse it through the PATCH request schema to produce a properly typed payload.
    */
-  static async applyRemoteThreadUpdate({
-    requestData,
-    urlPathParams,
-    user,
-    logger,
-  }: RemoteEventHandlerProps<
-    typeof threadsByIdDefinitions.PATCH,
-    "thread-updated"
-  >): Promise<void> {
+  static async applyRemoteThreadUpdate(
+    props: RemoteEventHandlerProps<
+      typeof threadsByIdDefinitions.PATCH,
+      "thread-updated"
+    >,
+  ): Promise<void> {
+    const { urlPathParams, user, logger } = props;
+    // Parse the relayed request data through the PATCH schema so we get a
+    // ThreadPatchRequestOutput with all optional fields correctly typed.
+    const parsed = threadsByIdDefinitions.PATCH.requestSchema.safeParse(
+      props.requestData,
+    );
+    if (!parsed.success) {
+      logger.error("Failed to parse relayed thread-updated request data", {
+        error: parsed.error.message,
+      });
+      return;
+    }
     const result = await this.updateThread(
-      requestData,
+      parsed.data,
       urlPathParams.threadId,
       user,
       defaultLocale,

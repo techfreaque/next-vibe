@@ -25,6 +25,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
+import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -1102,7 +1103,7 @@ export async function assertThreadIdle(threadId: string): Promise<void> {
   expectBun(
     thread.streamingState,
     `[assertThreadIdle] Thread ${threadId} must be idle (got "${thread.streamingState}")`,
-  ).toBe("idle");
+  ).toBe(ThreadStreamingState.IDLE);
 }
 
 /**

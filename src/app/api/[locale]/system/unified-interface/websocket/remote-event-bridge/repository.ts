@@ -22,11 +22,12 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { dispatchRemoteEvent } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/remote-event-registry";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { AnyEndpointEventEnvelope } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/user/auth/types";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type {
   RemoteEventBridgeRequestOutput,
@@ -36,18 +37,14 @@ import type {
 // ─── Typed event payload shape (derived from definition fields) ────────────────
 
 /**
- * The generic remote-event payload. Identifies the target route + event and
- * carries that event's own definition-driven payload. `domain` is the target
- * event's `sync.domain`, used for per-connection syncScope gating at the sender.
+ * The generic remote-event wire payload. The envelope carries all 4 event fields
+ * (responseData, requestData, urlPathParams, payload) plus routing metadata
+ * (endpointPath, endpointMethod, eventName). No duplication at the wire level.
  */
 export interface RemoteEventPayload {
   originInstanceId?: string;
   syncDomain?: string;
-  endpointPath?: string[];
-  endpointMethod?: string;
-  urlPathParams?: Record<string, string>;
-  endpointEventName?: string;
-  endpointPayload?: WidgetData;
+  envelope?: AnyEndpointEventEnvelope;
 }
 
 // ─── Repository ───────────────────────────────────────────────────────────────
@@ -65,7 +62,7 @@ export class RemoteEventBridgeRepository {
 
     if (data.eventName === "remote-event") {
       await RemoteEventBridgeRepository.handleRemoteEvent(
-        data.payload as RemoteEventPayload,
+        data.payload,
         userId,
         logger,
       );
@@ -88,10 +85,11 @@ export class RemoteEventBridgeRepository {
     userId: string | null,
     logger: EndpointLogger,
   ): Promise<void> {
+    const envelope = evt.envelope;
     if (
-      !evt.endpointPath ||
-      !evt.endpointMethod ||
-      !evt.endpointEventName ||
+      !envelope?.endpointPath ||
+      !envelope.endpointMethod ||
+      !envelope.eventName ||
       !evt.originInstanceId
     ) {
       return;
@@ -101,7 +99,7 @@ export class RemoteEventBridgeRepository {
       logger.warn(
         "[RemoteEventBridge] handleRemoteEvent: no userId — skipped",
         {
-          eventName: evt.endpointEventName,
+          eventName: envelope.eventName,
         },
       );
       return;
@@ -113,10 +111,10 @@ export class RemoteEventBridgeRepository {
     const selfInstanceId =
       await RemoteConnectionRepository.getLocalInstanceId(userId);
     if (evt.originInstanceId === selfInstanceId) {
-      logger.error("Emitted a remote event to local", {
+      logger.debug("[RemoteEventBridge] Echo-guard: dropping own event", {
         originInstanceId: evt.originInstanceId,
-        endpointPath: evt.endpointPath,
-        endpointEventName: evt.endpointEventName,
+        endpointPath: envelope.endpointPath,
+        eventName: envelope.eventName,
       });
       return;
     }
@@ -129,21 +127,20 @@ export class RemoteEventBridgeRepository {
         roles: [],
       };
       await dispatchRemoteEvent(
-        evt.endpointPath,
-        evt.endpointMethod,
-        evt.endpointEventName,
-        evt.endpointPayload,
+        envelope.endpointPath,
+        envelope.endpointMethod,
+        envelope,
         {
           instanceId: selfInstanceId,
           user,
-          urlPathParams: evt.urlPathParams ?? {},
+          locale,
           logger,
           isServer: true,
         },
       );
     } catch (err) {
       logger.warn("[RemoteEventBridge] remote-event dispatch failed", {
-        eventName: evt.endpointEventName,
+        eventName: envelope.eventName,
         error: err instanceof Error ? err.message : String(err),
       });
     }

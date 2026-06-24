@@ -201,7 +201,7 @@ const { GET } = createEndpoint({
               columns: 3,
               schema: z.string(),
             }),
-            label: responseField(scopedTranslation, {
+            content: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               label: "get.response.model.content" as const,
               columns: 3,
@@ -314,7 +314,7 @@ const { GET } = createEndpoint({
             contextWindow: 128000,
             parameterCount: null,
             intelligence: "brilliant",
-            label: "mainstream",
+            content: "mainstream",
             price: 12,
             supportsTools: true,
             utilities: ["chat", "coding", "analysis", "reasoning"],

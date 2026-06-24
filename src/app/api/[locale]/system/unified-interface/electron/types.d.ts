@@ -19,5 +19,11 @@ declare global {
   interface Window {
     /** Only defined when running inside the Electron desktop app */
     vibeElectron?: VibeElectronAPI;
+    /** TanStack QueryClient singleton — exposed for browser E2E test helpers */
+    __queryClient?: {
+      getQueryData: (
+        queryKey: readonly string[],
+      ) => string | null | Record<string, string>;
+    };
   }
 }

@@ -77,11 +77,12 @@ export function createNextjsFormatter(
 ): (chunk: string) => string {
   const isProduction = process.env["NODE_ENV"] === "production";
 
+  const startTime = Number(process.env["VIBE_START_TIME"] ?? Date.now());
   const getTimePrefix = (): string => {
     if (isProduction) {
       return new Date().toISOString().slice(11, 23);
     }
-    return `${process.uptime().toFixed(3)}s`;
+    return `${((Date.now() - startTime) / 1000).toFixed(3)}s`;
   };
 
   let lastPrefix = "";

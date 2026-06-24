@@ -20,16 +20,20 @@ import { sttModelOptions } from "@/app/api/[locale]/agent/speech-to-text/models"
 import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelOptions } from "@/app/api/[locale]/agent/video-generation/models";
 
-import type { WsProviderModelsGetResponseOutput } from "./definition";
-
-type ModelEntry = WsProviderModelsGetResponseOutput["models"][number];
+import type {
+  WsProviderModelEntry,
+  WsProviderModelsGetResponseOutput,
+} from "./definition";
 
 function getProviderDisplayName(providerId: string): string {
   const provider = modelProviders[providerId];
   return provider?.name ?? providerId;
 }
 
-function mapModel(model: AnyModelOption, category: string): ModelEntry {
+function mapModel(
+  model: AnyModelOption,
+  category: string,
+): WsProviderModelEntry {
   return {
     id: model.id,
     name: model.name,
@@ -42,7 +46,10 @@ function mapModel(model: AnyModelOption, category: string): ModelEntry {
   };
 }
 
-function mapModels(models: AnyModelOption[], category: string): ModelEntry[] {
+function mapModels(
+  models: AnyModelOption[],
+  category: string,
+): WsProviderModelEntry[] {
   return models
     .filter(
       (m) =>
@@ -59,7 +66,7 @@ export class WsProviderModelsRepository {
   static async listModels(): Promise<
     ResponseType<WsProviderModelsGetResponseOutput>
   > {
-    const models: ModelEntry[] = [
+    const models: WsProviderModelEntry[] = [
       ...mapModels(chatModelOptions, "chat"),
       ...mapModels(imageGenModelOptions, "image"),
       ...mapModels(musicGenModelOptions, "music"),

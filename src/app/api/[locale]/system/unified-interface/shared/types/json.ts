@@ -20,7 +20,6 @@ export type WidgetData =
   | undefined
   | Date
   | WidgetData[]
-  | ReadonlyArray<WidgetData>
   | { [key: string]: WidgetData };
 
 export const WidgetDataSchema: z.ZodType<WidgetData> = z.lazy(() =>

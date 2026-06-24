@@ -16,12 +16,14 @@ import {
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { z } from "zod";
 
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { AnyEndpointEventEnvelope } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
@@ -29,21 +31,29 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../chat/config";
 import { getDefaultToolIdsForUser } from "../../chat/constants";
-import type { ToolCall } from "../../chat/db";
+import type { MessageMetadata, ToolCall } from "../../chat/db";
 import { chatMessages, chatThreads } from "../../chat/db";
-import { ChatMessageRole } from "../../chat/enum";
-import { buildFavoriteConfig } from "../../chat/favorites/repository";
+import {
+  ChatMessageRole,
+  ThreadStatus,
+  ThreadStreamingState,
+} from "../../chat/enum";
+import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
 import { parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
-  emitThreadCreated,
-  emitThreadTitleUpdated,
+  createMessagesGetEmitter,
   type WsEmitCallback,
 } from "../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
+import {
+  createThreadsGetEmitter,
+  createThreadsPostEmitter,
+} from "../../chat/threads/emitter";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import { ApiProvider } from "../../models/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
+import { buildFavoriteConfig } from "../../skills/favorites/repository";
 import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import { getChatModelById } from "../models";
@@ -168,9 +178,9 @@ export class AiStreamRepository {
     sequenceIdOverride,
     subAgentDepth,
     mediaModelOverrides,
-    providerOverride,
     toolsOverride,
     parentAbortSignal,
+    confirmationOverridesOverride,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -337,7 +347,6 @@ export class AiStreamRepository {
       excludeMemories,
       favoriteIdOverride,
       mediaModelOverrides,
-      providerOverride,
       toolsOverride,
       parentAbortSignal,
     });
@@ -730,7 +739,6 @@ export class AiStreamRepository {
             messagesToCompactCount: compactingCheck.messagesToCompact.length,
             lastCompactingMessage: compactingCheck.lastCompactingMessage?.id,
           });
-
           // Store estimated input tokens from compacting check so streaming token
           // pushes include promptTokens without recalculating.
           ctx.estimatedInputTokens = compactingCheck.totalTokens;
@@ -1083,8 +1091,6 @@ export class AiStreamRepository {
               skill: data.skill,
               isIncognito,
               userId,
-              emittedToolResultIds,
-              ttsHandler,
               user,
               locale,
               logger,

@@ -70,6 +70,7 @@ export class StreamingTTSHandler {
   private isInsideThinkTag = false;
   private isInsideChatTag = false;
   private messageId: string | null = null;
+  private threadId: string | null = null;
   private readonly wsEmit: WsEmitCallback;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
@@ -114,6 +115,13 @@ export class StreamingTTSHandler {
    */
   setMessageId(messageId: string): void {
     this.messageId = messageId;
+  }
+
+  /**
+   * Set the thread ID (called when the stream starts for a thread)
+   */
+  setThreadId(threadId: string): void {
+    this.threadId = threadId;
   }
 
   /**
@@ -276,11 +284,14 @@ export class StreamingTTSHandler {
       if (audioDataUrl) {
         if (this.wsEmit) {
           this.wsEmit("audio-chunk", {
-            audioMessageId: this.messageId,
-            audioData: audioDataUrl,
-            chunkIndex: chunkIdx,
-            audioIsFinal: false,
-            audioText: cleanText,
+            urlPathParams: { threadId: this.threadId ?? "" },
+            responseData: {
+              audioMessageId: this.messageId,
+              audioData: audioDataUrl,
+              chunkIndex: chunkIdx,
+              audioIsFinal: false,
+              audioText: cleanText,
+            },
           });
         }
 
@@ -363,22 +374,25 @@ export class StreamingTTSHandler {
         });
         if (this.wsEmit) {
           this.wsEmit("error", {
-            messages: [
-              {
-                id: crypto.randomUUID(),
-                role: ChatMessageRole.ERROR,
-                content: message,
-                parentId: null,
-                sequenceId: null,
-                model: null,
-                skill: null,
-                metadata: null,
-                errorMessage: message,
-                errorCode: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-            ],
+            urlPathParams: { threadId: this.threadId ?? "" },
+            responseData: {
+              messages: [
+                {
+                  id: crypto.randomUUID(),
+                  role: ChatMessageRole.ERROR,
+                  content: message,
+                  parentId: null,
+                  sequenceId: null,
+                  model: null,
+                  skill: null,
+                  metadata: null,
+                  errorMessage: message,
+                  errorCode: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                },
+              ],
+            },
           });
         }
         // Disable TTS for this session to avoid per-chunk error spam
@@ -660,11 +674,14 @@ export class StreamingTTSHandler {
     // Emit final chunk marker
     if (this.chunkIndex > 0 && this.wsEmit) {
       this.wsEmit("audio-chunk", {
-        audioMessageId: this.messageId,
-        audioData: "",
-        chunkIndex: this.chunkIndex,
-        audioIsFinal: true,
-        audioText: "",
+        urlPathParams: { threadId: this.threadId ?? "" },
+        responseData: {
+          audioMessageId: this.messageId,
+          audioData: "",
+          chunkIndex: this.chunkIndex,
+          audioIsFinal: true,
+          audioText: "",
+        },
       });
     }
 

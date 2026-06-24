@@ -46,7 +46,7 @@ export function executeDockerCommand(
   const { t } = scopedTranslation.scopedT(locale);
 
   return new Promise((resolve) => {
-    const logger = createEndpointLogger(false, Date.now(), locale);
+    const logger = createEndpointLogger(false, locale);
 
     if (description) {
       logger.debug(description);

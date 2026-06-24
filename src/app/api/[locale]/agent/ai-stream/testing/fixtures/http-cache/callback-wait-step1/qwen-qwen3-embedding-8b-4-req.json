@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Generate an image: wait-for-task-test",
+    "input": "Generate an image: await-task-test",
     "encoding_format": "float"
   }
 }

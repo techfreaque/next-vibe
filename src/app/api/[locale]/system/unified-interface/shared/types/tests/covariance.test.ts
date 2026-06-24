@@ -45,7 +45,9 @@ import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Methods } from "../../types/enums";
 import { FieldDataType, WidgetType } from "../../types/enums";
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 
 // ============================================================================
 // LEVEL 1: Test basic field types
@@ -119,9 +121,9 @@ type Test1_4_Result =
 const test1_4: Test1_4_Result = "✓ PASS";
 
 // Test 1.5: ArrayField extends UnifiedField
-const test1_5_field = requestDataArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: objectField(genericST, {
+const test1_5_field = requestDataArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
@@ -132,8 +134,8 @@ const test1_5_field = requestDataArrayField(
         schema: z.string(),
       }),
     },
-  }) },
-);
+  }),
+});
 
 type Test1_5_Result =
   typeof test1_5_field extends UnifiedField<
@@ -272,17 +274,18 @@ const test3_2: Test3_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 4.1: CreateApiEndpoint with optional object field
-const test4_1_field = objectOptionalField(
-  genericST,
-  { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+const test4_1_field = objectOptionalField(genericST, {
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" },
+  children: {
     value: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "test4_1_field.value",
       schema: z.string(),
     }),
-  } },
-);
+  },
+});
 
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
   Methods.PATCH,
@@ -354,9 +357,9 @@ const test5_1_request_field = objectField(genericST, {
 });
 
 // Test 5.1b: Response-only array field
-const test5_1_response_field = responseArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: objectField(genericST, {
+const test5_1_response_field = responseArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
@@ -365,13 +368,13 @@ const test5_1_response_field = responseArrayField(
         schema: z.string(),
       }),
     },
-  }) },
-);
+  }),
+});
 
 // Test 5.1c: Optional login history
-const test5_1_optional_field = responseArrayOptionalField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: objectField(genericST, {
+const test5_1_optional_field = responseArrayOptionalField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
@@ -380,21 +383,22 @@ const test5_1_optional_field = responseArrayOptionalField(
         schema: z.number(),
       }),
     },
-  }) },
-);
+  }),
+});
 
 // Test 5.1d: Request data with optional settings
-const test5_1_request_optional = objectOptionalField(
-  genericST,
-  { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+const test5_1_request_optional = objectOptionalField(genericST, {
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" },
+  children: {
     url: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.URL,
       label: "settings.url",
       schema: z.string().url(),
     }),
-  } },
-);
+  },
+});
 
 // Test 5.1e: Mixed request/response structure with nested fields
 const test5_1_field = objectField(genericST, {
@@ -413,20 +417,25 @@ const test5_1_field = objectField(genericST, {
         }),
       },
     }),
-    preferences: objectOptionalField(
-      genericST,
-      { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+    preferences: objectOptionalField(genericST, {
+      type: WidgetType.CONTAINER,
+      usage: { request: "data" },
+      children: {
         theme: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "preferences.theme",
-          schema: z.string(),
+          schema: z.enum(["light", "dark"]),
+          options: [
+            { value: "light", label: "preferences.theme" },
+            { value: "dark", label: "preferences.theme" },
+          ],
         }),
-      } },
-    ),
-    results: responseArrayField(
-      genericST,
-      { type: WidgetType.CONTAINER, child: objectField(genericST, {
+      },
+    }),
+    results: responseArrayField(genericST, {
+      type: WidgetType.CONTAINER,
+      child: objectField(genericST, {
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
@@ -435,8 +444,8 @@ const test5_1_field = objectField(genericST, {
             schema: z.number(),
           }),
         },
-      }) },
-    ),
+      }),
+    }),
   },
 });
 
@@ -557,10 +566,7 @@ type Test5_2d_MatchingTKeys = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<
-      string,
-      ConstrainedChildUsage<FieldUsageConfig>
-    >
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
   never
 >;
@@ -690,10 +696,7 @@ type Test7_2_AcceptsAnyEndpoint = (
       string,
       z.ZodTypeAny,
       FieldUsageConfig,
-      AnyChildrenConstrain<
-        string,
-        ConstrainedChildUsage<FieldUsageConfig>
-      >
+      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
     >,
     never
   >,
@@ -757,9 +760,9 @@ const test9_2: Test9_2_HasChildren = "✓ PASS";
 // ============================================================================
 
 // Test 10.1: Array with nested object children with id and name fields
-const test10_1_field = requestDataArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: objectField(genericST, {
+const test10_1_field = requestDataArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
@@ -776,8 +779,8 @@ const test10_1_field = requestDataArrayField(
         schema: z.string(),
       }),
     },
-  }) },
-);
+  }),
+});
 
 type Test10_1_Result =
   typeof test10_1_field extends UnifiedField<
@@ -865,20 +868,20 @@ type Test10_3_Result =
 const test10_3: Test10_3_Result = "✓ PASS";
 
 // Test 10.4: Nested arrays (array of arrays)
-const test10_4_innerArray = requestDataArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: requestField(genericST, {
+const test10_4_innerArray = requestDataArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: requestField(genericST, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
     label: "String",
     schema: z.string(),
-  }) },
-);
+  }),
+});
 
-const test10_4_field = requestDataArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: test10_4_innerArray },
-);
+const test10_4_field = requestDataArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: test10_4_innerArray,
+});
 
 type Test10_4_Result =
   typeof test10_4_field extends UnifiedField<
@@ -925,13 +928,7 @@ const test11_1: Test11_1_Result = "✓ PASS";
 type Test11_2_UseEndpoint = <
   T extends Record<
     string,
-    CreateApiEndpoint<
-      Methods,
-      readonly UserRoleValue[],
-      string,
-      any,
-      never
-    >
+    CreateApiEndpoint<Methods, readonly UserRoleValue[], string, any, never>
   >,
 >(
   endpoints: T,
@@ -1173,9 +1170,9 @@ const test15_1_field = objectField(genericST, {
         }),
       },
     }),
-    results: responseArrayField(
-      genericST,
-      { type: WidgetType.CONTAINER, child: objectField(genericST, {
+    results: responseArrayField(genericST, {
+      type: WidgetType.CONTAINER,
+      child: objectField(genericST, {
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
@@ -1190,8 +1187,8 @@ const test15_1_field = objectField(genericST, {
             schema: z.string(),
           }),
         },
-      }) },
-    ),
+      }),
+    }),
   },
 });
 
@@ -1396,24 +1393,24 @@ type Test19_1_Result =
 const test19_1: Test19_1_Result = "✓ PASS";
 
 // Test 19.2: Deeply nested arrays (3 levels)
-const test19_2_level3 = responseArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: responseField(genericST, {
+const test19_2_level3 = responseArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: responseField(genericST, {
     type: WidgetType.TEXT,
     content: "String",
     schema: z.string(),
-  }) },
-);
+  }),
+});
 
-const test19_2_level2 = responseArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: test19_2_level3 },
-);
+const test19_2_level2 = responseArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: test19_2_level3,
+});
 
-const test19_2_field = responseArrayField(
-  genericST,
-  { type: WidgetType.CONTAINER, child: test19_2_level2 },
-);
+const test19_2_field = responseArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  child: test19_2_level2,
+});
 
 type Test19_2_Result =
   typeof test19_2_field extends UnifiedField<

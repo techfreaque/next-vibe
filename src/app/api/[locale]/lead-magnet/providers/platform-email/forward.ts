@@ -33,7 +33,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
 
   const { createEndpointLogger } =
     await import("@/app/api/[locale]/system/logger/server");
-  const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
+  const logger = createEndpointLogger(false, "en-GLOBAL");
 
   await EmailSendingRepository.sendEmail(
     {

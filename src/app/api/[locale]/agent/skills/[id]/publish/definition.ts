@@ -100,7 +100,11 @@ const { PATCH } = createEndpoint({
       status_response: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "patch.response.status.content" as const,
-        schema: z.string(),
+        schema: z.enum([
+          SkillStatus.DRAFT,
+          SkillStatus.PUBLISHED,
+          SkillStatus.UNLISTED,
+        ]),
       }),
 
       publishedAt: responseField(scopedTranslation, {
@@ -173,10 +177,12 @@ const { PATCH } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["status"] as const,
-      onEvent: async ({ responseData, urlPathParams, queryClient, logger }) => {
+      responseFields: ["status_response"] as const,
+      urlPathParamsFields: ["id"] as const,
+      onEvent: async ({ responseData, urlPathParams, logger }) => {
         const skillId = urlPathParams.id;
         const ownershipType =
-          responseData.status === SkillStatus.PUBLISHED
+          responseData.status_response === SkillStatus.PUBLISHED
             ? SkillOwnershipType.PUBLIC
             : SkillOwnershipType.USER;
         const [{ apiClient }, skillsDefinition] = await Promise.all([
@@ -204,7 +210,6 @@ const { PATCH } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },

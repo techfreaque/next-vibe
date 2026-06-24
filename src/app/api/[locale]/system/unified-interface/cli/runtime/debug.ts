@@ -409,7 +409,7 @@ export class CliResourceManager {
         this.abortController.abort();
       }
 
-      const logger = createEndpointLogger(false, Date.now(), locale);
+      const logger = createEndpointLogger(false, locale);
       try {
         await this.cleanupRegistry.cleanup(logger);
         process.exit(0);

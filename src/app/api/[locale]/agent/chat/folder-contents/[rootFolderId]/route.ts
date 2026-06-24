@@ -59,5 +59,9 @@ export const { GET, tools } = endpointsHandler({
           return !user.isPublic && !!user.id;
       }
     },
+    onRemoteEvent: {
+      "thread-title-updated": (props) =>
+        FolderContentsRepository.applyRemoteThreadTitleUpdated(props),
+    },
   },
 });

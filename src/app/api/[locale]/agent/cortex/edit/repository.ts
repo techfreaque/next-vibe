@@ -14,6 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -207,12 +208,7 @@ export class CortexEditRepository {
         logger,
         user,
       )("node-written", {
-        path,
-        find,
-        replace,
-        startLine,
-        endLine,
-        newContent,
+        requestData: { path, find, replace, startLine, endLine, newContent },
       });
     }
 
@@ -357,29 +353,25 @@ export class CortexEditRepository {
    * Cross-instance applier for `node-written`: re-run the edit on this instance
    * with the relayed inputs. Reuses editFile so there is one code path.
    */
-  static async applyRemoteEdit(
-    payload: {
-      path: string;
-      find?: string;
-      replace?: string;
-      startLine?: number;
-      endLine?: number;
-      newContent?: string;
-    },
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteEdit({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof editDefinitions.PATCH,
+    "node-written"
+  >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const result = await this.editFile({
       userId: user.id,
       user,
       locale: defaultLocale,
-      path: payload.path,
-      find: payload.find,
-      replace: payload.replace,
-      startLine: payload.startLine,
-      endLine: payload.endLine,
-      newContent: payload.newContent,
+      path: requestData.path,
+      find: requestData.find,
+      replace: requestData.replace,
+      startLine: requestData.startLine,
+      endLine: requestData.endLine,
+      newContent: requestData.newContent,
       logger,
       t,
       relayed: true,

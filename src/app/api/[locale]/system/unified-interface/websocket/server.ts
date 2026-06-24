@@ -30,9 +30,11 @@ import {
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { CountryLanguageValues } from "@/i18n/core/config";
 
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 import { getPubSubAdapter } from "./pubsub";
+import type { AnyEndpointEventEnvelope } from "./structured-events";
 import type {
   WsBatchEvent,
   WsClientMessage,
@@ -58,7 +60,7 @@ let shuttingDown = false;
  * Broadcast to all subscribers on a channel (no user filter).
  * Used by pub/sub adapters that relay events from other processes.
  */
-export function broadcastLocalToAll<T extends WidgetData>(
+export function broadcastLocalToAll<T>(
   channel: string,
   event: string,
   data: T,
@@ -90,7 +92,7 @@ export function broadcastLocalToAll<T extends WidgetData>(
  * Broadcast an event to all LOCAL subscribers of a channel.
  * Access control is enforced at subscribe time (not at broadcast time).
  */
-export function broadcastLocal<T extends WidgetData>(
+export function broadcastLocal<T>(
   channel: string,
   event: string,
   data: T,
@@ -147,11 +149,7 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
  * Publish an event through the pub/sub adapter.
  * NOTE: Route handlers should use createEndpointEmitter() from emitter.ts instead.
  */
-export function publish<T extends WidgetData>(
-  channel: string,
-  event: string,
-  data: T,
-): void {
+export function publish<T>(channel: string, event: string, data: T): void {
   getPubSubAdapter().publish(channel, event, data);
 }
 
@@ -564,6 +562,9 @@ export function startWebSocketServer(
         req.headers.get("upgrade")?.toLowerCase() === "websocket"
       ) {
         const channel = url.searchParams.get("channel");
+        const upgradeLocale = url.searchParams.get(
+          "locale",
+        ) as CountryLanguage | null;
 
         const user = await authenticateFromCookies(req, logger);
 
@@ -574,7 +575,8 @@ export function startWebSocketServer(
 
         if (
           channel &&
-          !(await authorizeWsChannel(user, channel, logger, locale))
+          upgradeLocale &&
+          !(await authorizeWsChannel(user, channel, logger, upgradeLocale))
         ) {
           return new Response("Forbidden", { status: 403 });
         }
@@ -917,7 +919,7 @@ export function startWebSocketServer(
                 ws.data.user,
                 msg.channel,
                 logger,
-                locale,
+                msg.locale,
               ))
             ) {
               return;

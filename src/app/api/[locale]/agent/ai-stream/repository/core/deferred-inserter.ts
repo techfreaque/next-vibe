@@ -82,36 +82,42 @@ export async function insertDeferredWakeUpMessage(
     metadata: { toolCall: deferredToolCall },
   });
 
-  const wsEmit = createMessagesEmitter(threadId, null, logger, user);
+  const wsEmit = createMessagesEmitter(logger, user);
   wsEmit("message-created", {
-    messages: [
-      {
-        id: deferredId,
-        threadId,
-        role: ChatMessageRole.TOOL,
-        isAI: true,
-        parentId: chainParentId,
-        content: null,
-        model: resolvedModel,
-        skill: resolvedSkill,
-        sequenceId: deferredSequenceId,
-        metadata: { toolCall: deferredToolCall },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        authorId: null,
-        authorName: null,
-        errorType: null,
-        errorCode: null,
-        errorMessage: null,
-        upvotes: 0,
-        downvotes: 0,
-        searchVector: null,
-      },
-    ],
-    streamingState: "streaming",
+    urlPathParams: { threadId },
+    responseData: {
+      messages: [
+        {
+          id: deferredId,
+          threadId,
+          role: ChatMessageRole.TOOL,
+          isAI: true,
+          parentId: chainParentId,
+          content: null,
+          model: resolvedModel,
+          skill: resolvedSkill,
+          sequenceId: deferredSequenceId,
+          metadata: { toolCall: deferredToolCall },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          authorId: null,
+          authorName: null,
+          errorType: null,
+          errorCode: null,
+          errorMessage: null,
+          upvotes: 0,
+          downvotes: 0,
+          searchVector: null,
+        },
+      ],
+      streamingState: ThreadStreamingState.STREAMING,
+    },
   });
   wsEmit("tool-result", {
-    messages: [{ id: deferredId, metadata: { toolCall: deferredToolCall } }],
+    urlPathParams: { threadId },
+    responseData: {
+      messages: [{ id: deferredId, metadata: { toolCall: deferredToolCall } }],
+    },
   });
 
   logger.debug("[WakeUp] Deferred message inserted by live stream", {

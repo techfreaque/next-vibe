@@ -206,7 +206,10 @@ describe("Compacting - context management", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {
@@ -228,7 +231,8 @@ describe("Compacting - context management", () => {
       `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`);
     }
     testUser = resolved;
 
@@ -288,9 +292,19 @@ describe("Compacting - context management", () => {
         `Failed to create quality-tester__kimi fav: ${!createResult.success ? createResult.message : ""}`,
       ).toBe(true);
       if (!createResult.success) {
-        return;
+        // oxlint-disable-next-line restricted-syntax
+        throw new Error(
+          `Failed to create quality-tester__kimi favorite: ${createResult.message}`,
+        );
       }
-      mainFavoriteId = String(createResult.data?.["id"] ?? "");
+      const favId = createResult.data?.["id"];
+      if (!favId) {
+        // oxlint-disable-next-line restricted-syntax
+        throw new Error(
+          "quality-tester__kimi favorite created but id is missing",
+        );
+      }
+      mainFavoriteId = String(favId);
     }
 
     // Top up credits so fixture-cached runs never hit the credit gate.

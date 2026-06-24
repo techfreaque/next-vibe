@@ -41,7 +41,7 @@ Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and 
 - **Hermes prod** (`vibe rebuild`) — zero-downtime update. `vibe build && vibe start` only for a fresh first start. Max's live preview — only touch when explicitly asked.
 - Never touch Thea unless doing a dedicated task (e.g. pulling prod logs).
 - Last log line `--- server offline ---` means that server is stopped.
-- Hot reload: dev servers pick up code changes automatically. No restart needed unless explicitly broken.
+- **Hot reload (dev only):** `vibe dev` and `vibe --hermes dev` pick up code changes automatically — never restart them after editing code. `vibe build`/`vibe start`/`vibe rebuild` are for the Next.js prod server only and are unrelated to dev hot reload.
 
 ## DB & Code Generation
 
@@ -139,4 +139,4 @@ Hard gate. Never skip. Never say "should work" — prove it. If something looks 
 
 ## Notes
 
-- **AGENTS.md is auto-generated.** Edit `src/app/api/[locale]/agent/chat/skills/default-skills/vibe-coder/skill.ts` → `vibe gen`
+- **AGENTS.md is auto-generated.** Edit `src/app/api/[locale]/agent/skills/default-skills/vibe-coder/skill.ts` → `vibe gen`

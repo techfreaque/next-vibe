@@ -869,7 +869,7 @@ export function installFetchCache(
       // 5 minutes is a safe upper bound that prevents indefinite hangs while allowing
       // legitimate long-running LLM responses.
       const real = await originalFetch(input, {
-        ...(init ?? {}),
+        ...init,
         signal: AbortSignal.timeout(300_000),
       });
       const responseHeaders = headersToRecord(real.headers);

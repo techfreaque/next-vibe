@@ -17,7 +17,6 @@ import "server-only";
 
 import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -178,13 +177,68 @@ export function createBatchingEmitter(
   return { emit, flush };
 }
 
-/** Set to true during shutdown to suppress expected broadcast errors */
-let shuttingDown = false;
-export function setShuttingDown(): void {
-  shuttingDown = true;
+// ─── Sync-channel broadcast (local → same-instance reverse-WS subscribers) ───
+
+/**
+ * POST an event to the proxy on `system/sync/{userId}`.
+ * All reverse-WS connectors subscribed to that channel receive it.
+ * Uses the private internal userId — not the public leadId — so the channel
+ * is not guessable from external data (users can have multiple leads).
+ * Internal helper — use the named exports below.
+ */
+function broadcastSyncChannel<T>(
+  userId: string,
+  event: string,
+  data: T,
+  logger: EndpointLogger,
+): void {
+  const url = getBroadcastUrl();
+  fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ channel: `system/sync/${userId}`, event, data }),
+  }).catch((err) => {
+    if (!shuttingDown) {
+      logger.warn(`[WS Emitter] Failed to broadcast ${event}`, {
+        error: err instanceof Error ? err.message : String(err),
+        userId,
+      });
+    }
+  });
+}
+
+// ─── Generic remote-event relay payload ───────────────────────────────────────
+
+/**
+ * One relay shape for every cross-instance remote event. Identifies the target
+ * route + event and carries that event's own definition-driven payload, plus the
+ * event's `syncDomain` for per-connection syncScope gating at the sender.
+ * `TPayload` is the inferred event payload — never widened.
+ */
+export interface RemoteEventRelayPayload<TPayload = WidgetData> {
+  userId: string;
+  logger: EndpointLogger;
+  syncDomain?: SyncDomain;
+  endpointPath: readonly string[];
+  endpointMethod: string;
+  urlPathParams: { readonly [K in string]: string };
+  eventName: string;
+  payload: TPayload;
 }
 
 /**
+ * Low-level hub publish for the reverse-ws relay path. Publishes a `remote-event`
+ * frame on `system/sync/{remoteUserId}`; the peer's connector, subscribed to that
+ * channel, delivers it to the bridge. Used by `pushRemoteEvent` in dispatch.ts
+ * after it has resolved which connections (per syncScope) should receive it.
+ */
+export function publishRemoteEventToHub<TPayload>(
+  remoteUserId: string,
+  payload: RemoteEventWirePayload<TPayload>,
+  logger: EndpointLogger,
+): void {
+  broadcastSyncChannel(remoteUserId, "remote-event", payload, logger);
+}
 
 /** The wire body of a relayed remote-event (what the bridge receives as `payload`). */
 export interface RemoteEventWirePayload<TPayload = WidgetData> {
@@ -219,22 +273,23 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
   logger: EndpointLogger,
   user: JwtPayloadType,
   urlPathParams: { readonly [K in string]: string } = {},
-): EmitEventNamed<ComputeEventPayloads<TEndpoint>> {
-  type TEventPayloads = ComputeEventPayloads<TEndpoint>;
+): EmitEventNamed<TEndpoint["types"]["EventPayloads"]> {
+  type TEventPayloads = TEndpoint["types"]["EventPayloads"];
   const pathChannel = buildWsChannel(endpoint.path, urlPathParams);
   const userId = user.isPublic ? user.leadId : user.id;
   const channel = buildUserChannel(userId);
 
   return ((
     eventName: keyof TEventPayloads & string,
-    payload: TEventPayloads[typeof eventName] & WidgetData,
+    payload: TEventPayloads[typeof eventName],
   ) => {
-    const envelope: EndpointEventEnvelope<
-      TEventPayloads[typeof eventName] & WidgetData
-    > = {
+    const envelope: AnyEndpointEventEnvelope = {
       endpointPath: endpoint.path,
       endpointMethod: endpoint.method,
       eventName,
+      responseData: payload,
+      requestData: payload,
+      urlPathParams,
       payload,
       channel: pathChannel,
     };
@@ -252,8 +307,8 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
     // ALL the user's connected instances, each gated by its own
     // syncScope[syncDomain] at the sender (pushRemoteEvent).
     if (!user.isPublic) {
-      const eventDecl =
-        endpoint.events?.[eventName as keyof typeof endpoint.events];
+      const eventsMap = endpoint.events;
+      const eventDecl = eventsMap?.[eventName];
       if (eventDecl?.remoteEvent === true) {
         const privateUser = user as JwtPrivatePayloadType;
         const remoteEvent: RemoteEventRelayPayload<

@@ -52,8 +52,14 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type {
-  ComputeEventPayloads,
   EndpointEventsMap,
+  EventEmitUrlPayloads,
+  EventPayloads,
+  EventPayloadTypes,
+  EventRequestPayloads,
+  EventResponsePayloads,
+  EventTypes,
+  EventUrlPayloads,
 } from "../../../websocket/structured-events";
 
 // Extract schema type directly from field, bypassing complex field structure
@@ -87,13 +93,17 @@ type InferUrlParamsSchema<TFields> = InferSchemaFromField<
  * This reduces repetition and improves type performance
  */
 type InferRequestInput<TFields> = z.input<InferRequestDataSchema<TFields>>;
-type InferRequestOutput<TFields> = z.output<InferRequestDataSchema<TFields>>;
+export type InferRequestOutput<TFields> = z.output<
+  InferRequestDataSchema<TFields>
+>;
 type InferResponseInput<TFields> = z.input<InferResponseDataSchema<TFields>>;
 export type InferResponseOutput<TFields> = z.output<
   InferResponseDataSchema<TFields>
 >;
 type InferUrlVariablesInput<TFields> = z.input<InferUrlParamsSchema<TFields>>;
-type InferUrlVariablesOutput<TFields> = z.output<InferUrlParamsSchema<TFields>>;
+export type InferUrlVariablesOutput<TFields> = z.output<
+  InferUrlParamsSchema<TFields>
+>;
 
 /**
  * Options for read (GET) operations at the endpoint level
@@ -164,6 +174,9 @@ export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
  * - Optional scoped translation keys - use TScopedTranslationKey to restrict translation keys to a specific scope
  *
  */
+/** Default timeout for endpoint handler execution (Next.js / TanStack route). 0 = no timeout. */
+export const DEFAULT_ENDPOINT_TIMEOUT_MS = 90_000;
+
 export interface ApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
@@ -362,7 +375,11 @@ export interface ApiEndpoint<
    * }
    * ```
    */
-  readonly events?: EndpointEventsMap<InferResponseOutput<TFields>>;
+  readonly events?: EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
+  >;
   // Unified fields for schema generation
   readonly fields: TFields;
 
@@ -543,8 +560,11 @@ export interface CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  // oxlint-disable-next-line no-explicit-any
-  TEvents extends EndpointEventsMap<any> | never,
+  out TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
+  >,
   RequestInput = InferRequestInput<TFields>,
   RequestOutput = InferRequestOutput<TFields>,
   ResponseInput = InferResponseInput<TFields>,
@@ -562,17 +582,20 @@ export interface CreateApiEndpoint<
    * Named events this endpoint can emit.
    *
    * Each key is an event name. The value declares:
-   * - `fields`: which ResponseOutput keys this event carries (typed Pick)
+   * - `responseFields`: which ResponseOutput keys this event carries (typed Pick)
+   * - `requestFields`: which RequestOutput keys to include in the payload
+   * - `urlPathParamsFields`: which UrlVariablesOutput keys to include in handler context
    * - `onEvent`: optional handler for cross-endpoint side effects (runs after auto-merge)
+   *   receives { responseData, requestData, urlPathParams, queryClient, logger, ... }
    *
-   * Server emits via `props.emitEvent("event-name", partial)` - type-checked against fields.
+   * Server emits via `props.emitEvent("event-name", payload)` - type-checked against declared fields.
    * Client subscribes via `useEndpoint({ subscribeToEvents: true })` - framework merges automatically.
    *
    * Usage:
    * ```ts
    * events: {
-   *   "message-upserted": { fields: ["messages"] as const },
-   *   "stream-finished":  { fields: [] as const, onEvent: ({ queryClient }) => { ... } },
+   *   "message-upserted": { responseFields: ["messages"] as const, operation: "merge" as const },
+   *   "stream-finished":  { onEvent: ({ queryClient }) => { ... } },
    * } satisfies EndpointEventsMap<typeof GET.types.ResponseOutput>
    * ```
    */
@@ -601,18 +624,30 @@ export interface CreateApiEndpoint<
           : never
     : never;
   readonly types: {
-    RequestInput: RequestInput;
-    RequestOutput: RequestOutput;
-    ResponseInput: ResponseInput;
-    ResponseOutput: ResponseOutput;
-    UrlVariablesInput: UrlVariablesInput;
-    UrlVariablesOutput: UrlVariablesOutput;
-    Fields: TFields;
-    Method: TMethod;
-    UserRoleValue: TUserRoleValue;
-    ScopedTranslationKey: TScopedTranslationKey;
-    Events: TEvents;
-    EventPayloads: ComputeEventPayloads<InferResponseOutput<TFields>, TEvents>;
+    readonly RequestInput: RequestInput;
+    readonly RequestOutput: RequestOutput;
+    readonly ResponseInput: ResponseInput;
+    readonly ResponseOutput: ResponseOutput;
+    readonly UrlVariablesInput: UrlVariablesInput;
+    readonly UrlVariablesOutput: UrlVariablesOutput;
+    readonly Fields: TFields;
+    readonly Method: TMethod;
+    readonly UserRoleValue: TUserRoleValue;
+    readonly ScopedTranslationKey: TScopedTranslationKey;
+    readonly Events: TEvents;
+    readonly EventPayloads: EventPayloads<TEvents>;
+    readonly EventResponsePayloads: EventResponsePayloads<
+      ResponseOutput,
+      TEvents
+    >;
+    readonly EventRequestPayloads: EventRequestPayloads<RequestOutput, TEvents>;
+    readonly EventUrlPayloads: EventUrlPayloads<UrlVariablesOutput, TEvents>;
+    readonly EventEmitUrlPayloads: EventEmitUrlPayloads<
+      UrlVariablesOutput,
+      TEvents
+    >;
+    readonly EventPayloadTypes: EventPayloadTypes<TEvents>;
+    readonly EventTypes: EventTypes<TEvents>;
   };
 }
 /**
@@ -628,20 +663,18 @@ export type CreateEndpointReturnInMethod<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>> | never,
+  TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
+  >,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     KMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    TEvents,
-    InferRequestInput<TFields>,
-    InferRequestOutput<TFields>,
-    InferResponseInput<TFields>,
-    InferResponseOutput<TFields>,
-    InferUrlVariablesInput<TFields>,
-    InferUrlVariablesOutput<TFields>
+    TEvents
   >;
 };
 
@@ -657,17 +690,20 @@ export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  const TEvents extends EndpointEventsMap<InferResponseOutput<TFields>> | never,
   const TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
-  > = UnifiedField<
-    TScopedTranslationKey,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
+  >,
+  const TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
+  > = EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
   >,
 >(
   config: ApiEndpoint<
@@ -676,6 +712,9 @@ export function createEndpoint<
     TScopedTranslationKey,
     TFields
   > & {
+    // Direct TEvents type — preserves literal types for const inference.
+    // onEvent ctx is typed via EndpointEventsMap's onEvent signature (any-based).
+    // Use `satisfies EndpointEventDeclaration<...>` on individual events for typed ctx.
     events?: TEvents;
   },
 ): CreateEndpointReturnInMethod<
@@ -732,9 +771,10 @@ export function createEndpoint<
     defaultExpanded: config.defaultExpanded,
     requiresConfirmation: config.requiresConfirmation,
     streamTimeoutMs: config.streamTimeoutMs,
+    timeoutMs: config.timeoutMs,
     defaultAiPinned: config.defaultAiPinned,
     defaultWebPinned: config.defaultWebPinned,
-    events: config.events,
+    events: config.events as TEvents | undefined,
     icon: config.icon,
     dynamicIcon: config.dynamicIcon,
     options: config.options,
@@ -766,10 +806,25 @@ export function createEndpoint<
       UserRoleValue: undefined! as TUserRoleValue,
       ScopedTranslationKey: undefined! as TScopedTranslationKey,
       Events: undefined! as TEvents,
-      EventPayloads: undefined! as ComputeEventPayloads<
+      EventPayloads: undefined! as EventPayloads<TEvents>,
+      EventResponsePayloads: undefined! as EventResponsePayloads<
         InferResponseOutput<TFields>,
         TEvents
       >,
+      EventRequestPayloads: undefined! as EventRequestPayloads<
+        InferRequestOutput<TFields>,
+        TEvents
+      >,
+      EventUrlPayloads: undefined! as EventUrlPayloads<
+        InferUrlVariablesOutput<TFields>,
+        TEvents
+      >,
+      EventEmitUrlPayloads: undefined! as EventEmitUrlPayloads<
+        InferUrlVariablesOutput<TFields>,
+        TEvents
+      >,
+      EventPayloadTypes: undefined! as EventPayloadTypes<TEvents>,
+      EventTypes: undefined! as EventTypes<TEvents>,
     },
   };
 

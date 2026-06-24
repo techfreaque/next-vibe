@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/versions/route"),
+      () => import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/versions/route"),
     ),
   },
 });

@@ -3,6 +3,12 @@ export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
+    clusterRole: {
+      none: "Brak",
+      controlPlane: "Control Plane",
+      worker: "Worker",
+      storage: "Storage",
+    },
     authType: {
       password: "Hasło",
       privateKey: "Klucz prywatny (PEM)",

@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/lead-magnet/providers/google-sheets/oauth/start/route"),
+      () => import("@/app/api/[locale]/lead-magnet/providers/google-sheets/oauth/start/route"),
     ),
   },
 });

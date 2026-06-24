@@ -117,7 +117,10 @@ if (!_resolvedRemoteUrl) {
         `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
-        return;
+        // oxlint-disable-next-line restricted-syntax
+        throw new Error(
+          `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+        );
       }
       testUser = resolved;
 
@@ -198,7 +201,10 @@ if (!_resolvedRemoteUrl) {
             `Stream failed: ${result.success ? "" : result.message}`,
           ).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(
+              `Stream failed: ${result.message ?? "unexpected failure"}`,
+            );
           }
 
           sharedThreadId = result.data.threadId;
@@ -253,7 +259,10 @@ if (!_resolvedRemoteUrl) {
             "A1 must create thread before A2",
           ).toBeTruthy();
           if (!sharedThreadId) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(
+              "sharedThreadId not set — prior step must have failed",
+            );
           }
 
           const testContent = `e2e-test-content-${Date.now()}`;
@@ -275,7 +284,10 @@ if (!_resolvedRemoteUrl) {
             `Stream failed: ${result.success ? "" : result.message}`,
           ).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(
+              `Stream failed: ${result.message ?? "unexpected failure"}`,
+            );
           }
 
           // Verify write call
@@ -347,7 +359,10 @@ if (!_resolvedRemoteUrl) {
             `Stream failed: ${result.success ? "" : result.message}`,
           ).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(
+              `Stream failed: ${result.message ?? "unexpected failure"}`,
+            );
           }
 
           sharedThreadId = result.data.threadId;
@@ -393,7 +408,10 @@ if (!_resolvedRemoteUrl) {
             "B1 must create thread before B2",
           ).toBeTruthy();
           if (!sharedThreadId) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(
+              "sharedThreadId not set — prior step must have failed",
+            );
           }
 
           // Verify the thread exists locally (threadMirrorMode='both' from connectToHermes)

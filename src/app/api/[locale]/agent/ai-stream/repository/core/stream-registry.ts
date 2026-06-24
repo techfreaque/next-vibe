@@ -12,7 +12,8 @@ import { and, eq, like, ne, sql } from "drizzle-orm";
 import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
-import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
+import { createMessagesGetEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
+import { createThreadsGetEmitter } from "@/app/api/[locale]/agent/chat/threads/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -147,7 +148,7 @@ export async function setStreamingStateAborting(
 ): Promise<void> {
   await db
     .update(chatThreads)
-    .set({ streamingState: "aborting" })
+    .set({ streamingState: ThreadStreamingState.ABORTING })
     .where(eq(chatThreads.id, threadId));
 }
 
@@ -173,7 +174,7 @@ function computePreview(content: string): string {
 }
 
 export interface ClearStreamingResult {
-  state: "idle" | "waiting";
+  state: ThreadStreamingState.IDLE | ThreadStreamingState.WAITING;
   preview: string | null;
   updatedAt: Date;
 }
@@ -184,7 +185,6 @@ export async function clearStreamingState(
   user: JwtPayloadType,
   lastContent?: string | null,
 ): Promise<ClearStreamingResult> {
-  const wsEmit = createMessagesEmitter(threadId, null, logger, user);
   StreamRegistry.unregister(threadId);
   const now = new Date();
 
@@ -220,12 +220,12 @@ export async function clearStreamingState(
     .limit(1);
 
   const { hasPendingCallForThread } =
-    await import("@/app/api/[locale]/remote-connection/pending-calls");
+    await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
 
-  const nextState =
+  const nextState: ThreadStreamingState.IDLE | ThreadStreamingState.WAITING =
     activeTask || resumePending || (await hasPendingCallForThread(threadId))
-      ? "waiting"
-      : "idle";
+      ? ThreadStreamingState.WAITING
+      : ThreadStreamingState.IDLE;
   const preview =
     lastContent && lastContent.trim().length > 0
       ? computePreview(lastContent)
@@ -239,14 +239,14 @@ export async function clearStreamingState(
       ...(preview !== null ? { preview } : {}),
     })
     .where(
-      nextState === "idle"
+      nextState === ThreadStreamingState.IDLE
         ? // Positively idle: rows + registry (cross-process reconciled) show
           // no pending work — clearing an earlier 'waiting' is correct, and
           // nothing else would ever transition it back.
           eq(chatThreads.id, threadId)
         : and(
             eq(chatThreads.id, threadId),
-            ne(chatThreads.streamingState, "waiting"),
+            ne(chatThreads.streamingState, ThreadStreamingState.WAITING),
           ),
     )
     .returning({ folderId: chatThreads.folderId });
@@ -263,8 +263,20 @@ export async function clearStreamingState(
   // show the stop button. Emit regardless of whether the DB update matched —
   // escalateToTask may have already set DB to "waiting" (skipping the update),
   // but the frontend still needs this event to show the stop button.
-  if (nextState === "waiting") {
-    wsEmit("streaming-state-changed", { streamingState: "waiting" });
+  if (nextState === ThreadStreamingState.WAITING) {
+    createMessagesGetEmitter(logger, user)("streaming-state-changed", {
+      responseData: {
+        streamingState: ThreadStreamingState.WAITING,
+      },
+      urlPathParams: { threadId },
+    });
+    createThreadsGetEmitter(logger, user)("streaming-state-changed", {
+      responseData: {
+        threads: [
+          { id: threadId, streamingState: ThreadStreamingState.WAITING },
+        ],
+      },
+    });
   }
 
   return { state: nextState, preview, updatedAt: now };
@@ -282,7 +294,7 @@ export async function setStreamingStateWaiting(
   const now = new Date();
   const [thread] = await db
     .update(chatThreads)
-    .set({ streamingState: "waiting", updatedAt: now })
+    .set({ streamingState: ThreadStreamingState.WAITING, updatedAt: now })
     .where(eq(chatThreads.id, threadId))
     .returning({ folderId: chatThreads.folderId });
 

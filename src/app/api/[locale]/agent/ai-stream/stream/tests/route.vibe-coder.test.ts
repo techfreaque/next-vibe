@@ -45,7 +45,11 @@ import { env } from "@/config/env";
 
 import { ChatModelId } from "../../models";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
-import { getOrCreateFolder, resolveUser, runTestStream } from "../../testing/headless-test-runner";
+import {
+  getOrCreateFolder,
+  resolveUser,
+  runTestStream,
+} from "../../testing/headless-test-runner";
 
 const VIBE_CODER_FAVORITE_ID = "00000000-0000-4010-a000-000000000001";
 
@@ -72,13 +76,25 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(
+        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+      );
     }
     testUser = resolved;
 
     // ── Create BACKGROUND/tests/vibe-coder subfolder ──
-    const testsParentId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "tests");
-    vibeCoderFolderId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "vibe-coder", testsParentId);
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    vibeCoderFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "vibe-coder",
+      testsParentId,
+    );
 
     // ── Save current codingAgent setting ──
     const [existing] = await db
@@ -179,7 +195,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       `VC1 stream failed: ${!result.success ? result.message : ""}`,
     ).toBe(true);
     if (!result.success) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`VC1: ${result.message ?? "unexpected failure"}`);
     }
 
     // Strip <think>...</think> blocks before assertions - AI reasoning may contain
@@ -257,7 +274,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       `VC2 stream failed: ${!result.success ? result.message : ""}`,
     ).toBe(true);
     if (!result.success) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`VC2: ${result.message ?? "unexpected failure"}`);
     }
 
     // Strip <think>...</think> blocks before assertions - AI reasoning may contain

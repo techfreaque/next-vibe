@@ -8,11 +8,6 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  finishIncognitoThreadIfIncognito,
-  onEventPersistMessage,
-  persistMessageIfIncognito,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -30,10 +25,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type {
-  EmitEventNamed,
-  EventPayloads,
-} from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
@@ -43,6 +34,11 @@ import {
   ThreadStreamingState,
   ThreadStreamingStateDB,
 } from "../../../enum";
+import {
+  finishIncognitoThreadIfIncognito,
+  onEventPersistMessage,
+  persistMessageIfIncognito,
+} from "../../../incognito/event-persist";
 import threadsDefinitions from "../../definition";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -108,6 +104,7 @@ const { GET } = createEndpoint({
         ],
         streamingState: true,
       } as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const {
@@ -187,6 +184,7 @@ const { GET } = createEndpoint({
       remoteEvent: true,
       syncDomain: "chat" as const,
       responseFields: { messages: ["id", "content", "metadata"] } as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -220,6 +218,7 @@ const { GET } = createEndpoint({
       remoteEvent: true,
       syncDomain: "chat" as const,
       responseFields: { messages: ["id", "metadata"] } as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -230,6 +229,7 @@ const { GET } = createEndpoint({
       remoteEvent: true,
       syncDomain: "chat" as const,
       responseFields: { messages: ["id", "metadata"] } as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -257,6 +257,7 @@ const { GET } = createEndpoint({
           "updatedAt",
         ],
       } as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const currentHref = getCurrentUrl();
@@ -710,7 +711,7 @@ const { GET } = createEndpoint({
             id: "660e8400-e29b-41d4-a716-446655440000",
             threadId: "550e8400-e29b-41d4-a716-446655440000",
             role: ChatMessageRole.USER,
-            label: "Hello, how can you help me?",
+            content: "Hello, how can you help me?",
             parentId: null,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
@@ -732,7 +733,7 @@ const { GET } = createEndpoint({
             id: "770e8400-e29b-41d4-a716-446655440000",
             threadId: "550e8400-e29b-41d4-a716-446655440000",
             role: ChatMessageRole.ASSISTANT,
-            label: "I can help you with various tasks!",
+            content: "I can help you with various tasks!",
             parentId: "660e8400-e29b-41d4-a716-446655440000",
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
@@ -957,8 +958,7 @@ export type MessageListUrlParamsTypeOutput =
   typeof GET.types.UrlVariablesOutput;
 export type MessageListResponseOutput = typeof GET.types.ResponseOutput;
 
-/** Typed emit callback for the messages WS channel - payload types from GET.types.EventPayloads. */
-export type MessagesWsEmit = EmitEventNamed<typeof GET.types.EventPayloads>;
+export type MessagesEventPayloads = typeof GET.types.EventPayloads;
 
 export type MessageCreateRequestOutput = typeof POST.types.RequestOutput;
 export type MessageCreateUrlParamsTypeOutput =

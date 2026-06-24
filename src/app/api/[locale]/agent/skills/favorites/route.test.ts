@@ -13,14 +13,14 @@ import { and, eq, like } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite/test-endpoint";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { isUuid } from "../../chat/slugify";
-import { IntelligenceLevel,ModelSelectionType } from "../enum";
+import { IntelligenceLevel, ModelSelectionType } from "../enum";
 import favoriteSingleEndpoint from "./[id]/definition";
 import favoriteCreateEndpoint from "./create/definition";
 import { chatFavorites } from "./db";
@@ -120,7 +120,10 @@ describe("Favorites CRUD Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
           return;
         }
         try {

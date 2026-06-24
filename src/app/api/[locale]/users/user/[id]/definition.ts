@@ -31,6 +31,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { dateSchema } from "../../../shared/types/common.schema";
+import {
+  USER_DELETE_ALIAS,
+  USER_UPDATE_ALIAS,
+  USER_VIEW_ALIAS,
+} from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const UserDeleteContainer = lazyWidget(() =>
@@ -50,6 +55,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["users", "user", "[id]"],
+  aliases: [USER_VIEW_ALIAS] as const,
   title: "id.get.title" as const,
   titleShort: "id.get.titleShort" as const,
   description: "id.get.description" as const,
@@ -408,6 +414,7 @@ const { PUT } = createEndpoint({
   scopedTranslation,
   method: Methods.PUT,
   path: ["users", "user", "[id]"],
+  aliases: [USER_UPDATE_ALIAS] as const,
   title: "id.put.title" as const,
   titleShort: "id.put.titleShort" as const,
   description: "id.put.description" as const,
@@ -699,6 +706,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["users", "user", "[id]"],
+  aliases: [USER_DELETE_ALIAS] as const,
   title: "id.delete.title" as const,
   titleShort: "id.delete.titleShort" as const,
   description: "id.delete.description" as const,

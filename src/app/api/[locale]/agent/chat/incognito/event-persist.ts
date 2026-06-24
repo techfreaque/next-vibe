@@ -15,10 +15,10 @@
  *      }
  */
 
+import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { DefaultFolderId } from "../config";
-import type { ChatFolder, ChatThread } from "../db";
 import { ThreadStreamingState } from "../enum";
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────

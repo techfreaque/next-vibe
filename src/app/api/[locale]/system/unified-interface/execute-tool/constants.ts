@@ -7,7 +7,7 @@ export const EXECUTE_TOOL_ALIAS = "execute-tool" as const;
 export const CallbackMode = {
   /** (default) Execute inline, result returned to AI, loop continues. Remote: same via /report. */
   WAIT: "wait",
-  /** Fire and forget. AI gets { taskId, hint } only. Result in task history, never injected into thread. Use wait-for-task to upgrade to wakeUp. */
+  /** Fire and forget. AI gets { taskId, hint } only. Result in task history, never injected into thread. Use await-task to upgrade to wakeUp. */
   DETACH: "detach",
   /** Like detach but always revives AI with result. Stream continues; resume-stream intercepts live loop or revives dead one. Args suppressed from AI context on revival. */
   WAKE_UP: "wakeUp",

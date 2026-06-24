@@ -489,13 +489,7 @@ const { PATCH } = createEndpoint({
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["title", "folderId", "status", "rootFolderId"] as const,
       responseFields: ["updatedAt"] as const,
-      onEvent: async ({
-        requestData,
-        responseData,
-        urlPathParams,
-        queryClient,
-        logger,
-      }) => {
+      onEvent: async ({ requestData, responseData, urlPathParams, logger }) => {
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = requestData.rootFolderId;
@@ -530,7 +524,6 @@ const { PATCH } = createEndpoint({
           },
           { requestData: { rootFolderId, subFolderId: null } },
         );
-        void queryClient;
       },
     },
   },
@@ -698,7 +691,7 @@ const { DELETE } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["rootFolderId"] as const,
-      onEvent: async ({ responseData, urlPathParams, queryClient, logger }) => {
+      onEvent: async ({ responseData, urlPathParams, logger }) => {
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = responseData.rootFolderId;
@@ -723,7 +716,6 @@ const { DELETE } = createEndpoint({
           },
           { requestData: { rootFolderId, subFolderId: null } },
         );
-        void queryClient;
       },
     },
   },

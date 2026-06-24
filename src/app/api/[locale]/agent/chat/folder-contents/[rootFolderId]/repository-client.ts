@@ -99,7 +99,7 @@ export class FolderContentsRepositoryClient {
           archived: null,
           canEdit: null,
           canPost: null,
-          streamingState: null,
+          streamingState: ThreadStreamingState.IDLE,
           rolesEdit: null,
           // Share link fields - null for folders
           activeShareCount: null,
@@ -128,7 +128,7 @@ export class FolderContentsRepositoryClient {
           canModerate: false,
           canDelete: true,
           canManagePermissions: false,
-          streamingState: "idle" as const,
+          streamingState: ThreadStreamingState.IDLE,
           rolesView: thread.rolesView ?? null,
           rolesEdit: thread.rolesEdit ?? null,
           rolesPost: thread.rolesPost ?? null,

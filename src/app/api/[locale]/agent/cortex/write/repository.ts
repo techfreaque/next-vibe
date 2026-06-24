@@ -14,6 +14,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
  */
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -202,9 +203,7 @@ export class CortexWriteRepository {
           logger,
           user,
         )("node-written", {
-          path,
-          content,
-          createParents,
+          requestData: { path, content, createParents },
         });
       }
 
@@ -232,11 +231,10 @@ export class CortexWriteRepository {
     requestData,
     user,
     logger,
-  }: {
-    requestData: { path: string; content: string; createParents: boolean };
-    user: JwtPrivatePayloadType;
-    logger: EndpointLogger;
-  }): Promise<void> {
+  }: RemoteEventHandlerProps<
+    typeof writeDefinitions.POST,
+    "node-written"
+  >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const result = await this.writeFile({
       userId: user.id,

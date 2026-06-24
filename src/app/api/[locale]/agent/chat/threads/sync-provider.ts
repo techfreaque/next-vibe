@@ -116,10 +116,10 @@ async function resolveRemoteSubfolderId(
 }
 
 /**
- * Push a single thread's current state to connected peers over the sync
- * channel. Used after out-of-band writes to a mirrored thread (detach/wakeUp
- * backfills, revival turns) that happen AFTER the live relay stream closed —
- * the persistent connector on the peer applies it via applySyncPayloads.
+ * Push a single thread's current state to connected peers via its endpoint's
+ * own thread-updated remoteEvent. Used after out-of-band writes to a mirrored
+ * thread (detach/wakeUp backfills, revival turns) that happen AFTER the live
+ * relay stream closed — the peer applies it via the threads route onRemoteEvent.
  *
  * Only pushes when the thread lives in a REMOTE/<instance> folder (a mirrored
  * thread); local-only threads never sync. Best-effort: the next connect-time
@@ -132,27 +132,55 @@ export async function pushThreadSync(
 ): Promise<void> {
   try {
     const [thread] = await db
-      .select({ rootFolderId: chatThreads.rootFolderId })
+      .select({
+        rootFolderId: chatThreads.rootFolderId,
+        title: chatThreads.title,
+        folderId: chatThreads.folderId,
+        status: chatThreads.status,
+      })
       .from(chatThreads)
       .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)))
       .limit(1);
-    if (!thread || thread.rootFolderId !== DefaultFolderId.REMOTE) {
+    if (
+      !thread ||
+      (thread.rootFolderId !== DefaultFolderId.REMOTE &&
+        thread.rootFolderId !== DefaultFolderId.BACKGROUND)
+    ) {
       return;
     }
     // Bump the thread updatedAt so the PULL path re-serves it too: the sync
     // provider selects threads by thread.updatedAt, and an out-of-band message
     // change (detach/wakeUp backfill) may not have touched the thread row.
+    const updatedAt = new Date();
     await db
       .update(chatThreads)
-      .set({ updatedAt: new Date() })
+      .set({ updatedAt })
       .where(eq(chatThreads.id, threadId));
 
-    const { serializeProviders } =
-      await import("@/app/api/[locale]/remote-connection/sync-provider");
-    const { broadcastSyncNotify } =
+    // Relay this thread as the [threadId] PATCH thread-updated remoteEvent —
+    // its own per-op event carrying the changed fields. createEndpointEmitter
+    // fans it out through the unified bridge, gated per-connection by
+    // syncScope["threads"] and applied on the peer via the [threadId] route's
+    // onRemoteEvent (which re-runs updateThread).
+    const { createEndpointEmitter } =
       await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-    const payloads = await serializeProviders(["threads"], userId, logger);
-    broadcastSyncNotify(userId, payloads, logger);
+    const { default: threadsByIdDefinitions } =
+      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+    const user: JwtPrivatePayloadType = {
+      id: userId,
+      leadId: userId,
+      isPublic: false,
+      roles: [],
+    };
+    createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+      threadId,
+    })("thread-updated", {
+      title: thread.title,
+      folderId: thread.folderId,
+      status: thread.status,
+      rootFolderId: thread.rootFolderId,
+      updatedAt,
+    });
   } catch (error) {
     logger.debug("[pushThreadSync] best-effort push failed", {
       threadId,
@@ -165,7 +193,7 @@ export async function pushThreadSync(
 
 export const threadsSyncProvider: SyncProvider = {
   key: "threads",
-  labelI18nKey: "remoteConnection.sync.threads",
+  labelKey: "threads",
 
   async getCursor(userId): Promise<ThreadsSyncCursor> {
     const threads = await db
@@ -225,7 +253,10 @@ export const threadsSyncProvider: SyncProvider = {
           typedCursor
             ? and(
                 eq(chatThreads.userId, userId),
-                gte(chatThreads.updatedAt, new Date(typedCursor.threadsCursor)),
+                // Pass cursor as a raw SQL string literal to avoid pg driver timezone
+                // conversion. The DB stores TIMESTAMP WITHOUT TIMEZONE in local time;
+                // new Date(cursor) → pg converts to local+offset, skewing comparison.
+                sql`${chatThreads.updatedAt} >= ${typedCursor.threadsCursor}::timestamp`,
               )
             : eq(chatThreads.userId, userId),
         )
@@ -233,28 +264,52 @@ export const threadsSyncProvider: SyncProvider = {
 
       const result: SyncedThread[] = [];
 
-      // Resolve instanceIds from the folder names (REMOTE/{instanceId} subfolders)
-      const folderIds = [
-        ...new Set(
-          threads
-            .map((t) => t.folderId)
-            .filter((id): id is string => id !== null),
-        ),
-      ];
+      // Resolve instanceIds from the folder names (REMOTE/{instanceId} subfolders).
+      // For nested paths (e.g. REMOTE/hermes/tests/suite or BACKGROUND/atlas/tests/suite),
+      // we need the TOP-LEVEL subfolder name (the instanceId), not the immediate folder.
+      // Load all REMOTE+BACKGROUND folders for this user in one query and walk up the
+      // tree in memory to find the top-level (parentId IS NULL) subfolder name.
+      const threadFolderIds = new Set(
+        threads
+          .map((t) => t.folderId)
+          .filter((id): id is string => id !== null),
+      );
       const instanceIdByFolderId = new Map<string, string>();
-      if (folderIds.length > 0) {
-        const folders = await db
+      if (threadFolderIds.size > 0) {
+        const allMirrorFolders = await db
           .select({
             id: chatFolders.id,
             name: chatFolders.name,
+            parentId: chatFolders.parentId,
             rootFolderId: chatFolders.rootFolderId,
           })
           .from(chatFolders)
-          .where(inArray(chatFolders.id, folderIds));
-        for (const folder of folders) {
-          if (folder.rootFolderId === DefaultFolderId.REMOTE) {
-            instanceIdByFolderId.set(folder.id, folder.name);
+          .where(
+            and(
+              eq(chatFolders.userId, userId),
+              inArray(chatFolders.rootFolderId, [
+                DefaultFolderId.REMOTE,
+                DefaultFolderId.BACKGROUND,
+              ]),
+            ),
+          );
+        // Build a map of id → folder for O(1) parent-walk
+        const folderById = new Map(allMirrorFolders.map((f) => [f.id, f]));
+        // For each thread's folderId, walk up to the top-level subfolder
+        for (const folderId of threadFolderIds) {
+          let folderCursor = folderById.get(folderId);
+          if (!folderCursor) {
+            continue;
           }
+          while (folderCursor.parentId !== null) {
+            const parent = folderById.get(folderCursor.parentId);
+            if (!parent) {
+              break;
+            }
+            folderCursor = parent;
+          }
+          // folderCursor is now the top-level subfolder whose name IS the instanceId
+          instanceIdByFolderId.set(folderId, folderCursor.name);
         }
       }
 
@@ -302,9 +357,13 @@ export const threadsSyncProvider: SyncProvider = {
         const msgCursorTime = msgCursor ? new Date(msgCursor).getTime() : null;
         const messages = (messagesByThreadId.get(thread.id) ?? []).filter(
           (m) =>
-            isOwnerAuthoritative ||
-            msgCursorTime === null ||
-            m.updatedAt.getTime() > msgCursorTime,
+            // Never ship compacting messages to peers — they are a local
+            // context-management detail. The receiver already has the messages
+            // in their original (pre-compaction) form from relay events.
+            !m.metadata?.isCompacting &&
+            (isOwnerAuthoritative ||
+              msgCursorTime === null ||
+              m.updatedAt.getTime() > msgCursorTime),
         );
 
         result.push({
@@ -350,7 +409,7 @@ export const threadsSyncProvider: SyncProvider = {
       // so the last element is not necessarily the latest updatedAt — e.g. a
       // backfilled early message). Matches the updatedAt-based serve filter.
       const messageCursors: Record<string, string> = {
-        ...(typedCursor?.messageCursors ?? {}),
+        ...typedCursor?.messageCursors,
       };
       for (const servedThread of result) {
         let maxUpdatedAt: string | null = null;
@@ -521,7 +580,16 @@ export const threadsSyncProvider: SyncProvider = {
                   .update(chatMessages)
                   .set({
                     content: remoteMsg.content,
-                    parentId: remoteMsg.parentId,
+                    // Owner-authoritative threads are mirrored from a remote
+                    // relay: the local relay-processor already set the correct
+                    // parentId chain. Overwriting it with the remote's value
+                    // can corrupt the chain (e.g. hermes re-parents via a
+                    // compacting node that was filtered from the sync payload).
+                    // For LWW (non-owner-authoritative) threads there is no
+                    // relay, so the remote's parentId IS authoritative.
+                    ...(!ownerAuthoritative && {
+                      parentId: remoteMsg.parentId,
+                    }),
                     sequenceId: remoteMsg.sequenceId,
                     authorId: remoteMsg.authorId,
                     authorName: remoteMsg.authorName,
@@ -534,6 +602,18 @@ export const threadsSyncProvider: SyncProvider = {
                   .where(eq(chatMessages.id, remoteMsg.id));
               }
             } else {
+              // For owner-authoritative (mirrored) threads, skip empty assistant
+              // messages on INSERT. These are streaming-start placeholders that
+              // the relay-processor prunes on stream-finished. If sync re-inserts
+              // them with the remote's parentId (which differs from the
+              // relay-processor's chain), they become dead-end leaves.
+              if (
+                ownerAuthoritative &&
+                remoteMsg.role === "assistant" &&
+                !remoteMsg.content
+              ) {
+                continue;
+              }
               messageInsertRows.push({
                 id: remoteMsg.id,
                 threadId: remoteThread.id,
@@ -555,6 +635,14 @@ export const threadsSyncProvider: SyncProvider = {
             logger.error("Failed to upsert synced message", {
               id: remoteMsg.id,
               threadId: remoteThread.id,
+              rawError:
+                msgError instanceof Error
+                  ? `${msgError.name}: ${msgError.message}`
+                  : String(msgError),
+              stack:
+                msgError instanceof Error
+                  ? msgError.stack?.split("\n").slice(0, 5).join(" | ")
+                  : undefined,
               ...parseError(msgError),
             });
           }
@@ -584,8 +672,35 @@ export const threadsSyncProvider: SyncProvider = {
       const batch = messageInsertRows.slice(i, i + 1000);
       try {
         await db.insert(chatMessages).values(batch).onConflictDoNothing();
-      } catch (error) {
-        logger.error("Failed to upsert synced message", parseError(error));
+      } catch (batchError) {
+        logger.warn("[SyncProvider] Batch insert failed, retrying row-by-row", {
+          batchSize: batch.length,
+          error:
+            batchError instanceof Error
+              ? batchError.message
+              : String(batchError),
+        });
+        // Try one-by-one to find the offending row and log it precisely
+        for (const row of batch) {
+          try {
+            await db.insert(chatMessages).values([row]).onConflictDoNothing();
+          } catch (singleError) {
+            logger.error("Failed to insert synced message (single)", {
+              id: row.id,
+              threadId: row.threadId,
+              role: row.role,
+              parentId: row.parentId,
+              rawError:
+                singleError instanceof Error
+                  ? `${singleError.name}: ${singleError.message}`
+                  : String(singleError),
+              stack:
+                singleError instanceof Error
+                  ? singleError.stack?.split("\n").slice(0, 5).join(" | ")
+                  : undefined,
+            });
+          }
+        }
       }
     }
 

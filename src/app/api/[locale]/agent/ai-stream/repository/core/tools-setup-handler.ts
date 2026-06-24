@@ -125,7 +125,7 @@ export class ToolsSetupHandler {
     const isAgentMode = !params.pinnedTools;
 
     // Build visible tool IDs from client request, or use defaults in agent mode.
-    // Always inject wait-for-task so AI can pause on background tasks regardless
+    // Always inject await-task so AI can pause on background tasks regardless
     // of the user's saved tool list (it may predate the tool being added to defaults).
     const visibleToolIdsFromClient = params.pinnedTools
       ? params.pinnedTools.map((t) => getFullPath(t.toolId) ?? t.toolId)

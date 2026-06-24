@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Assistant: <think>Now I have the schemas for both tools. Let me execute them.\n\n1. First, cortex-write with path=\"/memories/t2-cheap-test\" and content=\"T2_CHEAP_OK\"\n2. Then, cortex-read with path=\"/memories/t</think>\n\nAssistant: <think>Write</think>\n\nAssistant: <think>The write succeeded and the read confirmed the content is exactly \"T2_CHEAP_OK\". I should reply with STEP_OK.</think>STEP_OK\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='wait-for-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "input": "Assistant: <think>Now I have the schemas for both tools. Let me execute them.\n\n1. First, cortex-write with path=\"/memories/t2-cheap-test\" and content=\"T2_CHEAP_OK\"\n2. Then, cortex-read with path=\"/memories/t</think>\n\nAssistant: <think>Write</think>\n\nAssistant: <think>The write succeeded and the read confirmed the content is exactly \"T2_CHEAP_OK\". I should reply with STEP_OK.</think>STEP_OK\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
     "encoding_format": "float"
   }
 }

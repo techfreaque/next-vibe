@@ -3204,9 +3204,11 @@ function buildChatModelOptionsPool(): ChatModelOption[] {
 export const chatModelOptionsPool: ChatModelOption[] =
   buildChatModelOptionsPool();
 
-export const ChatModelIdOptions = Object.values(ChatModelId).map((id) => ({
+export const ChatModelIdOptions = (
+  Object.entries(ChatModelId) as [keyof typeof ChatModelId, ChatModelId][]
+).map(([key, id]) => ({
   value: id,
-  label: chatModelOptions.find((m) => m.id === id)?.name ?? id,
+  label: `models.names.${key}` as `models.names.${keyof typeof ChatModelId}`,
 }));
 
 export function getChatModelById(modelId: ChatModelId): ChatModelOption;
@@ -3258,11 +3260,28 @@ export type ChatManualModelSelection = z.infer<
   typeof chatManualModelSelectionSchema
 >;
 
-export const chatModelSelectionSchema = z.discriminatedUnion("selectionType", [
+/**
+ * Chat model selection — a manual pick or a filter-based selection.
+ *
+ * Declared as an EXPLICIT union of its two component types (not `z.infer` of the
+ * discriminated union) and the schema is annotated `z.ZodType<ChatModelSelection>`.
+ * This pins `z.output<chatModelSelectionSchema>` to this named type so consumers
+ * (definitions embedding it as a field, event-payload Picks over the request/
+ * response output) resolve it shallowly instead of re-deriving the discriminated
+ * union every time — which exceeds TS's instantiation-depth limit and collapses
+ * the field type to `unknown`/`{}`.
+ */
+export type ChatModelSelection =
+  | ChatManualModelSelection
+  | FiltersModelSelection;
+
+export const chatModelSelectionSchema: z.ZodType<
+  ChatModelSelection,
+  ChatModelSelection
+> = z.discriminatedUnion("selectionType", [
   chatManualModelSelectionSchema,
   filtersSelectionSchema,
 ]);
-export type ChatModelSelection = z.infer<typeof chatModelSelectionSchema>;
 
 // ============================================================
 // CHAT MODEL RESOLUTION

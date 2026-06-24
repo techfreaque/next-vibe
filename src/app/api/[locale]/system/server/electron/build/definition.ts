@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
   subCategory: "serverElectron",
   tags: ["tags.electronBuild"],
   icon: "package",
+  timeoutMs: 0,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_AUTH_BYPASS,

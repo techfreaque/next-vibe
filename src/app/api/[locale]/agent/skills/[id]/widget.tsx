@@ -159,6 +159,7 @@ import {
   videoGenModelSelectionSchema,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CompactTriggerEdit } from "../../chat/settings/widget";
@@ -2523,7 +2524,7 @@ function LeadCaptureForm({
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const availability = useProviderAvailability();
-
+  const logger = useLogger();
   const handleSubmit = useCallback((): void => {
     if (!firstName.trim() || !email.trim()) {
       return;
@@ -2535,14 +2536,7 @@ function LeadCaptureForm({
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("@/app/api/[locale]/lead-magnet/capture/definition"),
         ]);
-        const { createClientLogger } =
-          await import("@/app/api/[locale]/system/logger/client");
-        const logger = createClientLogger(
-          false,
-          Date.now(),
-          locale,
-          availability,
-        );
+
         const result = await apiClient.mutate(
           captureDef.POST,
           logger,
@@ -2557,7 +2551,7 @@ function LeadCaptureForm({
         setState("error");
       }
     })();
-  }, [skillId, firstName, email, locale, availability]);
+  }, [skillId, firstName, email, locale, availability, logger]);
 
   const displayHeadline = headline ?? t("get.leadCapture.fallbackHeadline");
   const displayButton = buttonText ?? t("get.leadCapture.fallbackButton");
@@ -2783,7 +2777,7 @@ function CreatorOtherSkills({
   >([]);
   const [loaded, setLoaded] = useState(false);
   const availability = useProviderAvailability();
-
+  const logger = useLogger();
   useEffect(() => {
     void (async (): Promise<void> => {
       try {
@@ -2791,14 +2785,7 @@ function CreatorOtherSkills({
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("@/app/api/[locale]/agent/skills/definition"),
         ]);
-        const { createClientLogger } =
-          await import("@/app/api/[locale]/system/logger/client");
-        const logger = createClientLogger(
-          false,
-          Date.now(),
-          locale,
-          availability,
-        );
+
         const result = await apiClient.fetch(
           listDef.default.GET,
           logger,
@@ -2831,7 +2818,7 @@ function CreatorOtherSkills({
       }
       setLoaded(true);
     })();
-  }, [creatorUserId, currentSkillId, locale, availability]);
+  }, [creatorUserId, currentSkillId, locale, availability, logger]);
 
   if (!loaded || skills.length === 0) {
     return null;

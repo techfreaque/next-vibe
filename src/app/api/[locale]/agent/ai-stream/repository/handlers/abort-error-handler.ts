@@ -15,10 +15,7 @@ import {
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "@/app/api/[locale]/agent/chat/enum";
+import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
@@ -448,22 +445,7 @@ export class AbortErrorHandler {
       streamAbort?.reason === AbortReason.REMOTE_TOOL_WAIT ||
       streamAbort?.reason === AbortReason.STREAM_TIMEOUT;
     if (isWaitingAbort) {
-      const cleared = await clearStreamingState(threadId, logger, user);
-      if (cleared.state === "waiting") {
-        // Emit WS event so live clients update the stop button.
-        // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
-        // STREAM_TIMEOUT: no prior emission, so this is the first signal.
-        try {
-          ctx.wsEmit("streaming-state-changed", {
-            streamingState: ThreadStreamingState.WAITING,
-          });
-        } catch (err) {
-          logger.warn("[AI Stream] Failed to emit waiting state WS event", {
-            threadId,
-            error: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
+      await clearStreamingState(threadId, logger, user);
     } else {
       await clearStreamingState(threadId, logger, user);
     }

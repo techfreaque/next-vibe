@@ -11,8 +11,8 @@ import {
 import { SQL_ALIAS } from "@/app/api/[locale]/system/db/sql/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
+import { AWAIT_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/await-task/constants";
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { WAIT_FOR_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
@@ -45,10 +45,10 @@ export const codeArchitectSkill: Skill = {
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
   userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
-  availableTools: [
+  pinnedTools: [
     tool(TOOL_HELP_ALIAS),
     tool(EXECUTE_TOOL_ALIAS),
-    tool(WAIT_FOR_TASK_ALIAS),
+    tool(AWAIT_TASK_ALIAS),
     tool(CORTEX_READ_ALIAS),
     tool(CORTEX_WRITE_ALIAS),
     tool(CORTEX_EDIT_ALIAS),

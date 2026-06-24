@@ -45,13 +45,13 @@ import {
   canPostInThread,
   canViewThread,
 } from "../permissions/permissions";
-import type definitions from "./definition";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
   ThreadListRequestOutput,
   ThreadListResponseOutput,
 } from "./definition";
+import definitions from "./definition";
 import { scopedTranslation, type ThreadsT } from "./i18n";
 
 /**

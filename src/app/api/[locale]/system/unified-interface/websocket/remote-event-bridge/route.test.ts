@@ -30,10 +30,12 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { RemoteEventBridgeResponseOutput } from "./definition";
+import type {
+  RemoteEventBridgeRequestOutput,
+  RemoteEventBridgeResponseOutput,
+} from "./definition";
 import endpoints from "./definition";
 import { RemoteEventBridgeRepository } from "./repository";
 
@@ -46,7 +48,7 @@ const _resolvedRemoteUrl = resolveRemoteUrlSync();
 async function routeBridgeToHermes(
   testUser: JwtPrivatePayloadType,
   eventName: string,
-  payload: WidgetData,
+  payload: RemoteEventBridgeRequestOutput["payload"],
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
   const { RouteExecuteRepository } =
     await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
@@ -64,7 +66,7 @@ async function routeBridgeToHermes(
     callbackMode: CallbackMode.WAIT,
     user: testUser,
     locale: defaultLocale,
-    logger: createEndpointLogger(false, Date.now(), defaultLocale),
+    logger: createEndpointLogger(false, defaultLocale),
     streamContext: makeHeadlessContext(),
     input: {
       eventName,
@@ -103,12 +105,16 @@ describe("Remote Event Bridge", () => {
           leadId: testUser.leadId,
           payload: {
             originInstanceId: "hermes",
-            domain: "cache",
-            endpointPath: ["remote-connection", "remote-event-bridge"],
-            endpointMethod: "POST",
-            urlPathParams: {},
-            endpointEventName: "update",
-            endpointPayload: {},
+            syncDomain: "cache",
+            envelope: {
+              endpointPath: ["remote-connection", "remote-event-bridge"],
+              endpointMethod: "POST",
+              eventName: "update",
+              responseData: {},
+              requestData: {},
+              urlPathParams: {},
+              payload: undefined,
+            },
           },
         },
         user: testUser,
@@ -168,12 +174,16 @@ describe("Remote Event Bridge", () => {
           leadId: testUser.leadId,
           payload: {
             originInstanceId: selfInstanceId,
-            domain: "cache",
-            endpointPath: ["test"],
-            endpointMethod: "GET",
-            urlPathParams: {},
-            endpointEventName: "update",
-            endpointPayload: {},
+            syncDomain: "cache",
+            envelope: {
+              endpointPath: ["test"],
+              endpointMethod: "GET",
+              eventName: "update",
+              responseData: {},
+              requestData: {},
+              urlPathParams: {},
+              payload: undefined,
+            },
           },
         },
         user: testUser,
@@ -194,7 +204,7 @@ describe("Remote Event Bridge", () => {
     it("REB-LOCAL-INVALID-PAYLOAD: handleRemoteEvent with invalid payload does not throw", async () => {
       const { createEndpointLogger } =
         await import("@/app/api/[locale]/system/logger/server");
-      const logger = createEndpointLogger(false, Date.now(), "en-US");
+      const logger = createEndpointLogger(false, "en-US");
 
       // Empty payload: missing the required endpointPath/endpointMethod/
       // endpointEventName fields → handler takes the early-return guard path.
@@ -251,12 +261,16 @@ describe("Remote Event Bridge", () => {
 
         const result = await routeBridgeToHermes(testUser, "remote-event", {
           originInstanceId: "atlas",
-          domain: "cache",
-          endpointPath: ["test"],
-          endpointMethod: "GET",
-          urlPathParams: {},
-          endpointEventName: "update",
-          endpointPayload: {},
+          syncDomain: "cache",
+          envelope: {
+            endpointPath: ["test"],
+            endpointMethod: "GET",
+            eventName: "update",
+            responseData: {},
+            requestData: {},
+            urlPathParams: {},
+            payload: undefined,
+          },
         });
 
         expect(
@@ -283,7 +297,7 @@ describe("Remote Event Bridge", () => {
   // ════════════════════════════════════════════════════════════════════════════
   // REVERSE-WS TO HERMES — requires live Hermes dev instance
   // transportMode = 'reverse-ws': Atlas sends event over the hub channel;
-  // hermes receives via onRemoteEvent["sync-event"] etc. on its own bridge.
+  // hermes receives via onRemoteEvent["remote-event"] on its own bridge.
   // Uses connectToHermesLocalAi() which sets transportMode='reverse-ws'.
   // ════════════════════════════════════════════════════════════════════════════
 
@@ -328,12 +342,16 @@ describe("Remote Event Bridge", () => {
 
         const result = await routeBridgeToHermes(testUser, "remote-event", {
           originInstanceId: "atlas",
-          domain: "cache",
-          endpointPath: ["test"],
-          endpointMethod: "GET",
-          urlPathParams: {},
-          endpointEventName: "update",
-          endpointPayload: {},
+          syncDomain: "cache",
+          envelope: {
+            endpointPath: ["test"],
+            endpointMethod: "GET",
+            eventName: "update",
+            responseData: {},
+            requestData: {},
+            urlPathParams: {},
+            payload: undefined,
+          },
         });
 
         expect(
@@ -360,9 +378,7 @@ describe("Remote Event Bridge", () => {
         const result = await routeBridgeToHermes(
           testUser,
           "totally-unknown-event",
-          {
-            leadId: testUser.leadId,
-          },
+          {},
         );
 
         expect(

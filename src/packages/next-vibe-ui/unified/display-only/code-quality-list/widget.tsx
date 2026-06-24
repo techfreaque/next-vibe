@@ -64,7 +64,7 @@ export default function CodeQualityListWidget<
   type CodeQualityListOutput = z.output<CodeQualityListSchema>;
   let value: CodeQualityListOutput | undefined;
   if (usage.request && fieldName && form) {
-    value = form.watch(fieldName) as CodeQualityListOutput | undefined;
+    value = form.watch(fieldName);
     if (!value) {
       value = field.value as CodeQualityListOutput | undefined;
     }

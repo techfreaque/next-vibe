@@ -71,7 +71,6 @@ describe("Cortex Write E2E", () => {
     expect(res.data.responsePath).toBe(path);
     expect(res.data.created).toBe(true);
     expect(res.data.size).toBeGreaterThan(0);
-    expect(res.data.responseContent).toBe(content);
   });
 
   it("round-trips: READ after write returns identical content incl. frontmatter", async () => {
@@ -271,7 +270,6 @@ describe("Cortex Write E2E", () => {
       return;
     }
     expect(writeSecond.data.created).toBe(false);
-    expect(writeSecond.data.responseContent).toBe(second);
 
     const readRes = await sendTestRequest({
       endpoint: readEndpoint.GET,

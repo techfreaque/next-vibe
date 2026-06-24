@@ -21,33 +21,29 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { z } from "zod";
 
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
-import type { ToolReportTarget } from "@/app/api/[locale]/system/unified-interface/execute-tool/tool-executor";
+import { broadcastToolResult } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/remote-transport";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { broadcastToolResult } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch";
-import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CallbackModeValue } from "./constants";
 import { CallbackMode } from "./constants";
-import type {
-  RouteExecuteRequestOutput,
-  RouteExecuteResponseInput,
+import executeDefinition, {
+  type RouteExecuteRequestOutput,
+  type RouteExecuteResponseInput,
 } from "./definition";
 import { checkFolderRestrictions } from "./handlers/folder-restrictions";
 import { handleLocalDetach } from "./handlers/local-detach";

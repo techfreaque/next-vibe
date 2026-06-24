@@ -54,7 +54,7 @@ export function WithAccessKey(): React.ReactElement {
 
 // jsx-a11y/no-autofocus - Using autoFocus
 export function WithAutofocus(): React.ReactElement {
-  return <input type="text" />;
+  return <input type="text" autoFocus />;
 }
 
 // jsx-a11y/no-distracting-elements - Using marquee/blink
@@ -70,8 +70,8 @@ export function DistractingElements(): React.ReactElement {
 export function RedundantRole(): React.ReactElement {
   return (
     <div>
-      <button>Click me</button>
-      <nav>Navigation</nav>
+      <button role="button">Click me</button>
+      <nav role="navigation">Navigation</nav>
     </div>
   );
 }

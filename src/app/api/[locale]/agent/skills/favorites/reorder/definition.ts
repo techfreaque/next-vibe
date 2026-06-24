@@ -21,6 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { FAVORITES_REORDER_ALIAS } from "../constants";
+import favoritesListDefinition from "../definition";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -123,7 +124,7 @@ const { POST } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["positions"] as const,
-      onEvent: async ({ requestData, queryClient, logger }) => {
+      onEvent: async ({ requestData, logger }) => {
         const positionById = new Map(
           requestData.positions.map((p) => [p.id, p.position]),
         );
@@ -146,7 +147,6 @@ const { POST } = createEndpoint({
             return { ...old, data: { ...old.data, favorites } };
           },
         );
-        void queryClient;
       },
     },
   },

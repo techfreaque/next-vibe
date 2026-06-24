@@ -1143,7 +1143,7 @@ Controls which roles get this tool pinned in the AI context window by default. A
 defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 ```
 
-**Pin for AI:** Tools the AI needs autonomously — `ai-run`, `tool-help`, `cortex-*` (memory), `execute-tool`, `wait-for-task`. Admin adds `coding-agent`, `sql`, `rebuild`.
+**Pin for AI:** Tools the AI needs autonomously — `ai-run`, `tool-help`, `cortex-*` (memory), `execute-tool`, `await-task`. Admin adds `coding-agent`, `sql`, `rebuild`.
 
 **Never AI-pin:** UI-only tools (dashboards, lists with custom widgets), endpoints that only make sense through browser interaction, tools with large response payloads that waste context.
 

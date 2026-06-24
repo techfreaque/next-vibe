@@ -33,12 +33,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
+import skillsDefinitions from "../definition";
 import {
   CATEGORY_CONFIG,
   CategoryOptions,
@@ -541,6 +541,7 @@ const { POST } = createEndpoint({
       syncDomain: "skills" as const,
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      responseFields: ["id"] as const,
       requestFields: [
         "name",
         "tagline",
@@ -554,15 +555,9 @@ const { POST } = createEndpoint({
         "pinnedTools",
         "compactTrigger",
       ] as const,
-      onEvent: async ({
-        responseData,
-        requestData,
-        queryClient,
-        logger,
-        locale,
-        user,
-      }) => {
+      onEvent: async ({ responseData, requestData, logger, locale, user }) => {
         const category = requestData.category;
+
         const [
           { apiClient: client },
           skillsDefinition,
@@ -641,7 +636,6 @@ const { POST } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },
@@ -726,9 +720,9 @@ export type SkillCreateRequestOutput = typeof POST.types.RequestOutput;
 export type SkillCreateResponseInput = typeof POST.types.ResponseInput;
 export type SkillCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-/** Inferred payload of the `skill-created` event (create request fields + id). */
+/** Inferred payload of the `skill-created` event (id from responseFields). */
 export type SkillCreatedEventPayload =
-  (typeof POST.types.EventPayloads)["skill-created"];
+  (typeof POST.types.EventResponsePayloads)["skill-created"];
 
 // Type for filter-based model selection
 export type FiltersModelSelection = Extract<

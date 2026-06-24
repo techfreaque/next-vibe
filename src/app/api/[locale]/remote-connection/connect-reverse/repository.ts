@@ -177,8 +177,7 @@ export class RemoteConnectionRegisterRepository {
 
     // Transport detection — ONE ordered async block (spec: register never
     // opens outbound sockets; reverse entries dispatch toward their initiator
-    // via local hub publish on system/tool-dispatch/{userId}, where the
-    // initiator's persistent WS is subscribed).
+    // via the remote-event relay on system/sync/{userId}).
     //   1. Ping localUrl with the reverse token (authenticated health check)
     //   2. Persist the detected transport hint
     // Fire-and-forget: registration succeeds regardless of ping result.

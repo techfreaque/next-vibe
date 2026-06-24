@@ -120,9 +120,7 @@ export class CortexMkdirRepository {
           logger,
           user,
         )("node-written", {
-          path,
-          viewType,
-          createParents,
+          requestData: { path, viewType, createParents },
         });
       }
 

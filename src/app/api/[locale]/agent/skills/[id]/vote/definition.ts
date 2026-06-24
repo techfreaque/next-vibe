@@ -146,7 +146,7 @@ const { POST } = createEndpoint({
     "skill-voted": {
       operation: "merge" as const,
       responseFields: ["voteCount", "trustLevel"] as const,
-      onEvent: async ({ responseData, urlPathParams, queryClient, logger }) => {
+      onEvent: async ({ responseData, urlPathParams, logger }) => {
         const skillId = urlPathParams.id;
 
         const [{ apiClient }, skillsDefinition] = await Promise.all([
@@ -180,7 +180,6 @@ const { POST } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },

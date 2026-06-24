@@ -148,7 +148,7 @@ Hard gate. Never skip. Never say "should work" — prove it. If something looks 
 
 1. **Lint/types:** \`mcp atlas check\` or \`vibe check <path>\` → 0 errors
 2. **\`vibe gen\`** → 0 warnings, route count increases
-3. **Tests:** \`bun test --bail <path>\` → all pass
+3. **Tests:** \`bun test --bail --isolate <path>\` → all pass
 4. **CLI non-interactive:** \`vibe <alias> "<arg>"\` → fields render, layout intentional, data correct
 5. **CLI interactive** _(only when user explicitly asks)_: \`vibe <alias> -i --agent-control\` never returns — treat it like a server. Start in background via agent harness background command support. Session prints \`Interactive session PID: <pid>\` as first stdout line and writes to \`.tmp/.vibe-interactive.pid\`. Interact via MCP tools \`interactive-capture\` and \`interactive-send-keys\` — PID auto-detected, no need to pass it. Full guide: \`docs/guides/interactive-cli-agent-control.md\`.
 6. **Browser E2E** _(mandatory)_: \`tool-help query=browser\` lists all tools. \`tool-help query=browser-<toolname>\` gives full schema. Flow: \`new-page\` → \`take-snapshot\` → interact (\`click\`/\`fill\`) → verify. Each session owns one tab; \`new-page\` replaces it. URL: \`http://localhost:<PORT>/en-US/tools/<alias>\`. Port from \`grep "^PORT:" .tmp/.atlas.pid\`.

@@ -2,6 +2,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Server-Management",
+  enum: {
+    framework: {
+      next: "Next.js",
+      tanstack: "TanStack/Vite",
+    },
+  },
   tags: {
     build: "Build",
   },

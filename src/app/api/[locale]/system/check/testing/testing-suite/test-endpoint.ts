@@ -12,6 +12,7 @@ import type {
   CreateApiEndpoint,
   InferRequestOutput,
   InferResponseOutput,
+  InferUrlVariablesOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -26,7 +27,6 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { InferUrlVariablesOutput } from "../../../unified-interface/react-native/native-endpoint";
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
@@ -69,7 +69,8 @@ export function testEndpoint<
   >,
   TEvents extends EndpointEventsMap<
     InferResponseOutput<TFields>,
-    InferRequestOutput<TFields>
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
   >,
 >(
   endpoint: CreateApiEndpoint<

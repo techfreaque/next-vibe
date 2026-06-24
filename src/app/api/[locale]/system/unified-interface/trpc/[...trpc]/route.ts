@@ -28,7 +28,7 @@ async function handler(
   { params }: { params: Promise<{ locale: CountryLanguage; trpc: string[] }> },
 ): Promise<Response> {
   const { locale: rawLocale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), rawLocale);
+  const logger = createEndpointLogger(false, rawLocale);
 
   // Dynamically import the generated router - only exists if tRPC is enabled
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

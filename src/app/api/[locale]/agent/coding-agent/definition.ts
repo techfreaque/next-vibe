@@ -255,7 +255,7 @@ const { POST } = createEndpoint({
         output: "",
         durationMs: 0,
         taskId: "escalated-1234567890-abc123",
-        hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+        hint: "Result will be injected into this thread when complete. Do NOT call await-task.",
       },
     },
   },

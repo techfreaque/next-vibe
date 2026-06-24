@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/system/unified-interface/data-sources/cron-executions-succeeded/route"),
+      () => import("@/app/api/[locale]/system/unified-interface/data-sources/cron-executions-succeeded/route"),
     ),
   },
 });

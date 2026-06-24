@@ -20,6 +20,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/task-completion-handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -29,7 +30,6 @@ import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "../cron/db";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
-import { handleTaskCompletion } from "../task-completion-handler";
 import type {
   CompleteTaskRequestOutput,
   CompleteTaskResponseOutput,

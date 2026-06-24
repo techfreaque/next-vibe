@@ -34,7 +34,6 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import type { ZodTypeAny } from "zod";
 
 import type {
   ContentBlock,

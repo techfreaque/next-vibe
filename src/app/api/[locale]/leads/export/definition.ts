@@ -170,7 +170,7 @@ const { GET } = createEndpoint({
         schema: z.string(),
       }),
 
-      filelabel: responseField(scopedTranslation, {
+      fileContent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.fileContent",
         schema: z.string(),
@@ -244,7 +244,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         fileName: "leads_export_2023-01-01.csv",
-        filelabel: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU...",
+        fileContent: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU...",
         mimeType: MimeType.CSV,
         totalRecords: 150,
         exportedAt: new Date("2023-01-01T12:00:00.000Z"),

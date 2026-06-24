@@ -1,17 +1,15 @@
 // AUTO-GENERATED from src/app/[locale]/tools/[...toolPath]/page.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { JSX } from "react";
-
-import { TanstackPage as Page } from "@/app/[locale]/tools/[...toolPath]/page";
 import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
+import { TanstackPage as Page } from "@/app/[locale]/tools/[...toolPath]/page";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) => {
-    const { tanstackLoader } =
-      await import("@/app/[locale]/tools/[...toolPath]/page");
+    const { tanstackLoader } = await import("@/app/[locale]/tools/[...toolPath]/page");
     const p = toNextParams(data);
     return tanstackLoader({
       params: Promise.resolve({
@@ -21,9 +19,7 @@ const loadData = createServerFn({ method: "GET" })
     });
   });
 
-function PageComponent(): JSX.Element {
-  return <Page {...Route.useLoaderData()} />;
-}
+function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }
 
 export const Route = createFileRoute("/$locale/tools/$")({
   staleTime: 0,

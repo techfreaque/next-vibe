@@ -156,7 +156,7 @@ export async function createLeadId(
   request: NextRequest,
   locale: CountryLanguage,
 ): Promise<NextResponse> {
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   const clientInfo = {
     userAgent: request.headers.get("user-agent") || undefined,

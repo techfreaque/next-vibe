@@ -16,11 +16,13 @@ import type { EndpointEventsMap } from "../../../websocket/structured-events";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField } from "../../field/utils";
 import type { UnifiedField } from "../../types/endpoint";
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 import { WidgetType } from "../../types/enums";
 import type { RequestResponseWidgetConfig } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 
 // ============================================================================
 // STEP 1: Test TKey variance - can specific TKey extend string?
@@ -150,7 +152,8 @@ type GenericEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EndpointEventsMap<any, any, any>
 >;
 
 type Test6_1_GenericEndpointExtendsAny =
@@ -168,7 +171,8 @@ type SpecificEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EndpointEventsMap<any, any, any>
 >;
 
 type Test6_2_SpecificEndpointExtendsAny =

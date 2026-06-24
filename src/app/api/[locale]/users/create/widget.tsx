@@ -25,7 +25,15 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
+import { MultiSelectFieldWidget } from "next-vibe-ui/unified/form-fields/multiselect-field/widget";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import React, { useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
@@ -305,7 +313,7 @@ export function UserCreateContainer({
     );
   }
 
-  // Default: form state - framework renders form fields; widget provides the wrapper
+  // Default: form state
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
@@ -320,6 +328,40 @@ export function UserCreateContainer({
         <Span className="text-xs text-muted-foreground hidden sm:block">
           {t("widget.headerSubtitle")}
         </Span>
+      </Div>
+
+      {/* Form body */}
+      <Div className="flex flex-col gap-4 p-4 overflow-y-auto">
+        <Div className="grid grid-cols-2 gap-3">
+          <EmailFieldWidget
+            fieldName="basicInfo.email"
+            field={children.basicInfo.children.email}
+          />
+          <PasswordFieldWidget
+            fieldName="basicInfo.password"
+            field={children.basicInfo.children.password}
+          />
+          <TextFieldWidget
+            fieldName="basicInfo.privateName"
+            field={children.basicInfo.children.privateName}
+          />
+          <TextFieldWidget
+            fieldName="basicInfo.publicName"
+            field={children.basicInfo.children.publicName}
+          />
+          <SelectFieldWidget
+            fieldName="basicInfo.country"
+            field={children.basicInfo.children.country}
+          />
+          <SelectFieldWidget
+            fieldName="basicInfo.language"
+            field={children.basicInfo.children.language}
+          />
+        </Div>
+        <Div className="flex gap-2">
+          <FormAlertWidget field={{}} />
+          <SubmitButtonWidget<typeof definition.POST> field={{}} />
+        </Div>
       </Div>
     </Div>
   );

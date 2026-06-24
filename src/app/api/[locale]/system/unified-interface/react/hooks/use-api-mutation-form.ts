@@ -149,12 +149,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   // Build form config with all options
   // Type annotation matches UseFormProps to ensure compatibility with react-hook-form
   const formConfig: UseFormProps<TEndpoint["types"]["RequestOutput"]> = {
-    resolver: zodResolver<
-      TEndpoint["types"]["RequestOutput"],
-      // oxlint-disable-next-line no-explicit-any
-      any,
-      TEndpoint["types"]["RequestOutput"]
-    >(endpoint.requestSchema),
+    resolver: zodResolver(endpoint.requestSchema),
     mode: "onSubmit" as const,
     reValidateMode: "onChange" as const,
     ...restFormOptions,

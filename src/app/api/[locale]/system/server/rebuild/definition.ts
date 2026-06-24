@@ -42,6 +42,7 @@ const { POST } = createEndpoint({
   subCategory: "serverManagement",
   tags: ["tags.rebuild"],
   icon: "refresh-cw",
+  timeoutMs: 0,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_AUTH_BYPASS,

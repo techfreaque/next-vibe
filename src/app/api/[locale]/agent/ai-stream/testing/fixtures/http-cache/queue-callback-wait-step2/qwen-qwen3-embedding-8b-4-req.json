@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Assistant: STEP_OK taskId=remote-hermes-1777217289149-htkjzo\n\nUser: [T5b wait-for-task] Call execute-tool with toolName='wait-for-task', instanceId='hermes', input={'taskId':'remote-hermes-1777217289149-htkjzo'}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nUser:",
+    "input": "Assistant: STEP_OK taskId=remote-hermes-1777217289149-htkjzo\n\nUser: [T5b await-task] Call execute-tool with toolName='await-task', instanceId='hermes', input={'taskId':'remote-hermes-1777217289149-htkjzo'}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nUser:",
     "encoding_format": "float"
   }
 }

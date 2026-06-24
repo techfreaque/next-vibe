@@ -118,6 +118,12 @@ export interface ToolCall {
    * locally-executed tool calls.
    */
   remoteInstanceId?: string;
+  /**
+   * pending-calls registry key for reverse-WS inline wait calls that auto-upgraded
+   * to wakeUp. Set when WAIT→wakeUp auto-upgrade fires so dismiss-task can
+   * cancel the revival without waiting for the tool to complete.
+   */
+  pendingCallId?: string;
 }
 
 /**
@@ -447,11 +453,9 @@ export const chatThreads = pgTable(
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
 
-    // Streaming state - 'idle' | 'streaming' | 'aborting' | 'waiting'
-    // 'waiting' = stream ended but an escalated task is still in flight (e.g. interactive claude-code)
-    streamingState: text("streaming_state")
-      .$type<"idle" | "streaming" | "aborting" | "waiting">()
-      .default("idle")
+    streamingState: text("streaming_state", { enum: ThreadStreamingStateDB })
+      .$type<ThreadStreamingState>()
+      .default(ThreadStreamingState.IDLE)
       .notNull(),
 
     // Timestamps

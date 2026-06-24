@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Branch tracking: the branch leaf at tool-call time ────────────────
-      // Stored by execute-tool/wait-for-task so revival appends the deferred
+      // Stored by execute-tool/await-task so revival appends the deferred
       // result to the correct branch even if the user switched branches.
       leafMessageId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

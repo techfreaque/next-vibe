@@ -13,16 +13,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { z } from "zod";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -33,7 +31,6 @@ import {
   type ChatMessage,
   chatMessages,
   chatThreads,
-  type MessageMetadata,
   type ToolCall,
 } from "../../../db";
 import {
@@ -215,7 +212,7 @@ export class MessagesRepository {
       ...(params.attachments && params.attachments.length > 0
         ? { attachments: params.attachments }
         : {}),
-      ...(params.extraMetadata ?? {}),
+      ...params.extraMetadata,
     };
     const hasMetadata = Object.keys(metadata).length > 0;
 
@@ -1017,6 +1014,61 @@ export class MessagesRepository {
   }
 }
 
+// ─── Remote event wire types ───────────────────────────────────────────────────
+// Minimal shapes for WS wire payloads received from a remote AI stream instance.
+// Used by headless-relay-processor.ts and MessagesRemoteRepository.
+
+export interface RemoteMsg {
+  id: string;
+  threadId: string;
+  role: string;
+  content: string | null;
+  parentId: string | null;
+  authorId: string | null;
+  isAI: boolean;
+  model: ChatModelId | null;
+  skill: string | null;
+  sequenceId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  metadata: MessageMetadata | null;
+}
+
+export type MsgCreated = RemoteMsg & {
+  streamingState?: ThreadStreamingState | null;
+};
+
+export interface MsgWithIdContent {
+  id: string;
+  content?: string | null;
+  metadata?: MessageMetadata | null;
+}
+
+const msgSchema: z.ZodType<RemoteMsg> = z.object({
+  id: z.string(),
+  threadId: z.string().optional().default(""),
+  role: z.string().optional().default("assistant"),
+  content: z.string().nullable().optional().default(null),
+  parentId: z.string().nullable().optional().default(null),
+  authorId: z.string().nullable().optional().default(null),
+  isAI: z.boolean().optional().default(false),
+  model: z.nativeEnum(ChatModelId).nullable().optional().default(null),
+  skill: z.string().nullable().optional().default(null),
+  sequenceId: z.string().nullable().optional().default(null),
+  createdAt: z.string().nullable().optional().default(null),
+  updatedAt: z.string().nullable().optional().default(null),
+  metadata: z
+    .record(z.string(), z.unknown())
+    .nullable()
+    .optional()
+    .default(null) as z.ZodType<MessageMetadata | null>,
+});
+
+export const remoteMessagesPayloadSchema = z.object({
+  messages: z.array(msgSchema).optional().default([]),
+  streamingState: z.string().nullable().optional(),
+});
+
 /** Parse the first message from a raw WS wire payload. Used by headless-relay-processor (boundary). */
 export function parseRemoteFirstMsg(
   raw: WsWireMessage["data"],
@@ -1025,12 +1077,14 @@ export function parseRemoteFirstMsg(
   return parsed.success ? (parsed.data.messages[0] ?? null) : null;
 }
 
-export const messagesOnRemoteEvent = {
-  "message-created": async (payload: {
-    messages?: MsgCreated[];
-    streamingState?: ThreadStreamingState | null;
-  }): Promise<void> => {
-    const raw = payload.messages?.[0];
+export class MessagesRemoteRepository {
+  static async applyRemoteMessageCreated({
+    responseData,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "message-created"
+  >): Promise<void> {
+    const raw = responseData.messages?.[0];
     const msgId = raw?.id;
     const msgThreadId = raw?.threadId;
     if (!msgId || !msgThreadId) {
@@ -1051,7 +1105,7 @@ export const messagesOnRemoteEvent = {
         content,
         parentId: raw.parentId ?? null,
         authorId: raw.authorId ?? null,
-        model: (raw.model ?? null) as ChatModelId | null,
+        model: raw.model ?? null,
         skill: raw.skill ?? null,
         metadata,
         sequenceId: raw.sequenceId ?? null,
@@ -1060,7 +1114,7 @@ export const messagesOnRemoteEvent = {
       })
       .onConflictDoNothing()
       .catch(() => undefined);
-    const state = payload.streamingState;
+    const state = responseData.streamingState;
     if (state) {
       await db
         .update(chatThreads)
@@ -1068,10 +1122,12 @@ export const messagesOnRemoteEvent = {
         .where(eq(chatThreads.id, msgThreadId))
         .catch(() => undefined);
     }
-  },
+  }
 
-  error: async (payload: { messages?: MsgWithIdContent[] }): Promise<void> => {
-    const msg = payload.messages?.[0];
+  static async applyRemoteError({
+    responseData,
+  }: RemoteEventHandlerProps<typeof definitions.GET, "error">): Promise<void> {
+    const msg = responseData.messages?.[0];
     if (!msg?.id) {
       return;
     }
@@ -1086,12 +1142,15 @@ export const messagesOnRemoteEvent = {
       })
       .where(eq(chatMessages.id, msg.id))
       .catch(() => undefined);
-  },
+  }
 
-  "content-done": async (payload: {
-    messages?: MsgWithIdContent[];
-  }): Promise<void> => {
-    const msg = payload.messages?.[0];
+  static async applyRemoteContentDone({
+    responseData,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "content-done"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
     if (!msg?.id || !msg.content) {
       return;
     }
@@ -1108,13 +1167,16 @@ export const messagesOnRemoteEvent = {
         })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
-  },
+  }
 
-  "tool-result": async (
-    payload: { messages?: MsgWithIdContent[] },
-    ctx: RemoteEventCtx,
-  ): Promise<void> => {
-    const msg = payload.messages?.[0];
+  static async applyRemoteToolResult({
+    responseData,
+    instanceId,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "tool-result"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
     const toolCall = msg?.metadata?.toolCall;
     if (!msg?.id || !toolCall) {
       return;
@@ -1141,8 +1203,8 @@ export const messagesOnRemoteEvent = {
         return;
       }
     }
-    const taggedToolCall = ctx.instanceId
-      ? { ...toolCall, remoteInstanceId: ctx.instanceId }
+    const taggedToolCall = instanceId
+      ? { ...toolCall, remoteInstanceId: instanceId }
       : toolCall;
     await db
       .update(chatMessages)
@@ -1150,19 +1212,22 @@ export const messagesOnRemoteEvent = {
         metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
-  },
+  }
 
-  "tool-result-updated": async (
-    payload: { messages?: MsgWithIdContent[] },
-    ctx: RemoteEventCtx,
-  ): Promise<void> => {
-    const msg = payload.messages?.[0];
+  static async applyRemoteToolResultUpdated({
+    responseData,
+    instanceId,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "tool-result-updated"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
     const toolCall = msg?.metadata?.toolCall;
     if (!msg?.id || !toolCall) {
       return;
     }
-    const taggedToolCall = ctx.instanceId
-      ? { ...toolCall, remoteInstanceId: ctx.instanceId }
+    const taggedToolCall = instanceId
+      ? { ...toolCall, remoteInstanceId: instanceId }
       : toolCall;
     await db
       .update(chatMessages)
@@ -1170,12 +1235,15 @@ export const messagesOnRemoteEvent = {
         metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
-  },
+  }
 
-  "tokens-updated": async (payload: {
-    messages?: MsgWithIdContent[];
-  }): Promise<void> => {
-    const msg = payload.messages?.[0];
+  static async applyRemoteTokensUpdated({
+    responseData,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "tokens-updated"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
     if (!msg?.id) {
       return;
     }
@@ -1191,38 +1259,44 @@ export const messagesOnRemoteEvent = {
         })}::jsonb`,
       })
       .where(eq(chatMessages.id, msg.id));
-  },
+  }
 
-  "stream-finished": async (
-    payload: { streamingState?: ThreadStreamingState | null },
-    ctx: RemoteEventCtx,
-  ): Promise<void> => {
-    void payload;
-    const threadId = ctx.urlPathParams.threadId ?? "";
+  static async applyRemoteStreamFinished({
+    urlPathParams,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "stream-finished"
+  >): Promise<void> {
+    const threadId = urlPathParams.threadId;
     await db
       .update(chatThreads)
       .set({ streamingState: ThreadStreamingState.IDLE, updatedAt: new Date() })
       .where(eq(chatThreads.id, threadId))
       .catch((err: Error) => {
-        ctx.logger.warn(
+        logger.warn(
           "[messages/repository] stream-finished: failed to mark thread idle",
           { threadId, error: err.message },
         );
       });
-  },
+  }
 
-  "streaming-state-changed": async (
-    payload: { streamingState?: ThreadStreamingState | null },
-    ctx: RemoteEventCtx,
-  ): Promise<void> => {
-    const threadId = ctx.urlPathParams.threadId ?? "";
-    if (!threadId || !payload.streamingState) {
-      return;
-    }
+  static async applyRemoteStreamingStateChanged({
+    responseData,
+    urlPathParams,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "streaming-state-changed"
+  >): Promise<void> {
+    const threadId = urlPathParams.threadId;
+
     await db
       .update(chatThreads)
-      .set({ streamingState: payload.streamingState, updatedAt: new Date() })
+      .set({
+        streamingState: responseData.streamingState,
+        updatedAt: new Date(),
+      })
       .where(eq(chatThreads.id, threadId))
       .catch(() => undefined);
-  },
-};
+  }
+}

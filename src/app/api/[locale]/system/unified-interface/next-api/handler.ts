@@ -99,15 +99,7 @@ export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
  * @returns Next.js route handler function
  */
 export function createNextHandler<T extends CreateApiEndpointAny>(
-  options: ApiHandlerOptions<
-    T["types"]["RequestOutput"],
-    T["types"]["ResponseOutput"],
-    T["types"]["UrlVariablesOutput"],
-    T["allowedRoles"],
-    T,
-    Platform,
-    T["types"]["ScopedTranslationKey"]
-  >,
+  options: ApiHandlerOptions<T>,
 ): NextHandlerReturnType<
   T["types"]["ResponseOutput"],
   T["types"]["UrlVariablesOutput"]
@@ -130,7 +122,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     // Extract Next.js-specific data
     const { locale, ...resolvedParams } = await params;
     const urlPathParams = resolvedParams as T["types"]["UrlVariablesOutput"];
-    const logger = createEndpointLogger(false, Date.now(), locale);
+    const logger = createEndpointLogger(false, locale);
 
     try {
       // CSRF double-submit validation for mutating browser requests

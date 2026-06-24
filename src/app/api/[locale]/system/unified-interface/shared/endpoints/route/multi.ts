@@ -143,6 +143,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint.path,
           Methods.GET,
           methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          endpoint,
         );
       }
     }
@@ -175,6 +176,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint.path,
           Methods.POST,
           methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          endpoint,
         );
       }
     }
@@ -207,6 +209,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint.path,
           Methods.PUT,
           methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          endpoint,
         );
       }
     }
@@ -239,6 +242,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint.path,
           Methods.PATCH,
           methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          endpoint,
         );
       }
     }
@@ -271,6 +275,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint.path,
           Methods.DELETE,
           methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          endpoint,
         );
       }
     }

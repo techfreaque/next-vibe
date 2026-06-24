@@ -209,8 +209,7 @@ export class CortexMoveRepository {
           logger,
           user,
         )("node-moved", {
-          from,
-          to,
+          requestData: { from, to },
         });
       }
 

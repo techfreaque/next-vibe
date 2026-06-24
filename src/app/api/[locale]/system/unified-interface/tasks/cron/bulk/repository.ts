@@ -139,8 +139,8 @@ export class CronBulkRepository {
           );
           for (const deletedId of allowedIds) {
             const removedPayload = { tasks: [{ id: deletedId }] };
-            emitTaskList("task-removed", removedPayload);
-            emitTaskQueue("task-removed", removedPayload);
+            emitTaskList("task-removed", { responseData: removedPayload });
+            emitTaskQueue("task-removed", { responseData: removedPayload });
           }
         } catch (error) {
           const parsedError = parseError(error);
@@ -202,8 +202,8 @@ export class CronBulkRepository {
             const updatedPayload = {
               tasks: [{ id: toggledId, enabled }],
             };
-            emitTaskList("task-updated", updatedPayload);
-            emitTaskQueue("task-updated", updatedPayload);
+            emitTaskList("task-updated", { responseData: updatedPayload });
+            emitTaskQueue("task-updated", { responseData: updatedPayload });
           }
         } catch (error) {
           const parsedError = parseError(error);

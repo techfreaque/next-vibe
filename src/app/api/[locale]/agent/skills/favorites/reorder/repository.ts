@@ -80,7 +80,9 @@ export class FavoritesReorderRepository {
         reorderDefinitions.POST,
         logger,
         user,
-      )("favorites-reordered", { positions: requestData.positions });
+      )("favorites-reordered", {
+        requestData: { positions: requestData.positions },
+      });
 
       return success({ success: true });
     } catch (error) {

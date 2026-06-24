@@ -66,11 +66,11 @@ export function formatLogPrefix(
 
 export function createLogger(
   debugEnabled = false,
-  startTime: number = Date.now(),
   locale: CountryLanguage,
   onPersist?: PersistFn,
   onFileLog?: FileLogFn,
 ): EndpointLogger {
+  const startTime = Number(process.env["VIBE_START_TIME"] ?? Date.now());
   const noTimePrefix = !!process.env["NEXT_RUNTIME"];
 
   const getTimePrefix = (): string => {

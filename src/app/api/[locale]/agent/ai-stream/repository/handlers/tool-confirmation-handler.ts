@@ -516,7 +516,6 @@ export class ToolConfirmationHandler {
         // Emit WS so the client has this message in cache before any revival stream events.
         const confirmedEmitter = createMessagesEmitter(
           toolMessage.threadId,
-          null,
           logger,
           user,
         );
@@ -684,7 +683,6 @@ export class ToolConfirmationHandler {
         // Emit WS so the client has this message in cache before any revival stream events.
         const rejectedEmitter = createMessagesEmitter(
           toolMessage.threadId,
-          null,
           logger,
           user,
         );

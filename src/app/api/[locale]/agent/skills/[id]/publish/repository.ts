@@ -113,9 +113,15 @@ export class SkillPublishRepository {
 
       // Suppressed when applying a relayed publish (avoids re-relay ping-pong).
       if (!relayed) {
-        createEndpointEmitter(publishDefinitions.PATCH, logger, user, {
-          id: skill.slug ?? skill.id,
-        })("skill-updated", { status: newStatus });
+        createEndpointEmitter(
+          publishDefinitions.PATCH,
+          logger,
+          user,
+        )("skill-updated", {
+          urlPathParams: { id: skill.slug ?? skill.id },
+          responseData: { status_response: newStatus },
+          requestData: { status: newStatus },
+        });
       }
 
       return success({

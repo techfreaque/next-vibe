@@ -9,14 +9,13 @@ import type {
   CreateApiEndpoint,
   InferRequestOutput,
   InferResponseOutput,
+  InferUrlVariablesOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { InferUrlVariablesOutput } from "../../../unified-interface/react-native/native-endpoint";
 
 /**
  * Options for testing an API endpoint
@@ -33,7 +32,8 @@ export interface TestEndpointOptions<
   >,
   TEvents extends EndpointEventsMap<
     InferResponseOutput<TFields>,
-    InferRequestOutput<TFields>
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
   >,
 > {
   /**
@@ -79,7 +79,8 @@ export interface TestRunner<
   >,
   TEvents extends EndpointEventsMap<
     InferResponseOutput<TFields>,
-    InferRequestOutput<TFields>
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>
   >,
 > {
   /**

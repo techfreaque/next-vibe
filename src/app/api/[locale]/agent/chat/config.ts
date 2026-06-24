@@ -53,6 +53,22 @@ export enum DefaultFolderId {
   REMOTE = "remote",
 }
 
+/** Root folder options shared by the get/patch/delete rootFolderId SELECT fields. */
+export const rootFolderIdOptions = [
+  { value: DefaultFolderId.PRIVATE, label: "config.folders.private" as const },
+  { value: DefaultFolderId.SHARED, label: "config.folders.shared" as const },
+  { value: DefaultFolderId.PUBLIC, label: "config.folders.public" as const },
+  {
+    value: DefaultFolderId.BACKGROUND,
+    label: "config.folders.background" as const,
+  },
+  {
+    value: DefaultFolderId.INCOGNITO,
+    label: "config.folders.incognito" as const,
+  },
+  { value: DefaultFolderId.REMOTE, label: "config.folders.remote" as const },
+];
+
 /**
  * Tool IDs denied per folder type. Stacked onto deniedToolIds in stream-setup.
  * Admin-only tools (campaign-starter, leads-import, etc.) are already gated by allowedRoles
@@ -66,7 +82,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     "coding-agent",
     CORTEX_EXEC_ALIAS,
     EXECUTE_TOOL_ALIAS,
-    "wait-for-task",
+    "await-task",
     "complete-task",
     "cron-create",
     "execute-task",
@@ -86,7 +102,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     "coding-agent",
     CORTEX_EXEC_ALIAS,
     EXECUTE_TOOL_ALIAS,
-    "wait-for-task",
+    "await-task",
     "complete-task",
     "cron-create",
     "execute-task",
@@ -151,7 +167,7 @@ export interface ToolExecutionContext {
    * The tool message ID for the current tool call being executed.
    * Set by tools-loader execute() wrapper from pendingToolMessages.get(toolCallId)
    * before calling each tool's execute(). Parallel-safe via per-call injection.
-   * Used by execute-tool and wait-for-task to record which DB row to update.
+   * Used by execute-tool and await-task to record which DB row to update.
    */
   currentToolMessageId: string | undefined;
   /**
@@ -178,7 +194,7 @@ export interface ToolExecutionContext {
     | undefined;
   /**
    * When set, finish-step-handler starts a timeout of this many ms using the
-   * stream's abort controller. Used for remote queue path and wait-for-task.
+   * stream's abort controller. Used for remote queue path and await-task.
    * Direct HTTP wait mode does NOT use this - the HTTP connection is the timeout.
    */
   pendingTimeoutMs: number | undefined;
@@ -234,6 +250,14 @@ export interface ToolExecutionContext {
    * Causes finish-step-handler to abort the stream before the AI response turn,
    * so the user sees the confirmation UI without the AI continuing.
    * Optional - only meaningful in streaming contexts.
+   *
+   * Bridge contract (one-way: execute-tool → ai-stream):
+   *   - local-execute.ts sets this when the TARGET tool requires confirmation
+   *     (requiresConfirmation gate fires inside execute-tool, which has no direct
+   *     access to ai-stream's StreamContext).
+   *   - stream-part-handler.ts mirrors it onto StreamContext.stepHasToolsAwaitingConfirmation
+   *     at tool-result time so the finish-step abort fires correctly.
+   * Do not read this field in execute-tool itself — it is a signal OUT to the stream layer.
    */
   stepHasToolsAwaitingConfirmation?: boolean;
   /**
@@ -320,9 +344,9 @@ export interface ToolExecutionContext {
    */
   cancelPendingStreamTimer?: (() => void) | undefined;
   /**
-   * Tool message IDs of wakeUp calls that were intercepted by wait-for-task.
+   * Tool message IDs of wakeUp calls that were intercepted by await-task.
    * The stream's finally block skips revival for these so the AI doesn't wake up
-   * again after wait-for-task already delivered the result inline.
+   * again after await-task already delivered the result inline.
    */
   suppressedWakeUpToolMessageIds?: Set<string>;
   /**

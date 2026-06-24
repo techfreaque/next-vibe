@@ -189,7 +189,7 @@
         "role": "system"
       },
       {
-        "content": "[T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wait-for-task-test'}, callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+        "content": "[T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'await-task-test'}, callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -207,7 +207,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"detach\",\"input\":{\"prompt\":\"wait-for-task-test\"},\"instanceId\":\"hermes\",\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"detach\",\"input\":{\"prompt\":\"await-task-test\"},\"instanceId\":\"hermes\",\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
             "id": "functions.execute-tool:3",
@@ -235,7 +235,7 @@
         "role": "system"
       },
       {
-        "content": "[T5b wait-for-task] Call execute-tool with toolName='wait-for-task', instanceId='hermes', input={'taskId':'remote-hermes-1777218946213-9ugl9a'}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b await-task] Call execute-tool with toolName='await-task', instanceId='hermes', input={'taskId':'remote-hermes-1777218946213-9ugl9a'}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -253,7 +253,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"taskId\":\"remote-hermes-1777218946213-9ugl9a\"},\"instanceId\":\"hermes\",\"toolName\":\"wait-for-task\"}",
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"taskId\":\"remote-hermes-1777218946213-9ugl9a\"},\"instanceId\":\"hermes\",\"toolName\":\"await-task\"}",
               "name": "execute-tool"
             },
             "id": "functions.execute-tool:4",
@@ -262,7 +262,7 @@
         ]
       },
       {
-        "content": "{\"originalArgs\":{\"prompt\":\"wait-for-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/f26e17fa-9eca-4fc9-b993-9b1b5457f14e/f0715de4-3bca-4832-8216-d22f6127273e.png\"},\"status\":\"status.completed\",\"waiting\":false}",
+        "content": "{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/f26e17fa-9eca-4fc9-b993-9b1b5457f14e/f0715de4-3bca-4832-8216-d22f6127273e.png\"},\"status\":\"status.completed\",\"waiting\":false}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:4"

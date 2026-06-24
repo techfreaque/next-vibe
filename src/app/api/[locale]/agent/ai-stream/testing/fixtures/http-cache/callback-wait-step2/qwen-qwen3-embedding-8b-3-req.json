@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----2572266c-1258-46f0-b87c-bd331925d499.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think>The result is: ` {\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"local…",
+    "encoding_format": "float"
+  }
+}

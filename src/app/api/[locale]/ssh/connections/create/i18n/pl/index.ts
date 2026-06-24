@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
       password: "Hasło",
       privateKey: "Klucz prywatny (PEM)",
       keyAgent: "Agent SSH",
+      local: "Lokalny komputer",
     },
   },
 

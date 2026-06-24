@@ -92,3 +92,21 @@ export const ViewModeDB = [
   ViewMode.FLAT,
   ViewMode.DEBUG,
 ] as const;
+
+/**
+ * Thread streaming state enum
+ * 'waiting' = stream ended but an escalated task is still in flight
+ */
+export enum ThreadStreamingState {
+  IDLE = "idle",
+  STREAMING = "streaming",
+  ABORTING = "aborting",
+  WAITING = "waiting",
+}
+
+export const ThreadStreamingStateDB = [
+  ThreadStreamingState.IDLE,
+  ThreadStreamingState.STREAMING,
+  ThreadStreamingState.ABORTING,
+  ThreadStreamingState.WAITING,
+] as const;

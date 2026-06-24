@@ -33,7 +33,6 @@ export const GET = (request: NextRequest): Response => {
 
   const logger = createEndpointLogger(
     env.NODE_ENV === Environment.DEVELOPMENT,
-    Date.now(),
     localeSegment,
   );
 

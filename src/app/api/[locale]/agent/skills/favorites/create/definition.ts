@@ -35,17 +35,19 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
 import { parseSkillId } from "../../../chat/slugify";
+import skillDefinitions from "../../[id]/definition";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../create/definition";
+import skillsDefinitions from "../../definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../enum";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
+import favoritesListDefinition from "../definition";
 import { scopedTranslation } from "./i18n";
 
 const FavoriteCreateContainer = lazy(() =>
@@ -427,19 +429,9 @@ const { POST } = createEndpoint({
       // navigation renders instantly. Character display fields (name/tagline/icon)
       // are resolved from the skills [id] cache when present, else fill in on the
       // next list refetch.
-      onEvent: async ({
-        responseData,
-        requestData,
-        queryClient,
-        logger,
-        locale,
-        user,
-      }) => {
+      onEvent: async ({ responseData, requestData, logger, locale, user }) => {
         const [
           { apiClient },
-          favoritesDefinition,
-          charactersDefinition,
-          skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
           { getEnvAvailability },
         ] = await Promise.all([
@@ -541,9 +533,6 @@ const { POST } = createEndpoint({
             };
           },
         );
-
-        // Keep queryClient referenced — the apiClient writes through it.
-        void queryClient;
       },
     },
   },
@@ -641,9 +630,9 @@ export type FavoriteCreateRequestOutput = typeof POST.types.RequestOutput;
 export type FavoriteCreateResponseInput = typeof POST.types.ResponseInput;
 export type FavoriteCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-/** Inferred payload of the `favorite-created` event (request config + new id). */
+/** Inferred payload of the `favorite-created` event (id from responseFields). */
 export type FavoriteCreatedEventPayload =
-  (typeof POST.types.EventPayloads)["favorite-created"];
+  (typeof POST.types.EventResponsePayloads)["favorite-created"];
 
 // Favorite field type alias for model selection (from POST request)
 // This is the full structure with currentSelection and characterModelSelection

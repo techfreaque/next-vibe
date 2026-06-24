@@ -504,8 +504,8 @@ export class CronTasksRepository {
             },
           ],
         };
-        emitTaskList("task-updated", updatedPayload);
-        emitTaskQueue("task-updated", updatedPayload);
+        emitTaskList("task-updated", { responseData: updatedPayload });
+        emitTaskQueue("task-updated", { responseData: updatedPayload });
       }
 
       return success({
@@ -586,8 +586,8 @@ export class CronTasksRepository {
       // Emit task-removed to WS subscribers
       const { emitTaskList, emitTaskQueue } = createTaskEmitters(logger, user);
       const removedPayload = { tasks: [{ id: canonicalId }] };
-      emitTaskList("task-removed", removedPayload);
-      emitTaskQueue("task-removed", removedPayload);
+      emitTaskList("task-removed", { responseData: removedPayload });
+      emitTaskQueue("task-removed", { responseData: removedPayload });
 
       return success({ success: true, message: "Task deleted successfully" });
     } catch (error) {

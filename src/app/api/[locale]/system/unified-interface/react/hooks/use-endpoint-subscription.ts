@@ -35,10 +35,7 @@ import {
 } from "../../websocket/cache-merger";
 import { buildUserChannel, buildWsChannel } from "../../websocket/channel";
 import { subscribeToChannel } from "../../websocket/client";
-import type {
-  AnyEndpointEventEnvelope,
-  EventPayloads,
-} from "../../websocket/structured-events";
+import type { AnyEndpointEventEnvelope } from "../../websocket/structured-events";
 import { eventDeclarationHasFields } from "../../websocket/structured-events";
 import { queryClient } from "./store";
 
@@ -88,10 +85,7 @@ export function useEndpointSubscription(
     const pathChannel = buildWsChannel(endpoint.path, resolvedParams);
     const userChannel = userId ? buildUserChannel(userId) : undefined;
 
-    function handleEvent(
-      eventName: string,
-      wirePayload: CreateApiEndpointAny["types"]["EventPayloads"][string],
-    ): void {
+    function handleEvent(eventName: string, wirePayload: WidgetData): void {
       const declaration = endpoint?.events?.[eventName];
       if (!declaration) {
         logger.warn(
@@ -128,38 +122,44 @@ export function useEndpointSubscription(
         );
       }
 
-      declaration.onEvent?.({
-        responseData: wirePayload,
-        requestData: requestDataRef.current,
-        urlPathParams: resolvedParams,
-        queryClient,
-        logger,
-        cacheKey,
-        user: userRef.current,
-        locale: localeRef.current,
-      });
+      const currentUser = userRef.current;
+      if (declaration.onEvent && currentUser) {
+        void declaration.onEvent({
+          responseData: wirePayload,
+          requestData: requestDataRef.current,
+          urlPathParams: resolvedParams,
+          logger,
+          cacheKey,
+          user: currentUser,
+          locale: localeRef.current,
+        });
+      }
     }
 
     const unsubscribers: Array<() => void> = [];
 
     // ── Path channel: direct emits + legacy __event__ envelope ──
     unsubscribers.push(
-      subscribeToChannel<
-        EndpointEventEnvelope<
-          CreateApiEndpointAny["types"]["EventPayloads"][string]
-        >
-      >(pathChannel, "__event__", (envelope) => {
-        handleEvent(envelope.eventName, envelope.payload);
-      }),
+      subscribeToChannel<AnyEndpointEventEnvelope>(
+        pathChannel,
+        "__event__",
+        (envelope) => {
+          handleEvent(envelope.eventName, envelope.payload);
+        },
+        locale,
+      ),
     );
 
     for (const eventName of Object.keys(endpoint.events)) {
       unsubscribers.push(
-        subscribeToChannel<
-          CreateApiEndpointAny["types"]["EventPayloads"][string]
-        >(pathChannel, eventName, (data) => {
-          handleEvent(eventName, data);
-        }),
+        subscribeToChannel<WidgetData>(
+          pathChannel,
+          eventName,
+          (data) => {
+            handleEvent(eventName, data);
+          },
+          locale,
+        ),
       );
     }
 
@@ -168,31 +168,33 @@ export function useEndpointSubscription(
     // to all endpoints for this user in one batch frame.
     if (userChannel) {
       unsubscribers.push(
-        subscribeToChannel<
-          EndpointEventEnvelope<
-            CreateApiEndpointAny["types"]["EventPayloads"][string]
-          >
-        >(userChannel, "__event__", (envelope) => {
-          if (envelope.channel === pathChannel) {
-            handleEvent(envelope.eventName, envelope.payload);
-          }
-        }),
+        subscribeToChannel<AnyEndpointEventEnvelope>(
+          userChannel,
+          "__event__",
+          (envelope) => {
+            if (envelope.channel === pathChannel) {
+              handleEvent(envelope.eventName, envelope.payload);
+            }
+          },
+          locale,
+        ),
       );
 
       for (const eventName of Object.keys(endpoint.events)) {
         unsubscribers.push(
-          subscribeToChannel<
-            CreateApiEndpointAny["types"]["EventPayloads"][string] & {
-              __channel?: string;
-            }
-          >(userChannel, eventName, (data) => {
-            // Events routed via user channel carry a __channel field so we
-            // can verify they belong to this endpoint instance.
-            if ("__channel" in data && data.__channel !== pathChannel) {
-              return;
-            }
-            handleEvent(eventName, data);
-          }),
+          subscribeToChannel<WidgetData & { __channel?: string }>(
+            userChannel,
+            eventName,
+            (data) => {
+              // Events routed via user channel carry a __channel field so we
+              // can verify they belong to this endpoint instance.
+              if ("__channel" in data && data.__channel !== pathChannel) {
+                return;
+              }
+              handleEvent(eventName, data);
+            },
+            locale,
+          ),
         );
       }
     }
@@ -202,5 +204,5 @@ export function useEndpointSubscription(
         unsub();
       }
     };
-  }, [enabled, endpoint, urlPathParamsKey, logger, cacheKey, userId]);
+  }, [enabled, endpoint, urlPathParamsKey, logger, cacheKey, userId, locale]);
 }

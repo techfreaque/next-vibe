@@ -29,7 +29,6 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import {
   UserPermissionRole,
   UserRole,
@@ -42,7 +41,7 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
-import type { SkillListResponseOutput } from "../definition";
+import skillsDefinitions, { type SkillListResponseOutput } from "../definition";
 import {
   CategoryOptions,
   ContentLevel,
@@ -282,17 +281,14 @@ const { DELETE } = createEndpoint({
       remoteEvent: true as const,
       syncDomain: "skills" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-      onEvent: async ({ urlPathParams, queryClient, logger }) => {
+      urlPathParamsFields: ["id"] as const,
+      onEvent: async ({ urlPathParams, logger }) => {
         const deletedId = urlPathParams.id;
-        if (!deletedId) {
-          return;
-        }
-        const [{ apiClient }, skillsDefinition] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
-          import("../definition"),
-        ]);
+        const { apiClient } = await import(
+          "@/app/api/[locale]/system/unified-interface/react/hooks/store"
+        );
         apiClient.updateEndpointData(
-          skillsDefinition.default.GET,
+          skillsDefinitions.GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -319,7 +315,6 @@ const { DELETE } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },
@@ -791,23 +786,18 @@ const { PATCH } = createEndpoint({
         "description",
         "category",
       ] as const,
-      onEvent: async (ctx) => {
-        const { partial, urlPathParams, queryClient, logger, locale, user } =
-          ctx;
+      urlPathParamsFields: ["id"] as const,
+      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
         const skillId = urlPathParams.id;
-        if (!skillId || !partial.category || !user) {
-          return;
-        }
-        const category = partial.category;
+
+        const category = requestData.category;
         const [
           { apiClient },
-          skillsDefinition,
           { SkillsRepositoryClient },
           { getEnvAvailability },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
-          import("../definition"),
           import("../repository-client"),
           import("../../env-availability"),
           import("../i18n"),
@@ -819,10 +809,10 @@ const { PATCH } = createEndpoint({
         const card = SkillsRepositoryClient.mapSkillToListItem(
           skillId,
           {
-            icon: partial.icon ?? null,
-            name: partial.name ?? null,
-            tagline: partial.tagline ?? null,
-            description: partial.description ?? null,
+            icon: requestData.icon ?? null,
+            name: requestData.name ?? null,
+            tagline: requestData.tagline ?? null,
+            description: requestData.description ?? null,
             category,
             modelSelection: null,
             ownershipType: SkillOwnershipType.USER,
@@ -834,7 +824,7 @@ const { PATCH } = createEndpoint({
           getEnvAvailability(),
         );
         apiClient.updateEndpointData(
-          skillsDefinition.default.GET,
+          skillsDefinitions.GET,
           logger,
           (old) => {
             if (!old?.success) {
@@ -856,7 +846,6 @@ const { PATCH } = createEndpoint({
             };
           },
         );
-        void queryClient;
       },
     },
   },
@@ -1025,7 +1014,7 @@ const { GET } = createEndpoint({
       }),
 
       // === CREATOR ECONOMY FIELDS ===
-      longlabel: responseField(scopedTranslation, {
+      longContent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
@@ -1132,7 +1121,7 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
-        longlabel: null,
+        longContent: null,
         favoritesCount: 0,
         creatorProfile: null,
         variants: [
@@ -1167,7 +1156,7 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
-        longlabel: null,
+        longContent: null,
         favoritesCount: 42,
         creatorProfile: null,
         variants: [
@@ -1214,9 +1203,9 @@ export type SkillDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type SkillDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type SkillDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
-/** Inferred payload of the `skill-updated` event (updated skill response fields). */
+/** Inferred payload of the `skill-updated` event (request fields submitted by the user). */
 export type SkillUpdatedEventPayload =
-  (typeof PATCH.types.EventPayloads)["skill-updated"];
+  (typeof PATCH.types.EventRequestPayloads)["skill-updated"];
 
 const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

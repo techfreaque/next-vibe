@@ -20,7 +20,7 @@
  *   T3  → retry + branch from T1 AI → two sibling forks: RETRY_RESPONSE + BRANCH_RESPONSE
  *   T4  → music gen (from retry branch) + video gen (from fork branch)
  *   T5  → detach dispatch: AI calls generate_image(detach), gets taskId
- *   T5b → wait-for-task: AI calls wait-for-task with T5 taskId, gets imageUrl
+ *   T5b → await-task: AI calls await-task with T5 taskId, gets imageUrl
  *   T5a → endLoop: tool-help(endLoop) executes inline, stream stops after 1 call
  *   T6  → wakeUp: phase1 dispatches async, phase2 revives with result
  *   T6c → wakeUp repeat: second full E2E wakeUp on same thread, no stale state from T6a/T6b
@@ -830,7 +830,8 @@ function assertStepOk(
 ): void {
   expect(content, `[${stepName}] AI returned empty content`).toBeTruthy();
   if (!content) {
-    return;
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(`[${stepName}] AI returned empty content`);
   }
   expect(
     content.includes("STEP_OK"),
@@ -850,7 +851,8 @@ function assertWakeUpPhase1Ok(
 ): void {
   expect(content, `[${stepName}] AI returned empty content`).toBeTruthy();
   if (!content) {
-    return;
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(`[${stepName}] AI returned empty content`);
   }
   expect(
     content.includes("STEP_OK") || content.includes("WAKEUP_OK"),
@@ -955,10 +957,18 @@ async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
     user,
   });
   if (!result.success) {
-    return 0;
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(`getBalance failed for user ${user.id}: ${result.message}`);
   }
   lastBalanceReadAt = new Date();
-  return typeof result.data?.["total"] === "number" ? result.data["total"] : 0;
+  const total = result.data?.["total"];
+  if (typeof total !== "number") {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(
+      `getBalance: unexpected response shape — total is ${String(total)}`,
+    );
+  }
+  return total;
 }
 
 /**
@@ -1174,7 +1184,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
-        return;
+        // oxlint-disable-next-line restricted-syntax
+        throw new Error(
+          `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+        );
       }
       testUser = resolved;
 
@@ -1239,9 +1252,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           `Failed to create quality-tester favorite: ${!createResult.success ? createResult.message : ""}`,
         ).toBe(true);
         if (!createResult.success) {
-          return;
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(
+            `Failed to create quality-tester favorite: ${createResult.message}`,
+          );
         }
-        mainFavoriteId = String(createResult.data?.["id"] ?? "");
+        const mainFavId = createResult.data?.["id"];
+        if (!mainFavId) {
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error("quality-tester favorite created but id is missing");
+        }
+        mainFavoriteId = String(mainFavId);
       }
 
       // ── Resolve native image gen favorite (Gemini 3.1 Flash Image Preview) ──
@@ -1271,9 +1292,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           "Failed to create native image favorite",
         ).toBe(true);
         if (!createResult.success) {
-          return;
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(
+            `Failed to create native image favorite: ${createResult.message}`,
+          );
         }
-        nativeImageFavoriteId = String(createResult.data?.["id"] ?? "");
+        const nativeImageFavId = createResult.data?.["id"];
+        if (!nativeImageFavId) {
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error("native image favorite created but id is missing");
+        }
+        nativeImageFavoriteId = String(nativeImageFavId);
       }
 
       // ── Resolve Nano Banana Pro favorite (Gemini 3 Pro Image Preview) ──
@@ -1302,13 +1331,21 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           "Failed to create nano-banana favorite",
         ).toBe(true);
         if (!createResult.success) {
-          return;
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(
+            `Failed to create nano-banana favorite: ${createResult.message}`,
+          );
         }
-        nanoBananaFavoriteId = String(createResult.data?.["id"] ?? "");
+        const nanoBananaFavId = createResult.data?.["id"];
+        if (!nanoBananaFavId) {
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error("nano-banana favorite created but id is missing");
+        }
+        nanoBananaFavoriteId = String(nanoBananaFavId);
       }
 
       // No stale local tasks may exist when a suite starts: the system
-      // prompt lists pending tasks, the AI calls wait-for-task on them, and
+      // prompt lists pending tasks, the AI calls await-task on them, and
       // that behavior gets baked into recorded fixtures.
       await db
         .delete(cronTasks)
@@ -1433,7 +1470,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       //   /report which fires the revival directly — just wait for idle.
       // EVERY mode handles the waiting state the same way: when a stream
       // pauses on a pending task or remote call, await the revival before
-      // returning — wait-for-task delivery is inline OR revival in any mode.
+      // returning — await-task delivery is inline OR revival in any mode.
       if (firstResult.result.success && firstResult.result.data.threadId) {
         const tid = firstResult.result.data.threadId;
 
@@ -1529,7 +1566,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // thread is about to enter 'waiting' (or jump straight to a
           // revival) — poll the transition instead of racing it.
           const { hasPendingCallForThread } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls");
+            await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
           const hasPendingWork = async (): Promise<boolean> => {
             const [runningTask] = await db
               .select({ id: cronTasks.id })
@@ -1636,10 +1673,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // Active reconcile tick: the /report may have landed in ANOTHER
             // process (dev server) — reconciliation completes this process's
             // pending-call entries against the backfilled tool message and
-            // fires any attached wait-for-task revival.
+            // fires any attached await-task revival.
             if (cfg.remoteInstanceId && revivalState === "waiting") {
               const { hasPendingCallForThread: reconcileTick } =
-                await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls");
+                await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
               await reconcileTick(tid);
             }
             // If thread went back to 'waiting' (AI retried after failure), pulse again.
@@ -1832,7 +1869,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             `T-RELAY stream failed: ${!result.success ? result.message : ""}`,
           ).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // Remote wallet must decrease — proves inference ran on hermes.
@@ -1976,7 +2014,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       let t2UserMsgId: string;
       let branchRetryAiMsgId: string; // From retry+branch test
       let branchForkAiMsgId: string; // From branch fork
-      let t5DetachTaskId: string; // taskId from T5 detach step, used by T5b wait-for-task step
+      let t5DetachTaskId: string; // taskId from T5 detach step, used by T5b await-task step
       // T6: wakeUp delivery shape — a fast task delivers inline within the
       // same stream (original message holds the image), a slow one delivers
       // via revival (deferred message). Both honour the contract: the tool
@@ -2012,7 +2050,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             `T1 stream failed: ${!result.success ? result.message : ""}`,
           ).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           if (isRemoteFolderMode) {
@@ -2201,7 +2240,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -2314,7 +2354,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -2487,7 +2528,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(retryResult.success).toBe(true);
           if (!retryResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(retryResult.message ?? "unexpected failure");
           }
 
           branchRetryAiMsgId = retryResult.data.lastAiMessageId!;
@@ -2572,7 +2614,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(branchResult.success).toBe(true);
           if (!branchResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(branchResult.message ?? "unexpected failure");
           }
 
           branchForkAiMsgId = branchResult.data.lastAiMessageId!;
@@ -2697,7 +2740,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         expect(musicResult.success).toBe(true);
         if (!musicResult.success) {
-          return;
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(musicResult.message ?? "unexpected failure");
         }
 
         const musicAdded = newMessages(musicMsgs, prevIdsMusic);
@@ -2822,7 +2866,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         expect(videoResult.success).toBe(true);
         if (!videoResult.success) {
-          return;
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(videoResult.message ?? "unexpected failure");
         }
 
         const videoAdded = newMessages(videoMsgs, prevIdsVideo);
@@ -2930,7 +2975,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wait-for-task-test' and callbackMode='detach'")}. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='await-task-test' and callbackMode='detach'")}. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -2939,7 +2984,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -3004,9 +3050,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         effectiveTestTimeout,
       );
 
-      // ── T5b: wait-for-task - AI calls wait-for-task with taskId from T5 ──
+      // ── T5b: await-task - AI calls await-task with taskId from T5 ──
       fit(
-        "T5b: wait-for-task - AI calls wait-for-task with detach taskId, gets imageUrl",
+        "T5b: await-task - AI calls await-task with detach taskId, gets imageUrl",
         async () => {
           // T5 already patched step2 fixtures: sentinel → t5DetachTaskId.
           // On first run the dir doesn't exist yet; step2 runs live and records real taskId.
@@ -3019,16 +3065,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           );
 
           // In direct remote mode, the detach taskId is a local `remote-direct-*` placeholder
-          // that lives in the local dev DB. wait-for-task must be called locally (not forwarded
+          // that lives in the local dev DB. await-task must be called locally (not forwarded
           // to the remote instance) regardless of cfg.remoteInstanceId.
-          // Explicitly say "the local wait-for-task tool" (not "execute-tool via remote") so
-          // the AI doesn't attempt to route wait-for-task through the remote instance.
+          // Explicitly say "the local await-task tool" (not "execute-tool via remote") so
+          // the AI doesn't attempt to route await-task through the remote instance.
           const waitForTaskInstr = cfg.remoteInstanceId
-            ? `the local wait-for-task tool (do NOT use execute-tool for this - call wait-for-task directly) with taskId='${t5DetachTaskId}'`
-            : `the wait-for-task tool with taskId='${t5DetachTaskId}'`;
+            ? `the local await-task tool (do NOT use execute-tool for this - call await-task directly) with taskId='${t5DetachTaskId}'`
+            : `the await-task tool with taskId='${t5DetachTaskId}'`;
           let { result: waitResult, messages: waitMsgs } = await runStream({
             user: testUser,
-            prompt: `[T5b wait-for-task] Call ${waitForTaskInstr}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T5b await-task] Call ${waitForTaskInstr}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -3036,10 +3082,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(waitResult.success).toBe(true);
           if (!waitResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(waitResult.message ?? "unexpected failure");
           }
 
-          // WAIT path: if wait-for-task registered as waiter (task was pending),
+          // WAIT path: if await-task registered as waiter (task was pending),
           // stream aborts with thread in 'waiting' state. Revival fires async when
           // the goroutine (from T5) calls handleTaskCompletion. Poll for idle, then
           // re-fetch messages so the backfilled tool result + revival AI response
@@ -3049,25 +3096,25 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const waitAdded = newMessages(waitMsgs, prevIds);
 
           // Per spec (wait, same-sequence path): if no user message arrived while waiting,
-          // the original wait-for-task tool message is backfilled in-place with the real result.
-          // No deferred message is created. Only 1 wait-for-task tool message must exist.
+          // the original await-task tool message is backfilled in-place with the real result.
+          // No deferred message is created. Only 1 await-task tool message must exist.
           const allWftMsgs = waitAdded.filter(
             (m) =>
               m.role === "tool" &&
-              (m.toolCall?.toolName === "wait-for-task" ||
+              (m.toolCall?.toolName === "await-task" ||
                 (m.toolCall?.toolName === "execute-tool" &&
                   toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "wait-for-task")),
+                    "await-task")),
           );
           expect(
             allWftMsgs.length,
-            "[T5b] expected exactly 1 wait-for-task tool message (same-sequence: backfill in-place, no deferred)",
+            "[T5b] expected exactly 1 await-task tool message (same-sequence: backfill in-place, no deferred)",
           ).toBe(1);
 
           const waitForTaskMsg = allWftMsgs[0]!;
           expect(
             waitForTaskMsg,
-            "[T5b] wait-for-task tool message not found",
+            "[T5b] await-task tool message not found",
           ).toBeDefined();
 
           // Same-sequence: original message must NOT be marked as deferred.
@@ -3077,7 +3124,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           ).toBeFalsy();
 
           const wftRes = resolveToolResult(waitForTaskMsg);
-          expect(wftRes, "[T5b] wait-for-task result is null").not.toBeNull();
+          expect(wftRes, "[T5b] await-task result is null").not.toBeNull();
           // Two paths depending on race:
           // (A) task pending when called → backfilled with raw image result: { imageUrl, ... }
           // (B) task already done → returns { status, result: { imageUrl }, waiting }
@@ -3116,7 +3163,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterWait = await getBalance(testUser);
-          // T5b only: wait-for-task + AI response (~0.3cr). Image gen was charged in T5.
+          // T5b only: await-task + AI response (~0.3cr). Image gen was charged in T5.
           await assertDeducted(testUser, beforeWait, afterWait, 0.1, 10);
 
           // Normalize fixtures: replace the real taskId with sentinel so the next
@@ -3151,7 +3198,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(endLoopResult.success).toBe(true);
           if (!endLoopResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(endLoopResult.message ?? "unexpected failure");
           }
 
           const endLoopAdded = newMessages(endLoopMsgs, prevIdsEndLoop);
@@ -3251,7 +3299,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // Queue mode (cfg.pulse): revival fires async. Poll for idle, then re-fetch.
@@ -3377,7 +3426,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -3441,7 +3491,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(result.success).toBe(true);
             if (!result.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(result.message ?? "unexpected stream failure");
             }
 
             const added = newMessages(messages, wakeupMsgIds);
@@ -3877,7 +3928,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success, "T6c: runStream failed").toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // Re-fetch + pull: the tool message mirrors after runStream's snapshot.
@@ -4101,7 +4153,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success, "T6d: runStream failed").toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // Re-fetch + pull: the tool message mirrors to this caller after
@@ -4365,9 +4418,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               endpoint: favByIdDefT7.PATCH,
               data: {
                 modelSelection: t7ModelSelection,
-                availableTools: [
-                  { toolId: confirmToolId, requiresConfirmation: true },
-                ],
+                availableTools: cfg.remoteInstanceId
+                  ? // Remote: execute-tool is the only registered SDK tool, all tools
+                    // route through it. Whitelist execute-tool with requiresConfirmation
+                    // so the AI signals approve via callbackMode=approve.
+                    [{ toolId: confirmToolId, requiresConfirmation: true }]
+                  : // Regular: individual tools each need to be whitelisted. Include
+                    // both tool-help (runs freely) and generate_image (requires confirm).
+                    [
+                      { toolId: "tool-help", requiresConfirmation: false },
+                      {
+                        toolId: confirmToolId,
+                        requiresConfirmation: true,
+                      },
+                    ],
               },
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -4385,7 +4449,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(result.success).toBe(true);
             if (!result.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(result.message ?? "unexpected stream failure");
             }
 
             const added = newMessages(messages, prevIds);
@@ -4519,7 +4584,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(confirmStream.success).toBe(true);
             if (!confirmStream.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(confirmStream.message ?? "unexpected failure");
             }
             const confirmResult = confirmStream;
 
@@ -4539,7 +4605,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 modelSelection: t7bFavGet.success
                   ? t7bFavGet.data.modelSelection
                   : null,
-                availableTools: [],
+                availableTools: null,
               },
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -4713,7 +4779,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(result.success, "CF1: stream must succeed").toBe(true);
             if (!result.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(result.message ?? "unexpected stream failure");
             }
 
             const added = newMessages(messages, prevIds);
@@ -4726,7 +4793,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "CF1: contact-form tool message must exist in thread",
             ).toBeDefined();
             if (!cfMsg) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(
+                "CF1: contact-form tool message not found in thread",
+              );
             }
 
             cfToolMsgId = cfMsg.id;
@@ -4807,7 +4877,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "CF2: confirmation stream must succeed",
             ).toBe(true);
             if (!confirmResult.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(confirmResult.message ?? "unexpected failure");
             }
 
             const messages = await getMessages(threadId);
@@ -4938,7 +5009,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -5099,7 +5171,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             "T9 setup: image gen turn must succeed",
           ).toBe(true);
           if (!genResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(genResult.message ?? "unexpected failure");
           }
 
           const genAdded = newMessages(genMessages, prevIds);
@@ -5132,7 +5205,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, beforeReport);
@@ -5195,7 +5269,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(imgResult.success).toBe(true);
           if (!imgResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(imgResult.message ?? "unexpected failure");
           }
           expect(imgResult.data.threadId).toBe(threadId);
 
@@ -5252,7 +5327,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(multiResult.success).toBe(true);
           if (!multiResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(multiResult.message ?? "unexpected failure");
           }
           expect(multiResult.data.threadId).toBe(threadId);
 
@@ -5322,7 +5398,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(voiceResult.success).toBe(true);
           if (!voiceResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(voiceResult.message ?? "unexpected failure");
           }
           expect(voiceResult.data.threadId).toBe(threadId);
 
@@ -5393,7 +5470,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(sttResult.success).toBe(true);
             if (!sttResult.success) {
-              return;
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(sttResult.message ?? "unexpected failure");
             }
             expect(sttResult.data.threadId).toBe(threadId);
 
@@ -5470,7 +5548,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(videoResult.success).toBe(true);
           if (!videoResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(videoResult.message ?? "unexpected failure");
           }
           expect(videoResult.data.threadId).toBe(threadId);
 
@@ -5522,7 +5601,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(wavResult.success).toBe(true);
           if (!wavResult.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(wavResult.message ?? "unexpected failure");
           }
           expect(wavResult.data.threadId).toBe(threadId);
 
@@ -5600,7 +5680,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
@@ -5747,7 +5828,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // The model should respond successfully (content may or may not reference the image
@@ -5803,7 +5885,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -5890,7 +5973,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -5976,7 +6060,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -6060,7 +6145,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           const added = newMessages(messages, prevIds);
@@ -6151,7 +6237,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // The vision model must confirm it can see an image (any image)
@@ -6228,7 +6315,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
@@ -6508,7 +6596,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           lastMainAiMsgId = result.data.lastAiMessageId!;
@@ -6550,7 +6639,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.success).toBe(true);
           if (!result.success) {
-            return;
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
           }
 
           // Incognito: messages not persisted - no messages should exist in DB for this thread
@@ -6619,10 +6709,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             });
 
             expect(result.success).toBe(false);
-            if (!result.success) {
-              expect(result.errorType?.errorCode).toBe(403);
-              expect(result.message).toContain("nsufficient");
+            if (result.success) {
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(
+                "C3: expected stream to fail with 403 but it succeeded",
+              );
             }
+            expect(result.errorType?.errorCode).toBe(403);
+            expect(result.message).toContain("nsufficient");
           } finally {
             for (const w of saved) {
               await db.execute(
@@ -6718,7 +6812,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await import("@/app/api/[locale]/agent/skills/repository");
           const { parseSkillId } =
             await import("@/app/api/[locale]/agent/chat/slugify");
-          const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+          const logger = createEndpointLogger(false, defaultLocale);
 
           // Resolve a favorite's model exactly like the web client: GET the
           // favorite config via endpoint, then run the client resolver with the

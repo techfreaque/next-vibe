@@ -111,7 +111,7 @@ export class FinishStepHandler {
       return { shouldAbort: true };
     }
 
-    // Remote queue / wait-for-task: if a tool set pendingTimeoutMs, start the timeout timer.
+    // Remote queue / await-task: if a tool set pendingTimeoutMs, start the timeout timer.
     // The timer fires AbortReason.STREAM_TIMEOUT so the stream dies cleanly - revival handles
     // continuation when /report delivers the result. Clears itself if stream aborts first.
     if (streamContext.pendingTimeoutMs) {

@@ -26,7 +26,7 @@ export async function requireAdminUser(
   locale: CountryLanguage,
   redirectPath?: string,
 ): Promise<JwtPrivatePayloadType> {
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   try {
     // Check authentication and role
@@ -56,7 +56,7 @@ export async function requireUser(
   locale: CountryLanguage,
   redirectPath?: string,
 ): Promise<CompleteUserType> {
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(false, locale);
 
   try {
     // Check authentication (any authenticated user)

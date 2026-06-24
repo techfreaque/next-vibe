@@ -628,6 +628,112 @@ async function closeCDPTab(targetId: string): Promise<void> {
   }
 }
 
+interface CDPCookie {
+  name: string;
+  value: string;
+  domain: string;
+  path?: string;
+  httpOnly?: boolean;
+  secure?: boolean;
+}
+
+/**
+ * Inject cookies into a Chrome tab via raw CDP Network.setCookies.
+ * Works for httpOnly cookies (unlike document.cookie).
+ * targetId comes from the CDPTarget returned by listCDPTargets().
+ */
+export async function setCookiesViaCDP(
+  targetId: string,
+  cookies: CDPCookie[],
+): Promise<void> {
+  const targets = await listCDPTargets();
+  const target = targets.find((t) => t.id === targetId);
+  if (!target) {
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    const ws = new WebSocket(target.webSocketDebuggerUrl);
+    ws.addEventListener("open", () => {
+      ws.send(
+        JSON.stringify({
+          id: 1,
+          method: "Network.setCookies",
+          params: { cookies },
+        }),
+      );
+    });
+    ws.addEventListener("message", () => {
+      ws.close();
+      resolve();
+    });
+    ws.addEventListener("error", () => {
+      ws.close();
+      resolve();
+    });
+    setTimeout(() => {
+      ws.close();
+      resolve();
+    }, 3000);
+  });
+}
+
+/**
+ * Get the CDP target ID for the active page in a session.
+ */
+export async function getSessionCDPTargetId(
+  sessionId: string,
+): Promise<string | null> {
+  const state = sessions.get(sessionId);
+  if (!state || state.pages.length === 0) {
+    return null;
+  }
+  const active = state.pages[state.activeIndex] ?? state.pages[0];
+  return active?.cdpTargetId ?? null;
+}
+
+/**
+ * Navigate a tab to a URL via raw CDP Page.navigate (does not wait for load event).
+ * Cookie injection must happen before calling this.
+ */
+export async function cdpNavigatePage(
+  targetId: string,
+  url: string,
+  waitMs = 30_000,
+): Promise<void> {
+  const targets = await listCDPTargets();
+  const target = targets.find((t) => t.id === targetId);
+  if (!target) {
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    const ws = new WebSocket(target.webSocketDebuggerUrl);
+    ws.addEventListener("open", () => {
+      ws.send(
+        JSON.stringify({
+          id: 1,
+          method: "Page.navigate",
+          params: { url },
+        }),
+      );
+    });
+    ws.addEventListener("message", (ev: MessageEvent) => {
+      const msg = JSON.parse(String(ev.data)) as { id?: number };
+      if (msg.id === 1) {
+        ws.close();
+        resolve();
+      }
+    });
+    ws.addEventListener("error", () => {
+      ws.close();
+      resolve();
+    });
+    setTimeout(() => {
+      ws.close();
+      resolve();
+    }, waitMs);
+  });
+}
+
 /**
  * Close orphan Chrome tabs left behind by dead sessions.
  * Uses CDP target IDs (stable across MCP restarts) rather than MCP integer IDs.
@@ -702,16 +808,21 @@ async function openPage(
   url: string,
   mcp: MCPProcess,
   logger: EndpointLogger,
+  timeout?: number,
 ): Promise<SessionPage | null> {
   // Snapshot CDP targets before opening so we can identify the new one.
   const beforeTargets = await listCDPTargets();
   const beforeIds = new Set(beforeTargets.map((t) => t.id));
 
+  const newPageArgs: Record<string, string | number> = { url };
+  if (timeout) {
+    newPageArgs["timeout"] = timeout;
+  }
   const resp = await sendRaw(mcp, {
     jsonrpc: "2.0",
     id: mcp.nextId++,
     method: "tools/call",
-    params: { name: "new_page", arguments: { url } },
+    params: { name: "new_page", arguments: newPageArgs },
   });
 
   const result = resp.result as
@@ -958,7 +1069,11 @@ export class BrowserRepository {
             }
           }
 
-          const page = await openPage(sessionId, url, mcp, logger);
+          const navTimeout =
+            typeof parsedArgs["timeout"] === "number"
+              ? (parsedArgs["timeout"] as number)
+              : undefined;
+          const page = await openPage(sessionId, url, mcp, logger, navTimeout);
           if (!page) {
             return fail({
               message: t("repository.mcp.tool.call.executionFailed"),

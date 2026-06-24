@@ -1123,7 +1123,10 @@ export class SkillsRepository {
           createSkillDefinitions.POST,
           logger,
           user,
-        )("skill-created", { ...data, id: skill.slug ?? skill.id });
+        )("skill-created", {
+          responseData: { id: skill.slug ?? skill.id },
+          requestData: data,
+        });
       }
 
       return success({
@@ -1267,27 +1270,21 @@ export class SkillsRepository {
             logger,
             user,
           )("skill-created", {
-            id: derivedSkill.slug ?? derivedSkill.id,
-            name: derivedSkill.name,
-            tagline: derivedSkill.tagline ?? "",
-            icon: derivedSkill.icon,
-            description: derivedSkill.description ?? "",
-            category: derivedSkill.category,
-            isPublic: derivedSkill.ownershipType === SkillOwnershipType.PUBLIC,
-            // Per-modality model selections live on the variants for skills.
-            voiceModelSelection: undefined,
-            sttModelSelection: undefined,
-            imageVisionModelSelection: undefined,
-            videoVisionModelSelection: undefined,
-            audioVisionModelSelection: undefined,
-            imageGenModelSelection: undefined,
-            musicGenModelSelection: undefined,
-            videoGenModelSelection: undefined,
-            systemPrompt: derivedSkill.systemPrompt ?? "",
-            variants: SkillsRepository.safeParseVariants(derivedSkill.variants),
-            availableTools: data.availableTools,
-            pinnedTools: data.pinnedTools,
-            compactTrigger: derivedSkill.compactTrigger ?? null,
+            responseData: { id: derivedSkill.slug ?? derivedSkill.id },
+            requestData: {
+              name: derivedSkill.name,
+              tagline: derivedSkill.tagline ?? "",
+              icon: derivedSkill.icon,
+              description: derivedSkill.description ?? "",
+              category: derivedSkill.category,
+              isPublic:
+                derivedSkill.ownershipType === SkillOwnershipType.PUBLIC,
+              systemPrompt: derivedSkill.systemPrompt || null,
+              variants: derivedSkill.variants ?? undefined,
+              availableTools: data.availableTools,
+              pinnedTools: data.pinnedTools,
+              compactTrigger: derivedSkill.compactTrigger ?? null,
+            },
           });
         }
 
@@ -1424,14 +1421,19 @@ export class SkillsRepository {
       // the framework merges them into the [id] DETAIL cache AND the client onEvent
       // rebuilds the LIST card; cross-instance (remoteEvent) the peer re-applies the
       // update.
-      createEndpointEmitter(skillIdDefinitions.PATCH, logger, user, {
-        id: existingSkill.slug ?? existingSkill.id,
-      })("skill-updated", {
-        name: updated.name ?? null,
-        icon: updated.icon ?? null,
-        tagline: updated.tagline ?? null,
-        description: updated.description ?? null,
-        category: updated.category,
+      createEndpointEmitter(
+        skillIdDefinitions.PATCH,
+        logger,
+        user,
+      )("skill-updated", {
+        urlPathParams: { id: existingSkill.slug ?? existingSkill.id },
+        requestData: {
+          name: updated.name ?? null,
+          icon: updated.icon ?? null,
+          tagline: updated.tagline ?? null,
+          description: updated.description ?? null,
+          category: updated.category,
+        },
       });
 
       // Return the full updated skill to match GET response structure
@@ -1527,9 +1529,13 @@ export class SkillsRepository {
       // This op owns its `skill-deleted` event (side-effect; the skill id rides on
       // urlPathParams). Locally its client onEvent removes the skill from the list;
       // cross-instance (remoteEvent) the peer's onRemoteEvent removes it by id.
-      createEndpointEmitter(skillIdDefinitions.DELETE, logger, user, {
-        id: deleted.slug ?? deleted.id,
-      })("skill-deleted", {});
+      createEndpointEmitter(
+        skillIdDefinitions.DELETE,
+        logger,
+        user,
+      )("skill-deleted", {
+        urlPathParams: { id: deleted.slug ?? deleted.id },
+      });
 
       // Fire-and-forget: remove embedding from cortex_nodes
       void (async (): Promise<void> => {
@@ -1643,15 +1649,16 @@ export class SkillsRepository {
    * instance with the relayed request. Reuses createSkill so there is one path.
    * The relayed `id` is informational — the slug is regenerated locally.
    */
-  static async applyRemoteSkillCreate(
-    payload: SkillCreatedEventPayload,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteSkillCreate({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    (typeof createSkillDefinitions)["POST"],
+    "skill-created"
+  >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
-    const { id: _relayedId, ...data } = payload;
-    void _relayedId;
-    const result = await this.createSkill(data, user, logger, t, true);
+    const result = await this.createSkill(requestData, user, logger, t, true);
     if (!result.success) {
       logger.error("Failed to apply remote skill create", {
         message: result.message,
@@ -1666,12 +1673,14 @@ export class SkillsRepository {
    * accepted (and ignored) so the route handler can stay a single expression that
    * uses it (route boilerplate forbids unused params / multi-statement bodies).
    */
-  static async applyRemoteSkillDeleteById(
-    payload: WidgetData,
-    skillId: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    void payload;
+  static async applyRemoteSkillDeleteById({
+    urlPathParams,
+    logger,
+  }: RemoteEventHandlerProps<
+    (typeof skillIdDefinitions)["DELETE"],
+    "skill-deleted"
+  >): Promise<void> {
+    const skillId = urlPathParams.id;
     try {
       const { parseSkillId: parse } = await import("../chat/slugify");
       const { skillId: resolvedId } = parse(skillId);
@@ -1695,14 +1704,15 @@ export class SkillsRepository {
    * Only updates the 5 display fields that ride on the event's requestFields.
    * Called by [id]/route.ts onRemoteEvent for "skill-updated".
    */
-  static async applyRemoteSkillPartialUpdate(
-    skillId: string,
-    partial: Pick<
-      SkillUpdateRequestOutput,
-      "name" | "icon" | "tagline" | "description" | "category"
-    >,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteSkillPartialUpdate({
+    requestData,
+    urlPathParams,
+    logger,
+  }: RemoteEventHandlerProps<
+    (typeof skillIdDefinitions)["PATCH"],
+    "skill-updated"
+  >): Promise<void> {
+    const skillId = urlPathParams.id;
     try {
       const { parseSkillId: parse } = await import("../chat/slugify");
       const { skillId: resolvedId } = parse(skillId);
@@ -1715,11 +1725,11 @@ export class SkillsRepository {
       await database
         .update(cs)
         .set({
-          name: partial.name,
-          tagline: partial.tagline,
-          icon: partial.icon,
-          description: partial.description,
-          category: partial.category,
+          name: requestData.name,
+          tagline: requestData.tagline,
+          icon: requestData.icon,
+          description: requestData.description,
+          category: requestData.category,
         })
         .where(eqOp(cs.slug, resolvedId));
     } catch (err) {

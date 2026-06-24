@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/system/unified-interface/tasks/pulse/status/route"),
+      () => import("@/app/api/[locale]/system/unified-interface/tasks/pulse/status/route"),
     ),
   },
 });

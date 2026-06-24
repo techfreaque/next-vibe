@@ -1,18 +1,3 @@
-/**
- * Wait For Task API Definition
- * POST /system/unified-interface/tasks/wait-for-task
- *
- * Allows an AI to synchronously wait on a pending background task.
- * If the task is already completed, returns the result immediately.
- * If pending: registers the calling thread (wakeUp mechanism) so that
- * when the task completes, the AI stream is automatically revived.
- *
- * Stream behavior:
- * - If already complete: returns result inline, stream continues.
- * - If pending: stream pauses (TOOL_WAITING), revived via resume-stream
- *   when the original task completes and calls handleTaskCompletion.
- */
-
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
@@ -35,47 +20,48 @@ import {
   CronTaskStatusDB,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-const WaitForTaskWidget = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.WaitForTaskWidget })),
-);
 
-import { scopedTranslation } from "../i18n";
+import { scopedTranslation } from "./i18n";
+
+const AwaitTaskWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.AwaitTaskWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "unified-interface", "tasks", "wait-for-task"],
-  title: "waitForTask.post.title",
-  titleShort: "waitForTask.post.titleShort",
-  description: "waitForTask.post.description",
+  path: ["system", "unified-interface", "execute-tool", "await-task"],
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
   icon: "clock",
   statusBadge: {
     loading: {
-      label: "waitForTask.post.status.waiting",
+      label: "post.status.waiting",
       color: "bg-blue-500/10 text-blue-500",
     },
     done: {
-      label: "waitForTask.post.status.complete",
+      label: "post.status.complete",
       color: "bg-green-500/10 text-green-500",
     },
   },
   category: "devTools",
   subCategory: "tasksCron",
-  tags: ["tags.tasks" as const],
+  tags: ["tags.awaitTask" as const],
   allowedRoles: [
+    UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ] as const,
-  defaultAiPinned: [UserRole.ADMIN] as const,
-  aliases: ["wait-for-task"],
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  aliases: ["await-task", "wait-for-task"],
 
   fields: customWidgetObject({
-    render: WaitForTaskWidget,
+    render: AwaitTaskWidget,
     noFormElement: true,
     usage: { request: "data", response: true } as const,
     children: {
-      // Request
       taskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -83,7 +69,6 @@ const { POST } = createEndpoint({
         schema: z.string().min(1),
       }),
 
-      // Response
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.enum(CronTaskStatusDB),
@@ -97,7 +82,6 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),
-      // Original tool info for widget rendering - mirrors execute-tool's toolName/input
       originalToolName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().optional(),
@@ -112,46 +96,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "waitForTask.post.errors.validation.title",
-      description: "waitForTask.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "waitForTask.post.errors.unauthorized.title",
-      description: "waitForTask.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "waitForTask.post.errors.internal.title",
-      description: "waitForTask.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "waitForTask.post.errors.forbidden.title",
-      description: "waitForTask.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "waitForTask.post.errors.notFound.title",
-      description: "waitForTask.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "waitForTask.post.errors.network.title",
-      description: "waitForTask.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "waitForTask.post.errors.unknown.title",
-      description: "waitForTask.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "waitForTask.post.errors.unsaved.title",
-      description: "waitForTask.post.errors.unsaved.description",
+      title: "post.errors.unsaved.title",
+      description: "post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "waitForTask.post.errors.conflict.title",
-      description: "waitForTask.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "waitForTask.post.success.title",
-    description: "waitForTask.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {
@@ -176,7 +160,7 @@ const { POST } = createEndpoint({
 
 export const endpoints = { POST };
 
-export type WaitForTaskRequestOutput = typeof POST.types.RequestOutput;
-export type WaitForTaskResponseOutput = typeof POST.types.ResponseOutput;
+export type AwaitTaskRequestOutput = typeof POST.types.RequestOutput;
+export type AwaitTaskResponseOutput = typeof POST.types.ResponseOutput;
 
 export default endpoints;

@@ -181,19 +181,21 @@ export class FolderRepository {
         folderContentsDefinitions.GET,
         logger,
         user,
-        { rootFolderId: updated.rootFolderId },
       );
       emitFolderContents("folder-updated", {
-        items: [
-          {
-            id: updated.id,
-            name: updated.name,
-            icon: updated.icon,
-            color: updated.color,
-            sortOrder: updated.sortOrder,
-            updatedAt: updated.updatedAt,
-          },
-        ],
+        urlPathParams: { rootFolderId: updated.rootFolderId },
+        responseData: {
+          items: [
+            {
+              id: updated.id,
+              name: updated.name,
+              icon: updated.icon,
+              color: updated.color,
+              sortOrder: updated.sortOrder,
+              updatedAt: updated.updatedAt,
+            },
+          ],
+        },
       });
 
       return success({
@@ -267,9 +269,11 @@ export class FolderRepository {
         folderContentsDefinitions.GET,
         logger,
         user,
-        { rootFolderId: folder.rootFolderId },
       );
-      emitFolderContents("folder-deleted", { items: [{ id: folder.id }] });
+      emitFolderContents("folder-deleted", {
+        urlPathParams: { rootFolderId: folder.rootFolderId },
+        responseData: { items: [{ id: folder.id }] },
+      });
 
       return success({
         id: folder.id,

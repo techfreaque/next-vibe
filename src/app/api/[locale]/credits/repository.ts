@@ -4161,13 +4161,15 @@ export class CreditRepository {
         user,
       );
       emitCredits("credits-balance-updated", {
-        total,
-        expiring,
-        permanent,
-        earned,
-        free,
-        expiresAt,
-        capacity,
+        responseData: {
+          total,
+          expiring,
+          permanent,
+          earned,
+          free,
+          expiresAt,
+          capacity,
+        },
       });
       return undefined;
     });

@@ -36,6 +36,7 @@ import {
 } from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
+import { USERS_CREATE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const UserCreateContainer = lazyWidget(() =>
@@ -49,6 +50,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["users", "create"],
+  aliases: [USERS_CREATE_ALIAS] as const,
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
   title: "post.title" as const,

@@ -43,6 +43,7 @@ const { POST } = createEndpoint({
   subCategory: "serverManagement",
   tags: ["tags.build"],
   icon: "package",
+  timeoutMs: 0,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_AUTH_BYPASS,

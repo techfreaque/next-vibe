@@ -675,7 +675,7 @@ async function executeRemoteEndpoint(params: {
     if (userId && resolvedInstanceId) {
       const { createEndpointLogger } =
         await import("@/app/api/[locale]/system/logger/server");
-      const transportLogger = createEndpointLogger(false, Date.now(), locale);
+      const transportLogger = createEndpointLogger(false, locale);
       const { RouteExecuteRepository } =
         await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
       return RouteExecuteRepository.runInProcessTyped({

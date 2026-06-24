@@ -105,7 +105,6 @@ export const SyncScopeSchema = z
     skills: z.boolean().default(false),
     favorites: z.boolean().default(false),
     threads: z.boolean().default(false),
-    chat: z.boolean().default(false),
   })
   .catchall(z.boolean());
 export type SyncScope = z.infer<typeof SyncScopeSchema>;
@@ -116,7 +115,6 @@ export const DEFAULT_SYNC_SCOPE: SyncScope = {
   skills: false,
   favorites: false,
   threads: false,
-  chat: false,
 };
 
 /**

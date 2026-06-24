@@ -222,7 +222,7 @@ export const useVoiceModeStore = create<VoiceModeState>()(
             ...persistedState?.settings,
             chatModeByConfig: {
               ...migratedChatMode,
-              ...(persistedState?.settings?.chatModeByConfig ?? {}),
+              ...persistedState?.settings?.chatModeByConfig,
             },
           },
         };

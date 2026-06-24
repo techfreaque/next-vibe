@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    productType: {
+      service: "Usługa",
+      physical: "Fizyczny",
+      digital: "Cyfrowy",
+    },
+  },
   tags: {
     products: "Produkty",
     catalog: "Katalog",

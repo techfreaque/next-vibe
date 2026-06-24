@@ -2,6 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Vibe Sense",
+  enums: {
+    resolution: {
+      "1m": "1 minuta",
+      "3m": "3 minuty",
+      "5m": "5 minut",
+      "15m": "15 minut",
+      "30m": "30 minut",
+      "1h": "1 godzina",
+      "4h": "4 godziny",
+      "1d": "1 dzień",
+      "1w": "1 tydzień",
+      "1M": "1 miesiąc",
+    },
+  },
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Uruchom backtest",

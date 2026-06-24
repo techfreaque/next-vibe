@@ -10,8 +10,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -98,6 +99,30 @@ export class ThreadByIdRepository {
       }),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
+  }
+
+  // Cross-instance remote-event appliers never fire on native (native is not a
+  // sync peer) — no-op stubs satisfy the shared repository interface.
+  // oxlint-disable-next-line no-unused-vars
+  static async applyRemoteThreadUpdate(
+    // oxlint-disable-next-line no-unused-vars
+    _props: RemoteEventHandlerProps<
+      typeof threadByIdEndpoints.PATCH,
+      "thread-updated"
+    >,
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  // oxlint-disable-next-line no-unused-vars
+  static async applyRemoteThreadDelete(
+    // oxlint-disable-next-line no-unused-vars
+    _props: RemoteEventHandlerProps<
+      typeof threadByIdEndpoints.DELETE,
+      "thread-deleted"
+    >,
+  ): Promise<void> {
+    return Promise.resolve();
   }
 }
 

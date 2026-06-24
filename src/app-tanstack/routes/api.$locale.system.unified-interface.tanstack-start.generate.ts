@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route"),
+      () => import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route"),
     ),
   },
 });

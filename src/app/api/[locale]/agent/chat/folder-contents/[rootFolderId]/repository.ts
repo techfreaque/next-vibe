@@ -32,6 +32,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -42,6 +43,7 @@ import type {
   FolderContentsResponseOutput,
   FolderContentsUrlVariablesOutput,
 } from "./definition";
+import definitions from "./definition";
 import type { FolderContentsT } from "./i18n";
 
 export class FolderContentsRepository {
@@ -195,7 +197,7 @@ export class FolderContentsRepository {
           archived: null,
           canEdit: null,
           canPost: null,
-          streamingState: null,
+          streamingState: ThreadStreamingState.IDLE,
           rolesEdit: null,
           // Share link fields - null for folders
           activeShareCount: null,
@@ -652,5 +654,41 @@ export class FolderContentsRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Cross-instance applier for `thread-title-updated`: update the title in DB
+   * and re-emit locally (fanOut=false) so this instance's WS clients see it.
+   */
+  static async applyRemoteThreadTitleUpdated(
+    props: RemoteEventHandlerProps<
+      typeof definitions.GET,
+      "thread-title-updated"
+    >,
+  ): Promise<void> {
+    const { responseData, urlPathParams, user, logger } = props;
+    const item = responseData.items?.[0];
+    if (!item?.id || !item.title) {
+      return;
+    }
+    await db
+      .update(chatThreads)
+      .set({ title: item.title, updatedAt: new Date() })
+      .where(eq(chatThreads.id, item.id))
+      .catch((err: Error) => {
+        logger.warn(
+          "[folder-contents/repository] thread-title-updated: DB update failed",
+          { threadId: item.id, error: err.message },
+        );
+      });
+    const { createEndpointEmitter } =
+      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
+      "thread-title-updated",
+      {
+        urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
+        responseData: { items: [{ id: item.id, title: item.title }] },
+      },
+    );
   }
 }

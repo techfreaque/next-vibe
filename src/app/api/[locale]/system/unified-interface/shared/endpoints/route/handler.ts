@@ -24,7 +24,7 @@ import {
   isStreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
-import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -43,11 +43,11 @@ import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,
 } from "../../field/utils";
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { WidgetData } from "../../types/json";
 import type { Platform } from "../../types/platform";
 import type { ServerDefaultContext } from "../../types/server-default";
+import { DEFAULT_ENDPOINT_TIMEOUT_MS } from "../definition/create";
 import { permissionsRegistry } from "../permissions/registry";
 import {
   validateHandlerRequestData,
@@ -118,18 +118,13 @@ export type InferJwtPayloadTypeFromRoles<
 /**
  * SMS handler configuration
  */
-export interface SMSHandler<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string,
-> {
+export interface SMSHandler<TEndpoint extends CreateApiEndpointAny> {
   readonly ignoreErrors?: boolean;
   readonly render: SmsFunctionType<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"],
+    TEndpoint["types"]["ScopedTranslationKey"]
   >;
 }
 
@@ -187,108 +182,145 @@ export interface ApiHandlerProps<
  * - FileResponse for binary file responses (e.g., file downloads)
  * - ContentResponse for mixed content blocks (text + images)
  */
-export type ApiHandlerFunction<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TPlatform extends Platform,
-  TScopedTranslationKey extends string,
-> = (
+export type ApiHandlerFunction<TEndpoint extends CreateApiEndpointAny> = (
   props: ApiHandlerProps<
-    TRequestOutput,
-    TUrlVariablesOutput,
-    TUserRoleValue,
-    TPlatform,
-    TScopedTranslationKey
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"],
+    TEndpoint["allowedRoles"],
+    Platform,
+    TEndpoint["types"]["ScopedTranslationKey"]
   >,
 ) =>
-  | Promise<HandlerResponse<TResponseOutput>>
-  | HandlerResponse<TResponseOutput>;
+  | Promise<HandlerResponse<TEndpoint["types"]["ResponseOutput"]>>
+  | HandlerResponse<TEndpoint["types"]["ResponseOutput"]>;
 
 export type CanSubscribeFn<TUrlVariables> = {
   bivarianceHack(params: {
     user: JwtPayloadType;
     urlPathParams: TUrlVariables;
     logger: EndpointLogger;
+    locale: CountryLanguage;
   }): Promise<boolean> | boolean;
 }["bivarianceHack"];
 
 /**
+ * Context passed to onRemoteEvent handlers — the non-data fields.
+ * urlPathParams has been moved into the per-handler props (typed per-event).
+ *
+ * `user` is `JwtPrivatePayloadType` — a remote event is always a server-to-server
+ * dispatch on behalf of an AUTHENTICATED user. The dispatch path enforces this:
+ * a non-authenticated origin is rejected before any handler runs.
+ */
+export interface RemoteEventContext {
+  readonly instanceId: string;
+  readonly user: JwtPrivatePayloadType;
+  readonly locale: CountryLanguage;
+  readonly logger: EndpointLogger;
+  readonly isServer: true;
+}
+
+type NeverToUndefined<T> = [T] extends [never] ? undefined : T;
+
+/** Props passed to each onRemoteEvent handler. K narrows requestData/responseData to the event's payload. */
+export interface RemoteEventHandlerProps<
+  TEndpoint extends CreateApiEndpointAny,
+  K extends keyof TEndpoint["types"]["Events"] =
+    keyof TEndpoint["types"]["Events"],
+> {
+  readonly responseData: NeverToUndefined<
+    TEndpoint["types"]["EventResponsePayloads"][K &
+      keyof TEndpoint["types"]["EventResponsePayloads"]]
+  >;
+  readonly requestData: NeverToUndefined<
+    TEndpoint["types"]["EventRequestPayloads"][K &
+      keyof TEndpoint["types"]["EventRequestPayloads"]]
+  >;
+  readonly urlPathParams: NeverToUndefined<
+    TEndpoint["types"]["EventUrlPayloads"][K &
+      keyof TEndpoint["types"]["EventUrlPayloads"]]
+  >;
+  readonly payload: NeverToUndefined<
+    TEndpoint["types"]["EventPayloadTypes"][K &
+      keyof TEndpoint["types"]["EventPayloadTypes"]]
+  >;
+  readonly instanceId: string;
+  readonly user: JwtPrivatePayloadType;
+  readonly locale: CountryLanguage;
+  readonly logger: EndpointLogger;
+  readonly isServer: true;
+}
+
+/**
+ * Map of server-side remote event handlers, keyed by event name.
+ * Only events declared with `remoteEvent: true` on the definition are valid keys.
+ */
+export type OnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> = {
+  [K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
+    remoteEvent: true;
+  }
+    ? K
+    : never]: (
+    props: RemoteEventHandlerProps<
+      TEndpoint,
+      K & keyof TEndpoint["types"]["Events"]
+    >,
+  ) => Promise<void> | void;
+};
+
+/** Convenience alias — use this in repository files to type `onRemoteEvent` exports. */
+export type EndpointOnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> =
+  OnRemoteEventMap<TEndpoint>;
+
+type _IsAnyEvents<T> = 0 extends 1 & T ? true : false;
+
+/** True when TEndpoint has at least one remoteEvent: true event. */
+type HasRemoteEvents<TEndpoint extends CreateApiEndpointAny> =
+  _IsAnyEvents<TEndpoint["types"]["Events"]> extends true
+    ? boolean
+    : keyof {
+          [K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
+            remoteEvent: true;
+          }
+            ? K
+            : never]: true;
+        } extends never
+      ? false
+      : true;
+
+/** Requires onRemoteEvent when the endpoint declares remoteEvent: true events; forbids it otherwise. */
+export type OnRemoteEventField<TEndpoint extends CreateApiEndpointAny> =
+  HasRemoteEvents<TEndpoint> extends true
+    ? { onRemoteEvent: OnRemoteEventMap<TEndpoint> }
+    : HasRemoteEvents<TEndpoint> extends boolean
+      ? { onRemoteEvent?: OnRemoteEventMap<TEndpoint> }
+      : { onRemoteEvent?: never };
+
+/**
  * Handler configuration for a single method.
  */
-export interface MethodHandlerConfig<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TPlatform extends Platform,
-  TScopedTranslationKey extends string,
-> {
-  handler: ApiHandlerFunction<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TUserRoleValue,
-    TPlatform,
-    TScopedTranslationKey
-  >;
-  email?: EmailHandler<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TUserRoleValue
-  >[];
-  sms?: SMSHandler<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TScopedTranslationKey
-  >[];
+export type MethodHandlerConfig<TEndpoint extends CreateApiEndpointAny> = {
+  handler: ApiHandlerFunction<TEndpoint>;
+  email?: EmailHandler<TEndpoint>[];
+  sms?: SMSHandler<TEndpoint>[];
   fieldDefaults?: Partial<
     Record<
-      keyof TRequestOutput & string,
+      keyof TEndpoint["types"]["RequestOutput"] & string,
       (ctx: ServerDefaultContext) => Promise<WidgetData | undefined>
     >
   >;
-  canSubscribe?: CanSubscribeFn<TUrlVariablesOutput>;
-}
+  canSubscribe?: CanSubscribeFn<TEndpoint["types"]["UrlVariablesOutput"]>;
+} & OnRemoteEventField<TEndpoint>;
 
-export interface ApiHandlerOptions<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TEndpoint extends CreateApiEndpointAny,
-  TPlatform extends Platform,
-  TScopedTranslationKey extends string,
-> {
+export interface ApiHandlerOptions<TEndpoint extends CreateApiEndpointAny> {
   endpoint: TEndpoint;
-  handler: ApiHandlerFunction<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TUserRoleValue,
-    TPlatform,
-    TScopedTranslationKey
-  >;
+  handler: ApiHandlerFunction<TEndpoint>;
   email?:
     | {
-        afterHandlerEmails?: EmailHandler<
-          TRequestOutput,
-          TResponseOutput,
-          TUrlVariablesOutput,
-          TUserRoleValue
-        >[];
+        afterHandlerEmails?: EmailHandler<TEndpoint>[];
       }
     | undefined;
   sms?: {
-    afterHandlerSms?: SMSHandler<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput,
-      TScopedTranslationKey
-    >[];
+    afterHandlerSms?: SMSHandler<TEndpoint>[];
   };
   /**
    * Server-side field defaults for fields hidden from this platform.
@@ -298,30 +330,32 @@ export interface ApiHandlerOptions<
    */
   fieldDefaults?: Partial<
     Record<
-      keyof TRequestOutput & string,
+      keyof TEndpoint["types"]["RequestOutput"] & string,
       (ctx: ServerDefaultContext) => Promise<WidgetData | undefined>
     >
   >;
 }
 
-export type GenericHandlerReturnType<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
-> = ((props: {
-  data: TRequestOutput;
-  urlPathParams: TUrlVariablesOutput;
-  user?: InferJwtPayloadTypeFromRoles<TUserRoleValue>; // Optional: if provided, skip auth; if not, do auth
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-  platform: Platform;
-  request?: NextRequest; // Optional NextRequest for Next.js platform
-  cronTaskId?: string; // Cron task DB ID when executed by the task runner
-  streamContext: ToolExecutionContext;
-}) => Promise<HandlerResponse<TResponseOutput>>) & {
-  canSubscribe?: CanSubscribeFn<TUrlVariablesOutput>;
-};
+export type GenericHandlerReturnType<TEndpoint extends CreateApiEndpointAny> =
+  ((props: {
+    data: TEndpoint["types"]["RequestOutput"];
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+    user?: InferJwtPayloadTypeFromRoles<TEndpoint["types"]["UserRoleValue"]>; // Optional: if provided, skip auth; if not, do auth
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    platform: Platform;
+    request?: NextRequest; // Optional NextRequest for Next.js platform
+    cronTaskId?: string; // Cron task DB ID when executed by the task runner
+    streamContext: ToolExecutionContext;
+  }) => Promise<HandlerResponse<TEndpoint["types"]["ResponseOutput"]>>) & {
+    canSubscribe?: CanSubscribeFn<TEndpoint["types"]["UrlVariablesOutput"]>;
+    // Optional here because this is the runtime-CONSTRUCTED handler type (the
+    // dispatcher checks presence at runtime). Author-time exhaustiveness — every
+    // remoteEvent the definition declares MUST have a handler — is enforced on the
+    // INPUT config via MethodHandlerConfig → OnRemoteEventField, which makes each
+    // declared remoteEvent a required key of onRemoteEvent.
+    onRemoteEvent?: OnRemoteEventMap<TEndpoint>;
+  };
 
 /**
  * Base type for generic handlers when exact types are not known
@@ -331,33 +365,30 @@ export type GenericHandlerReturnType<
  * constraining the specific types, allowing handlers with different specific
  * types to be stored together while maintaining type safety at the call site.
  */
-export type GenericHandlerBase = GenericHandlerReturnType<
-  // oxlint-disable-next-line no-explicit-any
-  any,
-  // oxlint-disable-next-line no-explicit-any
-  any,
-  // oxlint-disable-next-line no-explicit-any
-  any,
-  // oxlint-disable-next-line no-explicit-any
-  readonly any[]
->;
+export type GenericHandlerBase = GenericHandlerReturnType<CreateApiEndpointAny>;
+
+function makeTimeoutRace<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Handler timeout after ${String(ms)}ms`)),
+      ms,
+    );
+    void promise.then(
+      (v) => {
+        clearTimeout(timer);
+        return resolve(v);
+      },
+      (e: Error) => {
+        clearTimeout(timer);
+        return reject(e);
+      },
+    );
+  });
+}
 
 export function createGenericHandler<T extends CreateApiEndpointAny>(
-  options: ApiHandlerOptions<
-    T["types"]["RequestOutput"],
-    T["types"]["ResponseOutput"],
-    T["types"]["UrlVariablesOutput"],
-    T["allowedRoles"],
-    T,
-    Platform,
-    T["types"]["ScopedTranslationKey"]
-  >,
-): GenericHandlerReturnType<
-  T["types"]["RequestOutput"],
-  T["types"]["ResponseOutput"],
-  T["types"]["UrlVariablesOutput"],
-  T["allowedRoles"]
-> {
+  options: ApiHandlerOptions<T>,
+): GenericHandlerReturnType<T> {
   const { endpoint, handler, email, sms, fieldDefaults } = options;
 
   return async ({
@@ -540,18 +571,47 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       }
     }
 
-    const result = await handler({
-      data: validationResult.data.requestData as T["types"]["RequestOutput"],
-      urlPathParams: validationResult.data
-        .urlPathParams as T["types"]["UrlVariablesOutput"],
-      user,
-      t,
-      locale: validationResult.data.locale,
-      logger,
-      request,
-      platform,
-      cronTaskId,
-      streamContext,
+    const effectiveTimeoutMs =
+      endpoint.timeoutMs === 0
+        ? null // explicit 0 = no timeout
+        : (endpoint.timeoutMs ?? DEFAULT_ENDPOINT_TIMEOUT_MS);
+
+    const handlerPromise: Promise<
+      HandlerResponse<T["types"]["ResponseOutput"]>
+    > = Promise.resolve(
+      handler({
+        data: validationResult.data.requestData as T["types"]["RequestOutput"],
+        urlPathParams: validationResult.data
+          .urlPathParams as T["types"]["UrlVariablesOutput"],
+        user,
+        t,
+        locale: validationResult.data.locale,
+        logger,
+        request,
+        platform,
+        cronTaskId,
+        streamContext,
+      }),
+    );
+
+    const raced =
+      effectiveTimeoutMs !== null
+        ? makeTimeoutRace(handlerPromise, effectiveTimeoutMs)
+        : handlerPromise;
+
+    const result = await raced.catch((err: Error) => {
+      logger.error("[Generic Handler] Handler timed out or threw", {
+        routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
+        timeoutMs: effectiveTimeoutMs,
+        error: err.message,
+      });
+      return {
+        success: false as const,
+        message: sharedScopedTranslation
+          .scopedT(validationResult.data.locale)
+          .t("errorTypes.internal_error"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      };
     });
 
     // 5. Handle file responses - return immediately without email/SMS processing
@@ -596,13 +656,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     if (email?.afterHandlerEmails) {
       const { EmailHandlingRepository } =
         await import("@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/repository");
-      await EmailHandlingRepository.handleEmails<
-        T["types"]["RequestOutput"],
-        T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"],
-        T["types"]["ScopedTranslationKey"],
-        T["allowedRoles"]
-      >(
+      await EmailHandlingRepository.handleEmails<T>(
         {
           email,
           responseData: responseValidation.data as T["types"]["ResponseOutput"],
@@ -613,25 +667,14 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
           t,
           locale: validationResult.data.locale,
           user,
-        } satisfies EmailHandleRequestOutput<
-          T["types"]["RequestOutput"],
-          T["types"]["ResponseOutput"],
-          T["types"]["UrlVariablesOutput"],
-          T["types"]["ScopedTranslationKey"],
-          T["allowedRoles"]
-        >,
+        } satisfies EmailHandleRequestOutput<T>,
         logger,
       );
     }
 
     if (sms?.afterHandlerSms) {
       const { handleSms } = await import("@/app/api/[locale]/sms/handle-sms");
-      await handleSms<
-        T["types"]["RequestOutput"],
-        T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"],
-        T["types"]["ScopedTranslationKey"]
-      >({
+      await handleSms<T>({
         sms,
         user,
         responseData: responseValidation.data as T["types"]["ResponseOutput"],

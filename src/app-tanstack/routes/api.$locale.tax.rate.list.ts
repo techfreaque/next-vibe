@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/tax/rate/list")({
+export const Route = createFileRoute(
+  "/api/$locale/tax/rate/list",
+)({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/tax/rate/list/route"),

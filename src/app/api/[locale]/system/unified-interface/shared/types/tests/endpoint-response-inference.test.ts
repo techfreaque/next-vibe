@@ -51,7 +51,9 @@ const mockScopedTranslation = {
   }),
 };
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 
 /**
  * UNIT TESTS: Test individual field inference
@@ -83,6 +85,10 @@ const field2_requestEnum = requestField(genericST, {
   fieldType: FieldDataType.SELECT,
   label: "test" as string,
   schema: z.enum(["monthly", "yearly"]),
+  options: [
+    { value: "monthly", label: "test" as string },
+    { value: "yearly", label: "test" as string },
+  ] as const,
 });
 
 // Test Field 2: Check schema inference
@@ -672,6 +678,10 @@ const testSingleRequestEnum = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "test" as string,
         schema: z.enum(["monthly", "yearly"]),
+        options: [
+          { value: "monthly", label: "test" as string },
+          { value: "yearly", label: "test" as string },
+        ] as const,
       }),
     },
   }),
@@ -851,6 +861,10 @@ const testMultipleRequestFields = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "test" as string,
         schema: z.enum(["monthly", "yearly"]),
+        options: [
+          { value: "monthly", label: "test" as string },
+          { value: "yearly", label: "test" as string },
+        ] as const,
       }),
       provider: requestField(genericST, {
         type: WidgetType.FORM_FIELD,

@@ -355,7 +355,7 @@ export async function runCodingAgent(
       durationMs: Date.now() - start,
       taskId: trackingTaskId,
       terminalPending: true,
-      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call wait-for-task.",
+      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call await-task.",
     });
   }
 
@@ -400,7 +400,7 @@ export async function runCodingAgent(
       // terminalPending signals triggerLocalPulse to skip handleTaskCompletion and wait
       // for the real terminal to call complete-task with the actual output.
       terminalPending: true,
-      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call wait-for-task.",
+      hint: "Result will be injected automatically as a deferred message when complete. Do NOT call await-task.",
     });
   }
 

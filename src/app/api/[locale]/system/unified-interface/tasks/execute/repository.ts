@@ -19,6 +19,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/task-completion-handler";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
@@ -35,7 +36,6 @@ import {
   type CronTaskStatusValue,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
-import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -156,8 +156,8 @@ export class TaskExecuteRepository {
           },
         ],
       };
-      emitTaskList("task-updated", runningPayload);
-      emitTaskQueue("task-updated", runningPayload);
+      emitTaskList("task-updated", { responseData: runningPayload });
+      emitTaskQueue("task-updated", { responseData: runningPayload });
     }
 
     // 5. Resolve execution user context - always the task owner, never the caller
@@ -387,8 +387,8 @@ export class TaskExecuteRepository {
           },
         ],
       };
-      emitTaskList("task-updated", completedPayload);
-      emitTaskQueue("task-updated", completedPayload);
+      emitTaskList("task-updated", { responseData: completedPayload });
+      emitTaskQueue("task-updated", { responseData: completedPayload });
     }
 
     // 8. If task has callback context (set by execute-tool AI path), emit

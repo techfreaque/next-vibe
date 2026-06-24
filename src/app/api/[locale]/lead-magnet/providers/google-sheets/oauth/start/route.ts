@@ -13,11 +13,7 @@ import { buildGoogleAuthUrl } from "../../oauth-helpers";
 export async function GET(request: NextRequest): Promise<Response> {
   const url = new URL(request.url);
   const locale = url.pathname.split("/")[2] ?? "en";
-  const logger = createEndpointLogger(
-    false,
-    Date.now(),
-    `${locale}-GLOBAL` as never,
-  );
+  const logger = createEndpointLogger(false, `${locale}-GLOBAL` as never);
 
   const user = await AuthRepository.getAuthMinimalUser(
     [

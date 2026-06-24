@@ -12,7 +12,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import type { z } from "zod";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
@@ -77,9 +76,7 @@ export function useLocalStorageRead<T, TEndpoint extends CreateApiEndpointAny>(
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
-          endpoint.requestSchema,
-        )
+      ? zodResolver(endpoint.requestSchema)
       : undefined,
     defaultValues: (options.initialState ?? {}) as RequestType,
   });
@@ -226,9 +223,7 @@ export function useLocalStorageCreate<T>(
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
-          endpoint.requestSchema,
-        )
+      ? zodResolver(endpoint.requestSchema)
       : undefined,
     defaultValues: (options.autoPrefillData ??
       options.defaultValues ??
@@ -384,11 +379,7 @@ export function useLocalStorageDelete<T>(
 
   // Create form instance for localStorage mode (similar to API mode)
   const form = useForm<RequestType>({
-    resolver: endpoint
-      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
-          endpoint.requestSchema,
-        )
-      : undefined,
+    resolver: endpoint ? zodResolver(endpoint.requestSchema) : undefined,
     defaultValues: {} as RequestType,
   });
 

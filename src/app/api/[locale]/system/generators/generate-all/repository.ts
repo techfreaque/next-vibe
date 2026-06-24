@@ -1331,7 +1331,7 @@ export class GenerateAllRepository {
 }
 
 if (import.meta.main) {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
   void GenerateAllRepository.generateAll(
     {
       skipEndpoints: false,

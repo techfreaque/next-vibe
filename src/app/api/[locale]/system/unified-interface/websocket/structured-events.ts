@@ -1,23 +1,13 @@
-/**
- * Definition-Driven Event Types
- *
- * Events declare which fields from ResponseOutput they carry.
- * The payload IS exactly those fields - no partial, no wrapping.
- * Types are computed once in createEndpoint and stored in types.EventPayloads.
- */
-
-import type { QueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
 import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 // ============================================================================
-// DEEP PARTIAL - used only internally by cache-merger
+// DEEP PARTIAL
 // ============================================================================
 
 export type DeepPartial<T> = T extends
@@ -32,7 +22,7 @@ export type DeepPartial<T> = T extends
     : { [K in keyof T]?: DeepPartial<T[K]> };
 
 // ============================================================================
-// EVENT PAYLOAD - derived from declared fields, computed once on definition
+// FIELD SPEC HELPERS
 // ============================================================================
 
 type ArrayItem<T> =
@@ -48,11 +38,6 @@ export type NestedFieldSpec<TResponseOutput> = {
     | true;
 };
 
-/**
- * Derive the payload type from a nested field spec.
- * - Array key with sub-fields → Array<Pick<Item, subfields>>
- * - Key with `true` → the full field type
- */
 type NestedEventPayload<
   TResponseOutput,
   TSpec extends NestedFieldSpec<TResponseOutput>,
@@ -67,12 +52,6 @@ type NestedEventPayload<
     : TResponseOutput[K];
 };
 
-/**
- * Compute the payload type for an event from its declared fields.
- * Flat:   fields: ["audioData", "chunkIndex"] → Pick<Response, "audioData" | "chunkIndex">
- * Nested: fields: { messages: ["id", "content"], streamingState: true }
- *         → { messages: Array<Pick<Message, "id"|"content">>, streamingState: ... }
- */
 export type EventPayload<
   TResponseOutput,
   TFields extends
@@ -84,110 +63,108 @@ export type EventPayload<
     ? NestedEventPayload<TResponseOutput, TFields>
     : never;
 
-/**
- * Compute EventPayload for every event in the map - stored once on types.EventPayloads.
- */
-export type ComputeEventPayloads<
-  TResponseOutput,
-  TEvents extends EndpointEventsMap<TResponseOutput>,
-> = {
-  [K in keyof TEvents]: TEvents[K] extends { fields: infer F }
-    ? F extends readonly (keyof TResponseOutput)[]
-      ? EventPayload<TResponseOutput, F>
-      : F extends NestedFieldSpec<TResponseOutput>
-        ? NestedEventPayload<TResponseOutput, F>
-        : { readonly [key: string]: never }
-    : { readonly [key: string]: never };
-};
-
-// ============================================================================
-// OPERATION
-// ============================================================================
-
-export type EventOperation = "merge" | "append" | "remove";
-
 // ============================================================================
 // EVENT HANDLER CONTEXT
 // ============================================================================
 
-/**
- * Context passed to onEvent callbacks. The `partial` field is typed as the
- * event's declared payload - computed from fields via ComputeEventPayloads
- * and indexed per event name.
- *
- * For the single-event declaration interfaces below, `partial` is typed as
- * a safe structural subset of TResponseOutput. The precise per-event type
- * flows from types.EventPayloads[K] at the subscription hook level.
- */
-export interface EndpointEventHandlerContext<TResponseOutput, TRequestOutput> {
-  partial: { readonly [K in keyof TResponseOutput]?: TResponseOutput[K] };
-  urlPathParams: { readonly [K in string]: string };
-  requestData: TRequestOutput;
+/** Wide ctx — all responseData/requestData fields optional. Used as fallback. */
+export interface EndpointEventHandlerContext<
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+> {
+  responseData: {
+    readonly [K in keyof TResponseOutput]?: TResponseOutput[K];
+  };
+  requestData: {
+    readonly [K in keyof TRequestOutput]?: TRequestOutput[K];
+  };
+  urlPathParams: TUrlVariablesOutput extends { readonly [K in string]: string }
+    ? TUrlVariablesOutput
+    : { readonly [K in string]: string };
   queryClient: QueryClient;
   logger: EndpointLogger;
-  /** The React Query cache key for this subscription instance. */
   cacheKey: string | undefined;
+  user: JwtPayloadType;
+  locale: CountryLanguage;
+  isServer?: boolean;
 }
+
+/**
+ * Narrowed ctx: fields listed in TResFields/TReqFields are required;
+ * unlisted fields remain optional.
+ */
+type NarrowedEventCtx<
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+  TResFields extends
+    | readonly (keyof TResponseOutput)[]
+    | NestedFieldSpec<TResponseOutput>
+    | undefined,
+  TReqFields extends readonly (keyof TRequestOutput)[] | undefined,
+> = {
+  responseData: TResFields extends readonly (keyof TResponseOutput)[]
+    ? { readonly [K in TResFields[number]]: TResponseOutput[K] } & {
+        readonly [K in Exclude<
+          keyof TResponseOutput,
+          TResFields[number]
+        >]?: TResponseOutput[K];
+      }
+    : { readonly [K in keyof TResponseOutput]?: TResponseOutput[K] };
+  requestData: TReqFields extends readonly (keyof TRequestOutput)[]
+    ? { readonly [K in TReqFields[number]]: TRequestOutput[K] } & {
+        readonly [K in Exclude<
+          keyof TRequestOutput,
+          TReqFields[number]
+        >]?: TRequestOutput[K];
+      }
+    : { readonly [K in keyof TRequestOutput]?: TRequestOutput[K] };
+  urlPathParams: TUrlVariablesOutput extends { readonly [K in string]: string }
+    ? TUrlVariablesOutput
+    : { readonly [K in string]: string };
+  logger: EndpointLogger;
+  cacheKey: string | undefined;
+  user: JwtPayloadType | undefined;
+  locale: CountryLanguage;
+  isServer?: boolean;
+};
 
 // ============================================================================
-// SINGLE EVENT DECLARATION
+// EVENT DECLARATION — single unified interface
 // ============================================================================
 
-export interface EndpointEventDeclarationWithFlatFields<
+export type EventOperation = "merge" | "append" | "remove";
+
+export interface EndpointEventDeclaration<
   TResponseOutput,
-  TFields extends readonly [
-    keyof TResponseOutput,
-    ...(keyof TResponseOutput)[],
-  ],
   TRequestOutput,
+  TUrlVariablesOutput,
+  TResFields extends
+    | readonly (keyof TResponseOutput)[]
+    | NestedFieldSpec<TResponseOutput>
+    | undefined = undefined,
+  TReqFields extends readonly (keyof TRequestOutput)[] | undefined = undefined,
 > {
-  readonly fields: TFields;
-  readonly operation: EventOperation;
+  readonly responseFields?: TResFields;
+  readonly requestFields?: TReqFields;
+  readonly urlPathParamsFields?: readonly (keyof TUrlVariablesOutput)[];
+  readonly operation?: EventOperation;
+  readonly clientDelivery?: false;
+  readonly remoteEvent?: true;
+  readonly syncDomain?: SyncDomain;
+  readonly allowedRoles?: readonly UserRoleValue[];
+  readonly payloadType?: z.ZodTypeAny;
   onEvent?(
-    ctx: EndpointEventHandlerContext<TResponseOutput, TRequestOutput>,
-  ): void | Promise<void>;
-}
-
-export interface EndpointEventDeclarationWithNestedFields<
-  TResponseOutput,
-  TSpec extends NestedFieldSpec<TResponseOutput>,
-  TRequestOutput,
-> {
-  readonly fields: TSpec;
-  readonly operation: EventOperation;
-  onEvent?(
-    ctx: EndpointEventHandlerContext<TResponseOutput, TRequestOutput>,
-  ): void | Promise<void>;
-}
-
-export interface EndpointEventDeclarationSideEffect<
-  TResponseOutput,
-  TRequestOutput = Record<string, WidgetData>,
-> {
-  onEvent(
-    ctx: EndpointEventHandlerContext<TResponseOutput, TRequestOutput>,
-  ): void | Promise<void>;
-  readonly fields?: undefined;
-  readonly operation?: undefined;
-}
-
-export type EndpointEventDeclaration<
-  TResponseOutput,
-  TRequestOutput = Record<string, WidgetData>,
-> =
-  | EndpointEventDeclarationWithFlatFields<
+    ctx: NarrowedEventCtx<
       TResponseOutput,
-      readonly [keyof TResponseOutput, ...(keyof TResponseOutput)[]],
       TRequestOutput,
-      TUrlVariablesOutput
-    >
-  | EndpointEventDeclarationWithNestedFields<
-      TResponseOutput,
-      NestedFieldSpec<TResponseOutput>,
-      TRequestOutput,
-      TUrlVariablesOutput
-    >
-  | EndpointEventDeclarationSideEffect<TResponseOutput, TRequestOutput>;
+      TUrlVariablesOutput,
+      TResFields,
+      TReqFields
+    >,
+  ): void | Promise<void>;
+}
 
 // ============================================================================
 // EVENTS MAP
@@ -195,31 +172,167 @@ export type EndpointEventDeclaration<
 
 export interface EndpointEventsMap<
   TResponseOutput,
-  TRequestOutput = Record<string, WidgetData>,
+  TRequestOutput,
+  TUrlVariablesOutput,
 > {
-  [K: string]: EndpointEventDeclaration<TResponseOutput, TRequestOutput>;
+  [K: string]: EndpointEventDeclaration<
+    TResponseOutput,
+    TRequestOutput,
+    TUrlVariablesOutput,
+    | readonly (keyof TResponseOutput)[]
+    | NestedFieldSpec<TResponseOutput>
+    | undefined,
+    readonly (keyof TRequestOutput)[] | undefined
+  >;
 }
 
+/**
+ * Given a concrete event declaration type E (with literal requestFields/responseFields),
+ * constructs the same declaration with onEvent contextually typed to only the declared fields.
+ * Used in createEndpoint's events config to enable per-field type narrowing without wrappers.
+ */
+export type EventDeclWithNarrowedCtx<
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+  E,
+> = Omit<E, "onEvent"> & {
+  onEvent?(
+    ctx: NarrowedEventCtx<
+      TResponseOutput,
+      TRequestOutput,
+      TUrlVariablesOutput,
+      E extends {
+        responseFields: infer RF extends
+          | readonly (keyof TResponseOutput)[]
+          | NestedFieldSpec<TResponseOutput>;
+      }
+        ? RF
+        : undefined,
+      E extends {
+        requestFields: infer RqF extends readonly (keyof TRequestOutput)[];
+      }
+        ? RqF
+        : undefined
+    >,
+  ): void | Promise<void>;
+};
+
 // ============================================================================
-// TYPED EMIT - uses EventPayloads stored on types
+// DERIVED MAP TYPES — read from responseFields/requestFields/payloadType
 // ============================================================================
 
+type _IsAny<T> = 0 extends 1 & T ? true : false;
+
+export type EventPayloads<TEvents> =
+  _IsAny<TEvents> extends true
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Record<string, any>
+    : {
+        [K in keyof TEvents]: TEvents[K] extends {
+          types?: { payload: infer P } | undefined;
+        }
+          ? P
+          : TEvents[K] extends { types: { payload: infer P } }
+            ? P
+            : never;
+      };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line no-explicit-any
+type AnyEventTypesRecord = Record<
+  string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { ResponseData: any; RequestData: any; UrlPathParams: any }
+>;
+export type EventTypes<TEvents> =
+  _IsAny<TEvents> extends true
+    ? AnyEventTypesRecord
+    : {
+        [K in keyof TEvents]: TEvents[K] extends {
+          types?:
+            | {
+                ResponseData: infer RD;
+                RequestData: infer ReqD;
+                UrlPathParams: infer UP;
+              }
+            | undefined;
+        }
+          ? { ResponseData: RD; RequestData: ReqD; UrlPathParams: UP }
+          : TEvents[K] extends {
+                types: {
+                  ResponseData: infer RD;
+                  RequestData: infer ReqD;
+                  UrlPathParams: infer UP;
+                };
+              }
+            ? { ResponseData: RD; RequestData: ReqD; UrlPathParams: UP }
+            : never;
+      };
+
 /**
- * Typed emit function. TEventPayloads is types.EventPayloads - computed once on definition.
- * Each event name maps to its exact payload shape, no recomputation.
+ * Compute payload map from responseFields/requestFields/payloadType directly.
+ * Priority: payloadType → requestFields (+ optional responseFields) → nested responseFields → flat responseFields → {}
  */
-export interface EmitEventNamed<
-  TEventPayloads extends ComputeEventPayloads<
-    TResponseOutput,
-    EndpointEventsMap<TResponseOutput>
-  >,
-  TResponseOutput = TEventPayloads extends ComputeEventPayloads<
-    infer R,
-    EndpointEventsMap<infer R>
-  >
-    ? R
-    : never,
-> {
+export type ComputeEventPayloads<TResponseOutput, TRequestOutput, TEvents> =
+  _IsAny<TEvents> extends true
+    ? // oxlint-disable-next-line no-explicit-any
+      Record<string, any>
+    : {
+        [K in keyof TEvents]: TEvents[K] extends {
+          payloadType: infer TSchema extends z.ZodTypeAny;
+        }
+          ? z.infer<TSchema>
+          : TEvents[K] extends {
+                requestFields: infer TReqFields extends
+                  readonly (keyof TRequestOutput)[];
+              }
+            ? Pick<TRequestOutput, TReqFields[number]> &
+                (TEvents[K] extends {
+                  responseFields: infer TResSpec extends
+                    NestedFieldSpec<TResponseOutput>;
+                }
+                  ? NestedEventPayload<TResponseOutput, TResSpec>
+                  : TEvents[K] extends {
+                        responseFields: infer TResFields extends
+                          readonly (keyof TResponseOutput)[];
+                      }
+                    ? Pick<TResponseOutput, TResFields[number]>
+                    : Record<never, never>)
+            : TEvents[K] extends {
+                  responseFields: infer TSpec extends
+                    NestedFieldSpec<TResponseOutput>;
+                }
+              ? NestedEventPayload<TResponseOutput, TSpec>
+              : TEvents[K] extends {
+                    responseFields: infer TFields extends
+                      readonly (keyof TResponseOutput)[];
+                  }
+                ? Pick<TResponseOutput, TFields[number]>
+                : Record<never, never>;
+      };
+
+export type ComputeEventTypes<TResponseOutput, TRequestOutput, TEvents> = {
+  [K in keyof ComputeEventPayloads<TResponseOutput, TRequestOutput, TEvents>]: {
+    ResponseData: ComputeEventPayloads<
+      TResponseOutput,
+      TRequestOutput,
+      TEvents
+    >[K];
+    RequestData: ComputeEventPayloads<
+      TResponseOutput,
+      TRequestOutput,
+      TEvents
+    >[K];
+    UrlPathParams: Record<string, string>;
+  };
+};
+
+// ============================================================================
+// TYPED EMIT
+// ============================================================================
+
+export interface EmitEventNamed<TEventPayloads> {
   <K extends keyof TEventPayloads & string>(
     event: K,
     payload: TEventPayloads[K],
@@ -230,28 +343,56 @@ export interface EmitEventNamed<
 // RUNTIME HELPERS
 // ============================================================================
 
-export function eventDeclarationHasFields<TResponseOutput>(
-  declaration: EndpointEventDeclaration<TResponseOutput>,
+export function eventDeclarationHasFields<
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+>(
+  declaration: EndpointEventDeclaration<
+    TResponseOutput,
+    TRequestOutput,
+    TUrlVariablesOutput
+  >,
 ): boolean {
-  if (declaration.fields === undefined) {
+  if (declaration.responseFields === undefined) {
     return false;
   }
-  if (Array.isArray(declaration.fields)) {
-    return declaration.fields.length > 0;
+  if (Array.isArray(declaration.responseFields)) {
+    return declaration.responseFields.length > 0;
   }
-  return Object.keys(declaration.fields).length > 0;
+  return Object.keys(declaration.responseFields).length > 0;
 }
 
 // ============================================================================
 // WIRE ENVELOPE (server → client)
 // ============================================================================
 
-export interface EndpointEventEnvelope<TPayload> {
-  endpointPath: readonly string[];
-  endpointMethod: string;
-  urlPathParams: { readonly [K in string]: string };
-  eventName: string;
-  payload: TPayload;
-  /** Original path-based channel, present when event is routed via user channel */
-  channel?: string;
+export interface EndpointEventEnvelope<
+  TResponseData,
+  TRequestData,
+  TUrlPathParams,
+  TPayload,
+> {
+  readonly endpointPath: readonly string[];
+  readonly endpointMethod: string;
+  readonly eventName: string;
+  readonly responseData: TResponseData;
+  readonly requestData: TRequestData;
+  readonly urlPathParams: TUrlPathParams;
+  readonly payload: TPayload;
+  readonly channel?: string;
 }
+
+/** Wide alias for use-sites that don't need per-field types. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line no-explicit-any
+export type AnyEndpointEventEnvelope = EndpointEventEnvelope<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any
+>;

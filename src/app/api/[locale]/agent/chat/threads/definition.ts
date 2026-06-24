@@ -7,7 +7,6 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { onEventUpdateIncognitoThread } from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -24,7 +23,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
+import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
@@ -412,31 +411,58 @@ const { GET } = createEndpoint({
     "thread-title-updated": {
       responseFields: { threads: ["id", "title"] as const },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "requestData",
-        arrayField: "threads",
-        pick: ["title"],
-      }),
+      onEvent: async (ctx) => {
+        if (ctx.requestData.rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const item = ctx.responseData.threads?.[0];
+        if (!item?.id) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        await updateIncognitoThread(item.id, { title: item.title });
+      },
     },
     "streaming-state-changed": {
       responseFields: { threads: ["id", "streamingState"] as const },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "requestData",
-        arrayField: "threads",
-        pick: ["streamingState"],
-      }),
+      onEvent: async (ctx) => {
+        if (ctx.requestData.rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const item = ctx.responseData.threads?.[0];
+        if (!item?.id) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        await updateIncognitoThread(item.id, {
+          streamingState: item.streamingState,
+        });
+      },
     },
     "stream-finished": {
       responseFields: {
         threads: ["id", "streamingState", "preview", "updatedAt"] as const,
       },
       operation: "merge" as const,
-      onEvent: onEventUpdateIncognitoThread({
-        source: "requestData",
-        arrayField: "threads",
-        pick: ["streamingState", "preview", "updatedAt"],
-      }),
+      onEvent: async (ctx) => {
+        if (ctx.requestData.rootFolderId !== DefaultFolderId.INCOGNITO) {
+          return;
+        }
+        const item = ctx.responseData.threads?.[0];
+        if (!item?.id) {
+          return;
+        }
+        const { updateIncognitoThread } =
+          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        await updateIncognitoThread(item.id, {
+          streamingState: item.streamingState,
+          preview: item.preview,
+          updatedAt: item.updatedAt,
+        });
+      },
     },
     // Emitted by threads/[threadId]/repository.ts on PATCH and DELETE.
   },
@@ -641,13 +667,17 @@ const { POST } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["id", "title", "rootFolderId"] as const,
-      onEvent: async ({ responseData, queryClient, logger }) => {
-        const rootFolderId = responseData.rootFolderId;
-        const threadId = responseData.id;
+      onEvent: async ({ requestData, logger }) => {
+        const rootFolderId =
+          requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
+        const threadId = requestData.id;
         const [{ apiClient }, threadsDefinition] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("./definition"),
         ]);
+        if (!threadId) {
+          return;
+        }
         apiClient.updateEndpointData(
           threadsDefinition.default.GET,
           logger,
@@ -662,7 +692,7 @@ const { POST } = createEndpoint({
             const now = new Date();
             const newThread: ThreadListItem = {
               id: threadId,
-              title: responseData.title ?? "",
+              title: requestData.title ?? "",
               rootFolderId,
               folderId: null,
               status: ThreadStatus.ACTIVE,

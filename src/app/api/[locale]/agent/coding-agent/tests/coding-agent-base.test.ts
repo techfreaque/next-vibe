@@ -293,7 +293,7 @@ async function waitForThreadIdle(
  * recording run. On each replay, a new task ID is created by execute-tool.
  * This reads the dispatch message to get the current live task ID, then
  * replaces any old `remote-hermes-*` ID in the fixture directory so
- * wait-for-task can find the real task on subsequent replays.
+ * await-task can find the real task on subsequent replays.
  *
  * Must be called immediately after runStream() returns (before pulse),
  * when the dispatch message is already in the DB but the task is still pending.
@@ -864,12 +864,12 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       );
 
       // ── CA4: Batch WAKE_UP ───────────────────────────────────────────────
-      // Flow: execute-tool(wakeUp) → AI gets taskId → AI calls wait-for-task →
+      // Flow: execute-tool(wakeUp) → AI gets taskId → AI calls await-task →
       // stream pauses (REMOTE_TOOL_WAIT) → pulse runs coding-agent batch →
-      // handleTaskCompletion(WAIT) backfills wait-for-task → revival fires.
+      // handleTaskCompletion(WAIT) backfills await-task → revival fires.
       // Thread outcome is identical to WAIT from the user's perspective.
       fit(
-        "CA4: batch WAKE_UP - AI dispatches task, calls wait-for-task, result backfilled on revival",
+        "CA4: batch WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
           const wakeUpContext = `${cfg.cachePrefix}ca4-batch-wakeup`;
           setFetchCacheContext(wakeUpContext);
@@ -878,7 +878,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             user: testUser,
             threadId,
             favoriteId: mainFavoriteId,
-            prompt: `[CA4] Call ${agentInstr(cfg, "echo hello-ca4-wakeup", false, "wakeUp")} ONCE. After the tool returns a taskId, call the wait-for-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId. Do NOT call execute-tool again under any circumstances. When wait-for-task returns with output, verify it contains "hello-ca4-wakeup" then reply STEP_OK quoting the exact output value.`,
+            prompt: `[CA4] Call ${agentInstr(cfg, "echo hello-ca4-wakeup", false, "wakeUp")} ONCE. After the tool returns a taskId, call the await-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca4-wakeup" then reply STEP_OK quoting the exact output value.`,
           });
 
           expect(result.success, "CA4 must succeed").toBe(true);
@@ -891,7 +891,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           // the fixture with the current run's ID keeps it valid for subsequent replays.
           await patchWakeUpFixture(wakeUpContext, threadId, testUser);
 
-          // pulse: execute the pending wakeUp task + wait-for-task dependency
+          // pulse: execute the pending wakeUp task + await-task dependency
           if (cfg.pulse) {
             await cfg.pulse(threadId);
           }
@@ -911,31 +911,31 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "CA4: execute-tool(coding-agent) dispatch message must exist",
           ).toBeDefined();
 
-          // wait-for-task message must exist and have real output backfilled.
-          // The AI should call wait-for-task directly. Guard against the AI wrapping
-          // it in execute-tool (execute-tool with toolName="wait-for-task" in args).
+          // await-task message must exist and have real output backfilled.
+          // The AI should call await-task directly. Guard against the AI wrapping
+          // it in execute-tool (execute-tool with toolName="await-task" in args).
           const waitForTaskMsg = finalMsgs.findLast(
             (m) =>
               m.role === "tool" &&
-              (m.toolCall?.toolName === "wait-for-task" ||
+              (m.toolCall?.toolName === "await-task" ||
                 (m.toolCall?.toolName === "execute-tool" &&
                   toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "wait-for-task")),
+                    "await-task")),
           );
           expect(
             waitForTaskMsg,
-            "CA4: wait-for-task message must exist",
+            "CA4: await-task message must exist",
           ).toBeDefined();
 
           const waitRawRes = toolResultRecord(waitForTaskMsg?.toolCall?.result);
           expect(
             waitRawRes,
-            "CA4: wait-for-task result must be an object",
+            "CA4: await-task result must be an object",
           ).not.toBeNull();
 
           // Extract coding-agent {output, durationMs} from the result regardless of nesting:
-          // - Direct wait-for-task, revival: {durationMs, output}
-          // - Direct wait-for-task, inline:  {status, result: {durationMs, output}, ...}
+          // - Direct await-task, revival: {durationMs, output}
+          // - Direct await-task, inline:  {status, result: {durationMs, output}, ...}
           // - execute-tool(wft), revival:    {result: {durationMs, output}}
           // - execute-tool(wft), inline:     {result: {status, result: {durationMs, output}, ...}}
           function findOutputInResult(
@@ -951,12 +951,12 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           expect(
             waitInner,
-            `CA4: could not find {output, durationMs} in wait-for-task result (got: ${JSON.stringify(waitRawRes)})`,
+            `CA4: could not find {output, durationMs} in await-task result (got: ${JSON.stringify(waitRawRes)})`,
           ).not.toBeNull();
 
           expect(
             waitInner?.["output"],
-            "CA4: wait-for-task output must be present",
+            "CA4: await-task output must be present",
           ).toBeTruthy();
           const waitOutput = String(waitInner?.["output"] ?? "");
           expect(
@@ -975,7 +975,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "CA4: durationMs must be positive",
           ).toBe(true);
 
-          // No deferred child on the dispatch message - result came via wait-for-task
+          // No deferred child on the dispatch message - result came via await-task
           const deferred = finalMsgs.find(
             (m) =>
               m.role === "tool" &&
@@ -985,7 +985,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           );
           expect(
             deferred,
-            "CA4: wakeUp+wait-for-task must not insert deferred child",
+            "CA4: wakeUp+await-task must not insert deferred child",
           ).toBeUndefined();
 
           assertStepOk(lastAi(finalMsgs), "CA4");
@@ -1306,12 +1306,12 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       );
 
       // ── CA8: Interactive WAKE_UP ─────────────────────────────────────────
-      // Mirror of CA4: execute-tool(wakeUp) → AI calls wait-for-task → stream
+      // Mirror of CA4: execute-tool(wakeUp) → AI calls await-task → stream
       // pauses (REMOTE_TOOL_WAIT) → pulse runs coding-agent batch →
-      // handleTaskCompletion(WAIT) backfills wait-for-task → revival fires.
-      // Identical thread outcome to CA4: wait-for-task backfilled, STEP_OK.
+      // handleTaskCompletion(WAIT) backfills await-task → revival fires.
+      // Identical thread outcome to CA4: await-task backfilled, STEP_OK.
       fit(
-        "CA8: interactive WAKE_UP - AI dispatches task, calls wait-for-task, result backfilled on revival",
+        "CA8: interactive WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
           const wakeUpContext = `${cfg.cachePrefix}ca8-interactive-wakeup`;
           setFetchCacheContext(wakeUpContext);
@@ -1320,7 +1320,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             user: testUser,
             threadId,
             favoriteId: mainFavoriteId,
-            prompt: `[CA8] Call ${agentInstr(cfg, "echo hello-ca8-wakeup", true, "wakeUp")} ONCE. After the tool returns a taskId, call wait-for-task ONCE with that taskId. Do NOT call execute-tool again under any circumstances. When wait-for-task returns with output, verify it contains "hello-ca8-wakeup" then reply STEP_OK quoting the exact output value.`,
+            prompt: `[CA8] Call ${agentInstr(cfg, "echo hello-ca8-wakeup", true, "wakeUp")} ONCE. After the tool returns a taskId, call await-task ONCE with that taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca8-wakeup" then reply STEP_OK quoting the exact output value.`,
           });
 
           expect(result.success, "CA8 must succeed").toBe(true);
@@ -1350,30 +1350,30 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "CA8: execute-tool(coding-agent) dispatch message must exist",
           ).toBeDefined();
 
-          // wait-for-task message must have real output backfilled.
+          // await-task message must have real output backfilled.
           // Guard against the AI wrapping it in execute-tool.
           const waitForTaskMsg = finalMsgs.findLast(
             (m) =>
               m.role === "tool" &&
-              (m.toolCall?.toolName === "wait-for-task" ||
+              (m.toolCall?.toolName === "await-task" ||
                 (m.toolCall?.toolName === "execute-tool" &&
                   toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "wait-for-task")),
+                    "await-task")),
           );
           expect(
             waitForTaskMsg,
-            "CA8: wait-for-task message must exist",
+            "CA8: await-task message must exist",
           ).toBeDefined();
 
           const waitRawRes = toolResultRecord(waitForTaskMsg?.toolCall?.result);
           expect(
             waitRawRes,
-            "CA8: wait-for-task result must be an object",
+            "CA8: await-task result must be an object",
           ).not.toBeNull();
 
           // Extract coding-agent {output, durationMs} from the result regardless of nesting:
-          // - Direct wait-for-task, revival: {durationMs, output}
-          // - Direct wait-for-task, inline:  {status, result: {durationMs, output}, ...}
+          // - Direct await-task, revival: {durationMs, output}
+          // - Direct await-task, inline:  {status, result: {durationMs, output}, ...}
           // - execute-tool(wft), revival:    {result: {durationMs, output}}
           // - execute-tool(wft), inline:     {result: {status, result: {durationMs, output}, ...}}
           function findOutputInResultCA8(
@@ -1389,12 +1389,12 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           expect(
             waitInner,
-            `CA8: could not find {output, durationMs} in wait-for-task result (got: ${JSON.stringify(waitRawRes)})`,
+            `CA8: could not find {output, durationMs} in await-task result (got: ${JSON.stringify(waitRawRes)})`,
           ).not.toBeNull();
 
           expect(
             waitInner?.["output"],
-            "CA8: wait-for-task output must be present",
+            "CA8: await-task output must be present",
           ).toBeTruthy();
           const waitOutput = String(waitInner?.["output"] ?? "");
           expect(
@@ -1423,7 +1423,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           );
           expect(
             deferred,
-            "CA8: wakeUp+wait-for-task must not insert deferred child",
+            "CA8: wakeUp+await-task must not insert deferred child",
           ).toBeUndefined();
 
           // Verify all interactive tests stayed in same thread
