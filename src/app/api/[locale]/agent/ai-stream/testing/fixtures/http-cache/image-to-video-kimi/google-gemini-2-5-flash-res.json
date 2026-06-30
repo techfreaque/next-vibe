@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13cd7d1d947d278-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:31:11 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782819070-QuhFk6CexMVGQ2Kvle2O"
+  },
+  "body": {
+    "id": "gen-1782819070-QuhFk6CexMVGQ2Kvle2O",
+    "object": "chat.completion",
+    "created": 1782819070,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio recording begins with 4 seconds of silence, followed by a musical piece. The music is an uptempo (120 BPM estimate) electronic instrumental track. It features a bright, clean arpeggiated melodic synthesizer, complemented by a light, steady drum machine playing a straightforward beat with a kick drum on every beat, light snare on the offbeats, and a closed hi-hat on every 16th note. There's also an echoing synth pad providing harmonic texture. The overall feel is cheerful and somewhat optimistic.\n\nAfter just under 20 seconds, the music briefly pauses for approximately half a second, then resumes with the same instrumentation and melody, suggesting a loop or a short break in the sequence. This pattern repeats twice more, with another short pause around 39 seconds, and then a final very short pause before the sounds of speech begin.\n\nAt 47 seconds, a human voice is heard. It belongs to an adult male, speaking in a clear, conversational tone without a noticeable accent. He says, \"Okay, that sounds cool I think. Or this, I don't know.\" He has a slight upward inflection at the end, suggesting uncertainty. His pace is moderate.\n\nThe music continues throughout his speech and persists until the end of the 53-second clip, fading out at the very end. The sound quality of the audio is clean and clear, indicating a good recording environment, possibly a studio setting given the electronic nature of the music. The duration of the clip provides a short excerpt of the music and a brief moment of conversational speech.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 326,
+      "total_tokens": 1398,
+      "cost": 0.0016616,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016616,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000815
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

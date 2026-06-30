@@ -98,6 +98,7 @@ const { POST } = createEndpoint({
   },
   tags: ["tags.ai", "tags.chat"],
 
+  channel: { scope: "user" } as const,
   events: {
     // Emitted once a new thread is created - lets callers update thread lists without polling
     "thread-created": {
@@ -548,7 +549,7 @@ const { POST } = createEndpoint({
         prompt:
           "Summarise the available skills. Which is most suitable for customer support?",
         instructions: "One paragraph max.",
-        preCalls: [{ routeId: "agent_chat_skills_GET", args: {} }],
+        preCalls: [{ routeId: "agent_skills_GET", args: {} }],
         maxTurns: 1,
       },
       // Agentic: give AI tools and let it reason across multiple turns
@@ -587,7 +588,7 @@ const { POST } = createEndpoint({
         completionTokens: 87,
         creditCost: 0.3,
         preCallResults: [
-          { routeId: "agent_chat_skills_GET", success: true, error: null },
+          { routeId: "agent_skills_GET", success: true, error: null },
         ],
       },
     },

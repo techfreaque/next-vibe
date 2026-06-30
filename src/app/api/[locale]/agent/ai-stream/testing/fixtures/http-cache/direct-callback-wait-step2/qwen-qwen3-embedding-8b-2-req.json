@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user wants me to call generate_image with prompt='await-task-test' and callbackMode='detach'. I need to use execute-tool with callbackMode='detach'. Let me do that.</think>\n\nAssistant: <think> The result has a `taskId` string (\"local-bg-functions-execute-tool-6\") and does NOT have an `imageUrl`. This matches the expected behavior for detach mode. I should respond with STEP_OK and the taskId.</think> STEP_OK taskId=local-bg-functions-execute-tool-6\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-functions-execute-tool-6'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think> The user wants me to call await-task with taskId='local-bg-functions-execute-tool-6'. I need to check if the result contains an imageUrl string.</think>\n\nUser:",
+    "encoding_format": "float"
+  }
+}

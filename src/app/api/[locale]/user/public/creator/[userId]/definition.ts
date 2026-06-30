@@ -38,7 +38,7 @@ const CreatorProfileWidget = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["user", "public", "creator", ":userId"],
+  path: ["user", "public", "creator", "[userId]"],
   title: "get.title" as const,
   titleShort: "get.titleShort",
   description: "get.description" as const,

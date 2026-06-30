@@ -42,6 +42,7 @@ import {
   pathSegmentsToToolName,
 } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -62,7 +63,7 @@ interface EndpointsMetaRequestType {
 
 interface EndpointsMetaResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   endpointsFound: number;
   filesWritten: number;
   duration: number;

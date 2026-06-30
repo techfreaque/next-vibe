@@ -12,9 +12,11 @@ import {
   getDocumentScrollHeight,
   getScrollY,
 } from "next-vibe-ui/lib/dom";
-import { getScreenHeight, getScreenWidth } from "next-vibe-ui/lib/screen";
 
 import type { FrameTriggerConfig } from "./types";
+
+// This is the embed iframe script — it reads window directly rather than via
+// next-vibe-ui's screen helpers (which require an EndpointLogger).
 
 // ─── Trigger State ────────────────────────────────────────────────────────────
 
@@ -32,6 +34,8 @@ export interface TriggerState {
 // Global state updated by event listeners, shared across all triggers.
 // Using simple mutable object avoids per-trigger listener overhead.
 
+// Initial viewport is zeroed — populated by initSharedState() in the browser.
+// Computing it at module load would run on the server during SSR/import.
 let sharedState: TriggerState = {
   scroll: 0,
   time: 0,
@@ -39,11 +43,7 @@ let sharedState: TriggerState = {
   moves: 0,
   keys: 0,
   exit: false,
-  viewport: {
-    w: getScreenWidth(),
-    h: getScreenHeight(),
-    mobile: getScreenWidth() < 768,
-  },
+  viewport: { w: 0, h: 0, mobile: false },
 };
 
 let sharedStateInitialized = false;
@@ -55,12 +55,23 @@ function initSharedState(): void {
   }
   sharedStateInitialized = true;
 
+  const updateViewport = (): void => {
+    const w = window.innerWidth;
+    sharedState = {
+      ...sharedState,
+      viewport: { w, h: window.innerHeight, mobile: w < 768 },
+    };
+  };
+
+  // Seed the viewport now that we're in the browser.
+  updateViewport();
+
   // Scroll
   let scrollTimeout: ReturnType<typeof setTimeout>;
   addWindowListener("scroll", () => {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
-      const scrollHeight = getDocumentScrollHeight() - getScreenHeight();
+      const scrollHeight = getDocumentScrollHeight() - window.innerHeight;
       if (scrollHeight > 0) {
         sharedState = {
           ...sharedState,
@@ -97,16 +108,6 @@ function initSharedState(): void {
   });
 
   // Viewport changes
-  const updateViewport = (): void => {
-    sharedState = {
-      ...sharedState,
-      viewport: {
-        w: getScreenWidth(),
-        h: getScreenHeight(),
-        mobile: getScreenWidth() < 768,
-      },
-    };
-  };
   addWindowListener("resize", updateViewport);
 
   // Time - updated every second
@@ -180,7 +181,7 @@ function scrollTrigger(percent: number, callback: () => void): () => void {
   const interval = setInterval(check, 200);
 
   // Check immediately (page may already be scrolled)
-  const scrollHeight = getDocumentScrollHeight() - getScreenHeight();
+  const scrollHeight = getDocumentScrollHeight() - window.innerHeight;
   if (scrollHeight > 0) {
     const current = Math.round((getScrollY() / scrollHeight) * 100);
     if (current >= percent) {

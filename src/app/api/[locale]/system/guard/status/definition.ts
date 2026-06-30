@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -131,7 +132,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               label: "post.fields.createdAt.title",
               fieldType: FieldDataType.TEXT,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             securityLevel: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

@@ -35,7 +35,7 @@ export class DbUtilsRepository {
     try {
       logger.info("Checking database health...");
 
-      const timestamp = new Date().toISOString();
+      const timestamp = new Date();
       let status: "healthy" | "degraded" | "unhealthy" = "healthy";
 
       // Test primary connection

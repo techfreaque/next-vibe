@@ -29,7 +29,7 @@ interface InvoiceItem {
   invoiceId: string;
   customerId: string;
   amount: number;
-  dueDate: string;
+  dueDate: Date;
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -46,7 +46,7 @@ export class ReceivablesAgingRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
-      asOfDateResponse: string;
+      asOfDateResponse: Date;
       bucketsCurrentItems: InvoiceItem[];
       bucketsDays1to30Items: InvoiceItem[];
       bucketsDays31to60Items: InvoiceItem[];
@@ -75,7 +75,6 @@ export class ReceivablesAgingRepository {
 
     try {
       const asOfDate = data.asOfDate ? new Date(data.asOfDate) : new Date();
-      const asOfDateStr = asOfDate.toISOString().slice(0, 10);
 
       // Set to end of day for inclusive comparison
       const asOfMidnight = new Date(asOfDate);
@@ -106,7 +105,7 @@ export class ReceivablesAgingRepository {
           invoiceId: inv.id,
           customerId: inv.userId,
           amount,
-          dueDate: dueDate ? dueDate.toISOString().slice(0, 10) : asOfDateStr,
+          dueDate: dueDate ?? asOfDate,
         };
 
         if (!dueDate || dueDate > asOfMidnight) {
@@ -142,7 +141,7 @@ export class ReceivablesAgingRepository {
         totalsOver90;
 
       return success({
-        asOfDateResponse: asOfDateStr,
+        asOfDateResponse: asOfDate,
         bucketsCurrentItems,
         bucketsDays1to30Items,
         bucketsDays31to60Items,

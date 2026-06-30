@@ -405,6 +405,10 @@ const { GET } = createEndpoint({
 
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
+  // The threads list is the caller's own sidebar — delivered on their user
+  // channel. (Public-folder thread lists reach viewers via folder-contents.)
+  channel: { scope: "user" } as const,
+
   events: {
     // Framework merges the partial into the threads array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
@@ -656,6 +660,9 @@ const { POST } = createEndpoint({
       description: "post.errors.conflict.description",
     },
   },
+
+  // The creator's own new thread — delivered on their user channel.
+  channel: { scope: "user" } as const,
 
   // This op owns its `thread-created` event. `requestFields` carry the title +
   // rootFolderId the user submitted (the id rides too); the client onEvent inserts

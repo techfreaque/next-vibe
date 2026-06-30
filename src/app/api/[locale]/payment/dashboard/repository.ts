@@ -163,12 +163,12 @@ export class PaymentDashboardRepository {
         currency: row.currency,
         status: row.status,
         amount: row.amount,
-        dueDate: row.dueDate ? row.dueDate.toISOString() : null,
+        dueDate: row.dueDate ?? null,
         isOverdue:
           row.status === InvoiceStatus.OPEN &&
           row.dueDate !== null &&
           row.dueDate < now,
-        createdAt: row.createdAt.toISOString(),
+        createdAt: row.createdAt,
       }));
 
       return success({

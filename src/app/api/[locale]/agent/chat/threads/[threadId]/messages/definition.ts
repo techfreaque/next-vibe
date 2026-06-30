@@ -69,6 +69,11 @@ const { GET } = createEndpoint({
   subCategory: "messagesModerating",
   tags: ["tags.messages" as const],
 
+  // The message stream rides the owner's user channel for private threads and a
+  // shared channel for PUBLIC/SHARED ones — decided per thread by the route's
+  // resolveChannel (the same folder-trust the messages emitter uses).
+  channel: { scope: "resolved" } as const,
+
   events: {
     // ── message-created ──────────────────────────────────────────────────────
     // Framework merges the new message (upsert by id) and sets streamingState.

@@ -67,7 +67,8 @@ export function InvoicePublicViewWidget({
 
           {data.dueDate && (
             <Span className="text-sm text-muted-foreground">
-              {t("get.response.dueDate")}: {data.dueDate}
+              {t("get.response.dueDate")}:{" "}
+              {new Date(data.dueDate).toLocaleDateString()}
             </Span>
           )}
         </Div>

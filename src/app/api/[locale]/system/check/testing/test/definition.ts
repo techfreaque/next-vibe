@@ -29,7 +29,7 @@ const TestResultWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "check", "test"],
+  path: ["system", "check", "testing", "test"],
   title: "title",
   titleShort: "title",
   description: "description",

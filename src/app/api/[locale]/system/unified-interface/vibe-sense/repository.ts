@@ -63,7 +63,7 @@ interface GraphGetResponse {
     ownerId: string | null;
     parentVersionId: string | null;
     isActive: boolean;
-    createdAt: string;
+    createdAt: Date;
     config: GraphConfig;
   };
   series: GraphDataPayload["series"];
@@ -235,7 +235,7 @@ export class VibeSenseRepository {
         ownerId: r.ownerId,
         parentVersionId: r.parentVersionId,
         isActive: r.isActive,
-        createdAt: r.createdAt.toISOString(),
+        createdAt: r.createdAt,
       }));
 
       return success({ graphs });
@@ -378,7 +378,7 @@ export class VibeSenseRepository {
           ownerId: row.ownerId,
           parentVersionId: row.parentVersionId,
           isActive: row.isActive,
-          createdAt: row.createdAt.toISOString(),
+          createdAt: row.createdAt,
           config: row.config,
         },
         series,
@@ -520,7 +520,7 @@ export class VibeSenseRepository {
       versions: Array<{
         id: string;
         name: string;
-        createdAt: string;
+        createdAt: Date;
         isActive: boolean;
       }>;
     }>
@@ -531,7 +531,7 @@ export class VibeSenseRepository {
       const chain: Array<{
         id: string;
         name: string;
-        createdAt: string;
+        createdAt: Date;
         isActive: boolean;
       }> = [];
 
@@ -582,7 +582,7 @@ export class VibeSenseRepository {
         chain.push({
           id: row.id,
           name: row.name,
-          createdAt: row.createdAt.toISOString(),
+          createdAt: row.createdAt,
           isActive: row.isActive,
         });
 
@@ -828,7 +828,7 @@ export class VibeSenseRepository {
         nodeId,
         points: VibeSenseRepository.downsampleToResolution(points, resMs).map(
           (p) => ({
-            timestamp: p.timestamp.toISOString(),
+            timestamp: p.timestamp,
             value: p.value,
           }),
         ),
@@ -837,7 +837,7 @@ export class VibeSenseRepository {
       const signals = [...result.signals.entries()].map(([nodeId, events]) => ({
         nodeId,
         events: events.map((e) => ({
-          timestamp: e.timestamp.toISOString(),
+          timestamp: e.timestamp,
           fired: e.fired,
         })),
       }));

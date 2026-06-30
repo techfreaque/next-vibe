@@ -303,7 +303,9 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
                 <Div className="text-xs text-muted-foreground">
                   {t("post.response.executedAt")}
                 </Div>
-                <Div className="text-sm">{formatDate(result.executedAt)}</Div>
+                <Div className="text-sm">
+                  {formatDate(result.executedAt.toISOString())}
+                </Div>
               </Div>
             )}
           </Div>

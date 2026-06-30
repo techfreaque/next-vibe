@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e359ecaff1917-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 15:29:59 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782833397-28nhgHmZOIEnPdWh7CGO"
+  },
+  "body": {
+    "id": "gen-1782833397-28nhgHmZOIEnPdWh7CGO",
+    "object": "chat.completion",
+    "created": 1782833397,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of an electric guitar playing. The sound quality is good, suggesting a studio recording environment. The duration is approximately 25 seconds.\n\n**Music Description:**\n*   **Genre:** Funk/Soul, with a laid-back, groovy vibe.\n*   **Tempo:** Approximately 90-100 BPM (medium tempo).\n*   **Time Signature:** 4/4.\n*   **Instruments:** Electric guitar is the only instrument clearly audible. It plays a clean, funky riff with a slight wah-wah effect, reminiscent of 70s funk or soul music. The guitar's tone is bright and percussive, with a notable 'chick' sound on the upstrokes.\n*   **Performance:** The guitar plays a repetitive, syncopated riff throughout the clip, establishing a steady but rhythmically engaging groove. There are no distinct song sections like verses or choruses within this short clip; it feels like a looped segment of a larger track.\n*   **Production Style:** Clean and polished, with clear separation of notes. There might be some subtle compression or EQ to give the guitar its characteristic funk sound, but no heavy effects other than the wah.\n*   **Mood:** Relaxed, groovy, and cool. It evokes a feeling of easygoing coolness or a mellow dance groove.\n\n**Non-musical Audio Events:**\nNone. The clip is purely instrumental.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 298,
+      "total_tokens": 1370,
+      "cost": 0.0015916,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015916,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000745
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

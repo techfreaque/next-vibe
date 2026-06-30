@@ -53,8 +53,8 @@ export class UserAddressesRepository {
       return success({
         addresses: rows.map((r) => ({
           ...r,
-          createdAt: r.createdAt.toISOString(),
-          updatedAt: r.updatedAt.toISOString(),
+          createdAt: r.createdAt,
+          updatedAt: r.updatedAt,
         })),
       });
     } catch (error) {

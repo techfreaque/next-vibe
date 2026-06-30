@@ -127,7 +127,7 @@ export class UnifiedTaskRunnerRepository {
         userId: user.id,
       });
 
-      const timestamp = new Date().toISOString();
+      const timestamp = new Date();
 
       switch (data.action) {
         case "status":

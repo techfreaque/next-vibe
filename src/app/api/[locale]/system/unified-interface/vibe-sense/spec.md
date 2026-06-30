@@ -288,7 +288,7 @@ interface BacktestConfig {
 
 `actionMode: "simulate"` is passed to action endpoints - they skip actual side effects but return a response (e.g. simulated trade result) for analysis. `actionMode: "execute"` runs actions for real (rare - used for replay/recovery).
 
-Backtest results are stored in `pipeline_backtests` + `pipeline_datapoints` (tagged with `backtestRunId`). The chart widget can overlay backtest results on the live chart.
+Backtest runs are recorded in `pipeline_backtest_runs`, with per-datapoint output in `pipeline_backtest_results` (tagged with `backtestRunId`). The chart widget can overlay backtest results on the live chart.
 
 ### Gating
 
@@ -484,14 +484,14 @@ const config: GraphConfig = {
 
 ## Persistence
 
-| Table                 | Purpose                                     |
-| --------------------- | ------------------------------------------- |
-| `pipeline_graphs`     | Graph metadata (name, slug, owner, active)  |
-| `pipeline_versions`   | Versioned graph configs (immutable on save) |
-| `pipeline_datapoints` | Persisted node output series                |
-| `pipeline_signals`    | Persisted signal events                     |
-| `pipeline_runs`       | Execution log (status, errors, timing)      |
-| `pipeline_backtests`  | Backtest run metadata                       |
+| Table                       | Purpose                                                                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pipeline_graphs`           | Versioned DAG configs — **one row per version**, `isActive` marks the live one, `parentVersionId` links branches (slug shared across versions) |
+| `pipeline_datapoints`       | Persisted node output series                                                                                                                   |
+| `pipeline_signals`          | Persisted signal events                                                                                                                        |
+| `pipeline_runs`             | Execution log (status, errors, timing)                                                                                                         |
+| `pipeline_backtest_runs`    | Backtest run metadata                                                                                                                          |
+| `pipeline_backtest_results` | Per-datapoint backtest results                                                                                                                 |
 
 ### Persist Modes
 
@@ -529,7 +529,7 @@ Engine execution uses a system user context for cron runs. Manual execution and 
 
 ## Graph Versioning
 
-Every save creates a new immutable version in `pipeline_versions`. The graph always runs against the latest active version.
+Every save inserts a new immutable `pipeline_graphs` row (a version) sharing the graph's `slug`; edits never mutate an existing version. `parentVersionId` links a version to the one it was branched from, and `isActive = true` marks the version the graph runs against.
 
 ### Version Management
 

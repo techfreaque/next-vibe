@@ -152,8 +152,8 @@ export class BillLineAddRepository {
           lineTotal: line.lineTotal,
           expenseAccountId: line.expenseAccountId,
           sortOrder: line.sortOrder,
-          createdAt: line.createdAt.toISOString(),
-          updatedAt: line.updatedAt.toISOString(),
+          createdAt: line.createdAt,
+          updatedAt: line.updatedAt,
         },
       });
     } catch (error) {

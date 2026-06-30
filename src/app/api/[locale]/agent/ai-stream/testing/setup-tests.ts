@@ -20,3 +20,10 @@ import "server-only";
 import { loadEnvironment } from "@/app/api/[locale]/system/unified-interface/cli/runtime/environment";
 
 loadEnvironment();
+
+// The test suite runs against fetch-cache fixtures — i.e. in fixture mode. Mark it
+// so the codepaths that key off fixture mode behave consistently with the dev
+// server's fixture mode. In particular generateTaskId omits its random tail here,
+// keeping task IDs fully reproducible on replay (it still derives the id from the
+// replay-stable toolCallId; the flag only drops the prod-uniqueness suffix).
+process.env["VIBE_FIXTURE_MODE"] = "true";

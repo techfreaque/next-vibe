@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----5d671122-8e7e-4594-a0cf-994e536e84cd.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result has: taskId: \"local-bg-det-000001\" — present, it's a string. No imageUrl — correct, since it's detache…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----28a01e11-d75d-4f1f-afe4-e3e0a60d8f68.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result has: taskId: \"local-bg-det-000001\" — present, it's a string. No imageUrl — correct, since it's detache…",
     "encoding_format": "float"
   }
 }

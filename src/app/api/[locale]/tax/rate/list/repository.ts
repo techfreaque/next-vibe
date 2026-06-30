@@ -114,8 +114,8 @@ export class TaxRateListRepository {
           isDefault: row.isDefault,
           isActive: row.isActive,
           isCompound: row.isCompound,
-          createdAt: row.createdAt.toISOString(),
-          updatedAt: row.updatedAt.toISOString(),
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
         })),
       });
     } catch (error) {

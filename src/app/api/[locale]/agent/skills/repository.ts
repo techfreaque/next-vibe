@@ -30,7 +30,10 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type {
+  ChannelDecision,
+  RemoteEventHandlerProps,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import {
   searchField,
   searchItems,
@@ -119,6 +122,54 @@ export class SkillsRepository {
     }
     // Resolve legacy alias before slug lookup
     return eq(customSkills.slug, resolveIdAlias(skillId));
+  }
+
+  /**
+   * Resolve the WS channel for a skill `[id]` subscription. Single source of
+   * truth for skill visibility, shared by the read path and the route's
+   * `resolveChannel` so subscribe-auth and read-auth can never drift:
+   *   owner          → "user"     (events ride the owner's own user channel)
+   *   PUBLIC / SYSTEM → "resource" (shared channel; anyone viewing the skill)
+   *   otherwise      → "deny"
+   * Resolves SYSTEM skills without a DB hit.
+   */
+  static async resolveSubscriptionChannel(ctx: {
+    user: JwtPayloadType;
+    urlPathParams: { readonly id?: string };
+  }): Promise<ChannelDecision> {
+    const raw = ctx.urlPathParams.id;
+    if (!raw) {
+      return { kind: "deny" };
+    }
+    const { skillId } = parseSkillId(raw);
+
+    // SYSTEM / built-in skills are public to everyone — a shared resource channel.
+    if (DEFAULT_SKILLS.some((s) => s.id === skillId)) {
+      return { kind: "resource" };
+    }
+
+    const [skill] = await db
+      .select({
+        userId: customSkills.userId,
+        ownershipType: customSkills.ownershipType,
+      })
+      .from(customSkills)
+      .where(eq(customSkills.slug, skillId))
+      .limit(1);
+    if (!skill) {
+      return { kind: "deny" };
+    }
+
+    // Owner sees their own skill on their own channel (any ownershipType).
+    const userId = ctx.user.isPublic ? null : ctx.user.id;
+    if (userId !== null && skill.userId === userId) {
+      return { kind: "user" };
+    }
+    // Non-owner: only PUBLIC skills are visible, on the shared resource channel.
+    if (skill.ownershipType === SkillOwnershipType.PUBLIC) {
+      return { kind: "resource" };
+    }
+    return { kind: "deny" };
   }
 
   /**
@@ -812,6 +863,8 @@ export class SkillsRepository {
           longContent: null,
           favoritesCount: 0,
           creatorProfile: null,
+          voteCount: null,
+          userVote: null,
         });
       }
 
@@ -846,6 +899,8 @@ export class SkillsRepository {
           longContent: null,
           favoritesCount: 0,
           creatorProfile: null,
+          voteCount: null,
+          userVote: null,
         });
       }
 
@@ -887,6 +942,22 @@ export class SkillsRepository {
         .from(skillVotes)
         .where(eq(skillVotes.skillId, customSkill.id));
       favoritesCount = votesResult?.count ?? 0;
+
+      // The caller's own vote direction on this skill (null = no vote).
+      let userVote: SkillGetResponseOutput["userVote"] = null;
+      if (userId) {
+        const [ownVote] = await db
+          .select({ direction: skillVotes.direction })
+          .from(skillVotes)
+          .where(
+            and(
+              eq(skillVotes.skillId, customSkill.id),
+              eq(skillVotes.userId, userId),
+            ),
+          )
+          .limit(1);
+        userVote = ownVote?.direction ?? null;
+      }
 
       // Fetch creator profile if skill is owned by a user (private or published)
       if (
@@ -979,6 +1050,8 @@ export class SkillsRepository {
         longContent: customSkill.longContent ?? null,
         favoritesCount,
         creatorProfile,
+        voteCount: customSkill.voteCount,
+        userVote,
       });
     } catch (error) {
       logger.error("Failed to get skill by ID", parseError(error));

@@ -77,7 +77,7 @@ export class GuardStatusRepository {
       username: guardId.replace("guard_", "").replace(/_[^_]*$/, ""), // eslint-disable-line i18next/no-literal-string
       projectPath: `/tmp/projects/${guardId}`,
       status: "running",
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       securityLevel: "standard",
       isolationMethod: "rbash",
       isRunning: true,
@@ -126,7 +126,7 @@ export class GuardStatusRepository {
       username,
       projectPath,
       status: "created",
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       securityLevel: "standard",
       isolationMethod: "rbash",
       isRunning: false,
@@ -156,7 +156,7 @@ export class GuardStatusRepository {
         username: "guard_test_guard_project", // eslint-disable-line i18next/no-literal-string
         projectPath: "/tmp/test-guard-project",
         status: "created",
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
         securityLevel: "standard",
         isolationMethod: "rbash",
         isRunning: false,

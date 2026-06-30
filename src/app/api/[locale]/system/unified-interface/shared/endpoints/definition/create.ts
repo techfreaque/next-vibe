@@ -30,11 +30,15 @@ import type {
   ApiQueryFormOptions,
   ApiQueryOptions,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
-import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  generateFormSchema,
+  generateSchemaForUsage as generateSchemaFromUtils,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   EndpointExamples,
   ExtractInput,
   ExtractOutput,
+  InferFormSchema,
   InferSchemaFromField,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
@@ -52,6 +56,7 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type {
+  ChannelDeclaration,
   EndpointEventsMap,
   EventEmitUrlPayloads,
   EventPayloads,
@@ -60,6 +65,7 @@ import type {
   EventResponsePayloads,
   EventTypes,
   EventUrlPayloads,
+  HasClientDeliveredEventsOf,
 } from "../../../websocket/structured-events";
 
 // Extract schema type directly from field, bypassing complex field structure
@@ -683,7 +689,8 @@ export type CreateEndpointReturnInMethod<
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    TEvents
+    TEvents,
+    TChannel
   >;
 };
 
@@ -731,7 +738,8 @@ export function createEndpoint<
   TUserRoleValue,
   TScopedTranslationKey,
   TFields,
-  TEvents
+  TEvents,
+  TChannel
 > {
   const requestSchema = generateRequestDataSchema(config.fields);
   const responseSchema = generateResponseSchema(config.fields);
@@ -747,6 +755,7 @@ export function createEndpoint<
     TScopedTranslationKey,
     TFields,
     TEvents,
+    TChannel,
     InferRequestInput<TFields>,
     InferRequestOutput<TFields>,
     InferResponseInput<TFields>,
@@ -790,6 +799,7 @@ export function createEndpoint<
     requestSchema,
     responseSchema,
     requestUrlPathParamsSchema: requestUrlSchema,
+    formSchema,
     requiresAuthentication,
     types: {
       RequestInput: undefined! as ExtractInput<
@@ -844,6 +854,7 @@ export function createEndpoint<
     TUserRoleValue,
     TScopedTranslationKey,
     TFields,
-    TEvents
+    TEvents,
+    TChannel
   >;
 }

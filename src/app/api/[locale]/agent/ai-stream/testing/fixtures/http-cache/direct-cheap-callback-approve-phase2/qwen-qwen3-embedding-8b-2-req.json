@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think> The user wants me to call tool-help with toolName='generate_image' and check that the result contains name, description, and parameters schema.</think>\n\nAssistant: <think> The result for toolName='generate_image' contains:\n- name: \"generate_image\" ✓\n- description: \"Generate an image from a text prompt using AI\" ✓\n- parameters schema: a full JSON Schema object with properties, required, etc. ✓\n\nAll three are present. STEP_OK.</think> The result contains:\n- **name**: `generate_image`\n- **description**: `\"Generate an image from a text prompt using AI\"`\n- **parameters**: a full JSON Schema with properties (`prompt`, `model`, `size`, `quality`, `aspectRatio`, `inputMediaUrl`) and `required: [\"prompt\"]`\n\nAll three were present.\n\nSTEP_OK\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\n\nAssistant: <think> The user wants me to say exactly: \"RETRY_RESPONSE STEP_OK\"\n\nThis is a simple text response, no tool calls needed.</think> RETRY_RESPONSE STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

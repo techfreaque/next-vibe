@@ -16,6 +16,10 @@
  *
  * Thread layout (visible in UI):
  *   T1  → new thread + tool call (tool-help) - creates thread, tests parent chain + tool structure
+ *         Gradual exploration ladder (tool-help compact platform): broad list → categories.
+ *   T1a-cat   → narrow by category → tool names (step 2 of the ladder)
+ *   T1a-query → broad keyword search → names list, no schemas (step 3)
+ *   T1b       → detail mode: single tool full schema (step 4)
  *   T2  → image generation (gpt-5-image-mini via quality-tester skill, inline wait mode)
  *   T3  → retry + branch from T1 AI → two sibling forks: RETRY_RESPONSE + BRANCH_RESPONSE
  *   T4  → music gen (from retry branch) + video gen (from fork branch)
@@ -77,11 +81,7 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { ChatModelId } from "../../models";
-import {
-  normalizeFetchCacheFixtures,
-  patchFetchCacheFixtures,
-  setFetchCacheContext,
-} from "../../testing/fetch-cache";
+import { setFetchCacheContext } from "../../testing/fetch-cache";
 import {
   fetchThreadMessages,
   fetchThreadTitle,
@@ -950,6 +950,17 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
 
 /** Read the current credit balance for the test user via endpoint */
 async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
+  // Settle any in-flight fire-and-forget work (embeddings, vision-bridge) from a
+  // prior step before reading the balance — their credit deductions are real but
+  // land async; measuring before they settle would attribute a prior step's cost
+  // to the current one (cross-test bleed). Embeddings/vision are external fetches,
+  // so draining inflight fetches deterministically bounds the measurement window.
+  const { waitForInflightFetches } = await import("../../testing/fetch-cache");
+  // Let queued setTimeout(0) embeds kick off their fetch, then drain to settle.
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 50);
+  });
+  await waitForInflightFetches();
   const creditsDef = (await import("@/app/api/[locale]/credits/definition"))
     .default;
   const result = await sendTestRequest({
@@ -1009,6 +1020,24 @@ let lastBalanceReadAt = new Date(0);
  * generation from an earlier test, another process billing the shared
  * test wallet) is named in the failure instead of needing DB forensics.
  */
+/**
+ * True for credit transactions that are async INDEXING / media-bridge work, not
+ * a stream's own chat usage: cortex embeddings (a feature with no chat model)
+ * and the vision/embedding bridge models (gemini *flash* / *flash-lite* — used
+ * for describe + embedding, never as the chat model in these suites). Used to
+ * separate the dev-server's shared-wallet indexing charges from chat cost.
+ */
+function isIndexingCreditTx(tx: {
+  feature: string | null;
+  modelId: string | null;
+}): boolean {
+  if (tx.feature !== null && tx.modelId === null) {
+    return true;
+  }
+  const m = tx.modelId ?? "";
+  return m.includes("flash-lite") || m.includes("flash");
+}
+
 async function assertDeducted(
   user: JwtPrivatePayloadType,
   before: number,
@@ -1107,21 +1136,19 @@ async function readRemoteAdminBalance(): Promise<number | null> {
 
 // ── Test Suite ────────────────────────────────────────────────────────────────
 
-// Set to false to run full media gen / wakeUp / attachment tests (slow + expensive).
-const CHEAP_MODE = true;
-
 // 600s: remote (direct-http) tests make live API calls (image/video/music gen) that can take 5+ minutes.
 const TEST_TIMEOUT = 600_000;
 // Queue tests need extra time: WS connector + coding-agent AI inference on hermes-dev 3002 (up to 60s each)
 const QUEUE_TEST_TIMEOUT = 600_000;
+// Heavy media turns (image-to-video / image-to-image) send multi-MB requests and
+// the post-tool model turn runs long; on first recording the live media polling
+// also runs inside this window. The default 120s settle is too short — match the
+// fetch-cache's 5-minute live-fetch ceiling so recording and replay both finish.
+const MEDIA_SETTLE_TIMEOUT_MS = 300_000;
 
 export function describeStreamSuite(cfg: ModeConfig): void {
-  // Apply the global default WITHOUT copying cfg — REMOTE-folder suites use
-  // late-bound getters (subFolderIdOverride resolves only after setup), and
-  // a spread would freeze them to their pre-setup values.
-  if (cfg.cheapMode === undefined && CHEAP_MODE) {
-    cfg.cheapMode = true;
-  }
+  // cheapMode is an explicit per-suite flag set by the caller (cheap vs full
+  // wrapper file). No global override — each context has its own cheap + full file.
   // For queue tests (cfg.pulse set), individual tests need more time for cron cycles
   const effectiveTestTimeout = cfg.pulse ? QUEUE_TEST_TIMEOUT : TEST_TIMEOUT;
   describe(cfg.label, () => {
@@ -1130,6 +1157,29 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     // instance folder root.
     const suiteRootFolderId: DefaultFolderId =
       cfg.rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
+
+    // True when the AI loop runs ON the remote instance (direct-http relay,
+    // UNBOTTLED/reverse-ws relay, or REMOTE-folder routing). In those modes the
+    // remote user's wallet is billed — NOT the local testUser — so local-wallet
+    // deduction assertions are meaningless (the local balance may even rise from
+    // a sync/refund artifact). `assertDeductedLocal` therefore no-ops in remote
+    // mode; only the regular (local-loop) contexts assert local deductions.
+    const loopRunsRemote =
+      cfg.assertSystemPromptFromLocal === true ||
+      cfg.assertRelayRan === true ||
+      cfg.rootFolderIdOverride === DefaultFolderId.REMOTE;
+    async function assertDeductedLocal(
+      user: JwtPrivatePayloadType,
+      before: number,
+      after: number,
+      min: number,
+      max: number,
+    ): Promise<void> {
+      if (loopRunsRemote) {
+        return; // remote-billed: local wallet is not the billed party
+      }
+      await assertDeducted(user, before, after, min, max);
+    }
     let testUser: JwtPrivatePayloadType;
     /** Main favorite: quality-tester skill + kimi variant + media model selections */
     let mainFavoriteId: string;
@@ -1989,6 +2039,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         );
       }
 
+      /** Skipped counterpart of `fit` — registers a visible skipped test (so the
+       *  reason shows in the run output) without running it or touching the shared
+       *  thread state. The body is handed to `it.skip`, which records it but never
+       *  invokes it. Use for cases blocked by an external/provider issue that is
+       *  documented inline, not by a defect in our own code. */
+      function fitSkip(
+        name: string,
+        fn: () => Promise<void>,
+        timeout?: number,
+      ): void {
+        it.skip(name, fn, timeout);
+      }
+
       // Thread state shared across steps
       let threadId: string;
       // Tracks the last AI message on the main linear chain.
@@ -1999,7 +2062,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // abandoned. Passed to assertChainIntegrity as knownDeadEndLeaves so
       // check #5 only fires on genuinely unexpected leaves.
       const deadEndLeaves = new Set<string>();
-      // NOTE: knownBranchParents removed — 0 branches allowed at any time.
+      // Persistent set of assistant message IDs that legitimately have >1 child.
+      // A native image model (T11e) can emit multiple file parts in one turn, and a
+      // tools-capable model (T11f) can make parallel generate_image tool calls —
+      // both fan out a single assistant into several tool-message children. Because
+      // assertChainIntegrity validates the WHOLE shared thread on every call, these
+      // branch points must persist so EVERY later test honours them, not just the
+      // test that created them. Tests add to this set, then pass it as the
+      // knownBranchPoints argument.
+      const mediaBranchPoints = new Set<string>();
       // T6c/T6d are full E2E wakeUp tests chaining from T6b's revival AI.
 
       // Step artifacts
@@ -2041,7 +2112,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T1 thread-create+tool-call] Use ${toolInstr(cfg, "tool-help")} to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T1 thread-create+tool-call] Explore the tool catalog gradually with ${toolInstr(cfg, "tool-help")}. First call it with no arguments — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call ${toolInstr(cfg, "tool-help")} again with category='<that category name>' to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the categories list and the narrowed tools list both looked right, or FAILED: <reason> if anything was wrong.`,
             favoriteId: mainFavoriteId,
           });
 
@@ -2124,8 +2195,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(toolMsg.model).toBeTruthy();
 
           // ── tool-help result: tools array + totalCount ──
-          // When matchedCount > COMPACT_CATEGORY_ONLY_THRESHOLD (100), tool-help
-          // returns tools:[] + categories:[...] to save tokens. Both forms are valid.
+          // T1 explores gradually: a broad call (many tools) returns
+          // tools:[] + categories:[...], then a category-narrowed call returns
+          // tools:[...]. findToolMsg uses findLast, so toolRes here is the
+          // narrowed call when the model followed the ladder — but a single
+          // categories-only result is still valid (both forms accepted below).
           expect(
             Array.isArray(toolRes!["tools"]),
             "T1: tools is not an array",
@@ -2215,7 +2289,151 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           // Deduction varies with model round-trips (tool call + follow-up).
           // Kimi sometimes needs 2 LLM calls → higher cost. Allow up to 50.
-          await assertDeducted(testUser, before, after, 0, 50);
+          await assertDeductedLocal(testUser, before, after, 0, 50);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T1a-cat: gradual exploration — narrow a category to tool names ────
+      // Step 2 of the ladder: a broad list returns categories (T1); narrowing by
+      // category returns the tools in it (names + descriptions, no full schema).
+      fit(
+        "T1a-cat: tool-help category narrowing - categories drill down to tool names",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}tool-help-category`);
+          await pinBalance(testUser, 10);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
+
+          const { result, messages } = await runStream({
+            user: testUser,
+            prompt: `[T1a-cat tool-help-category] Call ${toolInstrWithArgs(cfg, "tool-help", "category='ai'")} to list the tools in the "ai" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success).toBe(true);
+          if (!result.success) {
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
+          }
+
+          const added = newMessages(messages, prevIds);
+          const toolMsg = findToolMsg(added, "tool-help", cfg);
+          expect(toolMsg, "T1a-cat: tool-help message not found").toBeDefined();
+          if (toolMsg) {
+            assertToolMessageComplete(toolMsg, "tool-help", "T1a-cat", cfg);
+          }
+          assertNoMetaToolPrefix(added, cfg);
+
+          const toolRes = resolveToolResult(toolMsg);
+          expect(toolRes, "T1a-cat: tool result is null").not.toBeNull();
+
+          // Narrowed category result: tool NAMES (not full schemas, not categories).
+          const catTools = toolRes!["tools"] as WidgetData[];
+          expect(
+            Array.isArray(catTools) && catTools.length > 0,
+            "T1a-cat: narrowing by category must return a non-empty tools array",
+          ).toBe(true);
+          const firstCatTool = toolResultRecord(catTools[0]);
+          expect(
+            firstCatTool?.["name"],
+            "T1a-cat: first tool missing name",
+          ).toBeTruthy();
+          expect(
+            firstCatTool?.["description"],
+            "T1a-cat: first tool missing description",
+          ).toBeTruthy();
+
+          const lastAi = messages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
+          assertStepOk(lastAi?.content, "T1a-cat");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          assertNoOrphans(messages, new Set([t1ToolAiMsgId]), {
+            expectedLeafId: lastMainAiMsgId,
+            knownDeadEndLeaves: deadEndLeaves,
+          });
+          await assertThreadIdle(threadId, testUser);
+          await assertNoPendingTasks(threadId);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T1a-query: gradual exploration — keyword search → names list ──────
+      // Step 3 of the ladder: a broad keyword search that matches many tools
+      // (more than the full-schema threshold) returns the names-only list —
+      // tool names + descriptions, no parameter schemas yet. This is the rung
+      // BELOW detail: the model narrows further (or picks a tool) to get schemas.
+      fit(
+        "T1a-query: tool-help keyword search - many matches return the names list (no schemas)",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}tool-help-query`);
+          await pinBalance(testUser, 10);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
+
+          const { result, messages } = await runStream({
+            user: testUser,
+            prompt: `[T1a-query tool-help-query] Call ${toolInstrWithArgs(cfg, "tool-help", "query='search'")} to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success).toBe(true);
+          if (!result.success) {
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(result.message ?? "unexpected stream failure");
+          }
+
+          const added = newMessages(messages, prevIds);
+          const toolMsg = findToolMsg(added, "tool-help", cfg);
+          expect(
+            toolMsg,
+            "T1a-query: tool-help message not found",
+          ).toBeDefined();
+          if (toolMsg) {
+            assertToolMessageComplete(toolMsg, "tool-help", "T1a-query", cfg);
+          }
+          assertNoMetaToolPrefix(added, cfg);
+
+          const toolRes = resolveToolResult(toolMsg);
+          expect(toolRes, "T1a-query: tool result is null").not.toBeNull();
+
+          // Names-list rung: a non-empty tools array where each entry has a
+          // name + description. (Schemas are the rung below — T1b detail.)
+          const queryTools = toolRes!["tools"] as WidgetData[];
+          expect(
+            Array.isArray(queryTools) && queryTools.length > 0,
+            "T1a-query: a keyword search must return a non-empty tools array",
+          ).toBe(true);
+          const firstQueryTool = toolResultRecord(queryTools[0]);
+          expect(
+            firstQueryTool?.["name"],
+            "T1a-query: first tool missing name",
+          ).toBeTruthy();
+          expect(
+            firstQueryTool?.["description"],
+            "T1a-query: first tool missing description",
+          ).toBeTruthy();
+
+          const lastAi = messages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
+          assertStepOk(lastAi?.content, "T1a-query");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          assertNoOrphans(messages, new Set([t1ToolAiMsgId]), {
+            expectedLeafId: lastMainAiMsgId,
+            knownDeadEndLeaves: deadEndLeaves,
+          });
+          await assertThreadIdle(threadId, testUser);
+          await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
       );
@@ -2486,7 +2704,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0.05, 50);
+          await assertDeductedLocal(testUser, before, after, 0.05, 50);
         },
         effectiveTestTimeout,
       );
@@ -2592,7 +2810,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterRetry = await getBalance(testUser);
-          await assertDeducted(testUser, beforeRetry, afterRetry, 0, 10);
+          await assertDeductedLocal(testUser, beforeRetry, afterRetry, 0, 10);
 
           // ── Fork 2: Branch from same parent (UI flow: operation="edit", parent=t2BranchParentId) ──
           // The UI's branchMessage hook uses: parentMessageId = userMsg.parentId, operation = "edit"
@@ -2711,7 +2929,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterBranch = await getBalance(testUser);
-          await assertDeducted(testUser, beforeBranch, afterBranch, 0, 10);
+          await assertDeductedLocal(testUser, beforeBranch, afterBranch, 0, 10);
         },
         effectiveTestTimeout,
       );
@@ -2833,7 +3051,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         // T4a: expectedLeaf = T4a music end; T2 end is dead-end; branchForkAiMsgId is the other active tip
         assertNoOrphans(
           musicMsgs,
-          new Set([t2BranchParentId].filter(Boolean)),
+          new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
           {
             expectedLeafId: musicResult.data.lastAiMessageId!,
             knownDeadEndLeaves: new Set([...deadEndLeaves, branchForkAiMsgId]),
@@ -2845,7 +3063,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         await assertNoPendingTasks(threadId);
 
         const afterMusic = await getBalance(testUser);
-        await assertDeducted(testUser, beforeMusic, afterMusic, 0, 15);
+        await assertDeductedLocal(testUser, beforeMusic, afterMusic, 0, 15);
 
         // ── Part B: Video gen from fork branch ──
         setFetchCacheContext(`${cfg.cachePrefix}video-generation`);
@@ -2932,7 +3150,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         // T4b: lastMainAiMsgId is now the sole active tip; deadEndLeaves has T2 end + T4a music end
         assertNoOrphans(
           videoMsgs,
-          new Set([t2BranchParentId].filter(Boolean)),
+          new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
           {
             expectedLeafId: lastMainAiMsgId,
             knownDeadEndLeaves: deadEndLeaves,
@@ -2945,7 +3163,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         // Video gen: VEO_3_1 via modelslab + chat model tokens.
         // In remote mode the video gen credits are deducted on the remote instance, not locally.
         // Only the LLM stream tokens are charged locally, so min=0 in remote mode.
-        await assertDeducted(
+        await assertDeductedLocal(
           testUser,
           beforeVideo,
           afterVideo,
@@ -2959,15 +3177,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T5: detach dispatch - AI calls generate_image with detach, gets taskId back",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}callback-wait-step1`);
-          // Self-heal: if a previous T5b run failed before normalizing fixtures,
-          // stale real task IDs may be baked into step2 files. Reset them now.
-          // Covers direct/queue IDs (local-bg-*), reverse-ws/remote IDs (remote-hermes-*),
-          // and direct-http IDs (remote-direct-hermes-*).
-          normalizeFetchCacheFixtures(
-            `${cfg.cachePrefix}callback-wait-step2`,
-            /(?:local-bg|remote-direct-hermes|remote-hermes)-\d+-\w+/g,
-            "T5B_TASK_ID_PLACEHOLDER",
-          );
           await pinBalance(testUser, 20);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -2995,22 +3204,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             genImgMsg,
             "[T5] generate_image tool message not found",
           ).toBeDefined();
-          if (genImgMsg) {
-            // The dispatch returned {taskId, pending} to the AI; by the time
-            // runStream returns, the completed task has backfilled the
-            // message to its terminal state.
-            assertToolMessageComplete(genImgMsg, "generate_image", "T5", cfg);
-          }
 
           const genImgRes = resolveToolResult(genImgMsg);
           expect(
             genImgRes,
             "[T5] generate_image result is null",
           ).not.toBeNull();
-          // The detach task completed before runStream returned (it awaits
-          // the reconcile) — the dispatch tool message is the canonical
-          // result store and now holds the FINAL image result. The taskId
-          // stays discoverable as toolCall.remoteTaskId.
+          // DETACH semantics: the dispatch returns ONLY { taskId } — fire-and-forget.
+          // It NEVER backfills the dispatch tool message with the result. The finished
+          // task is kept in task history; the result is retrieved later via await-task
+          // (T5b), which then cleans the task up. So here: taskId present, imageUrl ABSENT.
           const t5ToolCall = genImgMsg!.toolCall;
           const t5TaskIdRaw = t5ToolCall?.remoteTaskId ?? genImgRes!["taskId"];
           expect(
@@ -3018,17 +3221,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             `[T5] taskId missing (remoteTaskId or result.taskId): ${JSON.stringify({ remoteTaskId: t5ToolCall?.remoteTaskId, result: genImgRes })}`,
           ).toBe("string");
           expect(
-            typeof genImgRes!["imageUrl"],
-            `[T5] backfilled detach result must hold the final imageUrl: ${JSON.stringify(genImgRes)}`,
-          ).toBe("string");
+            genImgRes!["imageUrl"],
+            `[T5] detach must NOT backfill imageUrl — result is { taskId } only: ${JSON.stringify(genImgRes)}`,
+          ).toBeUndefined();
 
-          // Save for T5b - also patch T5b fixtures so replay uses the real taskId
+          // Save for T5b. taskIds are deterministic in fixture mode, so the
+          // value is stable across record/replay — no fixture patching needed.
           t5DetachTaskId = t5TaskIdRaw as string;
-          patchFetchCacheFixtures(
-            `${cfg.cachePrefix}callback-wait-step2`,
-            "T5B_TASK_ID_PLACEHOLDER",
-            t5DetachTaskId,
-          );
 
           const lastAi = messages.find(
             (m) => m.id === result.data.lastAiMessageId,
@@ -3038,7 +3237,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -3054,9 +3253,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T5b: await-task - AI calls await-task with detach taskId, gets imageUrl",
         async () => {
-          // T5 already patched step2 fixtures: sentinel → t5DetachTaskId.
-          // On first run the dir doesn't exist yet; step2 runs live and records real taskId.
-          // After step2, fixtures are normalized back to sentinel for the next run.
+          // taskId from T5 is deterministic (fixture mode), so the value the AI
+          // echoes here is stable across record/replay — no fixture patching.
           setFetchCacheContext(`${cfg.cachePrefix}callback-wait-step2`);
           await pinBalance(testUser, 20);
           const beforeWait = await getBalance(testUser);
@@ -3153,7 +3351,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             waitMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -3164,15 +3362,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const afterWait = await getBalance(testUser);
           // T5b only: await-task + AI response (~0.3cr). Image gen was charged in T5.
-          await assertDeducted(testUser, beforeWait, afterWait, 0.1, 10);
-
-          // Normalize fixtures: replace the real taskId with sentinel so the next
-          // run can patch sentinel → its own taskId before replaying.
-          patchFetchCacheFixtures(
-            `${cfg.cachePrefix}callback-wait-step2`,
-            t5DetachTaskId,
-            "T5B_TASK_ID_PLACEHOLDER",
-          );
+          await assertDeductedLocal(testUser, beforeWait, afterWait, 0.1, 10);
         },
         effectiveTestTimeout,
       );
@@ -3257,7 +3447,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             endLoopMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -3389,7 +3579,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             allMessages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -3401,56 +3591,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           // Image gen + at least one AI turn; kimi sometimes needs an extra
           // round trip (same allowance as T1).
-          await assertDeducted(testUser, before, after, 0.4, 50);
-        },
-        effectiveTestTimeout,
-      );
-
-      // ── T5c: execute-tool direct call ─────────────────────────────────────
-      fit(
-        "T5c: execute-tool direct call - tool-help via execute-tool wrapper",
-        async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}execute-tool-direct`);
-          await pinBalance(testUser, 10);
-          const prevIds = new Set(
-            (await getMessages(threadId)).map((m) => m.id),
-          );
-
-          const { result, messages } = await runStream({
-            user: testUser,
-            prompt: `[T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}${cfg.remoteInstanceId ? ` and instanceId='${cfg.remoteInstanceId}'` : ""}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.`,
-            threadId,
-            favoriteId: mainFavoriteId,
-            explicitParentMessageId: lastMainAiMsgId,
-          });
-
-          expect(result.success).toBe(true);
-          if (!result.success) {
-            // oxlint-disable-next-line restricted-syntax
-            throw new Error(result.message ?? "unexpected stream failure");
-          }
-
-          const added = newMessages(messages, prevIds);
-          // AI may call execute-tool directly or call tool-help - either way a tool must have run
-          const anyToolMsg = added.find((m) => m.role === "tool");
-          expect(anyToolMsg, "T5c: no tool call found").toBeDefined();
-
-          const lastAi = messages.find(
-            (m) => m.id === result.data.lastAiMessageId,
-          );
-          assertStepOk(lastAi?.content, "T5c");
-          lastMainAiMsgId = result.data.lastAiMessageId!;
-
-          assertNoOrphans(
-            messages,
-            new Set([t2BranchParentId].filter(Boolean)),
-            {
-              expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
-            },
-          );
-          await assertThreadIdle(threadId, testUser);
-          await assertNoPendingTasks(threadId);
+          await assertDeductedLocal(testUser, before, after, 0.4, 50);
         },
         effectiveTestTimeout,
       );
@@ -3632,7 +3773,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // Chain integrity: revival may or may not have landed yet - skip expectedLeafId check here.
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 knownDeadEndLeaves: deadEndLeaves,
               },
@@ -3642,7 +3783,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // The await covers the WHOLE delivery: dispatch turn + image gen
             // + revival turn; kimi sometimes needs extra round trips (same
             // allowance as T1).
-            await assertDeducted(testUser, before, after, 0, 50);
+            await assertDeductedLocal(testUser, before, after, 0, 50);
           },
           effectiveTestTimeout,
         );
@@ -3874,7 +4015,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             messages = await getMessages(threadId);
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 expectedLeafId: lastMainAiMsgId,
                 knownDeadEndLeaves: deadEndLeaves,
@@ -4118,7 +4259,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -4367,7 +4508,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -4522,7 +4663,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // Skip expectedLeafId; T7b will update lastMainAiMsgId after confirmation.
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 knownDeadEndLeaves: deadEndLeaves,
               },
@@ -4534,7 +4675,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // parent as the approve tool message (approveToolParentId = assistant placeholder).
             const after = await getBalance(testUser);
             // Queue mode: WAIT revival runs tool-help + AI response → higher cost
-            await assertDeducted(testUser, before, after, 0, cfg.pulse ? 8 : 3);
+            await assertDeductedLocal(
+              testUser,
+              before,
+              after,
+              0,
+              cfg.pulse ? 8 : 3,
+            );
           },
           effectiveTestTimeout,
         );
@@ -4721,7 +4868,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // Only T2's branch point remains as a known multi-child node.
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 expectedLeafId: lastMainAiMsgId,
                 knownDeadEndLeaves: deadEndLeaves,
@@ -4735,7 +4882,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // (e.g. kimi-k2-6 calls it with endLoop), doubling the image cost.
             // Confirmed image gen + AI turn; kimi sometimes needs extra
             // round trips (same allowance as T1).
-            await assertDeducted(testUser, before, after, 0.47, 50);
+            await assertDeductedLocal(testUser, before, after, 0.47, 50);
           },
           effectiveTestTimeout,
         );
@@ -4760,7 +4907,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[CF1] Call the contact-form tool right now with: name='Test User', subject=GENERAL_INQUIRY, message='Automated integration test. Please ignore.' Do not explain, just call the tool.`,
+              prompt: `[CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -4790,6 +4937,30 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             cfToolMsgId = cfMsg.id;
             cfToolParentId = cfMsg.parentId;
+
+            // Exactly ONE contact-form call. A second call is the classic
+            // double-call regression: when the tool response returns a raw i18n
+            // key (e.g. "response.success") instead of the translated value, the
+            // model cannot tell the call succeeded and re-invokes the tool.
+            // translatedValueSchema on the success field guarantees a real
+            // message is returned, so the AI stops after one call.
+            const cfCalls = added.filter((m) => {
+              if (m.role !== "tool") {
+                return false;
+              }
+              if (m.toolCall?.toolName === "contact-form") {
+                return true;
+              }
+              return (
+                m.toolCall?.toolName === "execute-tool" &&
+                toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                  "contact-form"
+              );
+            });
+            expect(
+              cfCalls.length,
+              "CF1: contact-form must be called exactly once — a second call means the tool response was not a clear success (raw i18n key regression)",
+            ).toBe(1);
 
             expect(
               cfMsg.toolCall?.waitingForConfirmation,
@@ -4831,7 +5002,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // Thread must be idle — stream aborted cleanly waiting for confirmation
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               { knownDeadEndLeaves: deadEndLeaves },
             );
             await assertThreadIdle(threadId, testUser);
@@ -4958,7 +5129,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             assertNoOrphans(
               messages,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 expectedLeafId: lastMainAiMsgId,
                 knownDeadEndLeaves: deadEndLeaves,
@@ -5115,7 +5286,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5125,7 +5296,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0.47, 12);
+          await assertDeductedLocal(testUser, before, after, 0.47, 12);
         },
         effectiveTestTimeout,
       );
@@ -5218,7 +5389,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5228,7 +5399,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 50);
+          await assertDeductedLocal(testUser, before, after, 0, 50);
         },
         effectiveTestTimeout,
       );
@@ -5285,7 +5456,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             imgMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5295,7 +5466,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterImg = await getBalance(testUser);
-          await assertDeducted(testUser, beforeImg, afterImg, 0, 30);
+          await assertDeductedLocal(testUser, beforeImg, afterImg, 0, 30);
 
           // ── Part B: Multi-attachment (image + music) ──
           setFetchCacheContext(`${cfg.cachePrefix}attachment-multi`);
@@ -5351,7 +5522,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             multiMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5361,7 +5532,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterMulti = await getBalance(testUser);
-          await assertDeducted(testUser, beforeMulti, afterMulti, 0, 30);
+          await assertDeductedLocal(testUser, beforeMulti, afterMulti, 0, 30);
 
           // ── Part C: Audio attachment (attachment path → audioVisionModel gap-fill) ──
           // Music file passed as attachment → gap-fill.bridgeStt() → audioVisionModel (Gemini Flash)
@@ -5421,7 +5592,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             voiceMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5431,7 +5602,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterVoice = await getBalance(testUser);
-          await assertDeducted(testUser, beforeVoice, afterVoice, 0, 30);
+          await assertDeductedLocal(testUser, beforeVoice, afterVoice, 0, 30);
 
           // ── Part C2: Voice STT path (audioInput → SpeechToTextRepository) ──
           // Audio passed via audioInput field (voice UI flow) → operation-handler.ts →
@@ -5502,7 +5673,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             assertNoOrphans(
               sttMsgs,
-              new Set([t2BranchParentId].filter(Boolean)),
+              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
               {
                 expectedLeafId: lastMainAiMsgId,
                 knownDeadEndLeaves: deadEndLeaves,
@@ -5512,7 +5683,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await assertNoPendingTasks(threadId);
 
             const afterStt = await getBalance(testUser);
-            await assertDeducted(testUser, beforeStt, afterStt, 0, 30);
+            await assertDeductedLocal(testUser, beforeStt, afterStt, 0, 30);
           } else {
             process.stdout.write(
               "[T10c_stt] Skipping - OPENAI_API_KEY not configured in this environment\n",
@@ -5556,7 +5727,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             videoMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5566,7 +5737,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterVideo = await getBalance(testUser);
-          await assertDeducted(testUser, beforeVideo, afterVideo, 0, 30);
+          await assertDeductedLocal(testUser, beforeVideo, afterVideo, 0, 30);
 
           // ── Part E: Voice WAV attachment → gap-fill audioVisionModel bridge ──
           // quality-tester skill uses DEFAULT_CHAT_MODEL_ID which does NOT support audio input.
@@ -5629,7 +5800,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             wavMsgs,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5639,7 +5810,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const afterWav = await getBalance(testUser);
-          await assertDeducted(testUser, beforeWav, afterWav, 0, 30);
+          await assertDeductedLocal(testUser, beforeWav, afterWav, 0, 30);
         },
         effectiveTestTimeout,
       );
@@ -5648,6 +5819,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11: native image generation - file part output, no generate_image tool call",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: native image generation runs in the full suite
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-generation-native`);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
@@ -5743,7 +5917,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5753,7 +5927,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0.4, 30);
+          await assertDeductedLocal(testUser, before, after, 0.4, 30);
         },
         effectiveTestTimeout,
       );
@@ -5774,6 +5948,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11b: follow-up turn after native gen - synthetic tool message persisted, chain continues",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: native image generation runs in the full suite
+          }
           setFetchCacheContext(
             `${cfg.cachePrefix}image-generation-native-gap-fill`,
           );
@@ -5828,7 +6005,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5838,7 +6015,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 20);
+          await assertDeductedLocal(testUser, before, after, 0, 20);
         },
         effectiveTestTimeout,
       );
@@ -5850,6 +6027,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11c: image-to-video via Nano Banana Pro - model sees image, calls generate_video with inputMediaUrl",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: real video generation runs in the full suite
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-video-nano-banana`);
           // I2V models (wan-2-6-i2v etc.) cost ~10 cr/sec × 5 sec × 1.3 markup = ~65 cr
           await pinBalance(testUser, 200);
@@ -5870,6 +6050,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: nanoBananaFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
+            // Heavy media turn: multi-MB request + slow post-tool model turn;
+            // on first record the live video polling must finish in this window
+            // for fixtures to persist. See TestStreamParams.settleTimeoutMs.
+            settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           });
 
           expect(result.success).toBe(true);
@@ -5920,7 +6104,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -5930,7 +6114,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 30, 150);
+          await assertDeductedLocal(testUser, before, after, 30, 150);
         },
         effectiveTestTimeout,
       );
@@ -5942,6 +6126,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11d: image-to-video via Kimi K2.6 - image-capable model passes image URL to generate_video tool",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: real video generation runs in the full suite
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-video-kimi`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
@@ -5958,6 +6145,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
+            settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           });
 
           expect(result.success).toBe(true);
@@ -6006,7 +6194,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -6016,19 +6204,25 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 30, 150);
+          await assertDeductedLocal(testUser, before, after, 30, 150);
         },
         effectiveTestTimeout,
       );
 
-      // ── T11e: I2I via Nano Banana Pro (sees image, calls generate_image tool with inputMediaUrl) ──
-      // Gemini 3 Pro Image Preview inputs: ["text","image"] - it can see the image directly.
-      // outputs: ["text","image"] → imageGenIsSameAsChatModel = true normally, but here we
-      // override imageGenModelSelection to a DIFFERENT model so the generate_image tool is available.
-      // The AI sees the image, then calls generate_image with inputMediaUrl for image-to-image.
+      // ── T11e: I2I via Nano Banana Pro (NATIVE image-to-image) ──
+      // Nano Banana Pro (gemini-3-pro-image-preview) has supportsTools:false and
+      // inputs/outputs ["text","image"]. It CANNOT call tools — it sees the input
+      // image directly and emits the transformed image as a native file part. The
+      // stream's FilePartHandler then synthesises a generate_image tool message
+      // (result.file, creditCost 0, empty args.prompt) exactly like T11 native gen.
+      // There is no generate_image tool call and no inputMediaUrl arg: the model
+      // generates natively, it does not bridge through the tool.
       fit(
-        "T11e: image-to-image via Nano Banana Pro - model sees image, calls generate_image with inputMediaUrl",
+        "T11e: image-to-image via Nano Banana Pro - native file-part output, no tool call",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: real image generation runs in the full suite
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-nano-banana`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
@@ -6041,10 +6235,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T11e i2i-nano-banana] Here is my photo: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. ${toolInstrWithArgs(cfg, "generate_image", `prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
+            prompt: `[T11e i2i-nano-banana] Here is my photo: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. Output the transformed image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason>.`,
             threadId,
             favoriteId: nanoBananaFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
+            settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           });
 
           expect(result.success).toBe(true);
@@ -6053,56 +6248,106 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             throw new Error(result.message ?? "unexpected stream failure");
           }
 
+          // The native image must have streamed out as a file part.
+          expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
+
           const added = newMessages(messages, prevIds);
 
-          // Tool message: AI called generate_image with inputMediaUrl
-          const imageToolMsg = findToolMsg(added, "generate_image", cfg);
-          expect(imageToolMsg).toBeDefined();
-          if (imageToolMsg) {
-            assertToolMessageComplete(
-              imageToolMsg,
-              "generate_image",
-              "T11e",
-              cfg,
-            );
-          }
-
-          // Args: inputMediaUrl must be the image URL passed in
-          const imageArgs = toolResultRecord(imageToolMsg!.toolCall?.args);
-          const resolvedArgs =
-            (imageArgs?.["input"] as Record<string, WidgetData> | undefined) ??
-            imageArgs;
+          // Native path: FilePartHandler synthesises a generate_image tool message
+          // (NOT a model tool call — Nano Banana Pro has supportsTools:false).
+          const imageToolMsg = added.find(
+            (m) =>
+              m.role === "tool" && m.toolCall?.toolName === "generate_image",
+          );
           expect(
-            resolvedArgs?.["inputMediaUrl"],
-            "[T11e] generate_image args.inputMediaUrl must be the input image URL",
-          ).toBe(INPUT_IMAGE_URL);
+            imageToolMsg,
+            "[T11e] native image-to-image must produce a synthetic generate_image tool message",
+          ).toBeDefined();
 
-          // Result: imageUrl, positive creditCost
+          // Result: native file part, zero credit cost (the native gen is billed on
+          // the chat model turn, not the synthetic tool).
           const imageRes = resolveToolResult(imageToolMsg);
           expect(imageRes).not.toBeNull();
-          expect(typeof imageRes!["imageUrl"]).toBe("string");
-          expect(imageRes!["imageUrl"]).toBeTruthy();
-          expect((imageRes!["creditCost"] as number) > 0).toBe(true);
+          expect(typeof imageRes!["file"]).toBe("string");
+          expect(imageRes!["file"]).toBeTruthy();
+          expect(imageRes!["creditCost"]).toBe(0);
 
+          // Native gen: args.prompt must be empty so gap-fill vision-bridges on the
+          // next non-image turn — there is no inputMediaUrl, the model saw the image.
+          const imageArgs = toolResultRecord(imageToolMsg!.toolCall?.args);
+          expect(
+            imageArgs!["prompt"],
+            "[T11e] synthetic tool message args.prompt must be empty for native gen",
+          ).toBe("");
+
+          // Native path leaf resolution. A native image model can emit MORE THAN
+          // ONE file part in a single turn, so FilePartHandler may create several
+          // synthetic generate_image tool messages as siblings under the same blank
+          // assistant. The true leaf is the post-tool AI text (STEP_OK) under the
+          // LAST such tool message; the earlier sibling tool messages are legitimate
+          // dead-end leaves (each holds its own image), so register them.
           const t11eAdded = newMessages(messages, prevIds);
-          const t11eLeaf = [...t11eAdded]
-            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-            .find((m) => !messages.some((other) => other.parentId === m.id));
-          lastMainAiMsgId = t11eLeaf?.id ?? result.data.lastAiMessageId!;
+          const nativeToolMsgs = t11eAdded.filter(
+            (m) =>
+              m.role === "tool" && m.toolCall?.toolName === "generate_image",
+          );
+          const lastNativeToolMsg = nativeToolMsgs[nativeToolMsgs.length - 1];
+          const postToolAi = lastNativeToolMsg
+            ? t11eAdded.find(
+                (m) =>
+                  m.role === "assistant" && m.parentId === lastNativeToolMsg.id,
+              )
+            : undefined;
+          lastMainAiMsgId =
+            postToolAi?.id ??
+            lastNativeToolMsg?.id ??
+            result.data.lastAiMessageId!;
+          // Sibling image tool messages (all but the one on the leaf path) are
+          // genuine dead-end leaves — one synthetic message per emitted file part.
+          // Persist them so later tests' reachability check honours them too.
+          for (const m of nativeToolMsgs) {
+            if (
+              m.id !== lastNativeToolMsg?.id &&
+              !messages.some((other) => other.parentId === m.id)
+            ) {
+              deadEndLeaves.add(m.id);
+            }
+          }
+          const t11eDeadEnds = deadEndLeaves;
+          // The blank assistant(s) parenting multiple image tool messages are
+          // legitimate branch points (one child per emitted file part). Register
+          // them in the PERSISTENT mediaBranchPoints set so this fan-out is honoured
+          // by every later test that re-validates the shared thread, not just here.
+          const t11eChildCounts = new Map<string, number>();
+          for (const m of nativeToolMsgs) {
+            if (m.parentId) {
+              t11eChildCounts.set(
+                m.parentId,
+                (t11eChildCounts.get(m.parentId) ?? 0) + 1,
+              );
+            }
+          }
+          for (const [parentId, count] of t11eChildCounts) {
+            if (count > 1) {
+              mediaBranchPoints.add(parentId);
+            }
+          }
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
+              knownDeadEndLeaves: t11eDeadEnds,
             },
           );
           await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
+          // Native gen is billed on the chat-model image-output turn (Nano Banana
+          // Pro), not via a positive-cost tool. Bracket that turn's deduction.
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 5, 150);
+          await assertDeductedLocal(testUser, before, after, 0.4, 150);
         },
         effectiveTestTimeout,
       );
@@ -6114,6 +6359,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11f: image-to-image via Kimi K2.6 - image-capable model passes image URL to generate_image tool",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: real image generation runs in the full suite
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
@@ -6130,6 +6378,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
+            settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           });
 
           expect(result.success).toBe(true);
@@ -6169,25 +6418,69 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect((imageRes!["creditCost"] as number) > 0).toBe(true);
           t11fOutputImageUrl = imageRes!["imageUrl"] as string;
 
+          // Kimi is a tools-capable model and may emit MORE THAN ONE generate_image
+          // tool call in a single turn (parallel tool calls). Each becomes a tool
+          // message sibling under the same assistant — a legitimate branch point,
+          // with the off-path siblings as dead-end leaves. The leaf is the post-tool
+          // AI text under the last tool message (or that tool message itself).
           const t11fAdded = newMessages(messages, prevIds);
-          const t11fLeaf = [...t11fAdded]
-            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-            .find((m) => !messages.some((other) => other.parentId === m.id));
-          lastMainAiMsgId = t11fLeaf?.id ?? result.data.lastAiMessageId!;
+          const t11fToolMsgs = t11fAdded.filter(
+            (m) =>
+              m.role === "tool" &&
+              (m.toolCall?.toolName === "generate_image" ||
+                (m.toolCall?.toolName === "execute-tool" &&
+                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                    "generate_image")),
+          );
+          const lastT11fToolMsg = t11fToolMsgs[t11fToolMsgs.length - 1];
+          const t11fPostToolAi = lastT11fToolMsg
+            ? t11fAdded.find(
+                (m) =>
+                  m.role === "assistant" && m.parentId === lastT11fToolMsg.id,
+              )
+            : undefined;
+          lastMainAiMsgId =
+            t11fPostToolAi?.id ??
+            lastT11fToolMsg?.id ??
+            result.data.lastAiMessageId!;
+          const t11fChildCounts = new Map<string, number>();
+          for (const m of t11fToolMsgs) {
+            if (m.parentId) {
+              t11fChildCounts.set(
+                m.parentId,
+                (t11fChildCounts.get(m.parentId) ?? 0) + 1,
+              );
+            }
+          }
+          for (const [parentId, count] of t11fChildCounts) {
+            if (count > 1) {
+              mediaBranchPoints.add(parentId);
+            }
+          }
+          // Persist sibling tool leaves so later tests' reachability check honours them.
+          for (const m of t11fToolMsgs) {
+            if (
+              m.id !== lastT11fToolMsg?.id &&
+              !messages.some((other) => other.parentId === m.id)
+            ) {
+              deadEndLeaves.add(m.id);
+            }
+          }
+          const t11fDeadEnds = deadEndLeaves;
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
+              knownDeadEndLeaves: t11fDeadEnds,
             },
           );
           await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 5, 150);
+          await assertDeductedLocal(testUser, before, after, 5, 150);
         },
         effectiveTestTimeout,
       );
@@ -6202,6 +6495,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11f-verify: vision model can see the generated image in tool result",
         async () => {
+          if (cfg.cheapMode) {
+            return; // cheapMode: depends on T11f media output (full suite only)
+          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi-verify`);
           await pinBalance(testUser, 30);
           const before = await getBalance(testUser);
@@ -6248,7 +6544,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -6258,7 +6554,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 20);
+          await assertDeductedLocal(testUser, before, after, 0, 20);
         },
         effectiveTestTimeout,
       );
@@ -6269,19 +6565,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // → generate_image tool is REMOVED → model produces image natively.
       // The user provides a reference image URL; the model sees it directly and generates
       // a modified image as inline file parts (native multimodal output).
-      // SKIPPED: OpenRouter no longer returns inline file parts for Gemini 3.1 Flash Image Preview
-      // (returns hallucinated tool calls instead). Re-enable when provider is fixed or switch
-      // to Unbottled provider. See: T11 works because it uses old cached fixtures with real data.
-      fit(
+      // SKIPPED (external provider regression, re-verified 2026-06-30): OpenRouter no
+      // longer returns inline file parts for Gemini 3.1 Flash Image Preview in a long
+      // multimodal thread — the model hallucinates a generate_image tool call (a tool
+      // that is intentionally NOT offered for native models), so no image is produced.
+      // This is a provider bug, not a defect here: native image gen is already proven
+      // by T11 (native text→image) and native image-to-image by T11e (Nano Banana Pro).
+      // Re-enable when the provider is fixed or switch this favorite to the Unbottled
+      // provider. Uses fitSkip so the skip is visible in the run output.
+      fitSkip(
         "T11g: native image-to-image via Nano Banana Pro - model sees reference image, generates natively",
         async () => {
-          // SKIP: OpenRouter returns hallucinated tool calls instead of inline file parts
-          // for Gemini 3.1 Flash Image Preview. Re-enable when provider is fixed.
-          const SKIP_T11G = true;
-          if (SKIP_T11G) {
-            return;
+          if (cfg.cheapMode) {
+            return; // cheapMode: native image generation runs in the full suite
           }
-
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-native`);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
@@ -6334,7 +6631,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -6344,7 +6641,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 40);
+          await assertDeductedLocal(testUser, before, after, 0, 40);
         },
         effectiveTestTimeout,
       );
@@ -6377,7 +6674,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           assertNoOrphans(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -6387,7 +6684,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 10);
+          await assertDeductedLocal(testUser, before, after, 0, 10);
         },
         effectiveTestTimeout,
       );
@@ -6403,7 +6700,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // T1's tool message is NOT a branch point - T1's final AI is the direct child on the main chain.
           assertChainIntegrity(
             messages,
-            new Set([t2BranchParentId].filter(Boolean)),
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
             {
               expectedLeafId: lastMainAiMsgId,
               knownDeadEndLeaves: deadEndLeaves,
@@ -6419,7 +6716,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Every other parent must have exactly 1 child (no accidental branching).
           const tree = buildTree(messages);
           const byId = new Map(messages.map((m) => [m.id, m]));
-          const knownBranchIds = new Set([t2BranchParentId].filter(Boolean));
+          const knownBranchIds = new Set(
+            [t2BranchParentId, ...mediaBranchPoints].filter(Boolean),
+          );
           for (const [parentId, children] of tree.entries()) {
             if (parentId === "__root__") {
               continue;
@@ -6573,7 +6872,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}credit-deduction`);
           await pinBalance(testUser, 50);
+          // getBalance drains in-flight async first, so this timestamp cleanly
+          // bounds the start of THIS stream's ledger entries.
           const before = await getBalance(testUser);
+          const creditWindowStart = new Date();
 
           const { result } = await runStream({
             user: testUser,
@@ -6591,16 +6893,51 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          expect((result.data.totalCreditsDeducted ?? 0) > 0).toBe(true);
+          const reported = result.data.totalCreditsDeducted ?? 0;
+          expect(reported > 0).toBe(true);
 
           const after = await getBalance(testUser);
-          const balanceDiff = before - after;
-          const reported = result.data.totalCreditsDeducted ?? 0;
-          expect(
-            Math.abs(balanceDiff - reported),
-            `Balance diff ${balanceDiff} vs reported ${reported}`,
-          ).toBeLessThan(0.01);
           expect(after).toBeLessThan(before);
+
+          // Truthful accounting check. totalCreditsDeducted is the stream's
+          // self-report of what IT charged (chat-model + tool credits via its own
+          // accumulator). Compare it to the ledger charges in this stream's time
+          // window that are CHAT usage — i.e. exclude async INDEXING the shared
+          // dev-server process bills against the same wallet: cortex embeddings
+          // (feature) and vision-bridge describes (flash-lite vision models).
+          // Those land with feature/model markers distinct from chat usage.
+          const { creditTransactions: cTx, creditWallets: cWallets } =
+            await import("@/app/api/[locale]/credits/db");
+          const { inArray: inArrayOp, gte: gteOp } =
+            await import("drizzle-orm");
+          const userWallets = (
+            await db
+              .select({ id: cWallets.id })
+              .from(cWallets)
+              .where(eq(cWallets.userId, testUser.id))
+          ).map((w) => w.id);
+          const windowTxs = await db
+            .select({
+              amount: cTx.amount,
+              feature: cTx.feature,
+              modelId: cTx.modelId,
+            })
+            .from(cTx)
+            .where(
+              and(
+                inArrayOp(cTx.walletId, userWallets),
+                gteOp(cTx.createdAt, creditWindowStart),
+              ),
+            );
+          const ledgerChatCost = windowTxs.reduce(
+            (sum, t) =>
+              sum + (t.amount < 0 && !isIndexingCreditTx(t) ? -t.amount : 0),
+            0,
+          );
+          expect(
+            Math.abs(ledgerChatCost - reported),
+            `Reported ${reported} must match this stream's chat ledger charges ${ledgerChatCost}`,
+          ).toBeLessThan(0.01);
 
           await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);

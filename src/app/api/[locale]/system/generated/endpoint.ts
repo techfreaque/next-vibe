@@ -115,37 +115,9 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/agent/chat/data-sources/chat-upvotes-total/definition")
       ).default.POST;
-    case "agent_chat_favorites_GET":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/definition")
-      ).default.GET;
-    case "agent_chat_favorites_create_POST":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/create/definition")
-      ).default.POST;
-    case "agent_chat_favorites_id_DELETE":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
-      ).default.DELETE;
-    case "agent_chat_favorites_id_GET":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
-      ).default.GET;
-    case "agent_chat_favorites_id_PATCH":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
-      ).default.PATCH;
-    case "agent_chat_favorites_reorder_POST":
-      return (
-        await import("@/app/api/[locale]/agent/skills/favorites/reorder/definition")
-      ).default.POST;
     case "agent_chat_folder-contents_rootFolderId_GET":
       return (
         await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition")
-      ).default.GET;
-    case "agent_chat_folders_root-permissions_GET":
-      return (
-        await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/definition")
       ).default.GET;
     case "agent_chat_folders_rootFolderId_GET":
       return (
@@ -155,6 +127,10 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
       ).default.POST;
+    case "agent_chat_folders_rootFolderId_root-permissions_GET":
+      return (
+        await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/definition")
+      ).default.GET;
     case "agent_chat_folders_subfolders_subFolderId_DELETE":
       return (
         await import("@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/definition")
@@ -193,41 +169,6 @@ export async function getEndpoint(
     case "agent_chat_settings_POST":
       return (await import("@/app/api/[locale]/agent/chat/settings/definition"))
         .default.POST;
-    case "agent_chat_skills_GET":
-      return (await import("@/app/api/[locale]/agent/skills/definition"))
-        .default.GET;
-    case "agent_chat_skills_create_POST":
-      return (await import("@/app/api/[locale]/agent/skills/create/definition"))
-        .default.POST;
-    case "agent_chat_skills_id_DELETE":
-      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
-        .default.DELETE;
-    case "agent_chat_skills_id_GET":
-      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
-        .default.GET;
-    case "agent_chat_skills_id_PATCH":
-      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
-        .default.PATCH;
-    case "agent_chat_skills_id_publish_PATCH":
-      return (
-        await import("@/app/api/[locale]/agent/skills/[id]/publish/definition")
-      ).default.PATCH;
-    case "agent_chat_skills_id_report_POST":
-      return (
-        await import("@/app/api/[locale]/agent/skills/[id]/report/definition")
-      ).default.POST;
-    case "agent_chat_skills_id_vote_POST":
-      return (
-        await import("@/app/api/[locale]/agent/skills/[id]/vote/definition")
-      ).default.POST;
-    case "agent_chat_skills_moderation_GET":
-      return (
-        await import("@/app/api/[locale]/agent/skills/moderation/definition")
-      ).default.GET;
-    case "agent_chat_skills_moderation_PATCH":
-      return (
-        await import("@/app/api/[locale]/agent/skills/moderation/definition")
-      ).default.PATCH;
     case "agent_chat_threads_GET":
       return (await import("@/app/api/[locale]/agent/chat/threads/definition"))
         .default.GET;
@@ -400,6 +341,65 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/agent/search/web-search/definition")
       ).default.GET;
+    case "agent_skills_GET":
+      return (await import("@/app/api/[locale]/agent/skills/definition"))
+        .default.GET;
+    case "agent_skills_create_POST":
+      return (await import("@/app/api/[locale]/agent/skills/create/definition"))
+        .default.POST;
+    case "agent_skills_favorites_GET":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/definition")
+      ).default.GET;
+    case "agent_skills_favorites_create_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/create/definition")
+      ).default.POST;
+    case "agent_skills_favorites_id_DELETE":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+      ).default.DELETE;
+    case "agent_skills_favorites_id_GET":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+      ).default.GET;
+    case "agent_skills_favorites_id_PATCH":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+      ).default.PATCH;
+    case "agent_skills_favorites_reorder_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/favorites/reorder/definition")
+      ).default.POST;
+    case "agent_skills_id_DELETE":
+      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
+        .default.DELETE;
+    case "agent_skills_id_GET":
+      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
+        .default.GET;
+    case "agent_skills_id_PATCH":
+      return (await import("@/app/api/[locale]/agent/skills/[id]/definition"))
+        .default.PATCH;
+    case "agent_skills_id_publish_PATCH":
+      return (
+        await import("@/app/api/[locale]/agent/skills/[id]/publish/definition")
+      ).default.PATCH;
+    case "agent_skills_id_report_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/[id]/report/definition")
+      ).default.POST;
+    case "agent_skills_id_vote_POST":
+      return (
+        await import("@/app/api/[locale]/agent/skills/[id]/vote/definition")
+      ).default.POST;
+    case "agent_skills_moderation_GET":
+      return (
+        await import("@/app/api/[locale]/agent/skills/moderation/definition")
+      ).default.GET;
+    case "agent_skills_moderation_PATCH":
+      return (
+        await import("@/app/api/[locale]/agent/skills/moderation/definition")
+      ).default.PATCH;
     case "agent_speech-to-text_POST":
       return (
         await import("@/app/api/[locale]/agent/speech-to-text/definition")
@@ -429,6 +429,90 @@ export async function getEndpoint(
     case "ai-tools":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .GET;
+    case "analytics_evaluators_and_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/and/definition")
+      ).default.POST;
+    case "analytics_evaluators_crossover_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/crossover/definition")
+      ).default.POST;
+    case "analytics_evaluators_not_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/not/definition")
+      ).default.POST;
+    case "analytics_evaluators_or_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/or/definition")
+      ).default.POST;
+    case "analytics_evaluators_script_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/script/definition")
+      ).default.POST;
+    case "analytics_evaluators_threshold_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/evaluators/threshold/definition")
+      ).default.POST;
+    case "analytics_indicators_bollinger_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/bollinger/definition")
+      ).default.POST;
+    case "analytics_indicators_clamp_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/clamp/definition")
+      ).default.POST;
+    case "analytics_indicators_delta_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/delta/definition")
+      ).default.POST;
+    case "analytics_indicators_ema_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/ema/definition")
+      ).default.POST;
+    case "analytics_indicators_macd_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/macd/definition")
+      ).default.POST;
+    case "analytics_indicators_rsi_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/rsi/definition")
+      ).default.POST;
+    case "analytics_indicators_window-avg_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/window-avg/definition")
+      ).default.POST;
+    case "analytics_indicators_window-max_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/window-max/definition")
+      ).default.POST;
+    case "analytics_indicators_window-min_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/window-min/definition")
+      ).default.POST;
+    case "analytics_indicators_window-sum_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/indicators/window-sum/definition")
+      ).default.POST;
+    case "analytics_transformers_field-pick_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/transformers/field-pick/definition")
+      ).default.POST;
+    case "analytics_transformers_json-path_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/transformers/json-path/definition")
+      ).default.POST;
+    case "analytics_transformers_merge_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/transformers/merge/definition")
+      ).default.POST;
+    case "analytics_transformers_ratio_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/transformers/ratio/definition")
+      ).default.POST;
+    case "analytics_transformers_script_POST":
+      return (
+        await import("@/app/api/[locale]/analytics/transformers/script/definition")
+      ).default.POST;
     case "await-task":
       return (
         await import("@/app/api/[locale]/system/unified-interface/execute-tool/await-task/definition")
@@ -2074,23 +2158,23 @@ export async function getEndpoint(
     case "leads_import_POST":
       return (await import("@/app/api/[locale]/leads/import/definition"))
         .default.POST;
-    case "leads_import_jobs_:jobId_DELETE":
+    case "leads_import_jobs_jobId_DELETE":
       return (
         await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition")
       ).default.DELETE;
-    case "leads_import_jobs_:jobId_GET":
+    case "leads_import_jobs_jobId_GET":
       return (
         await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition")
       ).default.GET;
-    case "leads_import_jobs_:jobId_PATCH":
+    case "leads_import_jobs_jobId_PATCH":
       return (
         await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition")
       ).default.PATCH;
-    case "leads_import_jobs_:jobId_retry_POST":
+    case "leads_import_jobs_jobId_retry_POST":
       return (
         await import("@/app/api/[locale]/leads/import/jobs/[jobId]/retry/definition")
       ).default.POST;
-    case "leads_import_jobs_:jobId_stop_POST":
+    case "leads_import_jobs_jobId_stop_POST":
       return (
         await import("@/app/api/[locale]/leads/import/jobs/[jobId]/stop/definition")
       ).default.POST;
@@ -2244,10 +2328,6 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/messenger/data-sources/messenger-total/definition")
       ).default.POST;
-    case "messenger_imap-client_sync_POST":
-      return (
-        await import("@/app/api/[locale]/messenger/providers/email/imap-client/sync/definition")
-      ).default.POST;
     case "messenger_inbox_folders_GET":
       return (
         await import("@/app/api/[locale]/messenger/inbox/folders/definition")
@@ -2283,6 +2363,10 @@ export async function getEndpoint(
     case "messenger_preview_send-test_POST":
       return (
         await import("@/app/api/[locale]/messenger/preview/send-test/definition")
+      ).default.POST;
+    case "messenger_providers_email_imap-client_sync_POST":
+      return (
+        await import("@/app/api/[locale]/messenger/providers/email/imap-client/sync/definition")
       ).default.POST;
     case "messenger_send_POST":
       return (await import("@/app/api/[locale]/messenger/send/definition"))
@@ -2967,10 +3051,6 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/remote-connection/list/definition")
       ).default.GET;
-    case "remote-connection_remote-event-bridge_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/definition")
-      ).default.POST;
     case "remote-connection_self_instanceId_GET":
       return (
         await import("@/app/api/[locale]/remote-connection/self/instanceId/definition")
@@ -3344,7 +3424,7 @@ export async function getEndpoint(
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
       ).default.POST;
-    case "system_check_test_POST":
+    case "system_check_testing_test_POST":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/definition")
       ).default.POST;
@@ -3416,9 +3496,13 @@ export async function getEndpoint(
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env/definition")
       ).default.POST;
-    case "system_generators_generate-all_codegen_POST":
+    case "system_generators_generate-all_POST":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/definition")
+      ).default.POST;
+    case "system_generators_generate-trpc-router_POST":
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/definition")
       ).default.POST;
     case "system_generators_generate-trpc-router_validation_POST":
       return (
@@ -3463,14 +3547,6 @@ export async function getEndpoint(
     case "system_help_GET":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .GET;
-    case "system_interactive_capture_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/interactive/capture/definition")
-      ).default.POST;
-    case "system_interactive_send-keys_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/interactive/send-keys/definition")
-      ).default.POST;
     case "system_logger_error-monitor_cleanup_POST":
       return (
         await import("@/app/api/[locale]/system/logger/error-monitor/cleanup/definition")
@@ -3499,10 +3575,6 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/logger/error-monitor/logs/definition")
       ).default.PATCH;
-    case "system_react-native_generate_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/react-native/generate/definition")
-      ).default.POST;
     case "system_release-tool_POST":
       return (await import("@/app/api/[locale]/system/release-tool/definition"))
         .default.POST;
@@ -3552,29 +3624,29 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/settings/generate-key/definition")
       ).default.GET;
-    case "system_setup_status_POST":
+    case "system_unified-interface_cli_interactive_capture_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
+        await import("@/app/api/[locale]/system/unified-interface/cli/interactive/capture/definition")
       ).default.POST;
-    case "system_setup_uninstall_POST":
+    case "system_unified-interface_cli_interactive_send-keys_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")
-      ).default.POST;
-    case "system_setup_update_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
-      ).default.POST;
-    case "system_side-tasks_generators_generate-trpc-router_POST":
-      return (
-        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/definition")
-      ).default.POST;
-    case "system_tanstack-start_generate_POST":
-      return (
-        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
+        await import("@/app/api/[locale]/system/unified-interface/cli/interactive/send-keys/definition")
       ).default.POST;
     case "system_unified-interface_cli_setup_install_POST":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
+      ).default.POST;
+    case "system_unified-interface_cli_setup_status_POST":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
+      ).default.POST;
+    case "system_unified-interface_cli_setup_uninstall_POST":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")
+      ).default.POST;
+    case "system_unified-interface_cli_setup_update_POST":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
     case "system_unified-interface_execute-tool_POST":
       return (
@@ -3595,6 +3667,14 @@ export async function getEndpoint(
     case "system_unified-interface_mcp_serve_POST":
       return (
         await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
+    case "system_unified-interface_react-native_generate_POST":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/react-native/generate/definition")
+      ).default.POST;
+    case "system_unified-interface_tanstack-start_generate_POST":
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
       ).default.POST;
     case "system_unified-interface_tasks_complete-task_POST":
       return (
@@ -3676,30 +3756,6 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/unified-interface/vibe-sense/cleanup/definition")
       ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_and_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/and/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_crossover_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/crossover/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_not_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/not/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_or_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/or/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_script_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/script/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_evaluators_threshold_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/evaluators/threshold/definition")
-      ).default.POST;
     case "system_unified-interface_vibe-sense_graphs_GET":
       return (
         await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition")
@@ -3736,69 +3792,13 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/versions/definition")
       ).default.GET;
-    case "system_unified-interface_vibe-sense_indicators_bollinger_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/bollinger/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_clamp_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/clamp/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_delta_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/delta/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_ema_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/ema/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_macd_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/macd/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_rsi_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/rsi/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_window-avg_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/window-avg/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_window-max_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/window-max/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_window-min_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/window-min/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_indicators_window-sum_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/indicators/window-sum/definition")
-      ).default.POST;
     case "system_unified-interface_vibe-sense_run-config_POST":
       return (
         await import("@/app/api/[locale]/system/unified-interface/vibe-sense/run-config/definition")
       ).default.POST;
-    case "system_unified-interface_vibe-sense_transformers_field-pick_POST":
+    case "system_unified-interface_websocket_remote-event-bridge_POST":
       return (
-        await import("@/app/api/[locale]/analytics/transformers/field-pick/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_transformers_json-path_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/transformers/json-path/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_transformers_merge_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/transformers/merge/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_transformers_ratio_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/transformers/ratio/definition")
-      ).default.POST;
-    case "system_unified-interface_vibe-sense_transformers_script_POST":
-      return (
-        await import("@/app/api/[locale]/analytics/transformers/script/definition")
+        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/definition")
       ).default.POST;
     case "t":
       return (
@@ -4032,7 +4032,7 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/user/private/sessions/[id]/definition")
       ).default.DELETE;
-    case "user_public_creator_:userId_GET":
+    case "user_public_creator_userId_GET":
       return (
         await import("@/app/api/[locale]/user/public/creator/[userId]/definition")
       ).default.GET;

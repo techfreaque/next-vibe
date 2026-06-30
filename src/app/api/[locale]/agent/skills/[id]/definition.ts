@@ -34,7 +34,11 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { dateSchema, iconSchema } from "../../../shared/types/common.schema";
+import {
+  dateSchema,
+  iconSchema,
+  translatedValueSchema,
+} from "../../../shared/types/common.schema";
 import { getBestChatModel } from "../../ai-stream/models";
 import {
   SKILL_DELETE_ALIAS,
@@ -49,6 +53,8 @@ import {
   ModelSelectionType,
   SkillCategory,
   SkillOwnershipType,
+  SkillVoteDirection,
+  SkillVoteDirectionDB,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -66,7 +72,7 @@ const SkillViewContainer = lazyWidget(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "chat", "skills", "[id]"],
+  path: ["agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
@@ -276,6 +282,9 @@ const { DELETE } = createEndpoint({
   // is a side-effect event; the skill id rides on `urlPathParams.id`. The client
   // onEvent removes the skill from the list cache; remoteEvent relays the delete
   // cross-instance, where the route's onRemoteEvent removes it by id.
+  // Owner sees deletes on their own user channel; a PUBLIC skill's delete rides
+  // the shared resource channel. Decided per-skill by the route's resolveChannel.
+  channel: { scope: "resolved" } as const,
   events: {
     "skill-deleted": {
       remoteEvent: true as const,
@@ -344,7 +353,7 @@ const { DELETE } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "skills", "[id]"],
+  path: ["agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
@@ -534,7 +543,7 @@ const { PATCH } = createEndpoint({
       // === RESPONSE ===
       success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       name: requestField(scopedTranslation, {
@@ -763,6 +772,10 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description" as const,
   },
 
+  // Owner sees updates on their own user channel; a PUBLIC skill's updates ride
+  // the shared resource channel. Decided per-skill by the route's resolveChannel.
+  channel: { scope: "resolved" } as const,
+
   // === WS EVENTS ===
   // Emitted by SkillsRepository after skill mutations - keeps skill detail view in sync.
   // Uses fields + merge so the framework applies the payload directly into the cache.
@@ -786,19 +799,24 @@ const { PATCH } = createEndpoint({
         "category",
       ] as const,
       urlPathParamsFields: ["id"] as const,
-      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
+      onEvent: async ({
+        requestData,
+        urlPathParams,
+        logger,
+        locale,
+        user,
+        agentEnvAvailability,
+      }) => {
         const skillId = urlPathParams.id;
 
         const category = requestData.category;
         const [
           { apiClient },
           { SkillsRepositoryClient },
-          { getEnvAvailability },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("../repository-client"),
-          import("../../env-availability"),
           import("../i18n"),
         ]);
         const { t } = skillsScopedTranslation.scopedT(locale);
@@ -820,7 +838,7 @@ const { PATCH } = createEndpoint({
           },
           t,
           user,
-          getEnvAvailability(),
+          agentEnvAvailability,
         );
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
@@ -883,7 +901,7 @@ const { PATCH } = createEndpoint({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "skills", "[id]"],
+  path: ["agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
@@ -972,6 +990,19 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(SkillOwnershipType),
+      }),
+
+      // Community vote metrics (null for non-community skills). voteCount is the
+      // net score (up - down); userVote is the caller's own vote, if any.
+      voteCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+      userVote: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(SkillVoteDirectionDB).nullable(),
       }),
 
       // Auto-compacting token threshold (null = use global/settings default)
@@ -1140,6 +1171,8 @@ const { GET } = createEndpoint({
             isDefault: true,
           },
         ],
+        voteCount: null,
+        userVote: null,
       },
       getCustom: {
         icon: "👨‍💻",
@@ -1158,6 +1191,8 @@ const { GET } = createEndpoint({
         longContent: null,
         favoritesCount: 42,
         creatorProfile: null,
+        voteCount: 12,
+        userVote: SkillVoteDirection.UP,
         variants: [
           {
             id: "default",

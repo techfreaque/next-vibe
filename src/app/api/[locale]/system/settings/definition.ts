@@ -7,6 +7,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import {
   ENV_KEYS,
   type EnvFieldType,
@@ -310,7 +311,7 @@ export const { PATCH } = createEndpoint({
       resultMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "patch.response.resultMessage.title" as const,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

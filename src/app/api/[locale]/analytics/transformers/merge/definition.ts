@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [TRANSFORMER_MERGE_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "transformers", "merge"],
+  path: ["analytics", "transformers", "merge"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

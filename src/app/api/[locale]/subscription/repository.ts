@@ -471,12 +471,8 @@ export class SubscriptionRepository {
         plan: SubscriptionRepository.normalizePlanId(),
         billingInterval: subscription.billingInterval,
         status: subscription.status,
-        currentPeriodStart:
-          subscription.currentPeriodStart?.toISOString() ||
-          new Date().toISOString(),
-        currentPeriodEnd:
-          subscription.currentPeriodEnd?.toISOString() ||
-          new Date().toISOString(),
+        currentPeriodStart: subscription.currentPeriodStart || new Date(),
+        currentPeriodEnd: subscription.currentPeriodEnd || new Date(),
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         cancelAt: subscription.cancelAt?.toISOString(),
         canceledAt: subscription.canceledAt?.toISOString(),
@@ -484,8 +480,8 @@ export class SubscriptionRepository {
         provider: subscription.provider,
         providerSubscriptionId:
           subscription.providerSubscriptionId || undefined,
-        createdAt: subscription.createdAt.toISOString(),
-        updatedAt: subscription.updatedAt.toISOString(),
+        createdAt: subscription.createdAt,
+        updatedAt: subscription.updatedAt,
       });
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
@@ -657,14 +653,11 @@ export class SubscriptionRepository {
         billingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
         currentPeriodStart:
-          updatedSubscription.currentPeriodStart?.toISOString() ||
-          new Date().toISOString(),
-        currentPeriodEnd:
-          updatedSubscription.currentPeriodEnd?.toISOString() ||
-          new Date().toISOString(),
+          updatedSubscription.currentPeriodStart || new Date(),
+        currentPeriodEnd: updatedSubscription.currentPeriodEnd || new Date(),
         cancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
-        createdAt: updatedSubscription.createdAt.toISOString(),
-        updatedAt: updatedSubscription.updatedAt.toISOString(),
+        createdAt: updatedSubscription.createdAt,
+        updatedAt: updatedSubscription.updatedAt,
         message: t("put.success.title"),
       });
     } catch (error) {

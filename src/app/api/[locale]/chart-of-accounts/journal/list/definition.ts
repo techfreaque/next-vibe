@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -145,7 +146,7 @@ const { GET } = createEndpoint({
             date: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "journalList.response.date" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -167,7 +168,7 @@ const { GET } = createEndpoint({
             postedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "journalList.response.postedAt" as const,
-              schema: z.string().nullable(),
+              schema: dateSchema.nullable(),
             }),
           },
         }),

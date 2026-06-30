@@ -69,7 +69,7 @@ export class ConnectionDetailRepository {
         isDefault: row.isDefault,
         fingerprint: row.fingerprint ?? null,
         notes: row.notes ?? null,
-        createdAt: row.createdAt.toISOString(),
+        createdAt: row.createdAt,
       });
     } catch (error) {
       logger.error("Failed to get SSH connection", parseError(error));
@@ -183,7 +183,7 @@ export class ConnectionDetailRepository {
         await import("@/app/api/[locale]/ssh/connections/mounts-bootstrap");
       await ensureDefaultMount(id, user.id!);
 
-      return success({ updatedAt: updated.updatedAt.toISOString() });
+      return success({ updatedAt: updated.updatedAt });
     } catch (error) {
       logger.error("Failed to update SSH connection", parseError(error));
       return fail({

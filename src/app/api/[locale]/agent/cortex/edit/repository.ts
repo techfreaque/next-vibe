@@ -74,7 +74,7 @@ export class CortexEditRepository {
       responsePath: string;
       size: number;
       replacements: number;
-      updatedAt: string;
+      updatedAt: Date;
     }>
   > {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
@@ -216,7 +216,7 @@ export class CortexEditRepository {
       responsePath: path,
       size,
       replacements,
-      updatedAt: now.toISOString(),
+      updatedAt: now,
     });
   }
 
@@ -252,7 +252,7 @@ export class CortexEditRepository {
       responsePath: string;
       size: number;
       replacements: number;
-      updatedAt: string;
+      updatedAt: Date;
     }>
   > {
     const mountPrefix = getMountPrefix(path, locale);
@@ -345,7 +345,7 @@ export class CortexEditRepository {
       responsePath: path,
       size,
       replacements,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     });
   }
 

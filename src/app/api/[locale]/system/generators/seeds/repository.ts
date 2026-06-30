@@ -21,6 +21,7 @@ import {
   formatGenerator,
 } from "@/app/api/[locale]/system/logger/formatters";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -42,7 +43,7 @@ interface SeedsRequestType {
 
 interface SeedsResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   seedsFound: number;
   duration: number;
   outputPath: string;

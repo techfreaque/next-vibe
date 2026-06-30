@@ -57,8 +57,8 @@ export class SessionManagementRepository {
         sessions: rows.map((row) => ({
           id: row.id,
           name: row.name,
-          createdAt: row.createdAt.toISOString(),
-          expiresAt: row.expiresAt.toISOString(),
+          createdAt: row.createdAt,
+          expiresAt: row.expiresAt,
           isCurrentSession: !!currentToken && row.token === currentToken,
         })),
       });

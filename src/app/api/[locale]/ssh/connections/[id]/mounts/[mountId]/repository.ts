@@ -52,7 +52,7 @@ export class MountDetailRepository {
         name: row[0].name,
         path: row[0].path,
         isDefault: row[0].isDefault,
-        createdAt: row[0].createdAt.toISOString(),
+        createdAt: row[0].createdAt,
       });
     } catch (error) {
       logger.error("Failed to get SSH mount", parseError(error));
@@ -123,7 +123,7 @@ export class MountDetailRepository {
         });
       }
 
-      return success({ updatedAt: updated.updatedAt.toISOString() });
+      return success({ updatedAt: updated.updatedAt });
     } catch (error) {
       logger.error("Failed to update SSH mount", parseError(error));
       return fail({

@@ -62,7 +62,7 @@ export class CortexListRepository {
     try {
       // Root listing: show all mount points + native writable prefixes
       if (path === "/") {
-        const now = new Date().toISOString();
+        const now = new Date();
         const { getLocaleRoots } = await import("../seeds/templates");
         const roots = getLocaleRoots(locale);
         const entries = [
@@ -113,7 +113,7 @@ export class CortexListRepository {
             entryPath: e.path,
             nodeType: e.nodeType,
             size: e.size,
-            updatedAt: e.updatedAt,
+            updatedAt: new Date(e.updatedAt),
           }),
         );
         return success({ responsePath: path, entries, total: entries.length });
@@ -127,7 +127,7 @@ export class CortexListRepository {
           entryPath: node.path,
           nodeType: node.nodeType === CortexNodeType.DIR ? "dir" : "file",
           size: node.size,
-          updatedAt: node.updatedAt.toISOString(),
+          updatedAt: node.updatedAt,
         }),
       );
 
@@ -139,7 +139,7 @@ export class CortexListRepository {
         getDefaultDocumentDirs,
       } = await import("../seeds/templates");
       const existingPaths = new Set(entries.map((e) => e.entryPath));
-      const now = new Date().toISOString();
+      const now = new Date();
       const normalizedDir = path.endsWith("/") ? path.slice(0, -1) : path;
 
       if (path.startsWith(MEMORIES_PREFIX)) {

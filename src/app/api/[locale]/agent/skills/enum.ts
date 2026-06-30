@@ -368,6 +368,25 @@ export const SkillTrustLevelDB = [
 ] as const;
 
 /**
+ * Skill Vote Direction Enum
+ * A user's vote on a community skill: UP (helpful) or DOWN (not helpful).
+ * Net score = count(UP) - count(DOWN). Absence of a row = no vote.
+ */
+export const {
+  enum: SkillVoteDirection,
+  options: SkillVoteDirectionOptions,
+  Value: SkillVoteDirectionValue,
+} = createEnumOptions(scopedTranslation, {
+  UP: "enums.voteDirection.up",
+  DOWN: "enums.voteDirection.down",
+});
+
+export const SkillVoteDirectionDB = [
+  SkillVoteDirection.UP,
+  SkillVoteDirection.DOWN,
+] as const;
+
+/**
  * Category configuration with icons and task mapping
  */
 export interface CategoryConfig {

@@ -8,7 +8,8 @@
 /* eslint-disable prettier/prettier */
 
 import {
-  lazyCanSubscribe,
+  lazyResolveChannel,
+  userChannelResolver,
   type WsChannelEntry,
 } from "../unified-interface/websocket/ws-channel-registry";
 
@@ -17,7 +18,7 @@ import {
  *
  * Definition modules are imported eagerly (lightweight, side-effect-free) to
  * read the endpoint object (path + allowedRoles). Route modules are imported
- * lazily via lazyCanSubscribe — only when a channel match needs resource-level
+ * lazily via lazyResolveChannel — only when a channel match needs resource-level
  * authorization — to avoid circular init errors in the production bundle.
  */
 export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
@@ -66,136 +67,99 @@ export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
   return [
     {
       endpoint: agent_ai_stream_run_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/ai-stream/run/route"),
-        "POST",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_chat_folder_contents_rootFolderId_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
+      resolveChannel: lazyResolveChannel(
+        () =>
+          import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
         "GET",
       ),
     },
     {
       endpoint: agent_chat_threads_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/route"),
-        "GET",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_chat_threads_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/route"),
-        "POST",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_chat_threads_threadId_DELETEDef.default.DELETE,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
-        "DELETE",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_chat_threads_threadId_messages_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
+      resolveChannel: lazyResolveChannel(
+        () =>
+          import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
         "GET",
       ),
     },
     {
       endpoint: agent_chat_threads_threadId_PATCHDef.default.PATCH,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
-        "PATCH",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_create_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/skills/create/route"),
-        "POST",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_favorites_create_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/skills/favorites/create/route"),
-        "POST",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_favorites_id_DELETEDef.default.DELETE,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
-        "DELETE",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_favorites_id_PATCHDef.default.PATCH,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
-        "PATCH",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_favorites_reorder_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/skills/favorites/reorder/route"),
-        "POST",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: agent_skills_id_DELETEDef.default.DELETE,
-      canSubscribe: lazyCanSubscribe(
+      resolveChannel: lazyResolveChannel(
         () => import("@/app/api/[locale]/agent/skills/[id]/route"),
         "DELETE",
       ),
     },
     {
       endpoint: agent_skills_id_PATCHDef.default.PATCH,
-      canSubscribe: lazyCanSubscribe(
+      resolveChannel: lazyResolveChannel(
         () => import("@/app/api/[locale]/agent/skills/[id]/route"),
         "PATCH",
       ),
     },
     {
       endpoint: agent_skills_id_publish_PATCHDef.default.PATCH,
-      canSubscribe: lazyCanSubscribe(
+      resolveChannel: lazyResolveChannel(
         () => import("@/app/api/[locale]/agent/skills/[id]/publish/route"),
         "PATCH",
       ),
     },
     {
       endpoint: agent_skills_id_vote_POSTDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
+      resolveChannel: lazyResolveChannel(
         () => import("@/app/api/[locale]/agent/skills/[id]/vote/route"),
         "POST",
       ),
     },
     {
       endpoint: credits_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/credits/route"),
-        "GET",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: system_unified_interface_tasks_cron_queue_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/system/unified-interface/tasks/cron/queue/route"),
-        "GET",
-      ),
+      resolveChannel: userChannelResolver,
     },
     {
       endpoint: system_unified_interface_tasks_cron_tasks_GETDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/route"),
-        "GET",
-      ),
+      resolveChannel: userChannelResolver,
     },
   ];
 }

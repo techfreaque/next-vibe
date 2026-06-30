@@ -38,7 +38,7 @@ export class CoaLedgerRepository {
         id: string;
         entryId: string;
         entryNumber: string;
-        date: string;
+        date: Date;
         description: string | null;
         type: string;
         amount: number;
@@ -137,7 +137,7 @@ export class CoaLedgerRepository {
           id: row.id,
           entryId: row.entryId,
           entryNumber: row.entryNumber,
-          date: row.date.toISOString(),
+          date: row.date,
           description: row.lineDescription ?? null,
           type: row.type,
           amount: row.amount,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----5ccae0a2-697b-488f-a5b7-366ce9581589.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The contact-form tool requires confirmation (requiresConfirmation: true). According to the system prompt, I shou…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----ceba8ab0-1049-45cf-a952-26df5158337d.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user wants me to call the contact-form tool directly with specific arguments: name='Test User' subject='subj…",
     "encoding_format": "float"
   }
 }

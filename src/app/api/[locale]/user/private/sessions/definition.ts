@@ -6,6 +6,10 @@
 
 import { z } from "zod";
 
+import {
+  dateSchema,
+  translatedValueSchema,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -100,8 +104,8 @@ const { GET } = createEndpoint({
           z.object({
             id: z.string().uuid(),
             name: z.string().nullable(),
-            createdAt: z.string(),
-            expiresAt: z.string(),
+            createdAt: dateSchema,
+            expiresAt: dateSchema,
             isCurrentSession: z.boolean(),
           }),
         ),
@@ -166,7 +170,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         label: "create.response.message",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

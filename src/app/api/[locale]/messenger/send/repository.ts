@@ -91,7 +91,7 @@ export class MessengerSendRepository {
           accountName: sendResult.data.accountName,
           channel: String(provider.channel),
           provider: provider.name,
-          sentAt: new Date().toISOString(),
+          sentAt: new Date(),
         },
       });
     } catch (error) {

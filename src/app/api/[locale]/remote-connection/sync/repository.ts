@@ -347,7 +347,7 @@ export class TaskSyncRepository {
       }
     }
 
-    const serverTime = new Date().toISOString();
+    const serverTime = new Date();
 
     return success({
       syncPayloads: filteredPayloads,

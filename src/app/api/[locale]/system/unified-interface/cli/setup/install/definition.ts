@@ -7,6 +7,7 @@
 import React from "react";
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -144,7 +145,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.title",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       output: responseField(scopedTranslation, {

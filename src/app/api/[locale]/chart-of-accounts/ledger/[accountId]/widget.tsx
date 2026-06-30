@@ -142,7 +142,7 @@ export function CoaLedgerWidget(_props: {
                     className="grid grid-cols-[5rem_1fr_4.5rem_8rem_8rem] gap-2 px-3 py-2 border-b last:border-b-0 text-sm hover:bg-muted/20"
                   >
                     <Span className="text-xs text-muted-foreground font-mono">
-                      {line.date}
+                      {line.date.toISOString().slice(0, 10)}
                     </Span>
                     <Span
                       className="truncate text-xs text-primary underline cursor-pointer hover:text-primary/70"

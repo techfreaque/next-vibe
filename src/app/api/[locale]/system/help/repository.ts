@@ -34,6 +34,7 @@ import {
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../logger/types";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
 import {
@@ -329,17 +330,63 @@ export class HelpRepository {
     }
   }
 
+  private static normLabel(s: string): string {
+    return s.toLowerCase().replace(/[\s_-]+/g, "");
+  }
+
+  /** Case/space-insensitive equality — used to drop name fields that just echo. */
+  private static sameLabel(a: string, b: string): boolean {
+    return HelpRepository.normLabel(a) === HelpRepository.normLabel(b);
+  }
+
+  /**
+   * Compact name fields. AI/MCP need ONE call name plus a human label —
+   * not name + title + titleShort + alias all saying the same thing.
+   *   - title: dropped when it just echoes the call name
+   *   - titleShort: dropped entirely — `title` already labels the tool; the
+   *     short variant is pure UI decoration an agent never needs
+   *   - aliases: first alias only, dropped when it echoes name/title
+   * Web/CLI keep every field (humans skim labels; full alias list aids discovery).
+   */
+  private static nameFields(
+    tool: EndpointMeta,
+    compact: boolean,
+  ): Pick<
+    HelpToolMetadataSerialized,
+    "name" | "title" | "titleShort" | "aliases"
+  > {
+    const name = tool.toolName;
+    if (!compact) {
+      return {
+        name,
+        title: tool.title,
+        titleShort: tool.titleShort,
+        aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
+      };
+    }
+    const includeTitle = !HelpRepository.sameLabel(tool.title, name);
+    const firstAlias = tool.aliases[0];
+    const includeAlias =
+      firstAlias !== undefined &&
+      !HelpRepository.sameLabel(firstAlias, name) &&
+      !HelpRepository.sameLabel(firstAlias, tool.title);
+    return {
+      name,
+      ...(includeTitle && { title: tool.title }),
+      ...(includeAlias && { aliases: [firstAlias] }),
+    };
+  }
+
   private static serializeMeta(
     tool: EndpointMeta,
     parameters?: HelpToolParameters,
     includeExamples = false,
     platforms?: Platform[],
     compact = false,
+    omitCategory = false,
   ): HelpToolMetadataSerialized {
     return {
-      name: tool.toolName,
-      title: tool.title,
-      titleShort: tool.titleShort,
+      ...HelpRepository.nameFields(tool, compact),
       // id is redundant with name - omit for compact platforms (AI/MCP) to save tokens
       ...(!compact && { id: tool.toolName }),
       // tags are low-signal for AI tool selection - omit for compact platforms
@@ -347,18 +394,26 @@ export class HelpRepository {
       // method is irrelevant for AI (calls via execute-tool) - omit for compact platforms
       ...(!compact && { method: tool.method }),
       description: tool.description,
-      category: tool.category,
-      ...(tool.subCategory && { subCategory: tool.subCategory }),
-      ...(tool.icon && { icon: tool.icon }),
-      // compact: only include first alias to avoid token bloat
-      aliases:
-        tool.aliases.length > 0
-          ? compact
-            ? tool.aliases.slice(0, 1)
-            : tool.aliases
-          : undefined,
-      requiresConfirmation: tool.requiresConfirmation,
-      credits: tool.credits,
+      // category: omit on compact when every returned tool shares it (the caller
+      // filtered by category, so repeating it per-tool is constant noise).
+      ...(omitCategory ? {} : { category: tool.category }),
+      // subCategory/icon are display-only — an AI/MCP caller can't render an icon
+      // and groups by category already. Web/CLI keep them for the UI.
+      ...(!compact && tool.subCategory && { subCategory: tool.subCategory }),
+      ...(!compact && tool.icon && { icon: tool.icon }),
+      // requiresConfirmation/credits: only emit when they actually carry signal
+      // (true / >0). On web/CLI the widget reads them regardless, so keep the
+      // explicit value there.
+      ...(compact
+        ? tool.requiresConfirmation
+          ? { requiresConfirmation: true }
+          : {}
+        : { requiresConfirmation: tool.requiresConfirmation }),
+      ...(compact
+        ? tool.credits && tool.credits > 0
+          ? { credits: tool.credits }
+          : {}
+        : { credits: tool.credits }),
       platforms,
       parameters,
       examples: includeExamples ? tool.examples : undefined,
@@ -369,27 +424,25 @@ export class HelpRepository {
     tool: EndpointMeta,
     platforms?: Platform[],
     compact = false,
+    omitCategory = false,
   ): HelpToolMetadataSerialized {
     return {
-      name: tool.toolName,
-      title: tool.title,
-      titleShort: tool.titleShort,
+      ...HelpRepository.nameFields(tool, compact),
       // id is redundant with name - omit for compact platforms
       ...(!compact && { id: tool.toolName }),
       // tags are low-signal for AI tool selection - omit for compact platforms
       ...(!compact && { tags: tool.tags }),
       description: tool.description,
-      category: tool.category,
-      ...(tool.subCategory && { subCategory: tool.subCategory }),
-      ...(tool.icon && { icon: tool.icon }),
-      // compact: only include first alias
-      aliases:
-        tool.aliases.length > 0
-          ? compact
-            ? tool.aliases.slice(0, 1)
-            : tool.aliases
-          : undefined,
-      credits: tool.credits,
+      // category: omit on compact when every returned tool shares it.
+      ...(omitCategory ? {} : { category: tool.category }),
+      // subCategory/icon are display-only — omit for compact (AI/MCP) consumers.
+      ...(!compact && tool.subCategory && { subCategory: tool.subCategory }),
+      ...(!compact && tool.icon && { icon: tool.icon }),
+      ...(compact
+        ? tool.credits && tool.credits > 0
+          ? { credits: tool.credits }
+          : {}
+        : { credits: tool.credits }),
       platforms,
     };
   }
@@ -635,9 +688,9 @@ export class HelpRepository {
       ? allTools.filter((tool) => {
           if (
             tool.name.toLowerCase().includes(lowerQuery) ||
-            tool.title.toLowerCase().includes(lowerQuery) ||
+            tool.title?.toLowerCase().includes(lowerQuery) ||
             tool.description.toLowerCase().includes(lowerQuery) ||
-            tool.category.toLowerCase().includes(lowerQuery) ||
+            tool.category?.toLowerCase().includes(lowerQuery) ||
             tool.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
             tool.aliases?.some((a) => a.toLowerCase().includes(lowerQuery))
           ) {
@@ -754,6 +807,7 @@ export class HelpRepository {
           user,
           locale,
           platform,
+          logger,
         );
       }
     }
@@ -763,9 +817,14 @@ export class HelpRepository {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
-    // Admin users always get full web-mode stats regardless of platform filter.
-    // Compact mode is for AI/MCP/CLI consumers, not admin UI.
-    const isCompact = !isAdmin && HelpRepository.isCompactPlatform(platform);
+    // Three distinct output paths, one definition. Each shows/requires only what
+    // its surface needs:
+    //   - compact (AI + MCP + CRON): token-lean, gradual detail as results shrink
+    //   - cli: full per-tool detail, no web stats/pin machinery
+    //   - web (everything else): rich stats, pin tabs, category-first browsing
+    // Compact wins even for admin: an admin inspecting `--platform=ai` must see
+    // exactly what the AI consumer receives, not the web stats view.
+    const isCompact = HelpRepository.isCompactPlatform(platform);
     const effectivePageSize =
       data.pageSize ??
       (isCompact
@@ -792,19 +851,16 @@ export class HelpRepository {
     const allMeta = metaModule.endpointsMeta as EndpointMeta[];
 
     // Discovery platform - what platform context are we listing tools for?
-    // Admin web UI: use CLI (broadest platform) so all tools are accessible for inspection.
-    // Non-admin users always see the AI tool set regardless of calling platform.
-    // Compact platforms (AI/MCP/CRON) keep their own platform semantics.
-    let discoveryPlatform: Platform;
-
-    if (isAdmin) {
-      // Admins on the web UI see the full tool set by default (CLI = broadest platform).
-      // The web platform would silently exclude WEB_OFF tools, making "All" misleadingly small.
-      discoveryPlatform = Platform.CLI;
-    } else {
-      // Non-admins always see their actual calling platform.
-      discoveryPlatform = platform;
-    }
+    // Compact (AI/MCP/CRON): always the actual platform so counts/filtering match
+    //   exactly what that surface exposes — including for admins inspecting it.
+    // Admin web UI: CLI (broadest platform) so all tools are visible for inspection;
+    //   the web platform would silently drop WEB_OFF tools, making "All" misleadingly small.
+    // Non-admins on web/CLI: their actual calling platform.
+    const discoveryPlatform: Platform = isCompact
+      ? platform
+      : isAdmin
+        ? Platform.CLI
+        : platform;
 
     // View-as-role: admin can impersonate a lower role to see what that role sees
     const viewAsRole = isAdmin ? data.viewAsRole : undefined;
@@ -824,9 +880,11 @@ export class HelpRepository {
       isPublicView,
     );
 
-    // Admin platform badges - derived directly from allowedRoles in meta
+    // Admin platform badges - derived directly from allowedRoles in meta.
+    // Web/CLI admin only: compact (AI/MCP) consumers don't get the 10-entry
+    // platforms array per tool — pure token bloat for an AI tool list.
     const getToolPlatforms = (tool: EndpointMeta): Platform[] | undefined => {
-      if (!isAdmin) {
+      if (!isAdmin || isCompact) {
         return undefined;
       }
       return HelpRepository.getMetaPlatforms(tool.allowedRoles);
@@ -849,10 +907,8 @@ export class HelpRepository {
     // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
     // to avoid loading all tools unnecessarily in the web UI.
     // Compact platforms (AI/MCP/CRON) and CLI default to "all" - no pinned filtering needed.
-    // Use isCompactPlatform() directly (not isCompact) so admin users on AI/MCP/CRON
-    // still get the "all" default — isCompact strips admin from compact detection.
     const isWebPlatform =
-      !HelpRepository.isCompactPlatform(platform) &&
+      !isCompact &&
       platform !== Platform.CLI &&
       platform !== Platform.CLI_PACKAGE;
     const statsFilter =
@@ -1069,12 +1125,15 @@ export class HelpRepository {
       }
     }
 
-    const adminMeta = isAdmin
-      ? {
-          currentPlatform: platform,
-          currentEnv,
-        }
-      : {};
+    // Admin web/CLI debug fields. Excluded from compact (AI/MCP) output — a tool
+    // list returned to an agent shouldn't carry server env/platform debug noise.
+    const adminMeta =
+      isAdmin && !isCompact
+        ? {
+            currentPlatform: platform,
+            currentEnv,
+          }
+        : {};
 
     // Web-only: server-computed counts for the pinned/allowed/all filter tabs.
     // allAiToolIds: flat list of all AI-platform tool names — used by the widget when
@@ -1152,9 +1211,12 @@ export class HelpRepository {
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
 
-    // Auto-upgrade to detail mode on exact name/alias match
+    // Auto-upgrade to detail mode on exact name/alias match.
+    // Uses allAccessibleMeta (pre-statsFilter) so exact lookups work even for
+    // tools excluded from the current stats view (e.g. AI_TOOL_OFF tools when
+    // statsFilter="all" replaces platformFilteredMeta with aiMeta).
     if (query && !category) {
-      const exactMatch = platformFilteredMeta.find(
+      const exactMatch = allAccessibleMeta.find(
         (m) =>
           m.toolName.toLowerCase() === query ||
           m.aliases.some((a) => a.toLowerCase() === query),
@@ -1239,6 +1301,11 @@ export class HelpRepository {
     // Categories always reflect the active filtered set (statsFilter + query + category).
     // Computed from `filtered` so counts stay aligned regardless of which view is active.
     const categories = HelpRepository.buildCategories(filtered);
+
+    // When every matched tool shares one category, that category is constant —
+    // for compact (AI/MCP) drop it from each tool AND from the (single-entry)
+    // categories array. The hint still names the filter context.
+    const singleCategory = isCompact && categories.length === 1;
 
     if (!hasFilters && !HelpRepository.isCompactPlatform(platform) && !isCli) {
       return success({
@@ -1329,21 +1396,28 @@ export class HelpRepository {
             })
           : "";
       return success({
-        tools: pageSlice.map(
-          (m) =>
-            HelpRepository.serializeMetaMinimal(m, getToolPlatforms(m), true), // compact=true
+        tools: pageSlice.map((m) =>
+          HelpRepository.serializeMetaMinimal(
+            m,
+            getToolPlatforms(m),
+            true, // compact=true
+            singleCategory,
+          ),
         ),
         totalCount,
         matchedCount,
-        categories,
+        // Drop the categories array when it would just echo the single category
+        // the caller already filtered by.
+        ...(singleCategory ? {} : { categories }),
         hint: t("get.hints.compactList", {
           matched: matchedCount,
           detailThreshold: HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD,
           pagination: paginationHint,
         }),
-        currentPage: safePage,
-        effectivePageSize,
-        totalPages,
+        // Pagination metadata only when it carries signal (more than one page).
+        ...(totalPages > 1
+          ? { currentPage: safePage, effectivePageSize, totalPages }
+          : {}),
         ...adminMeta,
       });
     }

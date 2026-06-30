@@ -27,7 +27,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
+import type {
+  InferFormSchema,
+  InferSchemaFromField,
+  UnifiedField,
+} from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type { Platform } from "../types/platform";

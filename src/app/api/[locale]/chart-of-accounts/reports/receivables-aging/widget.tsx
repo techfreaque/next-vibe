@@ -31,6 +31,10 @@ function formatAmount(n: number): string {
   }).format(n);
 }
 
+function formatDate(d: Date): string {
+  return d.toLocaleDateString();
+}
+
 interface BucketConfig {
   label: string;
   items: AgingItem[];
@@ -71,7 +75,7 @@ function BucketSection({
               {item.customerId}
             </Span>
             <Span className="text-muted-foreground shrink-0">
-              {item.dueDate}
+              {formatDate(item.dueDate)}
             </Span>
             <Span className="font-mono font-medium shrink-0 w-20 text-right">
               {formatAmount(item.amount)}
@@ -215,7 +219,8 @@ export function ReceivablesAgingWidget(
         <Div className="flex flex-col gap-3">
           {data.asOfDateResponse && (
             <Span className="text-sm text-muted-foreground">
-              {t("receivablesAging.widget.asOf")} {data.asOfDateResponse}
+              {t("receivablesAging.widget.asOf")}{" "}
+              {formatDate(data.asOfDateResponse)}
             </Span>
           )}
 

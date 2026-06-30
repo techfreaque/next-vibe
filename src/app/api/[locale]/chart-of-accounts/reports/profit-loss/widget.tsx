@@ -27,6 +27,10 @@ function formatAmount(n: number): string {
   }).format(n);
 }
 
+function formatDate(d: Date): string {
+  return d.toLocaleDateString();
+}
+
 function SectionRow({
   item,
   onDrill,
@@ -153,8 +157,8 @@ export function ProfitLossWidget(_props: ProfitLossWidgetProps): JSX.Element {
         <Div className="flex flex-col gap-4">
           {data.fromResponse && data.toResponse && (
             <Span className="text-sm text-muted-foreground">
-              {t("profitLoss.widget.dateRange")}: {data.fromResponse} —{" "}
-              {data.toResponse}
+              {t("profitLoss.widget.dateRange")}:{" "}
+              {formatDate(data.fromResponse)} — {formatDate(data.toResponse)}
             </Span>
           )}
 

@@ -152,8 +152,8 @@ export function CortexTerminalsWidget(_props: {
                 connectionSlug: string;
                 cwd: string;
                 name: string;
-                openedAt: string;
-                lastCommandAt: string;
+                openedAt: Date;
+                lastCommandAt: Date;
                 status: string;
               }) => (
                 <ListItem

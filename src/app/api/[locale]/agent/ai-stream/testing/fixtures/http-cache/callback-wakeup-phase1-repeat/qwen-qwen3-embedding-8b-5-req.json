@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The async background task dispatched earlier has finished. The tool result above is the final outcome. Resume the conversation naturally, following any instructions in the original user message.\n\nLooking at the result, I can see:\n1. An image was rendered inline: ![wakeup-test](https://...) - this is a markdown image link\n2. An `imageUrl` field: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/.../807f90da-8b5b-49f5-b424-4f3c6d04ea2f.png`\n\nThe instructions say: \"Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.\"\n\nBoth forms are present:\n- The markdown image link `![wakeup-test](http://localhost:3000/api/...)`\n- The `imageUrl` field `http://localhost:3000/api/\n\nUser: [T6c wakeUp-repeat] Call the generate_image tool with prompt='wakeup-repeat-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user wants me to call generate_image with prompt 'wakeup-repeat-test' and callbackMode='wakeUp'. \n\nLooking at the previous T6a, when I used wakeUp, the image came back immediately (inline). The user notes two valid outcomes:\n(a) DEFERRED - taskId, no image → end with STEP_OK\n(b) INLINE - imageUrl or markdown image immediately → end with WAKEUP_OK\n\nEither is correct. Only FAILED if neither taskId nor image.\n\nGiven the previous experience where wakeUp returned the image immediately, I'll call it and see what happens.</think>\n\nAssistant: <think> The result is a deferred taskId (local-wu-det-000003) with no image yet. This is outcome (a) DEFERRED. I should end with STEP_OK.</think> Deferred outcome — received `taskId` (`local-wu-det-000003`) with no image yet.\n\nSTEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

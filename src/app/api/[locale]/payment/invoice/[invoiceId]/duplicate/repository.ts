@@ -170,11 +170,11 @@ export class InvoiceDuplicateRepository {
           invoiceSequenceNumber: newInvoice.invoiceSequenceNumber ?? null,
           currency: newInvoice.currency,
           status: newInvoice.status,
-          dueDate: newInvoice.dueDate ? newInvoice.dueDate.toISOString() : null,
+          dueDate: newInvoice.dueDate ?? null,
           notes: newInvoice.notes ?? null,
           amount: totalAmount > 0 ? totalAmount.toString() : newInvoice.amount,
-          createdAt: newInvoice.createdAt.toISOString(),
-          updatedAt: newInvoice.updatedAt.toISOString(),
+          createdAt: newInvoice.createdAt,
+          updatedAt: newInvoice.updatedAt,
         },
       });
     } catch (error) {

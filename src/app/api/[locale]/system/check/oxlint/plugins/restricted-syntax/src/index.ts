@@ -381,6 +381,16 @@ const BROWSER_GLOBALS = new Set([
 const BROWSER_IMPL_PATH_FRAGMENTS = [
   "next-vibe-ui/web/",
   "next-vibe-ui/tanstack/",
+  // The vibe-frame embed bundle is a standalone, zero-dependency script that
+  // runs on third-party pages / inside the iframe. It talks to the browser
+  // directly and must NOT pull in next-vibe-ui. Only the in-frame runtime
+  // files are exempt — host-side app code (VibeFrameHost, mount/) still uses
+  // the abstractions.
+  "vibe-frame/bridge.ts",
+  "vibe-frame/inside-bridge.ts",
+  "vibe-frame/embed.ts",
+  "vibe-frame/embed-package.ts",
+  "vibe-frame/triggers.ts",
 ];
 
 /**

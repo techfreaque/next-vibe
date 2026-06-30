@@ -62,8 +62,8 @@ export class JourneyVariantsRepository {
         companyName: r.companyName ?? null,
         companyEmail: r.companyEmail ?? null,
         checkErrors: r.checkErrors ?? [],
-        createdAt: r.createdAt.toISOString(),
-        updatedAt: r.updatedAt.toISOString(),
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
       }));
 
       logger.info("journeyVariants.list.success", { total });
@@ -147,7 +147,7 @@ export class JourneyVariantsRepository {
         id: created.id,
         active: created.active,
         checkErrors: created.checkErrors ?? [],
-        createdAt: created.createdAt.toISOString(),
+        createdAt: created.createdAt,
       });
     } catch (error) {
       logger.error("journeyVariants.register.error", parseError(error));
@@ -228,7 +228,7 @@ export class JourneyVariantsRepository {
         weight: updated.weight,
         displayName: updated.displayName,
         description: updated.description ?? null,
-        updatedAt: updated.updatedAt.toISOString(),
+        updatedAt: updated.updatedAt,
       });
     } catch (error) {
       logger.error("journeyVariants.update.error", parseError(error));

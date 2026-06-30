@@ -99,7 +99,7 @@ const STATUS_FILTER_VALUES = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(dateStr: string | null | undefined): string {
+function formatDate(dateStr: Date | null | undefined): string {
   if (!dateStr) {
     return "—";
   }
@@ -109,7 +109,7 @@ function formatDate(dateStr: string | null | undefined): string {
       timeStyle: "short",
     });
   } catch {
-    return dateStr;
+    return new Date(dateStr).toISOString();
   }
 }
 

@@ -31,7 +31,10 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type {
+  GenericHandlerBase,
+  RemoteEventHandlerProps,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -151,6 +154,8 @@ export class RouteExecuteRepository {
         t,
         streamContext,
         platform,
+        preloadedHandler,
+        urlPathParams,
       };
 
       if (instanceId && !user.isPublic) {

@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [EMA_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "indicators", "ema"],
+  path: ["analytics", "indicators", "ema"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

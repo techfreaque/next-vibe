@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The revival result shows a rendered markdown image and an `imageUrl` field (`http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/3a35f8cd-148f-4e44-9c7a-2d954ee93a41/9505f8fe-e4dc-465f-9d02-07fe586b2c42.png`). The image URL is present and non-empty.\n\nWAKEUP_OK</think> The revived result contains a rendered markdown image and an `imageUrl` field. The URL is present and non-empty.\n\nWAKEUP_OK\n\nUser: [T6d wakeUp-stress] Call the generate_image tool with prompt='wakeup-stress-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user is asking me to call generate_image with callbackMode='wakeUp' again. Let me do that.</think>\n\nAssistant: <think> The result shows a taskId was returned immediately with no image. This is the deferred case. I should end with STEP_OK.</think> Deferred case: received `taskId` (`local-wu-functions-execute-tool-13`) with no image yet.\n\nSTEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

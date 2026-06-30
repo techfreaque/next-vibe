@@ -13,6 +13,8 @@
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
+import type { CacheKeyRequestInput } from "../react/hooks/query-key-builder";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
 
 // ============================================================================

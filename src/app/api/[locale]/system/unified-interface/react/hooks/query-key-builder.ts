@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { InferSchemaFromField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { FormQueryParams } from "./store";
 

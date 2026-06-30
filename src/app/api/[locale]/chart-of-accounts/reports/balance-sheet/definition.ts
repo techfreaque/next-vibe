@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -69,7 +70,7 @@ const { GET } = createEndpoint({
       asOfDateResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "balanceSheet.response.asOfDate" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       assets: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,

@@ -43,15 +43,18 @@ const HelpToolsWidget = lazyWidget(() =>
 const aiToolMetadataSchema = z.object({
   // Always present - `name` is the preferred call name (use this in execute-tool toolName param)
   name: z.string(),
-  title: z.string(),
-  titleShort: z.string(),
+  /** Human label. Omitted on compact platforms (AI/MCP) when it just echoes `name`. */
+  title: z.string().optional(),
+  /** Short human label. Omitted on compact platforms when it duplicates `title`/`name`. */
+  titleShort: z.string().optional(),
   description: z.string(),
   /** Internal technical ID (e.g. "system_server_rebuild_POST"). Use `name` to call tools, not this. Omitted for compact platforms (AI/MCP). */
   id: z.string().optional(),
   tags: z.array(z.string()).optional(),
   // Present in list mode with query/category
   method: z.string().optional(),
-  category: z.string(),
+  /** Tool category. Omitted on compact platforms when every returned tool shares it. */
+  category: z.string().optional(),
   subCategory: z.string().optional(),
   aliases: z.array(z.string()).optional(),
   // Only present in detail mode (toolName param)
@@ -287,6 +290,7 @@ const { GET } = createEndpoint({
         label: "get.fields.platform.label" as const,
         schema: z.string().optional(),
         userRoles: [UserRole.ADMIN],
+        hiddenForPlatforms: [Platform.AI],
       }),
 
       currentEnv: responseField(scopedTranslation, {
@@ -294,6 +298,7 @@ const { GET } = createEndpoint({
         label: "get.fields.platform.label" as const,
         schema: z.enum(["development", "production"]).optional(),
         userRoles: [UserRole.ADMIN],
+        hiddenForPlatforms: [Platform.AI],
       }),
 
       pinnedCount: responseField(scopedTranslation, {

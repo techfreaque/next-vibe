@@ -28,6 +28,7 @@ import { GenerateAllRepository } from "@/app/api/[locale]/system/generators/gene
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
@@ -57,7 +58,7 @@ export class RebuildRepository {
 
     // fn returns null on success, or an error string on failure
     const runStep = async (
-      label: string,
+      label: TranslatedKeyType,
       fn: () => Promise<string | null> | string | null,
     ): Promise<boolean> => {
       const t0 = Date.now();

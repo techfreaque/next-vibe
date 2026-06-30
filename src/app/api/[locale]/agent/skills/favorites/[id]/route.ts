@@ -21,25 +21,6 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         t,
         locale,
       ),
-    canSubscribe: async ({ user, urlPathParams }) => {
-      if (user.isPublic || !user.id) {
-        return false;
-      }
-      const slug = urlPathParams["id"];
-      if (!slug) {
-        return false;
-      }
-      const { eq } = await import("drizzle-orm");
-      const { db } = await import("@/app/api/[locale]/system/db");
-      const { chatFavorites } =
-        await import("@/app/api/[locale]/agent/skills/favorites/db");
-      const [fav] = await db
-        .select({ userId: chatFavorites.userId })
-        .from(chatFavorites)
-        .where(eq(chatFavorites.slug, slug))
-        .limit(1);
-      return !!fav && fav.userId === user.id;
-    },
   },
   [Methods.PATCH]: {
     email: undefined,

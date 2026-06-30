@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -197,22 +198,22 @@ const { POST } = createEndpoint({
           dueDate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.dueDate" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
           paidAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.paidAt" as const,
-            schema: z.string().nullable().optional(),
+            schema: dateSchema.nullable().optional(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.createdAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.updatedAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),

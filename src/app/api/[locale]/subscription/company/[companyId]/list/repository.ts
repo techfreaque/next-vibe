@@ -54,18 +54,16 @@ export class CompanySubscriptionListRepository {
           plan: sub.planId,
           billingInterval: sub.billingInterval,
           status: sub.status,
-          currentPeriodStart:
-            sub.currentPeriodStart?.toISOString() ?? new Date().toISOString(),
-          currentPeriodEnd:
-            sub.currentPeriodEnd?.toISOString() ?? new Date().toISOString(),
+          currentPeriodStart: sub.currentPeriodStart ?? new Date(),
+          currentPeriodEnd: sub.currentPeriodEnd ?? new Date(),
           cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
-          cancelAt: sub.cancelAt?.toISOString() ?? undefined,
-          canceledAt: sub.canceledAt?.toISOString() ?? undefined,
-          endedAt: sub.endedAt?.toISOString() ?? undefined,
+          cancelAt: sub.cancelAt ?? undefined,
+          canceledAt: sub.canceledAt ?? undefined,
+          endedAt: sub.endedAt ?? undefined,
           provider: sub.provider,
           providerSubscriptionId: sub.providerSubscriptionId ?? undefined,
-          createdAt: sub.createdAt.toISOString(),
-          updatedAt: sub.updatedAt.toISOString(),
+          createdAt: sub.createdAt,
+          updatedAt: sub.updatedAt,
         })),
       });
     } catch (error) {

@@ -173,7 +173,7 @@ function timestampToISO(utcSeconds: number): string {
   return new Date(utcSeconds * 1000).toISOString();
 }
 
-function toChartTime(isoTimestamp: string): UTCTimestamp {
+function toChartTime(isoTimestamp: Date): UTCTimestamp {
   return Math.floor(new Date(isoTimestamp).getTime() / 1000) as UTCTimestamp;
 }
 
@@ -219,7 +219,7 @@ function mergeSeries(prev: SeriesItem[], next: SeriesItem[]): SeriesItem[] {
       const merged = [...existing.points, ...s.points];
       const seen = new Map<string, (typeof merged)[number]>();
       for (const p of merged) {
-        seen.set(p.timestamp, p);
+        seen.set(p.timestamp.toISOString(), p);
       }
       map.set(s.nodeId, {
         nodeId: s.nodeId,
@@ -242,7 +242,7 @@ function mergeSignals(prev: SignalItem[], next: SignalItem[]): SignalItem[] {
     if (existing) {
       const seen = new Map<string, (typeof s.events)[number]>();
       for (const e of [...existing.events, ...s.events]) {
-        seen.set(e.timestamp, e);
+        seen.set(e.timestamp.toISOString(), e);
       }
       map.set(s.nodeId, {
         nodeId: s.nodeId,

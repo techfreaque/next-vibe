@@ -218,14 +218,12 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
                     : InvoiceStatus.DRAFT,
           invoiceUrl: finalizedInvoice.hosted_invoice_url || "",
           invoicePdf: finalizedInvoice.invoice_pdf || "",
-          dueDate: data.dueDate || new Date().toISOString(),
+          dueDate: data.dueDate ? new Date(data.dueDate) : new Date(),
           paidAt: finalizedInvoice.status_transitions?.paid_at
-            ? new Date(
-                finalizedInvoice.status_transitions.paid_at * 1000,
-              ).toISOString()
+            ? new Date(finalizedInvoice.status_transitions.paid_at * 1000)
             : undefined,
-          createdAt: new Date(finalizedInvoice.created * 1000).toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: new Date(finalizedInvoice.created * 1000),
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -424,8 +422,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           currency: refund.currency.toUpperCase(),
           status: refund.status || "pending",
           reason: data.reason || tRefund("reason.requestedByCustomer"),
-          createdAt: new Date(refund.created * 1000).toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: new Date(refund.created * 1000),
+          updatedAt: new Date(),
         },
       });
     } catch (error) {

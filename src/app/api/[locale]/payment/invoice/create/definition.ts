@@ -157,7 +157,7 @@ const { POST } = createEndpoint({
           dueDate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.dueDate" as const,
-            schema: z.string().nullable(),
+            schema: dateSchema.nullable(),
           }),
           notes: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -172,12 +172,12 @@ const { POST } = createEndpoint({
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.createdAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.updatedAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),

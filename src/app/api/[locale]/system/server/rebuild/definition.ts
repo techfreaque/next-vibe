@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -76,7 +77,7 @@ const { POST } = createEndpoint({
 
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       duration: responseField(scopedTranslation, {
@@ -95,7 +96,7 @@ const { POST } = createEndpoint({
           children: {
             label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              schema: z.string(),
+              schema: translatedValueSchema,
             }),
             ok: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

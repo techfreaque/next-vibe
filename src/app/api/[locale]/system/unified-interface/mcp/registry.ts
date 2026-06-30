@@ -27,7 +27,6 @@ import {
   type IDefinitionsRegistry,
 } from "../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
-import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import type { WidgetData } from "../shared/types/json";
 import { Platform } from "../shared/types/platform";

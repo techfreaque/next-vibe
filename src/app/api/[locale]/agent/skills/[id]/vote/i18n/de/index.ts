@@ -9,8 +9,14 @@ export const translations: typeof enTranslations = {
     title: "Für Fähigkeit abstimmen",
     titleShort: "Abstimmen",
     description:
-      "Abstimmung umschalten. Idempotent - erneut aufrufen zum Entfernen der Stimme.",
+      "Für oder gegen eine Community-Fähigkeit stimmen. Gleiche Richtung erneut entfernt die Stimme; Gegenrichtung kehrt sie um.",
     dynamicTitle: "Abstimmung: {{name}}",
+    direction: {
+      label: "Richtung",
+      description: "Abstimmungsrichtung: hoch (hilfreich) oder runter.",
+      up: "Hochstimmen",
+      down: "Runterstimmen",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -54,8 +60,10 @@ export const translations: typeof enTranslations = {
       description: "Ihre Abstimmung wurde aktualisiert",
     },
     response: {
-      voted: { content: "Abgestimmt" },
-      voteCount: { content: "Stimmenanzahl" },
+      userVote: { content: "Deine Stimme" },
+      voteCount: { content: "Wertung" },
+      upCount: { content: "Hochstimmen" },
+      downCount: { content: "Runterstimmen" },
       trustLevel: { content: "Vertrauensstufe" },
     },
     backButton: {

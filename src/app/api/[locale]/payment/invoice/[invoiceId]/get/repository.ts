@@ -92,12 +92,12 @@ export class InvoiceGetRepository {
         currency: invoice.currency,
         status: invoice.status,
         amount: invoice.amount,
-        dueDate: invoice.dueDate ? invoice.dueDate.toISOString() : null,
-        paidAt: invoice.paidAt ? invoice.paidAt.toISOString() : null,
+        dueDate: invoice.dueDate ?? null,
+        paidAt: invoice.paidAt ?? null,
         notes: invoice.notes ?? null,
         journalEntryId: invoice.journalEntryId ?? null,
-        createdAt: invoice.createdAt.toISOString(),
-        updatedAt: invoice.updatedAt.toISOString(),
+        createdAt: invoice.createdAt,
+        updatedAt: invoice.updatedAt,
         lines: lines.map((l) => ({
           id: l.id,
           description: l.description,
@@ -108,8 +108,8 @@ export class InvoiceGetRepository {
           taxAmount: l.taxAmount,
           lineTotal: l.lineTotal,
           sortOrder: l.sortOrder ?? null,
-          createdAt: l.createdAt.toISOString(),
-          updatedAt: l.updatedAt.toISOString(),
+          createdAt: l.createdAt,
+          updatedAt: l.updatedAt,
         })),
       });
     } catch (error) {

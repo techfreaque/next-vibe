@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13ccb8d18b0dcae-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:22:48 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782818567-sHo5lh0qwa4hS1LDq0mR"
+  },
+  "body": {
+    "id": "gen-1782818567-sHo5lh0qwa4hS1LDq0mR",
+    "object": "chat.completion",
+    "created": 1782818567,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip, 21 seconds in duration, featuring instrumental music. The sound quality is clear and well-produced, suggesting a studio recording.\n\n**Genre & Style:** The music falls under the Electronic Dance Music (EDM) umbrella, with elements of disco and funk. It has a very polished, contemporary feel.\n\n**Tempo & Key:** The tempo is upbeat, estimated around 120-130 BPM. The key appears to be major, contributing to its light and energetic mood.\n\n**Instrumentation & Arrangement:**\n- **Drums:** A tight, punchy drum machine provides a prominent four-on-the-floor beat throughout the clip. The kick drum is impactful, and the hi-hats are crisp, driving the rhythm. There's a noticeable snare hit that punctuates the beat.\n- **Bass:** A funky, electric bass plays a syncopated, walking bassline, adding a groovy, danceable foundation. The bass sound is very clean and melodic.\n- **Synthesizer/Keyboard:** A bright, staccato keyboard or synthesizer plays a catchy, repetitive melody with a disco-funk sensibility. It features short, plucked or stabbed notes that interlock with the bass. There's an additional, higher-pitched synth layer that occasionally adds flourishes or harmonic accents.\n\n**Interaction:** The instruments interact cohesively, creating a tight and energetic groove. The drums and bass lay down a strong rhythmic and harmonic base, while the synth melody provides the main catchy element.\n\n**Production:** The production is highly polished, with a clean mix and bright, clear instrument sounds. There are no noticeable effects like heavy reverb or delay within this short clip, suggesting a dry and direct sound.\n\n**Mood:** The mood is distinctly upbeat, energetic, and dance-inducing. It feels joyful and optimistic.\n\n**Song Structure:** This clip appears to be a small segment, possibly from a verse or pre-chorus section, as it establishes a strong groove and melody but doesn't show any major shifts that would signify a full structural element like a chorus or bridge.\n\nThere is no speech or vocal presence in this audio clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 448,
+      "total_tokens": 1520,
+      "cost": 0.0019666,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019666,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00112
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

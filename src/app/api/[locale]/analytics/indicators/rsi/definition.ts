@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [RSI_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "indicators", "rsi"],
+  path: ["analytics", "indicators", "rsi"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

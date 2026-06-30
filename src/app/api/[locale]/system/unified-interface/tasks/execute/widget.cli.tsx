@@ -100,7 +100,9 @@ function renderCli(value: TaskExecuteResponseOutput): string {
     );
   }
   if (value.executedAt) {
-    lines.push(`${chalk.dim("Executed")}  ${formatDate(value.executedAt)}`);
+    lines.push(
+      `${chalk.dim("Executed")}  ${formatDate(value.executedAt.toISOString())}`,
+    );
   }
   if (value.message) {
     lines.push("");
@@ -132,7 +134,7 @@ function renderMcp(value: TaskExecuteResponseOutput): string {
     lines.push(`Duration: ${formatDuration(value.duration)}`);
   }
   if (value.executedAt) {
-    lines.push(`Executed: ${formatDate(value.executedAt)}`);
+    lines.push(`Executed: ${formatDate(value.executedAt.toISOString())}`);
   }
   if (value.message) {
     lines.push(`Message: ${value.message}`);

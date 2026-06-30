@@ -142,10 +142,10 @@ export class EstimateListRepository {
           customerName: e.customerName ?? null,
           currency: e.currency,
           total: e.total,
-          validUntil: e.validUntil ? e.validUntil.toISOString() : null,
+          validUntil: e.validUntil ?? null,
           lineCount: lineCountMap.get(e.id) ?? 0,
-          createdAt: e.createdAt.toISOString(),
-          updatedAt: e.updatedAt.toISOString(),
+          createdAt: e.createdAt,
+          updatedAt: e.updatedAt,
         })),
       });
     } catch (error) {

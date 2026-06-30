@@ -10,7 +10,7 @@
 
 /**
  * Dynamically import client route handler by path
- * @param path - The route path (e.g., "agent_chat_favorites_GET")
+ * @param path - The route path (e.g., "agent_skills_favorites_GET")
  * @returns The client route module or null if not found
  */
 export async function getClientRouteHandler(path: string): Promise<any | null> {

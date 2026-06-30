@@ -45,7 +45,7 @@ const SkillPublishContainer = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "skills", "[id]", "publish"],
+  path: ["agent", "skills", "[id]", "publish"],
   aliases: [SKILL_PUBLISH_ALIAS],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -169,6 +169,10 @@ const { PATCH } = createEndpoint({
       description: "patch.errors.conflict.description" as const,
     },
   },
+
+  // Owner sees publish-state changes on their own channel; once PUBLIC the update
+  // rides the shared channel. Decided per-skill (current ownership) by the route.
+  channel: { scope: "resolved" } as const,
 
   events: {
     "skill-updated": {

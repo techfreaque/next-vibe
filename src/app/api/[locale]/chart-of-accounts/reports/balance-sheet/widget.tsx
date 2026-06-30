@@ -30,6 +30,10 @@ function formatAmount(n: number): string {
   }).format(n);
 }
 
+function formatDate(d: Date): string {
+  return d.toLocaleDateString();
+}
+
 function AccountLine({
   item,
   subtypeLabel,
@@ -185,7 +189,8 @@ export function BalanceSheetWidget(
           {data.asOfDateResponse && (
             <Div className="flex items-center justify-between">
               <Span className="text-sm text-muted-foreground">
-                {t("balanceSheet.widget.asOf")} {data.asOfDateResponse}
+                {t("balanceSheet.widget.asOf")}{" "}
+                {formatDate(data.asOfDateResponse)}
               </Span>
               {data.isBalanced !== undefined && (
                 <Badge

@@ -38,7 +38,6 @@ import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Star } from "next-vibe-ui/ui/icons/Star";
-import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import {
@@ -781,12 +780,7 @@ const SortableGroup = React.memo(function SortableGroup({
                 user={user}
                 locale={locale}
               />
-              {group.skillId !== NO_SKILL_ID && (
-                <FavoriteVoteButton
-                  skillId={group.skillId}
-                  navigate={navigate}
-                />
-              )}
+              {/* Voting moved into the favorite edit view (inline up/down). */}
               {group.skillId !== NO_SKILL_ID &&
                 !DEFAULT_SKILLS.some((s) => s.id === group.skillId) && (
                   <FavoriteReportButton
@@ -1466,37 +1460,6 @@ function DeleteGroupButton({
         </Div>
       </PopoverContent>
     </Popover>
-  );
-}
-
-function FavoriteVoteButton({
-  skillId,
-  navigate,
-}: {
-  skillId: string;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-}): React.JSX.Element {
-  const handleClick = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const voteDef = await import("../[id]/vote/definition");
-      navigate(voteDef.default.POST, {
-        urlPathParams: { id: skillId },
-        renderInModal: true,
-      });
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="h-10 w-10 p-0 inline-flex items-center justify-center"
-      onClick={handleClick}
-    >
-      <ThumbsUp className="h-4 w-4" />
-    </Button>
   );
 }
 

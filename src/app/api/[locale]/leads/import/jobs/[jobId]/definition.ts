@@ -6,6 +6,10 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import {
+  dateSchema,
+  translatedValueSchema,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -38,7 +42,7 @@ const ImportJobStatusContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["leads", "import", "jobs", ":jobId"],
+  path: ["leads", "import", "jobs", "[jobId]"],
   title: "get.title",
   titleShort: "get.titleShort",
   description: "get.description",
@@ -185,22 +189,22 @@ const { GET } = createEndpoint({
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "get.response.createdAt.content",
-                schema: z.string(),
+                schema: dateSchema,
               }),
               updatedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "get.response.updatedAt.content",
-                schema: z.string(),
+                schema: dateSchema,
               }),
               startedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "get.response.startedAt.content",
-                schema: z.string().nullable(),
+                schema: dateSchema.nullable(),
               }),
               completedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "get.response.completedAt.content",
-                schema: z.string().nullable(),
+                schema: dateSchema.nullable(),
               }),
             },
           }),
@@ -298,7 +302,7 @@ const { GET } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["leads", "import", "jobs", ":jobId"],
+  path: ["leads", "import", "jobs", "[jobId]"],
   title: "patch.title",
   titleShort: "patch.titleShort",
   description: "patch.description",
@@ -472,22 +476,22 @@ const { PATCH } = createEndpoint({
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.createdAt.content",
-                schema: z.string(),
+                schema: dateSchema,
               }),
               updatedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.updatedAt.content",
-                schema: z.string(),
+                schema: dateSchema,
               }),
               startedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.startedAt.content",
-                schema: z.string().nullable(),
+                schema: dateSchema.nullable(),
               }),
               completedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.completedAt.content",
-                schema: z.string().nullable(),
+                schema: dateSchema.nullable(),
               }),
             },
           }),
@@ -588,7 +592,7 @@ const { PATCH } = createEndpoint({
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["leads", "import", "jobs", ":jobId"],
+  path: ["leads", "import", "jobs", "[jobId]"],
   title: "delete.title",
   titleShort: "delete.titleShort",
   description: "delete.description",
@@ -631,7 +635,7 @@ const { DELETE } = createEndpoint({
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "delete.response.message.content",
-            schema: z.string(),
+            schema: translatedValueSchema,
           }),
         },
       }),

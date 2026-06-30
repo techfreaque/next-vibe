@@ -7,8 +7,14 @@ export const translations = {
     title: "Vote for Skill",
     titleShort: "Vote Skill",
     description:
-      "Toggle upvote on a community skill. Idempotent - call again to remove your vote.",
+      "Vote up or down on a community skill. Re-sending your current direction removes the vote; sending the opposite flips it.",
     dynamicTitle: "Vote: {{name}}",
+    direction: {
+      label: "Direction",
+      description: "Vote direction: up (helpful) or down (not helpful).",
+      up: "Upvote",
+      down: "Downvote",
+    },
     errors: {
       validation: { title: "Validation Error", description: "Invalid request" },
       network: {
@@ -43,8 +49,10 @@ export const translations = {
       description: "Your vote has been updated",
     },
     response: {
-      voted: { content: "Voted" },
-      voteCount: { content: "Vote Count" },
+      userVote: { content: "Your Vote" },
+      voteCount: { content: "Score" },
+      upCount: { content: "Upvotes" },
+      downCount: { content: "Downvotes" },
       trustLevel: { content: "Trust Level" },
     },
     backButton: {

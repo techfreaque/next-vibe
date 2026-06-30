@@ -94,9 +94,9 @@ export class InvoicePublicViewRepository {
         currency: invoice.currency,
         status: invoice.status,
         amount: invoice.amount,
-        dueDate: invoice.dueDate ? invoice.dueDate.toISOString() : null,
+        dueDate: invoice.dueDate ?? null,
         notes: invoice.notes ?? null,
-        createdAt: invoice.createdAt.toISOString(),
+        createdAt: invoice.createdAt,
         companyName,
         companyEmail,
         lines: lines.map((l) => ({

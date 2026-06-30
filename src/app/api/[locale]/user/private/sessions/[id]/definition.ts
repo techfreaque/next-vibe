@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -56,7 +57,7 @@ const { DELETE } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         label: "revoke.response.message",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

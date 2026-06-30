@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -69,7 +70,7 @@ const { GET } = createEndpoint({
       asOfDateResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "receivablesAging.response.asOfDate" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       bucketsCurrentItems: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -96,7 +97,7 @@ const { GET } = createEndpoint({
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "receivablesAging.response.dueDate" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),
@@ -126,7 +127,7 @@ const { GET } = createEndpoint({
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "receivablesAging.response.dueDate" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),
@@ -156,7 +157,7 @@ const { GET } = createEndpoint({
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "receivablesAging.response.dueDate" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),
@@ -186,7 +187,7 @@ const { GET } = createEndpoint({
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "receivablesAging.response.dueDate" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),
@@ -216,7 +217,7 @@ const { GET } = createEndpoint({
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "receivablesAging.response.dueDate" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),

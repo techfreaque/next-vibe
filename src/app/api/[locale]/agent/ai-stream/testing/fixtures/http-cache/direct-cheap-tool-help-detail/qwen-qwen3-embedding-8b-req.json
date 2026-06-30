@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user asked me to call tool-help with category='ai' and check that:\n1. The result contains a non-empty tools array\n2. Each tool has a name and description\n\nLooking at the result:\n- matchedCount: 69\n- tools array has 69 items (non-empty)\n- Each tool has a \"name\" field\n- Each tool has a \"description\" field\n\nSome also have \"title\", \"aliases\", \"credits\" - but the requirement is just name and description.\n\nEverything looks correct. I'll end with STEP_OK.</think> The call returned **69 tools** in the `ai` category. The `tools` array is non-empty, and every entry includes both a `name` and a `description` field.\n\nSTEP_OK\n\nUser: [T1a-query tool-help-query] Call the tool-help tool with query='search' to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think> The user wants me to call tool-help with query='search'. I need to check that the tools array is non-empty and each tool has a name and description.</think>\n\nAssistant: <think>The call returned 12 tools. The tools array is non-empty. Each tool has a name and description. Some also have category, credits, aliases, title. This looks correct.\n\nI should end with STEP_OK.</think>The call returned **12 tools** matching the query `search`. The `tools` array is non-empty, and every entry includes a `name` and a `description`.\n\nSTEP_OK\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

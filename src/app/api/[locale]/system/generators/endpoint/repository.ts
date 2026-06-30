@@ -24,6 +24,7 @@ import {
   endpointToToolName,
   getPreferredToolName,
 } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -43,7 +44,7 @@ interface EndpointRequestType {
 
 interface EndpointResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   endpointsFound: number;
   duration: number;
   outputFile?: string;

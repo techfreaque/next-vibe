@@ -30,7 +30,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "favorites", "reorder"],
+  path: ["agent", "skills", "favorites", "reorder"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -116,6 +116,7 @@ const { POST } = createEndpoint({
   // positions the user submitted. Client onEvent patches each favorite's position
   // in the list cache; remoteEvent relays cross-instance, where the route's
   // onRemoteEvent applies the same reorder by id.
+  channel: { scope: "user" } as const,
   events: {
     "favorites-reordered": {
       remoteEvent: true as const,

@@ -88,7 +88,7 @@ function JournalEntryRow({
             {entry.entryNumber}
           </Span>
           <Span className="text-xs text-muted-foreground shrink-0">
-            {entry.date.slice(0, 10)}
+            {entry.date.toISOString().slice(0, 10)}
           </Span>
         </Div>
         <Span className="text-sm font-medium truncate text-foreground">

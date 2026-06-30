@@ -139,9 +139,7 @@ export class CampaignQueueRepository {
         emailsSent: r.emailsSent,
         emailsOpened: r.emailsOpened,
         emailsClicked: r.emailsClicked,
-        startedAt: r.startedAt
-          ? new Date(r.startedAt).toISOString()
-          : new Date().toISOString(),
+        startedAt: r.startedAt ? new Date(r.startedAt) : new Date(),
       }));
 
       logger.debug("Campaign queue retrieved", {

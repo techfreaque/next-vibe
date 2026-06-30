@@ -14,3 +14,25 @@ export const SKILL_CREATOR_ID = "skill-creator" as const;
 export const SKILL_VERIFIED_VOTE_THRESHOLD = 10;
 /** Auto-hide threshold: report_count >= this → status = UNLISTED */
 export const SKILL_AUTO_HIDE_REPORT_THRESHOLD = 5;
+
+/**
+ * A tool reference in a skill's tool config (by alias/id, update-safe).
+ * Mirrors `ToolConfigItem` from chat/settings, kept here as a structural type
+ * so this leaf module has no imports — skill files import `tool` from here
+ * instead of from `config.ts`, which would create a load-time cycle
+ * (config → generated skills-index → skill.ts → config).
+ */
+export interface SkillToolConfigItem {
+  toolId: string;
+  requiresConfirmation: boolean;
+}
+
+/**
+ * Helper to create a tool config item (uses aliases for update-safe references).
+ */
+export function tool(
+  toolId: string,
+  requiresConfirmation = false,
+): SkillToolConfigItem {
+  return { toolId, requiresConfirmation };
+}

@@ -18,6 +18,7 @@ import { EmailSendingRepository } from "@/app/api/[locale]/messenger/providers/e
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
@@ -38,7 +39,7 @@ interface SendTestRequestType {
 
 interface SendTestResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
 }
 
 /**

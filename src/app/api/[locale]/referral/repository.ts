@@ -674,7 +674,7 @@ export class ReferralRepository {
           amountCents: e.amountCents,
           currency: e.currency,
           status: e.status,
-          createdAt: e.createdAt.toISOString(),
+          createdAt: e.createdAt,
         })),
         totalCount: Number(countResult?.count || 0),
       });

@@ -62,8 +62,8 @@ interface CustomWidgetProps {
 type TrendDirection = "up" | "down" | "neutral";
 
 interface ActivityRecord {
-  timestamp?: string;
-  createdAt?: string;
+  timestamp?: Date;
+  createdAt?: Date;
 }
 
 function computeTrend(recentActivity: ActivityRecord[]): TrendDirection {

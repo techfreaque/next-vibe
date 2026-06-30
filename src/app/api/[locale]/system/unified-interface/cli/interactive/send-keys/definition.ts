@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
   ],
   aliases: [INTERACTIVE_SEND_KEYS_ALIAS] as const,
   method: Methods.POST,
-  path: ["system", "interactive", "send-keys"],
+  path: ["system", "unified-interface", "cli", "interactive", "send-keys"],
   cli: {
     firstCliArgKey: "keys",
   },

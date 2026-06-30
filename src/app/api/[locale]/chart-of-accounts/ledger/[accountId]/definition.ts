@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
             date: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "ledger.response.date" as const,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

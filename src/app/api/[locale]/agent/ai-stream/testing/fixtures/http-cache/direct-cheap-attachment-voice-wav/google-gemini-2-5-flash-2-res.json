@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e3452bd0f383d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 15:29:07 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782833345-sryrevW2WSfNsHhFVreq"
+  },
+  "body": {
+    "id": "gen-1782833345-sryrevW2WSfNsHhFVreq",
+    "object": "chat.completion",
+    "created": 1782833345,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short, upbeat instrumental clip that's 29 seconds long, with a bright, clean production style, suggesting a studio recording. The sound quality is excellent.\n\n**Music Description:**\n*   **Genre/Subgenre:** This definitely falls into a Pop/Funk genre, with a strong Disco influence, reminiscent of artists like Daft Punk or Jamiroquai, especially with its groove and instrumentation.\n*   **Tempo:** Approximately 110-120 BPM, giving it a moderate, danceable pace.\n*   **Time Signature:** 4/4.\n*   **Instrumentation and Interaction:**\n    *   **Drums:** The drums are the driving force, featuring a standard pop/funk beat with a heavy beat on the kick and snare on 2 and 4. There's a closed hi-hat providing a consistent, tight sixteenth-note rhythm throughout. The drum sound is punchy and well-mixed.\n    *   **Bass:** A funky electric bass lays down a groovy, syncopated line, often featuring slides and short, percussive notes that interlock perfectly with the drums. It’s a very prominent and active bassline that contributes heavily to the funk feel.\n    *   **Electric Guitar (Rhythm):** A clean-toned electric guitar plays a rhythmic, wah-wah-like chordal part. It's not a strong, open wah effect, but rather a more subtle filter or tone modification, giving a \"chick-a-wacka\" sound, typical of disco and funk rhythm guitars. It's constant throughout the clip.\n    *   **Electric Piano (Rhodes/Wurlitzer-like):** An electric piano sound, likely a Rhodes or Wurlitzer emulation, plays chordal stabs and fills. It's layered above the guitar, adding to the harmonic and rhythmic texture. It has a warm, slightly chorused or vibrato-like tone.\n    *   **Synthesizer (Lead/Melody):** A bright, clear synthesizer plays a simple, catchy melody that floats above the other instruments. It's not overly complex but is memorable and contributes to the pop sensibility of the track. It enters early and continues throughout the clip.\n    *   **Orchestra Hits/Stabs:** Around the 0:25 mark, there's a quick, sharp \"orchestra hit\" sound, which is a classic production element often used in disco and 80s pop to emphasize a musical phrase or transition.\n*   **Mood and Emotional Arc:** The clip maintains a consistently upbeat, energetic, and slightly nostalgic mood. It evokes a feeling of dancing, good times, and general positivity. There's no significant emotional arc within this short segment; it simply presents a feel-good groove.\n\n**Non-Musical Audio Events:**\nThere's no speech, sound effects, or ambient sounds other than the music itself.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 616,
+      "total_tokens": 1688,
+      "cost": 0.0023866,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0023866,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00154
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

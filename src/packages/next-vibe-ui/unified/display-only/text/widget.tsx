@@ -152,7 +152,11 @@ export function TextWidget<
     className: fieldClassName,
   } = field;
   const usage = "usage" in field ? field.usage : undefined;
-  const label = labelKey ? t(labelKey) : undefined;
+  const label = labelKey ? t(labelKey, contentParams) : undefined;
+  // Display-only widget fields (widgetField()) carry no data schema - their
+  // label IS the text to show, not a caption above a value.
+  const isDisplayWidget =
+    "schemaType" in field && field.schemaType === "widget";
 
   // Get value from form for request fields, otherwise from value
   let value;
@@ -242,6 +246,22 @@ export function TextWidget<
           </Div>
         );
       }
+
+      return <Div className={cn("flex", alignmentClass)}>{textElement}</Div>;
+    }
+
+    // Display-only widget with a label and no content/value: the label IS the
+    // display text. Render it as text rather than a field caption above an
+    // empty "—" placeholder.
+    if (label && isDisplayWidget) {
+      const displayText = formatText(label, maxLength);
+      const textElement = multiline ? (
+        <Span className={cn("whitespace-pre-wrap", styleClasses)}>
+          {displayText}
+        </Span>
+      ) : (
+        <Span className={styleClasses}>{displayText}</Span>
+      );
 
       return <Div className={cn("flex", alignmentClass)}>{textElement}</Div>;
     }

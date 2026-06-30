@@ -25,10 +25,5 @@ export const { GET, tools } = endpointsHandler({
         data.pageSize,
         platform,
       ),
-    // The list is a pure read endpoint with no events of its own. Each CRUD op
-    // (create, [id] PATCH/DELETE, reorder) owns and applies its own remote event;
-    // their client onEvent handlers patch this list's cache. Clients still
-    // subscribe to the user channel to receive those relayed op events.
-    canSubscribe: ({ user }) => !!user.id,
   },
 });

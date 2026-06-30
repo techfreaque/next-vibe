@@ -79,7 +79,7 @@ export class HeadlessClientRepository {
     try {
       const [{ openConnection }, { remoteConnections }, { eq, and }] =
         await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector"),
+          import("@/app/api/[locale]/system/unified-interface/websocket/connector"),
           import("@/app/api/[locale]/remote-connection/db"),
           import("drizzle-orm"),
         ]);

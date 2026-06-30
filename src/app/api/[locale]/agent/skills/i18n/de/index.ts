@@ -609,6 +609,10 @@ export const translations: typeof enTranslations = {
       community: "Community",
       verified: "Verifiziert",
     },
+    voteDirection: {
+      up: "Hochstimmen",
+      down: "Runterstimmen",
+    },
   },
   modelSelection: {
     sort: {

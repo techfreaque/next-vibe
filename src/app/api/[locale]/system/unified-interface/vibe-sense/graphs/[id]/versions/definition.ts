@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -79,7 +80,7 @@ const { GET } = createEndpoint({
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.fields.versions.createdAt.label",
-              schema: z.string(),
+              schema: dateSchema,
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

@@ -9,7 +9,7 @@ import {
   CORTEX_WRITE_ALIAS,
 } from "../../../cortex/constants";
 import type { Skill } from "../../config";
-import { tool } from "../../config";
+import { tool } from "../../constants";
 import {
   ContentLevel,
   IntelligenceLevel,

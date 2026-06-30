@@ -7,18 +7,18 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
 import { Span } from "next-vibe-ui/ui/span";
 import {
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { type JSX } from "react";
 
 import { SkillTrustLevel } from "../../enum";
 import type definition from "./definition";
+import { SkillVoteButtons } from "./vote-buttons";
 
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];

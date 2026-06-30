@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nAssistant: <think> The user wants me to make two parallel tool calls in a single response:\n1. tool-help with no args (to list tools)\n2. generate_image with prompt='approve-test'\n\nThe generate_image tool requires user confirmation, so it should NOT execute yet when called with callbackMode default. Wait, the user said \"The generate_image tool requires user confirmation - it should NOT execute yet.\" But I'm not sure if generate_image actually requires confirmation by default. Let me re-read the instructions...\n\nThe user says \"The generate_image tool requires user confirmation - it should NOT execute yet.\" This is part of the test scenario - they want to verify that when calling it, it gets blocked/approved. But wait, the tool might not actually require approval. Let me check the system instructions...\n\n\nAssistant: <think> The user asked me to call both tool-help and generate_image with prompt='approve-test' in a single response. The generate_image was supposed to require user confirmation (callbackMode='approve'), but I used callbackMode='wait' instead. I need to acknowledge this and provide the STEP_OK as instructed, since the calls did execute.\n\nWait, looking at the instructions again: \"Call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet.\"\n\nBut I called it with callbackMode='wait', not 'approve'. However, the result shows that generate_image DID execute and returned an image. This means the test didn't work as intended - it was supposed \n\nUser: [CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.",
+    "encoding_format": "float"
+  }
+}

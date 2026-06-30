@@ -15,6 +15,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
+  requestField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
@@ -28,7 +29,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_VOTE_ALIAS } from "../../constants";
-import { SkillTrustLevelDB } from "../../enum";
+import {
+  SkillTrustLevelDB,
+  SkillVoteDirection,
+  SkillVoteDirectionDB,
+} from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 const SkillVoteContainer = lazyWidget(() =>
@@ -38,7 +43,7 @@ const SkillVoteContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "skills", "[id]", "vote"],
+  path: ["agent", "skills", "[id]", "vote"],
   aliases: [SKILL_VOTE_ALIAS],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -52,7 +57,7 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: SkillVoteContainer,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -66,15 +71,47 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      voted: responseField(scopedTranslation, {
+      // Vote direction. Re-sending the user's current direction toggles it off.
+      direction: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.direction.label" as const,
+        description: "post.direction.description" as const,
+        options: [
+          {
+            value: SkillVoteDirection.UP,
+            label: "post.direction.up" as const,
+          },
+          {
+            value: SkillVoteDirection.DOWN,
+            label: "post.direction.down" as const,
+          },
+        ],
+        schema: z.enum(SkillVoteDirectionDB).default(SkillVoteDirection.UP),
+      }),
+
+      // The user's resulting vote after this action: UP, DOWN, or null (cleared).
+      userVote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "post.response.voted.content" as const,
-        schema: z.boolean(),
+        label: "post.response.userVote.content" as const,
+        schema: z.enum(SkillVoteDirectionDB).nullable(),
       }),
 
       voteCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.voteCount.content" as const,
+        schema: z.number().int(),
+      }),
+
+      upCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.upCount.content" as const,
+        schema: z.number().int().nonnegative(),
+      }),
+
+      downCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.downCount.content" as const,
         schema: z.number().int().nonnegative(),
       }),
 
@@ -88,7 +125,7 @@ const { POST } = createEndpoint({
         label: "post.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
-        usage: { request: "urlPathParams" },
+        usage: { request: "data&urlPathParams" },
       }),
 
       submitButton: submitButton(scopedTranslation, {
@@ -97,7 +134,7 @@ const { POST } = createEndpoint({
         icon: "thumbs-up",
         variant: "outline",
         className: "ml-auto",
-        usage: { request: "urlPathParams" },
+        usage: { request: "data&urlPathParams" },
       }),
     },
   }),
@@ -140,6 +177,11 @@ const { POST } = createEndpoint({
       description: "post.errors.conflict.description" as const,
     },
   },
+
+  // A skill's vote metrics are visible to anyone who can view the skill — owner
+  // on their own channel, PUBLIC on the shared channel. Decided per-skill by the
+  // route's resolveChannel.
+  channel: { scope: "resolved" } as const,
 
   // Client-only event — vote metrics (voteCount/trustLevel) are instance-local,
   // never relayed cross-instance. The onEvent patches them into the list card.
@@ -195,10 +237,15 @@ const { POST } = createEndpoint({
     urlPathParams: {
       default: { id: "code-reviewer" },
     },
+    requests: {
+      default: { direction: SkillVoteDirection.UP },
+    },
     responses: {
       default: {
-        voted: true,
+        userVote: SkillVoteDirection.UP,
         voteCount: 5,
+        upCount: 6,
+        downCount: 1,
         trustLevel: "enums.trustLevel.community",
       },
     },
@@ -207,6 +254,7 @@ const { POST } = createEndpoint({
 
 export const endpoints = { POST };
 
+export type SkillVotePostRequestOutput = typeof POST.types.RequestOutput;
 export type SkillVotePostResponseOutput = typeof POST.types.ResponseOutput;
 
 export default endpoints;

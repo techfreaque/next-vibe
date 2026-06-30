@@ -12,7 +12,7 @@ import {
   CHAT_SETTINGS_UPDATE_ALIAS,
 } from "../../../chat/settings/constants";
 import type { Skill } from "../../config";
-import { tool } from "../../config";
+import { tool } from "../../constants";
 import {
   SKILL_CREATE_ALIAS,
   SKILL_DELETE_ALIAS,

@@ -27,6 +27,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { leads, type NewLead } from "../db";
@@ -448,10 +449,10 @@ export class LeadsImportRepository {
             error: job.error ?? null,
             retryCount: job.retryCount,
             maxRetries: job.maxRetries,
-            createdAt: job.createdAt.toISOString(),
-            updatedAt: job.updatedAt.toISOString(),
-            startedAt: job.startedAt?.toISOString() ?? null,
-            completedAt: job.completedAt?.toISOString() ?? null,
+            createdAt: job.createdAt,
+            updatedAt: job.updatedAt,
+            startedAt: job.startedAt ?? null,
+            completedAt: job.completedAt ?? null,
           })),
         },
       });
@@ -499,10 +500,10 @@ export class LeadsImportRepository {
           error: string | null;
         };
         timestamps: {
-          createdAt: string;
-          updatedAt: string;
-          startedAt: string | null;
-          completedAt: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+          startedAt: Date | null;
+          completedAt: Date | null;
         };
       };
     }>
@@ -572,10 +573,10 @@ export class LeadsImportRepository {
             error: updated.error ?? null,
           },
           timestamps: {
-            createdAt: updated.createdAt.toISOString(),
-            updatedAt: updated.updatedAt.toISOString(),
-            startedAt: updated.startedAt?.toISOString() ?? null,
-            completedAt: updated.completedAt?.toISOString() ?? null,
+            createdAt: updated.createdAt,
+            updatedAt: updated.updatedAt,
+            startedAt: updated.startedAt ?? null,
+            completedAt: updated.completedAt ?? null,
           },
         },
       });
@@ -619,10 +620,10 @@ export class LeadsImportRepository {
           error: string | null;
         };
         timestamps: {
-          createdAt: string;
-          updatedAt: string;
-          startedAt: string | null;
-          completedAt: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+          startedAt: Date | null;
+          completedAt: Date | null;
         };
       };
     }>
@@ -669,10 +670,10 @@ export class LeadsImportRepository {
             error: job.error ?? null,
           },
           timestamps: {
-            createdAt: job.createdAt.toISOString(),
-            updatedAt: job.updatedAt.toISOString(),
-            startedAt: job.startedAt?.toISOString() ?? null,
-            completedAt: job.completedAt?.toISOString() ?? null,
+            createdAt: job.createdAt,
+            updatedAt: job.updatedAt,
+            startedAt: job.startedAt ?? null,
+            completedAt: job.completedAt ?? null,
           },
         },
       });
@@ -697,7 +698,7 @@ export class LeadsImportRepository {
     ResponseType<{
       result: {
         success: boolean;
-        message: string;
+        message: TranslatedKeyType;
       };
     }>
   > {

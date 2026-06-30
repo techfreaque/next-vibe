@@ -24,7 +24,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "side-tasks", "generators", "generate-trpc-router"],
+  path: ["system", "generators", "generate-trpc-router"],
   title: "title",
   titleShort: "title",
   description: "description",

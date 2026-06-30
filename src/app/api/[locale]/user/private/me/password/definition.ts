@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -137,17 +138,17 @@ const { POST } = createEndpoint({
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "response.message",
-            schema: z.string(),
+            schema: translatedValueSchema,
           }),
           securityTip: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "response.securityTip",
-            schema: z.string().optional(),
+            schema: translatedValueSchema.optional(),
           }),
           nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "response.nextSteps.item",
-            schema: z.array(z.string()),
+            schema: z.array(translatedValueSchema),
           }),
         },
       }),

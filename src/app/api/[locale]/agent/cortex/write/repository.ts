@@ -65,7 +65,7 @@ export class CortexWriteRepository {
       responsePath: string;
       size: number;
       created: boolean;
-      updatedAt: string;
+      updatedAt: Date;
       responseContent: string;
     }>
   > {
@@ -107,7 +107,7 @@ export class CortexWriteRepository {
           responsePath: result.path,
           size: Buffer.byteLength(content, "utf8"),
           created: result.created,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
           responseContent: content,
         });
       } catch (error) {
@@ -211,7 +211,7 @@ export class CortexWriteRepository {
         responsePath: path,
         size,
         created: isNew,
-        updatedAt: now.toISOString(),
+        updatedAt: now,
         responseContent: content,
       });
     } catch (error) {

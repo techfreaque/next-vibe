@@ -57,7 +57,10 @@ import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
+import {
+  CallbackMode,
+  EXECUTE_TOOL_ALIAS,
+} from "../../../execute-tool/constants";
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import {
   type ReactTranslationKey,

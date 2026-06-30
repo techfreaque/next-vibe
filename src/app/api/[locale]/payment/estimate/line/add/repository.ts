@@ -149,8 +149,8 @@ export class EstimateLineAddRepository {
           taxAmount: line.taxAmount,
           lineTotal: line.lineTotal,
           sortOrder: line.sortOrder,
-          createdAt: line.createdAt.toISOString(),
-          updatedAt: line.updatedAt.toISOString(),
+          createdAt: line.createdAt,
+          updatedAt: line.updatedAt,
         },
       });
     } catch (error) {

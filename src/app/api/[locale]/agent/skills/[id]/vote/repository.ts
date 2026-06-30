@@ -1,11 +1,13 @@
 /**
  * Skill Vote Repository
- * Toggle-upvote logic with trust_level auto-upgrade
+ * Directional voting (up/down) with net-score recompute and trust_level
+ * auto-upgrade. Re-voting the same direction clears the vote (toggle off);
+ * voting the opposite direction flips it.
  */
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -22,16 +24,25 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SKILL_VERIFIED_VOTE_THRESHOLD } from "../../constants";
 import { customSkills, skillVotes } from "../../db";
-import { SkillOwnershipType, SkillTrustLevel } from "../../enum";
+import type { SkillVoteDirectionValue } from "../../enum";
+import {
+  SkillOwnershipType,
+  SkillTrustLevel,
+  SkillVoteDirection,
+} from "../../enum";
 import { SkillsRepository } from "../../repository";
 import voteDefinitions, {
+  type SkillVotePostRequestOutput,
   type SkillVotePostResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
+type SkillVoteDir = typeof SkillVoteDirectionValue;
+
 export class SkillVoteRepository {
-  static async toggleVote(
+  static async vote(
     urlPathParams: { id: string },
+    data: SkillVotePostRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -39,6 +50,11 @@ export class SkillVoteRepository {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const { id: skillId } = urlPathParams;
+      // Normalize the requested direction; default to UP for back-compat.
+      const direction: SkillVoteDir =
+        data.direction === SkillVoteDirection.DOWN
+          ? SkillVoteDirection.DOWN
+          : SkillVoteDirection.UP;
       const userId = user.id;
       if (!userId) {
         return fail({
@@ -79,9 +95,9 @@ export class SkillVoteRepository {
         });
       }
 
-      // Check if user already voted
+      // Current vote (if any) for this user on this skill.
       const [existingVote] = await db
-        .select({ id: skillVotes.id })
+        .select({ id: skillVotes.id, direction: skillVotes.direction })
         .from(skillVotes)
         .where(
           and(
@@ -90,11 +106,11 @@ export class SkillVoteRepository {
           ),
         );
 
-      let voted: boolean;
-      let newVoteCount: number;
+      // The user's resulting vote: null when toggled off, else the new direction.
+      let userVote: SkillVoteDir | null;
 
-      if (existingVote) {
-        // Remove vote
+      if (existingVote && existingVote.direction === direction) {
+        // Same direction again → remove the vote (toggle off).
         await db
           .delete(skillVotes)
           .where(
@@ -103,16 +119,41 @@ export class SkillVoteRepository {
               eq(skillVotes.userId, userId),
             ),
           );
-        newVoteCount = Math.max(0, skill.voteCount - 1);
-        voted = false;
+        userVote = null;
+      } else if (existingVote) {
+        // Opposite direction → flip the existing vote.
+        await db
+          .update(skillVotes)
+          .set({ direction })
+          .where(
+            and(
+              eq(skillVotes.skillId, resolvedId),
+              eq(skillVotes.userId, userId),
+            ),
+          );
+        userVote = direction;
       } else {
-        // Add vote
-        await db.insert(skillVotes).values({ skillId: resolvedId, userId });
-        newVoteCount = skill.voteCount + 1;
-        voted = true;
+        // No prior vote → insert.
+        await db
+          .insert(skillVotes)
+          .values({ skillId: resolvedId, userId, direction });
+        userVote = direction;
       }
 
-      // Auto-upgrade trust_level to VERIFIED at threshold
+      // Recompute net score from the source of truth: up - down.
+      const [tally] = await db
+        .select({
+          up: sql<number>`count(*) filter (where ${skillVotes.direction} = ${SkillVoteDirection.UP})`,
+          down: sql<number>`count(*) filter (where ${skillVotes.direction} = ${SkillVoteDirection.DOWN})`,
+        })
+        .from(skillVotes)
+        .where(eq(skillVotes.skillId, resolvedId));
+
+      const upCount = Number(tally?.up ?? 0);
+      const downCount = Number(tally?.down ?? 0);
+      const newVoteCount = upCount - downCount;
+
+      // Auto-upgrade trust_level to VERIFIED at threshold (net score).
       const newTrustLevel =
         newVoteCount >= SKILL_VERIFIED_VOTE_THRESHOLD
           ? SkillTrustLevel.VERIFIED
@@ -137,12 +178,14 @@ export class SkillVoteRepository {
       });
 
       return success({
-        voted,
+        userVote,
         voteCount: newVoteCount,
+        upCount,
+        downCount,
         trustLevel: newTrustLevel,
       });
     } catch (error) {
-      logger.error("SkillVoteRepository.toggleVote failed", parseError(error));
+      logger.error("SkillVoteRepository.vote failed", parseError(error));
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

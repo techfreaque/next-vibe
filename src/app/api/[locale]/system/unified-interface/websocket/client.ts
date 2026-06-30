@@ -21,6 +21,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   EventHandler,
+  WsChannelDescriptor,
   WsClientMessage,
   WsWireFrame,
   WsWireMessage,
@@ -188,6 +189,7 @@ function getOrCreateChannel(
     listeners: new Map(),
     wildcardListeners: new Set(),
     locale,
+    descriptor,
   };
   channels.set(channel, state);
 

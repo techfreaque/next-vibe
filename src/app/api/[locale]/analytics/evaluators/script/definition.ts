@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [EVALUATOR_SCRIPT_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "evaluators", "script"],
+  path: ["analytics", "evaluators", "script"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

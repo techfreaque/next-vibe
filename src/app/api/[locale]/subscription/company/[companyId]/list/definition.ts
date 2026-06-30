@@ -9,6 +9,7 @@ import {
   PaymentProvider,
   PaymentProviderDB,
 } from "@/app/api/[locale]/payment/enum";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -91,12 +92,12 @@ const { GET } = createEndpoint({
             currentPeriodStart: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             currentPeriodEnd: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             cancelAtPeriodEnd: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -104,15 +105,15 @@ const { GET } = createEndpoint({
             }),
             cancelAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              schema: z.string().optional(),
+              schema: dateSchema.optional(),
             }),
             canceledAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              schema: z.string().optional(),
+              schema: dateSchema.optional(),
             }),
             endedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              schema: z.string().optional(),
+              schema: dateSchema.optional(),
             }),
             provider: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -125,12 +126,12 @@ const { GET } = createEndpoint({
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: z.string(),
+              schema: dateSchema,
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: z.string(),
+              schema: dateSchema,
             }),
           },
         }),

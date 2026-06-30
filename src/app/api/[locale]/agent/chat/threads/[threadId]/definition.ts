@@ -483,6 +483,12 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description",
   },
 
+  // thread-updated is an owner action on a thread the caller manages; the channel
+  // is keyed by threadId only (no rootFolderId in the cache key), so it rides the
+  // owner's own user channel. Public-thread title changes reach viewers via the
+  // folder-contents channel, which is keyed by rootFolderId and resolved.
+  channel: { scope: "user" } as const,
+
   events: {
     "thread-updated": {
       remoteEvent: true as const,
@@ -680,6 +686,10 @@ const { DELETE } = createEndpoint({
     title: "delete.success.title",
     description: "delete.success.description",
   },
+
+  // Owner action on a managed thread; channel keyed by threadId only → the
+  // owner's own user channel (see the PATCH channel note above).
+  channel: { scope: "user" } as const,
 
   // This op owns its `thread-deleted` event. `requestFields: ["rootFolderId"]`
   // carries the sidebar bucket; the thread id rides on `urlPathParams.threadId`. The

@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -273,12 +274,12 @@ const { GET } = createEndpoint({
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.task.createdAt",
-            schema: z.string(),
+            schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.task.updatedAt",
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),
@@ -756,12 +757,12 @@ const { PUT } = createEndpoint({
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "put.response.task.createdAt",
-            schema: z.string(),
+            schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "put.response.task.updatedAt",
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),

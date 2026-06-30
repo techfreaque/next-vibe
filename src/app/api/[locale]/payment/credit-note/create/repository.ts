@@ -242,8 +242,8 @@ export class CreditNoteCreateRepository {
           status: creditNote.status,
           amount: totalAmount.toString(),
           reason: data.reason,
-          createdAt: creditNote.createdAt.toISOString(),
-          updatedAt: creditNote.updatedAt.toISOString(),
+          createdAt: creditNote.createdAt,
+          updatedAt: creditNote.updatedAt,
         },
       });
     } catch (error) {

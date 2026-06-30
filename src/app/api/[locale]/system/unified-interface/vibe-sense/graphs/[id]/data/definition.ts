@@ -8,6 +8,7 @@
 import React from "react";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -125,7 +126,7 @@ const { GET } = createEndpoint({
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.createdAt",
-            schema: z.string(),
+            schema: dateSchema,
           }),
           config: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -154,7 +155,7 @@ const { GET } = createEndpoint({
                   timestamp: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.series.timestamp",
-                    schema: z.string(),
+                    schema: dateSchema,
                   }),
                   value: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
@@ -187,7 +188,7 @@ const { GET } = createEndpoint({
                   timestamp: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.signals.timestamp",
-                    schema: z.string(),
+                    schema: dateSchema,
                   }),
                   fired: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,

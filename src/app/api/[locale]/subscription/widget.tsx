@@ -39,7 +39,7 @@ import { SubscriptionStatus } from "./enum";
 /**
  * Format date for display
  */
-function formatDate(date: string, locale: string): string {
+function formatDate(date: string | Date, locale: string): string {
   return new Date(date).toLocaleDateString(locale);
 }
 

@@ -208,7 +208,7 @@ export const translations: typeof enTranslations = {
             routeId: {
               label: "ID narzędzia",
               description:
-                "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_skills_GET'). Użyj tool-help do odkrywania.",
+                "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_skills_GET'). Użyj tool-help do odkrywania.",
               placeholder: "web-search",
             },
             args: {

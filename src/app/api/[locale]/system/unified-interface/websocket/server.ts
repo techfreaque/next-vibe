@@ -535,6 +535,7 @@ export function startWebSocketServer(
   registerLocalBroadcast({
     broadcastToAll: broadcastLocalToAll,
     broadcastBatch: broadcastLocalBatch,
+    getChannelSize,
   });
 
   return {

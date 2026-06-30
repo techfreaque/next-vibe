@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11d i2v-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think> The user wants me to call the generate_video tool with:\n- prompt='professional portrait, smooth camera pull-back'\n- inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'\n\nI need to check that the result has:\n1. non-empty videoUrl\n2. positive creditCost\n3. positive durationSeconds\n\nLet me call the tool.</think>\n\nAssistant: - The assistant executed a quality-tester integration test suite.\n- `tool-help` returned 530 tools across 22 categories; filtering by `category=\"ai\"` returned 69 tools, by `query=\"search\"` returned 12 tools, and by `toolName=\"generate_image\"` returned the full schema with parameters including `prompt` (required), `model`, `quality`, `size`, `aspectRatio`, and `inputMediaUrl`.\n- `generate_video` with prompt `\"spinning cube\"` returned videoUrl `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8795f4fe-67b7-4192-8f1c-766a9465ea97/7bffc6fa-65e8-4ab8-b475-9d7d0e822a71.mp4`, creditCost `124.8`, and durationSeconds `4`.\n- `generate_image` with `callbackMode=\"detach\"` and prompt `\"await-task-test\"` returned taskId `local-bg-1782397734876-p7pj9m`; `await-task` with taskId `local-bg-det-\n\nAssistant: <think>The result has:\n- videoUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8795f4fe-67b7-4192-8f1c-766a9465ea97/e1f9230b-48d1-41d6-bb12-23e14e249df4.mp4\" (non-empty)\n- creditCost: 124.8 (positive)\n- durationSeconds: 4 (positive)\n\nAll checks pass. I should end with STEP_OK.</think>STEP_OK\n\nUser: [T11e i2i-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — generate a stylized cartoon version of this image. Output the transformed image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

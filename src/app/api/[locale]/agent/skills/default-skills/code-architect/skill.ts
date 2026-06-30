@@ -17,7 +17,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
 import type { Skill } from "../../config";
-import { tool } from "../../config";
+import { tool } from "../../constants";
 import {
   ContentLevel,
   IntelligenceLevel,

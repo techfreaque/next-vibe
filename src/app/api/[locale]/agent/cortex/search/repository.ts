@@ -497,7 +497,7 @@ function mergeResults(
         Math.round(
           (data.ftsScore * FTS_WEIGHT + data.vectorScore * VECTOR_WEIGHT) * 100,
         ) / 100,
-      updatedAt: data.updatedAt.toISOString(),
+      updatedAt: data.updatedAt,
     }))
     .toSorted((a, b) => b.score - a.score)
     .slice(0, limit);
@@ -513,7 +513,7 @@ function mergeResults(
       resultPath: r.path,
       excerpt: r.excerpt,
       score: r.score,
-      updatedAt: r.updatedAt.toISOString(),
+      updatedAt: r.updatedAt,
     });
   }
 

@@ -6,6 +6,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { AgentEnvAvailability } from "../../../agent/env-availability";
+
 // ============================================================================
 // DEEP PARTIAL
 // ============================================================================

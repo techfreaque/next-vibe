@@ -15,7 +15,7 @@ import {
   CORTEX_WRITE_ALIAS,
 } from "../../../cortex/constants";
 import type { Skill } from "../../config";
-import { tool } from "../../config";
+import { tool } from "../../constants";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
 import { THEA_CORE_PROMPT } from "../thea/core";
 import { THEA_VARIANTS } from "../thea/skill";

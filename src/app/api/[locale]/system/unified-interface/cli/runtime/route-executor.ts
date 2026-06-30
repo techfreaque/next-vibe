@@ -11,6 +11,7 @@ import type {
 import {
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -41,10 +42,7 @@ import {
   definitionLoader,
   type IDefinitionLoader,
 } from "../../shared/endpoints/definition/loader";
-import {
-  type BaseExecutionContext,
-  RouteExecutionExecutor,
-} from "../../shared/endpoints/route/executor";
+import type { BaseExecutionContext } from "../../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Platform } from "../../shared/types/platform";

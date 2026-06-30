@@ -37,7 +37,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../../shared/types/common.schema";
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "../../../../shared/types/common.schema";
 import { parseSkillId } from "../../../chat/slugify";
 import type {
   FiltersModelSelection,
@@ -58,7 +61,7 @@ const FavoriteCreateContainer = lazy(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "favorites", "create"],
+  path: ["agent", "skills", "favorites", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -217,7 +220,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       // === REQUEST ===
@@ -396,6 +399,7 @@ const { POST } = createEndpoint({
   // caches) AND relayed cross-instance (remoteEvent), where the peer's
   // onRemoteEvent upserts the row from the same payload. No schema, no extra
   // events — the request data IS the payload.
+  channel: { scope: "user" } as const,
   events: {
     "favorite-created": {
       remoteEvent: true as const,
@@ -488,7 +492,7 @@ const { POST } = createEndpoint({
           requestData.voiceModelSelection ?? null,
           locale,
           user,
-          availability,
+          agentEnvAvailability,
         );
 
         // View 1 — favorites list: append if not already present.

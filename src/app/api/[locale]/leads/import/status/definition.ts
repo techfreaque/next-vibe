@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -217,22 +218,22 @@ const { GET } = createEndpoint({
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "status.get.response.items.title",
-                  schema: z.string(),
+                  schema: dateSchema,
                 }),
                 updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "status.get.response.items.title",
-                  schema: z.string(),
+                  schema: dateSchema,
                 }),
                 startedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "status.get.response.items.title",
-                  schema: z.string().nullable(),
+                  schema: dateSchema.nullable(),
                 }),
                 completedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "status.get.response.items.title",
-                  schema: z.string().nullable(),
+                  schema: dateSchema.nullable(),
                 }),
               },
             }),

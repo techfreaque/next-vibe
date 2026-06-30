@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13ccc8618ac74e3-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:23:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782818607-ktyGKVpSzeHa6IGsDniD"
+  },
+  "body": {
+    "id": "gen-1782818607-ktyGKVpSzeHa6IGsDniD",
+    "object": "chat.completion",
+    "created": 1782818607,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a 10-second close-up, high-definition promotional or social media clip featuring a Rubik’s Cube.\n\n**Visual Content and Progression:**\nThe scene opens with a static, tight close-up shot of a pair of hands holding a standard 3x3 Rubik’s Cube. The person’s skin tone is tan/medium. The cube is being manipulated; the upper layer with white, orange, and blue faces is rotated. Specifically, the top side is white, the front side is blue, and the side facing the right of the frame is orange. A distinct, black-bordered white square sticker with a black \"X\" or \"plus\" mark is centered on the blue face, positioned in the middle of the top row. The background is a dense, slightly out-of-focus pile of numerous other Rubik’s Cubes, creating a chaotic, cluttered, yet colorful mosaic of red, yellow, green, blue, white, and orange plastic blocks. Throughout the 10 seconds, the hands continuously and rhythmically rotate the top and side layers of the cube, demonstrating a fluid, expert-level manipulation of the puzzle. There are no camera movements, transitions, or cuts; the shot remains locked in a static, eye-level close-up.\n\n**Audio:**\nThere is no human speech in the video. The primary audio consists of the distinct, rhythmic, mechanical sound of the Rubik's Cube segments clicking into place as they are rotated. These sounds are crisp and amplified, emphasizing the tactile nature of the puzzle. The background music is a fast-paced, high-energy electronic track, likely synth-pop or modern house, characterized by a steady synthetic beat, a driving bassline, and upbeat, professional production values.\n\n**Style and Production:**\nThe style is realistic and highly polished, resembling a high-quality commercial advertisement or a social media short produced for platforms like Instagram or TikTok. The lighting is soft and directed, highlighting the plastic texture of the cubes and the detail of the hands. The production quality is professional, utilizing a shallow depth of field (bokeh effect) to keep the viewer’s focus strictly on the cube in the foreground.\n\n**Mood and Arc:**\nThe mood is focused, stimulating, and energetic. There is no narrative development; rather, the video serves as a sensory demonstration of the puzzle. The goal is to project a feeling of satisfaction, precision, and hobbyist expertise. The arc remains constant throughout the duration, maintaining a steady tempo from the first second until the final frame.\n\n**Duration and Pacing:**\nThe video is exactly 10 seconds long. The pacing is quick and rhythmic, synchronized with the sharp \"click\" sounds of the cube and the steady tempo of the electronic music. The constant motion of the solver's fingers keeps the visual energy high and the viewer engaged.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgEMOdbHV7C+eqAIqJHRa8gAl5BqajMsNmDblh7PKPzW90cr4CG3dSLnGvUtx7qzymZc",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 593,
+      "total_tokens": 1002,
+      "cost": 0.00099175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00099175,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.0008895
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

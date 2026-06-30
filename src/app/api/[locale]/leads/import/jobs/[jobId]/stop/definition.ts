@@ -36,7 +36,7 @@ const ImportJobStopContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["leads", "import", "jobs", ":jobId", "stop"],
+  path: ["leads", "import", "jobs", "[jobId]", "stop"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

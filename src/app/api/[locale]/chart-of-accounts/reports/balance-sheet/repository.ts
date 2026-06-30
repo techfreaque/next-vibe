@@ -41,7 +41,7 @@ export class BalanceSheetRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
-      asOfDateResponse: string;
+      asOfDateResponse: Date;
       assets: BalanceLine[];
       totalAssets: number;
       liabilities: BalanceLine[];
@@ -66,7 +66,6 @@ export class BalanceSheetRepository {
 
     try {
       const asOfDate = data.asOfDate ? new Date(data.asOfDate) : new Date();
-      const asOfDateStr = asOfDate.toISOString().slice(0, 10);
 
       const entryConditions = [
         eq(journalEntries.companyId, data.companyId),
@@ -153,7 +152,7 @@ export class BalanceSheetRepository {
         Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.0001;
 
       return success({
-        asOfDateResponse: asOfDateStr,
+        asOfDateResponse: asOfDate,
         assets,
         totalAssets,
         liabilities,

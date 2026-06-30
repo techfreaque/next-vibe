@@ -41,8 +41,8 @@ export class TaxReportRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
-      fromResponse: string;
-      toResponse: string;
+      fromResponse: Date;
+      toResponse: Date;
       vatCollected: number;
       vatReclaimable: number;
       netVatPayable: number;
@@ -68,9 +68,6 @@ export class TaxReportRepository {
         ? new Date(data.from)
         : new Date(today.getFullYear(), 0, 1);
       const toDate = data.to ? new Date(data.to) : today;
-
-      const fromStr = fromDate.toISOString().slice(0, 10);
-      const toStr = toDate.toISOString().slice(0, 10);
 
       const entryConditions = [
         eq(journalEntries.companyId, data.companyId),
@@ -148,8 +145,8 @@ export class TaxReportRepository {
       });
 
       return success({
-        fromResponse: fromStr,
-        toResponse: toStr,
+        fromResponse: fromDate,
+        toResponse: toDate,
         vatCollected,
         vatReclaimable,
         netVatPayable,

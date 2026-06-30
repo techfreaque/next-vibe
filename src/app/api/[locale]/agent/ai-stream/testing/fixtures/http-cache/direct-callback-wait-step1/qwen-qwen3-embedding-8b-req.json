@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\n\nAssistant: <think> The user wants me to say exactly: \"BRANCH_RESPONSE STEP_OK\"\n\nThis is a fork-branch test. I should just output that exact string.</think> BRANCH_RESPONSE STEP_OK\n\nUser: [T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think> The user wants me to call `generate_video` with `prompt='spinning cube'` and check the result for `videoUrl`, `creditCost`, and `durationSeconds`.\n\nI need to first call `tool-help` to get the schema for `generate_video`, then call it. Wait, actually I can just call `execute-tool` directly since I know the tool name. Let me call `generate_video` with the prompt.</think>\n\nAssistant: <think>The result has:\n- `videoUrl`: non-empty URL\n- `creditCost`: 124.8 (positive)\n- `durationSeconds`: 4 (positive)\n\nEverything looks correct, so I'll respond with STEP_OK.</think>STEP_OK\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

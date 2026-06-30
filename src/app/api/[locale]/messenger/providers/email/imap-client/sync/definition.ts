@@ -37,7 +37,7 @@ const ImapSyncContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["messenger", "imap-client", "sync"],
+  path: ["messenger", "providers", "email", "imap-client", "sync"],
   aliases: ["messenger-imap-sync"] as const,
   title: "title",
   titleShort: "titleShort",

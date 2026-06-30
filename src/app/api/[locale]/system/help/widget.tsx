@@ -126,6 +126,7 @@ import { endpointToUrlSegment } from "@/app/api/[locale]/system/unified-interfac
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { EXECUTE_TOOL_ALIAS } from "../unified-interface/execute-tool/constants";
@@ -228,6 +229,7 @@ function useSidebarCollapsed(
 ): [boolean, (collapsed: boolean) => void] {
   const entry = _getOrCreateSidebarEntry(storageId);
   const [collapsed, setLocalCollapsed] = useState(entry.collapsed);
+  const logger = useLogger();
 
   useEffect(() => {
     const listener = (v: boolean): void => setLocalCollapsed(v);
@@ -238,7 +240,7 @@ function useSidebarCollapsed(
         const v =
           stored !== null
             ? (JSON.parse(stored) as boolean)
-            : getScreenWidth() < 930;
+            : getScreenWidth(logger) < 930;
         entry.collapsed = v;
         for (const l of entry.listeners) {
           l(v);
@@ -249,7 +251,7 @@ function useSidebarCollapsed(
     return (): void => {
       entry.listeners.delete(listener);
     };
-  }, [storageId, entry]);
+  }, [storageId, entry, logger]);
 
   const setCollapsed = useCallback(
     (value: boolean): void => {
@@ -1089,7 +1091,9 @@ export function HelpToolsWidget(): JSX.Element {
       }
     > = {};
     for (const tool of visibleTools) {
-      const category = tool.category;
+      // category is omitted on compact (AI/MCP) payloads; web always sets it,
+      // but fall back so the grouping is total.
+      const category = tool.category ?? "";
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
       }
@@ -2628,7 +2632,7 @@ export function HelpToolsWidget(): JSX.Element {
                       categories.map(({ name, count }) => [name, count]),
                     )
                   : visibleTools.reduce((map, tool) => {
-                      const cat = tool.category;
+                      const cat = tool.category ?? "";
                       map.set(cat, (map.get(cat) ?? 0) + 1);
                       return map;
                     }, new Map<string, number>());

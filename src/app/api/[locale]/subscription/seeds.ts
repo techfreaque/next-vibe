@@ -248,11 +248,11 @@ export async function dev(
             providerSubscriptionId:
               adminCreatedSubscription.providerSubscriptionId || undefined,
             currentPeriodStart:
-              adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
+              adminCreatedSubscription.currentPeriodStart ?? new Date(),
             currentPeriodEnd:
-              adminCreatedSubscription.currentPeriodEnd?.toISOString() ?? "",
-            createdAt: adminCreatedSubscription.createdAt.toISOString(),
-            updatedAt: adminCreatedSubscription.updatedAt.toISOString(),
+              adminCreatedSubscription.currentPeriodEnd ?? new Date(),
+            createdAt: adminCreatedSubscription.createdAt,
+            updatedAt: adminCreatedSubscription.updatedAt,
           };
         }
       } else {

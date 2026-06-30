@@ -189,7 +189,7 @@ export class LeadStatsRepository {
         recentActivity,
         topPerformingCampaigns,
         topPerformingSources,
-        generatedAt: new Date().toISOString(),
+        generatedAt: new Date(),
         dataRange: {
           from: dateFrom.toISOString(),
           to: dateTo.toISOString(),
@@ -1091,7 +1091,7 @@ export class LeadStatsRepository {
       id: lead.id,
       leadEmail: lead.email || "",
       leadBusinessName: lead.businessName || "",
-      timestamp: lead.timestamp.toISOString(),
+      timestamp: lead.timestamp,
       type: LeadStatsRepository.mapLeadStatusToActivityType(lead.status),
       details: {
         status: lead.status,

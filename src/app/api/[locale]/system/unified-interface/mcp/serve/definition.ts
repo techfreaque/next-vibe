@@ -39,6 +39,7 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
   ] as const,
+  timeoutMs: 0,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

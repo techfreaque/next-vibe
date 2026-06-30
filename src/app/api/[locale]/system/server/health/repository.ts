@@ -118,7 +118,7 @@ export class HealthCheckRepository {
 
       const response: HealthCheckResponseOutput = {
         status: overallStatus,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         uptime: Date.now() - HealthCheckRepository.startTime,
         environment: {
           name: envInfo.environment,

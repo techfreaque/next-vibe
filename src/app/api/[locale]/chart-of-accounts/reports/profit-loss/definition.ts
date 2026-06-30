@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -85,12 +86,12 @@ const { GET } = createEndpoint({
       fromResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "profitLoss.response.from" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       toResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "profitLoss.response.to" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       revenue: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,

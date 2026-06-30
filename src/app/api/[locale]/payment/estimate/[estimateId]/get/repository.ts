@@ -76,9 +76,7 @@ export class EstimateGetRepository {
         customerEmail: estimate.customerEmail ?? null,
         customerName: estimate.customerName ?? null,
         currency: estimate.currency,
-        validUntil: estimate.validUntil
-          ? estimate.validUntil.toISOString()
-          : null,
+        validUntil: estimate.validUntil ?? null,
         title: estimate.title ?? null,
         notes: estimate.notes ?? null,
         terms: estimate.terms ?? null,
@@ -86,8 +84,8 @@ export class EstimateGetRepository {
         taxAmount: estimate.taxAmount,
         total: estimate.total,
         invoiceId: estimate.invoiceId ?? null,
-        createdAt: estimate.createdAt.toISOString(),
-        updatedAt: estimate.updatedAt.toISOString(),
+        createdAt: estimate.createdAt,
+        updatedAt: estimate.updatedAt,
         lines: lines.map((l) => ({
           id: l.id,
           description: l.description,

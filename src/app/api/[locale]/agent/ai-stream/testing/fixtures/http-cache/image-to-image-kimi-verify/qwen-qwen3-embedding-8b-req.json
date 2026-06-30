@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11f i2i-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — generate a stylized cartoon version of this image. the generate_image tool with prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think> The user wants me to generate a stylized cartoon version of an image from a URL. They specifically mention using the `generate_image` tool with:\n- prompt='stylized cartoon portrait, vibrant colors'\n- inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'\n\nI need to:\n1. Call generate_image with those parameters\n2. Check that the result has a non-empty imageUrl and a positive creditCost\n3. End with STEP_OK if correct, or FAILED: <reason>\n\nLet me first get the tool schema for generate_image to make sure I understand the parameters correctly.</think>\n\nAssistant: <think> The user wants me to generate a stylized cartoon version of an image using the `generate_image` tool with `inputMediaUrl`. Let me call this tool with the specified parameters</think>\n\nAssistant: <think> The result is:\n- imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/2aff13f2-1e4f-4d37-aa5f-4cdafb177749/0eb5b02a-8c66-47c1-b502-7aad003ac001.png\" (non-empty)\n- creditCost: 4.2 (positive)\n\nBoth conditions are met. I should report STEP_OK.</think> STEP_OK\n\nUser: [T11f-verify image-visibility] IMPORTANT: Do NOT use any tools. Do NOT call describe_image or fetch or any other tool. Just answer directly based on what you can already see in the conversation. In the previous step (T11f) you called generate_image. Can you see the generated output image as an inline image (not just a URL string) in the tool result from that step? If YES — you can see an actual image (any image, regardless of content) — reply with STEP_OK and briefly describe what the image shows. If NO — you cannot see any inline image, only a text URL or JSON — reply with FAILED: <explain what you see instead>.",
+    "encoding_format": "float"
+  }
+}

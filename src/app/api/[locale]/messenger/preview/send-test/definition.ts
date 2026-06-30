@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -121,7 +122,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "preview.sendTest.post.fields.message.title" as const,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

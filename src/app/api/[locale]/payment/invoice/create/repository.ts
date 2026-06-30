@@ -116,11 +116,11 @@ export class InvoiceCreateRepository {
           invoiceSequenceNumber: invoice.invoiceSequenceNumber ?? null,
           currency: invoice.currency,
           status: invoice.status,
-          dueDate: invoice.dueDate ? invoice.dueDate.toISOString() : null,
+          dueDate: invoice.dueDate ?? null,
           notes: invoice.notes ?? null,
           amount: invoice.amount,
-          createdAt: invoice.createdAt.toISOString(),
-          updatedAt: invoice.updatedAt.toISOString(),
+          createdAt: invoice.createdAt,
+          updatedAt: invoice.updatedAt,
         },
       });
     } catch (error) {

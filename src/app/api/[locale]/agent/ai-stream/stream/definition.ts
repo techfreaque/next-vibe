@@ -141,7 +141,9 @@ const { POST } = createEndpoint({
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: threadsDefinitions.GET,
+        listEndpoint: async () =>
+          (await import("@/app/api/[locale]/agent/chat/threads/definition"))
+            .default.GET,
         labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",
@@ -369,7 +371,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.FILE,
           // Accept both browser File objects (normal UI) and base64 wire format
-          // (from remote relay POST bodies sent by stream-relay.ts).
+          // (from remote relay POST bodies).
           schema: z.union([
             z.instanceof(File),
             z
@@ -456,108 +458,75 @@ const { POST } = createEndpoint({
       }),
 
       // === WS-PROVIDER / REMOTE RELAY FIELDS ===
-      // These fields are only used when the request comes from a remote relay caller
-      // (e.g. Atlas relaying to Hermes). Normal chat requests leave them undefined.
-      instanceId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.instanceId.label",
-        description: "post.instanceId.description",
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-      tools: requestDataArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "post.tools.title",
-          description: "post.tools.description",
-        },
-        objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          usage: { request: "data" },
-          children: {
-            name: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "post.tools.name.label",
-              description: "post.tools.name.description",
-              columns: 4,
-              schema: z.string().min(1),
-            }),
-            description: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "post.tools.toolDescription.label",
-              description: "post.tools.toolDescription.description",
-              columns: 4,
-              schema: z.string(),
-            }),
-            parameters: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
-              label: "post.tools.parameters.label",
-              description: "post.tools.parameters.description",
-              columns: 4,
-              schema: z.record(z.string(), z.unknown()),
-            }),
-          },
-        }),
-      ),
-      folderPath: requestField(scopedTranslation, {
+      // Discriminated union encoding how this stream should be executed.
+      // Normal chat requests use the default { mode: "local" }.
+      // Remote relay callers send inference-provider or relay context.
+      executionContext: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "post.folderPath.label",
-        description: "post.folderPath.description",
-        columns: 6,
-        schema: z.array(z.string()).optional(),
-      }),
-      threadMirrorMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.threadMirrorMode.label",
-        description: "post.threadMirrorMode.description",
-        columns: 6,
-        schema: z.enum(["both", "local", "cloud", "none"]).optional(),
-      }),
-      systemPrompt: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        label: "post.systemPrompt.label",
-        description: "post.systemPrompt.description",
-        placeholder: "post.systemPrompt.placeholder",
+        label: "post.executionContext.label",
+        description: "post.executionContext.description",
         columns: 12,
-        schema: z.string().optional(),
+        schema: z
+          .discriminatedUnion("mode", [
+            z.object({ mode: z.literal("local") }),
+            z.object({
+              mode: z.literal("inference-provider"),
+              instanceId: z.string(),
+              /** Original requesting user — provider runs AI under its own user but
+               *  must dispatch tool call-backs and emit events under the caller's identity. */
+              callerUserId: z.string().uuid(),
+              callerLeadId: z.string().uuid(),
+              tools: z
+                .array(
+                  z.object({
+                    name: z.string().min(1),
+                    description: z.string(),
+                    parameters: z.custom<JSONSchema7>(),
+                  }),
+                )
+                .optional(),
+              systemPrompt: z.string().optional(),
+              confirmationOverrides: z
+                .array(
+                  z.object({
+                    toolId: z.string(),
+                    requiresConfirmation: z.boolean(),
+                  }),
+                )
+                .optional(),
+            }),
+            z.object({
+              mode: z.literal("relay"),
+              instanceId: z.string(),
+              /** Original requesting user — provider runs AI under its own user but
+               *  must dispatch tool call-backs and emit events under the caller's identity. */
+              callerUserId: z.string().uuid(),
+              callerLeadId: z.string().uuid(),
+              threadMirrorMode: z.enum(["both", "local", "cloud", "none"]),
+              folderPath: z.array(z.string()).optional(),
+              systemPrompt: z.string().optional(),
+              tools: z
+                .array(
+                  z.object({
+                    name: z.string().min(1),
+                    description: z.string(),
+                    parameters: z.custom<JSONSchema7>(),
+                  }),
+                )
+                .optional(),
+              confirmationOverrides: z
+                .array(
+                  z.object({
+                    toolId: z.string(),
+                    requiresConfirmation: z.boolean(),
+                  }),
+                )
+                .optional(),
+            }),
+          ])
+          .default({ mode: "local" }),
       }),
-      confirmationOverrides: requestDataArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "post.confirmationOverrides.title",
-          description: "post.confirmationOverrides.description",
-        },
-        objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          usage: { request: "data" },
-          children: {
-            toolId: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "post.confirmationOverrides.toolId.label",
-              description: "post.confirmationOverrides.toolId.description",
-              schema: z.string(),
-            }),
-            requiresConfirmation: requestField(scopedTranslation, {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "post.confirmationOverrides.requiresConfirmation.label",
-              description:
-                "post.confirmationOverrides.requiresConfirmation.description",
-              schema: z.boolean(),
-            }),
-          },
-        }),
-      ),
 
       // === TIMEZONE (for cache-stable timestamps) ===
       timezone: requestField(scopedTranslation, {
@@ -689,6 +658,7 @@ const { POST } = createEndpoint({
         voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
+        executionContext: { mode: "local" },
       },
       withSkill: {
         operation: "send",
@@ -709,6 +679,7 @@ const { POST } = createEndpoint({
         voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
+        executionContext: { mode: "local" },
       },
       retry: {
         operation: "retry",
@@ -729,6 +700,7 @@ const { POST } = createEndpoint({
         voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
         timezone: "America/New_York",
+        executionContext: { mode: "local" },
       },
     },
     responses: {

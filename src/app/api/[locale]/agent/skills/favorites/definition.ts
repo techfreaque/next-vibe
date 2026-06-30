@@ -48,7 +48,7 @@ const FavoritesListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "favorites"],
+  path: ["agent", "skills", "favorites"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
   defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
@@ -244,7 +244,8 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
-              label: "get.response.favorite.separator.content" as const,
+              inline: true,
+              content: "get.response.favorite.separator.content" as const,
               usage: { response: true },
             }),
             modelProvider: responseField(scopedTranslation, {
@@ -258,8 +259,9 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
+              inline: true,
               className: "hidden sm:inline",
-              label: "get.response.favorite.separator.content" as const,
+              content: "get.response.favorite.separator.content" as const,
               usage: { response: true },
             }),
           },

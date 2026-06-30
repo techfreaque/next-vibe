@@ -143,14 +143,14 @@ export class InvoiceListRepository {
             currency: row.currency,
             status: row.status,
             amount: row.amount,
-            dueDate: row.dueDate ? row.dueDate.toISOString() : null,
+            dueDate: row.dueDate ?? null,
             notes: row.notes ?? null,
             lineCount: lineCounts.get(row.id) ?? 0,
             amountPaid,
             amountDue,
             isOverdue,
-            createdAt: row.createdAt.toISOString(),
-            updatedAt: row.updatedAt.toISOString(),
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
           };
         });
 

@@ -158,12 +158,11 @@ export class EmailStatsRepository {
         ...currentPeriodStats,
         historicalData,
         groupedStats,
-        generatedAt: new Date().toISOString(),
+        generatedAt: new Date(),
         dataRange: {
           from:
-            dateRange?.from?.toISOString() ||
-            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          to: dateRange?.to?.toISOString() || new Date().toISOString(),
+            dateRange?.from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          to: dateRange?.to || new Date(),
         },
         recentActivity,
         topPerformingTemplates,
@@ -892,7 +891,7 @@ export class EmailStatsRepository {
       return {
         id: email.id,
         action: activityType,
-        timestamp: email.createdAt.toISOString(),
+        timestamp: email.createdAt,
         details: email.subject || undefined,
       };
     });

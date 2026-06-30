@@ -36,7 +36,7 @@ const ImportJobRetryContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["leads", "import", "jobs", ":jobId", "retry"],
+  path: ["leads", "import", "jobs", "[jobId]", "retry"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

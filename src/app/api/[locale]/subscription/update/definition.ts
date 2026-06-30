@@ -5,6 +5,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -90,12 +91,12 @@ const { PUT } = createEndpoint({
       currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.currentPeriodStart" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.currentPeriodEnd" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -105,12 +106,12 @@ const { PUT } = createEndpoint({
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.createdAt" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.updatedAt" as const,
-        schema: z.string(),
+        schema: dateSchema,
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

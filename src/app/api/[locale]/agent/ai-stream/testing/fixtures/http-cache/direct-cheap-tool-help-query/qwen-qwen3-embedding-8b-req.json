@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user asked me to:\n1. Call tool-help with no arguments to get categories list\n2. Pick one category and call tool-help with category='<name>' to get tools in it\n3. Check that the second call returns a non-empty tools array and each tool has name and description\n4. End reply with STEP_OK or FAILED: <reason>\n\nResults:\n1. First call returned categories list with 22 categories, each having name and count. Looks good.\n2. I picked \"cortex\" category.\n3. Second call returned 12 tools, non-empty array. Each tool has:\n   - name (e.g., \"cortex-delete\")\n   - description (e.g., \"Remove a file or folder. Gone forever.\")\n   - Also has title but that's extra\n\nEverything looks correct. I should end with STEP_OK.</think> The first call returned **22 categories** (e.g., `account`, `ai`, `analytics`\n\nUser: [T1a-cat tool-help-category] Call the tool-help tool with category='ai' to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think> The user wants me to call tool-help with category='ai' and verify the result has a non-empty tools array where each tool has a name and description.</think>\n\nAssistant: <think> The user asked me to call tool-help with category='ai' and check that:\n1. The result contains a non-empty tools array\n2. Each tool has a name and description\n\nLooking at the result:\n- matchedCount: 69\n- tools array has 69 items (non-empty)\n- Each tool has a \"name\" field\n- Each tool has a \"description\" field\n\nSome also have \"title\", \"aliases\", \"credits\" - but the requirement is just name and description.\n\nEverything looks correct. I'll end with STEP_OK.</think> The call returned **69 tools** in the `ai` category. The `tools` array is non-empty, and every entry includes both a `name` and a `description` field.\n\nSTEP_OK\n\nUser: [T1a-query tool-help-query] Call the tool-help tool with query='search' to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

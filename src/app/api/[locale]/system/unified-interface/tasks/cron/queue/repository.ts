@@ -90,8 +90,8 @@ export class CronQueueRepository {
       averageExecutionTime: task.averageExecutionTime ?? null,
       consecutiveFailures: task.consecutiveFailures,
       owner: dbUserIdToOwner(task.userId),
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
     };
   }
 

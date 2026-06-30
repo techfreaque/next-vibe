@@ -34,8 +34,8 @@ export class CortexTerminalsRepository {
       connectionSlug: s.connectionSlug,
       cwd: s.cwd,
       name: s.name,
-      openedAt: s.openedAt.toISOString(),
-      lastCommandAt: s.lastCommandAt.toISOString(),
+      openedAt: s.openedAt,
+      lastCommandAt: s.lastCommandAt,
       status: s.status,
     }));
 

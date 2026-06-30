@@ -36,6 +36,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { clearStreamingState } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream-registry";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   chatMessages,
@@ -146,9 +147,9 @@ export class ResumeStreamRepository {
         });
       }
 
-      // After polling: check if wait-for-task intercepted this wakeUp while the stream
+      // After polling: check if await-task intercepted this wakeUp while the stream
       // was settling. The task row is deleted (completed branch) or has wakeUpCallbackMode=WAIT
-      // (pending branch). Either way, wait-for-task delivered the result inline - skip revival.
+      // (pending branch). Either way, await-task delivered the result inline - skip revival.
       if (wakeUpTaskId && callbackMode === "wakeUp") {
         const [taskRow] = await db
           .select({ wakeUpCallbackMode: cronTasks.wakeUpCallbackMode })
@@ -156,10 +157,10 @@ export class ResumeStreamRepository {
           .where(eq(cronTasks.id, wakeUpTaskId))
           .limit(1);
         // Task gone (deleted by complete-task cleanup) = normal flow, proceed with revival.
-        // Only skip if the task exists with callbackMode=wait, meaning wait-for-task intercepted it.
+        // Only skip if the task exists with callbackMode=wait, meaning await-task intercepted it.
         if (taskRow?.wakeUpCallbackMode === "wait") {
           logger.debug(
-            "[ResumeStream] wakeUp task intercepted by wait-for-task - skipping revival",
+            "[ResumeStream] wakeUp task intercepted by await-task - skipping revival",
             { wakeUpTaskId },
           );
           return success({ resumed: false, lastAiMessageId: null });
@@ -389,18 +390,19 @@ export class ResumeStreamRepository {
                         sql`${chatThreads.streamingState} = 'streaming'`,
                       ),
                     );
-                  createMessagesEmitter(
-                    effectiveThreadId,
-                    logger,
-                    user,
-                  )("streaming-state-changed", {
-                    streamingState: ThreadStreamingState.IDLE,
+                  createMessagesEmitter(logger, user, {
+                    rootFolderId: threadRootFolderId,
+                  })("streaming-state-changed", {
+                    responseData: {
+                      streamingState: ThreadStreamingState.IDLE,
+                    },
+                    urlPathParams: { threadId: effectiveThreadId },
                   });
                   logger.debug(
                     "[ResumeStream] wakeUp - cleared stuck streaming state (idempotency path)",
                     { threadId: effectiveThreadId },
                   );
-                } catch (_e) {
+                } catch {
                   // non-fatal
                 }
               }
@@ -487,12 +489,13 @@ export class ResumeStreamRepository {
                 abortSignal: revivalAbortSignal,
               })
                 .then(async (result) => {
-                  createMessagesEmitter(
-                    threadId,
-                    logger,
-                    user,
-                  )("stream-finished", {
-                    streamingState: ThreadStreamingState.IDLE,
+                  createMessagesEmitter(logger, user, {
+                    rootFolderId: threadRootFolderId,
+                  })("stream-finished", {
+                    responseData: {
+                      streamingState: ThreadStreamingState.IDLE,
+                    },
+                    urlPathParams: { threadId },
                   });
                   logger.debug(
                     "[ResumeStream] wakeUp revival (from existing deferred) complete",
@@ -684,50 +687,52 @@ export class ResumeStreamRepository {
               metadata: { toolCall: deferredToolCall },
             });
 
-            createMessagesEmitter(
-              effectiveThreadId,
-              logger,
-              user,
-            )("message-created", {
-              streamingState: ThreadStreamingState.STREAMING,
-              messages: [
-                {
-                  id: deferredId,
-                  threadId: effectiveThreadId,
-                  role: ChatMessageRole.TOOL,
-                  parentId: leafId,
-                  content: null,
-                  model: resolvedModel,
-                  skill: resolvedSkill,
-                  sequenceId: deferredSequenceId,
-                  metadata: { toolCall: deferredToolCall },
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  isAI: true,
-                  authorId:
-                    resolvedExisting?.authorId ?? existing?.authorId ?? null,
-                  authorName: null,
-                  errorType: null,
-                  errorCode: null,
-                  errorMessage: null,
-                  upvotes: 0,
-                  downvotes: 0,
-                  searchVector: null,
-                },
-              ],
+            createMessagesEmitter(logger, user, {
+              rootFolderId: threadRootFolderId,
+            })("message-created", {
+              urlPathParams: { threadId: effectiveThreadId },
+              responseData: {
+                streamingState: ThreadStreamingState.STREAMING,
+                messages: [
+                  {
+                    id: deferredId,
+                    threadId: effectiveThreadId,
+                    role: ChatMessageRole.TOOL,
+                    parentId: leafId,
+                    content: null,
+                    model: resolvedModel,
+                    skill: resolvedSkill,
+                    sequenceId: deferredSequenceId,
+                    metadata: { toolCall: deferredToolCall },
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    isAI: true,
+                    authorId:
+                      resolvedExisting?.authorId ?? existing?.authorId ?? null,
+                    authorName: null,
+                    errorType: null,
+                    errorCode: null,
+                    errorMessage: null,
+                    upvotes: 0,
+                    downvotes: 0,
+                    searchVector: null,
+                  },
+                ],
+              },
             });
 
-            createMessagesEmitter(
-              effectiveThreadId,
-              logger,
-              user,
-            )("tool-result", {
-              messages: [
-                {
-                  id: deferredId,
-                  metadata: { toolCall: deferredToolCall },
-                },
-              ],
+            createMessagesEmitter(logger, user, {
+              rootFolderId: threadRootFolderId,
+            })("tool-result", {
+              urlPathParams: { threadId: effectiveThreadId },
+              responseData: {
+                messages: [
+                  {
+                    id: deferredId,
+                    metadata: { toolCall: deferredToolCall },
+                  },
+                ],
+              },
             });
 
             const revivalParentId = deferredId;
@@ -764,12 +769,13 @@ export class ResumeStreamRepository {
               abortSignal: revivalAbortSignal,
             })
               .then(async (result) => {
-                createMessagesEmitter(
-                  threadId,
-                  logger,
-                  user,
-                )("stream-finished", {
-                  streamingState: ThreadStreamingState.IDLE,
+                createMessagesEmitter(logger, user, {
+                  rootFolderId: threadRootFolderId,
+                })("stream-finished", {
+                  responseData: {
+                    streamingState: ThreadStreamingState.IDLE,
+                  },
+                  urlPathParams: { threadId },
                 });
                 logger.debug("[ResumeStream] wakeUp revival complete", {
                   threadId,
@@ -818,12 +824,13 @@ export class ResumeStreamRepository {
                     ),
                   )
                   .catch(() => undefined);
-                createMessagesEmitter(
-                  effectiveThreadId,
-                  logger,
-                  user,
-                )("streaming-state-changed", {
-                  streamingState: ThreadStreamingState.IDLE,
+                createMessagesEmitter(logger, user, {
+                  rootFolderId: threadRootFolderId,
+                })("streaming-state-changed", {
+                  responseData: {
+                    streamingState: ThreadStreamingState.IDLE,
+                  },
+                  urlPathParams: { threadId: effectiveThreadId },
                 });
               });
 
@@ -837,17 +844,18 @@ export class ResumeStreamRepository {
           if (isLive && !isWaitMode) {
             // Stream still running - live loop will pick up the backfilled result.
             // Emit TOOL_RESULT WS so the UI bubble updates immediately.
-            createMessagesEmitter(
-              effectiveThreadId,
-              logger,
-              user,
-            )("tool-result", {
-              messages: [
-                {
-                  id: toolMessageId,
-                  metadata: { toolCall },
-                },
-              ],
+            createMessagesEmitter(logger, user, {
+              rootFolderId: threadRootFolderId,
+            })("tool-result", {
+              urlPathParams: { threadId: effectiveThreadId },
+              responseData: {
+                messages: [
+                  {
+                    id: toolMessageId,
+                    metadata: { toolCall },
+                  },
+                ],
+              },
             });
 
             logger.debug(
@@ -891,17 +899,18 @@ export class ResumeStreamRepository {
           // Emit tool-result WS so UI updates, then fire headless stream.
           if (isWaitMode) {
             // Emit tool-result WS so the UI bubble shows the real result.
-            createMessagesEmitter(
-              effectiveThreadId,
-              logger,
-              user,
-            )("tool-result", {
-              messages: [
-                {
-                  id: toolMessageId,
-                  metadata: { toolCall },
-                },
-              ],
+            createMessagesEmitter(logger, user, {
+              rootFolderId: threadRootFolderId,
+            })("tool-result", {
+              urlPathParams: { threadId: effectiveThreadId },
+              responseData: {
+                messages: [
+                  {
+                    id: toolMessageId,
+                    metadata: { toolCall },
+                  },
+                ],
+              },
             });
 
             logger.debug(
@@ -1006,12 +1015,13 @@ export class ResumeStreamRepository {
                   ),
                 )
                 .catch(() => undefined);
-              createMessagesEmitter(
-                effectiveThreadId,
-                logger,
-                user,
-              )("streaming-state-changed", {
-                streamingState: ThreadStreamingState.IDLE,
+              createMessagesEmitter(logger, user, {
+                rootFolderId: threadRootFolderId,
+              })("streaming-state-changed", {
+                responseData: {
+                  streamingState: ThreadStreamingState.IDLE,
+                },
+                urlPathParams: { threadId: effectiveThreadId },
               });
               return success({ resumed: true, lastAiMessageId: null });
             }
@@ -1040,20 +1050,22 @@ export class ResumeStreamRepository {
                   ),
                 )
                 .catch(() => undefined);
-              createMessagesEmitter(
-                effectiveThreadId,
-                logger,
-                user,
-              )("streaming-state-changed", {
-                streamingState: ThreadStreamingState.IDLE,
+              createMessagesEmitter(logger, user, {
+                rootFolderId: threadRootFolderId,
+              })("streaming-state-changed", {
+                responseData: {
+                  streamingState: ThreadStreamingState.IDLE,
+                },
+                urlPathParams: { threadId: effectiveThreadId },
               });
             } else {
-              createMessagesEmitter(
-                threadId,
-                logger,
-                user,
-              )("stream-finished", {
-                streamingState: ThreadStreamingState.IDLE,
+              createMessagesEmitter(logger, user, {
+                rootFolderId: threadRootFolderId,
+              })("stream-finished", {
+                responseData: {
+                  streamingState: ThreadStreamingState.IDLE,
+                },
+                urlPathParams: { threadId },
               });
               // Clean up any error messages that are children of the tool message.
               db.delete(chatMessages)
@@ -1138,12 +1150,13 @@ export class ResumeStreamRepository {
                 sql`${chatThreads.streamingState} = 'waiting'`,
               ),
             );
-          createMessagesEmitter(
-            threadId,
-            logger,
-            user,
-          )("streaming-state-changed", {
-            streamingState: ThreadStreamingState.IDLE,
+          createMessagesEmitter(logger, user, {
+            rootFolderId: threadRootFolderId,
+          })("streaming-state-changed", {
+            responseData: {
+              streamingState: ThreadStreamingState.IDLE,
+            },
+            urlPathParams: { threadId },
           });
           logger.debug(
             "[ResumeStream] Cleared thread from waiting to idle (no-op path)",

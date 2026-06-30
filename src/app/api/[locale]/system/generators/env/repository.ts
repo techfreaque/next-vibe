@@ -22,6 +22,7 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/logger/formatters";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { stripProjectRoot } from "../shared/utils";
 import type { GeneratorsEnvT } from "./i18n";
@@ -90,7 +91,7 @@ interface EnvGeneratorRequestType {
 
 interface EnvGeneratorResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   serverEnvFiles: number;
   clientEnvFiles: number;
   duration: number;

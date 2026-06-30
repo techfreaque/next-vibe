@@ -147,7 +147,8 @@ function LeadCard({
       <Div className="flex justify-between text-xs text-muted-foreground">
         <Span>
           {t("widget.columnStarted")}:{" "}
-          {formatDate(item.startedAt, locale) ?? t("widget.never")}
+          {formatDate(item.startedAt.toISOString(), locale) ??
+            t("widget.never")}
         </Span>
         <Span>
           {t("widget.columnNext")}:{" "}
@@ -320,7 +321,8 @@ export function CampaignQueueWidget(): React.JSX.Element {
                   {item.emailsClicked}
                 </Div>
                 <Div className="px-3 py-2 text-xs text-muted-foreground">
-                  {formatDate(item.startedAt, locale) ?? t("widget.never")}
+                  {formatDate(item.startedAt.toISOString(), locale) ??
+                    t("widget.never")}
                 </Div>
               </Div>
             ))}

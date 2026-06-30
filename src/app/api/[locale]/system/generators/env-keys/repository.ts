@@ -26,6 +26,7 @@ import type {
   EnvExample,
   EnvFieldType,
 } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import {
   generateFileHeader,
@@ -41,7 +42,7 @@ interface EnvKeysRequestType {
 
 interface EnvKeysResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   keysFound: number;
   duration: number;
   outputFile?: string;

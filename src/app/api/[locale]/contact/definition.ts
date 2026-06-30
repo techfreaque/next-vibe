@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   EndpointErrorTypes,
@@ -118,7 +119,7 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
-        schema: z.string(),
+        schema: translatedValueSchema,
         type: WidgetType.ALERT,
         columns: 12,
       }),

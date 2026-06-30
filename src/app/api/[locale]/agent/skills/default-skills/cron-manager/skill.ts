@@ -16,7 +16,7 @@ import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
-import { tool } from "../../config";
+import { tool } from "../../constants";
 import {
   ContentLevel,
   IntelligenceLevel,

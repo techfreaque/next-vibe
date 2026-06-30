@@ -600,6 +600,10 @@ export const translations = {
       community: "Community",
       verified: "Verified",
     },
+    voteDirection: {
+      up: "Upvote",
+      down: "Downvote",
+    },
   },
   modelSelection: {
     sort: {

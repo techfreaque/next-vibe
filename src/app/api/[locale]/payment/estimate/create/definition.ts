@@ -225,12 +225,12 @@ const { POST } = createEndpoint({
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.estimate.createdAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.estimate.updatedAt" as const,
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),

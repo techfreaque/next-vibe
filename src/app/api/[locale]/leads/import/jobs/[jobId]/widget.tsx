@@ -47,7 +47,7 @@ const STATUS_VARIANT: Record<string, PillVariant> = {
   [CsvImportJobStatus.FAILED]: "danger",
 };
 
-function formatTimestamp(value: string | null | undefined): string {
+function formatTimestamp(value: Date | null | undefined): string {
   if (!value) {
     return "—";
   }
@@ -57,7 +57,7 @@ function formatTimestamp(value: string | null | undefined): string {
       timeStyle: "short",
     });
   } catch {
-    return value;
+    return value.toISOString();
   }
 }
 

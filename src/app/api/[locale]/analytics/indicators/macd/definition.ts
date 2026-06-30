@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [MACD_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "indicators", "macd"],
+  path: ["analytics", "indicators", "macd"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

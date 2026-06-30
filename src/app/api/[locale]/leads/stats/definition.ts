@@ -973,7 +973,7 @@ const { GET } = createEndpoint({
             timestamp: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "response.generatedAt",
-              schema: z.string(),
+              schema: dateSchema,
             }),
             type: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
@@ -1037,7 +1037,7 @@ const { GET } = createEndpoint({
       generatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.generatedAt",
-        schema: z.string(),
+        schema: dateSchema,
       }),
 
       dataRange: responseField(scopedTranslation, {

@@ -65,7 +65,7 @@ export const translations: typeof enTranslations = {
           routeId: {
             label: "Tool-ID",
             description:
-              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_skills_GET'). Verwende tool-help zur Tool-Entdeckung.",
+              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_skills_GET'). Verwende tool-help zur Tool-Entdeckung.",
             placeholder: "web-search",
           },
           args: {

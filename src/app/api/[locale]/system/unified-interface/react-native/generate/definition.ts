@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -36,7 +37,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["generate:expo", "native:generate"],
   method: Methods.POST,
-  path: ["system", "react-native", "generate"],
+  path: ["system", "unified-interface", "react-native", "generate"],
   examples: {
     responses: {
       default: {
@@ -90,7 +91,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "generate.post.response.fields.message",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

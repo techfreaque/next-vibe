@@ -14,7 +14,6 @@ export const { GET, POST, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: async ({ data, user, locale, t, logger }) =>
       CronTasksListRepository.getTasks(data, user, locale, t, logger),
-    canSubscribe: ({ user }) => !!user.id,
   },
   [Methods.POST]: {
     handler: async ({ data, user, locale, t, logger }) =>

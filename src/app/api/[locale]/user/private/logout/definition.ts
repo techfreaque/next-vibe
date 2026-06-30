@@ -3,8 +3,7 @@
  * Production-ready endpoint for user logout functionality
  */
 
-import { z } from "zod";
-
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -53,7 +52,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         label: "response.message",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

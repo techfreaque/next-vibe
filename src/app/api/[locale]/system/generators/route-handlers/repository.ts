@@ -20,8 +20,10 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/logger/formatters";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { GenericHandlerBase } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -43,10 +45,18 @@ interface RouteHandlersRequestType {
 
 interface RouteHandlersResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   routesFound: number;
   duration: number;
   outputFile?: string;
+}
+
+/**
+ * Strip brackets so a dynamic segment compares equal to its declared form:
+ * filesystem "[id]" and declared path "[id]" both reduce to "id".
+ */
+function sanitizePathSegmentForCompare(seg: string): string {
+  return seg.replaceAll(/\[|\]/g, "");
 }
 
 /**
@@ -109,6 +119,26 @@ export class RouteHandlersGeneratorRepository {
         );
       }
 
+      // Validate declared paths match the filesystem before generating. A
+      // mismatch produces a route that 404s on the dev server (silent 200 HTML),
+      // which hangs any client read of that endpoint — fail loudly instead.
+      const pathErrors =
+        await RouteHandlersGeneratorRepository.validateDefinitionPaths(
+          validRouteFiles,
+        );
+      if (pathErrors.length > 0) {
+        for (const err of pathErrors) {
+          logger.error(formatWarning(err));
+        }
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            duration: Date.now() - startTime,
+          },
+        });
+      }
+
       // Generate content with only valid route files
       const { content, hotPathsContent, routeCount } =
         await RouteHandlersGeneratorRepository.generateContent(
@@ -123,6 +153,27 @@ export class RouteHandlersGeneratorRepository {
       );
       await writeGeneratedFile(outputFile, content, data.dryRun);
       await writeGeneratedFile(hotPathsFile, hotPathsContent, data.dryRun);
+
+      // Enforce that every subscribable WS channel has a resource-level
+      // canSubscribe guard on the emitting method. Fail-closed at build time:
+      // an unguarded channel would authorize on role alone (a leak), so we
+      // abort rather than generate it.
+      const wsErrors =
+        await RouteHandlersGeneratorRepository.validateWsChannels(
+          validRouteFiles,
+        );
+      if (wsErrors.length > 0) {
+        for (const err of wsErrors) {
+          logger.error(formatWarning(err));
+        }
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            duration: Date.now() - startTime,
+          },
+        });
+      }
 
       // Generate ws-channels.ts alongside route-handlers — one entry per
       // endpoint method that declares at least one client-delivered event.
@@ -253,6 +304,99 @@ export class RouteHandlersGeneratorRepository {
       // Definition file doesn't exist or can't be loaded
     }
     return [];
+  }
+
+  /**
+   * Validate that each definition's declared `path` matches its filesystem
+   * location, and that dynamic segments use the correct `[param]` format.
+   *
+   * The declared `path` is the single source of truth for the endpoint's URL
+   * and tool name at runtime (URL building, `endpointToToolName`, client-route
+   * dispatch). The dev server (TanStack/Vite) serves API routes from the
+   * filesystem, so when the two diverge the URL 404s — silently, with a 200 HTML
+   * body — and any client read of that endpoint hangs forever. We catch this at
+   * generation time instead.
+   *
+   * Returns a list of human-readable error strings (empty when all valid).
+   */
+  private static async validateDefinitionPaths(
+    routeFiles: string[],
+  ): Promise<string[]> {
+    const errors: string[] = [];
+
+    for (const routeFile of routeFiles) {
+      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+      // Filesystem segments between [locale] and the definition file.
+      const fsSegments = extractNestedPath(definitionPath);
+
+      let defaultExport: ApiSection | undefined;
+      try {
+        const definition = (await import(definitionPath)) as {
+          default?: ApiSection;
+        };
+        try {
+          defaultExport = definition.default;
+        } catch {
+          // Bun plugin race - yield then retry once.
+          await new Promise((resolve) => {
+            setTimeout(resolve, 10);
+          });
+          defaultExport = definition.default;
+        }
+      } catch {
+        // Import failure is reported by other passes; skip path validation here.
+        continue;
+      }
+      if (!defaultExport) {
+        continue;
+      }
+
+      for (const [method, endpoint] of Object.entries(defaultExport)) {
+        const declaredPath = (endpoint as { path?: readonly string[] })?.path;
+        if (!declaredPath) {
+          continue;
+        }
+
+        const rel = stripProjectRoot(definitionPath);
+
+        // 1) Length + structural match against the filesystem location.
+        const fsKey = fsSegments.map(sanitizePathSegmentForCompare).join("/");
+        const declKey = declaredPath
+          .map(sanitizePathSegmentForCompare)
+          .join("/");
+        if (fsKey !== declKey) {
+          errors.push(
+            `Path mismatch in ${rel} (${method}): declared path "${declaredPath.join("/")}" ` +
+              `does not match filesystem location "${fsSegments.join("/")}". ` +
+              `Update the definition's \`path\` to match the directory (or move the folder).`,
+          );
+          continue;
+        }
+
+        // 2) Dynamic-segment format: a bracketed directory segment must be
+        //    declared with the SAME bracketed token (not ":param" or bare name).
+        declaredPath.forEach((declSeg, i) => {
+          const fsSeg = fsSegments[i];
+          const fsIsDynamic = fsSeg?.startsWith("[") && fsSeg.endsWith("]");
+          const declIsDynamic =
+            declSeg.startsWith("[") && declSeg.endsWith("]");
+          if (fsIsDynamic && declSeg !== fsSeg) {
+            errors.push(
+              `Dynamic segment format error in ${rel} (${method}): segment "${declSeg}" ` +
+                `must be written as "${fsSeg}" to match the directory. ` +
+                `Use the bracketed form (e.g. "[id]"), not ":id" or a bare name.`,
+            );
+          } else if (declIsDynamic && !fsIsDynamic) {
+            errors.push(
+              `Dynamic segment format error in ${rel} (${method}): declared segment "${declSeg}" ` +
+                `is dynamic but the directory segment "${fsSeg}" is static.`,
+            );
+          }
+        });
+      }
+    }
+
+    return errors;
   }
 
   /**
@@ -492,6 +636,105 @@ ${hotPathEntries.join("\n")}
   }
 
   /**
+   * Validate that every client-subscribable WS channel has a `resolveChannel`
+   * on the EXACT method that emits its events.
+   *
+   * This is the build-time BACKSTOP to the type-level enforcement (a method with
+   * client-delivered events whose definition has channel scope resource/resolved
+   * cannot compile without resolveChannel). It additionally guards the stale-
+   * generated-file case and the scope:"user" case (which the type forbids a
+   * resolver for — and which is correct: a user-scoped channel needs no resolver,
+   * so it's skipped here too).
+   *
+   * It also catches the wrong-method footgun: a `resolveChannel` on GET while the
+   * events live on PATCH/DELETE leaves those channels unguarded. We check the
+   * resolver on the channel's own method, matching the runtime (lazyResolveChannel
+   * keys by method too).
+   *
+   * Route modules are imported here (CLI/generator context, not the prod bundle
+   * init path) only for the small set of channel-bearing routes — bounded work,
+   * and the only reliable way to read the runtime `tools[method].resolveChannel`.
+   */
+  private static async validateWsChannels(
+    routeFiles: string[],
+  ): Promise<string[]> {
+    const errors: string[] = [];
+
+    for (const routeFile of routeFiles) {
+      const methods =
+        await RouteHandlersGeneratorRepository.extractWsMethodsFromDefinition(
+          routeFile,
+        );
+      if (methods.length === 0) {
+        continue;
+      }
+
+      // A scope:"user" channel needs no route resolver (the definition decided
+      // it). Read the definition's channel.scope to know which methods require a
+      // resolver vs which are user-scoped (delivered on user/{id}).
+      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+      let defaultExport:
+        | Record<string, { channel?: { scope?: string } } | undefined>
+        | undefined;
+      try {
+        const definition = (await import(definitionPath)) as {
+          default?: Record<
+            string,
+            { channel?: { scope?: string } } | undefined
+          >;
+        };
+        defaultExport = definition.default;
+      } catch {
+        defaultExport = undefined;
+      }
+
+      let tools: Record<string, { resolveChannel?: unknown } | undefined>;
+      try {
+        const routeModule = (await import(routeFile)) as {
+          tools?: Record<string, { resolveChannel?: unknown } | undefined>;
+        };
+        tools = routeModule.tools ?? {};
+      } catch (error) {
+        errors.push(
+          `WS channel validation could not import ${stripProjectRoot(routeFile)}: ` +
+            `${parseError(error).message}. A route that declares client-delivered ` +
+            `events must be importable so its resolveChannel can be verified.`,
+        );
+        continue;
+      }
+
+      const rel = stripProjectRoot(routeFile);
+      for (const method of methods) {
+        const scope = defaultExport?.[method]?.channel?.scope;
+        if (scope === undefined) {
+          errors.push(
+            `Missing channel declaration in ${stripProjectRoot(definitionPath)} (${method}): ` +
+              `this method emits a client-delivered event but its definition has no ` +
+              `\`channel\`. Add \`channel: { scope: "user" | "resource" | "resolved" }\`.`,
+          );
+          continue;
+        }
+        // user scope is fully definition-decided — no route resolver required.
+        if (scope === "user") {
+          continue;
+        }
+        const handler = tools[method];
+        if (typeof handler?.resolveChannel !== "function") {
+          errors.push(
+            `Missing resolveChannel in ${rel} (${method}): the definition declares ` +
+              `channel scope "${scope}", so this method must supply a resolveChannel ` +
+              `that authorizes subscribers and decides the channel. Add it to the ` +
+              `${method} handler — on ${method} (the method that emits the events), ` +
+              `not another method of the same endpoint.`,
+          );
+        }
+      }
+    }
+
+    return errors;
+  }
+
+  /**
    * Generate ws-channels.ts content.
    *
    * For every endpoint method that declares a client-delivered event, emits an
@@ -538,6 +781,7 @@ ${hotPathEntries.join("\n")}
           routeImport,
           method,
           defAlias: `${aliasBase}_${method}Def`,
+          scope,
         });
       }
     }
@@ -561,12 +805,12 @@ ${hotPathEntries.join("\n")}
       .map((target) => `    ${target.defAlias},`)
       .join("\n");
 
-    // Entries: endpoint from the eager def, canSubscribe lazily from the route.
+    // Entries: endpoint from the eager def, resolveChannel lazily from the route.
     const entries = targets
       .map(
         (target) => `    {
       endpoint: ${target.defAlias}.default.${target.method},
-      canSubscribe: lazyCanSubscribe(
+      resolveChannel: lazyResolveChannel(
         () => import("${target.routeImport}"),
         "${target.method}",
       ),
@@ -580,7 +824,8 @@ ${hotPathEntries.join("\n")}
 /* eslint-disable prettier/prettier */
 
 import {
-  lazyCanSubscribe,
+  lazyResolveChannel,
+  userChannelResolver,
   type WsChannelEntry,
 } from "../unified-interface/websocket/ws-channel-registry";
 

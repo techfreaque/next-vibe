@@ -15,7 +15,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
@@ -251,26 +251,7 @@ export class TaskExecuteRepository {
             logger,
             platform: Platform.CRON,
             cronTaskId: task.id,
-            streamContext: {
-              rootFolderId: DefaultFolderId.BACKGROUND,
-              threadId: undefined,
-              aiMessageId: undefined,
-              currentToolMessageId: undefined,
-              callerToolCallId: undefined,
-              pendingToolMessages: undefined,
-              pendingTimeoutMs: undefined,
-              leafMessageId: undefined,
-              favoriteId: undefined,
-              skillId: undefined,
-              headless: undefined,
-              subAgentDepth: 0,
-              waitingForRemoteResult: undefined,
-              abortSignal: taskAbortController.signal,
-              callerCallbackMode: undefined,
-              onEscalatedTaskCancel: undefined,
-              escalateToTask: undefined,
-              isRevival: undefined,
-            },
+            streamContext: makeHeadlessContext(taskAbortController.signal),
           }),
           new Promise<never>((...[, reject]) => {
             setTimeout(() => reject(new Error("TASK_TIMEOUT")), timeoutMs);
@@ -440,7 +421,7 @@ export class TaskExecuteRepository {
       success: true,
       taskId: task.id,
       taskName: task.displayName,
-      executedAt: startedAt.toISOString(),
+      executedAt: startedAt,
       duration: finalDurationMs,
       status: finalStatus,
     });

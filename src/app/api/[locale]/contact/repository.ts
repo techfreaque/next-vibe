@@ -141,7 +141,7 @@ export class ContactRepository {
       );
 
       return success({
-        success: "response.success",
+        success: t("response.success"),
         messageId: contact.id,
         status: [ContactStatus.NEW],
       });
@@ -200,7 +200,7 @@ export class ContactRepository {
       }
 
       return success({
-        success: "response.success",
+        success: t("response.success"),
         messageId: contact.id,
         status: [data.status || ContactStatus.NEW],
       });

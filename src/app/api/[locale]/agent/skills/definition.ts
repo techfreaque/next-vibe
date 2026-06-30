@@ -31,7 +31,10 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../shared/types/common.schema";
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "../../shared/types/common.schema";
 import { allModelDefinitions } from "../models/all-models";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
@@ -58,7 +61,7 @@ const SkillsListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "skills"],
+  path: ["agent", "skills"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
   defaultWebPinned: [
     UserRole.CUSTOMER,
@@ -318,7 +321,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               size: "lg",
               emphasis: "bold",
-              schema: z.string(),
+              schema: translatedValueSchema,
             }),
             sectionCount: responseField(scopedTranslation, {
               type: WidgetType.BADGE,

@@ -52,8 +52,14 @@ import type {
   SkillStatusValue,
   SkillTrustLevelValue,
   SkillTypeValue,
+  SkillVoteDirectionValue,
 } from "./enum";
-import { SkillTrustLevel, SkillTrustLevelDB } from "./enum";
+import {
+  SkillTrustLevel,
+  SkillTrustLevelDB,
+  SkillVoteDirection,
+  SkillVoteDirectionDB,
+} from "./enum";
 
 /**
  * Custom Skills Table
@@ -182,6 +188,13 @@ export const skillVotes = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    // Vote direction: UP (helpful) or DOWN (not helpful). Net score on the
+    // skill = count(UP) - count(DOWN). Existing rows default to UP (back-compat
+    // with the previous upvote-only model).
+    direction: text("direction", { enum: SkillVoteDirectionDB })
+      .notNull()
+      .default(SkillVoteDirection.UP)
+      .$type<typeof SkillVoteDirectionValue>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => ({

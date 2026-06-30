@@ -125,7 +125,8 @@ import {
   videoGenModelSelectionSchema,
 } from "../../../video-generation/models";
 import { useSkill } from "../../[id]/hooks";
-import { ModelSelectionType } from "../../enum";
+import { SkillVoteButtons } from "../../[id]/vote/vote-buttons";
+import { ModelSelectionType, SkillOwnershipType } from "../../enum";
 import definitionPatch from "./definition";
 
 /**
@@ -208,6 +209,11 @@ export function FavoriteEditContainer({
     : (characterData?.variants?.find((v) => v.isDefault) ??
       characterData?.variants?.[0]);
   const characterModelSelection = characterVariant?.modelSelection;
+
+  // Community/public skills can be voted on; built-in (SYSTEM) and the user's
+  // own private skills cannot.
+  const isVotableSkill =
+    !isNoSkill && characterData?.skillOwnership === SkillOwnershipType.PUBLIC;
 
   // Get settings to check if this favorite is active
   const settingsOps = useChatSettings(user, logger);
@@ -976,21 +982,6 @@ export function FavoriteEditContainer({
                       </Div>
                     </Div>
                   </Div>
-
-                  {/* Action Buttons */}
-                  <Div className="flex flex-col gap-2">
-                    {/* View Skill Button */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="default"
-                      onClick={handleViewSkill}
-                      className="gap-2"
-                    >
-                      <Settings className="h-4 w-4" />
-                      {t("patch.viewSkillButton.label")}
-                    </Button>
-                  </Div>
                 </Div>
               )}
 
@@ -1015,22 +1006,46 @@ export function FavoriteEditContainer({
                 </Div>
               )}
 
-              {/* Use This Favorite Button - always show */}
-              <Button
-                type="button"
-                variant={isActiveFavorite ? "outline" : "default"}
-                size="default"
-                onClick={handleUseThisFavorite}
-                disabled={isActiveFavorite}
-                className="gap-2"
-              >
-                <CheckCircle className="h-4 w-4" />
-                {isActiveFavorite
-                  ? t("patch.currentlyActiveButton.label")
-                  : isNoSkill
-                    ? t("patch.useThisModelButton.label")
-                    : t("patch.useThisSkillButton.label")}
-              </Button>
+              {/* Skill actions — View Skill + Use This + vote, one line when
+                  there's room, wrapping on narrow widths. */}
+              <Div className="flex flex-wrap items-center gap-2">
+                {!isNoSkill && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="default"
+                    onClick={handleViewSkill}
+                    className="gap-2 flex-1 min-w-[8rem]"
+                  >
+                    <Settings className="h-4 w-4" />
+                    {t("patch.viewSkillButton.label")}
+                  </Button>
+                )}
+
+                <Button
+                  type="button"
+                  variant={isActiveFavorite ? "outline" : "default"}
+                  size="default"
+                  onClick={handleUseThisFavorite}
+                  disabled={isActiveFavorite}
+                  className="gap-2 flex-1 min-w-[8rem]"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  {isActiveFavorite
+                    ? t("patch.currentlyActiveButton.label")
+                    : isNoSkill
+                      ? t("patch.useThisModelButton.label")
+                      : t("patch.useThisSkillButton.label")}
+                </Button>
+
+                {isVotableSkill && baseSkillId && (
+                  <SkillVoteButtons
+                    skillId={baseSkillId}
+                    initialUserVote={characterData?.userVote ?? null}
+                    initialVoteCount={characterData?.voteCount ?? null}
+                  />
+                )}
+              </Div>
 
               {/* Brain - Chat */}
               {form && (

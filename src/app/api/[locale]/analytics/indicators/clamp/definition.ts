@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [CLAMP_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "indicators", "clamp"],
+  path: ["analytics", "indicators", "clamp"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

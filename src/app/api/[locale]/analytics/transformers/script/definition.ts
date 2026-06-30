@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [TRANSFORMER_SCRIPT_ALIAS],
   method: Methods.POST,
-  path: ["system", "unified-interface", "vibe-sense", "transformers", "script"],
+  path: ["analytics", "transformers", "script"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

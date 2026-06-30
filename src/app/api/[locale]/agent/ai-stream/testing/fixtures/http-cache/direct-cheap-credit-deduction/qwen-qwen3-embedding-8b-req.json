@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: <think> The user shared a video attachment and a detailed description was already provided in the message context (likely from a tool processing the video before this turn). The description is quite detailed about a Rubik's Cube promotional clip. I should acknowledge the video content briefly and end with STEP_OK since the video was successfully processed.\n\nLet me verify: the message contains a detailed description of a 4-second Rubik's Cube video clip. This means the video was processed successfully. I should provide a concise summary and end with STEP_OK.</think> The video shows a close-up, artistic clip (~4 seconds) of hands solving a Rubik's Cube on a workbench covered with many other cubes. The focus is on the precise rotation of the top layer to align orange and white tiles, accompan\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think> The user wants me to transcribe the exact words from the attached WAV audio file. The system already provided a detailed description of the audio content in the message context. The speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana, and I need to fill up the last few seconds and it will be\"\n\nThe word \"banana\" is clearly present in the transcription. I should repeat back the exact words and end with STEP_OK since the transcription contains \"banana\".</think> The exact words I heard:\n\n> \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana, and I need to fill up the last few seconds and it will be\"\n\nThe transcription contains the word **\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think> The user wants me to say exactly: \"INVALID_PARENT_TEST STEP_OK\"\n\nThis appears to be a test message. I should respond with exactly that text.</think> INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

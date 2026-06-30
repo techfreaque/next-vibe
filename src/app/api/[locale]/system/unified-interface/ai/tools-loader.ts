@@ -92,12 +92,12 @@ function createToolFromEndpoint(
   // validation and handled separately by tool-call-handler and the execute handler.
   //
   // Skip injection for:
-  // - wait-for-task: has its own stream-pause mechanism, callbackMode would interfere
+  // - await-task: has its own stream-pause mechanism, callbackMode would interfere
   // - execute-tool: has callbackMode as a native field in its definition schema
   const schemaObj = jsonSchemaObject as JSONSchema7 & {
     properties?: Record<string, JSONSchema7>;
   };
-  if (toolName !== "wait-for-task" && toolName !== EXECUTE_TOOL_ALIAS) {
+  if (toolName !== "await-task" && toolName !== EXECUTE_TOOL_ALIAS) {
     // Filter out callback modes blocked for this folder type.
     const blockedModes = new Set(
       FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [],
@@ -114,8 +114,8 @@ function createToolFromEndpoint(
         description:
           "OMIT for normal tool calls - result is returned synchronously, loop continues. " +
           "Only set when you need async: " +
-          "'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. " +
-          "'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. " +
+          "'detach' - fire-and-forget, returns {taskId}, use await-task later. " +
+          "'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call await-task. " +
           "'endLoop' - stops entire AI turn after this batch, use ONLY as final action. " +
           "'approve' - requires user confirmation before executing.",
       };
@@ -257,186 +257,60 @@ function createToolFromEndpoint(
           };
         }
 
-        if (
-          callbackMode === CallbackMode.DETACH ||
-          callbackMode === CallbackMode.WAKE_UP ||
+        // All tools route through RouteExecuteRepository so execute-tool is the single
+        // execution path. This covers WAIT, END_LOOP, DETACH, WAKE_UP, APPROVE, and
+        // plain synchronous tools with no callbackMode.
+        //
+        // For WAIT/END_LOOP modes: eagerly mark waitingForRemoteResult on the SHARED
+        // streamContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
+        // concurrently with async tool execution. If we wait until after DB operations in
+        // RouteExecuteRepository.execute(), FinishStep fires while waitingForRemoteResult
+        // is still undefined and skips the REMOTE_TOOL_WAIT abort, leaving thread "idle".
+        // We eagerly set it now, then reset it after execute() if no WAIT task was created.
+        // For execute-tool: effective callbackMode is in restParams.callbackMode.
+        const earlyCallbackMode =
           toolName === EXECUTE_TOOL_ALIAS
-        ) {
-          // For WAIT/END_LOOP modes: eagerly mark waitingForRemoteResult on the SHARED
-          // streamContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
-          // concurrently with async tool execution. If we wait until after DB operations in
-          // RouteExecuteRepository.execute(), FinishStep fires while waitingForRemoteResult
-          // is still undefined and skips the REMOTE_TOOL_WAIT abort, leaving thread "idle".
-          // We eagerly set it now, then reset it after execute() if no WAIT task was created.
-          // For execute-tool: effective callbackMode is in restParams.callbackMode.
-          const earlyCallbackMode =
-            toolName === EXECUTE_TOOL_ALIAS
-              ? restParams.callbackMode
-              : callbackMode;
-          // For execute-tool: only eagerly set waitingForRemoteResult when there IS a remote
-          // instanceId (remote WAIT creates a task that blocks the stream). For local inline
-          // execution (no instanceId), execute-tool runs generate_image etc. synchronously and
-          // the result is returned inline — setting waitingForRemoteResult=true here would cause
-          // processToolResult to skip writing the result to DB (it checks the flag before execute()
-          // returns and resets it), leaving the thread with a tool-call but no tool-result →
-          // AI_MissingToolResultsError on the next step.
-          const isRemoteExecuteToolWait =
-            toolName === EXECUTE_TOOL_ALIAS &&
-            restParams.instanceId !== undefined &&
-            restParams.instanceId !== null;
-          const didEagerlySetWaiting =
-            (earlyCallbackMode === CallbackMode.WAIT ||
-              earlyCallbackMode === CallbackMode.END_LOOP) &&
-            !!context.streamContext &&
-            (toolName !== EXECUTE_TOOL_ALIAS || isRemoteExecuteToolWait);
-          if (didEagerlySetWaiting) {
-            context.streamContext.waitingForRemoteResult = true;
-          }
-
-          // Inject the correct toolMessageId for this specific parallel tool call.
-          // pendingToolMessages is keyed by AI SDK toolCallId - populated by stream-part-handler.
-          // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
-          // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
-          // Resolve per-call toolMessageId BEFORE touching shared streamContext.
-          // Two parallel wakeUp tools each have a distinct options.toolCallId.
-          // We must NOT write to context.streamContext.callerToolCallId (shared) here —
-          // that would race with the sibling call and both would end up with the same ID.
-          // Instead, resolve the values locally and pass a per-call context snapshot.
-          let perCallToolMessageId: string | undefined;
-          let perCallLeafMessageId: string | null = null;
-
-          if (options?.toolCallId && context.streamContext) {
-            let pending = context.streamContext.pendingToolMessages?.get(
-              options.toolCallId,
-            );
-            if (!pending) {
-              // Brief spin-wait: stream-part-handler is processing the tool-call event concurrently.
-              // In practice this resolves within 1-2 ticks; 200ms cap is a generous safety bound.
-              for (let i = 0; i < 20 && !pending; i++) {
-                await new Promise<void>((resolve) => {
-                  setTimeout(resolve, 10);
-                });
-                pending = context.streamContext.pendingToolMessages?.get(
-                  options.toolCallId,
-                );
-              }
-            }
-            if (pending) {
-              perCallToolMessageId = pending.messageId;
-              perCallLeafMessageId =
-                pending.toolCallData?.parentId ??
-                context.streamContext.leafMessageId ??
-                null;
-            }
-          }
-
-          const { RouteExecuteRepository } =
-            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
-          const { scopedTranslation: executeScopedT } =
-            await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
-          const { t: execT } = executeScopedT.scopedT(context.locale);
-
-          // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
-          // Other tools: wrap in { toolName, input: restParams, callbackMode }
-          const executeData = (
-            toolName === EXECUTE_TOOL_ALIAS
-              ? restParams
-              : { toolName, input: restParams, callbackMode }
-          ) as Parameters<typeof RouteExecuteRepository.execute>[0];
-
-          // Build a per-call context snapshot with the resolved IDs.
-          // Reset waitingForRemoteResult to false in the copy so we can detect whether
-          // RouteExecuteRepository.execute() actually created a WAIT task (sets it to true).
-          // This avoids mutating the shared streamContext which would race with sibling parallel calls.
-          const perCallStreamContext = context.streamContext
-            ? {
-                ...context.streamContext,
-                waitingForRemoteResult: false as boolean | undefined,
-                callerToolCallId: options?.toolCallId,
-                currentToolMessageId:
-                  perCallToolMessageId ??
-                  context.streamContext.currentToolMessageId,
-                leafMessageId:
-                  perCallLeafMessageId ?? context.streamContext.leafMessageId,
-                // Pass the tool's configured stream timeout so execute-tool/escalateToTask
-                // can use it instead of the hardcoded 90s default.
-                // undefined = not set on definition → callers use default 90_000.
-                callerTimeoutMs: endpoint.streamTimeoutMs,
-              }
-            : context.streamContext;
-
-          context.logger.debug(
-            "[ToolsLoader] wakeUp/detach via RouteExecuteRepository",
-            {
-              toolName,
-              callerToolCallId: options?.toolCallId,
-              currentToolMessageId: perCallStreamContext?.currentToolMessageId,
-              aiMessageId: context.streamContext.aiMessageId,
-            },
-          );
-
-          const result = await RouteExecuteRepository.execute(
-            executeData,
-            context.user,
-            context.locale,
-            context.logger,
-            execT,
-            perCallStreamContext ?? context.streamContext,
-            Platform.AI,
-          );
-
-          // Propagate waitingForRemoteResult back to the shared streamContext.
-          // perCallStreamContext started with waitingForRemoteResult=false; execute() sets it
-          // to true only when a real remote WAIT/END_LOOP task was created.
-          // If execute() did NOT create a WAIT task, reset the eager flag we set above.
-          // Propagate the confirmation gate back to the shared streamContext.
-          // execute-tool's gate sets the flag on the per-call snapshot; stopWhen
-          // and finish-step read the shared context - without this the stream
-          // would start the AI-response turn despite the pending confirmation.
-          if (
-            perCallStreamContext?.stepHasToolsAwaitingConfirmation &&
-            context.streamContext
-          ) {
-            context.streamContext.stepHasToolsAwaitingConfirmation = true;
-          }
-
-          if (perCallStreamContext?.waitingForRemoteResult) {
-            // Confirm: a real WAIT task was created - keep the shared flag true
-            if (context.streamContext) {
-              context.streamContext.waitingForRemoteResult = true;
-            }
-          } else if (didEagerlySetWaiting && context.streamContext) {
-            // No WAIT task created (e.g. local execution, direct HTTP, dedup) - reset
-            context.streamContext.waitingForRemoteResult = false;
-          }
-
-          if (!result.success) {
-            // Return { success: false, message } so tool-result-handler's isErrorResponse
-            // check fires (looks for output.success === false + output.message: string).
-            // The handler extracts message, creates toolCall.error, sets status="failed".
-            // Returning { error: string } loses the structured shape and the tool renders
-            // as success in the UI.
-            const errMsg: string = result.messageParams?.error
-              ? typeof result.messageParams.error === "string" &&
-                !result.message.includes(result.messageParams.error)
-                ? `${String(result.message)}: ${result.messageParams.error}`
-                : String(result.message)
-              : String(result.message);
-            return { success: false as const, message: errMsg };
-          }
-
-          return result.data as WidgetData;
+            ? restParams.callbackMode
+            : callbackMode;
+        // For execute-tool: only eagerly set waitingForRemoteResult when there IS a remote
+        // instanceId (remote WAIT creates a task that blocks the stream). For local inline
+        // execution (no instanceId), execute-tool runs generate_image etc. synchronously and
+        // the result is returned inline — setting waitingForRemoteResult=true here would cause
+        // processToolResult to skip writing the result to DB (it checks the flag before execute()
+        // returns and resets it), leaving the thread with a tool-call but no tool-result →
+        // AI_MissingToolResultsError on the next step.
+        const isRemoteExecuteToolWait =
+          toolName === EXECUTE_TOOL_ALIAS &&
+          restParams.instanceId !== undefined &&
+          restParams.instanceId !== null;
+        const didEagerlySetWaiting =
+          (earlyCallbackMode === CallbackMode.WAIT ||
+            earlyCallbackMode === CallbackMode.END_LOOP) &&
+          !!context.streamContext &&
+          (toolName !== EXECUTE_TOOL_ALIAS || isRemoteExecuteToolWait);
+        if (didEagerlySetWaiting) {
+          context.streamContext.waitingForRemoteResult = true;
         }
 
-        // Default path: execute inline (wait, endLoop, approve handled by stream layer)
-        // Spin-wait for pendingToolMessages entry so currentToolMessageId is set
-        // before execute() runs. Same race as wakeUp/detach: AI SDK may call execute()
-        // before stream-part-handler processes the tool-call event (200ms cap, 20×10ms).
+        // Inject the correct toolMessageId for this specific parallel tool call.
+        // pendingToolMessages is keyed by AI SDK toolCallId - populated by stream-part-handler.
+        // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
+        // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
+        // Resolve per-call toolMessageId BEFORE touching shared streamContext.
+        // Two parallel tools each have a distinct options.toolCallId.
+        // We must NOT write to context.streamContext.callerToolCallId (shared) here —
+        // that would race with the sibling call and both would end up with the same ID.
+        // Instead, resolve the values locally and pass a per-call context snapshot.
+        let perCallToolMessageId: string | undefined;
+        let perCallLeafMessageId: string | null = null;
+
         if (options?.toolCallId && context.streamContext) {
           let pending = context.streamContext.pendingToolMessages?.get(
             options.toolCallId,
           );
           if (!pending) {
+            // Brief spin-wait: stream-part-handler is processing the tool-call event concurrently.
+            // In practice this resolves within 1-2 ticks; 200ms cap is a generous safety bound.
             for (let i = 0; i < 20 && !pending; i++) {
               await new Promise<void>((resolve) => {
                 setTimeout(resolve, 10);
@@ -447,32 +321,121 @@ function createToolFromEndpoint(
             }
           }
           if (pending) {
-            context.streamContext.currentToolMessageId = pending.messageId;
+            perCallToolMessageId = pending.messageId;
+            perCallLeafMessageId =
+              pending.toolCallData?.parentId ??
+              context.streamContext.leafMessageId ??
+              null;
           }
         }
 
-        const { RouteExecutionExecutor } =
-          await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-        const result =
-          await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
-            toolName,
-            data: restParams as Record<string, WidgetData>,
-            user: context.user,
-            locale: context.locale,
-            logger: context.logger,
-            platform: Platform.AI,
-            streamContext: context.streamContext,
-          });
+        const { RouteExecuteRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+        const { scopedTranslation: executeScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
+        const { t: execT } = executeScopedT.scopedT(context.locale);
 
-        if (!result.success) {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-          // eslint-disable-next-line @typescript-eslint/only-throw-error -- Throwing ErrorResponseType so AI SDK marks isError=true with structured data
-          throw result;
+        // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
+        // Other tools: wrap in { toolName, input: restParams, callbackMode }
+        const executeData = (
+          toolName === EXECUTE_TOOL_ALIAS
+            ? restParams
+            : { toolName, input: restParams, callbackMode }
+        ) as Parameters<typeof RouteExecuteRepository.execute>[0];
+
+        // Build a per-call context snapshot with the resolved IDs.
+        // Reset waitingForRemoteResult to false in the copy so we can detect whether
+        // RouteExecuteRepository.execute() actually created a WAIT task (sets it to true).
+        // This avoids mutating the shared streamContext which would race with sibling parallel calls.
+        const perCallStreamContext = context.streamContext
+          ? {
+              ...context.streamContext,
+              waitingForRemoteResult: false as boolean | undefined,
+              callerToolCallId: options?.toolCallId,
+              currentToolMessageId:
+                perCallToolMessageId ??
+                context.streamContext.currentToolMessageId,
+              leafMessageId:
+                perCallLeafMessageId ?? context.streamContext.leafMessageId,
+              // Pass the tool's configured stream timeout so execute-tool/escalateToTask
+              // can use it instead of the hardcoded 90s default.
+              // undefined = not set on definition → callers use default 90_000.
+              callerTimeoutMs: endpoint.streamTimeoutMs,
+            }
+          : context.streamContext;
+
+        context.logger.debug(
+          "[ToolsLoader] executing via RouteExecuteRepository",
+          {
+            toolName,
+            callbackMode,
+            callerToolCallId: options?.toolCallId,
+            currentToolMessageId: perCallStreamContext?.currentToolMessageId,
+            aiMessageId: context.streamContext.aiMessageId,
+          },
+        );
+
+        const result = await RouteExecuteRepository.execute(
+          executeData,
+          context.user,
+          context.locale,
+          context.logger,
+          execT,
+          perCallStreamContext ?? context.streamContext,
+          Platform.AI,
+        );
+
+        // Propagate waitingForRemoteResult back to the shared streamContext.
+        // perCallStreamContext started with waitingForRemoteResult=false; execute() sets it
+        // to true only when a real remote WAIT/END_LOOP task was created.
+        // If execute() did NOT create a WAIT task, reset the eager flag we set above.
+        // Propagate the confirmation gate back to the shared streamContext.
+        // execute-tool's gate sets the flag on the per-call snapshot; stopWhen
+        // and finish-step read the shared context - without this the stream
+        // would start the AI-response turn despite the pending confirmation.
+        if (
+          perCallStreamContext?.stepHasToolsAwaitingConfirmation &&
+          context.streamContext
+        ) {
+          context.streamContext.stepHasToolsAwaitingConfirmation = true;
         }
 
-        // Return the data to AI SDK
-        // Must be JSON-serializable for streaming
-        return result.data;
+        if (perCallStreamContext?.waitingForRemoteResult) {
+          // Confirm: a real WAIT task was created - keep the shared flag true
+          if (context.streamContext) {
+            context.streamContext.waitingForRemoteResult = true;
+          }
+        } else if (didEagerlySetWaiting && context.streamContext) {
+          // No WAIT task created (e.g. local execution, direct HTTP, dedup) - reset
+          context.streamContext.waitingForRemoteResult = false;
+        }
+
+        if (!result.success) {
+          // Return { success: false, message } so tool-result-handler's isErrorResponse
+          // check fires (looks for output.success === false + output.message: string).
+          // The handler extracts message, creates toolCall.error, sets status="failed".
+          // Returning { error: string } loses the structured shape and the tool renders
+          // as success in the UI.
+          const errMsg: string = result.messageParams?.error
+            ? typeof result.messageParams.error === "string" &&
+              !result.message.includes(result.messageParams.error)
+              ? `${String(result.message)}: ${result.messageParams.error}`
+              : String(result.message)
+            : String(result.message);
+          return { success: false as const, message: errMsg };
+        }
+
+        // execute-tool wraps inline (WAIT/END_LOOP) results as { result: actualData }.
+        // execute-tool itself expects this shape to stay as-is (the AI reads it).
+        // For all other tools, unwrap so the AI sees the tool's actual data directly.
+        if (toolName !== EXECUTE_TOOL_ALIAS) {
+          const d = result.data as Record<string, WidgetData> | null;
+          if (d !== null && typeof d === "object" && "result" in d) {
+            return d.result as WidgetData;
+          }
+        }
+
+        return result.data as WidgetData;
       };
 
       // If no abort signal, just run inline

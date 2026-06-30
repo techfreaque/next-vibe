@@ -635,6 +635,7 @@ export async function runTestStream(
     toolConfirmations,
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
+    settleTimeoutMs,
   } = params;
 
   const rootFolderId = rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;

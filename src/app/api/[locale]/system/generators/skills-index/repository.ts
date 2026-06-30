@@ -27,6 +27,7 @@ import {
   formatGenerator,
 } from "@/app/api/[locale]/system/logger/formatters";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -44,7 +45,7 @@ interface SkillsIndexRequestType {
 
 interface SkillsIndexResponseType {
   success: boolean;
-  message: string;
+  message: TranslatedKeyType;
   skillsFound: number;
   duration: number;
   outputFile?: string;

@@ -27,6 +27,10 @@ function formatAmount(n: number): string {
   }).format(n);
 }
 
+function formatDate(d: Date): string {
+  return d.toLocaleDateString();
+}
+
 function TaxLineRow({ line }: { line: TaxLine }): JSX.Element {
   return (
     <Div className="grid grid-cols-[6rem_1fr_8rem_8rem_6rem] gap-2 px-3 py-1.5 border-b last:border-b-0 text-sm hover:bg-muted/20">
@@ -112,8 +116,8 @@ export function TaxReportWidget(_props: TaxReportWidgetProps): JSX.Element {
         <Div className="flex flex-col gap-4">
           {data.fromResponse && data.toResponse && (
             <Span className="text-sm text-muted-foreground">
-              {t("taxReport.widget.dateRange")}: {data.fromResponse} —{" "}
-              {data.toResponse}
+              {t("taxReport.widget.dateRange")}: {formatDate(data.fromResponse)}{" "}
+              — {formatDate(data.toResponse)}
             </Span>
           )}
 

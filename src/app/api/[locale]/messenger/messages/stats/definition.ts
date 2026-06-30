@@ -500,7 +500,7 @@ const { GET } = createEndpoint({
       generatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.generatedAt",
-        schema: z.string(),
+        schema: dateSchema,
       }),
 
       dataRange: objectField(scopedTranslation, {
@@ -511,12 +511,12 @@ const { GET } = createEndpoint({
           from: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.dataRange.from",
-            schema: z.string(),
+            schema: dateSchema,
           }),
           to: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.dataRange.to",
-            schema: z.string(),
+            schema: dateSchema,
           }),
         },
       }),
@@ -541,7 +541,7 @@ const { GET } = createEndpoint({
             timestamp: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.recentActivity.timestamp",
-              schema: z.string(),
+              schema: dateSchema,
             }),
             details: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

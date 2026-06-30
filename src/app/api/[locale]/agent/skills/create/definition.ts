@@ -35,7 +35,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../shared/types/common.schema";
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import {
@@ -62,7 +65,7 @@ const SkillCreateContainer = lazy(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "skills", "create"],
+  path: ["agent", "skills", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
@@ -91,6 +94,7 @@ const { POST } = createEndpoint({
 
         // Optimistically add the new skill to the list
         const { availability } = data;
+        const { t } = scopedTranslation.scopedT(data.locale);
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,
@@ -169,7 +173,7 @@ const { POST } = createEndpoint({
 
               const newSection: SkillSection = {
                 sectionIcon: categoryConfig.icon,
-                sectionTitle: categoryConfig.category,
+                sectionTitle: t(categoryConfig.category),
                 sectionCount: 1,
                 skills: [newSkill],
               };
@@ -195,7 +199,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       name: requestField(scopedTranslation, {
@@ -534,6 +538,7 @@ const { POST } = createEndpoint({
   // the list card from the request payload and inserts it into the skills list
   // (grouped by category); remoteEvent relays the same request cross-instance,
   // where the route's onRemoteEvent re-runs create.
+  channel: { scope: "user" } as const,
   events: {
     "skill-created": {
       remoteEvent: true as const,
@@ -626,7 +631,7 @@ const { POST } = createEndpoint({
                       ...old.data.sections,
                       {
                         sectionIcon: card.icon,
-                        sectionTitle: card.category,
+                        sectionTitle: t(card.category),
                         sectionCount: 1,
                         skills: [card],
                       },

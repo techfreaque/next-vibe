@@ -44,6 +44,7 @@ export async function tanstackLoader({
       user,
       locale,
       Platform.NEXT_PAGE,
+      logger,
     );
     if (result.success) {
       initialHelpData = result.data;

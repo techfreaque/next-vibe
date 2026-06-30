@@ -54,8 +54,8 @@ export class ProfitLossRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
-      fromResponse: string;
-      toResponse: string;
+      fromResponse: Date;
+      toResponse: Date;
       revenue: AccountLine[];
       totalRevenue: number;
       expenses: AccountLine[];
@@ -84,9 +84,6 @@ export class ProfitLossRepository {
         ? new Date(data.from)
         : new Date(today.getFullYear(), 0, 1);
       const toDate = data.to ? new Date(data.to) : today;
-
-      const fromStr = fromDate.toISOString().slice(0, 10);
-      const toStr = toDate.toISOString().slice(0, 10);
 
       const entryConditions = [
         eq(journalEntries.companyId, data.companyId),
@@ -192,8 +189,8 @@ export class ProfitLossRepository {
       const netProfit = totalRevenue - totalExpenses;
 
       return success({
-        fromResponse: fromStr,
-        toResponse: toStr,
+        fromResponse: fromDate,
+        toResponse: toDate,
         revenue,
         totalRevenue,
         expenses,

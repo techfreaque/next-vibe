@@ -286,7 +286,10 @@ export class RemoteEventBridgeRepository {
         defaultLocale,
       );
       if (!rolesResult.success) {
-        logger.error();
+        logger.error(
+          "[RemoteEventBridge] Failed to resolve user roles for relayed event",
+          { userId, eventName: envelope.eventName },
+        );
         return;
       }
 

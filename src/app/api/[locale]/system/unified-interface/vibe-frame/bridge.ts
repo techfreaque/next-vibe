@@ -33,7 +33,6 @@ import {
   replaceUrl,
   silentReplaceState,
 } from "next-vibe-ui/lib/location";
-import { getScreenHeight, getScreenWidth } from "next-vibe-ui/lib/screen";
 import {
   getLocalItem,
   getSessionItem,
@@ -253,8 +252,10 @@ function navigateAction(payload: PayloadFor<"navigate">): boolean {
   }
 }
 
+// This is the embed bridge — it reads window directly rather than via
+// next-vibe-ui's screen helpers (which require an EndpointLogger).
 function getWindowSizeAction(): { width: number; height: number } {
-  return { width: getScreenWidth(), height: getScreenHeight() };
+  return { width: window.innerWidth, height: window.innerHeight };
 }
 
 function getScrollPositionAction(): { x: number; y: number } {
@@ -273,12 +274,12 @@ function setScrollPositionAction(
 }
 
 function getViewportInfoAction(): ResponseFor<"getViewportInfo"> {
-  const w = getScreenWidth();
+  const w = window.innerWidth;
   const deviceType: "desktop" | "mobile" | "tablet" =
     w < 768 ? "mobile" : w < 1024 ? "tablet" : "desktop";
   return {
     width: w,
-    height: getScreenHeight(),
+    height: window.innerHeight,
     scrollX: getScrollX(),
     scrollY: getScrollY(),
     deviceType,

@@ -35,7 +35,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["remote-connection", "remote-event-bridge"],
+  path: ["system", "unified-interface", "websocket", "remote-event-bridge"],
   aliases: ["remote-event-bridge"],
   title: "remoteEventBridge.post.title" as const,
   titleShort: "remoteEventBridge.post.titleShort" as const,

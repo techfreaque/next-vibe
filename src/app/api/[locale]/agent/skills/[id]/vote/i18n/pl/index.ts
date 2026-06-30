@@ -9,8 +9,14 @@ export const translations: typeof enTranslations = {
     title: "Głosuj na umiejętność",
     titleShort: "Zagłosuj",
     description:
-      "Przełącz głos na umiejętność społeczności. Idempotentne - wywołaj ponownie aby usunąć głos.",
+      "Głosuj za lub przeciw umiejętności społeczności. Ten sam kierunek usuwa głos; przeciwny go odwraca.",
     dynamicTitle: "Głosowanie: {{name}}",
+    direction: {
+      label: "Kierunek",
+      description: "Kierunek głosu: w górę (pomocne) lub w dół.",
+      up: "Głos za",
+      down: "Głos przeciw",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -51,8 +57,10 @@ export const translations: typeof enTranslations = {
       description: "Twój głos został zaktualizowany",
     },
     response: {
-      voted: { content: "Zagłosowano" },
-      voteCount: { content: "Liczba głosów" },
+      userVote: { content: "Twój głos" },
+      voteCount: { content: "Wynik" },
+      upCount: { content: "Głosy za" },
+      downCount: { content: "Głosy przeciw" },
       trustLevel: { content: "Poziom zaufania" },
     },
     backButton: {

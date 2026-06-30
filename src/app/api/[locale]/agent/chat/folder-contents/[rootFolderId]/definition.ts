@@ -460,6 +460,11 @@ const { GET } = createEndpoint({
     },
   },
 
+  // PUBLIC/SHARED folders stream on a shared channel; PRIVATE on the owner's own
+  // channel; INCOGNITO never reaches the server. Decided per rootFolderId by the
+  // route's resolveChannel.
+  channel: { scope: "resolved" } as const,
+
   events: {
     // Framework merges the partial into the items array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.

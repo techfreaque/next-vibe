@@ -62,7 +62,7 @@ export const translations = {
           routeId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_skills_GET'). Use tool-help to discover tools.",
+              "Alias or full tool name to call (e.g. 'web-search', 'agent_skills_GET'). Use tool-help to discover tools.",
             placeholder: "web-search",
           },
           args: {

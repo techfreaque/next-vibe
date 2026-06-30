@@ -27,6 +27,7 @@ import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-gen
 import {
   dateSchema,
   iconSchema,
+  translatedValueSchema,
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -81,7 +82,7 @@ const FavoriteEditContainer = lazy(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "chat", "favorites", "[id]"],
+  path: ["agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -298,6 +299,7 @@ const { DELETE } = createEndpoint({
   // `urlPathParams.id` (the [id] route param). The client onEvent removes the row
   // from the list cache; remoteEvent relays the delete cross-instance, where the
   // route's onRemoteEvent removes the row by that same slug.
+  channel: { scope: "user" } as const,
   events: {
     "favorite-deleted": {
       remoteEvent: true as const,
@@ -392,7 +394,7 @@ const { DELETE } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "favorites", "[id]"],
+  path: ["agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -657,7 +659,7 @@ const { PATCH } = createEndpoint({
       // === RESPONSE ===
       success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
 
       // === REQUEST ===
@@ -905,6 +907,7 @@ const { PATCH } = createEndpoint({
   // param). The client onEvent rebuilds the card and patches the matching row in
   // the list cache; remoteEvent relays the edit cross-instance, where the route's
   // onRemoteEvent re-applies the update keyed by that same slug.
+  channel: { scope: "user" } as const,
   events: {
     "favorite-updated": {
       remoteEvent: true as const,
@@ -932,7 +935,14 @@ const { PATCH } = createEndpoint({
         "memoryLimit",
       ] as const,
       urlPathParamsFields: ["id"] as const,
-      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
+      onEvent: async ({
+        requestData,
+        urlPathParams,
+        logger,
+        locale,
+        user,
+        agentEnvAvailability,
+      }) => {
         const favoriteId = urlPathParams.id;
 
         const [
@@ -940,16 +950,13 @@ const { PATCH } = createEndpoint({
           favoritesDefinition,
           skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
-          { getEnvAvailability },
         ] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("../definition"),
           import("../../[id]/definition"),
           import("../repository-client"),
-          import("../../../env-availability"),
         ]);
 
-        const availability = getEnvAvailability();
         const { skillId: baseSkillId, variantId } = parseSkillId(
           requestData.skillId ?? "default",
         );
@@ -1008,7 +1015,7 @@ const { PATCH } = createEndpoint({
                 requestData.voiceModelSelection ?? null,
                 locale,
                 user,
-                availability,
+                agentEnvAvailability,
               );
             return {
               ...old,
@@ -1077,7 +1084,7 @@ const { PATCH } = createEndpoint({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "favorites", "[id]"],
+  path: ["agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 

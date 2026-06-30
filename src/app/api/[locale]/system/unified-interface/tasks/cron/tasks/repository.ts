@@ -143,8 +143,8 @@ export class CronTasksListRepository {
       targetInstance: task.targetInstance ?? null,
       tags: task.tags,
       owner: dbUserIdToOwner(task.userId),
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
     };
     return formatted;
   }

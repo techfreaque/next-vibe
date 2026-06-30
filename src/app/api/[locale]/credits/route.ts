@@ -16,6 +16,5 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: async ({ user, locale, logger, t }) =>
       CreditRepository.getCreditBalanceForUser(user, locale, logger, t),
-    canSubscribe: ({ user }) => !!user.id,
   },
 });

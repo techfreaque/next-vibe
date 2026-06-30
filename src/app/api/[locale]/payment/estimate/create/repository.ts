@@ -153,8 +153,8 @@ export class EstimateCreateRepository {
           subtotal: estimate.subtotal,
           taxAmount: estimate.taxAmount,
           total: estimate.total,
-          createdAt: estimate.createdAt.toISOString(),
-          updatedAt: estimate.updatedAt.toISOString(),
+          createdAt: estimate.createdAt,
+          updatedAt: estimate.updatedAt,
         },
       });
     } catch (error) {

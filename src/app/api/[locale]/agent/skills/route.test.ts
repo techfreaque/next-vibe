@@ -36,6 +36,7 @@ import {
   SkillCategory,
   SkillSourceFilter,
   SkillStatus,
+  SkillVoteDirection,
 } from "./enum";
 import skillModerationEndpoint from "./moderation/definition";
 

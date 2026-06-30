@@ -94,7 +94,7 @@ export class CortexReadRepository {
             truncated: false,
             readonly: false,
             nodeType: "file",
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date(),
           });
         }
       } else if (path.startsWith("/documents/")) {
@@ -111,7 +111,7 @@ export class CortexReadRepository {
             truncated: false,
             readonly: false,
             nodeType: "file",
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date(),
           });
         }
       }
@@ -146,7 +146,7 @@ export class CortexReadRepository {
       truncated,
       readonly: false,
       nodeType: "file",
-      updatedAt: node.updatedAt.toISOString(),
+      updatedAt: node.updatedAt,
     });
   }
 
@@ -204,7 +204,7 @@ export class CortexReadRepository {
             truncated: false,
             readonly: true,
             nodeType: "dir",
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date(),
           });
         }
         return fail({
@@ -231,7 +231,7 @@ export class CortexReadRepository {
         truncated,
         readonly: !isVirtualWritable(path),
         nodeType: result.nodeType,
-        updatedAt: result.updatedAt,
+        updatedAt: new Date(result.updatedAt),
       });
     } catch (error) {
       logger.error("Cortex virtual mount read failed", parseError(error), {

@@ -139,16 +139,6 @@ export interface Skill {
   changeNote?: string | null;
 }
 
-/**
- * Helper to create a tool config item (uses aliases for update-safe references)
- */
-export function tool(
-  toolId: string,
-  requiresConfirmation = false,
-): ToolConfigItem {
-  return { toolId, requiresConfirmation };
-}
-
 export const NO_SKILL = {
   id: NO_SKILL_ID,
   category: SkillCategory.ASSISTANT,

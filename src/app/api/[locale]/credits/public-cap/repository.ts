@@ -111,7 +111,7 @@ export class PublicCapRepository {
       capAmount: row.capAmount,
       remainingToday: remaining,
       percentUsed,
-      lastResetAt: row.lastResetAt.toISOString(),
+      lastResetAt: row.lastResetAt,
       capExceeded: row.spendToday >= row.capAmount,
     });
   }

@@ -36,11 +36,11 @@ export class CoaJournalListRepository {
       entries: Array<{
         id: string;
         entryNumber: string;
-        date: string;
+        date: Date;
         description: string;
         status: string;
         sourceType: string;
-        postedAt: string | null;
+        postedAt: Date | null;
       }>;
       totalCount: number;
     }>
@@ -131,11 +131,11 @@ export class CoaJournalListRepository {
         entries: rows.map((r) => ({
           id: r.id,
           entryNumber: r.entryNumber,
-          date: r.date.toISOString(),
+          date: r.date,
           description: r.description,
           status: r.status,
           sourceType: r.sourceType,
-          postedAt: r.postedAt?.toISOString() ?? null,
+          postedAt: r.postedAt ?? null,
         })),
         totalCount: totalCount ?? 0,
       });

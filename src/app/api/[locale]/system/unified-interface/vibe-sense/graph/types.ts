@@ -87,18 +87,18 @@ export interface GraphSummary {
   ownerId: string | null;
   parentVersionId: string | null;
   isActive: boolean;
-  createdAt: string;
+  createdAt: Date;
 }
 
 /** Time-series data payload for a graph (used by data + get endpoints) */
 export interface GraphDataPayload {
   series: Array<{
     nodeId: string;
-    points: Array<{ timestamp: string; value: number }>;
+    points: Array<{ timestamp: Date; value: number }>;
   }>;
   signals: Array<{
     nodeId: string;
-    events: Array<{ timestamp: string; fired: boolean }>;
+    events: Array<{ timestamp: Date; fired: boolean }>;
   }>;
 }
 

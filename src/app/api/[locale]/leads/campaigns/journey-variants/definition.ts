@@ -6,6 +6,7 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -104,12 +105,12 @@ const variantItemSchema = objectField(scopedTranslation, {
     createdAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       label: "get.response.createdAt",
-      schema: z.string(),
+      schema: dateSchema,
     }),
     updatedAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       label: "get.response.updatedAt",
-      schema: z.string(),
+      schema: dateSchema,
     }),
   },
 });
@@ -325,7 +326,7 @@ const { POST } = createEndpoint({
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.createdAt",
-        schema: z.string(),
+        schema: dateSchema,
       }),
     },
   }),
@@ -488,7 +489,7 @@ const { PATCH } = createEndpoint({
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.updatedAt",
-        schema: z.string(),
+        schema: dateSchema,
       }),
     },
   }),

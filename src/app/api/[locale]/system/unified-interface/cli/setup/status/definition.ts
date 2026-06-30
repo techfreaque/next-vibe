@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 
+import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -37,7 +38,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: [CLI_STATUS_ALIAS] as const,
   method: Methods.POST,
-  path: ["system", "setup", "status"],
+  path: ["system", "unified-interface", "cli", "setup", "status"],
   examples: {
     responses: {
       default: {
@@ -86,7 +87,7 @@ const { POST } = createEndpoint({
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.fields.message",
-        schema: z.string(),
+        schema: translatedValueSchema,
       }),
     },
   }),

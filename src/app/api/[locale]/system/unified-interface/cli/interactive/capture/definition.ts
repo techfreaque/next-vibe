@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
   ],
   aliases: [INTERACTIVE_CAPTURE_ALIAS] as const,
   method: Methods.POST,
-  path: ["system", "interactive", "capture"],
+  path: ["system", "unified-interface", "cli", "interactive", "capture"],
   cli: {
     firstCliArgKey: "pid",
   },

@@ -6,6 +6,7 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { AiStreamPostRequestOutput } from "@/app/api/[locale]/agent/ai-stream/stream/definition";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
@@ -30,6 +31,7 @@ export interface AnswerAsAIDeps {
   };
   /** Active favorite config for model/tool resolution */
   favoriteConfig: FavoriteConfig | null;
+  executionContext;
 }
 
 export async function answerAsAI(
@@ -46,6 +48,7 @@ export async function answerAsAI(
     activeThreadId,
     settings,
     favoriteConfig,
+    executionContext,
   } = deps;
 
   logger.debug("Answer as AI operation", { messageId, content });
@@ -115,6 +118,7 @@ export async function answerAsAI(
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
       audioInput: { file: null },
       timezone,
+      executionContext,
     });
   } catch (error) {
     logger.error("Failed to answer as AI", parseError(error));
