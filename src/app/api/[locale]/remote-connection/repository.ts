@@ -585,6 +585,12 @@ export class RemoteConnectionRepository {
     localUrl: string | null;
     token: string | null;
     leadId: string;
+    /**
+     * True when this row is a reverse entry — the peer initiated the connection
+     * to US and we hold THEIR url+token. We can always reach them via direct-http
+     * to their bridge (e.g. to return a tool result), regardless of transportMode.
+     */
+    isReverseEntry: boolean;
   } | null> {
     const [row] = await db
       .select({
@@ -595,6 +601,7 @@ export class RemoteConnectionRepository {
         localUrl: remoteConnections.localUrl,
         token: remoteConnections.token,
         leadId: remoteConnections.leadId,
+        isReverseEntry: remoteConnections.isReverseEntry,
       })
       .from(remoteConnections)
       .where(
@@ -618,6 +625,7 @@ export class RemoteConnectionRepository {
       remoteUrl: row.remoteUrl,
       localUrl: row.localUrl,
       leadId: row.leadId,
+      isReverseEntry: row.isReverseEntry,
       token: row.token
         ? RemoteConnectionRepository.decryptToken(row.token)
         : null,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----2572266c-1258-46f0-b87c-bd331925d499.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think>The result is: ` {\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"local…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----7e832591-d9ac-4168-9730-7d1b7302c255.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result shows: taskId: \"local-bg-1782397734876-p7pj9m\" (a string) No imageUrl present hint says \"Task detached…",
     "encoding_format": "float"
   }
 }

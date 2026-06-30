@@ -1,17 +1,17 @@
 /**
  * Reverse Connection Update Repository
  *
- * Called by the initiating (local) instance via HTTP to mirror syncScope changes
- * to the remote side's reverse entry. The remote updates its stored record so
- * the sync serve-filter stays consistent on both sides.
- *
- * Only updates the reverse entry (isReverseEntry=true). Normal outbound rows
- * are managed by the initiating side directly.
+ * The canonical "mirror a setting to the peer" endpoint. Either side calls it on
+ * the other (via runInProcessTyped) to keep both rows in sync: syncScope (sync
+ * serve-filter) and remoteTransportMode (how the peer reaches us → drives our
+ * connector lifecycle). Matches the local connection to the caller by either
+ * instanceId or remoteInstanceId — works for both the reverse entry and the
+ * outbound row.
  */
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -36,22 +36,33 @@ export class ReverseConnectionUpdateRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<{ updated: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const { instanceId, syncScope } = data;
+    const { instanceId, syncScope, remoteTransportMode } = data;
 
+    // `instanceId` is the CALLER's self-id. On this (callee) side the connection
+    // to that caller is keyed either by instanceId (we are the caller's reverse
+    // entry) or by remoteInstanceId (we initiated to the caller, so it's our
+    // outbound row). Match either — both sides must stay in sync; the mirror is
+    // not specific to reverse entries.
     const [row] = await db
-      .select({ id: remoteConnections.id })
+      .select({
+        id: remoteConnections.id,
+        instanceId: remoteConnections.instanceId,
+      })
       .from(remoteConnections)
       .where(
         and(
           eq(remoteConnections.userId, user.id),
-          eq(remoteConnections.instanceId, instanceId),
-          eq(remoteConnections.isReverseEntry, true),
+          eq(remoteConnections.isActive, true),
+          or(
+            eq(remoteConnections.instanceId, instanceId),
+            eq(remoteConnections.remoteInstanceId, instanceId),
+          ),
         ),
       )
       .limit(1);
 
     if (!row) {
-      logger.warn("[ReverseUpdate] No reverse entry found", {
+      logger.warn("[ReverseUpdate] No connection found for caller", {
         userId: user.id,
         instanceId,
       });
@@ -68,23 +79,43 @@ export class ReverseConnectionUpdateRepository {
     if (syncScope !== undefined) {
       patch.syncScope = syncScope;
     }
+    if (remoteTransportMode !== undefined) {
+      patch.remoteTransportMode = remoteTransportMode;
+    }
+
+    // The local row's own instanceId (may differ from the caller's self-id when
+    // this is our outbound row, keyed by remoteInstanceId).
+    const localInstanceId = row.instanceId;
 
     await db
       .update(remoteConnections)
       .set(patch)
-      .where(
-        and(
-          eq(remoteConnections.userId, user.id),
-          eq(remoteConnections.instanceId, instanceId),
-          eq(remoteConnections.isReverseEntry, true),
-        ),
-      );
+      .where(eq(remoteConnections.id, row.id));
 
-    logger.info("[ReverseUpdate] Updated reverse entry", {
+    logger.info("[ReverseUpdate] Mirrored settings to local connection", {
       userId: user.id,
-      instanceId,
+      callerInstanceId: instanceId,
+      localInstanceId,
       syncScope,
+      remoteTransportMode,
     });
+
+    // Connector lifecycle on THIS side: open the outbound connector to the peer
+    // (subscribing to its remote-event hub) exactly when the peer reaches us via
+    // reverse-ws — i.e. remoteTransportMode became "reverse-ws". Otherwise the
+    // peer reaches us directly and we keep no socket. (cloud instances never open
+    // outbound sockets; openConnection no-ops there.)
+    if (remoteTransportMode !== undefined) {
+      if (remoteTransportMode === "reverse-ws") {
+        const { restartConnection } =
+          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+        await restartConnection(localInstanceId);
+      } else {
+        const { closeConnection } =
+          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+        closeConnection(localInstanceId);
+      }
+    }
 
     return success({ updated: true });
   }

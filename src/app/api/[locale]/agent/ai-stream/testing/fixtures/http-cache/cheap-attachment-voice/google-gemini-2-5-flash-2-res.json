@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11ce6f73be2dc50-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:29:07 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484146-wBTfHUoipSkve970WSP6"
+  },
+  "body": {
+    "id": "gen-1782484146-wBTfHUoipSkve970WSP6",
+    "object": "chat.completion",
+    "created": 1782484146,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio features an upbeat, funk-infused instrumental track played on a synth. The duration is a short clip.\n\n**Music Analysis:**\n- **Genre/Subgenre:** Funk, Synth-Funk\n- **Tempo:** Approximately 110-120 BPM (moderately fast)\n- **Time Signature:** 4/4\n- **Instruments:**\n    - **Drums:** A tight, driving drum machine beat with a prominent snare on the 2 and 4. The hi-hats provide a continuous, energetic pulse.\n    - **Bass:** A synth bass plays a groovy, walking bassline, providing a strong rhythmic and harmonic foundation.\n    - **Synth Keyboard (Melody/Chords):** A bright, staccato synth plays a catchy, repetitive melodic phrase, punctuated by short, rhythmic chords. The sound has a somewhat whimsical, playful quality.\n    - **Synth Lead (Occasional Fills):** A slightly different synth sound occasionally plays short, high-pitched melodic fills that add a layer of complexity and interest.\n- **Interactions:** The drums, bass, and rhythmic synth keyboard are tightly locked into a groove, creating a danceable and percussive feel. The lead synth occasionally layers over this foundation.\n- **Mood:** Energetic, playful, funky, lighthearted.\n- **Production Style:** Polished, clean synth sounds. There's a noticeable reverb on some of the synth elements, giving it a somewhat spacious feel without being overly grand. It evokes a retro 80s or early 90s synth-pop/funk vibe.\n\n**Non-Musical Audio Events:**\n- There is a brief, almost imperceptible \"pop\" or \"click\" sound right at the very beginning of the clip, possibly an artifact of the audio starting point.\n\n**Sound Quality:** Good, clear digital sound quality.\n**Recording Environment:** Seems like a studio production.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 402,
+      "total_tokens": 1474,
+      "cost": 0.0018516,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018516,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

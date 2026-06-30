@@ -18,7 +18,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import * as pendingCalls from "@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls";
 import * as resolveTaskUser from "@/app/api/[locale]/system/unified-interface/tasks/cron/resolve-task-user";
-import * as wsEmitter from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import {
+  clearLocalBroadcast,
+  registerLocalBroadcast,
+} from "@/app/api/[locale]/system/unified-interface/websocket/local-broadcast";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 

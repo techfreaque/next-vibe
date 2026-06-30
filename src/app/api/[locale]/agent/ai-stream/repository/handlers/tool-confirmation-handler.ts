@@ -28,7 +28,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { db } from "../../../../system/db";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
-import { chatMessages } from "../../../chat/db";
+import { chatMessages, chatThreads } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11cea0bca0cd29e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:31:13 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484272-UyIpVd3DPQy35nQD8QHk"
+  },
+  "body": {
+    "id": "gen-1782484272-UyIpVd3DPQy35nQD8QHk",
+    "object": "chat.completion",
+    "created": 1782484272,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip, approximately 30 seconds in duration, exhibiting a polished production quality. There are no spoken words, vocals, or human voices present in the recording.\n\n**Music Description:**\nThe music can be categorized as **House** or **Deep House**, with clear influences of **Disco** and **Funk**.\n- **Tempo:** The tempo is moderately fast, estimated to be around 125-130 BPM.\n- **Instruments and Arrangement:**\n    - **Drums:** A prominent drum machine provides the core rhythm. It features a punchy kick drum on every beat, driving the groove. A crisp, open hi-hat plays on the off-beats, creating a classic four-on-the-floor feel. A subtle closed hi-hat or shaker provides additional high-frequency rhythm.\n    - **Bass:** A funky, electric bass guitar plays a syncopated, walking bassline, adding a significant groove and warmth to the track. Its interplay with the drums is a key characteristic of the song's energy.\n    - **Piano/Keys:** A clean-sounding, possibly Rhodes-style electric piano plays rhythmic chords, injecting a soulful and melodic element. It primarily accents the beat and harmonizes with the bassline.\n    - **Synthesizer/Lead:** A bright, staccato synthesizer line plays a catchy, repetitive melody. This acts as the main harmonic hook of the track.\n- **Section Analysis (0:00 - 0:30):** The entire clip appears to be a continuous loop or a main section of a song, possibly a verse or a build-up. All instruments are present from the beginning and play consistently throughout, establishing a steady, danceable groove. There are no sudden changes in instrumentation or discernible song structure transitions within this short segment.\n- **Mood:** The overall mood is uplifting, energetic, and groovy, typical of dance music designed for an engaging and positive atmosphere.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 408,
+      "total_tokens": 1480,
+      "cost": 0.0018666,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018666,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00102
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

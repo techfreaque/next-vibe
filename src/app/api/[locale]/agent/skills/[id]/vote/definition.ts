@@ -81,7 +81,7 @@ const { POST } = createEndpoint({
       trustLevel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.trustLevel.content" as const,
-        schema: z.string(),
+        schema: z.enum(SkillTrustLevelDB),
       }),
 
       backButton: backButton(scopedTranslation, {

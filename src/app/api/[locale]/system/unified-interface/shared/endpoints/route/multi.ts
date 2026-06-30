@@ -7,10 +7,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
  */
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 
-import {
-  type AnyRemoteHandlerMap,
-  registerRemoteEventHandlers,
-} from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/registry";
+import { registerRemoteEventHandlers } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/registry";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NextHandlerReturnType } from "../../../next-api/handler";
@@ -142,7 +139,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         registerRemoteEventHandlers(
           endpoint.path,
           Methods.GET,
-          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          methodConfig.onRemoteEvent,
           endpoint,
         );
       }
@@ -175,7 +172,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         registerRemoteEventHandlers(
           endpoint.path,
           Methods.POST,
-          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          methodConfig.onRemoteEvent,
           endpoint,
         );
       }
@@ -208,7 +205,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         registerRemoteEventHandlers(
           endpoint.path,
           Methods.PUT,
-          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          methodConfig.onRemoteEvent,
           endpoint,
         );
       }
@@ -241,7 +238,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         registerRemoteEventHandlers(
           endpoint.path,
           Methods.PATCH,
-          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          methodConfig.onRemoteEvent,
           endpoint,
         );
       }
@@ -274,7 +271,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         registerRemoteEventHandlers(
           endpoint.path,
           Methods.DELETE,
-          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+          methodConfig.onRemoteEvent ,
           endpoint,
         );
       }

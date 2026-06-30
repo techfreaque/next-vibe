@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The query='search' call returned 12 tools. Each tool has:\n- A `name` field (e.g., `users-list`, `agent-search-messages`, `brave-search`, etc.)\n- A `description` field (e.g., \"Search and filter users\", \"Search messages within a specific thread...\", etc.)\n\nThe tools array is non-empty (12 items), and every entry includes both a name and a description. This looks correct.</think>The `query='search'` call returned **12 tools**. Every entry includes both a `name` and a `description`. Examples:\n\n- `users-list` — \"Search and filter users\"\n- `agent-search-messages` — \"Search messages across all threads using full-text search\"\n- `brave-search` — \"Search the internet for current information...\"\n- `cortex-search` — \"Find files by name or content. Searches everything.\"\n\nAll 12 entries follow th\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with toolName='generate_image' and check that the result contains a name, a description, and a parameters schema.</think>\n\nAssistant: <think>The result contains:\n1. `name`: \"generate_image\"\n2. `description`: \"Generate an image from a text prompt using AI\"\n3. `parameters`: a full JSON schema with properties, required fields, etc.\n\nAll three are present. I should end with STEP_OK.</think>The result for `toolName='generate_image'` contains all three required items:\n\n- **name**: `generate_image`\n- **description**: \"Generate an image from a text prompt using AI\"\n- **parameters schema**: a full JSON Schema object with properties (`model`, `prompt`, `size`, `quality`, `aspectRatio`, `inputMediaUrl`), required fields, types, enums, and defaults.\n\nSTEP_OK\n\nUser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

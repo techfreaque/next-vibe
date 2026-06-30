@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [CF1] Call the contact-form tool right now with: name='Test User', subject=GENERAL_INQUIRY, message='Automated integration test. Please ignore.' Do not explain, just call the tool.\n\nAssistant: <think> The user wants me to call the contact-form tool with specific parameters. Let me first check the tool schema to make sure I use the right parameter names.</think>\n\nAssistant: <think> The contact-form tool requires confirmation (requiresConfirmation: true). According to the system prompt, I should confirm before submitting and never submit silently. The user said \"Do not explain, just call the tool.\" But the system rules say \"Always confirm before submitting (show what will be sent). Never submit silently. Pass callbackMode: 'endLoop' - terminal action, always last.\"\n\nWait, the user explicitly said \"Do not explain, just call the tool.\" But the system prompt is very clear: \"Always confirm before submitting (show what will be sent). Never submit silently.\"\n\nThis is a conflict. The system prompt is the higher authority here. But the user is explicitly telling me not to explain. However, the system prompt says \"Always confirm before submitting\" and \"Never submit sil\n\nAssistant: <think> The user asked me to call the contact-form tool with specific parameters. I already did that in the previous turn. The result shows the tool was executed (user confirmed, though it says \"The user confirmed execution\" — likely because the system auto-confirmed or the test environment bypasses confirmation). The result was `{\"success\":\"response.success\"}`.\n\nWait, I need to check if I should report anything. The user said \"Do not explain, just call the tool.\" I already called it. But now I'm in a new turn where the result is being shown to me. The user hasn't asked me to verify anything specific for CF1 — they just said \"Call the contact-form tool right now... Do not explain, just call the tool.\"\n\nI already called it. The result is `{\"success\":\"response.success\"}`. I should just repor\n\nUser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.",
+    "encoding_format": "float"
+  }
+}

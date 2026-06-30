@@ -152,18 +152,17 @@ export interface EndpointEventDeclaration<
 // EVENTS MAP
 //
 // Structural constraint for the events config passed to createEndpoint().
-// Uses a plain object shape — NOT EndpointEventDeclaration with wide generics.
+// Intentionally NOT `Record<string, EndpointEventDeclaration<…wide…>>`: a value
+// type carrying the declaration's wide field generics contextually types every
+// onEvent with those wide generics, which makes the per-event narrowing
+// (EventResponsePayloads / EventRequestPayloads, read by RemoteEventHandlerProps)
+// collapse to `never`/`undefined` via distributive conditionals.
 //
-// Why: EndpointEventsMap is an index-signature type. If its value type were
-// EndpointEventDeclaration<R, Rq, U, wideRes, wideReq, widePayload>, every
-// onEvent callback would be contextually typed with the wide generics, which
-// makes ComputePayload resolve to `unknown` via distributive conditionals.
-//
-// Instead: the value type is a plain structural shape. The four payload fields
-// (responseFields, requestFields, urlPathParamsFields, payloadType) are typed
-// with their correct constraint types. onEvent accepts `any` payload here —
-// the actual payload type flows from the literal TEvents[K] that createEndpoint
-// captures as `const TEvents`, then ComputeEventPayloads reads from it.
+// Instead the value is a plain structural shape: the four field specs carry their
+// real constraint types; onEvent accepts the FULL output types + `any` payload
+// (so an author may reference any field at the constraint level). The actual
+// per-event payloads flow from the `const TEvents` literal createEndpoint
+// captures, read field-by-field by ComputeEventPayloads — never from this map.
 // ============================================================================
 
 export interface EndpointEventsMap<
@@ -172,11 +171,6 @@ export interface EndpointEventsMap<
   TUrlVariablesOutput,
 > {
   [K: string]: {
-    // Field specs accept any flat-array or nested-object spec (the real per-field
-    // narrowing is computed later by EventResponsePayloads et al. from the stored
-    // `const TEvents` literal). At the constraint level we don't know which fields
-    // a given event declares, so the inline onEvent ctx exposes the FULL output
-    // types — every field an author might reference flows with its real type.
     // oxlint-disable-next-line no-explicit-any
     readonly responseFields?: readonly any[] | Record<string, any>;
     // oxlint-disable-next-line no-explicit-any

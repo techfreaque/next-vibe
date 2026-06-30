@@ -19,7 +19,6 @@ import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
@@ -27,6 +26,10 @@ import { ChatMessageRole } from "../../../chat/enum";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { ChatModelOption } from "../../models";
 import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
+import {
+  buildErrorChainMessage,
+  sanitizeJsonSchemaRefs,
+} from "./convert/json-sanitize";
 import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
 export class MessageConverter {
@@ -684,7 +687,6 @@ export class MessageConverter {
       const converted = await MessageConverter.toAiSdkMessage(
         msg,
         logger,
-        locale,
         modelConfig,
       );
       if (converted === null) {

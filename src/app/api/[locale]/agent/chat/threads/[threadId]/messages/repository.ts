@@ -1261,7 +1261,10 @@ export class MessagesRemoteRepository {
       });
     createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
       "stream-finished",
-      { urlPathParams },
+      {
+        urlPathParams,
+        responseData: { streamingState: ThreadStreamingState.IDLE },
+      },
     );
   }
 

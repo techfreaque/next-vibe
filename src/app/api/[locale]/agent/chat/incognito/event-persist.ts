@@ -1,18 +1,16 @@
 /**
  * Incognito Event Persistence Helpers
  *
- * Two levels of helpers:
+ * Imperative helpers for use inside onEvent handlers:
+ *   - persistMessageIfIncognito
+ *   - finishIncognitoThreadIfIncognito
  *
- * 1. Factory helpers (onEventXxx) - for simple events where the entire
- *    onEvent is incognito persistence. Assign directly:
- *      onEvent: onEventPersistMessage()
- *
- * 2. Imperative helpers (persistXxxIfIncognito) - for mixed events that
- *    also have other logic. Call inside an existing onEvent handler:
- *      onEvent: async (ctx) => {
- *        // ... other logic
- *        await persistMessageIfIncognito(ctx.urlPathParams.threadId, ctx.requestData.rootFolderId, ...);
- *      }
+ * Factory helpers that return typed onEvent handlers:
+ *   - onEventPersistMessage
+ *   - onEventUpdateIncognitoThread
+ *   - onEventDeleteIncognitoThread
+ *   - onEventUpdateIncognitoFolder
+ *   - onEventDeleteIncognitoFolder
  */
 
 import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/db";
@@ -21,48 +19,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { DefaultFolderId } from "../config";
 import { ThreadStreamingState } from "../enum";
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
+// ─── Imperative helpers ───────────────────────────────────────────────────────
 
-function isIncognito<TRes, TReq>(
-  ctx: EndpointEventHandlerContext<TRes, TReq>,
-  source: "urlPathParams" | "requestData",
-): boolean {
-  if (source === "urlPathParams") {
-    return ctx.urlPathParams["rootFolderId"] === DefaultFolderId.INCOGNITO;
-  }
-  const val = (ctx.requestData as Record<string, string | undefined>)[
-    "rootFolderId"
-  ];
-  return val === DefaultFolderId.INCOGNITO;
-}
-
-function firstItemId<TRes, TReq>(
-  ctx: EndpointEventHandlerContext<TRes, TReq>,
-  arrayField: string,
-): string | undefined {
-  const partial = ctx.partial as Record<string, Array<Record<string, string>>>;
-  const arr = partial[arrayField];
-  if (!Array.isArray(arr)) {
-    return undefined;
-  }
-  const first = arr[0];
-  if (
-    first !== null &&
-    typeof first === "object" &&
-    !Array.isArray(first) &&
-    typeof first["id"] === "string"
-  ) {
-    return first["id"];
-  }
-  return undefined;
-}
-
-// ─── Imperative helpers (for mixed onEvent handlers) ─────────────────────────
-
-/**
- * Persist a specific message to incognito localStorage.
- * Use in mixed onEvent handlers where you already have msgId and threadId.
- */
 export async function persistMessageIfIncognito(
   threadId: string,
   msgId: string,
@@ -77,21 +35,13 @@ export async function persistMessageIfIncognito(
     import("../threads/[threadId]/messages/hooks/update-messages"),
     import("./storage"),
   ]);
-  const msgs = getCachedMessages(
-    threadId,
-    rootFolderId as DefaultFolderId,
-    logger,
-  );
+  const msgs = getCachedMessages(threadId, rootFolderId, logger);
   const msg = msgs.find((m) => m.id === msgId);
   if (msg && !(skipOptimistic && msg.metadata?.isOptimistic)) {
     await saveMessage(msg);
   }
 }
 
-/**
- * Set streamingState: "idle" on a thread in incognito localStorage.
- * Use in mixed onEvent handlers where you already have threadId and rootFolderId.
- */
 export async function finishIncognitoThreadIfIncognito(
   threadId: string,
   rootFolderId: string,
@@ -105,185 +55,150 @@ export async function finishIncognitoThreadIfIncognito(
   });
 }
 
-// ─── Factory helpers (for simple onEvent = pure incognito persistence) ────────
+// ─── onEvent factory helpers ──────────────────────────────────────────────────
+//
+// These factories return functions whose `ctx` parameter type is fully inferred
+// by the framework at the call site — no manual generic constraints here.
+// TypeScript resolves TResponseData/TRequestData/TUrlPathParams from the event
+// declaration's responseFields/requestFields/urlPathParamsFields, then checks
+// that the function body accesses only valid properties.
 
-/**
- * Persist a message from the live cache to incognito localStorage after a merge.
- * Reads the FULL message from cache (not just the partial) so all fields are saved.
- *
- * @param skipOptimistic - skip messages with metadata.isOptimistic (default: true)
- */
-export function onEventPersistMessage<TRes, TReq>(opts?: {
-  skipOptimistic?: boolean;
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const skipOptimistic = opts?.skipOptimistic ?? true;
-
+export function onEventPersistMessage(): (ctx: {
+  responseData: { messages?: ReadonlyArray<{ id?: string | null }> | null };
+  requestData: { rootFolderId?: string | null };
+  urlPathParams: { threadId: string };
+  logger: EndpointLogger;
+}) => Promise<void> {
   return async (ctx) => {
-    if (!isIncognito(ctx, "requestData")) {
+    const rootFolderId = ctx.requestData.rootFolderId ?? "";
+    if (rootFolderId !== DefaultFolderId.INCOGNITO) {
       return;
     }
-    const msgId = firstItemId(ctx, "messages");
-    if (!msgId) {
+    const threadId = ctx.urlPathParams.threadId;
+    const messages = ctx.responseData.messages;
+    if (!messages) {
       return;
     }
-    const threadId = ctx.urlPathParams["threadId"];
-    if (!threadId) {
-      return;
+    for (const msg of messages) {
+      if (!msg.id) {
+        continue;
+      }
+      await persistMessageIfIncognito(
+        threadId,
+        msg.id,
+        rootFolderId,
+        ctx.logger,
+      );
     }
-    const rootFolderId =
-      (ctx.requestData as Record<string, string | undefined>)["rootFolderId"] ??
-      "";
-    await persistMessageIfIncognito(
-      threadIdRaw,
-      msgId,
-      rootFolderId,
-      ctx.logger,
-      skipOptimistic,
-    );
   };
 }
 
-// ─── Thread persistence ───────────────────────────────────────────────────────
-
-/**
- * Update a thread in incognito localStorage from the event partial.
- *
- * @param source - "requestData" (threads endpoint) or "urlPathParams" (folder-contents)
- * @param arrayField - field name in partial that holds the thread/item array
- * @param pick - which fields from the partial item to pass to updateIncognitoThread
- */
-export function onEventUpdateIncognitoThread<TRes, TReq>(opts: {
-  source: "urlPathParams" | "requestData";
-  arrayField: string;
-  pick: (keyof ChatThread)[];
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const { source, arrayField, pick } = opts;
-
+export function onEventUpdateIncognitoThread<
+  TArrayField extends string,
+  TKey extends keyof ChatThread,
+>(opts: {
+  source: "requestData" | "urlPathParams";
+  arrayField: TArrayField;
+  pick: TKey[];
+}): (ctx: {
+  responseData: Record<
+    TArrayField,
+    ReadonlyArray<Pick<ChatThread, TKey | "id">>
+  >;
+  requestData: { rootFolderId?: string | null };
+  urlPathParams: { rootFolderId?: string | null };
+}) => Promise<void> {
   return async (ctx) => {
-    if (!isIncognito(ctx, source)) {
+    const rootFolderId =
+      opts.source === "urlPathParams"
+        ? (ctx.urlPathParams.rootFolderId ?? "")
+        : (ctx.requestData.rootFolderId ?? "");
+    if (rootFolderId !== DefaultFolderId.INCOGNITO) {
       return;
     }
-    const partial = ctx.partial as Record<string, Array<Partial<ChatThread>>>;
-    const item = partial[arrayField]?.[0];
-    if (!item?.id) {
-      return;
-    }
-    const updates: Partial<ChatThread> = {};
-    for (const key of pick) {
-      if (item[key] !== undefined) {
-        (updates as Record<string, ChatThread[typeof key]>)[key] = item[key];
-      }
-    }
-    if (Object.keys(updates).length === 0) {
-      return;
-    }
+    const items = ctx.responseData[opts.arrayField];
     const { updateIncognitoThread } = await import("./storage");
-    await updateIncognitoThread(item.id, updates);
+    for (const item of items) {
+      const patch: Pick<ChatThread, TKey> = Object.fromEntries(
+        opts.pick.map((key) => [key, item[key]]),
+      ) as Pick<ChatThread, TKey>;
+      await updateIncognitoThread(item.id, patch);
+    }
   };
 }
 
-/**
- * Delete a thread from incognito localStorage.
- */
-export function onEventDeleteIncognitoThread<TRes, TReq>(opts: {
-  source: "urlPathParams" | "requestData";
-  arrayField: string;
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const { source, arrayField } = opts;
-
+export function onEventDeleteIncognitoThread<TArrayField extends string>(opts: {
+  source: "requestData" | "urlPathParams";
+  arrayField: TArrayField;
+}): (ctx: {
+  responseData: Record<TArrayField, ReadonlyArray<{ id: string }>>;
+  requestData: { rootFolderId?: string | null };
+  urlPathParams: { rootFolderId?: string | null };
+}) => Promise<void> {
   return async (ctx) => {
-    if (!isIncognito(ctx, source)) {
-      return;
-    }
-    const id = firstItemId(ctx, arrayField);
-    if (!id) {
-      return;
-    }
-    const { deleteThread } = await import("./storage");
-    await deleteThread(id);
-  };
-}
-
-/**
- * Set streamingState: "idle" on the thread in incognito localStorage.
- * Used for stream-finished on the messages channel where threadId is in urlPathParams.
- */
-export function onEventFinishIncognitoThread<TRes, TReq>(opts: {
-  source: "urlPathParams" | "requestData";
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const { source } = opts;
-
-  return async (ctx) => {
-    if (!isIncognito(ctx, source)) {
-      return;
-    }
-    const threadId = ctx.urlPathParams["threadId"];
-    if (!threadId) {
-      return;
-    }
     const rootFolderId =
-      (source === "requestData"
-        ? (ctx.requestData as Record<string, string | undefined>)[
-            "rootFolderId"
-          ]
-        : ctx.urlPathParams["rootFolderId"]) ?? "";
-    await finishIncognitoThreadIfIncognito(threadId, rootFolderId);
+      opts.source === "urlPathParams"
+        ? (ctx.urlPathParams.rootFolderId ?? "")
+        : (ctx.requestData.rootFolderId ?? "");
+    if (rootFolderId !== DefaultFolderId.INCOGNITO) {
+      return;
+    }
+    const items = ctx.responseData[opts.arrayField];
+    const { deleteThread } = await import("./storage");
+    for (const item of items) {
+      await deleteThread(item.id);
+    }
   };
 }
 
-// ─── Folder persistence ───────────────────────────────────────────────────────
-
-/**
- * Update a folder in incognito localStorage from the event partial.
- * Always reads rootFolderId from urlPathParams (folder-contents endpoint).
- */
-export function onEventUpdateIncognitoFolder<TRes, TReq>(opts: {
-  arrayField: string;
-  pick: (keyof ChatFolder)[];
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const { arrayField, pick } = opts;
-
+export function onEventUpdateIncognitoFolder<
+  TArrayField extends string,
+  TKey extends keyof ChatFolder,
+>(opts: {
+  arrayField: TArrayField;
+  pick: TKey[];
+}): (ctx: {
+  responseData: Record<
+    TArrayField,
+    ReadonlyArray<Pick<ChatFolder, TKey | "id">>
+  >;
+  requestData: { rootFolderId?: string | null };
+  urlPathParams: { rootFolderId?: string | null };
+}) => Promise<void> {
   return async (ctx) => {
-    if (!isIncognito(ctx, "urlPathParams")) {
+    const rootFolderId =
+      ctx.urlPathParams.rootFolderId ?? ctx.requestData.rootFolderId ?? "";
+    if (rootFolderId !== DefaultFolderId.INCOGNITO) {
       return;
     }
-    const partial = ctx.partial as Record<string, Array<Partial<ChatFolder>>>;
-    const item = partial[arrayField]?.[0];
-    if (!item?.id) {
-      return;
-    }
-    const updates: Partial<ChatFolder> = {};
-    for (const key of pick) {
-      if (item[key] !== undefined) {
-        (updates as Record<string, ChatFolder[typeof key]>)[key] = item[key];
-      }
-    }
-    if (Object.keys(updates).length === 0) {
-      return;
-    }
+    const items = ctx.responseData[opts.arrayField];
     const { updateIncognitoFolder } = await import("./storage");
-    await updateIncognitoFolder(item.id, updates);
+    for (const item of items) {
+      const patch: Pick<ChatFolder, TKey> = Object.fromEntries(
+        opts.pick.map((key) => [key, item[key]]),
+      ) as Pick<ChatFolder, TKey>;
+      await updateIncognitoFolder(item.id, patch);
+    }
   };
 }
 
-/**
- * Delete a folder from incognito localStorage.
- * Always reads rootFolderId from urlPathParams (folder-contents endpoint).
- */
-export function onEventDeleteIncognitoFolder<TRes, TReq>(opts: {
-  arrayField: string;
-}): (ctx: EndpointEventHandlerContext<TRes, TReq>) => Promise<void> {
-  const { arrayField } = opts;
-
+export function onEventDeleteIncognitoFolder<TArrayField extends string>(opts: {
+  arrayField: TArrayField;
+}): (ctx: {
+  responseData: Record<TArrayField, ReadonlyArray<{ id: string }>>;
+  requestData: { rootFolderId?: string | null };
+  urlPathParams: { rootFolderId?: string | null };
+}) => Promise<void> {
   return async (ctx) => {
-    if (!isIncognito(ctx, "urlPathParams")) {
+    const rootFolderId =
+      ctx.urlPathParams.rootFolderId ?? ctx.requestData.rootFolderId ?? "";
+    if (rootFolderId !== DefaultFolderId.INCOGNITO) {
       return;
     }
-    const id = firstItemId(ctx, arrayField);
-    if (!id) {
-      return;
-    }
+    const items = ctx.responseData[opts.arrayField];
     const { deleteFolder } = await import("./storage");
-    await deleteFolder(id);
+    for (const item of items) {
+      await deleteFolder(item.id);
+    }
   };
 }

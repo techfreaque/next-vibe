@@ -1291,6 +1291,7 @@ export class HelpRepository {
               true,
               getToolPlatforms(m),
               true, // compact=true (we're inside isCompact block)
+              singleCategory,
             );
           }),
         );

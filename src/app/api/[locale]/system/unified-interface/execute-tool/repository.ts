@@ -30,7 +30,6 @@ import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
-import { broadcastToolResult } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/remote-transport";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";

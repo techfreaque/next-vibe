@@ -212,16 +212,6 @@ export interface HeadlessAiStreamResult {
   pinnedToolCount: number;
 }
 
-/**
- * Run a full AI stream without SSE.
- * DB persistence, compacting, and tool loops work exactly like the regular stream.
- * Returns the lastAiMessageId - caller reads message content from DB.
- */
-/**
- * Resolve model and skill from a favorite ID.
- * Returns the model ID and skill ID from the favorite's modelSelection.
- * Falls back to NO_SKILL_ID if the favorite has no skill set.
- */
 export async function resolveFavorite(
   favoriteId: string,
   userId: string,
@@ -250,7 +240,6 @@ export async function resolveFavorite(
   const skill = favorite.skillId || NO_SKILL_ID;
   const availability = await getInstanceAvailability();
 
-  // Resolve model from modelSelection
   const sel = favorite.modelSelection;
 
   if (sel && isManualSelection(sel) && "manualModelId" in sel) {
@@ -267,7 +256,6 @@ export async function resolveFavorite(
     }
   }
 
-  // No favorite-level selection: resolve from the skill's variant
   if (skill !== NO_SKILL_ID) {
     const { SkillsRepository } = await import("../../skills/repository");
     const skillResult = await SkillsRepository.getSkillById(
@@ -586,6 +574,7 @@ export async function runHeadlessAiStream(
       resumeToken: null,
       timezone: "UTC",
       attachments: headlessAttachments ?? null,
+      executionContext: { mode: "local" as const },
     };
 
     const result = await AiStreamRepository.createAiStream({

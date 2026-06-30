@@ -167,24 +167,22 @@ export class cancelRepository {
                 })
                 .where(eq(chatMessages.id, waitingTask.wakeUpToolMessageId));
 
-              createMessagesEmitter(
-                threadId,
-                thread.rootFolderId,
-                logger,
-                user,
-              )("tool-result", {
-                messages: [
-                  {
-                    id: waitingTask.wakeUpToolMessageId,
-                    metadata: {
-                      toolCall: {
-                        ...toolCall,
-                        status: "failed" as const,
-                        result: undefined,
+              createMessagesEmitter(logger, user)("tool-result", {
+                urlPathParams: { threadId },
+                responseData: {
+                  messages: [
+                    {
+                      id: waitingTask.wakeUpToolMessageId,
+                      metadata: {
+                        toolCall: {
+                          ...toolCall,
+                          status: "failed" as const,
+                          result: undefined,
+                        },
                       },
                     },
-                  },
-                ],
+                  ],
+                },
               });
 
               logger.info(
@@ -224,12 +222,10 @@ export class cancelRepository {
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.
         await clearStreamingState(threadId, logger, user);
-        createMessagesEmitter(
-          threadId,
-          thread.rootFolderId,
-          logger,
-          user,
-        )("stream-finished", { streamingState: ThreadStreamingState.IDLE });
+        createMessagesEmitter(logger, user)("stream-finished", {
+          urlPathParams: { threadId },
+          responseData: { streamingState: ThreadStreamingState.IDLE },
+        });
         logger.info(
           "[Cancel] No active stream found - cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
           { threadId },

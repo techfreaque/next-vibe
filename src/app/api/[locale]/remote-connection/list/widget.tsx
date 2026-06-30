@@ -193,7 +193,7 @@ function RenameSelfButton({
     e.stopPropagation();
     setIsLoading(true);
     try {
-      const defs = await import("../self-rename/definition");
+      const defs = await import("../self/rename/definition");
       navigate(defs.default.PATCH, {
         popNavigationOnSuccess: 1,
         renderInModal: true,

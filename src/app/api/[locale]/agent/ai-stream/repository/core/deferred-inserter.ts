@@ -9,7 +9,10 @@
 
 import "server-only";
 
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import { eq } from "drizzle-orm";
+
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import {
   ChatMessageRole,
   ThreadStreamingState,

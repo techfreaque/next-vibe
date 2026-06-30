@@ -2,13 +2,16 @@
  * Unified WS Event Emitter
  *
  * Single source of truth for all event broadcasting — local and remote:
- *   - Local delivery:   POST to this instance's Bun proxy /ws/broadcast
- *   - Reverse-WS peers: POST to proxy on system/sync/{userId} (peers subscribe)
- *   - Direct-http peers: POST to each peer's remote-event-bridge
+ *   - Local delivery:   the WS proxy's socket registry (in-process when the
+ *     proxy shares this process, else a loopback POST to /ws/broadcast)
+ *   - Reverse-WS peers: published on the remote-event channel (peers subscribe)
+ *   - Direct-http peers: relayed to each peer's remote-event-bridge
  *
- * Next.js and route handlers run in a separate process from the Bun proxy.
- * To broadcast WS events they POST to the proxy's internal /ws/broadcast
- * endpoint which calls broadcastLocal() in-process where WS connections live.
+ * The proxy owns the live sockets. When it runs in this same process it
+ * registers its broadcast fns (see local-broadcast.ts) and we deliver directly;
+ * otherwise (Next.js / proxy in separate processes) we POST to the proxy's
+ * internal /ws/broadcast endpoint, which calls broadcastLocal() where the
+ * sockets live.
  */
 
 import "server-only";
@@ -55,14 +58,20 @@ let shuttingDown = false;
 // ─── Low-level broadcast primitives ───────────────────────────────────────────
 
 /**
- * POST a single WS event to the Bun proxy. Only the connection matching
- * the user's identity receives the event. Fire-and-forget.
+ * Deliver a single WS event. Only the connection matching the user's identity
+ * receives the event. In-process when the proxy shares this process; otherwise a
+ * fire-and-forget loopback POST to the proxy.
  */
-export function publishWsEvent<T extends AnyEndpointEventEnvelope>(
+function publishWsEvent<T extends AnyEndpointEventEnvelope>(
   msg: Omit<WsWireMessage<T>, "seq">,
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): void {
+  const local = getLocalBroadcast();
+  if (local) {
+    local.broadcastToAll(msg.channel, msg.event, msg.data);
+    return;
+  }
   const url = getBroadcastUrl();
   fetch(url, {
     method: "POST",
@@ -80,10 +89,11 @@ export function publishWsEvent<T extends AnyEndpointEventEnvelope>(
 }
 
 /**
- * POST multiple events in a single HTTP call — proxy packs them into one WS frame.
+ * Deliver multiple events as a single WS frame per socket. In-process when the
+ * proxy shares this process; otherwise one loopback POST the proxy unpacks.
  * Use for related events emitted together (e.g. stream-finished + sidebar update).
  */
-export function publishWsEventBatch(
+function publishWsEventBatch(
   events: WsBatchEvent[],
   logger: EndpointLogger,
   user: JwtPayloadType,
@@ -103,6 +113,11 @@ export function publishWsEventBatch(
     );
     return;
   }
+  const local = getLocalBroadcast();
+  if (local) {
+    local.broadcastBatch(events);
+    return;
+  }
   const url = getBroadcastUrl();
   fetch(url, {
     method: "POST",
@@ -118,101 +133,12 @@ export function publishWsEventBatch(
   });
 }
 
-/**
- * Accumulate high-frequency events and flush in a single HTTP POST.
- * Use for LLM content-delta streams to avoid per-chunk HTTP overhead.
- */
-export function createBatchingEmitter(
-  logger: EndpointLogger,
-  user: JwtPayloadType,
-  flushMs = 16,
-): {
-  emit: (channel: string, event: string, data: WsWireMessage["data"]) => void;
-  flush: () => void;
-} {
-  const queue: WsBatchEvent[] = [];
-  let timer: ReturnType<typeof setTimeout> | null = null;
-
-  function flush(): void {
-    if (timer !== null) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    if (queue.length === 0) {
-      return;
-    }
-    publishWsEventBatch([...queue], logger, user);
-    queue.length = 0;
-  }
-
-  function emit(
-    channel: string,
-    event: string,
-    data: WsWireMessage["data"],
-  ): void {
-    queue.push({ channel, event, data });
-    if (timer === null) {
-      timer = setTimeout(flush, flushMs);
-    }
-    if (queue.length >= 50) {
-      flush();
-    }
-  }
-
-  return { emit, flush };
-}
-
-// ─── Remote-event hub broadcast (local → reverse-WS peers on system/sync/{userId}) ───
+// ─── Remote-event hub broadcast (local → reverse-WS peers on the remote-event channel) ───
 
 /**
- * POST an event to the proxy on `system/sync/{userId}`.
- * All reverse-WS connectors subscribed to that channel receive it.
- * Uses the private internal userId — not the public leadId — so the channel
- * is not guessable from external data (users can have multiple leads).
- *
- * Payload is wrapped as AnyEndpointEventEnvelope so the wire type is consistent.
- * Receivers read the routing info from data.payload (a RemoteEventWirePayload).
- */
-function broadcastSyncChannel<TPayload>(
-  userId: string,
-  event: string,
-  payload: TPayload,
-  logger: EndpointLogger,
-): void {
-  const envelope: AnyEndpointEventEnvelope = {
-    endpointPath: ["remote-connection", "remote-event-bridge"],
-    endpointMethod: "POST",
-    eventName: event,
-    responseData: payload,
-    requestData: payload,
-    urlPathParams: {},
-    payload,
-  };
-  const url = getBroadcastUrl();
-  fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      channel: `system/sync/${userId}`,
-      event,
-      data: envelope,
-    }),
-  }).catch((err) => {
-    if (!shuttingDown) {
-      logger.warn(`[WS Emitter] Failed to broadcast ${event}`, {
-        error: err instanceof Error ? err.message : String(err),
-        userId,
-      });
-    }
-  });
-}
-
-// ─── Generic remote-event relay payload ───────────────────────────────────────
-
-/**
- * One relay shape for every cross-instance remote event. Identifies the target
- * route + event and carries that event's own envelope (all 4 fields together).
- * The envelope already contains endpointPath, endpointMethod, eventName,
+ * Generic remote-event relay payload. One relay shape for every cross-instance
+ * remote event. Identifies the target route + event and carries that event's own
+ * envelope (all 4 fields together): endpointPath, endpointMethod, eventName,
  * urlPathParams, responseData, requestData, and payload — no duplication.
  */
 export interface RemoteEventRelayPayload<TPayload = AnyEndpointEventEnvelope> {
@@ -223,17 +149,50 @@ export interface RemoteEventRelayPayload<TPayload = AnyEndpointEventEnvelope> {
 }
 
 /**
- * Low-level hub publish for the reverse-ws relay path. Publishes a `remote-event`
- * frame on `system/sync/{remoteUserId}`; the peer's connector, subscribed to that
- * channel, delivers it to the bridge. Used by `pushRemoteEvent` in dispatch.ts
- * after it has resolved which connections (per syncScope) should receive it.
+ * Hub publish for the reverse-ws relay path. Publishes a `remote-event` frame on
+ * the local remote-event channel; the peer's connector, subscribed to that
+ * channel, delivers it to the bridge. Used by RemoteEventBridgeRepository
+ * .pushRemoteEvent after it has resolved which connections should receive it.
+ *
+ * Uses the private internal userId — not the public leadId — so the channel is
+ * not guessable from external data (users can have multiple leads). The payload
+ * is wrapped as AnyEndpointEventEnvelope so the wire type stays consistent;
+ * receivers read the routing info from data.payload (a RemoteEventWirePayload).
  */
 export function publishRemoteEventToHub<TPayload>(
   remoteUserId: string,
   payload: RemoteEventWirePayload<TPayload>,
   logger: EndpointLogger,
 ): void {
-  broadcastSyncChannel(remoteUserId, "remote-event", payload, logger);
+  const envelope: AnyEndpointEventEnvelope = {
+    endpointPath: ["remote-connection", "remote-event-bridge"],
+    endpointMethod: "POST",
+    eventName: REMOTE_EVENT_NAME,
+    responseData: payload,
+    requestData: payload,
+    urlPathParams: {},
+    payload,
+  };
+  const channel = buildRemoteEventChannel(remoteUserId);
+
+  const local = getLocalBroadcast();
+  if (local) {
+    local.broadcastToAll(channel, REMOTE_EVENT_NAME, envelope);
+    return;
+  }
+  const url = getBroadcastUrl();
+  fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ channel, event: REMOTE_EVENT_NAME, data: envelope }),
+  }).catch((err) => {
+    if (!shuttingDown) {
+      logger.warn(`[WS Emitter] Failed to broadcast ${REMOTE_EVENT_NAME}`, {
+        error: err instanceof Error ? err.message : String(err),
+        userId: remoteUserId,
+      });
+    }
+  });
 }
 
 /**
@@ -258,9 +217,9 @@ export interface RemoteEventWirePayload<TPayload = AnyEndpointEventEnvelope> {
  * This mirrors the React Query cache key so server and client always match.
  *
  * Each emit delivers on all three paths simultaneously:
- *   1. Local WS (POST to proxy user channel)
- *   2. Reverse-WS peers (POST to proxy system/sync/{userId})
- *   3. Direct-HTTP peers (POST to each peer's /ws/broadcast via dispatch)
+ *   1. Local WS (user channel — in-process or loopback to the proxy)
+ *   2. Reverse-WS peers (the remote-event channel; peers subscribe)
+ *   3. Direct-HTTP peers (relayed to each peer's remote-event-bridge)
  */
 export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
@@ -334,8 +293,9 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
           syncDomain: eventDecl.syncDomain,
           envelope,
         };
-        void import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch").then(
-          ({ pushRemoteEvent }) => pushRemoteEvent(remoteEvent),
+        void import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/repository").then(
+          ({ RemoteEventBridgeRepository }) =>
+            RemoteEventBridgeRepository.pushRemoteEvent(remoteEvent),
         );
       }
     }

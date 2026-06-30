@@ -311,7 +311,7 @@ export function runCli({
             await HelpRepository.startInteractive(
               user,
               options.locale,
-              effectivePlatform,
+              interactivePlatform,
             );
             await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
               success: true,

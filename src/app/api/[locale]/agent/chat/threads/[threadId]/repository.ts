@@ -520,7 +520,7 @@ export class ThreadByIdRepository {
       fanOut: false,
     })("thread-deleted", {
       urlPathParams: { threadId: urlPathParams.threadId },
-      requestData: props.requestData,
+      requestData,
     });
   }
 }

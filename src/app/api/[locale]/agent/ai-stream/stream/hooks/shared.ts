@@ -287,6 +287,7 @@ export async function createAndSendUserMessage(
       imageSize: params.imageSize,
       imageQuality: params.imageQuality,
       musicDuration: params.musicDuration,
+      executionContext: { mode: "local" as const },
     });
 
     if (!streamStarted) {

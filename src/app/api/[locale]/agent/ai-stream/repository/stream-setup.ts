@@ -14,12 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 
-import {
-  type ChatModelOption,
-  getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import { type ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getBestImageGenModel,
@@ -39,7 +34,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -68,7 +62,6 @@ import {
   COMPACT_TRIGGER_PERCENTAGE,
   isStreamAbort,
 } from "./core/constants";
-import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { wireEscalateToTask } from "./core/escalation-handler";
 import { type BridgeContext, ModalityResolver } from "./core/modality-resolver";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
@@ -76,8 +69,9 @@ import { StreamRegistry } from "./core/stream-registry";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { OperationHandler } from "./handlers/operation-handler";
-import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processor";
 import { UserMessageHandler } from "./handlers/user-message-handler";
+import { runConfirmationsPhase } from "./setup/confirmations-phase";
+import { runModelCreditPhase } from "./setup/model-credit-phase";
 import {
   buildSystemPrompt,
   type SystemPromptParams,
@@ -585,6 +579,8 @@ export async function setupAiStream(params: {
 
   const creditValidation = await CreditValidatorHandler.validateCredits({
     user,
+    userId,
+    leadId,
     ipAddress,
     modelInfo: modelConfig,
     locale,

@@ -71,7 +71,7 @@ export class StreamingTTSHandler {
   private isInsideChatTag = false;
   private messageId: string | null = null;
   private threadId: string | null = null;
-  private readonly wsEmit: WsEmitCallback;
+  private readonly wsEmit: MessagesWsEmit;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
   private readonly voiceModelSelection: VoiceModelSelection;
@@ -93,7 +93,7 @@ export class StreamingTTSHandler {
   private generationChain: Promise<void> = Promise.resolve();
 
   constructor(params: {
-    wsEmit: WsEmitCallback;
+    wsEmit: MessagesWsEmit;
     logger: EndpointLogger;
     locale: CountryLanguage;
     voiceModelSelection: VoiceModelSelection;
@@ -778,7 +778,7 @@ export class StreamingTTSHandler {
  * Create a streaming TTS handler
  */
 export function createStreamingTTSHandler(params: {
-  wsEmit: WsEmitCallback;
+  wsEmit: MessagesWsEmit;
   logger: EndpointLogger;
   locale: CountryLanguage;
   voiceModelSelection: VoiceModelSelection;

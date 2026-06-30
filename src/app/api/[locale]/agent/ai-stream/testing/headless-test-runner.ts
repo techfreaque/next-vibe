@@ -734,6 +734,7 @@ export async function runTestStream(
       voiceMode: { enabled: false, voice: resolvedVoice },
       resumeToken: null,
       timezone: "UTC",
+      executionContext: { mode: "local" as const },
     },
   });
 

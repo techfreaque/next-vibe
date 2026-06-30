@@ -632,14 +632,27 @@ export interface CreateApiEndpoint<
     readonly ScopedTranslationKey: TScopedTranslationKey;
     readonly Events: TEvents;
     readonly EventPayloads: EventPayloads<TEvents>;
+    // Event payload maps re-derive the output types from TFields rather than from
+    // the RequestOutput/ResponseOutput/UrlVariablesOutput parameters. Those
+    // parameters are then used ONLY covariantly (the readonly *Output members
+    // above), so they can be annotated `out` — letting TypeScript trust covariance
+    // and avoid the deep variance re-measurement that fails the whole-type
+    // `extends CreateApiEndpointAny` check. The EMIT-side payloads embed the type
+    // contravariantly, which would otherwise make these parameters invariant.
     readonly EventResponsePayloads: EventResponsePayloads<
-      ResponseOutput,
+      InferResponseOutput<TFields>,
       TEvents
     >;
-    readonly EventRequestPayloads: EventRequestPayloads<RequestOutput, TEvents>;
-    readonly EventUrlPayloads: EventUrlPayloads<UrlVariablesOutput, TEvents>;
+    readonly EventRequestPayloads: EventRequestPayloads<
+      InferRequestOutput<TFields>,
+      TEvents
+    >;
+    readonly EventUrlPayloads: EventUrlPayloads<
+      InferUrlVariablesOutput<TFields>,
+      TEvents
+    >;
     readonly EventEmitUrlPayloads: EventEmitUrlPayloads<
-      UrlVariablesOutput,
+      InferUrlVariablesOutput<TFields>,
       TEvents
     >;
     readonly EventPayloadTypes: EventPayloadTypes<TEvents>;

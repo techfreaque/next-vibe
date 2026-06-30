@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11cf6b63ec1a0af-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:39:57 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484791-eRTw0LOsOQTQTbYMIODE"
+  },
+  "body": {
+    "id": "gen-1782484791-eRTw0LOsOQTQTbYMIODE",
+    "object": "chat.completion",
+    "created": 1782484791,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a high-quality, professionally produced social media-style clip, likely from a tutorial or a hobbyist feature. It maintains a consistent, realistic visual style with a shallow depth of field that keeps the focus entirely on the hands and the Rubik’s cube.\n\n### Visual Content\nThe video features a close-up, static shot of a person's hands holding a Rubik’s cube. The background is completely filled with a large, chaotic pile of dozens of other Rubik’s cubes, creating a sense of abundance or obsession.\n\n*   **The Main Cube:** The cube in the hands is a standard 3x3 Rubik's cube. It appears partially solved or scrambled. The most prominent feature is a small, black-and-white sticker attached to the center white square of the top face. This sticker features an icon: a stylized white character logo (a \"stick figure\" style mascot commonly associated with the \"Cubehead\" brand) set against a black square background.\n*   **Actions:** The person’s hands are actively manipulating the cube. The fingers move with practiced rhythm, performing a sequence of turns (a \"move\" or algorithm) where the face of the cube rotates, changing the pattern of the colored squares. The hands move deliberately and smoothly.\n*   **Surroundings:** The background is an out-of-focus sea of vibrant primary colors—reds, blues, yellows, greens, and whites—from the surrounding scrambled cubes, giving the impression of an indoor environment, possibly a hobbyist's desk or storage area.\n\n### Audio\n*   **Music:** The audio consists of a rhythmic, upbeat electronic track. It features a percussive, lo-fi hip-hop or \"chillhop\" beat with a steady tempo. The sound design includes rhythmic clicking noises that sync perfectly with the mechanical rotation of the Rubik's cube pieces.\n*   **Speech:** There is no spoken dialogue in this segment.\n*   **Sound Effects:** The dominant sound is the crisp, tactile \"click-clack\" of the plastic cube moving, emphasizing the mechanical precision of the puzzle being manipulated.\n\n### Style and Production\n*   **Production Quality:** High-definition video with professional lighting. The lighting is soft and even, highlighting the textures of the plastic cubes and the skin tones of the hands.\n*   **Camera Work:** The camera angle remains fixed in a tight medium-close-up. There are no pans, zooms, or cuts within this short duration.\n*   **Style:** It feels like a \"B-roll\" or introduction shot for a video tutorial or an aesthetic social media reel about cubing.\n\n### Mood and Arc\n*   **Emotional Tone:** The mood is calm, focused, and satisfying. The rhythmic visuals and audio create a \"zen\" or \"oddly satisfying\" atmosphere typical of assembly or skill-based demonstration videos. \n*   **Demonstration:** The video serves to showcase skill and the tactile nature of cubing, establishing a brand identity through the specific mascot logo on the cube.\n\n### Duration and Pacing\n*   **Pacing:** The pacing is steady and deliberate. The movement of the cube is fluid, matching the rhythmic nature of the background music. The video snippet provided is very short (under 5 seconds), functioning as a looped or transition-style clip.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "AY89a18u4XMHGsZSHR/1iAFoOayqRkb7pn6JMiRF6kqdTmWq/lg4LnOWx/p5DkKihao=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 700,
+      "total_tokens": 1108,
+      "cost": 0.001152,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001152,
+        "upstream_inference_prompt_cost": 0.000102,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

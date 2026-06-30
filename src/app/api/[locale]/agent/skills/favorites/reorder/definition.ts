@@ -124,8 +124,8 @@ const { POST } = createEndpoint({
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["positions"] as const,
       onEvent: async ({ requestData, logger }) => {
-        const positionById = new Map(
-          requestData.positions.map((p) => [p.id, p.position]),
+        const positionById = new Map<string, number>(
+          requestData.positions.map((p) => [p.id, p.position] as const),
         );
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -137,12 +137,12 @@ const { POST } = createEndpoint({
             if (!old?.success) {
               return old;
             }
-            const favorites = old.data.favorites
-              .map((f) => {
-                const position = positionById.get(f.id);
-                return position === undefined ? f : { ...f, position };
-              })
-              .toSorted((a, b) => a.position - b.position);
+            const favorites = old.data.favorites.map((f) => {
+              const next = positionById.get(f.id);
+              const position: number | null = next ?? f.position;
+              return { ...f, position };
+            });
+            favorites.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
             return { ...old, data: { ...old.data, favorites } };
           },
         );

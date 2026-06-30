@@ -6,29 +6,25 @@
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "X-Generation-Id,cf-ray",
     "cache-control": "no-cache",
-    "cf-ray": "a0fb9b5fde879874-FRA",
+    "cf-ray": "a114a8ca6cb3bbf1-FRA",
     "connection": "keep-alive",
     "content-type": "text/event-stream",
-    "date": "Mon, 22 Jun 2026 13:30:21 GMT",
+    "date": "Thu, 25 Jun 2026 14:28:33 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1782135019-8CzTDPndd6jtKZ2jTKHi"
+    "x-generation-id": "gen-1782397713-CrUnnElR3ulj8z2O65rG"
   },
   "events": [
     ": OPENROUTER PROCESSING",
     ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    ": OPENROUTER PROCESSING",
-    "data: {\"id\":\"gen-1782135019-8CzTDPndd6jtKZ2jTKHi\",\"object\":\"chat.completion.chunk\",\"created\":1782135019,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1782135019-8CzTDPndd6jtKZ2jTKHi\",\"object\":\"chat.completion.chunk\",\"created\":1782135019,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" write succeeded and the read confirmed the content is exactly \\\"T2_CHEAP_OK\\\". I should reply with STEP_OK.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" write succeeded and the read confirmed the content is exactly \\\"T2_CHEAP_OK\\\". I should reply with STEP_OK.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1782135019-8CzTDPndd6jtKZ2jTKHi\",\"object\":\"chat.completion.chunk\",\"created\":1782135019,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
-    "data: {\"id\":\"gen-1782135019-8CzTDPndd6jtKZ2jTKHi\",\"object\":\"chat.completion.chunk\",\"created\":1782135019,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
-    "data: {\"id\":\"gen-1782135019-8CzTDPndd6jtKZ2jTKHi\",\"object\":\"chat.completion.chunk\",\"created\":1782135019,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":18137,\"completion_tokens\":30,\"total_tokens\":18167,\"cost\":0.01207272,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.01207272,\"upstream_inference_prompt_cost\":0.01197042,\"upstream_inference_completions_cost\":0.0001023},\"completion_tokens_details\":{\"reasoning_tokens\":26,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: {\"id\":\"gen-1782397713-CrUnnElR3ulj8z2O65rG\",\"object\":\"chat.completion.chunk\",\"created\":1782397713,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The write succeeded (created: true, size: 11) and the read returned content exactly \\\"T2_CHEAP_OK\\\". Everything is correct.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The write succeeded (created: true, size: 11) and the read returned content exactly \\\"T2_CHEAP_OK\\\". Everything is correct.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397713-CrUnnElR3ulj8z2O65rG\",\"object\":\"chat.completion.chunk\",\"created\":1782397713,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Write succeeded (`created: true`, size 11). Read-back confirmed content is exactly **\\\"\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397713-CrUnnElR3ulj8z2O65rG\",\"object\":\"chat.completion.chunk\",\"created\":1782397713,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"T2_CHEAP_OK\\\"**.\\n\\nSTEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397713-CrUnnElR3ulj8z2O65rG\",\"object\":\"chat.completion.chunk\",\"created\":1782397713,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782397713-CrUnnElR3ulj8z2O65rG\",\"object\":\"chat.completion.chunk\",\"created\":1782397713,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":13243,\"completion_tokens\":62,\"total_tokens\":13305,\"cost\":0.004592632,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":8448,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.004592632,\"upstream_inference_prompt_cost\":0.004381212,\"upstream_inference_completions_cost\":0.00021142},\"completion_tokens_details\":{\"reasoning_tokens\":31,\"image_tokens\":0,\"audio_tokens\":0}}}",
     "data: [DONE]"
   ]
 }

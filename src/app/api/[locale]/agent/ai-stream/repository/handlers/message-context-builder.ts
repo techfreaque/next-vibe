@@ -691,7 +691,6 @@ export class MessageContextBuilder {
       modelConfig,
       timezone,
       rootFolderId,
-      locale,
       logger,
       compactTrigger,
     } = params;
@@ -807,7 +806,6 @@ export class MessageContextBuilder {
       logger,
       timezone,
       rootFolderId,
-      locale,
       modelConfig,
     );
     const systemTokens = Math.ceil(systemPrompt.length / 3.5);

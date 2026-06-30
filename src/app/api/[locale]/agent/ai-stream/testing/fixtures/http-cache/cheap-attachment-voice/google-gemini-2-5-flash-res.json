@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11ce6f6cfde1c60-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:29:07 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484146-7VW9ekznWNHA5QkABAR9"
+  },
+  "body": {
+    "id": "gen-1782484146-7VW9ekznWNHA5QkABAR9",
+    "object": "chat.completion",
+    "created": 1782484146,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short audio clip, approximately 23 seconds in duration, featuring light rock or jazz fusion music. The sound quality is clear and polished, suggesting a studio recording.\n\nThe music comprises the following instruments:\n- **Drums:** Playing a consistent, laid-back beat with a closed hi-hat, snare, and kick drum, creating a steady but not overly aggressive rhythm. The tempo is moderately slow, estimated around 70-80 BPM in a 4/4 time signature.\n- **Electric Piano/Keyboard:** Playing a melodic line with a clean, slightly sustained tone. The melody consists of a descending and ascending pattern, giving a relaxed and somewhat melancholic feel.\n- **Electric Guitar:** Playing a very clean, almost jazzy riff that complements the keyboard. The guitar often plays unison or harmonized lines with the keyboard.\n- **Bass Guitar:** Providing a smooth, walking bass line that underpins the harmony and rhythm, giving the track a solid foundation.\n\nThe instruments play in a coordinated, interweaving fashion. The electric piano and guitar often trade lead melodic phrases or double them, creating a gentle call-and-response or unified melody. The drums and bass provide a steady, unobtrusive rhythmic and harmonic bed.\n\nThere are no vocals or discernible lyrics. The mood is calm, relaxing, and somewhat mellow, leaning towards a reflective or chill ambiance. There are no sudden dynamic changes or complex structural shifts within this short clip; it feels like a segment from a longer instrumental piece, potentially a verse or a repeated melodic phrase.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 320,
+      "total_tokens": 1392,
+      "cost": 0.0016466,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016466,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0008
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

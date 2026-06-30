@@ -27,7 +27,7 @@ const dispatchRemoteEvent = vi.fn(async (): Promise<void> => undefined);
 const getLocalInstanceId = vi.fn(async (): Promise<string> => "self-instance");
 
 vi.mock(
-  "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/remote-event-registry",
+  "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/registry",
   () => ({
     dispatchRemoteEvent: (...args: unknown[]): Promise<void> =>
       dispatchRemoteEvent(...(args as [])),

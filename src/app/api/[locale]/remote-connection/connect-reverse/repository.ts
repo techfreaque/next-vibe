@@ -50,9 +50,17 @@ import type { RemoteRegisterT } from "./i18n";
 
 export class RemoteConnectionRegisterRepository {
   /**
-   * Ping a localUrl to check if it is directly reachable via HTTP.
-   * Uses executeRemote() with proper auth against the server health endpoint.
-   * Returns true if the remote responds (even with an error), false on network failure.
+   * Probe a localUrl to decide whether the peer is directly reachable over HTTP.
+   *
+   * This is the transport-detection bootstrap: its result SETS the connection's
+   * transportMode (direct-http vs reverse-ws). It therefore cannot go through the
+   * transport-resolving remote-call path (runInProcessTyped) — there is no
+   * connection/instanceId yet, and this probe is what decides the leg that path
+   * will later pick. A minimal authenticated GET to the peer's health endpoint is
+   * the irreducible primitive here.
+   *
+   * Returns true if the remote responds (even with an error), false on network
+   * failure.
    */
   static async checkDirectAccessibility(
     localUrl: string | null | undefined,
@@ -65,20 +73,19 @@ export class RemoteConnectionRegisterRepository {
       return false;
     }
     try {
-      const { executeRemote } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch");
       const healthDef =
         await import("@/app/api/[locale]/system/server/health/definition");
-      const result = await executeRemote({
-        definition: healthDef.default.GET,
-        data: {},
-        token,
-        leadId,
-        remoteUrl: localUrl,
-        locale,
-        logger,
+      const path = healthDef.default.GET.path.join("/");
+      const url = `${localUrl}/api/${locale}/${path}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
+        },
+        signal: AbortSignal.timeout(30_000),
       });
-      return result.success;
+      // Any HTTP answer (even an error status) proves direct reachability.
+      return response.status > 0;
     } catch {
       logger.debug(
         "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
@@ -178,7 +185,7 @@ export class RemoteConnectionRegisterRepository {
 
     // Transport detection — ONE ordered async block (spec: register never
     // opens outbound sockets; reverse entries dispatch toward their initiator
-    // via the remote-event relay on system/sync/{userId}).
+    // via the remote-event relay on the remote-event channel).
     //   1. Ping localUrl with the reverse token (authenticated health check)
     //   2. Persist the detected transport hint
     // Fire-and-forget: registration succeeds regardless of ping result.

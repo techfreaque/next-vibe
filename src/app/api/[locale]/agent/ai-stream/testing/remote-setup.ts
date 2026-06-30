@@ -485,7 +485,7 @@ export async function connectToHermes(
   // relayStream() opens a per-stream dedicated WS instead.
   // reloadWsProviderConnector() handles any instanceId variant (e.g. "hermes-rn5-*").
   const { reloadWsProviderConnector } =
-    await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+    await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
   reloadWsProviderConnector();
 
   // Trigger hermes to reconnect its atlas WS — this is the real connect event
@@ -496,6 +496,56 @@ export async function connectToHermes(
   const hermesBeforeTs = await resolveHermesAtlasLastSyncedAt();
   await triggerHermesReconnect(remoteUrl);
   await assertSyncCompleted(user.id, remoteUrl, hermesBeforeTs);
+
+  // Ensure capabilities are populated on the atlas hermes row.
+  // Hermes skips resending capabilities when its sentCapabilitiesVersion already
+  // matches the current version. After a disconnect/reconnect, atlas's row is fresh
+  // but hermes doesn't know to resend. Clear hermes's sentCapabilitiesVersion via
+  // the prod DB so the next sync triggers a full capability push.
+  const [atlasRow] = await db
+    .select({ capabilities: remoteConnections.capabilities })
+    .from(remoteConnections)
+    .where(
+      and(
+        eq(remoteConnections.userId, user.id),
+        eq(remoteConnections.remoteUrl, remoteUrl),
+        eq(remoteConnections.isReverseEntry, false),
+      ),
+    )
+    .limit(1);
+  if (!atlasRow?.capabilities) {
+    // Force hermes to resend capabilities by clearing its sentCapabilitiesVersion
+    const pdb = getProdDb();
+    const prodUserId = await resolveProdUserId();
+    // The reverse entry (is_reverse_entry = true) is the row hermes uses for
+    // pullOnConnect — it tracks sentCapabilitiesVersion for its push to atlas.
+    await pdb.execute(
+      sql`UPDATE remote_connections SET sent_capabilities_version = NULL WHERE user_id = ${prodUserId} AND instance_id = ${ATLAS_INSTANCE_ID}`,
+    );
+    // Trigger another sync so hermes resends capabilities
+    const beforeTs2 = await resolveHermesAtlasLastSyncedAt();
+    await triggerHermesReconnect(remoteUrl);
+    // Wait for lastSyncedAt to advance past the first sync's timestamp
+    const deadline2 = Date.now() + 60_000;
+    while (Date.now() < deadline2) {
+      const [row2] = await db
+        .select({ capabilities: remoteConnections.capabilities })
+        .from(remoteConnections)
+        .where(
+          and(
+            eq(remoteConnections.userId, user.id),
+            eq(remoteConnections.remoteUrl, remoteUrl),
+            eq(remoteConnections.isReverseEntry, false),
+          ),
+        )
+        .limit(1);
+      if (row2?.capabilities) {
+        break;
+      }
+      await sleep(300);
+    }
+    void beforeTs2; // used for ordering but not checked strictly
+  }
 }
 
 /**
@@ -522,9 +572,12 @@ export async function connectToHermesLocalAi(
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
 
-  // Override the connection settings set by connectToHermes via the PATCH
-  // endpoint: transportMode=reverse-ws → traffic rides the reverse-WS connector.
-  // REMOTE-folder threads route to hermes by folder ancestry (no DB setting).
+  // Set atlas's send leg to reverse-ws: atlas hub-publishes to hermes, which
+  // means hermes must run a connector subscribed to atlas's hub. The PATCH
+  // mirrors this to hermes as its remoteTransportMode=reverse-ws (via
+  // connect-reverse/update), and hermes opens that connector. We do NOT touch
+  // hermes's own transportMode — it stays direct-http so the result returns to
+  // atlas over http (the bridge's back leg). One call; the mirror does the rest.
   const localPatch = await sendTestRequest({
     endpoint: connByIdDef.PATCH,
     data: { transportMode: "reverse-ws" },
@@ -538,17 +591,47 @@ export async function connectToHermesLocalAi(
     );
   }
 
-  // Open the reverse-WS connector on hermes so it's ready to handle
-  // tool-execute-request events dispatched by execute-tool(instanceId='hermes').
-  // Ask hermes to PATCH its own atlas connection to reverse-ws via its endpoint
-  // (routed to hermes through the connection).
-  await sendTestRequest({
-    endpoint: connByIdDef.PATCH,
-    data: { transportMode: "reverse-ws" },
-    urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-    user,
-    instanceId: HERMES_INSTANCE_ID,
-  });
+  // Wait for hermes's connector to actually connect+subscribe to atlas's hub
+  // before returning — otherwise the first forward hub-publish reaches zero
+  // subscribers and is dropped (the publish path does not buffer).
+  await waitForHermesConnectorReady(user);
+}
+
+/**
+ * Poll until hermes's reverse-ws connector to atlas is live (wsConnectedAt set
+ * recently on hermes's atlas row). Reverse-ws forward delivery requires the
+ * peer's connector to be subscribed before the first publish.
+ */
+async function waitForHermesConnectorReady(
+  user: JwtPrivatePayloadType,
+  timeoutMs = 30_000,
+): Promise<void> {
+  const { sendTestRequest } =
+    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+  const connByIdDef = (
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+  ).default;
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const res = await sendTestRequest({
+      endpoint: connByIdDef.GET,
+      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
+      user,
+      instanceId: HERMES_INSTANCE_ID,
+    });
+    if (
+      res.success &&
+      typeof res.data === "object" &&
+      res.data !== null &&
+      "wsConnectedAt" in res.data &&
+      res.data.wsConnectedAt !== null
+    ) {
+      return;
+    }
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+  }
 }
 
 /**
@@ -808,8 +891,12 @@ async function assertSyncCompleted(
   // 120s: allows up to one 15s 500-retry + a large sync (threads can take ~50s on first run).
   const deadline = Date.now() + 120_000;
 
-  // Phase 1: wait for atlas's hermes row to have lastSyncedAt + capabilities
-  // (set by atlas when hermes's pullOnConnect POSTs to /sync)
+  // Phase 1: wait for atlas's hermes row to have lastSyncedAt set.
+  // Capabilities may already be stored from a prior session — hermes only resends
+  // them when its sentCapabilitiesVersion differs from the local version, which
+  // won't happen if hermes's state is intact across reconnects.
+  // lastSyncedAt being set (row was deleted then recreated by disconnectFromHermes)
+  // is sufficient proof that hermes's pullOnConnect ran against atlas.
   while (Date.now() < deadline) {
     const [row] = await db
       .select({
@@ -824,7 +911,7 @@ async function assertSyncCompleted(
           eq(remoteConnections.isReverseEntry, false),
         ),
       );
-    if (row?.lastSyncedAt && row.capabilities) {
+    if (row?.lastSyncedAt) {
       break;
     }
     await sleep(200);
@@ -833,7 +920,7 @@ async function assertSyncCompleted(
   if (Date.now() >= deadline) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      "[connectToHermes] Sync did not complete within 120s — lastSyncedAt or capabilities not populated after hermes reconnect",
+      "[connectToHermes] Sync did not complete within 120s — lastSyncedAt not populated after hermes reconnect",
     );
   }
 

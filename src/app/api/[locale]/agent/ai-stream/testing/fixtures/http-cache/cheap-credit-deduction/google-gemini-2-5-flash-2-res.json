@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11cf6b5ee74a19f-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:39:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484791-4CWBNxnQk5wrZzcKwAin"
+  },
+  "body": {
+    "id": "gen-1782484791-4CWBNxnQk5wrZzcKwAin",
+    "object": "chat.completion",
+    "created": 1782484791,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio segment begins with an electronic drum beat, consistent throughout the clip at approximately 130 BPM, alongside a cheerful, upbeat melody played on a plucked string instrument resembling a ukulele or possibly a synth mimicking a similar timbre. The sound quality is clear, suggesting a studio recording. The entire piece has a clean, polished production style with a moderate amount of reverb on the melodic instrument.\n\nAt 0:00, the drum beat and the melodic instrument instantly begin, establishing a consistent rhythm and cheerful mood. The melody is relatively simple, repeating a short, catchy phrase, contributing to the overall bright and uplifting feel of the music. There are no vocals, speech, or additional sound effects throughout the clip. The music remains consistent with no discernible changes in structure or instrumentation for the entire 22-second duration.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 166,
+      "total_tokens": 1238,
+      "cost": 0.0012616,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012616,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000415
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

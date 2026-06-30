@@ -11,7 +11,6 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -23,19 +22,14 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
-import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
-import {
-  chatMessages,
-  type MessageMetadata,
-  type ToolCall,
-} from "../../../chat/db";
-import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
+import type { MessageMetadata, ToolCall } from "../../../chat/db";
+import type { ThreadStreamingState } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";

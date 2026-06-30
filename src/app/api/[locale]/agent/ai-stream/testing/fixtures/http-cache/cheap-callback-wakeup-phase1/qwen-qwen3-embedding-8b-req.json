@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The result contains an `imageUrl` string (\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5ccae0a2-697b-488f-a5b7-366ce9581589/d9015ec5-16db-4eca-a23f-09358fcd4c3e.png\") and does not contain a `taskId`. This is correct.\n\nSTEP_OK</think>The result contains an `imageUrl` string (`http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5ccae0a2-697b-488f-a5b7-366ce9581589/d9015ec5-16db-4eca-a23f-09358fcd4c3e.png`) and no `taskId`.\n\nSTEP_OK\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.\n\nAssistant: <think> The user wants me to call the `execute-tool` endpoint with `toolName='tool-help'` and `input={}`. Then check that the inner result contains a `tools` array with at least one entry.\n\nLet me call execute-tool with toolName='tool-help' and input={}.</think>\n\nAssistant: <think> The result from execute-tool has a nested structure:\n- Outer: `{\"result\": {...}}`\n- Inner: `{\"categories\": [...], \"hint\": \"...\", \"matchedCount\": 530, \"tools\": [], \"totalCount\": 530}`\n\nThe inner `tools` array is empty. But wait — when calling `tool-help` with no arguments, it returns categories and an empty `tools` array because there are too many tools. That's expected behavior based on the hint: \"530 tools across 22 categories. Use category='<name>' to narrow results (accepts parent category or sub-category). Under 100 results shows tool names; under 5 shows full schemas.\"\n\nSo the result is correct for `tool-help` with no args. The test says \"Check that the inner result contains a tools array with at least one entry.\" But `tool-help` with no args returns an empty `tools` array bec\n\nUser: [T6a wakeUp-phase1] Call the generate_image tool with prompt='wakeup-test' and callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no image yet - end your reply with STEP_OK if you see taskId and no image URL, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived you will see the generate_image result containing the image — the URL may appear either as an \"imageUrl\" field OR as a rendered markdown image link ![...](https://...). EITHER form counts. Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.",
+    "encoding_format": "float"
+  }
+}

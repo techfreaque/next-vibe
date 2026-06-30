@@ -999,7 +999,7 @@ type Test12_1_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test12_1: Test12_1_Result = "✗ FAIL";
+const test12_1: Test12_1_Result = "✓ PASS"; // now PASSES after the endpoint type alignment fix
 
 // Test 12.2: Verify type inference works with custom fields
 type Test12_2_CustomRequest = Test12_1_CustomEndpoint["types"]["RequestOutput"];
@@ -1099,7 +1099,7 @@ type Test14_1_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test14_1: Test14_1_Result = "✗ FAIL";
+const test14_1: Test14_1_Result = "✓ PASS"; // now PASSES after the endpoint type alignment fix
 
 // Test 14.2: DELETE endpoint
 const test14_2_field = objectField(genericST, {
@@ -1134,7 +1134,7 @@ type Test14_2_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test14_2: Test14_2_Result = "✗ FAIL";
+const test14_2: Test14_2_Result = "✓ PASS"; // now PASSES after the endpoint type alignment fix
 
 // ============================================================================
 // LEVEL 15: Test complex real-world scenarios
@@ -1530,7 +1530,7 @@ type Test20_1_DefaultValid =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test20_1: Test20_1_DefaultValid = "✗ FAIL";
+const test20_1: Test20_1_DefaultValid = "✓ PASS"; // now PASSES after the endpoint type alignment fix
 
 // Test 20.2: Verify the record has all expected keys
 type Test20_2_RecordValid = keyof Test20_1_MultiEndpoint extends

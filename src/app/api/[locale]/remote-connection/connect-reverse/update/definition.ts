@@ -22,7 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { SyncScopeSchema } from "../../db";
+import { SyncScopeSchema, TransportModeSchema } from "../../db";
 import { scopedTranslation } from "./i18n";
 
 const ReverseUpdateWidget = lazyWidget(() =>
@@ -60,6 +60,15 @@ const { PATCH } = createEndpoint({
         label: "patch.syncScope.label" as const,
         description: "patch.syncScope.description" as const,
         schema: SyncScopeSchema.optional(),
+      }),
+      // How the peer reaches US (mirror of the peer's own transportMode). Sets
+      // our row's remoteTransportMode and (re)opens/closes our connector.
+      remoteTransportMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.syncScope.label" as const,
+        description: "patch.syncScope.description" as const,
+        schema: TransportModeSchema.optional(),
       }),
       updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

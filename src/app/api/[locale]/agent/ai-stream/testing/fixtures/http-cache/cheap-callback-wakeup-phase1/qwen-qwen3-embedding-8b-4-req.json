@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----5ccae0a2-697b-488f-a5b7-366ce9581589.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The result from execute-tool has a nested structure: Outer: {\"result\": {...}} Inner: {\"categories\": [...], \"hint…",
+    "encoding_format": "float"
+  }
+}

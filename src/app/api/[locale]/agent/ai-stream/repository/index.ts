@@ -11,7 +11,6 @@ import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-  success,
 } from "next-vibe/shared/types/response.schema";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 
@@ -20,51 +19,45 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DefaultFolderId } from "../../chat/config";
+import type { DefaultFolderId } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
-import {
-  ChatMessageRole,
-  ThreadStatus,
-  ThreadStreamingState,
-} from "../../chat/enum";
+import { ThreadStatus, ThreadStreamingState } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
-import { parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
-  createMessagesGetEmitter,
   type MessagesWsEmit,
 } from "../../chat/threads/[threadId]/messages/emitter";
-import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
 import {
   createThreadsGetEmitter,
   createThreadsPostEmitter,
 } from "../../chat/threads/emitter";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
-import { buildFavoriteConfig } from "../../skills/favorites/repository";
-import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { StreamErrorType } from "./core/constants";
+import { runAutoQueueBranch } from "./branches/auto-queue-branch";
+import {
+  emitSetupError,
+  emitStreamCreationError,
+} from "./branches/setup-error-emitter";
 import {
   clearStreamingState,
   QueueRegistry,
   setStreamingStateWaiting,
-  StreamRegistry,
 } from "./core/stream-registry";
 import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
 } from "./core/wake-up-channel";
-import { serializeError } from "./error-utils";
+import { emitStreamFinished } from "./finalize/stream-finalizer";
+import { handleWakeUpRevivalBatch } from "./finalize/wakeup-revival";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
@@ -791,7 +784,6 @@ export class AiStreamRepository {
                     logger,
                     data.timezone,
                     data.rootFolderId,
-                    locale,
                   );
                 const gapFilledForCompacting = await GapFillExecutor.runGapFill(
                   {

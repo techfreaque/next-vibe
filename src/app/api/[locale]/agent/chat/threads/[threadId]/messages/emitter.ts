@@ -5,6 +5,7 @@ import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interfa
 import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { DefaultFolderId } from "../../../config";
 import messagesDefinitions from "./definition";
 
 export type MessagesWsEmit = EmitEventNamed<

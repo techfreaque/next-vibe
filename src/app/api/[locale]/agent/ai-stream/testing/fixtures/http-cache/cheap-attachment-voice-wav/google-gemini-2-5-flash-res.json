@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11ce96cea3edc86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:30:48 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484247-Mu2IPW7U2lNWoLfHgsA9"
+  },
+  "body": {
+    "id": "gen-1782484247-Mu2IPW7U2lNWoLfHgsA9",
+    "object": "chat.completion",
+    "created": 1782484247,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of an instrumental song, approximately 20 seconds in length. It features a funky, upbeat rhythm with a clear bassline, keyboard melody, and percussion.\n\n**Music Description:**\n*   **Genre:** Funk/Disco\n*   **Tempo:** Approximately 110-120 BPM (moderately fast)\n*   **Instruments:**\n    *   **Bass Guitar:** Plays a prominent, driving, rhythmic line typical of funk, with a clean, punchy tone.\n    *   **Electric Piano/Keyboard:** Plays a catchy, melodic line that is slightly syncopated, providing a light and groovy feel. It sounds like a Fender Rhodes or Wurlitzer type of electric piano.\n    *   **Drums:** Feature a standard funk beat with a strong emphasis on the hi-hat and snare. The hi-hat plays a consistent, tight sixteenth-note pattern, contributing to the busy, energetic feel. The kick drum is steady, marking the downbeats.\n*   **Production Style:** The production sounds polished and clean, with a clear mix where each instrument is distinctly audible. There's a slight retro feel to the sound, evoking 70s funk and disco.\n*   **Mood:** Upbeat, groovy, energetic, and slightly nostalgic.\n\n**Overall Impression:**\nThe clip is suitable for background music in a lighthearted or celebratory context. The sound quality is excellent, suggesting a professional studio recording environment. There are no vocals, speech, or notable sound effects other than the music itself.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 323,
+      "total_tokens": 1395,
+      "cost": 0.0016541,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016541,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0008075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

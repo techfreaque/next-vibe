@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Generate an image: wakeup-test",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----b8783240-8a40-4de0-8b1b-604a46d26e78.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result has an imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/cf74e291-c087-4445-8713…",
     "encoding_format": "float"
   }
 }

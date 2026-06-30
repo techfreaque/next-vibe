@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The read returned content exactly \"T2_CHEAP_OK\". Write succeeded and read confirmed.</think>Write succeeded (`created: true`, size 11). Read back returned content exactly `\"T2_CHEAP_OK\"`.\n\nSTEP_OK\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call generate_image with prompt='await-task-test' and callbackMode='detach', then check that the immediate result has a taskId string and does NOT have an imageUrl.\n\nLet me call execute-tool with toolName='generate_image', input containing prompt, and callbackMode='detach'.</think>\n\nAssistant: <think>The result has:\n- `taskId`: \"local-bg-det-000001\" — present, it's a string.\n- No `imageUrl` — correct, since it's detached.\n\nThis looks right. I should end with STEP_OK and the taskId value.</think>The immediate result contains a `taskId` string (`local-bg-det-000001`) and does **not** contain an `imageUrl`.\n\nSTEP_OK taskId=local-bg-det-000001\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-det-000001'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

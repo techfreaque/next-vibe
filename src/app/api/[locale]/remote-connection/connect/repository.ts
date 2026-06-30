@@ -669,10 +669,10 @@ export class RemoteConnectionConnectRepository {
         // Open the persistent WS when the stored row is already negotiated to
         // reverse-ws (e.g. reconnect after the ping recorded the transport).
         // Fresh connects wait for the ping to determine reachability;
-        // direct-http connections use per-stream dedicated WS (stream-relay.ts).
+        // direct-http connections POST directly to the remote stream endpoint.
         if (stored && stored.transportMode === "reverse-ws") {
           const { openConnection } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+            await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
           openConnection({
             id: stored.id,
             instanceId,

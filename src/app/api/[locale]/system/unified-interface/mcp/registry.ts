@@ -248,7 +248,7 @@ export class MCPRegistry {
         : undefined;
     if (userId) {
       const { RemoteTransport } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/transport");
+        await import("@/app/api/[locale]/remote-connection/transport");
       const target = await RemoteTransport.resolveTarget({
         userId,
         locale: context.locale,

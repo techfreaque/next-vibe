@@ -18,17 +18,12 @@ import {
 import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import {
-  buildControlChannel,
-  buildControlEnvelope,
-} from "@/app/api/[locale]/system/unified-interface/websocket/channel";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { ControlEvent, remoteConnections } from "../db";
+import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import type {
   RemoteConnectionByIdDeleteResponseOutput,
@@ -220,12 +215,6 @@ export class RemoteConnectionInstanceRepository {
       invalidateUnbottledCache();
     }
 
-    if (transportMode !== undefined) {
-      const { reloadWsProviderConnector } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
-      reloadWsProviderConnector();
-    }
-
     logger.info("Updated remote connection settings", {
       userId: user.id,
       instanceId,
@@ -236,70 +225,74 @@ export class RemoteConnectionInstanceRepository {
       transportMode,
     });
 
-    // Mirror syncScope to the remote side via connect-reverse/update.
-    // This keeps the serve-filter consistent: both sides know which domains to
-    // include when responding to sync pulls.
-    //
-    // Direction logic:
-    //   outbound row  — local initiated, so remote holds a reverse entry for
-    //                   our selfInstanceId. Call remote's connect-reverse/update
-    //                   via HTTP with the remote token.
-    //   reverse entry — cloud side; we ARE the remote. Publish on the local WS
-    //                   hub (system/control/{userId}) so the initiator's
-    //                   persistent reverse-ws picks it up immediately.
-    if (syncScope !== undefined) {
-      if (row.isReverseEntry) {
-        publishWsEvent(
-          {
-            channel: `system/control/${user.id}`,
-            event: "settings-update",
-            data: { syncScope },
-          },
-          logger,
-          user,
-        );
-      } else if (row.token && row.remoteUrl) {
-        void (async (): Promise<void> => {
-          try {
-            const selfInstanceId =
-              RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-            const { executeRemote } =
-              await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch");
-            const reverseUpdateDef =
-              await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
-            const plainToken = RemoteConnectionRepository.decryptToken(
-              row.token,
-            );
-            await executeRemote({
-              definition: reverseUpdateDef.default.PATCH,
-              data: { instanceId: selfInstanceId, syncScope },
-              token: plainToken,
-              leadId: row.leadId,
-              remoteUrl: row.remoteUrl,
-              locale,
-              logger,
-            });
-          } catch (err) {
-            logger.warn(
-              "[PATCH] Failed to mirror syncScope to remote — remote picks up on next reconnect",
-              { instanceId: targetInstanceId, error: String(err) },
-            );
-          }
-        })();
-      }
+    // Mirror changed settings to the peer's reverse entry via the peer's real
+    // connect-reverse/update endpoint, over the single canonical remote-call
+    // (runInProcessTyped resolves the leg + auth). No magic WS control events —
+    // "do X on the peer" is always a definition-driven endpoint call.
+    //   • syncScope          — keeps the sync serve-filter consistent both sides.
+    //   • remoteTransportMode — our transportMode IS the peer's "how the remote
+    //     reaches me"; the peer stores it and (re)opens/closes its connector.
+    if (
+      (syncScope !== undefined || transportMode !== undefined) &&
+      row.token &&
+      row.remoteUrl
+    ) {
+      void (async (): Promise<void> => {
+        try {
+          const selfInstanceId =
+            RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+          const { RouteExecuteRepository } =
+            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+          const { CallbackMode } =
+            await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
+          const reverseUpdateDef =
+            await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: reverseUpdateDef.default.PATCH,
+            instanceId: targetInstanceId,
+            callbackMode: CallbackMode.WAIT,
+            user,
+            locale,
+            logger,
+            input: {
+              instanceId: selfInstanceId,
+              ...(syncScope !== undefined ? { syncScope } : {}),
+              ...(transportMode !== undefined
+                ? { remoteTransportMode: transportMode }
+                : {}),
+            },
+          });
+        } catch (err) {
+          logger.warn(
+            "[PATCH] Failed to mirror settings to peer — picked up on reconnect",
+            { instanceId: targetInstanceId, error: String(err) },
+          );
+        }
+      })();
     }
 
-    // transportMode is auto-negotiated and dispatch-driven (spec.md) — no
-    // user-triggered transport flips, no WS lifecycle changes from PATCH.
-    // isInferenceProvider / forceSystemProvider are routing priority flags
-    // read at request time; they do not touch the channel either.
-
-    // reconnectNow: close and reopen the WS connection so pullOnConnect fires
-    // naturally on the WS open event — the correct sync trigger per spec.
+    // Connector lifecycle: a side runs an outbound connector (subscribing to the
+    // peer's remote-event hub) exactly when the PEER reaches it via reverse-ws —
+    // i.e. remoteTransportMode === "reverse-ws". Our own transportMode is our
+    // SEND leg and never opens a socket. Recompute from the post-patch row.
+    // (cloud instances never open outbound sockets; openConnection no-ops there.)
+    const effectiveRemoteMode =
+      (await RemoteConnectionRepository.getRemoteTransportMode(
+        user.id,
+        targetInstanceId,
+      )) ?? row.remoteTransportMode;
     if (reconnectNow === true) {
       const { restartConnection } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
       await restartConnection(targetInstanceId);
+    } else if (effectiveRemoteMode === "reverse-ws") {
+      const { restartConnection } =
+        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+      await restartConnection(targetInstanceId);
+    } else {
+      const { closeConnection } =
+        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+      closeConnection(targetInstanceId);
     }
 
     return success({ updated: true });
@@ -350,7 +343,7 @@ export class RemoteConnectionInstanceRepository {
     });
 
     // Hot-close the WS connection immediately
-    void import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector")
+    void import("@/app/api/[locale]/system/unified-interface/websocket/connector")
       .then(({ closeConnection }) => closeConnection(instanceId))
       .catch((err: Error) => {
         logger.warn("[DISCONNECT] Failed to close WS connector", {
@@ -657,7 +650,7 @@ export class RemoteConnectionInstanceRepository {
     // Step 5: Restart the live channel so it reconnects with the NEW token —
     // otherwise the open WS keeps authenticating with the rotated-out one.
     const { restartConnection } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+      await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
     await restartConnection(instanceId);
 
     logger.info("[REAUTH] Token refreshed and channel restarted", {
@@ -720,18 +713,14 @@ export class RemoteConnectionInstanceRepository {
       }
     })();
 
-    // Send rename control message via WS if live (remote applies immediately),
-    // then re-home the local connector under the new instanceId — the registry
-    // is keyed by instanceId and the old entry would otherwise go stale
-    // (acquireConnection(newId) would open a duplicate socket).
+    // Re-home the local connector under the new instanceId — the registry is
+    // keyed by instanceId and the old entry would otherwise go stale
+    // (acquireConnection(newId) would open a duplicate socket). The peer learns
+    // the new name from the self/rename propagation below, NOT a WS control event.
     void (async (): Promise<void> => {
       try {
-        const { getWsConnection, closeConnection, restartConnection } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
-        const conn = getWsConnection(instanceId);
-        if (conn?.isConnected()) {
-          conn.send(`system/control/${user.id}`, "rename", { newInstanceId });
-        }
+        const { closeConnection, restartConnection } =
+          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
         closeConnection(instanceId);
         await restartConnection(newInstanceId);
       } catch {

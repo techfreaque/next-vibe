@@ -57,6 +57,16 @@ interface GenerationResult {
   errors: Array<{ file: string; error: string }>;
 }
 
+/**
+ * Opaque handle for TanStack's resolved router-generator config. We never read
+ * its fields - it flows straight from getConfig() into the Generator - so we
+ * model it as a branded type rather than importing TanStack's internal schema
+ * (which would pull the package into the bundler's static trace).
+ */
+interface GeneratorConfig {
+  readonly __brand: "tanstack-router-generator-config";
+}
+
 export class GenerateTanstackRoutesRepository {
   // Lazy getters - evaluated at call time, not module parse time.
   // This prevents Turbopack's NFT tracer from following process.cwd() during
@@ -125,6 +135,13 @@ export class GenerateTanstackRoutesRepository {
       }
 
       const result = GenerateTanstackRoutesRepository.generateRoutes();
+
+      // Regenerate routeTree.gen.ts to match the route files we just wrote.
+      // The tanstackStart Vite plugin normally does this via its file watcher,
+      // but renames (delete old path + create new path) can leave routeTree.gen.ts
+      // pointing at deleted files. Running TanStack's own generator here guarantees
+      // the tree always matches disk, regardless of whether the watcher fired.
+      await GenerateTanstackRoutesRepository.regenerateRouteTree(result);
 
       const message = t("generate.post.success.description", {
         created: result.created.length,
@@ -856,6 +873,48 @@ export class GenerateTanstackRoutesRepository {
       } catch {
         // ignore
       }
+    }
+  }
+
+  /**
+   * Regenerate routeTree.gen.ts from the route files on disk using TanStack's
+   * own router-generator. This is the same generator the tanstackStart Vite
+   * plugin drives via its file watcher - we invoke it directly so that a
+   * `vibe gen` run (or the dev-watcher) always leaves the route tree consistent
+   * with disk, even when the watcher misses a rename and leaves stale imports.
+   *
+   * Best-effort: failures are recorded in result.errors but never abort the
+   * overall route-file generation (the files themselves are already written).
+   */
+  private static async regenerateRouteTree(
+    result: GenerationResult,
+  ): Promise<void> {
+    const root = GenerateTanstackRoutesRepository.PROJECT_ROOT;
+    const srcDirectory = join(root, "src/app-tanstack");
+    try {
+      const routerGeneratorPkg = "@tanstack/router-generator";
+      const { Generator, getConfig } = (await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ routerGeneratorPkg
+      )) as {
+        getConfig: (inlineConfig: {
+          routesDirectory: string;
+          generatedRouteTree: string;
+        }) => GeneratorConfig;
+        Generator: new (opts: { config: GeneratorConfig; root: string }) => {
+          run: () => Promise<void>;
+        };
+      };
+
+      const config = getConfig({
+        routesDirectory: resolve(srcDirectory, "routes"),
+        generatedRouteTree: resolve(srcDirectory, "routeTree.gen.ts"),
+      });
+      await new Generator({ config, root }).run();
+    } catch (error) {
+      result.errors.push({
+        file: "src/app-tanstack/routeTree.gen.ts",
+        error: parseError(error).message,
+      });
     }
   }
 

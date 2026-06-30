@@ -17,8 +17,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import type { SyncCursor } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteToolCapabilitySchema } from "@/app/api/[locale]/remote-connection/db";
 import {
+  RemoteToolCapabilitySchema,
   StandardSyncCursorSchema,
   ThreadsSyncCursorSchema,
 } from "@/app/api/[locale]/remote-connection/db";
@@ -53,6 +53,16 @@ export function claimSyncSlot(key: string): boolean {
 }
 
 export function releaseSyncSlot(key: string): void {
+  inFlightSyncs.delete(key);
+}
+
+/**
+ * Force-clear a sync slot, e.g. when a connection is closed while a pull is in flight.
+ * The abandoned in-flight pull will hit releaseSyncSlot() in its finally block — that's
+ * a harmless no-op since the key won't be present. The new connection can now claim
+ * the slot immediately without waiting for the abandoned pull to finish.
+ */
+export function forceReleaseSyncSlot(key: string): void {
   inFlightSyncs.delete(key);
 }
 
@@ -150,7 +160,7 @@ export class TaskSyncRepository {
     const { remoteConnections: connTable } =
       await import("@/app/api/[locale]/remote-connection/db");
     const { buildSyncPayloads } =
-      await import("@/app/api/[locale]/remote-connection/sync-provider");
+      await import("@/app/api/[locale]/remote-connection/sync/provider");
 
     // Find the connection record for this user
     const conditions = [
@@ -246,7 +256,20 @@ export class TaskSyncRepository {
     }
 
     // ── 3. Build payloads for enabled domains only ────────────────────────────
+    // null syncScope = no allowlist configured → all domains enabled (open connection).
     const syncScope = connRow?.syncScope;
+    const domainEnabled = (domain: string): boolean => {
+      if (!syncScope) {
+        return true;
+      }
+      return (
+        (domain === "memories" && !!syncScope.memories) ||
+        (domain === "documents" && !!syncScope.documents) ||
+        (domain === "skills" && !!syncScope.skills) ||
+        (domain === "favorites" && !!syncScope.favorites) ||
+        (domain === "threads" && !!syncScope.threads)
+      );
+    };
 
     // ── 2b. Apply pushed payloads BEFORE serializing the response ────────────
     // Bidirectional push-pull in one round trip (sync/spec.md): the caller's
@@ -261,19 +284,13 @@ export class TaskSyncRepository {
             : pushedSchema.parse(data.pushPayloads);
         const scopedPushed: Record<string, string> = {};
         for (const [domain, payload] of Object.entries(pushed)) {
-          const enabled =
-            (domain === "memories" && syncScope?.memories) ||
-            (domain === "documents" && syncScope?.documents) ||
-            (domain === "skills" && syncScope?.skills) ||
-            (domain === "favorites" && syncScope?.favorites) ||
-            (domain === "threads" && syncScope?.threads);
-          if (enabled) {
+          if (domainEnabled(domain)) {
             scopedPushed[domain] = payload;
           }
         }
         if (Object.keys(scopedPushed).length > 0) {
           const { applySyncPayloads } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
+            await import("@/app/api/[locale]/remote-connection/sync/provider");
           const counts = await applySyncPayloads(scopedPushed, user.id, logger);
           logger.debug("Applied pushed payloads", { instanceId, counts });
         }
@@ -285,20 +302,10 @@ export class TaskSyncRepository {
 
     // Filter cursors to only enabled domains
     const filteredCursors: Record<string, SyncCursor> = {};
-    if (syncScope?.memories && incomingCursors.memories) {
-      filteredCursors.memories = incomingCursors.memories;
-    }
-    if (syncScope?.documents && incomingCursors.documents) {
-      filteredCursors.documents = incomingCursors.documents;
-    }
-    if (syncScope?.skills && incomingCursors.skills) {
-      filteredCursors.skills = incomingCursors.skills;
-    }
-    if (syncScope?.favorites && incomingCursors.favorites) {
-      filteredCursors.favorites = incomingCursors.favorites;
-    }
-    if (syncScope?.threads && incomingCursors.threads) {
-      filteredCursors.threads = incomingCursors.threads;
+    for (const [domain, cursor] of Object.entries(incomingCursors)) {
+      if (domainEnabled(domain)) {
+        filteredCursors[domain] = cursor;
+      }
     }
 
     const { syncPayloads, syncCounts, ourCursors } = await buildSyncPayloads(
@@ -318,13 +325,7 @@ export class TaskSyncRepository {
     const filteredCursorResponse: Record<string, SyncCursor> = {};
 
     for (const key of Object.keys(syncPayloads)) {
-      const enabled =
-        (key === "memories" && syncScope?.memories) ||
-        (key === "documents" && syncScope?.documents) ||
-        (key === "skills" && syncScope?.skills) ||
-        (key === "favorites" && syncScope?.favorites) ||
-        (key === "threads" && syncScope?.threads);
-      if (enabled) {
+      if (domainEnabled(key)) {
         filteredPayloads[key] = syncPayloads[key] ?? "[]";
         filteredCounts[key] = syncCounts[key] ?? 0;
         filteredCursorResponse[key] = ourCursors[key]!;

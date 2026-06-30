@@ -28,7 +28,6 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
 import type { GenericHandlerBase } from "./handler";

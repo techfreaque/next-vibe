@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----2d07faca-48ed-4e6a-a78c-a0001acb596c.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The user is asking me to say exactly: \"RETRY_RESPONSE STEP_OK\" This seems to be part of a test suite. I should o…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----563412bd-4a85-44cc-9357-971454d1160a.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The user wants me to say exactly: \"RETRY_RESPONSE STEP_OK\" This is a retry-branch test. I should output exactly t…",
     "encoding_format": "float"
   }
 }

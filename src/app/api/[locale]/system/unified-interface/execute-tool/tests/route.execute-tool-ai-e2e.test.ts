@@ -162,6 +162,23 @@ async function resolveAiText(threadId: string): Promise<string> {
   return msgs.map((m) => m.content ?? "").join("\n");
 }
 
+/**
+ * Find a tool call in DB messages by name — matches both direct calls (toolName=X)
+ * and calls routed through execute-tool (toolName=execute-tool, args.toolName=X).
+ */
+function findToolCall(
+  toolMsgs: Array<{ metadata: MessageMetadata | null }>,
+  toolName: string,
+): (typeof toolMsgs)[number] | undefined {
+  return toolMsgs.find(
+    (m) =>
+      m.metadata?.toolCall?.toolName === toolName ||
+      (m.metadata?.toolCall?.toolName === "execute-tool" &&
+        (m.metadata.toolCall.args as { toolName?: string } | undefined)
+          ?.toolName === toolName),
+  );
+}
+
 /** Extract first taskId=<value> from a string (AI reports for detach/wakeUp). */
 function extractTaskId(text: string): string | null {
   const m = /taskId=([a-z0-9\-_.]+)/i.exec(text);
@@ -876,9 +893,7 @@ if (_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const dismissCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "dismiss-task",
-      );
+      const dismissCall = findToolCall(toolMsgs, "dismiss-task");
       expect(
         dismissCall,
         "ET-AI-LOCAL-DISMISS: dismiss-task TOOL message must be in DB",
@@ -938,9 +953,7 @@ if (_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const completeCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "complete-task",
-      );
+      const completeCall = findToolCall(toolMsgs, "complete-task");
       expect(
         completeCall,
         "ET-AI-LOCAL-COMPLETE-TASK: complete-task TOOL message must be in DB",
@@ -1008,23 +1021,11 @@ if (!_atlasRunning) {
           ),
         );
 
-      // Top up hermes credits
-      const {
-        resolveProdAdminToken,
-        resolveProdUserId,
-        ensureRemoteUserCredits,
-      } =
+      // Top up hermes credits directly via prod DB (no execute-tool routing needed)
+      const { resolveProdUserId, ensureProdUserCredits } =
         await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-      const remoteAdminToken = await resolveProdAdminToken(
-        _remoteUrl ?? "http://localhost:3002",
-      );
       prodUserId = await resolveProdUserId();
-      await ensureRemoteUserCredits(
-        _remoteUrl ?? "http://localhost:3002",
-        remoteAdminToken,
-        prodUserId,
-        20_000,
-      );
+      await ensureProdUserCredits(prodUserId, 20_000);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -1037,7 +1038,7 @@ if (!_atlasRunning) {
         "execute-tool-ai-e2e-direct",
         testsParentId,
       );
-    }, 120_000);
+    }, 240_000);
 
     afterAll(async () => {
       const {
@@ -1417,9 +1418,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const awaitCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "await-task",
-      );
+      const awaitCall = findToolCall(toolMsgs, "await-task");
       expect(
         awaitCall,
         "ET-AI-REMOTE-DIRECT-DETACH-THEN-AWAIT: await-task TOOL message must be in DB",
@@ -1480,9 +1479,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const dismissCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "dismiss-task",
-      );
+      const dismissCall = findToolCall(toolMsgs, "dismiss-task");
       expect(
         dismissCall,
         "ET-AI-REMOTE-DIRECT-DISMISS: dismiss-task TOOL message must be in DB",
@@ -1540,9 +1537,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const completeCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "complete-task",
-      );
+      const completeCall = findToolCall(toolMsgs, "complete-task");
       expect(
         completeCall,
         "ET-AI-REMOTE-DIRECT-COMPLETE-TASK: complete-task TOOL message must be in DB",
@@ -1587,23 +1582,28 @@ if (!_atlasRunning) {
         _remoteUrl ?? "http://localhost:3002",
       );
 
-      // Top up hermes credits
-      const {
-        resolveProdAdminToken,
-        resolveProdUserId,
-        ensureRemoteUserCredits,
-      } =
+      // Set atlas's hermes connection to reverse-ws via the real PATCH endpoint
+      // (end to end — no manual DB writes). The handler opens the connector so it
+      // subscribes to the peer's remote-event channel (the reverse-ws forward leg).
+      const connByIdDef = (
+        await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+      ).default;
+      const wsPatch = await sendTestRequest({
+        endpoint: connByIdDef.PATCH,
+        data: { transportMode: "reverse-ws" },
+        urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+        user: testUser,
+      });
+      expect(
+        wsPatch.success,
+        `ET-AI-REMOTE-WS: set reverse-ws PATCH failed: ${JSON.stringify(wsPatch)}`,
+      ).toBe(true);
+
+      // Top up hermes credits directly via prod DB (no execute-tool routing needed)
+      const { resolveProdUserId, ensureProdUserCredits } =
         await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-      const remoteAdminToken = await resolveProdAdminToken(
-        _remoteUrl ?? "http://localhost:3002",
-      );
       prodUserId = await resolveProdUserId();
-      await ensureRemoteUserCredits(
-        _remoteUrl ?? "http://localhost:3002",
-        remoteAdminToken,
-        prodUserId,
-        20_000,
-      );
+      await ensureProdUserCredits(prodUserId, 20_000);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -1616,7 +1616,7 @@ if (!_atlasRunning) {
         "execute-tool-ai-e2e-ws",
         testsParentId,
       );
-    }, 120_000);
+    }, 240_000);
 
     afterAll(async () => {
       const {
@@ -1985,9 +1985,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const awaitCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "await-task",
-      );
+      const awaitCall = findToolCall(toolMsgs, "await-task");
       expect(
         awaitCall,
         "ET-AI-REMOTE-WS-DETACH-THEN-AWAIT: await-task TOOL message must be in DB",
@@ -2048,9 +2046,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const dismissCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "dismiss-task",
-      );
+      const dismissCall = findToolCall(toolMsgs, "dismiss-task");
       expect(
         dismissCall,
         "ET-AI-REMOTE-WS-DISMISS: dismiss-task TOOL message must be in DB",
@@ -2108,9 +2104,7 @@ if (!_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
-      const completeCall = toolMsgs.find(
-        (m) => m.metadata?.toolCall?.toolName === "complete-task",
-      );
+      const completeCall = findToolCall(toolMsgs, "complete-task");
       expect(
         completeCall,
         "ET-AI-REMOTE-WS-COMPLETE-TASK: complete-task TOOL message must be in DB",
