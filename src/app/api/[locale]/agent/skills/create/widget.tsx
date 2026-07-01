@@ -4,24 +4,24 @@
 
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { IconFieldWidget } from "next-vibe-ui/unified/form-fields/icon-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX, useCallback, useMemo, useState } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";

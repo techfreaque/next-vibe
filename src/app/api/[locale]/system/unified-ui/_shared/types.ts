@@ -1,0 +1,449 @@
+import type { InferResponseOutput } from "next-vibe/core/definition/create";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ServerDefaultContext } from "next-vibe/core/route/server-default";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import type {
+  DisplayOnlyWidgetConfig,
+  ObjectWidgetConfig,
+  UnifiedField,
+} from "next-vibe/unified-ui/_shared/configs";
+import type { Path } from "react-hook-form";
+import type z from "zod";
+
+/**
+ * Base widget renderer props (before value is added to field)
+ * Renderers receive fields without values and augment them internally
+ */
+export interface BaseWidgetRendererProps<
+  TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+> {
+  fieldName: string;
+  field: UnifiedField<
+    string,
+    z.ZodTypeAny,
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+  >;
+  context: BaseWidgetContext<TEndpoint>;
+}
+
+/**
+ * Base widget props shared across all platforms.
+ * The `widgetType` field acts as the discriminator for the union.
+ * Value type is inferred from the field's schema for type safety.
+ */
+export interface BaseWidgetProps<
+  TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+  TWidgetConfig extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+  >,
+> {
+  fieldName: Path<TEndpoint["types"]["RequestOutput"]>;
+  field: BaseWidgetFieldProps<TUsage, TWidgetConfig>;
+  /**
+   * Inline button info (only set on ROOT container by EndpointRenderer)
+   * Indicates if buttons/alerts are already defined inline in the field tree
+   * Used by root container to decide if auto-buttons should be rendered
+   */
+  inlineButtonInfo?: {
+    hasSubmitButton: boolean;
+    hasBackButton: boolean;
+    hasFormAlert: boolean;
+  };
+}
+
+/**
+ * Base widget props shared across all platforms.
+ * The `widgetType` field acts as the discriminator for the union.
+ * Value type is inferred from the field's schema for type safety.
+ */
+/**
+ * Distributive conditional - each union member of TWidgetConfig
+ * gets its own value type, enabling schemaType-based narrowing
+ * via hasChild/hasChildren guards.
+ */
+export type BaseWidgetFieldProps<
+  TUsage extends FieldUsageConfig,
+  TWidgetConfig extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+  >,
+> = TWidgetConfig & {
+  value: InferResponseOutput<TWidgetConfig> | undefined;
+  parentValue?: WidgetData;
+};
+
+/**
+ * Dispatch-level field type for renderer entry points.
+ * Distributive conditional that maps each UnifiedField member to itself + value/parentValue.
+ * This preserves discriminated union narrowing in switch statements.
+ */
+export type DispatchField<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
+  TChildren extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
+> =
+  UnifiedField<TKey, TSchema, TUsage, TChildren> extends infer UF extends
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      TUsage,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+    >
+    ? BaseWidgetFieldProps<TUsage, UF>
+    : never;
+
+export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
+  locale: CountryLanguage;
+  isInteractive: boolean;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+
+  platform: Platform;
+  endpointFields: TEndpoint["fields"]; // Original endpoint fields for nested path lookup
+  disabled: boolean; // Disable all form inputs
+  response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined; // Full ResponseType from endpoint (includes success/error state)
+  /**
+   * Navigation context for cross-definition navigation
+   * Provides type-safe navigation methods (push/pop) for endpoint navigation
+   */
+  navigation: UseNavigationStackReturn;
+  /**
+   * Current endpoint being rendered (for self-referencing navigation)
+   */
+  endpoint: TEndpoint;
+  /**
+   * Translation function for widgets to use directly
+   * This is the scoped translation from the endpoint definition
+   * Automatically falls back to global translation if no scoped translation is defined
+   * Widgets should ALWAYS use context.t for all translations
+   */
+  t: (
+    key: TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
+    params?: TParams,
+  ) => TranslatedKeyType;
+  /**
+   * Endpoint mutations available for widgets to trigger directly
+   * Widgets can call these methods to perform CRUD operations
+   * This enables definition-driven interactions without custom handlers
+   */
+  endpointMutations?: {
+    create?: {
+      submit: (data: TEndpoint["types"]["RequestOutput"]) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    update?: {
+      submit: (data: TEndpoint["types"]["RequestOutput"]) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    delete?: {
+      submit: (data: TEndpoint["types"]["RequestOutput"]) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    read?: {
+      refetch: () => Promise<void>;
+      remove?: () => void;
+      isLoading?: boolean;
+      isLoadingFresh?: boolean;
+      isFetching?: boolean;
+    };
+  };
+  /**
+   * Whether to render only response fields (for CLI result-formatter mode)
+   * When true, container widgets should filter out request fields
+   */
+  responseOnly?: boolean;
+}
+
+export type SchemaTypes =
+  | "primitive"
+  | "object"
+  | "object-optional"
+  | "object-union"
+  | "array"
+  | "array-optional"
+  | "widget"
+  | "widget-object";
+
+/**
+ * Field usage configuration
+ * Specifies whether a field is used in request, response, or both
+ */
+export type FieldUsageConfig =
+  | { request: "data"; response?: never }
+  | { request: "urlPathParams"; response?: never }
+  | { request: "data&urlPathParams"; response?: never }
+  | { request?: never; response: true }
+  | { request: "data"; response: true }
+  | { request: "urlPathParams"; response: true }
+  | { request: "data&urlPathParams"; response: true };
+
+/**
+ * Common widget properties
+ * TKey allows scoped translation keys
+ */
+
+export interface BaseWidgetConfig<
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends SchemaTypes,
+> {
+  type: WidgetType;
+  className?: string;
+  order?: number;
+  /** Hide this field from rendering */
+  hidden?: boolean | ((data: WidgetData) => boolean);
+  /** Render inline with next sibling that also has inline: true */
+  inline?: boolean;
+  /** Number of columns for grid layout */
+  columns?: number;
+  schemaType: TSchemaType;
+  usage: TUsage;
+  /**
+   * Whitelist of user permission roles that can see this field.
+   * If set, only users with at least one of these roles will see the field.
+   * Empty array means no one sees the field (same as hidden: true).
+   * If omitted, the field is visible to all users who can access the endpoint.
+   */
+  visibleFor?: readonly (typeof UserPermissionRoleValue)[];
+  /**
+   * Platforms on which this field is hidden from the input schema.
+   * If omitted, the field is visible on all platforms.
+   * Use this to hide admin/web-only fields from AI, MCP, or CLI consumers.
+   */
+  hiddenForPlatforms?: readonly Platform[];
+  /**
+   * Server-side default value resolver for hidden fields.
+   * Called after validation when the field is stripped by `hiddenForPlatforms`
+   * or `visibleFor`. The returned value is merged into the validated request
+   * data so the repository receives it as if the client had sent it.
+   *
+   * Co-locates the "resolve value when hidden" logic directly on the field.
+   */
+  serverDefault?: (
+    ctx: ServerDefaultContext,
+  ) => WidgetData | undefined | Promise<WidgetData | undefined>;
+}
+
+export interface BasePrimitiveWidgetConfig<
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive" | "widget",
+  TSchema extends z.ZodTypeAny,
+> extends BaseWidgetConfig<TUsage, TSchemaType> {
+  schema: TSchema;
+}
+
+export type BasePrimitiveDisplayOnlyWidgetConfig<
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
+> = BaseWidgetConfig<TUsage, TSchemaType> & {
+  schema?: never;
+};
+
+/**
+ * Base config for object widgets (containers with children)
+ * TChildren is a Record mapping field names to their field definitions
+ */
+export type BaseObjectWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "object" | "object-optional" | "widget-object",
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+> = BaseWidgetConfig<TUsage, TSchemaType> & {
+  children: TChildren;
+  schemaType: "object" | "object-optional" | "widget-object";
+};
+
+/**
+ * Extract all keys from variant children
+ */
+type ExtractVariantKeys<TVariants> = TVariants extends readonly [
+  infer First,
+  ...infer Rest,
+]
+  ? First extends ObjectWidgetConfig<
+      string,
+      FieldUsageConfig,
+      "object",
+      infer TChildren
+    >
+    ? keyof TChildren | ExtractVariantKeys<Rest>
+    : never
+  : never;
+
+/**
+ * Base config for object-union widgets (discriminated unions)
+ * TVariants is a readonly tuple of ObjectField variants
+ */
+export type BaseObjectUnionWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends SchemaTypes,
+  TVariants extends UnionObjectWidgetConfigConstrain<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+> = BaseWidgetConfig<TUsage, TSchemaType> & {
+  discriminator: ExtractVariantKeys<TVariants> extends never
+    ? string
+    : ExtractVariantKeys<TVariants>;
+  variants: TVariants;
+  schemaType: "object-union";
+};
+
+/**
+ * Base config for array widgets (lists with a single child type)
+ * TChild is the field definition for array items
+ */
+export type BaseArrayWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "array" | "array-optional",
+  TChild extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
+> = BaseWidgetConfig<TUsage, TSchemaType> & {
+  child: TChild;
+  schemaType: "array" | "array-optional";
+};
+
+// ============================================================================
+// CONSTRAINTS
+// ============================================================================
+
+/**
+ * Constrain child usage based on parent usage
+ * Children can be more specific than parent but must be compatible
+ */
+export type ConstrainedChildUsage<TUsage extends FieldUsageConfig> =
+  FieldUsageConfig &
+    (TUsage extends {
+      request: "data&urlPathParams";
+      response: true;
+    }
+      ?
+          | { request: "data"; response?: never }
+          | { request: "urlPathParams"; response?: never }
+          | { request: "data&urlPathParams"; response?: never }
+          | { request?: never; response: true }
+          | { request: "data"; response: true }
+          | { request: "urlPathParams"; response: true }
+          | { request: "data&urlPathParams"; response: true }
+      : TUsage extends { request: "data"; response: true }
+        ?
+            | { request: "data"; response?: never }
+            | { request?: never; response: true }
+            | { request: "data"; response: true }
+        : TUsage extends { request: "urlPathParams"; response: true }
+          ?
+              | { request: "urlPathParams"; response?: never }
+              | { request?: never; response: true }
+              | { request: "urlPathParams"; response: true }
+          : TUsage extends { request: "data"; response?: never }
+            ? { request: "data"; response?: never }
+            : TUsage extends { request: "urlPathParams"; response?: never }
+              ? { request: "urlPathParams"; response?: never }
+              : TUsage extends {
+                    request: "data&urlPathParams";
+                    response?: never;
+                  }
+                ?
+                    | { request: "data"; response?: never }
+                    | { request: "urlPathParams"; response?: never }
+                    | { request: "data&urlPathParams"; response?: never }
+                : TUsage extends { request?: never; response: true }
+                  ? { request?: never; response: true }
+                  : TUsage);
+
+export type AnyChildrenConstrain<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for schema covariance
+  | BasePrimitiveWidgetConfig<TUsage, "primitive", z.ZodTypeAny>
+  | BasePrimitiveDisplayOnlyWidgetConfig<TUsage, "widget">
+  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">
+  | BaseArrayWidgetConfig<
+      TKey,
+      TUsage,
+      "array" | "array-optional",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for children covariance
+      any
+    >
+  | BaseObjectWidgetConfig<
+      TKey,
+      TUsage,
+      "object" | "object-optional" | "widget-object",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for children covariance
+      any
+    >
+  | BaseObjectUnionWidgetConfig<
+      TKey,
+      TUsage,
+      SchemaTypes,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for variants covariance
+      any
+    >
+  | never;
+
+/**
+ * Constraint for simple object children without recursion
+ * Used when object fields contain primitive fields only
+ */
+export type ObjectChildrenConstraint<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+> = Record<string, AnyChildrenConstrain<TKey, TUsage>>;
+
+/**
+ * Constraint for array child elements
+ * Used to define the type of elements in array fields
+ */
+export type ArrayChildConstraint<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+> = AnyChildrenConstrain<TKey, TUsage>;
+
+/**
+ * Single variant in a discriminated union
+ * Each variant is an object widget with constrained children
+ */
+export type ObjectUnionVariant<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+> = ObjectWidgetConfig<
+  TKey,
+  TUsage,
+  "object",
+  ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+>;
+
+/**
+ * Constraint for object union variant arrays
+ * Defines the shape for discriminated union variants
+ */
+export type UnionObjectWidgetConfigConstrain<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+> = readonly [
+  ObjectUnionVariant<TKey, TUsage>,
+  ...ObjectUnionVariant<TKey, TUsage>[],
+];

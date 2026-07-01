@@ -1,22 +1,25 @@
 "use client";
 
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { MicOff } from "next-vibe-ui/ui/icons/MicOff";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { Upload } from "next-vibe-ui/ui/icons/Upload";
-import type { InputChangeEvent, InputRefObject } from "next-vibe-ui/ui/input";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { MicOff } from "next-vibe/ui/web/ui/icons/MicOff";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { Upload } from "next-vibe/ui/web/ui/icons/Upload";
+import type {
+  InputChangeEvent,
+  InputRefObject,
+} from "next-vibe/ui/web/ui/input";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -24,9 +27,9 @@ import {
   useWidgetLogger,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useRef, useState } from "react";
 

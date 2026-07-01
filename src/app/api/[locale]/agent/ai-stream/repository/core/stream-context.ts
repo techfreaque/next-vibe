@@ -3,9 +3,10 @@
  * Replaces scattered closure variables to prevent memory leaks
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import { type MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";

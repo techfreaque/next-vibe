@@ -20,7 +20,7 @@
  *     - VPS_APP_DIR:  App directory on VPS (e.g. "/root/next-vibe")
  */
 
-import type { ReleaseFileConfig } from "./src/app/api/[locale]/system/release-tool/definition";
+import type { ReleaseFileConfig } from "./src/app/api/[locale]/system/tooling/release/definition";
 
 const releaseConfig: ReleaseFileConfig = {
   // Package manager to use for dependency operations

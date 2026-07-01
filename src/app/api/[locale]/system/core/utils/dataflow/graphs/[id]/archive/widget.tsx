@@ -1,0 +1,99 @@
+/**
+ * Vibe Sense - Archive Widget
+ * Confirmation UI with archive button and success feedback.
+ */
+
+"use client";
+
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Archive } from "next-vibe/ui/web/ui/icons/Archive";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
+import {
+  useWidgetNavigation,
+  useWidgetTranslation,
+  useWidgetValue,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import React, { useCallback } from "react";
+
+import type definition from "./definition";
+
+export function ArchiveWidget(): React.JSX.Element {
+  const t = useWidgetTranslation<typeof definition.POST>();
+  const navigation = useWidgetNavigation();
+  const response = useWidgetValue<typeof definition.POST>();
+
+  const handleBackToList = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const listDef = await import("../../definition");
+      navigation.push(listDef.default.GET);
+    })();
+  }, [navigation]);
+
+  return (
+    <Div className="flex flex-col gap-4 p-4">
+      {/* Confirmation card */}
+      <Card>
+        <CardContent className="pt-4">
+          <Div className="flex flex-col items-center gap-3 py-4">
+            <Archive className="h-10 w-10 text-orange-500" />
+            <P className="text-sm font-medium text-center">
+              {t("post.description")}
+            </P>
+            <P className="text-xs text-muted-foreground text-center">
+              {t("post.widget.confirmDescription")}
+            </P>
+          </Div>
+        </CardContent>
+      </Card>
+
+      <FormAlertWidget field={{}} />
+
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{
+          text: "post.title",
+          icon: "archive",
+          variant: "destructive",
+        }}
+      />
+
+      {/* Success result */}
+      {response !== null && response !== undefined && response.archivedId && (
+        <Card className="border-green-300 dark:border-green-700">
+          <CardContent className="pt-4">
+            <Div className="flex items-center gap-3">
+              <Check className="h-5 w-5 text-success shrink-0" />
+              <Div className="flex-1">
+                <P className="text-sm font-medium">{t("post.success.title")}</P>
+                <Div className="flex items-center gap-2 mt-1">
+                  <Span className="text-xs text-muted-foreground">
+                    {t("post.widget.archivedIdLabel")}
+                  </Span>
+                  <Badge variant="outline" className="text-xs font-mono">
+                    {response.archivedId}
+                  </Badge>
+                </Div>
+              </Div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToList}
+                className="shrink-0 gap-1"
+              >
+                <ArrowLeft className="h-3 w-3" />
+                {t("post.widget.backToList")}
+              </Button>
+            </Div>
+          </CardContent>
+        </Card>
+      )}
+    </Div>
+  );
+}

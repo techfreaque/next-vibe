@@ -4,27 +4,26 @@
 
 "use client";
 
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { getCurrentOrigin } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
+import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { DollarSign } from "next-vibe/ui/web/ui/icons/DollarSign";
+import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetSelector,
   useWidgetTranslation,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useCallback, useState } from "react";
-
-import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../../config";
 import type definition from "./definition";

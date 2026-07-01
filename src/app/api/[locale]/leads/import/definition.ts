@@ -3,33 +3,20 @@
  * Defines endpoints for CSV import operations
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
 import {
   Countries,
   CountriesOptions,
   Languages,
   LanguagesOptions,
-} from "@/i18n/core/config";
-
+} from "next-vibe/core/i18n/core/config";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -37,7 +24,19 @@ import {
   LeadSourceOptions,
   LeadStatus,
   LeadStatusOptions,
-} from "../enum";
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  backButton,
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import type { CsvImportJobStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 

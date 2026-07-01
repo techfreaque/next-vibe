@@ -1,0 +1,30 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a14098866ceedbdb-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 22:27:00 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782858420-BOZJ9cYxZQldbKo4SFWk"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to explore the tool catalog using `tool-help`. First, I need to call it with no arguments to get a categories list. Then pick one category and call it again with `category='<that category name>'`. Finally, verify the results\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to explore the tool catalog using `tool-help`. First, I need to call it with no arguments to get a categories list. Then pick one category and call it again with `category='<that category name>'`. Finally, verify the results\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" and report STEP_OK or FAILED.\\n\\nLet me start by calling `tool-help` with no arguments.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" and report STEP_OK or FAILED.\\n\\nLet me start by calling `tool-help` with no arguments.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:0\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\":\\\"tool-help\\\",\\\"input\\\":{}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782858420-BOZJ9cYxZQldbKo4SFWk\",\"object\":\"chat.completion.chunk\",\"created\":1782858420,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":6421,\"completion_tokens\":95,\"total_tokens\":6516,\"cost\":0.002976658,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":3072,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.002976658,\"upstream_inference_prompt_cost\":0.002652708,\"upstream_inference_completions_cost\":0.00032395},\"completion_tokens_details\":{\"reasoning_tokens\":72,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

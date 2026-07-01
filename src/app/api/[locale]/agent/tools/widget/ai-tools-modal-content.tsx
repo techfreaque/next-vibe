@@ -1,21 +1,21 @@
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import helpDefinitions from "next-vibe/help-tool/definition";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe-ui/ui/dialog";
-import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Link } from "next-vibe-ui/ui/link";
+} from "next-vibe/ui/web/ui/dialog";
+import { Maximize } from "next-vibe/ui/web/ui/icons/Maximize";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Link } from "next-vibe/ui/web/ui/link";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/tools/i18n";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface AIToolsModalContentProps {
   locale: CountryLanguage;

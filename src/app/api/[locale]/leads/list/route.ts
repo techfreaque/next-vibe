@@ -1,11 +1,11 @@
 import "server-only";
 
+import { Methods } from "next-vibe/core/definition/enums";
 /**
  * Leads List API Route Handler
  * Handles GET requests for listing leads with filtering and pagination
  */
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import endpoints from "./definition";
 import { LeadsListRepository } from "./repository";

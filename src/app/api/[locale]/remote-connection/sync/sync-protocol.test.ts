@@ -34,6 +34,10 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
@@ -47,11 +51,7 @@ import {
   registerSyncProvider,
   type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import {
   ATLAS_INSTANCE_ID,

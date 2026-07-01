@@ -1,21 +1,20 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Span } from "next-vibe-ui/ui/span";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { type JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
 import type {

@@ -1,15 +1,14 @@
 /// <reference types="node" />
 import { createHash, createHmac } from "node:crypto";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { smsEnv } from "../env";
 import { scopedTranslation } from "../i18n";

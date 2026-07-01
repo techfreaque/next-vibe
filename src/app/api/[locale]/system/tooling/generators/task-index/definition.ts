@@ -1,0 +1,153 @@
+/**
+ * Task Index Generator Endpoint Definition
+ * Simple endpoint for generating task index files
+ */
+
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { scopedTranslation } from "next-vibe/tooling/generators/task-index/i18n";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "tooling", "generators", "task-index"],
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
+  category: "devTools",
+  subCategory: "Generators",
+  tags: ["post.title"],
+  icon: "wand",
+  allowedRoles: [
+    // use vibe generate instead
+  ],
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      // === REQUEST FIELDS ===
+      outputFile: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.outputDir.label",
+        description: "post.fields.outputDir.description",
+        columns: 12,
+        schema: z.string().default("src/generated/tasks-index.ts"),
+      }),
+
+      dryRun: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.verbose.label",
+        description: "post.fields.verbose.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
+      // === RESPONSE FIELDS ===
+      success: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.success.title",
+        schema: z.boolean(),
+      }),
+      message: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.message.title",
+        schema: z.string(),
+      }),
+      tasksFound: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.tasksFound.title",
+        schema: z.coerce.number(),
+      }),
+      duration: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
+    },
+  }),
+
+  // === EXAMPLES ===
+  examples: {
+    requests: {
+      default: {
+        outputFile: "src/generated/tasks-index.ts",
+        dryRun: false,
+      },
+    },
+    responses: {
+      default: {
+        success: true,
+        message: "Generated task index with 5 tasks in 150ms",
+        tasksFound: 5,
+        duration: 150,
+      },
+    },
+  },
+
+  errorTypes: {
+    validation_failed: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    unauthorized: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    server_error: {
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
+    },
+    unknown_error: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    network_error: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    forbidden: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    not_found: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    conflict: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+    unsaved_changes: {
+      title: "post.errors.unsaved.title",
+      description: "post.errors.unsaved.description",
+    },
+  },
+
+  successTypes: {
+    title: "post.success.title",
+    description: "post.success.description",
+  },
+});
+
+const taskIndexGeneratorEndpoints = { POST };
+export default taskIndexGeneratorEndpoints;
+
+export type TaskIndexRequestInput = typeof POST.types.RequestInput;
+export type TaskIndexRequestOutput = typeof POST.types.RequestOutput;
+export type TaskIndexResponseInput = typeof POST.types.ResponseInput;
+export type TaskIndexResponseOutput = typeof POST.types.ResponseOutput;

@@ -5,11 +5,11 @@ import {
   removeRootCssVar,
   rootHasClass,
   setRootCssVar,
-} from "next-vibe-ui/lib/css-vars";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/lib/css-vars";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 

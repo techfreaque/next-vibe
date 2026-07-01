@@ -1,0 +1,327 @@
+/**
+ * Run TypeScript type checking Endpoint Definition
+ * Production-ready endpoint for run typescript type checking
+ */
+
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { scopedTranslation } from "next-vibe/tooling/check/typecheck/i18n";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+  widgetField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+const CheckResultWidget = lazyWidget(() =>
+  import("next-vibe/tooling/check/typecheck/widget").then((m) => ({
+    default: m.CheckResultWidget,
+  })),
+);
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "tooling", "check", "typecheck"],
+  title: "title",
+  titleShort: "title",
+  description: "description",
+  category: "devTools",
+  subCategory: "Check",
+  tags: ["tag"],
+  icon: "check-circle",
+  allowedRoles: [
+    // intentionally disabled so AI can't call it and rather uses check
+  ],
+  aliases: ["typecheck", "tc"],
+  cli: {
+    firstCliArgKey: "path",
+  },
+
+  fields: customWidgetObject({
+    render: CheckResultWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
+      // === REQUEST FIELDS ===
+      title: widgetField(scopedTranslation, {
+        type: WidgetType.TITLE,
+        label: "container.title",
+        level: 1,
+        columns: 12,
+        usage: { request: "data" },
+      }),
+
+      path: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.path.label",
+        description: "fields.path.description",
+        placeholder: "fields.path.placeholder",
+        columns: 6,
+        schema: z.union([z.string(), z.array(z.string())]).optional(),
+      }),
+
+      disableFilter: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.disableFilter.label",
+        description: "fields.disableFilter.description",
+        columns: 4,
+        schema: z.boolean().default(false),
+      }),
+
+      timeout: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "fields.timeout.label",
+        description: "fields.timeout.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).max(3600).default(900),
+      }),
+
+      limit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "fields.limit.label",
+        description: "fields.limit.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional().default(200),
+      }),
+
+      page: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "fields.page.label",
+        description: "fields.page.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional().default(1),
+      }),
+
+      skipSorting: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.skipSorting.label",
+        description: "fields.skipSorting.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
+
+      filter: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.filter.label",
+        description: "fields.filter.description",
+        placeholder: "fields.filter.placeholder",
+        columns: 8,
+        schema: z.union([z.string(), z.array(z.string())]).optional(),
+      }),
+
+      summaryOnly: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.summaryOnly.label",
+        description: "fields.summaryOnly.description",
+        columns: 4,
+        schema: z.boolean().default(false),
+      }),
+
+      extensive: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.extensive.label",
+        description: "fields.extensive.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
+
+      // === RESPONSE FIELDS ===
+      items: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            file: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            line: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.coerce.number().optional(),
+            }),
+            column: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.coerce.number().optional(),
+            }),
+            rule: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string().optional(),
+            }),
+            severity: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.enum(["error", "warning", "info"]),
+            }),
+            message: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+          },
+        }),
+      }),
+
+      files: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            file: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            errors: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+            warnings: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+            total: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+          },
+        }),
+      }),
+
+      totalIssues: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+      totalFiles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      totalErrors: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      filteredIssues: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      filteredFiles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      displayedIssues: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      displayedFiles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      truncatedMessage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      currentPage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      totalPages: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "errors.validation.title",
+      description: "errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "errors.internal.title",
+      description: "errors.internal.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "errors.server.title",
+      description: "errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "success.title",
+    description: "success.description",
+  },
+
+  examples: {
+    requests: {
+      default: {
+        limit: 100,
+        page: 1,
+      },
+    },
+    responses: {
+      default: {
+        items: [],
+        files: [],
+        totalIssues: 0,
+        totalFiles: 0,
+      },
+    },
+  },
+});
+
+export type TypecheckRequestInput = typeof POST.types.RequestInput;
+export type TypecheckRequestOutput = typeof POST.types.RequestOutput;
+export type TypecheckResponseInput = typeof POST.types.ResponseInput;
+export type TypecheckResponseOutput = typeof POST.types.ResponseOutput;
+
+export type TypecheckIssue = NonNullable<
+  TypecheckResponseOutput["items"]
+>[number];
+
+const endpoints = { POST };
+export default endpoints;

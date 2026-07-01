@@ -1,12 +1,12 @@
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 /**
  * Virtual Mount Resolver
  * Routes Cortex paths to the appropriate data source and renders as markdown
  */
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 export interface VirtualReadResult {
   content: string;

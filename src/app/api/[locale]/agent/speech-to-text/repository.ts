@@ -5,13 +5,17 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
@@ -28,9 +32,6 @@ import {
   type SttModelSelection,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { CreditRepository } from "../../credits/repository";
 import {
@@ -39,7 +40,6 @@ import {
   STT_COST_PER_SECOND,
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
-import type { JwtPayloadType } from "../../user/auth/types";
 import { ModelSelectionType } from "../skills/enum";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import {

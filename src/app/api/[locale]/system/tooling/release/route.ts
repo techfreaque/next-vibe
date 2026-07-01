@@ -1,0 +1,23 @@
+/**
+ * Release Tool Route
+ * API route for managing package releases
+ */
+
+import "server-only";
+
+import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+
+import releaseToolEndpoints from "./definition";
+
+export const { tools } = endpointsHandler({
+  endpoint: releaseToolEndpoints,
+  [Methods.POST]: {
+    handler: async ({ data, locale, logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).releaseToolRepository.execute(data, locale, logger),
+  },
+});

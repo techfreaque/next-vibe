@@ -1,13 +1,14 @@
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
-import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
+import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
 import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/constants";
-import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/tasks/cron/tasks/constants";
+import { PULSE_STATUS_ALIAS } from "next-vibe/tasks/pulse/status/constants";
+
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import {
   CORTEX_LIST_ALIAS,

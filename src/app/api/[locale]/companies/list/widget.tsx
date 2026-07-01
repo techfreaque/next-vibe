@@ -1,21 +1,21 @@
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Building } from "next-vibe-ui/ui/icons/Building";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Building } from "next-vibe/ui/web/ui/icons/Building";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX } from "react";
 
 import type { CompanyMemberRoleValue, CompanyTypeValue } from "../enum";

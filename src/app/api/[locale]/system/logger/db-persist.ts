@@ -10,15 +10,17 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   errorLogs,
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,
   type NewErrorLog,
-} from "@/app/api/[locale]/system/logger/error-monitor/db";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { type ErrorLogLevel, type LoggerMetadata } from "./types";
+} from "next-vibe/logger/error-monitor/db";
+import {
+  type ErrorLogLevel,
+  type LoggerMetadata,
+} from "next-vibe/logger/types";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
 function truncate(str: string | undefined | null, maxLen: number): string {
@@ -130,7 +132,7 @@ export function persistErrorLog(
   void (async (): Promise<void> => {
     try {
       // Dynamic import to avoid circular dependencies and module-level DB init
-      const { db } = await import("@/app/api/[locale]/system/db");
+      const { db } = await import("next-vibe/database");
 
       const { sql } = await import("drizzle-orm");
 

@@ -9,9 +9,9 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 import type { DefaultFolderId } from "../../../chat/config";

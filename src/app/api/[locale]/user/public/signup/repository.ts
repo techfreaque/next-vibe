@@ -5,26 +5,26 @@
 
 import "server-only";
 
-import type { NextRequest } from "next-vibe-ui/lib/request";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { AuthRepository } from "../../auth/repository";
-import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { NewUser } from "../../db";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { UserDetailLevel } from "../../enum";
-import { SessionRepository } from "../../private/session/repository";
+import { SessionRepository } from "next-vibe/identity/session/repository";
 import { UserRepository } from "../../repository";
 import type { StandardUserType } from "../../types";
 import {
@@ -32,8 +32,8 @@ import {
   UserRole,
   type UserRoleValue,
   isUserPermissionRole,
-} from "../../user-roles/enum";
-import { UserRolesRepository } from "../../user-roles/repository";
+} from "next-vibe/identity/roles/enum";
+import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
@@ -137,7 +137,7 @@ export class SignupRepository {
       // Auto-login: Create session and store auth token
       // Link leadId to user
       const { LeadAuthRepository } =
-        await import("@/app/api/[locale]/leads/auth/repository");
+        await import("next-vibe/identity/lead/device-auth");
       await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
@@ -159,9 +159,9 @@ export class SignupRepository {
       // Resolve skillCreatorUserId from lead.skillId (if it's a UUID → look up customSkills owner)
       let skillCreatorUserId: string | null = null;
       try {
-        const { db: dbInstance } = await import("@/app/api/[locale]/system/db");
+        const { db: dbInstance } = await import("next-vibe/database");
         const { leads: leadsTable } =
-          await import("@/app/api/[locale]/leads/db");
+          await import("next-vibe/identity/lead/db");
         const { eq: eqFn } = await import("drizzle-orm");
         const [leadRow] = await dbInstance
           .select({ skillId: leadsTable.skillId })
@@ -305,7 +305,7 @@ export class SignupRepository {
       ) {
         try {
           const { LeadsRepository } =
-            await import("@/app/api/[locale]/leads/repository");
+            await import("next-vibe/identity/lead/repository");
           await LeadsRepository.updateLeadSkillId(
             leadIdResult.leadId,
             data.supportedSkillId,
@@ -574,7 +574,7 @@ export class SignupRepository {
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
       const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
       const { LeadsRepository } =
-        await import("@/app/api/[locale]/leads/repository");
+        await import("next-vibe/identity/lead/repository");
       const convertResult = await LeadsRepository.convertLead(
         leadId,
         { email, userId },

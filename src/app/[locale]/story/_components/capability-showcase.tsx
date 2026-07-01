@@ -1,17 +1,20 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import { Lock } from "next-vibe-ui/ui/icons/Lock";
-import { ShieldPlus } from "next-vibe-ui/ui/icons/ShieldPlus";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Link } from "next-vibe-ui/ui/link";
-import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { cn } from "next-vibe/core/utils/utils";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
+import { Lock } from "next-vibe/ui/web/ui/icons/Lock";
+import { ShieldPlus } from "next-vibe/ui/web/ui/icons/ShieldPlus";
+import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -28,12 +31,8 @@ import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
 import { useLogger } from "@/hooks/use-logger";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";

@@ -2,19 +2,18 @@
  * Email Template Registry Types
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import type {
   ErrorResponseType,
   SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JSX, ReactElement } from "react";
 import type { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../providers/email/smtp-client/components/tracking_context.email";
 

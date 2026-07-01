@@ -4,23 +4,25 @@
  */
 
 "use client";
-
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Span } from "next-vibe-ui/ui/span";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import type { ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -28,17 +30,13 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { useCallback, useState } from "react";
 
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { formatSimpleDate } from "@/i18n/core/localization-utils";
-
-import { LeadStatus } from "../enum";
 import type definition from "./definition";
 
 type Lead = NonNullable<
@@ -248,8 +246,7 @@ export function LeadsSearchContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id } });
       })();
     },
@@ -259,8 +256,7 @@ export function LeadsSearchContainer({
   const handleEditLead = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
         navigate(leadDef.default.PATCH, {
           urlPathParams: { id: lead.id },
           prefillFromGet: true,
@@ -274,8 +270,7 @@ export function LeadsSearchContainer({
   const handleDeleteLead = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
         navigate(leadDef.default.DELETE, { urlPathParams: { id: lead.id } });
       })();
     },

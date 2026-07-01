@@ -7,30 +7,17 @@ import {
   ChartType,
   DateRangePreset,
   TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/core/core-utils/stats-filtering.schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { CountryFilter, LanguageFilter } from "@/i18n/core/config";
-
-import { UserRole } from "../../user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { CountryFilter, LanguageFilter } from "next-vibe/core/i18n/core/config";
 import {
   ActivityType,
   EmailCampaignStage,
@@ -47,7 +34,19 @@ import {
   LeadStatusFilterOptions,
   SortOrder,
   SortOrderOptions,
-} from "../enum";
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  backButton,
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import { LEADS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

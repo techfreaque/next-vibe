@@ -1,11 +1,11 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 
 import type endpoints from "./definition";

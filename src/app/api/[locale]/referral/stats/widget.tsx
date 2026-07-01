@@ -4,17 +4,17 @@
 
 "use client";
 
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { DollarSign } from "next-vibe/ui/web/ui/icons/DollarSign";
+import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Wallet } from "next-vibe/ui/web/ui/icons/Wallet";
 import {
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";

@@ -1,0 +1,1 @@
+ALTER TABLE "skill_votes" ADD COLUMN "direction" text DEFAULT 'enums.voteDirection.up' NOT NULL;

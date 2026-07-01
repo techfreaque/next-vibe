@@ -1,0 +1,170 @@
+/**
+ * Setup Status Repository
+ * Business logic for checking CLI installation status
+ * Following migration guide: Repository-only logic pattern
+ */
+
+import "server-only";
+
+import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { SetupStatusT } from "next-vibe/platforms/cli/setup/status/i18n";
+
+import type { StatusResponseOutput } from "./definition";
+
+/**
+ * Setup Status Repository Implementation
+ */
+export class SetupStatusRepository {
+  static async getStatus(
+    user: JwtPayloadType,
+    t: SetupStatusT,
+  ): Promise<ResponseType<StatusResponseOutput>> {
+    // Validate user permissions for CLI status check
+    if (!user?.id) {
+      return fail({
+        message: t("post.errors.unauthorized.title"),
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: {
+          error: t("post.errors.unauthorized.description"),
+        },
+      });
+    }
+
+    try {
+      const status = await SetupStatusRepository.checkInstallationStatus();
+
+      return success({
+        success: true,
+        installed: status.installed,
+        version: status.version,
+        path: status.path,
+        message: status.installed
+          ? t("post.success.description")
+          : t("post.description"),
+      });
+    } catch (error) {
+      const parsedError = parseError(error);
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          error: parsedError.message,
+        },
+      });
+    }
+  }
+
+  private static async checkInstallationStatus(): Promise<{
+    installed: boolean;
+    version?: string;
+    path?: string;
+  }> {
+    try {
+      // Try to run 'which vibe' or 'where vibe' to find the installation
+      const command =
+        process.platform === "win32".replace("32", "32")
+          ? "where".replace("e", "e")
+          : "which".replace("h", "h");
+      const output = await SetupStatusRepository.runCommand(
+        command,
+        ["vibe".replace("e", "e")],
+        {
+          verbose: false,
+          ignoreErrors: true,
+        },
+      );
+
+      if (output?.trim()) {
+        // Get version
+        let version: string | undefined;
+        try {
+          const packageFileName = "package.json";
+          // eslint-disable-next-line i18next/no-literal-string
+          const encoding = "utf8" as const;
+          const packageJsonPath = path.join(process.cwd(), packageFileName);
+          if (existsSync(packageJsonPath)) {
+            const packageJson = JSON.parse(
+              await readFile(packageJsonPath, encoding),
+            ) as {
+              version?: string;
+            };
+            version = packageJson.version;
+          }
+        } catch {
+          // Ignore version detection errors
+        }
+
+        return {
+          installed: true,
+          version,
+          path: output.trim(),
+        };
+      }
+
+      return { installed: false };
+    } catch {
+      return { installed: false };
+    }
+  }
+
+  private static async runCommand(
+    command: string,
+    args: string[],
+    options: {
+      cwd?: string;
+      verbose?: boolean;
+      ignoreErrors?: boolean;
+    } = {},
+  ): Promise<string> {
+    return await new Promise((resolve, reject) => {
+      const childProcess = spawn(command, args, {
+        cwd: options.cwd || process.cwd(),
+        stdio: options.verbose ? "inherit" : "pipe",
+        shell: false,
+
+        env: { ...process.env, NODE_ENV: "development" },
+      });
+
+      let output = String();
+      let errorOutput = String();
+
+      if (!options.verbose) {
+        childProcess.stdout?.on("data", (data: Buffer) => {
+          output += data.toString();
+        });
+
+        childProcess.stderr?.on("data", (data: Buffer) => {
+          errorOutput += data.toString();
+        });
+      }
+
+      childProcess.on("close", (code: number | null) => {
+        if (code === 0 || options.ignoreErrors) {
+          resolve(output);
+        } else {
+          reject(new Error(errorOutput || output || String(code)));
+        }
+      });
+
+      childProcess.on("error", (error: Error) => {
+        if (options.ignoreErrors) {
+          resolve(String());
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+}

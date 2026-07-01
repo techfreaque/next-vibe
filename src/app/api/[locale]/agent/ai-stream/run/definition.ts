@@ -10,16 +10,17 @@
  *     --skill=default --prompt="Summarise these skills"
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
-  ChatModelId,
-  ChatModelIdOptions,
-  getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { Platform } from "next-vibe/core/definition/platform";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -28,16 +29,15 @@ import {
   requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+  ChatModelId,
+  ChatModelIdOptions,
+  getChatModelById,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 
 import { DefaultFolderId } from "../../chat/config";
 import { SKILL_CREATOR_ID } from "../../skills/constants";

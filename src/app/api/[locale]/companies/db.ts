@@ -14,9 +14,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { leads } from "next-vibe/identity/lead/db";
 import type { z } from "zod";
 
-import { leads } from "../leads/db";
 import { users } from "../user/db";
 import { CompanyMemberRole, CompanyMemberRoleDB, CompanyTypeDB } from "./enum";
 

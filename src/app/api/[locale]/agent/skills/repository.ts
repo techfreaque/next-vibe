@@ -6,8 +6,34 @@
 import "server-only";
 
 import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { Platform } from "next-vibe/core/definition/platform";
+import { isAgentPlatform } from "next-vibe/core/definition/platform";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type {
+  ChannelDecision,
+  RemoteEventHandlerProps,
+} from "next-vibe/core/route/handler";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
+import {
+  searchField,
+  searchItems,
+} from "next-vibe/core/utils/in-memory-search";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import type { EmitChannelDecision } from "next-vibe/realtime/structured-events";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
@@ -22,29 +48,7 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type {
-  ChannelDecision,
-  RemoteEventHandlerProps,
-} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import {
-  searchField,
-  searchItems,
-} from "@/app/api/[locale]/system/unified-interface/shared/search/in-memory-search";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import {
   ensureUniqueSlug,
@@ -1768,7 +1772,7 @@ export class SkillsRepository {
       const [{ eq: eqOp }, { db: database }, { customSkills: cs }] =
         await Promise.all([
           import("drizzle-orm"),
-          import("@/app/api/[locale]/system/db"),
+          import("next-vibe/database"),
           import("./db"),
         ]);
       await database.delete(cs).where(eqOp(cs.slug, resolvedId));
@@ -1807,7 +1811,7 @@ export class SkillsRepository {
       const [{ eq: eqOp }, { db: database }, { customSkills: cs }] =
         await Promise.all([
           import("drizzle-orm"),
-          import("@/app/api/[locale]/system/db"),
+          import("next-vibe/database"),
           import("./db"),
         ]);
       await database

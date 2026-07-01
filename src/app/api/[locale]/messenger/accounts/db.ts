@@ -23,10 +23,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "next-vibe/identity/lead/enum";
 
-import type { Countries, Languages } from "@/i18n/core/config";
-
-import type { EmailCampaignStage, EmailJourneyVariant } from "../../leads/enum";
 import { users } from "../../user/db";
 import {
   EmailImapAuthMethodDB,

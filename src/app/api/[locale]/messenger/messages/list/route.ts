@@ -3,8 +3,8 @@
  * Handles GET requests for listing emails with filtering and pagination
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import { EmailsRepository } from "../repository";
 import definitions from "./definition";

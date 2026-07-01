@@ -5,8 +5,8 @@
  * It connects the API endpoint definition with its implementation and email template.
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "next-vibe/core/definition/enums";
 
 import { PasswordRepository } from "../repository";
 import resetPasswordConfirmEndpoints from "./definition";

@@ -27,6 +27,9 @@ import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
 import { eq } from "drizzle-orm";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -38,9 +41,6 @@ import {
   ModelSortField,
 } from "@/app/api/[locale]/agent/skills/enum";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 import { ChatModelId } from "../../models";

@@ -1,22 +1,21 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import helpDefinitions from "next-vibe/help-tool/definition";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 

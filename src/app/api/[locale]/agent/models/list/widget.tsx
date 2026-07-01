@@ -1,18 +1,23 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { P } from "next-vibe-ui/ui/typography";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/web/ui/tabs";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

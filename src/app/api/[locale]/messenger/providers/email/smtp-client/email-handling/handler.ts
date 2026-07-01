@@ -5,10 +5,16 @@
 
 import "server-only";
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import type {
   ErrorResponseType,
   SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 
 import type {
   EmailRenderProps,
@@ -16,12 +22,6 @@ import type {
   EmailResolvedData,
   ScopedTResult,
 } from "@/app/api/[locale]/messenger/registry/template";
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
 export type { EmailRenderProps, EmailRenderSkip, EmailResolvedData };
 

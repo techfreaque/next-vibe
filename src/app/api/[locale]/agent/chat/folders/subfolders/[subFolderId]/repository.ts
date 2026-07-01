@@ -1,22 +1,21 @@
 import "server-only";
 
 import { eq, inArray } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { canManageFolder } from "@/app/api/[locale]/agent/chat/permissions/permissions";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import folderContentsDefinitions from "../../../folder-contents/[rootFolderId]/definition";
+import { createFolderContentsEmitter } from "../../../folder-contents/[rootFolderId]/emitter";
 import type {
   FolderDeleteResponseOutput,
   FolderGetResponseOutput,

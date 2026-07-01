@@ -6,18 +6,17 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
+import type { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType as BaseResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Countries, Languages } from "@/i18n/core/config";
-import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";

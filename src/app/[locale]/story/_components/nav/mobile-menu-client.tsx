@@ -1,21 +1,19 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { addDocumentListener } from "next-vibe-ui/lib/dom";
-import type { BadgeVariant } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
-import { Menu } from "next-vibe-ui/ui/icons/Menu";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Link } from "next-vibe-ui/ui/link";
-import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { addDocumentListener } from "next-vibe/ui/web/lib/dom";
+import type { BadgeVariant } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe/ui/web/ui/icons/ChevronUp";
+import { Menu } from "next-vibe/ui/web/ui/icons/Menu";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
 import { scopedTranslation } from "../i18n";

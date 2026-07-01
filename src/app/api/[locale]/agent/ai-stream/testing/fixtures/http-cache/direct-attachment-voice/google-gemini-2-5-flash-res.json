@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e936889a8dbab-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 16:34:01 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782837239-HBx9jGYBYiHzmwS7H8BU"
+  },
+  "body": {
+    "id": "gen-1782837239-HBx9jGYBYiHzmwS7H8BU",
+    "object": "chat.completion",
+    "created": 1782837239,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short musical recording lasting 29 seconds. The music is a jaunty, upbeat instrumental piece with a disco-funk feel, likely from the instrumental break of a larger track.\n\n**Musical Elements:**\n\n*   **Tempo:** Up-tempo, estimated around 120-125 BPM.\n*   **Time Signature:** 4/4.\n*   **Key/Scale:** Seems to be in a major key, possibly C major or G major, utilizing a bright, major pentatonic feel for the melodic elements.\n*   **Instruments:**\n    *   **Electric Guitar (Strummed Rhythm):** Plays a muted, rhythmic, funky strumming pattern throughout, providing a strong rhythmic and harmonic foundation. It has a clean tone with a slight, subtle overdrive or compression.\n    *   **Electric Bass:** A punchy, plucked bass line that walks and jumps, anchoring the groove. It’s prominent and provides the main melodic drive in the low end.\n    *   **Drums:** Feature a crisp, driving disco beat with a clear kick and snare, and a prominent open hi-hat that gives it the characteristic disco groove. There are occasional cymbal crashes to mark sections.\n    *   **Keyboard (Electric Piano/Clavinet-like):** Plays a bright, melodic riff with a percussive attack, often in unison or harmony with the lead guitar. It adds to the funky texture.\n    *   **Electric Guitar (Lead/Melody):** Plays a clean, vibrato-rich lead melody that is very prominent. It sounds like classic 70s-era funk or disco lead guitar. The melody is catchy and somewhat repetitive, reinforcing the upbeat mood. There are some sustained notes with vibrato and quick, melodic arpeggiated runs.\n*   **Interactions:** The bass and drums lay down a solid, driving rhythmic foundation. The rhythm guitar and keyboard interlock to provide harmonic and rhythmic texture. The lead guitar plays a prominent, memorable melody over this tight backing.\n*   **Production:** The production style sounds fairly polished and clean, with a good mix where all instruments are clearly discernible. There's a sense of studio recording. The overall sound is bright and punchy.\n*   **Mood:** Upbeat, cheerful, energetic, danceable, and slightly nostalgic.\n\n**Structure:**\n\nThe clip appears to be a continuous loop or a segment from a larger instrumental break, as there's no clear intro, verse, or chorus structure within this short duration. The music maintains a consistent groove and melodic theme. The drum pattern becomes slightly more energetic in the latter half of the clip, with more frequent open hi-hats.\n\n**Sound Quality:** Good fidelity, clear and well-recorded.\n\n**Non-Musical Elements:** None.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 587,
+      "total_tokens": 1659,
+      "cost": 0.0023141,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0023141,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0014675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

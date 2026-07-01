@@ -3,27 +3,26 @@
  * Enriched public thread feed with server-side aggregated stats
  */
 
-import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
-import { lazy } from "react";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import {
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
 import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";

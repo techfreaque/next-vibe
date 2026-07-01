@@ -6,26 +6,26 @@
 
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { ListItem } from "next-vibe-ui/ui/list-item";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
-import { MetricCard } from "next-vibe-ui/ui/metric-card";
-import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { Span } from "next-vibe-ui/ui/span";
-import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
+import { ListItem } from "next-vibe/ui/web/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
+import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { type JSX } from "react";
 
 import type definition from "./definition";

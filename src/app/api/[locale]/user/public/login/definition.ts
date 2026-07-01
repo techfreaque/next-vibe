@@ -5,25 +5,25 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   customWidgetObject,
   requestField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
 
 import { scopedTranslation } from "./i18n";
-import { UserRole } from "../../user-roles/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { LOGIN_ALIAS } from "./constants";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 const LoginFormContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LoginFormContainer })),

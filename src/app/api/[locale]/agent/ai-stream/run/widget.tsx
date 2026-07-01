@@ -8,30 +8,39 @@
 
 "use client";
 
-import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
-import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { getFullPath } from "next-vibe/core/core-utils/path";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import helpDefinitions from "next-vibe/help-tool/definition";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import type { AutocompleteOption } from "next-vibe/ui/web/ui/autocomplete-field";
+import { AutocompleteField } from "next-vibe/ui/web/ui/autocomplete-field";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/tooltip";
+import { P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -43,13 +52,13 @@ import {
   useWidgetResponseOnly,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -61,17 +70,8 @@ import React, {
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { type ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { platform } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { getEndpoint } from "@/generated/endpoint";
 
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../chat/config";

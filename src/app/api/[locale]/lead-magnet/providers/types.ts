@@ -2,7 +2,7 @@
  * Shared types for lead magnet providers
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 
 import type { LeadMagnetT } from "../i18n";
 

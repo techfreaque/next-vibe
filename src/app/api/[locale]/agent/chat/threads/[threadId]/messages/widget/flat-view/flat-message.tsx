@@ -1,14 +1,16 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { getElementById } from "next-vibe-ui/lib/dom";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { getElementById } from "next-vibe/ui/web/lib/dom";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div, type DivMouseEvent } from "next-vibe/ui/web/ui/div";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Span, type SpanMouseEvent } from "next-vibe/ui/web/ui/span";
+import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 
@@ -23,9 +25,6 @@ import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSkill } from "../../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";

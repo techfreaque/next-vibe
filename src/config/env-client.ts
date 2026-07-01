@@ -2,11 +2,11 @@
  * Core Client Environment
  */
 
-import { Environment } from "next-vibe/shared/utils/env-util";
-import { getCurrentOrigin } from "next-vibe-ui/lib/location";
+import { defineEnvClient } from "next-vibe/env/define-env-client";
+import { Environment } from "next-vibe/env/env-util";
+import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
 import { z } from "zod";
 
-import { defineEnvClient } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env-client";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 
 const isServer = typeof window === "undefined";

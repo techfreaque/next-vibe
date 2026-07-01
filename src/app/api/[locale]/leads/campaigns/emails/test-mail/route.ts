@@ -1,11 +1,11 @@
 import "server-only";
 
+import { Methods } from "next-vibe/core/definition/enums";
 /**
  * Test Email API Route Handler
  * POST /api/[locale]/leads/campaigns/emails/test-mail
  */
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import definitions from "./definition";
 import { TestEmailRepository } from "./repository";

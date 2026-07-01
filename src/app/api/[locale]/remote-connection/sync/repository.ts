@@ -7,13 +7,22 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
 import type { SyncCursor } from "@/app/api/[locale]/remote-connection/db";
@@ -22,12 +31,6 @@ import {
   StandardSyncCursorSchema,
   ThreadsSyncCursorSchema,
 } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

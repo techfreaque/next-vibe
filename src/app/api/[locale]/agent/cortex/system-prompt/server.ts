@@ -1,14 +1,14 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
+import { languageConfig } from "next-vibe/core/i18n";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/system-prompt/prompt";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { languageConfig } from "@/i18n";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { stripFrontmatter, truncateContent } from "../_shared/text-utils";
 import type {
@@ -342,7 +342,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
       return [];
     }
 
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { cortexNodes } = await import("../db");
     const { CortexNodeType } = await import("../enum");
     const { eq, and, isNotNull, notLike, like, or, sql } =
@@ -431,7 +431,7 @@ async function loadMemoryContext(
   totalCount: number;
   archivedCount: number;
 }> {
-  const { db } = await import("@/app/api/[locale]/system/db");
+  const { db } = await import("next-vibe/database");
   const { cortexNodes } = await import("../db");
   const { CortexNodeType } = await import("../enum");
   const { eq, and, like, sql } = await import("drizzle-orm");
@@ -548,7 +548,7 @@ async function buildTrimmedDocTree(
   documentsPath: string,
   locale: string,
 ): Promise<TrimmedDocDir[]> {
-  const { db } = await import("@/app/api/[locale]/system/db");
+  const { db } = await import("next-vibe/database");
   const { cortexNodes } = await import("../db");
   const { CortexNodeType } = await import("../enum");
   const { sql } = await import("drizzle-orm");
@@ -664,7 +664,7 @@ interface PinnedThread {
 
 async function loadPinnedThreads(userId: string): Promise<PinnedThread[]> {
   try {
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { chatThreads } = await import("../../chat/db");
     const { eq, and } = await import("drizzle-orm");
 
@@ -696,7 +696,7 @@ interface SkillRecord {
 
 async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
   try {
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { chatFavorites } = await import("../../skills/favorites/db");
     const { eq } = await import("drizzle-orm");
 
@@ -741,7 +741,7 @@ async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
 
 async function loadCreatedSkills(userId: string): Promise<SkillRecord[]> {
   try {
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { customSkills } = await import("../../skills/db");
     const { SkillOwnershipType } = await import("../../skills/enum");
     const { eq, and, ne, sql } = await import("drizzle-orm");
@@ -777,7 +777,7 @@ async function loadTasksForCortex(
 ): Promise<{ items: CronTaskItem[]; totalCount: number }> {
   try {
     const { CronTasksRepository } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/repository");
+      await import("next-vibe/tasks/cron/repository");
     const items = await CronTasksRepository.loadTaskItems({ userId, logger });
     return { items, totalCount: items.length };
   } catch {
@@ -802,7 +802,7 @@ async function loadFavoritesForCortex(
     ] = await Promise.all([
       import("@/app/api/[locale]/agent/skills/favorites/db"),
       import("@/app/api/[locale]/agent/chat/settings/db"),
-      import("@/app/api/[locale]/system/db"),
+      import("next-vibe/database"),
       import("drizzle-orm"),
     ]);
 
@@ -1342,7 +1342,7 @@ export async function loadRawEmbeddingScores(
     return { scores: [], embeddingGenerated: false };
   }
 
-  const { db } = await import("@/app/api/[locale]/system/db");
+  const { db } = await import("next-vibe/database");
   const { cortexNodes } = await import("../db");
   const { CortexNodeType } = await import("../enum");
   const { eq, and, isNotNull, sql } = await import("drizzle-orm");

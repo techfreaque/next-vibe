@@ -6,7 +6,7 @@
 
 "use client";
 
-import { storage } from "next-vibe-ui/lib/storage";
+import { storage } from "next-vibe/ui/web/lib/storage";
 
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";

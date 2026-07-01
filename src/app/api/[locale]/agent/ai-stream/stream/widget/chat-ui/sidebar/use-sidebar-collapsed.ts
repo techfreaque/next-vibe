@@ -8,11 +8,11 @@
 
 "use client";
 
-import { getScreenWidth } from "next-vibe-ui/lib/screen";
-import { storage } from "next-vibe-ui/lib/storage";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { getScreenWidth } from "next-vibe/ui/web/lib/screen";
+import { storage } from "next-vibe/ui/web/lib/storage";
 import { create } from "zustand";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { useLogger } from "@/hooks/use-logger";
 
 const STORAGE_KEY = "sidebar-collapsed";

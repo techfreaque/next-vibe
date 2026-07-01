@@ -1,19 +1,19 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { redirect } from "next-vibe-ui/lib/redirect";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Link } from "next-vibe-ui/ui/link";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { redirect } from "next-vibe/ui/web/lib/redirect";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Link } from "next-vibe/ui/web/ui/link";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import ResetPasswordForm from "./_components/reset-password-form";
 import { scopedTranslation as pageT } from "./i18n";

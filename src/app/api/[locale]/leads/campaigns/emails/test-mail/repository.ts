@@ -6,25 +6,25 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";
 import type {
   TestEmailRequestOutput,

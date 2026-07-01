@@ -3,24 +3,23 @@
  * Converts audio to text using Eden AI providers
  */
 
-import { lazy } from "react";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
 const SpeechToTextContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SpeechToTextContainer })),

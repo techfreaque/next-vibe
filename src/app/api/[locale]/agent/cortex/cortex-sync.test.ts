@@ -33,6 +33,11 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -56,13 +61,8 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";

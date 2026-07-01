@@ -6,13 +6,22 @@
 import "server-only";
 
 import { and, count, desc, eq, inArray, or, sql, sum } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import {
+  leadLeadLinks,
+  leads,
+  userLeadLinks,
+} from "next-vibe/identity/lead/db";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import {
@@ -28,11 +37,6 @@ import {
   CreditPackType,
   CreditTransactionTypeDB,
 } from "@/app/api/[locale]/credits/enum";
-import {
-  leadLeadLinks,
-  leads,
-  userLeadLinks,
-} from "@/app/api/[locale]/leads/db";
 import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
 import {
@@ -46,11 +50,7 @@ import {
 } from "@/app/api/[locale]/referral/db";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles, users } from "@/app/api/[locale]/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserViewResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

@@ -15,10 +15,21 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
+import type {
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
+  EmailProviderValue,
+} from "next-vibe/identity/lead/enum";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+  LeadSource,
+  LeadStatus,
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   CampaignType,
@@ -26,18 +37,6 @@ import {
 } from "../../../../messenger/accounts/enum";
 import { MessageStatus } from "../../../../messenger/messages/enum";
 import { users } from "../../../../user/db";
-import { emailCampaigns, leads } from "../../../db";
-import type {
-  EmailCampaignStageValue,
-  EmailJourneyVariantValue,
-  EmailProviderValue,
-} from "../../../enum";
-import {
-  EmailCampaignStage,
-  EmailJourneyVariant,
-  LeadSource,
-  LeadStatus,
-} from "../../../enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 

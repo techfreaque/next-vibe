@@ -7,10 +7,10 @@
  */
 
 import { and, eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { accountNodes, coaTemplateNodes, coaTemplates } from "./db";
 import { AccountSubtype, AccountType } from "./enum";

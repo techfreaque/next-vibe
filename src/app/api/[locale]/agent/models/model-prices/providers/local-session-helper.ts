@@ -9,17 +9,17 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { UserRoleDB } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
 
 import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 /**
  * Resolve an admin session pointing at the given local URL.

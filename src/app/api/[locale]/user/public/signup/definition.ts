@@ -5,25 +5,25 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   customWidgetObject,
   requestField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { scopedTranslation } from "./i18n";
-import { UserRole } from "../../user-roles/enum";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 const SignupFormContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.SignupFormContainer })),

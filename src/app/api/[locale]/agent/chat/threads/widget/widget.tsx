@@ -5,10 +5,12 @@
 
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { success } from "next-vibe/core/route/response.schema";
+import { cn } from "next-vibe/core/utils/utils";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,10 +20,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe-ui/ui/alert-dialog";
-import { Button } from "next-vibe-ui/ui/button";
-import type { DivMouseEvent } from "next-vibe-ui/ui/div";
-import { Div } from "next-vibe-ui/ui/div";
+} from "next-vibe/ui/web/ui/alert-dialog";
+import { Button } from "next-vibe/ui/web/ui/button";
+import type { DivMouseEvent } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,33 +33,33 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
-import { Archive } from "next-vibe-ui/ui/icons/Archive";
-import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
-import { Edit2 } from "next-vibe-ui/ui/icons/Edit2";
-import { FolderInput } from "next-vibe-ui/ui/icons/FolderInput";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { MoreVertical } from "next-vibe-ui/ui/icons/MoreVertical";
-import { Pin } from "next-vibe-ui/ui/icons/Pin";
-import { PinOff } from "next-vibe-ui/ui/icons/PinOff";
-import { Share2 } from "next-vibe-ui/ui/icons/Share2";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
-import { Input } from "next-vibe-ui/ui/input";
+} from "next-vibe/ui/web/ui/dropdown-menu";
+import { Archive } from "next-vibe/ui/web/ui/icons/Archive";
+import { ArchiveRestore } from "next-vibe/ui/web/ui/icons/ArchiveRestore";
+import { Edit2 } from "next-vibe/ui/web/ui/icons/Edit2";
+import { FolderInput } from "next-vibe/ui/web/ui/icons/FolderInput";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { MoreVertical } from "next-vibe/ui/web/ui/icons/MoreVertical";
+import { Pin } from "next-vibe/ui/web/ui/icons/Pin";
+import { PinOff } from "next-vibe/ui/web/ui/icons/PinOff";
+import { Share2 } from "next-vibe/ui/web/ui/icons/Share2";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import type { InputKeyboardEvent } from "next-vibe/ui/web/ui/input";
+import { Input } from "next-vibe/ui/web/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { P } from "next-vibe-ui/ui/typography";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+} from "next-vibe/ui/web/ui/tooltip";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
@@ -73,8 +75,6 @@ import {
 import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/widget";
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";

@@ -3,6 +3,22 @@
  * Generates images from text prompts using various AI providers
  */
 
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { Platform } from "next-vibe/core/definition/platform";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  backButton,
+  customWidgetObject,
+  requestField,
+  responseField,
+  submitButton,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -10,22 +26,6 @@ import {
   ImageGenModelId,
   ImageGenModelIdOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  requestField,
-  responseField,
-  submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {

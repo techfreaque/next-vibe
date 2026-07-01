@@ -1,36 +1,36 @@
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { getCurrentUrl, openInNewTab } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { success } from "next-vibe/core/route/response.schema";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { getCurrentUrl, openInNewTab } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe-ui/ui/dialog";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import { Lock } from "next-vibe-ui/ui/icons/Lock";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Send } from "next-vibe-ui/ui/icons/Send";
-import { Input } from "next-vibe-ui/ui/input";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/dialog";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
+import { Lock } from "next-vibe/ui/web/ui/icons/Lock";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { Send } from "next-vibe/ui/web/ui/icons/Send";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

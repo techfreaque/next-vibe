@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 
 import type { ImapAccountShape } from "../db";
 import type { ImapConnectionStatus, ImapSpecialUseType } from "../enum";

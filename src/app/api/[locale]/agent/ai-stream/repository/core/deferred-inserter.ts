@@ -10,6 +10,9 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
@@ -18,9 +21,6 @@ import {
   ThreadStreamingState,
 } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { walkToLeafMessage } from "./branch-utils";
 import type { WakeUpPayload } from "./wake-up-channel";

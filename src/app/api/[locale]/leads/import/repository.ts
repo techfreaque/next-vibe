@@ -7,36 +7,43 @@ import "server-only";
 
 import { and, count, eq, sql } from "drizzle-orm";
 import type {
+  Countries,
+  CountryLanguage,
+  Languages,
+} from "next-vibe/core/i18n/core/config";
+import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import {
-  CronTaskPriority,
-  TaskCategory,
-  TaskOutputMode,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-
-import type { JwtPrivatePayloadType } from "../../user/auth/types";
-import { leads, type NewLead } from "../db";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { leads, type NewLead } from "next-vibe/identity/lead/db";
 import type {
   EmailCampaignStageValue,
   LeadSourceValue,
   LeadStatusValue,
-} from "../enum";
-import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
+} from "next-vibe/identity/lead/enum";
+import {
+  EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import {
+  CronTaskPriority,
+  TaskCategory,
+  TaskOutputMode,
+} from "next-vibe/tasks/enum";
+
 import { type CsvImportJob, csvImportJobs, importBatches } from "./db";
 import type {
   LeadsImportRequestOutput,

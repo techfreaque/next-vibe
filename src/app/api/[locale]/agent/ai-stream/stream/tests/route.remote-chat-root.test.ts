@@ -30,10 +30,10 @@ import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
 import { sql } from "drizzle-orm";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 import { setFetchCacheContext } from "../../testing/fetch-cache";
@@ -184,7 +184,7 @@ if (_remoteUrl && _isFixtureMode) {
     });
 
     it("RCR-1: atlas thread is in REMOTE/hermes/tests/unbottled-relay", async () => {
-      const { db } = await import("@/app/api/[locale]/system/db");
+      const { db } = await import("next-vibe/database");
       const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
       const { eq } = await import("drizzle-orm");
       const [row] = await db

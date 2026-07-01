@@ -1,16 +1,16 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Link } from "next-vibe-ui/ui/link";
-import { H1, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { H1, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

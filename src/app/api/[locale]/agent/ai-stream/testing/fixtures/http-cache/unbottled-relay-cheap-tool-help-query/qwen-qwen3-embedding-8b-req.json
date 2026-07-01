@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The second call returned a non-empty tools array with 12 tools. Each tool has a name and description. The categories list also looked right. Everything looks correct.\n\nI should end with STEP_OK.</think>STEP_OK\n\nUser: [T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call execute-tool with toolName='tool-help' and input={'category':'ai'} to list the tools in the \"ai\" category. Then I need to check that the result contains a non-empty tools array and that each tool has a name and description. End with STEP_OK or FAILED: <reason>.</think>\n\nAssistant: <think>The result contains a non-empty tools array (69 tools listed). Each tool has a \"name\" and a \"description\" field. Some also have \"title\" and \"aliases\". I need to verify that every tool has name and description. Looking through the list, all visible entries have both. The last few also have name and description. It looks correct.\n\nI'll end with STEP_OK.</think>STEP_OK\n\nUser: [T1a-query tool-help-query] Call execute-tool with toolName='tool-help', input={'query':'search'} to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

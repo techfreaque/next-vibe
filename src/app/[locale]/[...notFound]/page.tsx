@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 import { NotFoundBackButton } from "./not-found-client";

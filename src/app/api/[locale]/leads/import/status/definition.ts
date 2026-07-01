@@ -3,11 +3,17 @@
  * List and monitor import jobs with filtering
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -16,15 +22,8 @@ import {
   responseArrayField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import {
   CsvImportJobStatus,

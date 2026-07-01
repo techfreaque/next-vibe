@@ -28,13 +28,18 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import { clearStreamingState } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream-registry";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -49,18 +54,17 @@ import {
 } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseSkillId } from "../../chat/slugify";
 import { getInstanceAvailability } from "../../env-availability";
 import { NO_SKILL_ID } from "../../skills/constants";
 import { walkToLeafMessage } from "../repository/core/branch-utils";
 import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
-import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";
+import {
+  ASYNC_REVIVAL_INSTRUCTIONS,
+  resolveFavorite,
+  runHeadlessAiStream,
+} from "../repository/headless";
 import type { AiStreamT } from "../stream/i18n";
 import type {
   ResumeStreamRequestOutput,
@@ -490,6 +494,7 @@ export class ResumeStreamRepository {
               })
                 .then(async (result) => {
                   createMessagesEmitter(logger, user, {
+                    threadId,
                     rootFolderId: threadRootFolderId,
                   })("stream-finished", {
                     responseData: {
@@ -770,6 +775,7 @@ export class ResumeStreamRepository {
             })
               .then(async (result) => {
                 createMessagesEmitter(logger, user, {
+                  threadId,
                   rootFolderId: threadRootFolderId,
                 })("stream-finished", {
                   responseData: {
@@ -1060,6 +1066,7 @@ export class ResumeStreamRepository {
               });
             } else {
               createMessagesEmitter(logger, user, {
+                threadId,
                 rootFolderId: threadRootFolderId,
               })("stream-finished", {
                 responseData: {
@@ -1151,6 +1158,7 @@ export class ResumeStreamRepository {
               ),
             );
           createMessagesEmitter(logger, user, {
+            threadId,
             rootFolderId: threadRootFolderId,
           })("streaming-state-changed", {
             responseData: {

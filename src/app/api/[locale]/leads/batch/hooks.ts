@@ -5,15 +5,19 @@
 
 "use client";
 
-import { parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type {
+  EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
+} from "next-vibe/identity/lead/enum";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useCallback, useEffect, useState } from "react";
 
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogger } from "@/hooks/use-logger";
 
-import type { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 import type { LeadListGetRequestTypeOutput } from "../list/definition";
 import definitions, { type BatchOperationScope } from "./definition";
 

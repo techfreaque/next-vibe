@@ -3,8 +3,9 @@
  * Each provider extends this and implements fetch().
  */
 
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import { CREDIT_VALUE_USD } from "@/app/api/[locale]/products/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { Modality } from "../../enum";
 import type { ApiProvider } from "../../models";

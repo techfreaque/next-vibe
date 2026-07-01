@@ -5,25 +5,24 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
+} from "next-vibe/core/route/response.schema";
 import {
   LeadSortField,
   LeadStatus,
   LeadStatusFilter,
   SortOrder,
-} from "../enum";
-import type { LeadsT } from "../i18n";
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
-import { LeadsRepository } from "../repository";
+} from "next-vibe/identity/lead/enum";
+import type { LeadsT } from "next-vibe/identity/lead/i18n";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import { LeadsRepository } from "next-vibe/identity/lead/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { LeadSearchGetResponseOutput } from "./definition";
 import type { LeadsSearchT } from "./i18n";
 

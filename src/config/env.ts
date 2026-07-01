@@ -4,12 +4,11 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { defineEnv } from "next-vibe/env/define-env";
+import { Environment } from "next-vibe/env/env-util";
 import { z } from "zod";
-
-import { Environment } from "@/app/api/[locale]/shared/utils/env-util";
-import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_PROJECT_URL } from "./constants";
 

@@ -3,16 +3,15 @@
  * Handles user avatar operations
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
@@ -106,7 +105,7 @@ export class AvatarRepository {
 
       // Update user avatar in database
       const { eq } = await import("drizzle-orm");
-      const { db } = await import("@/app/api/[locale]/system/db");
+      const { db } = await import("next-vibe/database");
       const { users } = await import("../../../db");
 
       await db
@@ -178,7 +177,7 @@ export class AvatarRepository {
 
       // Delete avatar from database
       const { eq } = await import("drizzle-orm");
-      const { db } = await import("@/app/api/[locale]/system/db");
+      const { db } = await import("next-vibe/database");
       const { users } = await import("../../../db");
 
       await db

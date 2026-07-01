@@ -3,22 +3,20 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Span } from "next-vibe-ui/ui/span";
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { MessageStatus } from "../enum";
 import type definition from "./definition";
@@ -73,8 +71,7 @@ export function EmailDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef =
-        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: email.leadId! } });
     })();
   };

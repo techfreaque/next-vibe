@@ -3,12 +3,12 @@
  * Reads model definitions (static, no DB) and applies search + filter.
  */
 
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { success } from "@/app/api/[locale]/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatModelOptions } from "../../ai-stream/models";
 import { imageGenModelOptions } from "../../image-generation/models";

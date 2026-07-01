@@ -3,11 +3,11 @@
  * Provides seed data for email message storage and tracking
  */
 
-import { parseError } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { translations } from "@/config/i18n/en";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contactClientRepository } from "../../contact/repository-client";
 import { UserDetailLevel } from "../../user/enum";

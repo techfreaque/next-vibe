@@ -3,13 +3,10 @@
  * Client+server safe. No server imports.
  */
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  EndpointErrorTypes,
-  Methods,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { dataSourceWidget } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
+import { dataSourceWidget } from "next-vibe/core/utils/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
 
 import { CHAT_MESSAGES_WITH_ATTACHMENTS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

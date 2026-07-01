@@ -1,15 +1,14 @@
 // AUTO-GENERATED from src/app/api/[locale]/inventory/warehouse/[warehouseId]/update/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
-import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
+import { wrapNextApiRoute } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
 
 export const Route = createFileRoute(
   "/api/$locale/inventory/warehouse/$warehouseId/update",
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/app/api/[locale]/inventory/warehouse/[warehouseId]/update/route"),
+      () => import("@/app/api/[locale]/inventory/warehouse/[warehouseId]/update/route"),
     ),
   },
 });

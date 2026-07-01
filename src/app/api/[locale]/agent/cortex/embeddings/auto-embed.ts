@@ -8,11 +8,10 @@ import "server-only";
  * Optionally deducts credits for user-triggered operations.
  */
 import { eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { cortexNodes } from "../db";
 import type { CortexCreditFeatureValue } from "../enum";

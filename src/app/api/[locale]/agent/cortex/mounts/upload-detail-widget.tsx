@@ -7,11 +7,11 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Paperclip } from "next-vibe-ui/ui/icons/Paperclip";
-import { Span } from "next-vibe-ui/ui/span";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Paperclip } from "next-vibe/ui/web/ui/icons/Paperclip";
+import { Span } from "next-vibe/ui/web/ui/span";
 
 interface UploadDetailWidgetProps {
   path: string;

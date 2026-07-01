@@ -3,8 +3,8 @@
  * Handles data access and business logic for contact form submissions
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/translation-utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/translation-utils";
 
 import { contactClientEnv } from "./env-client";
 

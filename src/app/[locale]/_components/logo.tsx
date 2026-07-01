@@ -1,16 +1,16 @@
 "use client";
 
 import type { Route } from "next";
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { Image } from "next-vibe-ui/ui/image";
-import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Image } from "next-vibe/ui/web/ui/image";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 
 import { envClient, platform } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 export function Logo({
   locale,

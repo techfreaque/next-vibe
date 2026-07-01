@@ -1,17 +1,19 @@
 "use client";
 
-import { getCookie } from "next-vibe-ui/lib/cookies";
-import { assignUrl } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
+import { getCookie } from "next-vibe/ui/web/lib/cookies";
+import { assignUrl } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
 import { useCallback, useRef, useState } from "react";
 
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+
 import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
 import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
@@ -20,7 +22,6 @@ import {
   CSRF_TOKEN_HEADER_NAME,
 } from "@/config/constants";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface LoginFormProps {
   locale: CountryLanguage;

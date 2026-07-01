@@ -5,19 +5,18 @@
 
 import "server-only";
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
 import { createTrackingContext } from "../components/tracking_context.email";

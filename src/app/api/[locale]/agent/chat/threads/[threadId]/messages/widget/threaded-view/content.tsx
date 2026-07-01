@@ -1,11 +1,13 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Span, type SpanMouseEvent } from "next-vibe/ui/web/ui/span";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React from "react";
 
@@ -13,9 +15,6 @@ import { Logo } from "@/app/[locale]/_components/logo";
 import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { scopedTranslation } from "../../i18n";

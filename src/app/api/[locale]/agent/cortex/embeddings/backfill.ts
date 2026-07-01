@@ -7,8 +7,7 @@ import "server-only";
  * Rate-limited to avoid API throttling.
  */
 import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "next-vibe/database";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
@@ -39,7 +38,7 @@ async function resolveNodeContentForEmbedding(
   storedContent: string | null,
 ): Promise<string> {
   const { isNativePath, getMountPrefix } = await import("../repository");
-  const { defaultLocale } = await import("@/i18n/core/config");
+  const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
   if (isNativePath(path, defaultLocale)) {
     return storedContent ?? "";
   }

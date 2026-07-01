@@ -1,0 +1,47 @@
+import type { WidgetType } from "next-vibe/core/definition/enums";
+import type {
+  BaseObjectWidgetConfig,
+  BasePrimitiveWidgetConfig,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "next-vibe/unified-ui/_shared/types";
+import type { BaseContainerLayoutProps } from "next-vibe/unified-ui/containers/container/types";
+import type z from "zod";
+
+/**
+ * Custom widget config - allows custom React component renderer
+ */
+export interface CustomWidgetObjectConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "object" | "object-optional" | "widget-object",
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+>
+  extends
+    BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
+    BaseContainerLayoutProps<TKey> {
+  type: WidgetType.CUSTOM_WIDGET;
+  // oxlint-disable-next-line typescript/no-explicit-any
+  render?: React.ComponentType<any>;
+  /** Skip the outer <form> element. FormProvider is still provided so form
+   *  fields work, but the widget is responsible for its own <form> boundaries.
+   *  Use this when the widget embeds sub-endpoints that need their own forms. */
+  noFormElement?: boolean;
+}
+
+/**
+ * Custom widget config - allows custom React component renderer
+ */
+export interface CustomWidgetPrimitiveConfig<
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget" | "primitive",
+  TSchema extends z.ZodTypeAny,
+> extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
+  type: WidgetType.CUSTOM_WIDGET;
+  // oxlint-disable-next-line typescript/no-explicit-any
+  render?: React.ComponentType<any>;
+}

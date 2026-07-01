@@ -12,10 +12,16 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { useRouter, useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { success } from "next-vibe/core/route/response.schema";
+import { cn } from "next-vibe/core/utils/utils";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import {
+  useRouter,
+  useSilentHistory,
+} from "next-vibe/ui/web/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,15 +31,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe-ui/ui/alert-dialog";
-import { Button } from "next-vibe-ui/ui/button";
+} from "next-vibe/ui/web/ui/alert-dialog";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe-ui/ui/dialog";
-import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
+} from "next-vibe/ui/web/ui/dialog";
+import { Div, type DivMouseEvent } from "next-vibe/ui/web/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,31 +49,31 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
-import { Archive } from "next-vibe-ui/ui/icons/Archive";
-import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Edit } from "next-vibe-ui/ui/icons/Edit";
-import { FolderInput } from "next-vibe-ui/ui/icons/FolderInput";
-import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
-import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
-import { MoreVertical } from "next-vibe-ui/ui/icons/MoreVertical";
-import { Pin } from "next-vibe-ui/ui/icons/Pin";
-import { PinOff } from "next-vibe-ui/ui/icons/PinOff";
-import { Share2 } from "next-vibe-ui/ui/icons/Share2";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/dropdown-menu";
+import { Archive } from "next-vibe/ui/web/ui/icons/Archive";
+import { ArchiveRestore } from "next-vibe/ui/web/ui/icons/ArchiveRestore";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Edit } from "next-vibe/ui/web/ui/icons/Edit";
+import { FolderInput } from "next-vibe/ui/web/ui/icons/FolderInput";
+import { FolderPlus } from "next-vibe/ui/web/ui/icons/FolderPlus";
+import { MessageSquarePlus } from "next-vibe/ui/web/ui/icons/MessageSquarePlus";
+import { MoreVertical } from "next-vibe/ui/web/ui/icons/MoreVertical";
+import { Pin } from "next-vibe/ui/web/ui/icons/Pin";
+import { PinOff } from "next-vibe/ui/web/ui/icons/PinOff";
+import { Share2 } from "next-vibe/ui/web/ui/icons/Share2";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { useMemo, useState } from "react";
 
 import {
@@ -90,9 +96,6 @@ import {
   ThreadStreamingState,
 } from "@/app/api/[locale]/agent/chat/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";

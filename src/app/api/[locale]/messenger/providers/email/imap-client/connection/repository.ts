@@ -7,15 +7,14 @@ import "server-only";
 
 import Imap from "imap";
 import { simpleParser } from "mailparser";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ImapAccountShape } from "../db";
 import {

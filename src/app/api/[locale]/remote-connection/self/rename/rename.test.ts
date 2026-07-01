@@ -25,6 +25,9 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -35,9 +38,6 @@ import {
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
 import selfRenameDefinitions from "@/app/api/[locale]/remote-connection/self/rename/definition";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 import {

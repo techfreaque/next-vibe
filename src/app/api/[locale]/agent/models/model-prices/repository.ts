@@ -10,17 +10,17 @@ import "server-only";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";

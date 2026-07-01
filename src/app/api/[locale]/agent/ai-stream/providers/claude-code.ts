@@ -26,8 +26,7 @@ import type {
   LanguageModelV2Usage,
 } from "@ai-sdk/provider";
 import type { SDKPartialAssistantMessage } from "@anthropic-ai/claude-agent-sdk";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";

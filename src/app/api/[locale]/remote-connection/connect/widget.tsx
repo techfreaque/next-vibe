@@ -12,33 +12,32 @@
 
 "use client";
 
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-import { Lock } from "next-vibe-ui/ui/icons/Lock";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
+import { Lock } from "next-vibe/ui/web/ui/icons/Lock";
+import { P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetLocale,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
-import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
+import { UrlFieldWidget } from "next-vibe/unified-ui/form-fields/url-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
-
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";

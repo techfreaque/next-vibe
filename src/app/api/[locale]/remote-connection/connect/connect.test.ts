@@ -21,6 +21,9 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -29,10 +32,7 @@ import {
   instanceIdentities,
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -166,7 +166,7 @@ if (_remoteUrl) {
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       const { createEndpointLogger } =
-        await import("@/app/api/[locale]/system/logger/server");
+        await import("next-vibe/logger/server");
       const target = await RemoteTransport.resolveTarget({
         userId: testUser.id,
         folderId: folder.id,

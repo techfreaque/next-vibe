@@ -6,22 +6,20 @@
 
 import "server-only";
 
-import { env } from "@/config/env";
-
-import { Environment } from "../../../shared/utils";
+import { Environment } from "next-vibe/env/env-util";
 import {
   CRON_SCHEDULES,
   HISTORY_INTERVALS,
   TASK_TIMEOUTS,
-} from "../../../system/unified-interface/tasks/constants";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "../../../system/unified-interface/tasks/enum";
+} from "next-vibe/tasks/constants";
+import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 import {
   createCronTask,
   type Task,
-} from "../../../system/unified-interface/tasks/unified-runner/types";
+} from "next-vibe/tasks/unified-runner/types";
+
+import { env } from "@/config/env";
+
 import definitions from "./definition";
 import { tools } from "./route";
 

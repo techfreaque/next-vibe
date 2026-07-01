@@ -8,20 +8,20 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
@@ -242,9 +242,9 @@ export class RemoteConnectionInstanceRepository {
           const selfInstanceId =
             RemoteConnectionRepository.deriveDefaultSelfInstanceId();
           const { RouteExecuteRepository } =
-            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+            await import("next-vibe/execute-tool/repository");
           const { CallbackMode } =
-            await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
+            await import("next-vibe/execute-tool/constants");
           const reverseUpdateDef =
             await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
           await RouteExecuteRepository.runInProcessTyped({
@@ -283,11 +283,11 @@ export class RemoteConnectionInstanceRepository {
       )) ?? row.remoteTransportMode;
     if (reconnectNow === true) {
       const { restartConnection } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+        await import("next-vibe/realtime/connector");
       await restartConnection(targetInstanceId);
     } else if (effectiveRemoteMode === "reverse-ws") {
       const { restartConnection } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+        await import("next-vibe/realtime/connector");
       await restartConnection(targetInstanceId);
     } else {
       const { closeConnection } =
@@ -556,7 +556,7 @@ export class RemoteConnectionInstanceRepository {
     // Fallback: signed JWT
     if (!reverseToken) {
       const { AuthRepository } =
-        await import("@/app/api/[locale]/user/auth/repository");
+        await import("next-vibe/identity/auth/repository");
       const reverseTokenResult = await AuthRepository.signJwt(
         user,
         logger,
@@ -720,7 +720,7 @@ export class RemoteConnectionInstanceRepository {
     void (async (): Promise<void> => {
       try {
         const { closeConnection, restartConnection } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+          await import("next-vibe/realtime/connector");
         closeConnection(instanceId);
         await restartConnection(newInstanceId);
       } catch {
@@ -734,7 +734,7 @@ export class RemoteConnectionInstanceRepository {
       void (async (): Promise<void> => {
         try {
           const { RouteExecuteRepository } =
-            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+            await import("next-vibe/execute-tool/repository");
           const selfRenameDef =
             await import("@/app/api/[locale]/remote-connection/self/rename/definition");
           const result = await RouteExecuteRepository.runInProcessTyped({

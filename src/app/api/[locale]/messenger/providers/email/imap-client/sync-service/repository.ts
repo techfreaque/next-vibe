@@ -6,16 +6,20 @@
 import "server-only";
 
 import { and, eq, notInArray } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type {
   MessengerFolder,
@@ -26,10 +30,6 @@ import {
   emails,
   messengerFolders,
 } from "@/app/api/[locale]/messenger/messages/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";

@@ -6,20 +6,22 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import { customSkills } from "../../db";
 import type { SkillStatusValue } from "../../enum";

@@ -4,17 +4,17 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { Film } from "next-vibe-ui/ui/icons/Film";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
+import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
+import { Film } from "next-vibe/ui/web/ui/icons/Film";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -23,12 +23,12 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
-import { IconFieldWidget } from "next-vibe-ui/unified/form-fields/icon-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { useMemo, useState } from "react";
 
 import {

@@ -10,16 +10,15 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-
 // ── Definition imports ───────────────────────────────────────────────────────
-import { testEndpoint } from "../../system/check/testing/testing-suite/test-endpoint";
+import { testEndpoint } from "../../system/tooling/check/testing/testing-suite/test-endpoint";
 import { isUuid } from "../chat/slugify";
 import { SttModelId } from "../speech-to-text/models";
 import skillSingleEndpoint from "./[id]/definition";
@@ -333,10 +332,11 @@ describe("Skills CRUD Integration", () => {
   });
 
   // ── S8: Vote on skill ─────────────────────────────────────────────────
-  fit("S8: vote on published skill records vote", async () => {
+  fit("S8: upvote on published skill records vote", async () => {
     const response = await sendTestRequest({
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
+      data: { direction: SkillVoteDirection.UP },
       user: adminUser,
     });
 
@@ -345,15 +345,17 @@ describe("Skills CRUD Integration", () => {
       return;
     }
 
-    expect(response.data.voted).toBe(true);
+    expect(response.data.userVote).toBe(SkillVoteDirection.UP);
+    expect(response.data.upCount).toBeGreaterThanOrEqual(1);
     expect(response.data.voteCount).toBeGreaterThanOrEqual(1);
   });
 
-  // ── S9: Vote again (toggle off) ───────────────────────────────────────
-  fit("S9: second vote toggles off", async () => {
+  // ── S9: Same direction again (toggle off) ─────────────────────────────
+  fit("S9: re-upvote toggles off", async () => {
     const response = await sendTestRequest({
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
+      data: { direction: SkillVoteDirection.UP },
       user: adminUser,
     });
 
@@ -364,7 +366,36 @@ describe("Skills CRUD Integration", () => {
       return;
     }
 
-    expect(response.data.voted).toBe(false);
+    expect(response.data.userVote).toBeNull();
+  });
+
+  // ── S9b: Downvote, then flip to upvote ────────────────────────────────
+  fit("S9b: downvote then flip to upvote", async () => {
+    const down = await sendTestRequest({
+      endpoint: skillVoteEndpoint.POST,
+      urlPathParams: { id: createdSkillSlug },
+      data: { direction: SkillVoteDirection.DOWN },
+      user: adminUser,
+    });
+    expect(down.success, `Downvote failed: ${down.message}`).toBe(true);
+    if (!down.success) {
+      return;
+    }
+    expect(down.data.userVote).toBe(SkillVoteDirection.DOWN);
+    expect(down.data.downCount).toBeGreaterThanOrEqual(1);
+    expect(down.data.voteCount).toBeLessThanOrEqual(0);
+
+    const flip = await sendTestRequest({
+      endpoint: skillVoteEndpoint.POST,
+      urlPathParams: { id: createdSkillSlug },
+      data: { direction: SkillVoteDirection.UP },
+      user: adminUser,
+    });
+    expect(flip.success, `Flip failed: ${flip.message}`).toBe(true);
+    if (!flip.success) {
+      return;
+    }
+    expect(flip.data.userVote).toBe(SkillVoteDirection.UP);
   });
 
   // ── S10: Report skill ─────────────────────────────────────────────────

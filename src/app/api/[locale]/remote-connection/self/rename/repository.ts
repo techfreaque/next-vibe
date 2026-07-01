@@ -7,18 +7,17 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import { instanceIdentities, remoteConnections } from "../../db";
 import { RemoteConnectionRepository } from "../../repository";
@@ -103,7 +102,7 @@ export class RemoteConnectionSelfRenameRepository {
     // hand-rolled URL/auth). Sends propagate:false so remotes do not call us back.
     void (async (): Promise<void> => {
       const { RouteExecuteRepository } =
-        await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+        await import("next-vibe/execute-tool/repository");
       const selfRenameDef = await import("./definition");
       const conns = await RemoteConnectionRepository.getAllActiveConnections(
         user.id,

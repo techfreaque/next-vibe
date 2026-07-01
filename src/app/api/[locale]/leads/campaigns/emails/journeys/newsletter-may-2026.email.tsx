@@ -6,6 +6,7 @@
  * You stay the pilot — but now you have a crew.
  */
 
+import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
@@ -13,7 +14,6 @@ import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/emai
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 
-import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,
   EmailTemplateFunction,

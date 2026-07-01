@@ -4,20 +4,22 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
-import { dateSchema } from "next-vibe/shared/types/common.schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
+import { UserRoleDB, type UserRoleValue } from "next-vibe/identity/roles/enum";
+import { userRoleResponseSchema } from "next-vibe/identity/roles/types";
 import { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType, JwtPrivatePayloadType } from "./auth/types";
 import {
   Language,
   Theme,
   type UserDetailLevel,
   type UserDetailLevelValue,
 } from "./enum";
-import { UserRoleDB, type UserRoleValue } from "./user-roles/enum";
-import { userRoleResponseSchema } from "./user-roles/types";
 
 /**
  * User Preferences Schema

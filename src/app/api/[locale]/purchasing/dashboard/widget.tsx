@@ -1,14 +1,14 @@
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Span } from "next-vibe-ui/ui/span";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type definition from "./definition";

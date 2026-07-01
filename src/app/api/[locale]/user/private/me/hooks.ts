@@ -5,26 +5,25 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { useToast } from "next-vibe-ui/hooks/use-toast";
+} from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 import { useEffect, useRef } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { useTranslation } from "@/i18n/core/client";
 
 import {
   createCustomStateKey,
   useCustomState,
-} from "../../../system/unified-interface/react/hooks/store";
+} from "../../../system/platforms/react/hooks/store";
 import {
   type EnhancedMutationResult,
   useApiMutation,
-} from "../../../system/unified-interface/react/hooks/use-api-mutation";
-import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
-import type { JwtPayloadType } from "../../auth/types";
+} from "../../../system/platforms/react/hooks/use-api-mutation";
+import { useApiQuery } from "../../../system/platforms/react/hooks/use-api-query";
 import meEndpoints, {
   type MeDeleteRequestOutput,
   type MeDeleteResponseOutput,

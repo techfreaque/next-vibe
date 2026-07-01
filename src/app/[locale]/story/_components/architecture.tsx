@@ -1,12 +1,12 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { CodeSnippet } from "next-vibe-ui/ui/markdown";
-import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CodeSnippet } from "next-vibe/ui/web/ui/markdown";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -16,7 +16,6 @@ import {
   type EndpointPlatformKey,
   PLATFORM_COUNT,
 } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

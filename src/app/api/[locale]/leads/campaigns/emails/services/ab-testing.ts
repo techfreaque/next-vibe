@@ -3,18 +3,17 @@
  * Handles journey assignment and performance tracking for email campaigns
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Countries } from "next-vibe/core/i18n/core/config";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
   fail,
-} from "next-vibe/shared/types/response.schema";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/core/route/response.schema";
+import { EmailJourneyVariant } from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries } from "@/i18n/core/config";
-
-import { EmailJourneyVariant } from "../../../enum";
 import {
   type JourneysTranslationKey,
   scopedTranslation as journeysScopedTranslation,

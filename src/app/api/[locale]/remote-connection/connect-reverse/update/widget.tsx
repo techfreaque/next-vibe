@@ -12,10 +12,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "./i18n";

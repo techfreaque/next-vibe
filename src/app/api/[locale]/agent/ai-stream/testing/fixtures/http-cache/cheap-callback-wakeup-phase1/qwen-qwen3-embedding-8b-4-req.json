@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----5ccae0a2-697b-488f-a5b7-366ce9581589.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The result from execute-tool has a nested structure: Outer: {\"result\": {...}} Inner: {\"categories\": [...], \"hint…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----51812a4f-db8d-4725-9a66-56905667420c.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result contains an imageUrl string (\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5ccae0a2-69…",
     "encoding_format": "float"
   }
 }

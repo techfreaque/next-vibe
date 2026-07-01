@@ -8,7 +8,7 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
@@ -22,11 +22,11 @@ import type {
   EmailTemplateDefinition,
 } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ErrorResponseType,
   SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import { scopedTranslation as userScopedTranslation } from "../../i18n";
 import {
@@ -34,7 +34,7 @@ import {
   type SignupT,
 } from "./i18n";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { configScopedTranslation } from "@/config/i18n";
 import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
@@ -49,13 +49,13 @@ import userCreateDefinition, {
   type UserCreateRequestOutput,
   type UserCreateResponseOutput,
 } from "../../../users/create/definition";
-import type { JwtPrivatePayloadType } from "../../auth/types";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
 import {
   UserPermissionRole,
   filterUserPermissionRoles,
-} from "../../user-roles/enum";
+} from "next-vibe/identity/roles/enum";
 import signupDefinition, {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,

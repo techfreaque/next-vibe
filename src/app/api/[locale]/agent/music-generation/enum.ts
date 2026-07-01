@@ -2,7 +2,7 @@
  * Music Generation Enums
  */
 
-import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
 import { scopedTranslation } from "./i18n";
 

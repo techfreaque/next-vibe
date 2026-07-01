@@ -5,39 +5,39 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Info } from "next-vibe-ui/ui/icons/Info";
-import { List } from "next-vibe-ui/ui/icons/List";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { RefreshCcw } from "next-vibe-ui/ui/icons/RefreshCcw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { Upload } from "next-vibe-ui/ui/icons/Upload";
-import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Li } from "next-vibe-ui/ui/li";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { Code } from "next-vibe-ui/ui/typography";
-import { Ul } from "next-vibe-ui/ui/ul";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Download } from "next-vibe/ui/web/ui/icons/Download";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { Info } from "next-vibe/ui/web/ui/icons/Info";
+import { List } from "next-vibe/ui/web/ui/icons/List";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { RefreshCcw } from "next-vibe/ui/web/ui/icons/RefreshCcw";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { Upload } from "next-vibe/ui/web/ui/icons/Upload";
+import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
+import { Li } from "next-vibe/ui/web/ui/li";
+import { ExternalLink } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Code } from "next-vibe/ui/web/ui/typography";
+import { Ul } from "next-vibe/ui/web/ui/ul";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { FileFieldWidget } from "next-vibe-ui/unified/form-fields/file-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { FileFieldWidget } from "next-vibe/unified-ui/form-fields/file-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React from "react";
 
 import type definition from "./definition";

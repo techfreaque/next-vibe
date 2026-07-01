@@ -4,6 +4,23 @@
  */
 
 import type { JSONSchema7 } from "json-schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  customWidgetObject,
+  objectField,
+  requestDataArrayOptionalField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -27,24 +44,7 @@ import {
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestDataArrayOptionalField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";

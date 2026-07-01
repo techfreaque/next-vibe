@@ -1,17 +1,17 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { NewsletterPage } from "./_components/newsletter-page";
 import { scopedTranslation } from "./i18n";

@@ -7,17 +7,17 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/creator/[userId]/i18n";
 import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreatorPageData, CreatorProfilePage } from "./page-client";
 
@@ -31,7 +31,7 @@ async function resolveUserName(param: string): Promise<string | null> {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidPattern.test(param)) {
     const { eq, or, sql } = await import("drizzle-orm");
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { users } = await import("@/app/api/[locale]/user/db");
     const result = await db
       .select({ publicName: users.publicName })
@@ -46,7 +46,7 @@ async function resolveUserName(param: string): Promise<string | null> {
     return result[0]?.publicName ?? null;
   }
   const { eq } = await import("drizzle-orm");
-  const { db } = await import("@/app/api/[locale]/system/db");
+  const { db } = await import("next-vibe/database");
   const { users } = await import("@/app/api/[locale]/user/db");
   const result = await db
     .select({ publicName: users.publicName })

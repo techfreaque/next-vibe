@@ -4,24 +4,23 @@
  * Cursor-first protocol: local sends cursors → remote returns only newer records.
  */
 
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { REMOTE_SYNC_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

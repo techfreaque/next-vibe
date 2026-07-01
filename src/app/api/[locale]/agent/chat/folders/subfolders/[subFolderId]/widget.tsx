@@ -1,8 +1,8 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import type definition from "./definition";

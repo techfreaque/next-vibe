@@ -2,19 +2,33 @@
  * Users Statistics API Definition
  * Comprehensive endpoint for user analytics with historical charts
  */
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
 import {
   ChartType,
   ChartTypeOptions,
-  DateRangePreset,
   DateRangePresetOptions,
-  TimePeriod,
   TimePeriodOptions,
-} from "@/app/api/[locale]/shared/stats-filtering";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+} from "next-vibe/core/core-utils/stats-filtering";
+import {
+  DateRangePreset,
+  TimePeriod,
+} from "next-vibe/core/core-utils/stats-filtering.schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "next-vibe/core/i18n/core/config";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -23,23 +37,9 @@ import {
   requestField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { dateSchema } from "../../shared/types/common.schema";
 import {
   PaymentMethodFilter,
   PaymentMethodFilterOptions,

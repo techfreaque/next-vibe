@@ -15,18 +15,18 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { SyncScope } from "../db";
 import { instanceIdentities, remoteConnections } from "../db";
@@ -74,7 +74,7 @@ export class RemoteConnectionRegisterRepository {
     }
     try {
       const healthDef =
-        await import("@/app/api/[locale]/system/server/health/definition");
+        await import("next-vibe/server/server/health/definition");
       const path = healthDef.default.GET.path.join("/");
       const url = `${localUrl}/api/${locale}/${path}`;
       const response = await fetch(url, {

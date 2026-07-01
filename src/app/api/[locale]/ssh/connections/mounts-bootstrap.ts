@@ -12,8 +12,7 @@ import "server-only";
  *   (remote connections are handled via cortex-exec, no FS mount needed)
  */
 import { and, count as drizzleCount, eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "next-vibe/database";
 
 import { sshConnectionMounts, sshConnections } from "../db";
 import { SshAuthType } from "../enum";

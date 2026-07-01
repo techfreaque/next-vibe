@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Link } from "next-vibe-ui/ui/link";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Card, CardContent, CardHeader } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { BookOpen } from "next-vibe/ui/web/ui/icons/BookOpen";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX, ReactNode } from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 

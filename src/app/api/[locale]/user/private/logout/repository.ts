@@ -5,22 +5,21 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { scopedTranslation as sessionScopedTranslation } from "next-vibe/identity/session/i18n";
+import { SessionRepository } from "next-vibe/identity/session/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { AuthRepository } from "../../auth/repository";
-import type { JwtPrivatePayloadType } from "../../auth/types";
-import { scopedTranslation as sessionScopedTranslation } from "../session/i18n";
-import { SessionRepository } from "../session/repository";
 import type { LogoutPostResponseOutput } from "./definition";
 import type { LogoutT } from "./i18n";
 

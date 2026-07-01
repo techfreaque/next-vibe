@@ -1,0 +1,23 @@
+/**
+ * Database Migration Route
+ * API route for running database migrations
+ */
+
+import "server-only";
+
+import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+
+import migrateEndpoints from "./definition";
+
+export const { tools } = endpointsHandler({
+  endpoint: migrateEndpoints,
+  [Methods.POST]: {
+    handler: async ({ t, logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DatabaseMigrationRepository.runMigrations(t, logger),
+  },
+});

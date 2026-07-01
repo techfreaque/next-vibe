@@ -3,12 +3,15 @@
  * Main entry point for the email system
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "next-vibe/identity/lead/enum";
+import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
+import { LeadTrackingRepository } from "next-vibe/identity/tracking/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
-import { LeadTrackingRepository } from "../../tracking/repository";
-import type { LeadWithEmailType } from "../../types";
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";
 import { campaignSchedulerService } from "./services/scheduler";

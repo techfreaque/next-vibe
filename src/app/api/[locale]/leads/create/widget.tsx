@@ -3,35 +3,33 @@
  */
 
 "use client";
-
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Tag } from "next-vibe-ui/ui/icons/Tag";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { cn } from "next-vibe/core/utils/utils";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Tag } from "next-vibe/ui/web/ui/icons/Tag";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { useCallback, useEffect } from "react";
 
-import { cn } from "@/app/api/[locale]/shared/utils";
-
-import { LeadStatus } from "../enum";
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -69,8 +67,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef =
-        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [navigate, createdLeadId]);
@@ -80,8 +77,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef =
-        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
       navigate(leadDef.default.PATCH, {
         urlPathParams: { id: createdLeadId },
         prefillFromGet: true,
@@ -110,8 +106,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef =
-        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [createdLeadId, navigate]);

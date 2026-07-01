@@ -11,8 +11,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "next-vibe/database";
 
 import type { ToolConfigItem } from "../chat/settings/definition";
 import { isUuid } from "../chat/slugify";

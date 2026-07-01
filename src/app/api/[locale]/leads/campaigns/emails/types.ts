@@ -3,17 +3,17 @@
  * Type definitions for the lead email system
  */
 
-import type { JSX } from "react";
-
-import type { CampaignTypeValue } from "@/app/api/[locale]/messenger/accounts/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { TrackingContext } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
-} from "../../enum";
-import type { LeadWithEmailType } from "../../types";
+} from "next-vibe/identity/lead/enum";
+import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
+import type { JSX } from "react";
+
+import type { CampaignTypeValue } from "@/app/api/[locale]/messenger/accounts/enum";
+
+import type { TrackingContext } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 
 /**
  * Email Template Data Interface

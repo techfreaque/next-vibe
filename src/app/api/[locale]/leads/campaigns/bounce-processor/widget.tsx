@@ -5,31 +5,35 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Span } from "next-vibe-ui/ui/span";
+import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React from "react";
-
-import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 
 import type definition from "./definition";
 

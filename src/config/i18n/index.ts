@@ -1,5 +1,5 @@
 // oxlint-disable oxlint-plugin-boilerplate/i18n-pattern -- root config i18n, not an endpoint translation scope
-import { createScopedTranslation } from "@/i18n/core/scoped-translation";
+import { createScopedTranslation } from "next-vibe/core/i18n/core/scoped-translation";
 
 import { translations as enTranslations } from "./en";
 

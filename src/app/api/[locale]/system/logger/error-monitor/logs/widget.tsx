@@ -5,20 +5,20 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
-import { Pre } from "next-vibe-ui/ui/pre";
-import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { ChevronUp } from "next-vibe/ui/web/ui/icons/ChevronUp";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
+import { Pre } from "next-vibe/ui/web/ui/pre";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -28,15 +28,14 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { DateFieldWidget } from "next-vibe/unified-ui/form-fields/date-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import React, { useCallback, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type endpoints from "./definition";
 import type { ErrorLogsResponseOutput } from "./definition";
@@ -279,7 +278,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
       setUpdatingFingerprint(fingerprint);
       try {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const endpointsDef = await import("./definition");
         await apiClient.mutate(
           endpointsDef.PATCH,

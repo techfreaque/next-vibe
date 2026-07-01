@@ -1,8 +1,9 @@
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
+
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
 import {

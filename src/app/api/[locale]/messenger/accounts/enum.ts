@@ -2,7 +2,7 @@
  * Unified Messenger Accounts Enums
  * Covers all channels: EMAIL (SMTP/API), SMS, WhatsApp, Telegram
  */
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
 import { scopedTranslation } from "./i18n";
 

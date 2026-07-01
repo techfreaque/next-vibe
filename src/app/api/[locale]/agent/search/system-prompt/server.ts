@@ -1,7 +1,8 @@
 import "server-only";
 
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
 import type { WebData } from "./prompt";

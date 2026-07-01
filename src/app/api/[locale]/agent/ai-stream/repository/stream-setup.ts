@@ -7,12 +7,17 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next-vibe-ui/lib/request";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import type { NextRequest } from "next-vibe/ui/web/lib/request";
 
 import { type ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
@@ -30,11 +35,6 @@ import {
   getBestVideoGenModel,
   type VideoGenModelSelection,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
   FOLDER_DENIED_TOOL_IDS,

@@ -3,22 +3,18 @@
  * Client+server safe. No server imports.
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  Methods,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
   rangeRequestField,
   resolutionRequestField,
   timeSeriesResponseField,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 
 import { LEADS_ENGAGEMENTS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

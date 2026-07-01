@@ -1,10 +1,13 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
-import { Div } from "next-vibe-ui/ui/div";
-import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
-import { ResizableContainer } from "next-vibe-ui/ui/resizable";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { useWindowSize } from "next-vibe/ui/web/hooks/use-window-size";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { ResizableContainer } from "next-vibe/ui/web/ui/resizable";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -12,10 +15,6 @@ import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/[rootFolder
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SidebarFooter } from "./footer/sidebar-footer";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";

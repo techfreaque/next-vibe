@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e94df8940d28e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 16:35:02 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782837300-vXXVVSTRWqsj669upqqA"
+  },
+  "body": {
+    "id": "gen-1782837300-vXXVVSTRWqsj669upqqA",
+    "object": "chat.completion",
+    "created": 1782837300,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The video is a high-definition, professional-quality close-up shot focused on a pair of brown-skinned hands manipulating a 3x3x3 Rubik’s Cube. The setting appears to be an indoor studio or workshop, as the foreground and background are densely packed with dozens of other Rubik’s Cubes, most of which are partially scrambled or solved, creating a vibrant, multicolored, and slightly chaotic aesthetic.\n\n**Visual Sequence and Action:**\n00:00 - The video begins with a close-up, chest-level shot of the hands holding the cube. The cube's front face displays a partially solved grid: a top row of white, a middle row of blue, and a bottom row of orange. The cube features a small black logo on the white-center square. The hands are actively rotating the layers of the cube with fluid, practiced movements. Throughout the duration, the person rotates the cube horizontally and vertically while manipulating the faces to align colors, exhibiting the dexterity of a puzzle enthusiast. The background is a sea of cubes, creating a shallow depth of field that keeps the focus entirely on the hands and the cube being played with.\n\n**Camera and Technique:**\n- **Shot Type:** Extreme close-up/Macro style.\n- **Lighting:** Warm, professional studio lighting with soft highlights on the plastic surfaces of the cubes, suggesting artificial balanced lighting rather than sunlight.\n- **Camera Movement:** The camera remains static, though there is a subtle, slight zoom or micro-adjustment in framing to track the cube as it moves in the hands.\n\n**Audio:**\n- **Music:** The video features a high-energy, fast-paced electronic track. It has a rhythmic, synth-driven quality, common in \"challenge\" or \"speed-run\" style online video content. The tempo is brisk and upbeat. \n- **Sound Effects:** There is no distinct dialogue. The primary audio is the crisp, mechanical, percussive \"clack-clack\" sound of the Rubik's Cube plastic layers clicking into place, which is amplified and mixed clearly against the music.\n\n**Style, Mood, and Production:**\n- **Style:** This is a social media-ready clip, likely from a platforms like TikTok, Instagram Reels, or YouTube Shorts. It has the polished aesthetic of a high-quality video content creator.\n- **Mood:** The mood is focused, rhythmic, and stimulating. It conveys a sense of skill and technical mastery. \n- **Production Quality:** High-end production; color grading is saturated, making the primary colors of the cubes (Red, Orange, Yellow, Green, Blue, White) pop against the dark background. \n\n**Text/UI Elements:**\n- There is no visible text, captions, or UI overlays present on the screen at any point.\n\n**Duration and Pacing:**\n- The video is a short loop or clip, roughly 5-6 seconds in duration. The pacing is fast and continuous, with the primary action (the spinning of the cube) occurring without interruption. The focus is entirely on the kinetic, repetitive motion of the hands.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgEMOdbHCQarSQ4HRmyCP2uGpiqCdSaQaJuLFBB4kJQBMj/kN7TgcZ8vPOFJOUbXEqOH",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 648,
+      "total_tokens": 1057,
+      "cost": 0.00107425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107425,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.000972
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

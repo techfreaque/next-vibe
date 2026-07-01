@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Span } from "next-vibe-ui/ui/span";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 
 /**

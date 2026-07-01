@@ -21,6 +21,16 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Platform } from "next-vibe/core/definition/platform";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserRoleDB } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import closePageEndpoints from "@/app/api/[locale]/browser/close-page/definition";
@@ -38,20 +48,10 @@ import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definiti
 import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
 import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -118,16 +118,14 @@ async function run<TDef extends CreateApiEndpointAny>(
   data: TDef["types"]["ResponseOutput"];
   error?: string;
 }> {
-  // sendTestRequest has a complex conditional intersection type that TS can't narrow for
-  // a generic TDef. We cast through the known parameter type to satisfy TypeScript.
-  type SendArgs = Parameters<typeof sendTestRequest<TDef>>[0];
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- conditional intersection can't be narrowed for generic TDef; cast is structurally safe
-  const sendArgs = {
+  // sendTestRequest uses a conditional intersection type that TypeScript cannot resolve for
+  // a generic TDef parameter. Calling with CreateApiEndpointAny resolves the conditional;
+  // the response type is cast back to TDef's response below.
+  const result = await sendTestRequest<CreateApiEndpointAny>({
     endpoint: definition,
-    data: input,
+    data: input as CreateApiEndpointAny["types"]["RequestOutput"],
     user,
-  } as unknown as SendArgs;
-  const result = await sendTestRequest(sendArgs);
+  });
   if (!result.success) {
     return {
       success: false,

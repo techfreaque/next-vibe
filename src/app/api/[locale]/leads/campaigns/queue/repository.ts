@@ -6,23 +6,22 @@
 import "server-only";
 
 import { and, asc, count, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   CampaignTypeFilter,
   mapCampaignTypeFilter,
 } from "../../../messenger/accounts/enum";
-import { emailCampaigns, leads } from "../../db";
-import { LeadStatus } from "../../enum";
 import type {
   CampaignQueueGetRequestOutput,
   CampaignQueueGetResponseOutput,

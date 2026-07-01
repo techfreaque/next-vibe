@@ -11,20 +11,19 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import Imap from "imap";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { messengerAccounts } from "../../accounts/db";
 import { CampaignType, MessageChannel } from "../../accounts/enum";

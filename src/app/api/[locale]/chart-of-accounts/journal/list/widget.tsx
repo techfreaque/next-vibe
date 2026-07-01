@@ -1,16 +1,16 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
-import { Span } from "next-vibe-ui/ui/span";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { BookOpen } from "next-vibe/ui/web/ui/icons/BookOpen";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useEffect, useRef } from "react";
 
 import type definition from "./definition";

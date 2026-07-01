@@ -8,24 +8,17 @@
  * - leads/stats (single-select variants, in filter panel)
  */
 
-import { z } from "zod";
-
-import {
-  objectOptionalField,
-  requestField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   FieldDataType,
   LayoutType,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   Countries,
   CountriesOptions,
   Languages,
   LanguagesOptions,
-} from "@/i18n/core/config";
-
+} from "next-vibe/core/i18n/core/config";
 import {
   EmailCampaignStageFilter,
   EmailCampaignStageFilterOptions,
@@ -37,8 +30,14 @@ import {
   LeadStatusFilterOptions,
   SortOrder,
   SortOrderOptions,
-} from "./enum";
-import { scopedTranslation } from "./i18n";
+} from "next-vibe/identity/lead/enum";
+import { scopedTranslation } from "next-vibe/identity/lead/i18n";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "next-vibe/core/i18n/core/config";
 
 /**
  * Core filter fields used in list and batch operations.

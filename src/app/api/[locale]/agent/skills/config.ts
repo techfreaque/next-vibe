@@ -7,16 +7,13 @@
  * DEFAULT_SKILLS and COMPANION_SKILLS are auto-generated - see generators/skills-index
  */
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-
-import {
-  COMPANION_SKILLS,
-  DEFAULT_SKILLS,
-} from "@/app/api/[locale]/system/generated/skills-index";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+
+import { COMPANION_SKILLS, DEFAULT_SKILLS } from "@/generated/skills-index";
 
 import type { ChatModelSelection } from "../ai-stream/models";
 import type {

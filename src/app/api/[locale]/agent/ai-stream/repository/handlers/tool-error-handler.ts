@@ -10,19 +10,16 @@
  */
 
 import type { JSONValue } from "ai";
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { getEndpoint } from "@/generated/endpoint";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { type ToolCall } from "../../../chat/db";

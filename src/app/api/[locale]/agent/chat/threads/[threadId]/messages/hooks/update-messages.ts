@@ -10,12 +10,12 @@
  * writes needed for those.
  */
 
-import { success } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 
 import { ChatMessageRole, ThreadStreamingState } from "../../../../enum";
 import messagesDefinition from "../definition";

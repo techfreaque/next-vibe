@@ -1,13 +1,12 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/core/utils/utils";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 
 import {
   useWidgetForm,
   useWidgetLocale,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { scopedTranslation } from "./i18n";
 import { calculatePasswordStrength } from "./calculate-password-strength";
 

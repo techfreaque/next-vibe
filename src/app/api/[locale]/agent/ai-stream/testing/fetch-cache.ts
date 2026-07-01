@@ -37,8 +37,8 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { defaultLocale } from "@/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
 
 import { createEndpointLogger } from "../../../system/logger/server";
 import type { EndpointLogger } from "../../../system/logger/types";

@@ -3,14 +3,15 @@
  * Handles retrying messages in both incognito and server modes
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";

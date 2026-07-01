@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Link } from "next-vibe-ui/ui/link";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Code } from "next-vibe/ui/web/ui/icons/Code";
+import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   BlockQuote,
   H1,
@@ -18,11 +22,9 @@ import {
   Lead,
   Muted,
   P,
-} from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
-import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   ENDPOINT_PLATFORMS,
   GITHUB_REPO_URL,
@@ -30,8 +32,6 @@ import {
 } from "@/config/constants";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { ContactFormSection } from "../_components/contact-form-section";
 import { scopedTranslation } from "./i18n";
@@ -265,8 +265,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<FrameworkPageData> {
   const { locale } = await params;
-  const { endpointsMeta } =
-    await import("@/app/api/[locale]/system/generated/endpoints-meta/en");
+  const { endpointsMeta } = await import("@/generated/endpoints-meta/en");
   const snippets = getCodeSnippets(locale);
   return {
     locale,

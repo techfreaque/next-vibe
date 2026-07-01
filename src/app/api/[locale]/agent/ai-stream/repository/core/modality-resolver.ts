@@ -4,6 +4,8 @@
  */
 import "server-only";
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
@@ -61,7 +63,6 @@ import {
   type VideoGenModelOption,
   type VideoGenModelSelection,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 /**
  * Fields read from an active skill variant for bridge model resolution.

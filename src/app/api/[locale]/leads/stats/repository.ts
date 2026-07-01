@@ -18,29 +18,26 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
-import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
+import type { ChartType } from "next-vibe/core/core-utils/stats-filtering.schema";
 import {
   getDateRangeFromPreset,
   TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import { emailCampaigns, leads } from "@/app/api/[locale]/leads/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/core/core-utils/stats-filtering.schema";
 import {
   convertCountryFilter,
   convertLanguageFilter,
   CountryFilter,
   LanguageFilter,
-} from "@/i18n/core/config";
-
+} from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
 import {
   ActivityType,
   EmailCampaignStageFilter,
@@ -50,7 +47,9 @@ import {
   mapCampaignStageFilter,
   mapSourceFilter,
   mapStatusFilter,
-} from "../enum";
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type {
   LeadsStatsGroupedByCampaignStage,
   LeadsStatsGroupedByConversionFunnel,

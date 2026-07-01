@@ -4,8 +4,9 @@
 
 import "server-only";
 
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";

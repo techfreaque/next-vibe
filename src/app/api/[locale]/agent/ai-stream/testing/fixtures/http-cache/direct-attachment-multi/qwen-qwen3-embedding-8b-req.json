@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The image was generated successfully. I need to end my reply with STEP_OK as instructed.</think> STEP_OK\n\nUser: [T9 report] An image was generated for you earlier in this conversation. Look at the generate_image tool result in your context and report the exact imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://' or 'http://', or FAILED: <reason> if no imageUrl was visible.\n\nAssistant: <think> The user wants me to report the exact imageUrl from the generate_image tool result in my context. Looking at the context, I can see the previous generate_image result from [T9 setup] (Context ID:986c9692):\n\n```\nimageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/2c828df7-53d3-4dec-a8c1-319263e74962/15a4ed37-d6cf-46de-9d96-10a9680e1eca.png\n```\n\nThis is a non-empty URL starting with 'http://'. The user wants me to report the exact imageUrl and end with STEP_OK if it starts with https:// or http://.</think> The exact imageUrl from the generate_image result is:\n\n`http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/2c828df7-53d3-4dec-a8c1-319263e74962/15a4ed37-d6cf-46de-9d96-10a9680e1eca.png`\n\nSTEP_OK\n\nUser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.\n\nAssistant: <think> The user has attached an image to their message. I can see it's a solid red circle on a white background. The image appears to be embedded in the message with markdown. I need to describe it briefly and end with STEP_OK.\n\nThe image shows: a large, perfectly round, solid bright red circle centered on a plain white background. The circle has smooth edges and uniform color.</think> The attached image shows a large, solid bright red circle centered on a plain white background. The circle has smooth, even edges and uniform color.\n\nSTEP_OK\n\nUser: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

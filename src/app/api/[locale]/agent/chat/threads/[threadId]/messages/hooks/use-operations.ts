@@ -4,13 +4,15 @@
  * Located in threads/[threadId]/messages/ folder as per architectural standards
  */
 
-import { parseError } from "next-vibe/shared/utils";
-import { toast } from "next-vibe-ui/hooks/use-toast";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { toast } from "next-vibe/ui/web/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useCallback, useMemo, useRef } from "react";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -21,8 +23,6 @@ import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";

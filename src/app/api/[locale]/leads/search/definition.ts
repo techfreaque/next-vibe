@@ -3,10 +3,25 @@
  * Defines the endpoint for searching leads with pagination and filtering
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import {
+  EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
+  LeadStatusDB,
+  LeadStatusOptions,
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -14,25 +29,9 @@ import {
   requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, Languages } from "@/i18n/core/config";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { dateSchema } from "../../shared/types/common.schema";
-import {
-  EmailCampaignStage,
-  LeadSource,
-  LeadStatus,
-  LeadStatusDB,
-  LeadStatusOptions,
-} from "../enum";
 import { LEADS_SEARCH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

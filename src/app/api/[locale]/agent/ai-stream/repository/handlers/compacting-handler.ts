@@ -6,16 +6,13 @@
 import "server-only";
 
 import { streamText } from "ai";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";

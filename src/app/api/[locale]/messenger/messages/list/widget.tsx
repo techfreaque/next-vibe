@@ -3,24 +3,24 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Send } from "next-vibe-ui/ui/icons/Send";
-import { ListItem } from "next-vibe-ui/ui/list-item";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
-import { Span } from "next-vibe-ui/ui/span";
-import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { MessageCircle } from "next-vibe/ui/web/ui/icons/MessageCircle";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { Send } from "next-vibe/ui/web/ui/icons/Send";
+import { ListItem } from "next-vibe/ui/web/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -29,13 +29,12 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import React, { useCallback, useMemo } from "react";
 
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {
@@ -179,7 +178,7 @@ export function EmailsListContainer({
   const handleGraphs = useCallback((): void => {
     void (async (): Promise<void> => {
       const graphsDef =
-        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+        await import("next-vibe/core/utils/dataflow/graphs/definition");
       navigate(graphsDef.default.GET, {
         data: { search: "messenger" },
       });

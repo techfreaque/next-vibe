@@ -9,6 +9,7 @@
  * sync-provider reuses it.
  */
 
+import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { z } from "zod";
 
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -22,7 +23,6 @@ import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-gen
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 
 import {
   SkillCategory,

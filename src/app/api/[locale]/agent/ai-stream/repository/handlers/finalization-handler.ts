@@ -2,7 +2,7 @@
  * FinalizationHandler - Finalizes ASSISTANT messages at stream end
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { MessageDbWriter } from "../core/message-db-writer";
 

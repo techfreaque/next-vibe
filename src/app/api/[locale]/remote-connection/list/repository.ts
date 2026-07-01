@@ -8,13 +8,12 @@ import { and, eq } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";

@@ -6,12 +6,12 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
 
 import type { BridgeSkill } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { isUuid, parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
 import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import { db } from "@/app/api/[locale]/system/db";
 
 /**
  * Resolve a BridgeSkill from a raw skillId (supports "slug__variantId" format).

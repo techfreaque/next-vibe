@@ -7,40 +7,34 @@
 import "server-only";
 
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { Environment } from "next-vibe/shared/utils/env-util";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import {
-  cronTasks,
-  type NewCronTask,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { CountryLanguageValues } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/language-utils";
-
-import { scopedTranslation as smtpScopedTranslation } from "../../../messenger/providers/email/smtp-client/i18n";
-import { SmtpRepository } from "../../../messenger/providers/email/smtp-client/repository";
-import { leads } from "../../db";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { Environment } from "next-vibe/env/env-util";
+import { leads } from "next-vibe/identity/lead/db";
 import {
   EmailCampaignStage,
   isStatusTransitionAllowed,
   LeadStatus,
-} from "../../enum";
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
+import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
+import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
+
+import { env } from "@/config/env";
+
+import { scopedTranslation as smtpScopedTranslation } from "../../../messenger/providers/email/smtp-client/i18n";
+import { SmtpRepository } from "../../../messenger/providers/email/smtp-client/repository";
 import { type CampaignStarterConfig, campaignStarterConfigs } from "./db";
 import type {
   CampaignStarterConfigGetResponseOutput,

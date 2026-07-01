@@ -7,18 +7,18 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { eq } from "drizzle-orm";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   createFileResponse,
   ErrorResponseTypes,
   fail,
   type HandlerResponse,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";

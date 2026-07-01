@@ -4,14 +4,10 @@
  * Non-CLI platforms resolve the instance ID in the repository.
  */
 
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import { Platform } from "next-vibe/core/definition/platform";
+import { requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { requestField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  FieldDataType,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import { scopedTranslation } from "../i18n";
 

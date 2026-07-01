@@ -1,11 +1,10 @@
 "use client";
 
-import { Dialog } from "next-vibe-ui/ui/dialog";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { Dialog } from "next-vibe/ui/web/ui/dialog";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
-
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useCortexModalStore } from "./store";
 

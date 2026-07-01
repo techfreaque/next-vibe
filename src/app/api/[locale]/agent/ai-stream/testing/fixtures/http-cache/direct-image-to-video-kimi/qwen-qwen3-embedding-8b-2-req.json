@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11b follow-up] You may or may not have generated an image previously. Say STEP_OK and continue the conversation.\n\nAssistant: STEP_OK\n\nUser: [T11c i2v-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: [tool:execute-tool] {\"input\":{\"prompt\":\"professional portrait, smooth camera pull-back\",\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\"},\"toolName\":\"generate_video\",\"callbackMode\":\"wa\n\nTool: [result:execute-tool] {\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8746021f-ad19-4bc3-9773-2caab27f8048/0fbc60a3-92e5-47b5-aae6-dd22cc15a4f1.mp4\",\"text\":null,\"mediaType\":null,\"creditCost\":124.8}\n\nUser: [T11d i2v-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_video\",\"input\":{\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\",\"prompt\":\"professional portrait, smooth camera pull-back\"},\"callbackMode\":\"wa\n\nTool: [result:execute-tool] {\"result\":{\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8746021f-ad19-4bc3-9773-2caab27f8048/eceec902-762d-49fd-9b7f-d6b1c1f382a7.mp4\",\"creditCost\":124.8,\"durationSeconds\":4}}",
+    "encoding_format": "float"
+  }
+}

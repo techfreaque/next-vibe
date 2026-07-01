@@ -3,20 +3,19 @@
  * Serves uploaded files from filesystem storage
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestUrlPathParamsField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestUrlPathParamsField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { THREAD_FILES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

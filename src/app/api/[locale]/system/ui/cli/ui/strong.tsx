@@ -1,0 +1,22 @@
+import { Text } from "ink";
+import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
+import type { StrongProps } from "next-vibe/ui/web/ui/strong";
+import * as React from "react";
+
+export function Strong({
+  className,
+  children,
+}: StrongProps): React.JSX.Element | null {
+  const { text, hidden } = parseClassesToInkProps(className);
+
+  if (hidden) {
+    return null;
+  }
+
+  // Strong always renders bold; merge any className-derived text props on top
+  return (
+    <Text bold {...text}>
+      {children}
+    </Text>
+  );
+}

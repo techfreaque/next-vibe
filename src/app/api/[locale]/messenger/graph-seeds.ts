@@ -7,16 +7,17 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
+import type {
+  GraphConfig,
+  GraphSeedEntry,
+} from "next-vibe/core/utils/dataflow/graph/types";
+import { COMPLETE_TASK_ALIAS } from "next-vibe/tasks/complete-task/constants";
+
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import type {
-  GraphConfig,
-  GraphSeedEntry,
-} from "../system/unified-interface/vibe-sense/graph/types";
 import { MESSENGER_BOUNCED_ALIAS } from "./data-sources/messenger-bounced/constants";
 import { MESSENGER_CLICKED_ALIAS } from "./data-sources/messenger-clicked/constants";
 import { MESSENGER_DELIVERED_ALIAS } from "./data-sources/messenger-delivered/constants";

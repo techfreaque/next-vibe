@@ -3,28 +3,14 @@
  * Handles batch updates for leads based on filter criteria
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseArrayOptionalField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
-import { UserRole } from "../../user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
 import {
   BatchOperationScope,
   BatchOperationScopeOptions,
@@ -35,7 +21,20 @@ import {
   LeadStatus,
   LeadStatusFilter,
   LeadStatusOptions,
-} from "../enum";
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  backButton,
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseArrayOptionalField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import { leadsBatchFilterFields } from "../shared-filter-fields";
 import { scopedTranslation } from "./i18n";
 

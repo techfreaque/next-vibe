@@ -4,27 +4,26 @@
  * POST - create a new address
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { UserRole } from "../../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const UserAddressesContainer = lazyWidget(() =>

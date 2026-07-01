@@ -7,14 +7,14 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import {

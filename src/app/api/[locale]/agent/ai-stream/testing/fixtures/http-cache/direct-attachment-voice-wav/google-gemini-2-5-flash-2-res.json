@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e963c0a4ad28e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 16:35:56 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782837355-V3VxnyYpwQ55VnGmScEM"
+  },
+  "body": {
+    "id": "gen-1782837355-V3VxnyYpwQ55VnGmScEM",
+    "object": "chat.completion",
+    "created": 1782837355,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip of hip-hop music, approximately 20 seconds in duration. The sound quality is good, suggesting a studio recording. The tempo is medium, estimated at 100-110 BPM.\n\nThe primary instruments are:\n- **Synth bass:** A pulsating synth bass line provides a deep, rhythmic foundation.\n- **Drums:** A drum machine creates a steady, hip-hop beat featuring a prominent snare on the off-beats and a slightly delayed hi-hat pattern.\n- **Electric piano/synth:** A bright electric piano or synth plays a simple, catchy melody in the higher register.\n\nThe music maintains a consistent, slightly repetitive groove throughout the clip. There are no vocals or notable sound effects.\nThe mood is relaxed and upbeat.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 162,
+      "total_tokens": 1234,
+      "cost": 0.0012516,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012516,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

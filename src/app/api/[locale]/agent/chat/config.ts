@@ -3,7 +3,16 @@
  * Default folder definitions and utilities
  */
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import {
+  type CallbackModeValue,
+  EXECUTE_TOOL_ALIAS,
+} from "next-vibe/execute-tool/constants";
+import {
+  type UserPermissionRoleValue,
+  UserRole,
+} from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import {
@@ -18,15 +27,6 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "@/app/api/[locale]/agent/cortex/constants";
-import {
-  type CallbackModeValue,
-  EXECUTE_TOOL_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import {
-  type UserPermissionRoleValue,
-  UserRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
  * Default folder IDs

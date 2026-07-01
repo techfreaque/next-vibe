@@ -4,31 +4,30 @@
  * PATCH endpoint to resolve/reopen an error log by fingerprint
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import { ERROR_LOGS_ALIAS } from "./constants";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   ErrorLogStatusFilter,
   ErrorLogStatusFilterDB,
   ErrorLogStatusFilterOptions,
-} from "./enum";
-import { scopedTranslation } from "./i18n";
+} from "next-vibe/logger/error-monitor/logs/enum";
+import { scopedTranslation } from "next-vibe/logger/error-monitor/logs/i18n";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { ERROR_LOGS_ALIAS } from "./constants";
 
 const ErrorLogsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ErrorLogsContainer })),

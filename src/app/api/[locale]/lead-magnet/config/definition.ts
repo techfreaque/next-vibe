@@ -5,22 +5,21 @@
  * POST (save) is handled per-provider under providers/<name>/
  */
 
-import { lazy } from "react";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  customWidgetObject,
+  objectField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
 import { LeadMagnetProviderDB } from "../enum";
 import { scopedTranslation } from "./i18n";

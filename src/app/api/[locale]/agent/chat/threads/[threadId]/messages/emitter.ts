@@ -1,9 +1,12 @@
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import {
+  type ChannelBinding,
+  createEndpointEmitter,
+} from "next-vibe/realtime/emitter";
+import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 
 import { DefaultFolderId } from "../../../config";
 import messagesDefinitions from "./definition";

@@ -4,17 +4,16 @@
  */
 
 import { and, eq } from "drizzle-orm";
-
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { LoggerMetadata } from "@/app/api/[locale]/system/logger/types";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { LoggerMetadata } from "next-vibe/logger/types";
 
 import { stockLevels, stockMovements, warehouses } from "../db";
 import type { StockMovementTypeDB } from "../enum";

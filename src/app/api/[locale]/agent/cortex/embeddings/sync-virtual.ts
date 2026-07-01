@@ -6,7 +6,7 @@ import "server-only";
  * so it gets an embedding and becomes searchable via vector search.
  * Uses content hashing to skip redundant embedding API calls.
  */
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "next-vibe/database";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";

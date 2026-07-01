@@ -1,0 +1,109 @@
+/**
+ * Status Indicator Widget - Platform-agnostic React implementation
+ * Displays status with colored indicators
+ */
+
+"use client";
+
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import type { ReactRequestResponseWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
+import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import type {
+  StatusIndicatorWidgetConfig,
+  StatusIndicatorWidgetSchema,
+} from "next-vibe/unified-ui/display-only/status-indicator/types";
+import type { JSX } from "react";
+
+/**
+ * Maps status to Badge variant
+ */
+function mapStatusToBadgeVariant(
+  status: "success" | "warning" | "error" | "info" | "pending",
+): "default" | "secondary" | "destructive" | "outline" | "notification" {
+  switch (status) {
+    case "success":
+      return "default";
+    case "warning":
+      return "notification";
+    case "error":
+      return "destructive";
+    case "info":
+      return "secondary";
+    case "pending":
+      return "outline";
+    default:
+      return "default";
+  }
+}
+
+/**
+ * Status Indicator Widget
+ *
+ * Displays a status badge with semantic color coding.
+ *
+ * UI Config Options:
+ * - status: "success" | "warning" | "error" | "info" | "pending"
+ * - label: Optional translation key for status text
+ *
+ * Status Variants:
+ * - success → green badge
+ * - warning → yellow/orange badge
+ * - error → red badge
+ * - info → blue/gray badge
+ * - pending → outlined badge
+ */
+export function StatusIndicatorWidget<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
+  TSchema extends StatusIndicatorWidgetSchema,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive",
+>({
+  field,
+  fieldName,
+}: ReactRequestResponseWidgetProps<
+  TEndpoint,
+  TUsage,
+  StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+>): JSX.Element {
+  const t = useWidgetTranslation<TEndpoint>();
+  const form = useWidgetForm();
+  const { status, label, className, usage } = field;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
+
+  const badgeVariant = mapStatusToBadgeVariant(status);
+
+  // Use label if provided, otherwise use the value itself
+  const displayText = label
+    ? t(label)
+    : typeof value === "string"
+      ? value
+      : status;
+
+  return (
+    <Badge variant={badgeVariant} className={className}>
+      {displayText}
+    </Badge>
+  );
+}
+
+StatusIndicatorWidget.displayName = "StatusIndicatorWidget";
+
+export default StatusIndicatorWidget;

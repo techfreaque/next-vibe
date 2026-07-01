@@ -1,0 +1,630 @@
+// This project uses code from shadcn/ui.
+// The code is licensed under the MIT License.
+// https://github.com/shadcn-ui/ui
+
+import { cn } from "next-vibe/core/utils/utils";
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetOpenTrigger,
+  BottomSheetView,
+} from "next-vibe/ui/native/ui/bottom-sheet";
+import { Calendar as CalendarIcon } from "next-vibe/ui/native/ui/icons/Calendar";
+import { X } from "next-vibe/ui/native/ui/icons/X";
+import {
+  type Option,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/native/ui/select";
+import { styledNative } from "next-vibe/ui/native/utils/style-converter";
+// Import ALL form types from web - ZERO definitions here
+import type {
+  FormComboboxProps,
+  FormDatePickerProps,
+  FormDescriptionProps,
+  FormFieldContextValue,
+  FormItemContextValue,
+  FormItemProps,
+  FormMessageProps,
+  UseFormFieldReturn,
+} from "next-vibe/ui/web/ui/form/form";
+import type { LabelRootProps } from "next-vibe/ui/web/ui/label";
+import type { JSX } from "react";
+import * as React from "react";
+import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
+import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import { Pressable, View } from "react-native";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
+
+import { Button } from "./button";
+import { Calendar } from "./calendar";
+import { Checkbox } from "./checkbox";
+import { Input } from "./input";
+import { Label } from "./label";
+import { RadioGroup } from "./radio-group";
+import { Span } from "./span";
+import { Switch } from "./switch";
+import { Textarea } from "./textarea";
+
+const StyledPressable = styledNative(Pressable);
+const StyledView = styledNative(View);
+const StyledAnimatedText = styledNative(Animated.Text);
+
+const Form = FormProvider;
+
+const FormFieldContext = React.createContext<
+  FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
+>(undefined);
+
+const FormField = <
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({
+  ...props
+}: ControllerProps<TFieldValues, TName>): JSX.Element => {
+  return (
+    <FormFieldContext.Provider value={{ name: props.name }}>
+      <Controller {...props} />
+    </FormFieldContext.Provider>
+  );
+};
+
+const useFormField = (): UseFormFieldReturn => {
+  const fieldContext = React.useContext(FormFieldContext);
+  const itemContext = React.useContext(FormItemContext);
+  const { getFieldState, formState } = useFormContext();
+
+  if (!fieldContext) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    throw new Error("useFormField should be used within <FormField>");
+  }
+
+  if (!itemContext) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    throw new Error("useFormField should be used within <FormItem>");
+  }
+
+  const fieldState = getFieldState(fieldContext.name, formState);
+
+  const { id } = itemContext;
+
+  return {
+    id,
+    name: fieldContext.name,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
+    ...fieldState,
+  };
+};
+
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(
+  undefined,
+);
+
+function FormItem({ className, children }: FormItemProps): JSX.Element {
+  const id = React.useId();
+  const viewClassName = cn("space-y-1", className);
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <StyledView className={viewClassName}>{children}</StyledView>
+    </FormItemContext.Provider>
+  );
+}
+FormItem.displayName = "FormItem";
+
+function FormLabel({
+  className,
+  children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  htmlFor, // Intentionally extracted - not used in React Native
+}: LabelRootProps): JSX.Element {
+  const { error, formItemId } = useFormField();
+  const labelClassName = cn("px-px", error && "text-destructive", className);
+
+  return (
+    <Label htmlFor={formItemId} className={labelClassName}>
+      {children}
+    </Label>
+  );
+}
+FormLabel.displayName = "FormLabel";
+
+function FormDescription({
+  children,
+  className,
+}: Pick<FormDescriptionProps, "children" | "className">): JSX.Element {
+  const { formDescriptionId } = useFormField();
+
+  return (
+    <Span
+      id={formDescriptionId}
+      className={className ?? "text-sm text-muted-foreground pt-1"}
+    >
+      {children}
+    </Span>
+  );
+}
+FormDescription.displayName = "FormDescription";
+
+function FormMessage({
+  children,
+  t,
+}: Pick<FormMessageProps, "children" | "t">): JSX.Element | null {
+  const { error, formMessageId } = useFormField();
+  const body = error ? String(error?.message) : children;
+
+  if (!body) {
+    return null;
+  }
+
+  return (
+    <StyledAnimatedText
+      entering={FadeInDown}
+      exiting={FadeOut.duration(275)}
+      nativeID={formMessageId}
+      className="text-sm font-medium text-destructive"
+    >
+      {t(String(body))}
+    </StyledAnimatedText>
+  );
+}
+FormMessage.displayName = "FormMessage";
+
+function FormInput({
+  label,
+  description,
+  onChange,
+  style,
+  className,
+  value,
+  defaultValue,
+  placeholder,
+  disabled,
+  type,
+  id,
+  t,
+}: Omit<React.ComponentPropsWithoutRef<typeof Input>, "onChangeText"> & {
+  label?: string;
+  description?: string;
+  onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  return (
+    <FormItem>
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+
+      <Input
+        aria-labelledby={formItemId}
+        aria-describedby={
+          error
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
+        }
+        aria-invalid={!!error}
+        onChangeText={onChange}
+        {...(className ? { className } : style ? { style } : {})}
+        value={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        type={type}
+        id={id}
+      />
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormInput.displayName = "FormInput";
+
+function FormTextarea({
+  label,
+  description,
+  onChange,
+  style,
+  className,
+  value,
+  defaultValue,
+  placeholder,
+  disabled,
+  readOnly,
+  variant,
+  rows,
+  minRows,
+  maxLength,
+  t,
+}: Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "onChangeText"> & {
+  label?: string;
+  description?: string;
+  onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  return (
+    <FormItem>
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+
+      <Textarea
+        aria-labelledby={formItemId}
+        aria-describedby={
+          error
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
+        }
+        aria-invalid={!!error}
+        onChangeText={onChange}
+        {...(className ? { className } : style ? { style } : {})}
+        value={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        readOnly={readOnly}
+        variant={variant}
+        rows={rows}
+        minRows={minRows}
+        maxLength={maxLength}
+      />
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormTextarea.displayName = "FormTextarea";
+
+function FormCheckbox({
+  label,
+  description,
+  value,
+  onChange,
+  style,
+  className,
+  disabled,
+  t,
+}: Omit<
+  React.ComponentPropsWithoutRef<typeof Checkbox>,
+  "checked" | "onCheckedChange"
+> & {
+  label?: string;
+  description?: string;
+  value?: boolean;
+  onChange?: (value: boolean) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  const formItemClassName = "px-1";
+  const viewClassName = "flex-row gap-3 items-center";
+
+  return (
+    <FormItem className={formItemClassName}>
+      <StyledView className={viewClassName}>
+        <Checkbox
+          aria-labelledby={formItemId}
+          aria-describedby={
+            error
+              ? `${formDescriptionId} ${formMessageId}`
+              : `${formDescriptionId}`
+          }
+          aria-invalid={!!error}
+          onCheckedChange={onChange}
+          checked={value}
+          {...(className ? { className } : style ? { style } : {})}
+          disabled={disabled}
+        />
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+      </StyledView>
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormCheckbox.displayName = "FormCheckbox";
+
+function FormDatePicker({
+  label,
+  description,
+  value,
+  onChange,
+  t,
+}: FormDatePickerProps & { t: FormMessageProps["t"] }): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  const buttonClassName = "flex-row gap-3 justify-start px-3 relative";
+  const clearButtonClassName = "absolute right-0 active:opacity-70 pr-3";
+  const bottomSheetViewClassName = "pt-2";
+
+  return (
+    <FormItem>
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+      <BottomSheet>
+        <BottomSheetOpenTrigger asChild>
+          <Button
+            variant="outline"
+            className={buttonClassName}
+            aria-labelledby={formItemId}
+            aria-describedby={
+              error
+                ? `${formDescriptionId} ${formMessageId}`
+                : `${formDescriptionId}`
+            }
+            aria-invalid={!!error}
+          >
+            <CalendarIcon size={18} />
+            <Span className="flex-1 text-left">
+              {value ? new Date(value).toLocaleDateString() : "Pick a date"}
+            </Span>
+            {!!value && (
+              <StyledPressable
+                className={clearButtonClassName}
+                onPress={(): void => {
+                  onChange?.("");
+                }}
+              >
+                <X size={18} />
+              </StyledPressable>
+            )}
+          </Button>
+        </BottomSheetOpenTrigger>
+        <BottomSheetContent>
+          <BottomSheetView className={bottomSheetViewClassName}>
+            <Calendar
+              selected={value ? new Date(value) : undefined}
+              onSelect={(date): void => {
+                onChange?.(date?.toISOString().split("T")[0] ?? "");
+              }}
+            />
+          </BottomSheetView>
+        </BottomSheetContent>
+      </BottomSheet>
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormDatePicker.displayName = "FormDatePicker";
+
+function FormRadioGroup({
+  label,
+  description,
+  value,
+  onChange,
+  style,
+  className,
+  disabled,
+  defaultValue,
+  children,
+  t,
+}: Omit<
+  React.ComponentPropsWithoutRef<typeof RadioGroup>,
+  "onValueChange" | "value"
+> & {
+  label?: string;
+  description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  return (
+    <FormItem className="gap-3">
+      <View>
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+        {!!description && <FormDescription>{description}</FormDescription>}
+      </View>
+      <RadioGroup
+        aria-labelledby={formItemId}
+        aria-describedby={
+          error
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
+        }
+        aria-invalid={!!error}
+        onValueChange={onChange}
+        value={value}
+        {...(className ? { className } : style ? { style } : {})}
+        disabled={disabled}
+        defaultValue={defaultValue}
+      >
+        {children}
+      </RadioGroup>
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormRadioGroup.displayName = "FormRadioGroup";
+
+function FormCombobox({
+  label,
+  description,
+  value,
+  onChange,
+  options = [],
+}: FormComboboxProps): JSX.Element {
+  const { formItemId } = useFormField();
+
+  return (
+    <FormItem>
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+      <Select
+        value={value?.value}
+        onValueChange={(val) => onChange?.({ label: val, value: val })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select an option" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option): JSX.Element | null => {
+            if (!option) {
+              return null;
+            }
+            return (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                label={option.label}
+              >
+                {option.label}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+      {!!description && <FormDescription>{description}</FormDescription>}
+    </FormItem>
+  );
+}
+
+FormCombobox.displayName = "FormCombobox";
+
+/**
+ * @prop {children}
+ * @example
+ *  <SelectTrigger className='w-[250px]'>
+      <SelectValue
+        className='text-foreground text-sm text-lg'
+        placeholder='Select a fruit'
+      />
+    </SelectTrigger>
+    <SelectContent insets={contentInsets} className='w-[250px]'>
+      <SelectGroup>
+        <SelectLabel>Fruits</SelectLabel>
+        <SelectItem label='Apple' value='apple'>
+          Apple
+        </SelectItem>
+      </SelectGroup>
+    </SelectContent>
+ */
+function FormSelect({
+  label,
+  description,
+  onChange,
+  value,
+  t,
+  ...props
+}: Omit<
+  React.ComponentPropsWithoutRef<typeof Select>,
+  "open" | "onOpenChange" | "onValueChange" | "value"
+> & {
+  label?: string;
+  description?: string;
+  value?: Partial<Option>;
+  onChange: (value: { label: string; value: string }) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  return (
+    <FormItem>
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+      <Select
+        aria-labelledby={formItemId}
+        aria-describedby={
+          error
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
+        }
+        aria-invalid={!!error}
+        value={value?.value}
+        onValueChange={(val) => onChange({ label: val, value: val })}
+        {...props}
+      />
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormSelect.displayName = "FormSelect";
+
+function FormSwitch({
+  label,
+  description,
+  value,
+  onChange,
+  style,
+  className,
+  disabled,
+  defaultChecked,
+  id,
+  t,
+}: Omit<
+  React.ComponentPropsWithoutRef<typeof Switch>,
+  "checked" | "onCheckedChange"
+> & {
+  label?: string;
+  description?: string;
+  value?: boolean;
+  onChange?: (value: boolean) => void;
+  t: FormMessageProps["t"];
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
+
+  const formItemClassName = "px-1";
+  const viewClassName = "flex-row gap-3 items-center";
+
+  return (
+    <FormItem className={formItemClassName}>
+      <StyledView className={viewClassName}>
+        <Switch
+          aria-labelledby={formItemId}
+          aria-describedby={
+            error
+              ? `${formDescriptionId} ${formMessageId}`
+              : `${formDescriptionId}`
+          }
+          aria-invalid={!!error}
+          onCheckedChange={onChange}
+          checked={value}
+          {...(className ? { className } : style ? { style } : {})}
+          disabled={disabled}
+          defaultChecked={defaultChecked}
+          id={id}
+        />
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
+      </StyledView>
+      {!!description && <FormDescription>{description}</FormDescription>}
+      <FormMessage t={t} />
+    </FormItem>
+  );
+}
+
+FormSwitch.displayName = "FormSwitch";
+
+export {
+  Form,
+  FormCheckbox,
+  // FormCombobox, // TODO: Implement Combobox component
+  // FormDatePicker, // TODO: Implement Calendar and BottomSheet components
+  FormDescription,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormRadioGroup,
+  FormSelect,
+  FormSwitch,
+  FormTextarea,
+  useFormField,
+};

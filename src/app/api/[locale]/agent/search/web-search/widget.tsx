@@ -9,31 +9,31 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Star } from "next-vibe-ui/ui/icons/Star";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
+import { Star } from "next-vibe/ui/web/ui/icons/Star";
+import { ExternalLink } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { MarkdownWidget } from "next-vibe-ui/unified/display-only/markdown/widget";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SearchBarWidget } from "next-vibe-ui/unified/interactive/search-bar/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { MarkdownWidget } from "next-vibe/unified-ui/display-only/markdown/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SearchBarWidget } from "next-vibe/unified-ui/interactive/search-bar/widget";
 import type { JSX } from "react";
 
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";

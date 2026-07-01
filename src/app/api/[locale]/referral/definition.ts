@@ -6,27 +6,26 @@
  * in the global translation system before this endpoint can be fully functional.
  */
 
-import { z } from "zod";
-
-import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-  submitButton,
-  widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
+import { success } from "next-vibe/core/route/response.schema";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { success } from "../shared/types/response.schema";
-import { UserRole } from "../user/user-roles/enum";
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import { scopedTranslation } from "./i18n";
 
@@ -52,7 +51,7 @@ export const { POST } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const codesListDefinition = await import("./codes/list/definition");
 
         // Get the new code from request

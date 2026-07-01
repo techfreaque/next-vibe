@@ -3,51 +3,52 @@
  */
 
 "use client";
-
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
-import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Star } from "next-vibe-ui/ui/icons/Star";
-import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
-import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Input } from "next-vibe-ui/ui/input";
-import { Link } from "next-vibe-ui/ui/link";
+import { isCliPlatform } from "next-vibe/core/definition/platform";
+import { cn } from "next-vibe/core/utils/utils";
+import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
+import { Maximize } from "next-vibe/ui/web/ui/icons/Maximize";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Star } from "next-vibe/ui/web/ui/icons/Star";
+import { ThumbsUp } from "next-vibe/ui/web/ui/icons/ThumbsUp";
+import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Link } from "next-vibe/ui/web/ui/link";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+} from "next-vibe/ui/web/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+} from "next-vibe/ui/web/ui/tooltip";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -55,22 +56,20 @@ import {
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
-import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
-import { SeparatorWidget } from "next-vibe-ui/unified/display-only/separator/widget";
-import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
+import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
+import { SeparatorWidget } from "next-vibe/unified-ui/display-only/separator/widget";
+import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
-import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
-import { cn } from "../../shared/utils";
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
@@ -1797,7 +1796,7 @@ export function EditFavBeforeAddButton({
 
     try {
       const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        await import("next-vibe/platforms/react/hooks/store");
       const skillSingleDefinitions = await import("./[id]/definition");
       const createFavoriteDefinitions =
         await import("./favorites/create/definition");
@@ -2012,7 +2011,7 @@ export function SkillFavoriteActions({
       const { ChatSettingsRepositoryClient } =
         await import("../chat/settings/repository-client");
       const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        await import("next-vibe/platforms/react/hooks/store");
       const favoritesDefinition = await import("./favorites/[id]/definition");
 
       // Fetch the favorite to get its data
@@ -2073,7 +2072,7 @@ export function SkillFavoriteActions({
       const { ChatSettingsRepositoryClient } =
         await import("../chat/settings/repository-client");
       const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        await import("next-vibe/platforms/react/hooks/store");
       const favoritesDefinition = await import("./favorites/[id]/definition");
 
       // Fetch the favorite to get its data

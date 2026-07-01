@@ -10,30 +10,33 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { Div } from "next-vibe-ui/ui/div";
+} from "next-vibe/ui/web/ui/card";
+import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe-ui/ui/form/form";
-import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
-import { Gift } from "next-vibe-ui/ui/icons/Gift";
-import { Heart } from "next-vibe-ui/ui/icons/Heart";
-import { Label } from "next-vibe-ui/ui/label";
-import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/form/form";
+import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
+import { Gift } from "next-vibe/ui/web/ui/icons/Gift";
+import { Heart } from "next-vibe/ui/web/ui/icons/Heart";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import skillSingleDefinition from "@/app/api/[locale]/agent/skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/app/api/[locale]/referral/lead/current/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -41,15 +44,15 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
-import { LinkWidget } from "next-vibe-ui/unified/display-only/link/widget";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
+import { LinkWidget } from "next-vibe/unified-ui/display-only/link/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
 import type definition from "../definition";
 
@@ -74,6 +77,7 @@ export function SignupFormContainer({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
   const data = useWidgetValue<typeof definition.POST>();
 
   const referralEndpoint = useEndpoint(
@@ -118,30 +122,37 @@ export function SignupFormContainer({
   const displayLabel = prefillLabel ?? prefillCode;
 
   // UUID skills from localStorage for creator-support selector
-  const [uuidSkills, setUuidSkills] = useState(() =>
-    ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution(),
-  );
+  const [uuidSkills, setUuidSkills] = useState<
+    Array<{ skillId: string; name: string | null }>
+  >([]);
   const hasUuidSkills = uuidSkills.length > 0;
 
-  // Async-resolve names for UUID skills that don't have one yet
+  // Load UUID skills on mount, then async-resolve names for any missing ones
   useEffect(() => {
-    const missing = uuidSkills.filter((s) => !s.name);
-    if (missing.length === 0) {
-      return;
-    }
     void (async () => {
+      const initial =
+        await ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution();
+      setUuidSkills(initial);
+
+      const missing = initial.filter((s) => !s.name);
+      if (missing.length === 0) {
+        return;
+      }
       const resolved = await Promise.allSettled(
         missing.map(async (s) => {
-          const res = await fetch(
-            `/api/${locale}/agent/chat/skills/${s.skillId}`,
-          );
-          if (!res.ok) {
+          const response = await executeQuery({
+            endpoint: skillSingleDefinition.GET,
+            logger,
+            user,
+            locale,
+            availability,
+            requestData: undefined,
+            pathParams: { id: s.skillId },
+          });
+          if (!response.success) {
             return s;
           }
-          const json = (await res.json()) as {
-            data?: { name?: string | null };
-          };
-          return { skillId: s.skillId, name: json.data?.name ?? null };
+          return { skillId: s.skillId, name: response.data.name ?? null };
         }),
       );
       const updates = new Map<string, string | null>();

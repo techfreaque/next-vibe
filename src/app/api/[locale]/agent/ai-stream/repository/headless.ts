@@ -8,21 +8,18 @@
 import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../chat/config";
 import type { MessageMetadata } from "../../chat/db";

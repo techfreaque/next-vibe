@@ -1,12 +1,12 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
 import type { JSX } from "react";
 
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import resetRequestDefinitions from "@/app/api/[locale]/user/public/reset-password/request/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ResetPasswordFormProps {
   locale: CountryLanguage;

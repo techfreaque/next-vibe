@@ -5,30 +5,29 @@
  * Fires when a series value satisfies a comparison against a constant.
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  objectField,
-  requestField,
-  submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   rangeRequestField,
   resolutionRequestField,
   signalsResponseField,
   timeSeriesRequestField,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  backButton,
+  objectField,
+  requestField,
+  submitButton,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

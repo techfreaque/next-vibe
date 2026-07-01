@@ -1,37 +1,37 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe-ui/ui/collapsible";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
-import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
-import { User } from "next-vibe-ui/ui/icons/User";
-import { Link } from "next-vibe-ui/ui/link";
-import { Progress, ProgressIndicator } from "next-vibe-ui/ui/progress";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/collapsible";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
+import { HelpCircle } from "next-vibe/ui/web/ui/icons/HelpCircle";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { ShoppingCart } from "next-vibe/ui/web/ui/icons/ShoppingCart";
+import { User } from "next-vibe/ui/web/ui/icons/User";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Progress, ProgressIndicator } from "next-vibe/ui/web/ui/progress";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+} from "next-vibe/ui/web/ui/tooltip";
 import type { JSX } from "react";
 
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarFooterStore } from "../../welcome-tour/sidebar-footer-store";
 import { TOUR_DATA_ATTRS } from "../../welcome-tour/tour-config";

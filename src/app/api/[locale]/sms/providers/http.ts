@@ -1,13 +1,9 @@
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
-
-import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "../env";
 import { scopedTranslation } from "../i18n";

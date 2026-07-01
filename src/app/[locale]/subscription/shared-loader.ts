@@ -1,15 +1,15 @@
-import { notFound } from "next-vibe-ui/lib/not-found";
-import { redirect } from "next-vibe-ui/lib/redirect";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { notFound } from "next-vibe/ui/web/lib/not-found";
+import { redirect } from "next-vibe/ui/web/lib/redirect";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 export interface SubscriptionPageData {
   locale: CountryLanguage;

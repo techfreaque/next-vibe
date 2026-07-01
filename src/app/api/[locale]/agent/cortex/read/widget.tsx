@@ -5,24 +5,24 @@
 
 "use client";
 
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span } from "next-vibe-ui/ui/span";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetDisabled,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";

@@ -13,7 +13,7 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 
 import {
   failSuitePrerequisites,

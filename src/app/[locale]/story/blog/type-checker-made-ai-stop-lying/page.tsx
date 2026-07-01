@@ -1,21 +1,21 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string -- code examples are not user-facing text */
 import type { Metadata } from "next";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Link } from "next-vibe-ui/ui/link";
-import { CodeBlock } from "next-vibe-ui/ui/markdown";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { CodeBlock } from "next-vibe/ui/web/ui/markdown";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 
@@ -400,10 +400,13 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
               {[
                 {
                   from: "<button>",
-                  to: '<Button> from "next-vibe-ui/ui/button"',
+                  to: '<Button> from "next-vibe/ui/web/ui/button"',
                 },
-                { from: "<a>", to: '<Link> from "next-vibe-ui/ui/link"' },
-                { from: "<p>", to: '<P> from "next-vibe-ui/ui/typography"' },
+                { from: "<a>", to: '<Link> from "next-vibe/ui/web/ui/link"' },
+                {
+                  from: "<p>",
+                  to: '<P> from "next-vibe/ui/web/ui/typography"',
+                },
               ].map(({ from, to }) => (
                 <Div
                   key={from}
@@ -524,7 +527,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
               title: t("demo.round3Title"),
               desc: t("demo.round3Description"),
               result: t("demo.round3Result"),
-              code: 'import type { ResponseType } from "@/response-type";\n\nexport function parseApiResponse<T>(\n  response: ResponseType<T>\n): T | null {\n  if (!response.success) return null;\n  return response.data;\n}',
+              code: 'import type { ResponseType } from "next-vibe/core/route/response.schema";\n\nexport function parseApiResponse<T>(\n  response: ResponseType<T>\n): T | null {\n  if (!response.success) return null;\n  return response.data;\n}',
               pass: "  Oxlint: 0 errors\n  ESLint: 0 errors\n  TypeScript: 0 errors\n\n0 errors found.",
               color: "border-green-200 dark:border-green-800/50",
               numColor:

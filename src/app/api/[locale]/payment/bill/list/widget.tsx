@@ -1,24 +1,24 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Building } from "next-vibe-ui/ui/icons/Building";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { FilePlus } from "next-vibe-ui/ui/icons/FilePlus";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Receipt } from "next-vibe-ui/ui/icons/Receipt";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Building } from "next-vibe/ui/web/ui/icons/Building";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { FilePlus } from "next-vibe/ui/web/ui/icons/FilePlus";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Receipt } from "next-vibe/ui/web/ui/icons/Receipt";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useState } from "react";
 
 import { BillStatus } from "@/app/api/[locale]/payment/enum";

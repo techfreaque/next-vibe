@@ -25,14 +25,14 @@ import { installFetchCache } from "../../agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../agent/ai-stream/constants";
@@ -385,7 +385,7 @@ if (_remoteUrl && _isFixtureMode) {
       );
 
       const devUrl = "http://localhost:3000";
-      const { defaultLocale } = await import("@/i18n/core/config");
+      const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
       const streamUrl = `${devUrl}/api/${defaultLocale}/agent/ai-stream/ws-provider/stream`;
 
       const streamResp = await fetch(streamUrl, {

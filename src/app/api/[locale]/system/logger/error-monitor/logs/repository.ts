@@ -7,26 +7,25 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import { errorLogs } from "../db";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import type {
   ErrorLogsPatchRequestOutput,
   ErrorLogsPatchResponseOutput,
   ErrorLogsRequestOutput,
   ErrorLogsResponseOutput,
-} from "./definition";
+} from "next-vibe/logger/error-monitor/logs/definition";
+import type { ErrorLogsT } from "next-vibe/logger/error-monitor/logs/i18n";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { errorLogs } from "../db";
 import { ErrorLogStatusFilter } from "./enum";
-import type { ErrorLogsT } from "./i18n";
 
 export class ErrorLogsRepository {
   static async getLogs(

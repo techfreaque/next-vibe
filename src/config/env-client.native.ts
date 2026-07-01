@@ -1,6 +1,6 @@
 /* eslint-disable i18next/no-literal-string */
 import Constants from "expo-constants";
-import { Environment } from "next-vibe/shared/utils/env-util";
+import { Environment } from "next-vibe/env/env-util";
 
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import type { EnvClient } from "@/config/env-client";

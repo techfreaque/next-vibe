@@ -5,34 +5,33 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
-import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { ListItem } from "next-vibe-ui/ui/list-item";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
-import { Span } from "next-vibe-ui/ui/span";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { Methods } from "next-vibe/core/definition/enums";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
+import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
+import { FolderPlus } from "next-vibe/ui/web/ui/icons/FolderPlus";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { ListItem } from "next-vibe/ui/web/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetEndpoint,
   useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback } from "react";
-
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type detailDefinition from "./[mountId]/definition";
 import type createDefinition from "./create/definition";

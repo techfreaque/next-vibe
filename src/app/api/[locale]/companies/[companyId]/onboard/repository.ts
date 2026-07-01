@@ -10,13 +10,17 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { accountNodes } from "@/app/api/[locale]/chart-of-accounts/db";
 import {
@@ -26,12 +30,8 @@ import {
 import { CoaSetupRepository } from "@/app/api/[locale]/chart-of-accounts/setup/repository";
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
 import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { taxRates } from "@/app/api/[locale]/tax/db";
 import { seedDefaultTaxRates } from "@/app/api/[locale]/tax/seeds";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { defaultLocale } from "@/i18n/core/config";
 
 import type {
   CompanyOnboardRequestOutput,

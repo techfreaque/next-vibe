@@ -3,9 +3,10 @@
  * Covers tax rate configuration and tax reporting.
  */
 
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
 import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TAX_RATE_LIST_ALIAS } from "./rate/list/constants";
 

@@ -4,9 +4,9 @@
  */
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 

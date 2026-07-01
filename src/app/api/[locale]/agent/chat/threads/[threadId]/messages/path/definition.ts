@@ -3,26 +3,26 @@
  * Retrieves messages following a specific conversation path with branch metadata
  */
 
-import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";

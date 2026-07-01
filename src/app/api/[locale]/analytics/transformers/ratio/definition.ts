@@ -5,14 +5,13 @@
  * Divides series A by series B, aligned by timestamp.
  */
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -20,8 +19,9 @@ import {
   resolutionRequestField,
   timeSeriesRequestField,
   timeSeriesResponseField,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { objectField } from "next-vibe/unified-ui/_shared/utils";
 
 import { TRANSFORMER_RATIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

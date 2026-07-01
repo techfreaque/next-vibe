@@ -5,11 +5,11 @@
 
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { useCallback, useEffect, useState } from "react";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";

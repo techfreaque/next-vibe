@@ -4,7 +4,7 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import type { ForwardLeadFn } from "../types";
 

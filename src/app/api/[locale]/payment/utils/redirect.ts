@@ -3,8 +3,8 @@
  * Shared utilities for handling payment provider redirects
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { assignUrl } from "next-vibe-ui/lib/location";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { assignUrl } from "next-vibe/ui/web/lib/location";
 
 /**
  * Handles redirect to payment provider checkout

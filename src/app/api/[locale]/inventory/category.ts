@@ -3,10 +3,11 @@
  * Covers stock levels, transfers, and warehouse management.
  */
 
+import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
 import { INVENTORY_DASHBOARD_ALIAS } from "@/app/api/[locale]/inventory/dashboard/constants";
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 export const category: CategoryDefinition = {
   key: "inventory",

@@ -1,7 +1,8 @@
 import "server-only";
 
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import { z } from "zod";
 
 import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
@@ -9,7 +10,6 @@ import {
   type SyncProvider,
   toStandardCursor,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType, CortexSyncPolicy } from "./enum";

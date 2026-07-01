@@ -6,7 +6,7 @@
 
 "use client";
 
-import type { TextareaRefObject } from "next-vibe-ui/ui/textarea";
+import type { TextareaRefObject } from "next-vibe/ui/web/ui/textarea";
 import { createRef, type RefObject } from "react";
 import { create } from "zustand";
 
@@ -14,9 +14,9 @@ import { create } from "zustand";
 import {
   ImageQuality,
   ImageSize,
-} from "@/app/api/[locale]/agent/image-generation/enum";
+} from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 // eslint-disable-next-line no-restricted-imports -- Enum objects needed for keyof typeof derivation
-import { MusicDuration } from "@/app/api/[locale]/agent/music-generation/enum";
+import { MusicDuration } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 
 export { ImageQuality, ImageSize, MusicDuration };
 

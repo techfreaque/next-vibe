@@ -3,34 +3,30 @@
  * GET endpoint for email campaign performance statistics
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  CronTaskPriorityDB,
-  CronTaskStatusDB,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
+} from "next-vibe/core/definition/enums";
 import {
   EmailJourneyVariantFilter,
   EmailJourneyVariantFilterOptions,
-} from "../../enum";
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { CronTaskPriorityDB, CronTaskStatusDB } from "next-vibe/tasks/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import { CAMPAIGN_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 const CampaignStatsWidget = lazyWidget(() =>

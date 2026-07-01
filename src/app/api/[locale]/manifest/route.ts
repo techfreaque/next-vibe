@@ -6,12 +6,12 @@
  */
 
 import { NextResponse } from "next/server";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 // Constants for manifest values (non-translatable)
 const MANIFEST_CONSTANTS = {

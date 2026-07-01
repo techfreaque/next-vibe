@@ -1,7 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { PageLayout } from "next-vibe-ui/ui/page-layout";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { PageLayout } from "next-vibe/ui/web/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
@@ -10,15 +16,9 @@ import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { accountNavItems } from "../_components/account-nav-items";
 

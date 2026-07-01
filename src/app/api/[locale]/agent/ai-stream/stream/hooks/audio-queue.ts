@@ -7,7 +7,7 @@
  * primed for instant playback - eliminating gaps between chunks.
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 /** How many seconds before the current chunk ends to start preloading the next */
 const PREFETCH_LEAD_TIME_S = 5;

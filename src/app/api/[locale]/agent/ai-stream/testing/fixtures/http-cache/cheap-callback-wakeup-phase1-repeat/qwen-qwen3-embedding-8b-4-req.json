@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----5ccae0a2-697b-488f-a5b7-366ce9581589.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user is testing the wakeUp callback mode. I already emitted STEP_OK in the first phase when I got the taskId…",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----51812a4f-db8d-4725-9a66-56905667420c.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user is asking me to check the wakeUp result. Looking at the conversation, I can see that the deferred tool…",
     "encoding_format": "float"
   }
 }

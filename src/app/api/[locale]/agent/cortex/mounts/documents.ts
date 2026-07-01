@@ -1,8 +1,7 @@
 import "server-only";
 
 import { and, count as drizzleCount, eq, like } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "next-vibe/database";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";

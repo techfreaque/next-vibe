@@ -6,11 +6,11 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 
 import type { UrlCacheCleanupPostResponseOutput } from "./definition";
 

@@ -15,22 +15,23 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   DEFAULT_REMOTE_TOOL_IDS,
   getDefaultToolIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
 import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/app/api/[locale]/user/public/login/definition";
@@ -40,7 +41,6 @@ import {
 } from "@/config/constants";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import registerEndpoints from "../connect-reverse/definition";
 import { remoteConnections, SyncScopeSchema } from "../db";
@@ -129,6 +129,7 @@ export class RemoteConnectionConnectRepository {
       token,
       leadId,
       instanceId,
+      selfUserId,
       locale,
       reverseToken,
       reverseLeadId,
@@ -149,6 +150,7 @@ export class RemoteConnectionConnectRepository {
         body: JSON.stringify({
           instanceId,
           localUrl,
+          selfUserId,
           ...(reverseToken ? { reverseToken } : {}),
           ...(reverseLeadId ? { reverseLeadId } : {}),
         }),
@@ -672,7 +674,7 @@ export class RemoteConnectionConnectRepository {
         // direct-http connections POST directly to the remote stream endpoint.
         if (stored && stored.transportMode === "reverse-ws") {
           const { openConnection } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+            await import("next-vibe/realtime/connector");
           openConnection({
             id: stored.id,
             instanceId,

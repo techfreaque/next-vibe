@@ -1,9 +1,10 @@
 "use client";
 
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent } from "next-vibe-ui/ui/dialog";
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Dialog, DialogContent } from "next-vibe/ui/web/ui/dialog";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +13,12 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
-import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/dropdown-menu";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { MessageSquarePlus } from "next-vibe/ui/web/ui/icons/MessageSquarePlus";
+import { PanelLeft } from "next-vibe/ui/web/ui/icons/PanelLeft";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -28,7 +29,6 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { LocaleSelectorContent } from "./locale-selector-content";

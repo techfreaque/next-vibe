@@ -2,13 +2,11 @@
  * ToolCallHandler - Handles tool call events during streaming
  */
 
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { CallbackMode, CallbackModeDB } from "next-vibe/execute-tool/constants";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import {
-  CallbackMode,
-  CallbackModeDB,
-} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ToolCall } from "../../../chat/db";
@@ -201,6 +199,24 @@ export class ToolCallHandler {
       logger,
     });
 
+    // Mid-stream compacting race: same as processToolCall fallback path.
+    // Only use pendingQueueParentId if currentParentId still points to compact
+    // (no subsequent message has advanced the chain past it).
+    const compactingIdInput = ctx.pendingQueueParentId;
+    const toolParentId =
+      compactingIdInput !== null &&
+      compactingIdInput !== undefined &&
+      ctx.currentParentId === compactingIdInput
+        ? compactingIdInput
+        : prep.currentParentId;
+    if (
+      compactingIdInput !== null &&
+      compactingIdInput !== undefined &&
+      ctx.currentParentId === compactingIdInput
+    ) {
+      ctx.pendingQueueParentId = null;
+    }
+
     const toolCallData: ToolCall = {
       toolCallId,
       toolName,
@@ -214,7 +230,7 @@ export class ToolCallHandler {
     await dbWriter.emitToolCall({
       toolMessageId,
       threadId,
-      parentId: prep.currentParentId,
+      parentId: toolParentId,
       userId,
       model,
       skill,
@@ -234,13 +250,13 @@ export class ToolCallHandler {
       currentAssistantMessageId: prep.currentAssistantMessageId,
       currentAssistantContent: prep.currentAssistantContent,
       isInReasoningBlock: prep.isInReasoningBlock,
-      currentParentId: prep.currentParentId,
+      currentParentId: toolParentId,
       requiresConfirmation: false,
       pendingToolMessage: {
         messageId: toolMessageId,
         toolCallData: {
           toolCall: toolCallData,
-          parentId: prep.currentParentId,
+          parentId: toolParentId,
         },
       },
     };
@@ -397,6 +413,32 @@ export class ToolCallHandler {
       logger,
     });
 
+    // Mid-stream compacting race: prepareStep can fire and complete its compacting
+    // DB write DURING the flushContent() await inside prepareAssistantMessage.
+    // When that happens ctx.currentParentId AND pendingQueueParentId are both set
+    // to the compacting message ID (the direct sets in stream-execution-handler).
+    // prep.currentParentId is the stale pre-compacting value captured before the yield.
+    //
+    // Use the compacting message as tool parent ONLY when currentParentId still points
+    // to it — meaning no subsequent message (e.g. a reasoning block) has been created
+    // as a child of compact yet. If currentParentId has already advanced past compact
+    // (a text-delta created an assistant message that correctly chains off compact),
+    // use prep.currentParentId instead — the assistant is the correct parent.
+    const compactingId = ctx.pendingQueueParentId;
+    const toolParentId =
+      compactingId !== null &&
+      compactingId !== undefined &&
+      ctx.currentParentId === compactingId
+        ? compactingId
+        : prep.currentParentId;
+    if (
+      compactingId !== null &&
+      compactingId !== undefined &&
+      ctx.currentParentId === compactingId
+    ) {
+      ctx.pendingQueueParentId = null;
+    }
+
     logger.debug("[AI Stream] Tool confirmation check", {
       toolName: part.toolName,
       toolConfigFound: !!toolConfig,
@@ -423,7 +465,7 @@ export class ToolCallHandler {
     await dbWriter.emitToolCall({
       toolMessageId,
       threadId,
-      parentId: prep.currentParentId,
+      parentId: toolParentId,
       userId,
       model,
       skill,
@@ -452,13 +494,13 @@ export class ToolCallHandler {
         currentAssistantMessageId: prep.currentAssistantMessageId,
         currentAssistantContent: prep.currentAssistantContent,
         isInReasoningBlock: prep.isInReasoningBlock,
-        currentParentId: prep.currentParentId,
+        currentParentId: toolParentId,
         requiresConfirmation: true,
         pendingToolMessage: {
           messageId: toolMessageId,
           toolCallData: {
             toolCall: toolCallData,
-            parentId: prep.currentParentId,
+            parentId: toolParentId,
           },
         },
       };
@@ -473,13 +515,13 @@ export class ToolCallHandler {
       currentAssistantMessageId: prep.currentAssistantMessageId,
       currentAssistantContent: prep.currentAssistantContent,
       isInReasoningBlock: prep.isInReasoningBlock,
-      currentParentId: prep.currentParentId,
+      currentParentId: toolParentId,
       requiresConfirmation: false,
       pendingToolMessage: {
         messageId: toolMessageId,
         toolCallData: {
           toolCall: toolCallData,
-          parentId: prep.currentParentId,
+          parentId: toolParentId,
         },
       },
     };

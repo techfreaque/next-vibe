@@ -13,7 +13,7 @@
  * - Type-safe params forwarding
  */
 
-import { createPageWrapperWithImport } from "@/app/api/[locale]/system/unified-interface/react-native/nextjs-compat-wrapper";
+import { createPageWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
 
 /**
  * Wrapper component that dynamically imports and converts Expo Router's synchronous params

@@ -5,29 +5,29 @@
 
 import { Button, Section, Text as Span } from "@react-email/components";
 import { eq } from "drizzle-orm";
+import type { UndefinedType } from "next-vibe/core/definition/common.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { userLeadLinks } from "next-vibe/identity/lead/db";
+import type { UserRole } from "next-vibe/identity/roles/enum";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { userLeadLinks } from "@/app/api/[locale]/leads/db";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { UndefinedType } from "@/app/api/[locale]/shared/types/common.schema";
-import { db } from "@/app/api/[locale]/system/db";
 import { users } from "@/app/api/[locale]/user/db";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   AdminAddCreditsPostRequestOutput,

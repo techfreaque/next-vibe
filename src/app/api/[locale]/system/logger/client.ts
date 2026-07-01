@@ -4,9 +4,10 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createLogger } from "./create-logger";
 import type { EndpointLogger, LoggerMetadata } from "./types";
@@ -78,8 +79,8 @@ function reportToServer(
   void (async (): Promise<void> => {
     try {
       const [{ executeMutation }, { POST }] = await Promise.all([
-        import("@/app/api/[locale]/system/unified-interface/react/hooks/mutation-executor"),
-        import("@/app/api/[locale]/system/logger/error-monitor/client-log/definition"),
+        import("next-vibe/platforms/react/hooks/mutation-executor"),
+        import("next-vibe/logger/error-monitor/client-log/definition"),
       ]);
 
       // Minimal public-user stub - server re-auths from the JWT cookie.

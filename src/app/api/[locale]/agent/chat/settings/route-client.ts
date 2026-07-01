@@ -1,5 +1,5 @@
-import { clientEndpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/client-multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Methods } from "next-vibe/core/definition/enums";
+import { clientEndpointsHandler } from "next-vibe/core/route/client-multi";
 
 import definitions from "./definition";
 import { ChatSettingsRepositoryClient } from "./repository-client";

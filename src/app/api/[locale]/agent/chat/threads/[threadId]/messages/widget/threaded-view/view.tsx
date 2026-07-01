@@ -1,29 +1,28 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
-import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { CornerDownRight } from "next-vibe/ui/web/ui/icons/CornerDownRight";
+import { useWidgetItem } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
-import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+import { getDirectReplies } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSkill } from "../../../../../../skills/[id]/hooks";
 import type messagesDefinition from "../../definition";

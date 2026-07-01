@@ -1,18 +1,18 @@
 "use client";
-
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Video as VideoIcon } from "next-vibe-ui/ui/icons/Video";
-import { Input } from "next-vibe-ui/ui/input";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H3 } from "next-vibe-ui/ui/typography";
-import { Video } from "next-vibe-ui/ui/video";
+import { objectValues } from "next-vibe/core/utils/object";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Download } from "next-vibe/ui/web/ui/icons/Download";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Video as VideoIcon } from "next-vibe/ui/web/ui/icons/Video";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { ExternalLink } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { H3 } from "next-vibe/ui/web/ui/typography";
+import { Video } from "next-vibe/ui/web/ui/video";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -20,10 +20,10 @@ import {
   useWidgetLocale,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -41,7 +41,6 @@ import {
   getVideoGenModelById,
 } from "@/app/api/[locale]/agent/video-generation/models";
 
-import { objectValues } from "../../shared/utils";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";

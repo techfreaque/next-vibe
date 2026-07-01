@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import loginOptionsEndpoints from "./definition";
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { env } from "@/config/env";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 
 const endpoint = loginOptionsEndpoints.GET;
 
@@ -71,7 +71,7 @@ describe("GET /user/public/login/options", () => {
     expect(res.success).toBe(false);
     if (res.success) return;
     // Repository returns NOT_FOUND when email not found
-    const { ErrorResponseTypes } = await import("next-vibe/shared/types/response.schema");
+    const { ErrorResponseTypes } = await import("next-vibe/core/route/response.schema");
     expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.NOT_FOUND.errorCode);
   });
 
@@ -84,7 +84,7 @@ describe("GET /user/public/login/options", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    const { ErrorResponseTypes } = await import("next-vibe/shared/types/response.schema");
+    const { ErrorResponseTypes } = await import("next-vibe/core/route/response.schema");
     expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 

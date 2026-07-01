@@ -2,14 +2,14 @@
  * Hooks for password reset token validation
  */
 
-import { useToast } from "next-vibe-ui/hooks/use-toast";
+import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { useTranslation } from "@/i18n/core/client";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 
 import resetPasswordValidateEndpoint from "./definition";
-import { useApiQuery } from "../../../../system/unified-interface/react/hooks/use-api-query";
-import type { JwtPayloadType } from "../../../auth/types";
+import { useApiQuery } from "../../../../system/platforms/react/hooks/use-api-query";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { scopedTranslation } from "./i18n";
 
 /**

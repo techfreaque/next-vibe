@@ -1,9 +1,10 @@
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
 import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/web-search/constants";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   CORTEX_DELETE_ALIAS,

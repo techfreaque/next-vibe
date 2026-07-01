@@ -3,11 +3,17 @@
  * Defines endpoints for getting, updating, and deleting individual threads
  */
 
-import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
+import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 import {
   objectField,
   requestField,
@@ -15,16 +21,10 @@ import {
   requestUrlPathParamsField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../config";
 import {
@@ -503,7 +503,7 @@ const { PATCH } = createEndpoint({
 
         const rootFolderId = requestData.rootFolderId;
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,
@@ -708,7 +708,7 @@ const { DELETE } = createEndpoint({
 
         const rootFolderId = responseData.rootFolderId;
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,

@@ -1,0 +1,4 @@
+import { Plus as LucidePlus } from "lucide-react";
+import { type IconComponent } from "next-vibe/ui/web/lib/helper";
+
+export const Plus: IconComponent = LucidePlus;

@@ -7,27 +7,26 @@
 import "server-only";
 
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type {
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type { Address } from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-
-import type {
-  EmailCampaignStageValue,
-  EmailJourneyVariantValue,
-} from "@/app/api/[locale]/leads/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { MessengerAccount } from "../../../accounts/db";
 import { messengerAccounts } from "../../../accounts/db";

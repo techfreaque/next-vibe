@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { createLogger } from "./create-logger";
 import { persistErrorLog } from "./db-persist";

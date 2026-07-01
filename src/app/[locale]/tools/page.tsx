@@ -1,15 +1,14 @@
 export const dynamic = "force-dynamic";
 
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
-
-import { parseError } from "@/app/api/[locale]/shared/utils";
-import type { HelpGetResponseOutput } from "@/app/api/[locale]/system/help/definition";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ToolsPageClient } from "./page-client";
 
@@ -37,8 +36,7 @@ export async function tanstackLoader({
 
   let initialHelpData: HelpGetResponseOutput | null = null;
   try {
-    const { HelpRepository } =
-      await import("@/app/api/[locale]/system/help/repository");
+    const { HelpRepository } = await import("next-vibe/help-tool/repository");
     const result = await HelpRepository.getTools(
       { statsFilter: "webPinned", page: undefined, pageSize: undefined },
       user,

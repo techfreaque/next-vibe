@@ -1,0 +1,89 @@
+import { Text } from "ink";
+import * as React from "react";
+
+export type {
+  SheetCloseProps,
+  SheetContentProps,
+  SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetOverlayProps,
+  SheetPortalProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
+} from "next-vibe/ui/web/ui/sheet";
+
+import type {
+  SheetCloseProps,
+  SheetContentProps,
+  SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetPortalProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
+} from "next-vibe/ui/web/ui/sheet";
+
+export function Sheet({
+  children,
+  open,
+}: SheetRootProps): React.JSX.Element | null {
+  if (open === false) {
+    return null;
+  }
+  return <>{children}</>;
+}
+
+export function SheetTrigger({
+  children,
+}: SheetTriggerProps): React.JSX.Element | null {
+  return <Text>{children}</Text>;
+}
+
+export function SheetClose({
+  children,
+}: SheetCloseProps): React.JSX.Element | null {
+  return <Text>{children}</Text>;
+}
+
+export function SheetPortal({
+  children,
+}: SheetPortalProps): React.JSX.Element | null {
+  return <>{children}</>;
+}
+
+export function SheetOverlay(): null {
+  return null;
+}
+
+export function SheetContent({
+  children,
+}: SheetContentProps): React.JSX.Element | null {
+  return <>{children}</>;
+}
+
+export function SheetHeader({
+  children,
+}: SheetHeaderProps): React.JSX.Element | null {
+  return <>{children}</>;
+}
+
+export function SheetFooter({
+  children,
+}: SheetFooterProps): React.JSX.Element | null {
+  return <>{children}</>;
+}
+
+export function SheetTitle({
+  children,
+}: SheetTitleProps): React.JSX.Element | null {
+  return <Text bold>{children}</Text>;
+}
+
+export function SheetDescription({
+  children,
+}: SheetDescriptionProps): React.JSX.Element | null {
+  return <Text>{children}</Text>;
+}

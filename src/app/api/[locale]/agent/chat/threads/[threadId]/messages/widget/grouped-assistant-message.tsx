@@ -1,22 +1,25 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
+import type { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   copyImageToClipboard,
   copyToClipboard,
-} from "next-vibe-ui/lib/clipboard";
-import { downloadFromUrl } from "next-vibe-ui/lib/download";
-import { Audio } from "next-vibe-ui/ui/audio";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { Image } from "next-vibe-ui/ui/image";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import { Video } from "next-vibe-ui/ui/video";
+} from "next-vibe/ui/web/lib/clipboard";
+import { downloadFromUrl } from "next-vibe/ui/web/lib/download";
+import { Audio } from "next-vibe/ui/web/ui/audio";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { Download } from "next-vibe/ui/web/ui/icons/Download";
+import { Image } from "next-vibe/ui/web/ui/image";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { Video } from "next-vibe/ui/web/ui/video";
 import {
   type JSX,
   memo,
@@ -41,10 +44,6 @@ import {
   processMessageGroupForTTS,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
 import { scopedTranslation } from "../i18n";

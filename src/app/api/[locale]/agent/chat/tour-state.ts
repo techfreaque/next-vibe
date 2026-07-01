@@ -4,7 +4,7 @@ import {
   getLocalItem,
   removeLocalItem,
   setLocalItem,
-} from "next-vibe-ui/lib/storage";
+} from "next-vibe/ui/web/lib/storage";
 import { create } from "zustand";
 import type { StorageValue } from "zustand/middleware";
 import { persist } from "zustand/middleware";

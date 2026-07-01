@@ -1,11 +1,11 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { CodingAgentSettingData } from "./prompt";
 

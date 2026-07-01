@@ -1,0 +1,94 @@
+/**
+ * Auth Utilities
+ * Helper functions for authentication in server components
+ */
+import "server-only";
+
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { redirect } from "next-vibe/ui/web/lib/redirect";
+
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
+import type { CompleteUserType } from "@/app/api/[locale]/user/types";
+
+import { AuthRepository } from "./repository";
+import type { JwtPrivatePayloadType } from "./types";
+
+/**
+ * Require an authenticated admin user
+ * Redirects to login if not authenticated or not an admin
+ */
+export async function requireAdminUser(
+  locale: CountryLanguage,
+  redirectPath?: string,
+): Promise<JwtPrivatePayloadType> {
+  const logger = createEndpointLogger(false, locale);
+
+  try {
+    // Check authentication and role
+    const minimalUser = await AuthRepository.getAuthMinimalUser<
+      [typeof UserRole.ADMIN]
+    >([UserRole.ADMIN], { platform: Platform.NEXT_PAGE, locale }, logger);
+
+    // Check if user is public (not authenticated)
+    if (minimalUser.isPublic) {
+      redirect(
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
+      );
+    }
+
+    return minimalUser;
+  } catch (error) {
+    logger.debug("Error in requireAdminUser", parseError(error));
+    redirect(`/${locale}`);
+  }
+}
+
+/**
+ * Require an authenticated user (any role)
+ * Redirects to login if not authenticated
+ */
+export async function requireUser(
+  locale: CountryLanguage,
+  redirectPath?: string,
+): Promise<CompleteUserType> {
+  const logger = createEndpointLogger(false, locale);
+
+  try {
+    // Check authentication (any authenticated user)
+    const minimalUser = await AuthRepository.getAuthMinimalUser<[]>(
+      [],
+      { platform: Platform.NEXT_PAGE, locale },
+      logger,
+    );
+
+    // Check if user is public (not authenticated)
+    if (minimalUser.isPublic || !minimalUser.id) {
+      redirect(
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+      );
+    }
+
+    // Fetch complete user details
+    const userResult = await UserRepository.getUserById<
+      typeof UserDetailLevel.COMPLETE
+    >(minimalUser.id ?? "", UserDetailLevel.COMPLETE, locale, logger);
+
+    if (!userResult.success) {
+      redirect(
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+      );
+    }
+
+    return userResult.data;
+  } catch (error) {
+    logger.error("Error in requireUser", parseError(error));
+    redirect(
+      `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+    );
+  }
+}

@@ -4,22 +4,24 @@
  * Mirrors server repository structure but runs in browser
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { getLocalItem, storage } from "next-vibe-ui/lib/storage";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
+import { getLocalItem, storage } from "next-vibe/ui/web/lib/storage";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
+import skillSingleDefinition from "@/app/api/[locale]/agent/skills/[id]/definition";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { parseError } from "../../../shared/utils";
 import type { ChatModelSelection } from "../../ai-stream/models";
 import { STORAGE_KEYS } from "../../chat/constants";
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
@@ -34,6 +36,7 @@ import { modelProviders } from "../../models/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
 import type { TtsModelId } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
+import type { SkillVariantData } from "../db";
 import { ModelSelectionType } from "../enum";
 import { scopedTranslation as charactersScopedTranslation } from "../i18n";
 import type {

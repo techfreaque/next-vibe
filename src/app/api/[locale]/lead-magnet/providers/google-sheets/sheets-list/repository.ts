@@ -1,11 +1,11 @@
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import type { GoogleSheetsT } from "../i18n";
 import type { GoogleSpreadsheet } from "../oauth-helpers";

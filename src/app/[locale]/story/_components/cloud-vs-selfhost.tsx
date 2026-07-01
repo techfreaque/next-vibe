@@ -1,21 +1,21 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardHeader } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { Layers } from "next-vibe-ui/ui/icons/Layers";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardHeader } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Cloud } from "next-vibe/ui/web/ui/icons/Cloud";
+import { Code } from "next-vibe/ui/web/ui/icons/Code";
+import { Layers } from "next-vibe/ui/web/ui/icons/Layers";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { FREE_CREDIT_POOL } from "@/app/api/[locale]/credits/constants";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

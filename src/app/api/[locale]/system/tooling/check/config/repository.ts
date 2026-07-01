@@ -1,0 +1,1057 @@
+/**
+ * Unified Check Configuration Repository
+ *
+ * Centralizes all configuration operations for code quality tools:
+ * - Loading and validating check.config.ts
+ * - Generating output files (.oxlintrc.json, .oxfmtrc.json)
+ * - Updating VSCode settings
+ * - Providing configuration to all check modules
+ */
+
+import { existsSync, promises as fs } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { parseJsonWithComments } from "next-vibe/core/utils/parse-json";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation } from "next-vibe/tooling/check/config/i18n";
+import type {
+  CheckConfig,
+  CreateDefaultCheckConfigResult,
+  CreateDefaultMcpConfigResult,
+  EnsureConfigResult,
+  GenerateVSCodeSettingsResult,
+  OxlintJsPlugin,
+} from "next-vibe/tooling/check/config/types";
+
+// ============================================================
+// Repository Implementation
+// ============================================================
+
+export class ConfigRepositoryImpl {
+  // --------------------------------------------------------
+  // Static Private Helpers - Path Resolution
+  // --------------------------------------------------------
+
+  private static getConfigFilePath(): string {
+    return resolve(process.cwd(), "check.config.ts");
+  }
+
+  private static resolveJsPluginPath(pluginPath: string): string {
+    // Pattern: @next-vibe/checker/oxlint-plugins/restricted-syntax.ts or .js
+    if (pluginPath.startsWith("@next-vibe/checker/oxlint-plugins/")) {
+      const fileName = pluginPath.slice(
+        "@next-vibe/checker/oxlint-plugins/".length,
+      );
+      const baseName = fileName.replace(/\.(ts|js)$/, "");
+      const extension = fileName.endsWith(".ts") ? "ts" : "js";
+
+      if (extension === "ts") {
+        // Local development: .ts -> source files
+        // Walk up from cwd to find the project root containing the plugin sources
+        let searchDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          const sourcePath = resolve(
+            searchDir,
+            "src",
+            "app",
+            "api",
+            "[locale]",
+            "system",
+            "tooling",
+            "check",
+            "oxlint",
+            "plugins",
+            baseName,
+            "src",
+            "index.ts",
+          );
+          if (existsSync(sourcePath)) {
+            return sourcePath;
+          }
+          const parent = dirname(searchDir);
+          if (parent === searchDir) {
+            break;
+          }
+          searchDir = parent;
+        }
+      } else {
+        // Installed package: .js -> look for .ts in installed package first (package ships .ts sources)
+        const installedTsPath = resolve(
+          process.cwd(),
+          "node_modules",
+          "@next-vibe",
+          "checker",
+          "oxlint-plugins",
+          `${baseName}.ts`,
+        );
+        if (existsSync(installedTsPath)) {
+          return installedTsPath;
+        }
+
+        // Also try compiled .js (future: if package ships compiled files)
+        const compiledPath = resolve(
+          process.cwd(),
+          "node_modules",
+          "@next-vibe",
+          "checker",
+          "oxlint-plugins",
+          fileName,
+        );
+        if (existsSync(compiledPath)) {
+          return compiledPath;
+        }
+
+        // Fallback for .js: try finding .ts source files (dev environment / monorepo)
+        let searchDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          const sourcePath = resolve(
+            searchDir,
+            "src",
+            "app",
+            "api",
+            "[locale]",
+            "system",
+            "tooling",
+            "check",
+            "oxlint",
+            "plugins",
+            baseName,
+            "src",
+            "index.ts",
+          );
+          if (existsSync(sourcePath)) {
+            return sourcePath;
+          }
+          const parent = dirname(searchDir);
+          if (parent === searchDir) {
+            break;
+          }
+          searchDir = parent;
+        }
+      }
+
+      // Fallback: return expected path from cwd
+      return resolve(
+        process.cwd(),
+        "src",
+        "app",
+        "api",
+        "[locale]",
+        "system",
+        "tooling",
+        "check",
+        "oxlint",
+        "plugins",
+        baseName,
+        "src",
+        "index.ts",
+      );
+    }
+
+    // If no prefix matched, return absolute path if it exists, otherwise as-is
+    if (pluginPath.startsWith("/")) {
+      return pluginPath;
+    }
+
+    const absolutePath = `${process.cwd()}/${pluginPath}`;
+    return existsSync(absolutePath) ? absolutePath : pluginPath;
+  }
+
+  private static resolveJsPlugins(
+    jsPlugins: (string | OxlintJsPlugin)[] | undefined,
+  ): string[] {
+    if (!jsPlugins || jsPlugins.length === 0) {
+      return [];
+    }
+
+    // Resolve paths - supports both string paths and objects with path property
+    // Options in objects are for future oxlint native support, currently plugins read from config.oxlint.rules
+    return jsPlugins.map((plugin) => {
+      const pluginPath = typeof plugin === "string" ? plugin : plugin.path;
+      return ConfigRepositoryImpl.resolveJsPluginPath(pluginPath);
+    });
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - Package Discovery
+  // --------------------------------------------------------
+
+  private static async findPackageRoot(
+    startDir: string,
+  ): Promise<string | null> {
+    let currentDir = startDir;
+    const root = resolve("/");
+
+    while (currentDir !== root) {
+      const packageJsonPath = resolve(currentDir, "package.json");
+      if (existsSync(packageJsonPath)) {
+        try {
+          const content = await fs.readFile(packageJsonPath, "utf8");
+          const pkg = JSON.parse(content) as { name?: string };
+          if (pkg.name === "@next-vibe/checker" || pkg.name === "next-vibe") {
+            return currentDir;
+          }
+        } catch {
+          // Continue searching
+        }
+      }
+      currentDir = dirname(currentDir);
+    }
+    return null;
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - Config Generation
+  // --------------------------------------------------------
+
+  private static generateEslintConfigContent(): string {
+    return `/**
+ * ESLint Flat Config (Auto-generated)
+ * Loads plugins and builds config from check.config.ts
+ */
+
+import { createRequire } from "node:module";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectRoot = resolve(__dirname, "..");
+const require = createRequire(resolve(projectRoot, "package.json"));
+
+// Load ESLint plugins
+const reactCompilerPlugin = require("eslint-plugin-react-compiler");
+const reactHooksPlugin = require("eslint-plugin-react-hooks");
+const simpleImportSortPlugin = require("eslint-plugin-simple-import-sort");
+const tseslint = require("typescript-eslint");
+
+// Load check.config.ts and build flatConfig with plugins
+const exported = require(resolve(projectRoot, "check.config.ts")).default;
+const checkConfig = typeof exported === "function" ? exported() : exported;
+
+// Build flatConfig by calling buildFlatConfig with loaded plugins
+export default checkConfig.eslint?.buildFlatConfig?.(
+  reactCompilerPlugin,
+  reactHooksPlugin,
+  simpleImportSortPlugin,
+  tseslint
+) || checkConfig.eslint?.flatConfig || [];
+`;
+  }
+
+  private static buildOxfmtConfig(
+    prettierConfig: CheckConfig["prettier"] & { enabled: true },
+  ): Record<string, boolean | string | number> {
+    return {
+      semi: prettierConfig.semi ?? true,
+      singleQuote: prettierConfig.singleQuote ?? false,
+      trailingComma: prettierConfig.trailingComma ?? "all",
+      tabWidth: prettierConfig.tabWidth ?? 2,
+      useTabs: prettierConfig.useTabs ?? false,
+      printWidth: prettierConfig.printWidth ?? 80,
+      arrowParens: prettierConfig.arrowParens ?? "always",
+      endOfLine: prettierConfig.endOfLine ?? "lf",
+      bracketSpacing: prettierConfig.bracketSpacing ?? true,
+      jsxSingleQuote: prettierConfig.jsxSingleQuote ?? false,
+    };
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - VSCode Settings
+  // --------------------------------------------------------
+
+  private static applyOxcSettings(
+    settings: Record<string, WidgetData>,
+    oxc: NonNullable<
+      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
+    >["oxc"],
+  ): void {
+    if (!oxc) {
+      return;
+    }
+    if (oxc.enable !== undefined) {
+      settings["oxc.enable"] = oxc.enable;
+    }
+    if (oxc.lintRun) {
+      settings["oxc.lint.run"] = oxc.lintRun;
+    }
+    if (oxc.configPath) {
+      settings["oxc.configPath"] = oxc.configPath;
+    }
+    if (oxc.fmtConfigPath) {
+      settings["oxc.fmt.configPath"] = oxc.fmtConfigPath;
+    }
+    if (oxc.fmtExperimental !== undefined) {
+      settings["oxc.fmt.experimental"] = oxc.fmtExperimental;
+    }
+    if (oxc.typeAware !== undefined) {
+      settings["oxc.typeAware"] = oxc.typeAware;
+    }
+    if (oxc.traceServer) {
+      settings["oxc.trace.server"] = oxc.traceServer;
+    }
+  }
+
+  private static applyEditorSettings(
+    settings: Record<string, WidgetData>,
+    editor: NonNullable<
+      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
+    >["editor"],
+  ): void {
+    if (!editor) {
+      return;
+    }
+    if (editor.formatOnSave !== undefined) {
+      settings["editor.formatOnSave"] = editor.formatOnSave;
+    }
+    if (editor.defaultFormatter) {
+      settings["editor.defaultFormatter"] = editor.defaultFormatter;
+    }
+    if (editor.codeActionsOnSave) {
+      settings["editor.codeActionsOnSave"] = editor.codeActionsOnSave;
+    }
+  }
+
+  private static applyTypescriptSettings(
+    settings: Record<string, WidgetData>,
+    ts: NonNullable<
+      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
+    >["typescript"],
+  ): void {
+    if (!ts) {
+      return;
+    }
+    if (ts.validateEnable !== undefined) {
+      settings["typescript.validate.enable"] = ts.validateEnable;
+    }
+    if (ts.suggestAutoImports !== undefined) {
+      settings["typescript.suggest.autoImports"] = ts.suggestAutoImports;
+    }
+    if (ts.preferTypeOnlyAutoImports !== undefined) {
+      settings["typescript.preferences.preferTypeOnlyAutoImports"] =
+        ts.preferTypeOnlyAutoImports;
+    }
+    if (ts.experimentalUseTsgo !== undefined) {
+      settings["typescript.experimental.useTsgo"] = ts.experimentalUseTsgo;
+    }
+  }
+
+  private static applyFileSettings(
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
+    files: NonNullable<
+      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
+    >["files"],
+  ): void {
+    if (!files) {
+      return;
+    }
+    if (files.eol) {
+      settings["files.eol"] = files.eol;
+    }
+    if (files.exclude) {
+      settings["files.exclude"] = {
+        ...(existing["files.exclude"] as Record<string, boolean> | undefined),
+        ...files.exclude,
+      };
+    }
+  }
+
+  private static applySearchSettings(
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
+    search: NonNullable<
+      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
+    >["search"],
+  ): void {
+    if (!search?.exclude) {
+      return;
+    }
+    settings["search.exclude"] = {
+      ...(existing["search.exclude"] as Record<string, boolean> | undefined),
+      ...search.exclude,
+    };
+  }
+
+  private static applyLanguageFormatterSettings(
+    settings: Record<string, WidgetData>,
+    existing: Record<string, WidgetData>,
+    vscodeSettings: NonNullable<
+      CheckConfig["vscode"] & { enabled: true }
+    >["settings"],
+  ): void {
+    const formatter = vscodeSettings?.editor?.defaultFormatter;
+    if (!formatter) {
+      return;
+    }
+
+    for (const lang of [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact",
+    ]) {
+      const langKey = `[${lang}]`;
+      const existingLang = existing[langKey] as
+        | Record<string, WidgetData>
+        | undefined;
+      settings[langKey] = {
+        ...existingLang,
+        "editor.defaultFormatter": formatter,
+        "editor.formatOnSave": vscodeSettings?.editor?.formatOnSave ?? true,
+        ...(lang.includes("typescript")
+          ? {
+              "editor.codeActionsOnSave": {
+                "source.organizeImports": "always",
+              },
+            }
+          : {}),
+      };
+    }
+  }
+
+  // --------------------------------------------------------
+  // Public Methods
+  // --------------------------------------------------------
+
+  static async ensureConfigReady(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+    createConfig: boolean,
+  ): Promise<EnsureConfigResult> {
+    const configPath = ConfigRepositoryImpl.getConfigFilePath();
+    const configExists = existsSync(configPath);
+
+    if (createConfig && configExists) {
+      logger.debug("check.config.ts already exists", { path: configPath });
+      return {
+        ready: false,
+        error: "exists",
+        message:
+          "check.config.ts already exists. To restore the default configuration, delete the existing file first and run 'npx @next-vibe/checker config-create' to create a new one.",
+        configPath,
+      };
+    }
+
+    if (!configExists) {
+      if (createConfig) {
+        logger.info("Creating default check.config.ts...");
+        const createResult =
+          await ConfigRepositoryImpl.createDefaultCheckConfig(logger, locale);
+        if (!createResult.success) {
+          return {
+            ready: false,
+            error: "creation_failed",
+            message: `Failed to create check.config.ts: ${createResult.message}`,
+            configPath,
+          };
+        }
+        logger.info("Created check.config.ts successfully");
+      } else {
+        logger.debug("check.config.ts not found", { path: configPath });
+        return {
+          ready: false,
+          error: "missing",
+          message:
+            "check.config.ts not found. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
+          configPath,
+        };
+      }
+    }
+
+    const loaded = await ConfigRepositoryImpl.loadCheckConfig(logger);
+    if (!loaded) {
+      return {
+        ready: false,
+        error: "load_failed",
+        message:
+          "check.config.ts could not be loaded. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
+        configPath,
+      };
+    }
+
+    const { config, configMtimeMs } = loaded;
+    const status = await ConfigRepositoryImpl.checkConfigStatus(
+      logger,
+      config,
+      configMtimeMs,
+    );
+    let regenerated = false;
+
+    if (status.needsRegeneration) {
+      logger.debug("Regenerating config files");
+      const genResult = await ConfigRepositoryImpl.generateAllConfigs(
+        logger,
+        config,
+        locale,
+      );
+      if (genResult.success) {
+        regenerated = true;
+        logger.debug("Config files regenerated successfully");
+      } else {
+        logger.warn("Failed to regenerate config files", {
+          error: genResult.message,
+        });
+      }
+    } else {
+      logger.debug("Config files are up-to-date");
+    }
+
+    return { ready: true, config, regenerated };
+  }
+
+  static async generateAllConfigs(
+    logger: EndpointLogger,
+    config: CheckConfig,
+    locale: CountryLanguage,
+  ): Promise<
+    ResponseType<{
+      oxlintConfigPath?: string;
+      oxfmtConfigPath?: string;
+      eslintConfigPath?: string;
+    }>
+  > {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      let oxlintConfigPath: string | undefined;
+      let oxfmtConfigPath: string | undefined;
+      let eslintConfigPath: string | undefined;
+
+      // Generate oxlint config if enabled
+      if (config.oxlint.enabled) {
+        oxlintConfigPath = await ConfigRepositoryImpl.generateOxlintConfig(
+          logger,
+          config.oxlint,
+        );
+      }
+
+      // Generate prettier/oxfmt config if enabled
+      if (config.prettier.enabled) {
+        oxfmtConfigPath = await ConfigRepositoryImpl.generatePrettierConfig(
+          logger,
+          config.prettier,
+        );
+
+        // Generate .prettierignore from oxlint ignore patterns for oxfmt --ignore-path.
+        // Always include nonExtensiveIgnorePatterns (generated/test files should never
+        // be auto-formatted regardless of --extensive flag).
+        const ignorePatterns = config.oxlint.enabled
+          ? [
+              ...(config.oxlint.ignorePatterns ?? []),
+              ...(config.oxlint.nonExtensiveIgnorePatterns ?? []),
+            ]
+          : [];
+        if (config.prettier.ignoreFilePath && ignorePatterns.length > 0) {
+          await ConfigRepositoryImpl.generatePrettierIgnore(
+            logger,
+            config.prettier.ignoreFilePath,
+            ignorePatterns,
+          );
+        }
+      }
+
+      // Generate ESLint config if enabled
+      if (config.eslint.enabled) {
+        eslintConfigPath = await ConfigRepositoryImpl.generateEslintConfig(
+          logger,
+          config.eslint,
+        );
+      }
+
+      return success({
+        oxlintConfigPath,
+        oxfmtConfigPath,
+        eslintConfigPath,
+      });
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to generate configs", { error: errorMessage });
+      return fail({
+        message: t("errors.generateConfigsFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
+    }
+  }
+
+  static async generateVSCodeSettings(
+    logger: EndpointLogger,
+    config: CheckConfig,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GenerateVSCodeSettingsResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const settingsPath = `${process.cwd()}/.vscode/settings.json`;
+
+    try {
+      // Check if VSCode integration is enabled
+      if (!config.vscode.enabled) {
+        logger.debug("VSCode settings generation disabled");
+        return success({ settingsPath });
+      }
+
+      const vscodeConfig = config.vscode;
+      if (!vscodeConfig.autoGenerateSettings) {
+        logger.debug("VSCode settings auto-generation disabled");
+        return success({ settingsPath });
+      }
+
+      await fs.mkdir(dirname(settingsPath), { recursive: true });
+
+      const existingSettings = await ConfigRepositoryImpl.loadExistingSettings(
+        settingsPath,
+        locale,
+      );
+      const newSettings: Record<string, WidgetData> = { ...existingSettings };
+
+      // Apply all settings using static helpers
+      ConfigRepositoryImpl.applyOxcSettings(
+        newSettings,
+        vscodeConfig.settings?.oxc,
+      );
+      ConfigRepositoryImpl.applyEditorSettings(
+        newSettings,
+        vscodeConfig.settings?.editor,
+      );
+      ConfigRepositoryImpl.applyTypescriptSettings(
+        newSettings,
+        vscodeConfig.settings?.typescript,
+      );
+      ConfigRepositoryImpl.applyFileSettings(
+        newSettings,
+        existingSettings,
+        vscodeConfig.settings?.files,
+      );
+      ConfigRepositoryImpl.applySearchSettings(
+        newSettings,
+        existingSettings,
+        vscodeConfig.settings?.search,
+      );
+      ConfigRepositoryImpl.applyLanguageFormatterSettings(
+        newSettings,
+        existingSettings,
+        vscodeConfig.settings,
+      );
+
+      await fs.writeFile(
+        settingsPath,
+        JSON.stringify(newSettings, null, 2),
+        "utf8",
+      );
+      logger.debug("Generated VSCode settings", { path: settingsPath });
+
+      return success({ settingsPath });
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to generate VSCode settings", {
+        error: errorMessage,
+      });
+      return fail({
+        message: t("errors.generateVSCodeSettingsFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
+    }
+  }
+
+  static async createDefaultCheckConfig(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<CreateDefaultCheckConfigResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const configPath = ConfigRepositoryImpl.getConfigFilePath();
+
+    try {
+      const currentDir = dirname(fileURLToPath(import.meta.url));
+      const packageRoot =
+        await ConfigRepositoryImpl.findPackageRoot(currentDir);
+
+      if (!packageRoot) {
+        return fail({
+          message: t("errors.packageRootNotFound"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      const templatePath = resolve(packageRoot, "check.config.ts");
+
+      if (!existsSync(templatePath)) {
+        return fail({
+          message: t("errors.templateNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { path: templatePath },
+        });
+      }
+
+      let templateContent = await fs.readFile(templatePath, "utf8");
+
+      // Replace .ts extensions with .js for installed package usage
+      templateContent = templateContent.replace(
+        /@next-vibe\/checker\/oxlint-plugins\/([^"']+)\.ts/g,
+        "@next-vibe/checker/oxlint-plugins/$1.js",
+      );
+
+      await fs.writeFile(configPath, templateContent, "utf8");
+
+      // Also create .mcp.json
+      const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
+        logger,
+        ".mcp.json",
+        locale,
+      );
+      if (!mcpResult.success) {
+        logger.warn("Failed to create .mcp.json", {
+          error: mcpResult.message,
+        });
+      }
+      const mcpCursorResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
+        logger,
+        ".cursor/mcp.json",
+        locale,
+      );
+      if (!mcpCursorResult.success) {
+        logger.warn("Failed to create .cursor/mcp.json", {
+          error: mcpCursorResult.message,
+        });
+      }
+
+      const mcpVscodeResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
+        logger,
+        ".vscode/mcp.json",
+        locale,
+      );
+      if (!mcpVscodeResult.success) {
+        logger.warn("Failed to create .vscode/mcp.json", {
+          error: mcpVscodeResult.message,
+        });
+      }
+
+      return success({ configPath });
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to create check.config.ts", { error: errorMessage });
+      return fail({
+        message: t("errors.createConfigFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
+    }
+  }
+
+  static async createDefaultMcpConfig(
+    logger: EndpointLogger,
+    path: string,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<CreateDefaultMcpConfigResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const projectPath = process.cwd();
+    const mcpConfigPath = `${projectPath}/${path}`;
+
+    try {
+      // Use .mcp.example.json template if available, replacing {{PROJECT_PATH}}
+      // eslint-disable-next-line i18next/no-literal-string
+      const examplePath = resolve(projectPath, ".mcp.example.json");
+      let mcpContent: string;
+
+      if (existsSync(examplePath)) {
+        const template = await fs.readFile(examplePath, "utf8");
+        mcpContent = template.replaceAll("{{PROJECT_PATH}}", projectPath);
+      } else {
+        // Fallback: minimal config using npx for external @next-vibe/checker package
+        mcpContent = JSON.stringify(
+          {
+            mcpServers: {
+              vibe: {
+                command: "npx",
+                // eslint-disable-next-line i18next/no-literal-string
+                args: ["--yes", "@next-vibe/checker@latest", "mcp"],
+                env: {
+                  PROJECT_ROOT: projectPath,
+                },
+              },
+            },
+          },
+          null,
+          2,
+        );
+      }
+
+      await fs.mkdir(dirname(mcpConfigPath), { recursive: true });
+      await fs.writeFile(mcpConfigPath, mcpContent, "utf8");
+
+      return success({ mcpConfigPath });
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to create .mcp.json", { error: errorMessage });
+      return fail({
+        message: t("errors.createMcpConfigFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
+    }
+  }
+
+  // --------------------------------------------------------
+  // Private Methods
+  // --------------------------------------------------------
+
+  private static async loadCheckConfig(
+    logger: EndpointLogger,
+  ): Promise<{ config: CheckConfig; configMtimeMs: number } | null> {
+    try {
+      const configPath = ConfigRepositoryImpl.getConfigFilePath();
+
+      if (!existsSync(configPath)) {
+        logger.debug("check.config.ts not found", { path: configPath });
+        return null;
+      }
+
+      // Stat and dynamic import in parallel - stat is needed for stale check anyway
+      // Use indirect import to prevent Turbopack static analysis
+      // eslint-disable-next-line -- dynamic import required for runtime config loading
+      const dynamicImport = new Function("p", "return import(p)") as (
+        p: string,
+      ) => Promise<{
+        default?: CheckConfig | (() => CheckConfig);
+        config?: CheckConfig | (() => CheckConfig);
+      }>;
+      const [configStats, configModule] = await Promise.all([
+        fs.stat(configPath),
+        dynamicImport(configPath),
+      ]);
+
+      const exportedValue = configModule.default ?? configModule.config;
+
+      if (!exportedValue) {
+        logger.warn("check.config.ts must export 'default' or 'config'");
+        return null;
+      }
+
+      // Support both direct object exports and factory functions
+      const config =
+        typeof exportedValue === "function" ? exportedValue() : exportedValue;
+
+      logger.debug(`Loaded check.config.ts (path: ${configPath})`);
+      return { config, configMtimeMs: configStats.mtimeMs };
+    } catch (error) {
+      logger.debug(
+        `Failed to load check.config.ts (error: ${parseError(error).message})`,
+      );
+      return null;
+    }
+  }
+
+  private static async checkConfigStatus(
+    logger: EndpointLogger,
+    config: CheckConfig,
+    configMtimeMs: number,
+  ): Promise<{ needsRegeneration: boolean }> {
+    // If no tools are enabled, no regeneration needed
+    if (
+      !config.oxlint.enabled &&
+      !config.prettier.enabled &&
+      !config.eslint.enabled
+    ) {
+      return { needsRegeneration: false };
+    }
+
+    // Collect all generated config paths to stat in parallel
+    const generatedPaths: string[] = [];
+    if (config.oxlint.enabled) {
+      generatedPaths.push(`${process.cwd()}/${config.oxlint.configPath}`);
+    }
+
+    try {
+      const results = await Promise.all(
+        generatedPaths.map((p) => fs.stat(p).catch(() => null)),
+      );
+
+      for (const stat of results) {
+        if (!stat || configMtimeMs > stat.mtimeMs) {
+          return { needsRegeneration: true };
+        }
+      }
+
+      // Also check that all resolved jsPlugin paths actually exist on disk.
+      // This catches stale configs where the package was updated and plugin
+      // paths changed (e.g. from .dist/oxlint-plugins/ to oxlint-plugins/).
+      if (config.oxlint.enabled && config.oxlint.jsPlugins?.length) {
+        const oxlintConfigPath = `${process.cwd()}/${config.oxlint.configPath}`;
+        try {
+          const rawConfig = await fs.readFile(oxlintConfigPath, "utf8");
+          const parsed = JSON.parse(rawConfig) as {
+            jsPlugins?: string[];
+          };
+          if (parsed.jsPlugins?.length) {
+            for (const pluginPath of parsed.jsPlugins) {
+              if (!existsSync(pluginPath)) {
+                logger.debug(
+                  "Stale jsPlugin path detected, forcing regeneration",
+                  { path: pluginPath },
+                );
+                return { needsRegeneration: true };
+              }
+            }
+          }
+        } catch {
+          // If we can't read/parse the config, regenerate to be safe
+          return { needsRegeneration: true };
+        }
+      }
+
+      return { needsRegeneration: false };
+    } catch (error) {
+      logger.debug("Error checking config status", {
+        error: parseError(error).message,
+      });
+      return { needsRegeneration: true };
+    }
+  }
+
+  private static async loadExistingSettings(
+    settingsPath: string,
+    locale: CountryLanguage,
+  ): Promise<Record<string, WidgetData>> {
+    if (!existsSync(settingsPath)) {
+      return {};
+    }
+    try {
+      const content = await fs.readFile(settingsPath, "utf8");
+      const parseResult = parseJsonWithComments(content, locale);
+      if (parseResult.success && typeof parseResult.data === "object") {
+        return parseResult.data as Record<string, WidgetData>;
+      }
+    } catch {
+      // Return empty object if parsing fails
+    }
+    return {};
+  }
+
+  private static async generateOxlintConfig(
+    logger: EndpointLogger,
+    oxlintConfig: CheckConfig["oxlint"] & { enabled: true },
+  ): Promise<string> {
+    const configPath = `${process.cwd()}/${oxlintConfig.configPath}`;
+    await fs.mkdir(dirname(configPath), { recursive: true });
+
+    // Convert jsPlugins to array of paths for .oxlintrc.json
+    // Options are not yet supported by oxlint natively, used via direct import workaround
+    const resolvedJsPlugins = ConfigRepositoryImpl.resolveJsPlugins(
+      oxlintConfig.jsPlugins,
+    );
+
+    // Only include valid oxlint schema fields (not CheckConfig metadata like enabled, configPath, cachePath, lintableExtensions)
+    const oxlintConfigForFile: {
+      $schema?: string;
+      ignorePatterns?: string[];
+      plugins?: string[];
+      jsPlugins?: string[];
+      categories?: typeof oxlintConfig.categories;
+      rules?: typeof oxlintConfig.rules;
+      settings?: typeof oxlintConfig.settings;
+      env?: typeof oxlintConfig.env;
+      globals?: typeof oxlintConfig.globals;
+      overrides?: typeof oxlintConfig.overrides;
+    } = {};
+
+    if (oxlintConfig.$schema !== undefined) {
+      oxlintConfigForFile.$schema = oxlintConfig.$schema;
+    }
+    if (oxlintConfig.ignorePatterns !== undefined) {
+      oxlintConfigForFile.ignorePatterns = oxlintConfig.ignorePatterns;
+    }
+    if (oxlintConfig.plugins !== undefined) {
+      oxlintConfigForFile.plugins = oxlintConfig.plugins;
+    }
+    if (resolvedJsPlugins.length > 0) {
+      oxlintConfigForFile.jsPlugins = resolvedJsPlugins;
+    }
+    if (oxlintConfig.categories !== undefined) {
+      oxlintConfigForFile.categories = oxlintConfig.categories;
+    }
+    if (oxlintConfig.rules !== undefined) {
+      oxlintConfigForFile.rules = oxlintConfig.rules;
+    }
+    if (oxlintConfig.settings !== undefined) {
+      oxlintConfigForFile.settings = oxlintConfig.settings;
+    }
+    if (oxlintConfig.env !== undefined) {
+      oxlintConfigForFile.env = oxlintConfig.env;
+    }
+    if (oxlintConfig.globals !== undefined) {
+      oxlintConfigForFile.globals = oxlintConfig.globals;
+    }
+    if (oxlintConfig.overrides !== undefined) {
+      oxlintConfigForFile.overrides = oxlintConfig.overrides;
+    }
+
+    if (resolvedJsPlugins.length > 0) {
+      logger.debug("Resolved jsPlugins paths", {
+        paths: resolvedJsPlugins,
+      });
+    }
+
+    await fs.writeFile(
+      configPath,
+      JSON.stringify(oxlintConfigForFile, null, 2),
+      "utf8",
+    );
+    logger.debug("Generated .oxlintrc.json", { path: configPath });
+
+    return configPath;
+  }
+
+  private static async generatePrettierConfig(
+    logger: EndpointLogger,
+    prettierConfig: CheckConfig["prettier"] & { enabled: true },
+  ): Promise<string> {
+    const configPath = `${process.cwd()}/${prettierConfig.configPath}`;
+    await fs.mkdir(dirname(configPath), { recursive: true });
+
+    const oxfmtConfig = ConfigRepositoryImpl.buildOxfmtConfig(prettierConfig);
+    await fs.writeFile(
+      configPath,
+      JSON.stringify(oxfmtConfig, null, 2),
+      "utf8",
+    );
+    logger.debug("Generated .oxfmtrc.json", { path: configPath });
+
+    return configPath;
+  }
+
+  private static async generatePrettierIgnore(
+    logger: EndpointLogger,
+    ignoreFilePath: string,
+    ignorePatterns: string[],
+  ): Promise<void> {
+    const filePath = `${process.cwd()}/${ignoreFilePath}`;
+    await fs.mkdir(dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, `${ignorePatterns.join("\n")}\n`, "utf8");
+    logger.debug("Generated .prettierignore", { path: filePath });
+  }
+
+  private static async generateEslintConfig(
+    logger: EndpointLogger,
+    eslintConfig: CheckConfig["eslint"] & { enabled: true },
+  ): Promise<string> {
+    const configPath = `${process.cwd()}/${eslintConfig.configPath}`;
+    await fs.mkdir(dirname(configPath), { recursive: true });
+
+    await fs.writeFile(
+      configPath,
+      ConfigRepositoryImpl.generateEslintConfigContent(),
+      "utf8",
+    );
+    logger.debug("Generated eslint.config.mjs", { path: configPath });
+
+    return configPath;
+  }
+}

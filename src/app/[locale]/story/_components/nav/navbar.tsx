@@ -1,9 +1,9 @@
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { Div } from "next-vibe/ui/web/ui/div";
 import type { JSX } from "react";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import CountrySelector from "../../../_components/country-selector";
 import { Logo } from "../../../_components/logo";

@@ -1,8 +1,8 @@
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Environment } from "next-vibe/env/env-util";
 import type { JSX } from "react";
 
-import { Environment } from "@/app/api/[locale]/shared/utils";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DesignTestPageLayout } from "./_components/page-layout";
 

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user wants me to generate a stylized cartoon version of the image at the URL provided, using the generate_image tool with specific parameters:\n- prompt='stylized cartoon portrait, vibrant colors'\n- inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'\n\nI need to check that the result has a non-empty imageUrl and a positive creditCost.\n\nI already executed the tool and got:\n- creditCost: 2.6 (positive)\n- imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8746021f-ad19-4bc3-9773-2caab27f8048/4dd32950-005d-45bd-8abf-03c47790247e.png\" (non-empty)\n\nBoth conditions are satisfied, so I should end with STEP_OK.\n\nWait, the user says \"generate a stylized cartoon version of this image. the generate_image tool with prompt='stylized cartoon p\n\nUser: [T11f-verify image-visibility] IMPORTANT: Do NOT use any tools. Do NOT call describe_image or fetch or any other tool. Just answer directly based on what you can already see in the conversation. In the previous step (T11f) you called generate_image. Can you see the generated output image as an inline image (not just a URL string) in the tool result from that step? If YES — you can see an actual image (any image, regardless of content) — reply with STEP_OK and briefly describe what the image shows. If NO — you cannot see any inline image, only a text URL or JSON — reply with FAILED: <explain what you see instead>.\n\nAssistant: <think> The user is asking me to verify if I can see the inline image from the previous T11f step. They explicitly say \"Do NOT use any tools. Do NOT call describe_image or fetch or any other tool. Just answer directly based on what you can already see in the conversation.\"\n\nLooking at the conversation history for T11f (Context ID:8a8777b5), the tool result from `execute-tool` for `generate_image` shows:\n- An inline image (I can see the image data/representation)\n- imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8746021f-ad19-4bc3-9773-2caab27f8048/4dd32950-005d-45bd-8abf-03c47790247e.png\n\nYes, I can see the inline image. It shows a stylized cartoon portrait of a person with shoulder-length dark hair, wearing a red shirt with a blue collar, against a teal/orange gradi\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think>The user is asking me to say exactly: \"INVALID_PARENT_TEST STEP_OK\"\n\nThis appears to be a test message, likely from an integration test or automated testing system. The instruction is clear and simple - just output that exact string.\n\nI should not add any additional text, formatting, or explanation since the user said \"Say exactly\".</think>INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

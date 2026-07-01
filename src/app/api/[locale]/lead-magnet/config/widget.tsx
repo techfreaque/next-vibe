@@ -1,20 +1,22 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -22,13 +24,11 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import { LeadMagnetProviderDB } from "../enum";
 import type endpoints from "./definition";
@@ -125,7 +125,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
     void (async (): Promise<void> => {
       const [configDef, { apiClient }] = await Promise.all([
         import("./definition"),
-        import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+        import("next-vibe/platforms/react/hooks/store"),
       ]);
       if (!user) {
         return;

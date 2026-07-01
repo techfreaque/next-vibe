@@ -1,0 +1,84 @@
+/**
+ * CLI NumberInput - text input that parses integers/floats
+ * Also supports +/- keys to increment/decrement
+ */
+import { Box, Text, useInput } from "ink";
+import TextInput from "ink-text-input";
+import type { NumberInputProps } from "next-vibe/ui/web/ui/number-input";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
+
+export type { NumberInputProps } from "next-vibe/ui/web/ui/number-input";
+
+export function NumberInput({
+  value = 0,
+  onChange,
+  min,
+  max,
+  step = 1,
+  disabled = false,
+}: NumberInputProps): JSX.Element | null {
+  const isMcp = useIsMcp();
+  const [text, setText] = useState(String(value));
+
+  useInput(
+    (input, key) => {
+      if (disabled) {
+        return;
+      }
+      if (key.upArrow || input === "+") {
+        const next =
+          max !== undefined ? Math.min(max, value + step) : value + step;
+        onChange?.(next);
+        setText(String(next));
+      }
+      if (key.downArrow || input === "-") {
+        const next =
+          min !== undefined ? Math.max(min, value - step) : value - step;
+        onChange?.(next);
+        setText(String(next));
+      }
+    },
+    { isActive: !isMcp && !disabled },
+  );
+
+  if (isMcp) {
+    const rangeHint =
+      min !== undefined && max !== undefined ? ` (${min}-${max})` : "";
+    return (
+      <Text>
+        {value}
+        {rangeHint}
+      </Text>
+    );
+  }
+
+  if (disabled) {
+    return <Text dimColor>[{value}]</Text>;
+  }
+
+  const rangeHint =
+    min !== undefined && max !== undefined ? ` (${min}-${max}, ↑↓)` : " (↑↓)";
+
+  return (
+    <Box>
+      <TextInput
+        value={text}
+        placeholder={String(value)}
+        onChange={(t): void => {
+          setText(t);
+          const num = parseFloat(t);
+          if (!isNaN(num)) {
+            const clamped =
+              min !== undefined && max !== undefined
+                ? Math.min(max, Math.max(min, num))
+                : num;
+            onChange?.(clamped);
+          }
+        }}
+      />
+      <Text dimColor>{rangeHint}</Text>
+    </Box>
+  );
+}

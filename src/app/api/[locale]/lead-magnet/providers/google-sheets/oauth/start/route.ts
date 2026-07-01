@@ -1,12 +1,11 @@
 // oxlint-disable oxlint-plugin-boilerplate/route-pattern -- OAuth start uses raw Response.redirect(), cannot use endpointsHandler
 import "server-only";
 
-import type { NextRequest } from "next-vibe-ui/lib/request";
-
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { Platform } from "next-vibe/core/definition/platform";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import type { NextRequest } from "next-vibe/ui/web/lib/request";
 
 import { buildGoogleAuthUrl } from "../../oauth-helpers";
 

@@ -2,23 +2,22 @@
  * Subscription API Endpoint Definition
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
-import { UserRole } from "../user/user-roles/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 

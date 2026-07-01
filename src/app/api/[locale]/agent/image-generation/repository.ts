@@ -5,14 +5,17 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
@@ -27,9 +30,6 @@ import {
   type ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";

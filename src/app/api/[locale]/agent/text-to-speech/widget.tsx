@@ -1,25 +1,25 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import type { DivMouseEvent } from "next-vibe-ui/ui/div";
-import { Div } from "next-vibe-ui/ui/div";
-import { Pause } from "next-vibe-ui/ui/icons/Pause";
-import { Play } from "next-vibe-ui/ui/icons/Play";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
-import { Span } from "next-vibe-ui/ui/span";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H3 } from "next-vibe-ui/ui/typography";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import type { DivMouseEvent } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Pause } from "next-vibe/ui/web/ui/icons/Pause";
+import { Play } from "next-vibe/ui/web/ui/icons/Play";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { Volume2 } from "next-vibe/ui/web/ui/icons/Volume2";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { H3 } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

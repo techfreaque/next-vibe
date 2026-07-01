@@ -5,11 +5,11 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { AbortReason, isStreamAbort } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";

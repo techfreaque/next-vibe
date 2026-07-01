@@ -1,20 +1,19 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation } from "@/app/api/[locale]/agent/cortex/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useCortexModalStore } from "./store";
 

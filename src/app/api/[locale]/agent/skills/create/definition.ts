@@ -3,6 +3,26 @@
  * Defines endpoint for creating a new custom skill
  */
 
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import {
+  backButton,
+  customWidgetObject,
+  requestField,
+  responseField,
+  submitButton,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -18,27 +38,7 @@ import { skillVariantsSchema } from "@/app/api/[locale]/agent/skills/db";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  requestField,
-  responseField,
-  submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  iconSchema,
-  translatedValueSchema,
-} from "../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import {
@@ -559,20 +559,25 @@ const { POST } = createEndpoint({
         "pinnedTools",
         "compactTrigger",
       ] as const,
-      onEvent: async ({ responseData, requestData, logger, locale, user }) => {
+      onEvent: async ({
+        responseData,
+        requestData,
+        logger,
+        locale,
+        user,
+        agentEnvAvailability,
+      }) => {
         const category = requestData.category;
 
         const [
           { apiClient: client },
           skillsDefinition,
           { SkillsRepositoryClient },
-          { getEnvAvailability },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("next-vibe/platforms/react/hooks/store"),
           import("../definition"),
           import("../repository-client"),
-          import("../../env-availability"),
           import("../i18n"),
         ]);
         const { t } = skillsScopedTranslation.scopedT(locale);
@@ -594,7 +599,7 @@ const { POST } = createEndpoint({
           },
           t,
           user,
-          getEnvAvailability(),
+          agentEnvAvailability,
         );
         client.updateEndpointData(
           skillsDefinition.default.GET,

@@ -3,7 +3,10 @@
  * ALL three operations work identically - they create a new user message and stream AI response
  */
 
-import { parseError } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -13,9 +16,6 @@ import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UseAIStreamReturn } from "./use-ai-stream";
 

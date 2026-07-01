@@ -10,7 +10,9 @@
  * - getFilteredTtsModels(), getFilteredSttModels(), etc.: Role-specific filtered models
  */
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -70,8 +72,6 @@ import {
   type VideoGenModelOption,
   videoGenModelOptions,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { formatSkillId } from "../chat/slugify";
 import type { SkillListItem } from "./definition";

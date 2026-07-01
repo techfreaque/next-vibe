@@ -3,16 +3,16 @@
  * Provides seed data for users management functionality
  */
 
-import { parseError } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPrivatePayloadType } from "../user/auth/types";
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";
-import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";
 import { UserCreateRepository } from "./create/repository";

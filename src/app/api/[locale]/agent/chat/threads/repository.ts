@@ -18,19 +18,21 @@ import {
   or,
 } from "drizzle-orm";
 import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { leads } from "@/app/api/[locale]/leads/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { leads } from "next-vibe/identity/lead/db";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";
 import { DefaultFolderId } from "../config";
@@ -967,7 +969,7 @@ export class ThreadsRepository {
     // Re-emit on the POST channel (fanOut: false) so local WS subscribers on
     // this instance fire their onEvent and insert the thread into the list cache.
     const { createEndpointEmitter } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+      await import("next-vibe/realtime/emitter");
     createEndpointEmitter(definitions.POST, logger, user, { fanOut: false })(
       "thread-created",
       {

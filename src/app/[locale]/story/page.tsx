@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
@@ -11,14 +15,10 @@ import {
   getAvailableProviderCount,
   type ModelCountsByContentLevel,
 } from "@/app/api/[locale]/agent/models/all-models";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { HomeClient } from "./_components/home-client";
 import { scopedTranslation } from "./i18n";

@@ -16,7 +16,7 @@ import type {
   EslintFlatConfigItem,
   EslintParser,
   EslintPluginLike,
-} from "@next-vibe/checker/system/check/config/types";
+} from "@next-vibe/checker/tooling/check/config/types";
 
 // --------------------------------------------------------
 // Vibe Check Defaults
@@ -108,7 +108,6 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "build",
   "test-files",
   "test-project",
-  "coding-challange",
   "public/vibe-frame/**",
   // Files
   ".DS_Store",
@@ -386,7 +385,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
             "error",
             {
-              excludedPaths: ["/src/packages/next-vibe-ui/"],
+              excludedPaths: ["/system/ui/"],
               excludedFilePatterns: [
                 "/email.tsx",
                 ".email.tsx",
@@ -677,9 +676,9 @@ const oxlint: CheckConfig["oxlint"] = {
   },
   overrides: [
     {
-      // next-vibe-ui platform wrappers legitimately use native HTML elements
+      // vibe ui platform wrappers legitimately use native HTML elements
       // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
-      files: ["**/next-vibe-ui/**"],
+      files: ["**/system/ui/**"],
       rules: {
         "nextjs/no-head-element": "off",
       },

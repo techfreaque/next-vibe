@@ -4,9 +4,10 @@
  * CRITICAL: This file must be isomorphic (works in both environments)
  */
 
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 /**
  * Format absolute timestamp for message metadata

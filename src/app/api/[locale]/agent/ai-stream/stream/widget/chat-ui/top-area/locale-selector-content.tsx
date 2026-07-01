@@ -1,17 +1,26 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Span } from "next-vibe-ui/ui/span";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type {
+  Countries,
+  CountryInfo,
+  Languages,
+} from "next-vibe/core/i18n/core/config";
+import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Span } from "next-vibe/ui/web/ui/span";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/web/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";
-import { useTranslation } from "@/i18n/core/client";
-import type { Countries, CountryInfo, Languages } from "@/i18n/core/config";
-import { getUniqueLanguages } from "@/i18n/core/language-utils";
 
 export const LocaleSelectorContent: FC = () => {
   const translationContext = useTranslation();

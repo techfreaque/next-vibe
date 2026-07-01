@@ -1,13 +1,13 @@
 "use client";
 
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useMemo } from "react";
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import remoteConnectionEndpoints from "@/app/api/[locale]/remote-connection/list/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
 

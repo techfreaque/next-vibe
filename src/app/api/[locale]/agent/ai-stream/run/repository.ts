@@ -11,13 +11,21 @@
 import "server-only";
 
 import { and, eq, or } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { CallbackMode } from "next-vibe/execute-tool/constants";
+import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   type ChatModelId,
@@ -46,14 +54,6 @@ import {
   resolveFavoriteConfig,
 } from "@/app/api/[locale]/agent/skills/favorites/repository";
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { HeadlessPreCall } from "../repository/headless";
 import { runHeadlessAiStream } from "../repository/headless";

@@ -5,31 +5,30 @@
  * Allows users to attach files to chat messages
  */
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Paperclip } from "next-vibe-ui/ui/icons/Paperclip";
-import { X } from "next-vibe-ui/ui/icons/X";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Paperclip } from "next-vibe/ui/web/ui/icons/Paperclip";
+import { X } from "next-vibe/ui/web/ui/icons/X";
 import {
   Input,
   type InputChangeEvent,
   type InputRefObject,
-} from "next-vibe-ui/ui/input";
+} from "next-vibe/ui/web/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+} from "next-vibe/ui/web/ui/tooltip";
 import type { JSX } from "react";
 import { memo, useRef, useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { isAllowedFileType } from "../../../chat/incognito/file-utils";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";

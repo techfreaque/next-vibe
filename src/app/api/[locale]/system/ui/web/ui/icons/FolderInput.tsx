@@ -1,0 +1,4 @@
+import { FolderInput as LucideFolderInput } from "lucide-react";
+import { type IconComponent } from "next-vibe/ui/web/lib/helper";
+
+export const FolderInput: IconComponent = LucideFolderInput;

@@ -11,8 +11,8 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type Stripe from "stripe";
 
 /** Extracted from Stripe.Checkout.SessionCreateParams - TS6 can't resolve merged class/namespace */
@@ -55,13 +55,14 @@ const PAYMENT_METHOD_TO_STRIPE: Record<
   [PaymentMethodType.SEPA_DEBIT]: "sepa_debit",
 };
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { subscriptions } from "../subscription/db";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
@@ -841,7 +842,7 @@ export class PaymentRepository {
       } = await import("../credits/db");
       const { CreditTransactionType } = await import("../credits/enum");
       const { withTransaction } =
-        await import("../system/db/utils/repository-helpers");
+        await import("../system/database/utils/repository-helpers");
 
       const periodEndMs = subResult.data.currentPeriodEnd;
       const renewalKey = `renewal_${subscriptionId}_${periodEndMs}`;

@@ -1,9 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { redirect } from "next-vibe-ui/lib/redirect";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { redirect } from "next-vibe/ui/web/lib/redirect";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SubscriptionPageProps {
   params: Promise<{ locale: CountryLanguage }>;

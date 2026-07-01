@@ -1,6 +1,12 @@
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
 import {
   backButton,
   objectField,
@@ -8,15 +14,8 @@ import {
   requestUrlPathParamsField,
   responseField,
   submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
 

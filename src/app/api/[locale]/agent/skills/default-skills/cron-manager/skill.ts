@@ -1,19 +1,20 @@
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,
   CRON_UPDATE_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/constants";
-import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/constants";
-import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
+} from "next-vibe/tasks/cron/[id]/constants";
+import { CRON_HISTORY_ALIAS } from "next-vibe/tasks/cron/history/constants";
+import { CRON_STATS_ALIAS } from "next-vibe/tasks/cron/stats/constants";
 import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/constants";
-import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/constants";
-import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/tasks/cron/tasks/constants";
+import { PULSE_EXECUTE_ALIAS } from "next-vibe/tasks/pulse/execute/constants";
+import { PULSE_STATUS_ALIAS } from "next-vibe/tasks/pulse/status/constants";
+
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

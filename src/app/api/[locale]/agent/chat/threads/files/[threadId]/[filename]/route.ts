@@ -3,8 +3,8 @@
  * Serves uploaded files from filesystem storage
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import definitions from "./definition";
 import { ChatFileRepository } from "./repository";

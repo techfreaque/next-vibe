@@ -1,0 +1,30 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a13eb46f6e0adb0f-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 16:56:32 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782838591-zcsmlT65zhS6QodEQ77z"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782838591-zcsmlT65zhS6QodEQ77z\",\"object\":\"chat.completion.chunk\",\"created\":1782838591,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user is asking me to say exactly: \\\"INVALID_PARENT_TEST STEP_OK\\\"\\n\\nThis appears to be a test message, likely from an integration test or automated testing system. The instruction is clear and simple - just output that exact string.\\n\\nI should not add\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user is asking me to say exactly: \\\"INVALID_PARENT_TEST STEP_OK\\\"\\n\\nThis appears to be a test message, likely from an integration test or automated testing system. The instruction is clear and simple - just output that exact string.\\n\\nI should not add\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782838591-zcsmlT65zhS6QodEQ77z\",\"object\":\"chat.completion.chunk\",\"created\":1782838591,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" any additional text, formatting, or explanation since the user said \\\"Say exactly\\\".\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" any additional text, formatting, or explanation since the user said \\\"Say exactly\\\".\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782838591-zcsmlT65zhS6QodEQ77z\",\"object\":\"chat.completion.chunk\",\"created\":1782838591,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"INVALID_PARENT_TEST STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782838591-zcsmlT65zhS6QodEQ77z\",\"object\":\"chat.completion.chunk\",\"created\":1782838591,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782838591-zcsmlT65zhS6QodEQ77z\",\"object\":\"chat.completion.chunk\",\"created\":1782838591,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":6205,\"completion_tokens\":74,\"total_tokens\":6279,\"cost\":0.002630392,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":3328,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.002630392,\"upstream_inference_prompt_cost\":0.002378052,\"upstream_inference_completions_cost\":0.00025234},\"completion_tokens_details\":{\"reasoning_tokens\":67,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

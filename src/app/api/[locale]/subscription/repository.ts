@@ -6,19 +6,20 @@
 import "server-only";
 
 import { desc, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getEnvAvailability } from "../agent/env-availability";
 import { getAvailableModelCount } from "../agent/models/all-models";
@@ -29,7 +30,6 @@ import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
-import type { JwtPrivatePayloadType } from "../user/auth/types";
 import type {
   SubscriptionCancelDeleteRequestOutput,
   SubscriptionCancelDeleteResponseOutput,
@@ -942,7 +942,7 @@ export class SubscriptionRepository {
       // Send confirmation emails (user + admin)
       try {
         const { users: usersTable } = await import("../user/db");
-        const { userLeadLinks } = await import("../leads/db");
+        const { userLeadLinks } = await import("next-vibe/identity/lead/db");
         const [fullUser] = await db
           .select({
             email: usersTable.email,

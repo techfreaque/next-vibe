@@ -1,10 +1,10 @@
 import "server-only";
 
+import { Methods } from "next-vibe/core/definition/enums";
 /**
  * Lead Skill Attribution Route Handler
  */
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import definitions from "./definition";
 import { LeadSkillRepository } from "./repository";

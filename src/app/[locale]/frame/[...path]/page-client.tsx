@@ -8,22 +8,22 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { setRootCssVar } from "next-vibe-ui/lib/css-vars";
-import { getDocumentScrollHeight } from "next-vibe-ui/lib/dom";
-import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type {
   FrameTheme,
   ParentToFrameMessage,
-} from "@/app/api/[locale]/system/unified-interface/vibe-frame/types";
-import { useFrameBridge } from "@/app/api/[locale]/system/unified-interface/vibe-frame/use-bridge";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/platforms/vibe-frame/types";
+import { useFrameBridge } from "next-vibe/platforms/vibe-frame/use-bridge";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { setRootCssVar } from "next-vibe/ui/web/lib/css-vars";
+import { getDocumentScrollHeight } from "next-vibe/ui/web/lib/dom";
+import { Div } from "next-vibe/ui/web/ui/div";
+import type { JSX } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { getEndpoint } from "@/generated/endpoint";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

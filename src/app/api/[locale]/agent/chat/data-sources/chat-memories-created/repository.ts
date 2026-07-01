@@ -10,19 +10,19 @@ import { and, count, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
-import { db } from "@/app/api/[locale]/system/db";
+} from "next-vibe/core/route/response.schema";
 import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/core/utils/dataflow/shared/query-utils";
+import { fillGaps } from "next-vibe/core/utils/dataflow/shared/range";
+import { db } from "next-vibe/database";
+
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 
 export class QueryChatMemoriesCreatedRepository {
   static async queryChatMemoriesCreated(data: {

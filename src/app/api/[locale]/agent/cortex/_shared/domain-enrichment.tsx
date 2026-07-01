@@ -11,7 +11,7 @@
 
 "use client";
 
-import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { Suspense, useMemo } from "react";
 
 import { scopedTranslation } from "../i18n";

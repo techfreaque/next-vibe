@@ -4,13 +4,13 @@
  * This file implements the middleware for the application.
  */
 
-import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe-ui/lib/request";
+import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
 
+import type { languageDefaults } from "./app/api/[locale]/system/core/i18n";
+import type { CountryLanguage } from "./app/api/[locale]/system/core/i18n/core/config";
 // we have to use relative paths as vercel cant resolve import aliases from here
-import { middleware } from "./app/api/[locale]/system/middleware";
-import type { languageDefaults } from "./i18n";
-import type { CountryLanguage } from "./i18n/core/config";
+import { middleware } from "./app/api/[locale]/system/server/middleware";
 
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";

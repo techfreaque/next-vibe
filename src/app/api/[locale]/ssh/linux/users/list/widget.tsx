@@ -4,11 +4,11 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Span } from "next-vibe-ui/ui/span";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Table,
   TableBody,
@@ -16,14 +16,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe-ui/ui/table";
-import { P } from "next-vibe-ui/ui/typography";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+} from "next-vibe/ui/web/ui/table";
+import { P } from "next-vibe/ui/web/ui/typography";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback } from "react";
 
 import type endpoints from "./definition";

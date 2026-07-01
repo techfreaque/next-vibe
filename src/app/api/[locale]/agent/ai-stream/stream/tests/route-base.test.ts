@@ -54,6 +54,14 @@ import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
 import { and, eq, like, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -69,15 +77,7 @@ import {
 } from "@/app/api/[locale]/agent/skills/enum";
 import { contacts } from "@/app/api/[locale]/contact/db";
 import { ContactSubject } from "@/app/api/[locale]/contact/enum";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { ChatModelId } from "../../models";
@@ -1590,7 +1590,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // guarantees the mirror converges even without a live WS push.
             {
               const { getWsConnection } =
-                await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+                await import("next-vibe/realtime/connector");
               const conn = cfg.systemPromptInstanceId
                 ? getWsConnection(cfg.systemPromptInstanceId)
                 : null;
@@ -1616,7 +1616,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // thread is about to enter 'waiting' (or jump straight to a
           // revival) — poll the transition instead of racing it.
           const { hasPendingCallForThread } =
-            await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
+            await import("next-vibe/execute-tool/pending-calls");
           const hasPendingWork = async (): Promise<boolean> => {
             const [runningTask] = await db
               .select({ id: cronTasks.id })
@@ -1726,7 +1726,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // fires any attached await-task revival.
             if (cfg.remoteInstanceId && revivalState === "waiting") {
               const { hasPendingCallForThread: reconcileTick } =
-                await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
+                await import("next-vibe/execute-tool/pending-calls");
               await reconcileTick(tid);
             }
             // If thread went back to 'waiting' (AI retried after failure), pulse again.

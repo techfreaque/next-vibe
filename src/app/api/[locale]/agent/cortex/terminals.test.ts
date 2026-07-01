@@ -9,11 +9,10 @@
 
 import "server-only";
 
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { drainSessionPool } from "../../ssh/session/pool";
 import terminalsEndpoint from "./terminals/definition";

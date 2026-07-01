@@ -1,18 +1,17 @@
 "use client";
 
-import { getReferrer } from "next-vibe-ui/lib/dom";
-import { getCurrentUrl } from "next-vibe-ui/lib/location";
-import { getUserAgent } from "next-vibe-ui/lib/media";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { EngagementTypes } from "next-vibe/identity/lead/enum";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import trackingEndpoints from "next-vibe/identity/tracking/engagement/definition";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { getReferrer } from "next-vibe/ui/web/lib/dom";
+import { getCurrentUrl } from "next-vibe/ui/web/lib/location";
+import { getUserAgent } from "next-vibe/ui/web/lib/media";
 import { useEffect, useRef } from "react";
 
-import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useLogger } from "@/hooks/use-logger";
-import { useTranslation } from "@/i18n/core/client";
-
-import { EngagementTypes } from "../../api/[locale]/leads/enum";
 
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 

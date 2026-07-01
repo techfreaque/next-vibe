@@ -3,20 +3,19 @@
  */
 
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { PaginationWidget } from "next-vibe-ui/unified/containers/pagination/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { PaginationWidget } from "next-vibe/unified-ui/containers/pagination/widget";
 
 import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
-import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 

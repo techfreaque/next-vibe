@@ -1,8 +1,7 @@
+import { objectEntries } from "next-vibe/core/utils/object";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
-import { objectEntries } from "../../shared/utils";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {

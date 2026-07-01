@@ -4,9 +4,9 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { parseError } from "../../../../shared/utils";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class FileUploadEventHandler {

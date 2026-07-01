@@ -9,11 +9,12 @@ import "server-only";
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import {
   type IconKey,
   IconKeyDB,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import {
@@ -53,7 +54,6 @@ import {
   type SyncProvider,
   toStandardCursor,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { db } from "@/app/api/[locale]/system/db";
 
 import { chatFavorites } from "./db";
 

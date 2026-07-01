@@ -5,22 +5,21 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Span } from "next-vibe-ui/ui/span";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetDisabled,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-
-import { useTranslation } from "@/i18n/core/client";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";

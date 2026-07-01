@@ -1,23 +1,19 @@
 /// <reference types="node" />
 import { performance } from "node:perf_hooks";
 
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
+import type { UndefinedType } from "next-vibe/core/definition/common.schema";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
+} from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { smsEnv } from "./env";
 import { scopedTranslation } from "./i18n";

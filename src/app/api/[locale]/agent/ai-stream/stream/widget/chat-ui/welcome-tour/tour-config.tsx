@@ -1,12 +1,14 @@
-import { getRootCssVar } from "next-vibe-ui/lib/css-vars";
-import { Div } from "next-vibe-ui/ui/div";
-import type { Step } from "next-vibe-ui/ui/joyride";
-import { Li } from "next-vibe-ui/ui/li";
-import { Span } from "next-vibe-ui/ui/span";
-import { Strong } from "next-vibe-ui/ui/strong";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
-import { Ul } from "next-vibe-ui/ui/ul";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
+import { getRootCssVar } from "next-vibe/ui/web/lib/css-vars";
+import { Div } from "next-vibe/ui/web/ui/div";
+import type { Step } from "next-vibe/ui/web/ui/joyride";
+import { Li } from "next-vibe/ui/web/ui/li";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Strong } from "next-vibe/ui/web/ui/strong";
+import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { Ul } from "next-vibe/ui/web/ui/ul";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
@@ -14,8 +16,6 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { formatCurrency } from "@/i18n/core/localization-utils";
 
 import { getTourSelector, TOUR_DATA_ATTRS } from "./tour-attrs";
 export type { TourDataAttr } from "./tour-attrs";

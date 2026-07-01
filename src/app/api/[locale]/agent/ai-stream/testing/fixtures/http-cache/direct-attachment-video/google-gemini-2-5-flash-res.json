@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e94de3f03dc82-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 16:35:02 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782837300-rxcuuQZE3XpjKtnm9zXG"
+  },
+  "body": {
+    "id": "gen-1782837300-rxcuuQZE3XpjKtnm9zXG",
+    "object": "chat.completion",
+    "created": 1782837300,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is an audio clip of a piece of hip-hop instrumental music with a duration of 35 seconds.\n\nThe sound quality is clean and polished, suggesting a studio recording environment.\n\nThe tempo is moderate, approximately 90-100 BPM, and the time signature appears to be 4/4. The key or scale is not immediately discernible without further analysis, but it has a somewhat playful, light, and understated mood.\n\nInstruments heard and their interactions:\n- **Drums:** A drum machine provides a standard hip-hop beat. It includes a clear, crisp snap-like snare hit, a kick drum that is not overly prominent, and a closed hi-hat that plays a steady rhythm. The drum pattern is consistent throughout the clip.\n- **Bass:** A sub-bass or low 808-style bass provides a foundational, driving rhythm but remains in the background, not dominating the mix.\n- **Electric Piano/Keyboard:** A clean electric piano sound plays a groovy, somewhat jazzy chord progression with a slightly swung feel. This forms the main melodic and harmonic bed of the track. Its interaction with the drums creates a head-nodding rhythm.\n- **Percussion:** A shaker or a similar high-frequency percussion instrument adds to the rhythmic texture, playing a consistent, subtly intricate pattern on top of the main drum beat.\n\nThere are no vocals, speech, or noticeable sound effects. The clip seems to be a loop or a segment of a longer instrumental track, without a clear intro, verse, or chorus structure within this short duration. The production style is clean and polished with a modern feel.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 338,
+      "total_tokens": 1410,
+      "cost": 0.0016916,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016916,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000845
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

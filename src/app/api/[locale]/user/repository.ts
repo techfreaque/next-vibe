@@ -6,24 +6,25 @@
 import "server-only";
 
 import { and, count, eq, ilike, inArray, not, or } from "drizzle-orm";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { hashPassword } from "next-vibe/shared/utils/password";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
+import { hashPassword } from "next-vibe/identity/auth/password";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { userLeadLinks } from "next-vibe/identity/lead/db";
+import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
+import { UserRole, type UserRoleValue } from "next-vibe/identity/roles/enum";
+import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { LeadAuthRepository } from "../leads/auth/repository";
-import { userLeadLinks } from "../leads/db";
-import { scopedTranslation as authScopedTranslation } from "./auth/i18n";
-import { AuthRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
@@ -37,8 +38,6 @@ import type {
   UserSearchOptions,
   UserType,
 } from "./types";
-import { UserRole, type UserRoleValue } from "./user-roles/enum";
-import { UserRolesRepository } from "./user-roles/repository";
 
 /**
  * Derive a URL-safe slug from a display name.

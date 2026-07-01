@@ -1,22 +1,21 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { PenTool } from "next-vibe-ui/ui/icons/PenTool";
-import { Image } from "next-vibe-ui/ui/image";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Section } from "next-vibe-ui/ui/section";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { Lightbulb } from "next-vibe/ui/web/ui/icons/Lightbulb";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { PenTool } from "next-vibe/ui/web/ui/icons/PenTool";
+import { Image } from "next-vibe/ui/web/ui/image";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Section } from "next-vibe/ui/web/ui/section";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, P } from "next-vibe/ui/web/ui/typography";
 import type React from "react";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

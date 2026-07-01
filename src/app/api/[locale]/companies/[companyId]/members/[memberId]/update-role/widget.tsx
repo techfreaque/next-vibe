@@ -1,21 +1,21 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX } from "react";
 
 import type { CompanyMemberRoleValue } from "../../../../enum";

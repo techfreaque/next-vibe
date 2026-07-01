@@ -3,12 +3,16 @@
  * Defines endpoint for retrieving credit transaction history
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
-import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -16,16 +20,12 @@ import {
   requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { paginationField } from "next-vibe/unified-ui/containers/pagination/types";
+import { z } from "zod";
 
-import { dateSchema } from "../../shared/types/common.schema";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
 

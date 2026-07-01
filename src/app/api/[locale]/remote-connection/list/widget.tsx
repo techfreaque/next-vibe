@@ -8,43 +8,43 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { WifiOff } from "next-vibe-ui/ui/icons/WifiOff";
-import { Link } from "next-vibe-ui/ui/link";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, P } from "next-vibe-ui/ui/typography";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
+import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { SiGithub } from "next-vibe/ui/web/ui/icons/SiGithub";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { WifiOff } from "next-vibe/ui/web/ui/icons/WifiOff";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, P } from "next-vibe/ui/web/ui/typography";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { GITHUB_REPO_URL } from "@/config/constants";
 import { envClient } from "@/config/env-client";
 

@@ -5,23 +5,23 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Info } from "next-vibe-ui/ui/icons/Info";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Span } from "next-vibe-ui/ui/span";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Info } from "next-vibe/ui/web/ui/icons/Info";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type { FolderPermissionsTranslationKey } from "./i18n";

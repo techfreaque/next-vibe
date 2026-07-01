@@ -6,38 +6,39 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { Environment } from "next-vibe/shared/utils/env-util";
-
-import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { Environment } from "next-vibe/env/env-util";
 import {
-  cronTaskExecutions,
-  cronTasks,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTasksRepository } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
-import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { CountryLanguageValues } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/language-utils";
-
-import { emailCampaigns, leadLeadLinks, leads } from "../../db";
+  emailCampaigns,
+  leadLeadLinks,
+  leads,
+} from "next-vibe/identity/lead/db";
 import {
   EmailJourneyVariant,
   EmailJourneyVariantFilter,
   LeadStatus,
-} from "../../enum";
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
+import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
+
+import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
+import { env } from "@/config/env";
+
 import { campaignStarterConfigs } from "../campaign-starter/db";
 import type {
   CampaignStatsGetRequestOutput,

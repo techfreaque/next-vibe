@@ -34,9 +34,8 @@ const numericNumber = customType<{
   },
 });
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import type { z } from "zod";
-
-import { CurrenciesArr } from "@/i18n/core/config";
 
 import { companies } from "../companies/db";
 import { users } from "../user/db";

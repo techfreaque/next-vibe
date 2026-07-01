@@ -3,21 +3,21 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Server } from "next-vibe-ui/ui/icons/Server";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Server } from "next-vibe/ui/web/ui/icons/Server";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -26,10 +26,8 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback, useMemo } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import messengerAccountCreateDefinition from "../create/definition";
 import messengerAccountEditDefinition from "../edit/[id]/definition";
@@ -227,7 +225,7 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
   const handleGraphs = useCallback((): void => {
     void (async (): Promise<void> => {
       const graphsDef =
-        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+        await import("next-vibe/core/utils/dataflow/graphs/definition");
       navigate(graphsDef.default.GET, {
         data: { search: "messenger" },
       });

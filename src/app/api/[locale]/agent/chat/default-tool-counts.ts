@@ -9,12 +9,13 @@
 
 import "server-only";
 
-import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
-import { permissionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/permissions/registry";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { Platform } from "next-vibe/core/definition/platform";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
 
-import type { JwtPayloadType } from "../../user/auth/types";
+import { endpointsMeta } from "@/generated/endpoints-meta/en";
+
 import { getDefaultToolIds } from "./constants";
 
 /** Cached counts per role key */

@@ -4,24 +4,23 @@
 
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   useWidgetForm,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo } from "react";
-
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";

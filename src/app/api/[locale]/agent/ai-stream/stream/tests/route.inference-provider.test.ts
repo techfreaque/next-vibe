@@ -47,13 +47,13 @@ installFetchCache();
 import { installWsFixture } from "../../testing/ws-fixture";
 installWsFixture();
 
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { reloadWsProviderConnector } from "next-vibe/realtime/connector";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { reloadWsProviderConnector } from "@/app/api/[locale]/system/unified-interface/websocket/connector";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 import {

@@ -7,7 +7,12 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
@@ -18,11 +23,6 @@ import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
-import { ErrorResponseTypes } from "@/app/api/[locale]/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { ChatMessageRole } from "../../chat/enum";
 import type { MessagesWsEmit } from "../../chat/threads/[threadId]/messages/emitter";

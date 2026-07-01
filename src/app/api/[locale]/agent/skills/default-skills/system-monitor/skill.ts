@@ -1,13 +1,14 @@
+import { DB_HEALTH_ALIAS } from "next-vibe/database/health/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
+import { CRON_HISTORY_ALIAS } from "next-vibe/tasks/cron/history/constants";
+import { CRON_STATS_ALIAS } from "next-vibe/tasks/cron/stats/constants";
+import { PULSE_EXECUTE_ALIAS } from "next-vibe/tasks/pulse/execute/constants";
+import { PULSE_HISTORY_ALIAS } from "next-vibe/tasks/pulse/history/constants";
+import { PULSE_STATUS_ALIAS } from "next-vibe/tasks/pulse/status/constants";
+
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DB_HEALTH_ALIAS } from "@/app/api/[locale]/system/db/health/constants";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
-import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/constants";
-import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
-import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/constants";
-import { PULSE_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/history/constants";
-import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

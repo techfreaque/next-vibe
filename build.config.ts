@@ -15,8 +15,8 @@ import {
   OutputFormatEnum,
   SourcemapModeEnum,
   ViteBuildTypeEnum,
-} from "@/app/api/[locale]/system/builder/enum";
-import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
+} from "@/app/api/[locale]/system/tooling/builder/enum";
+import type { BuildConfig } from "@/app/api/[locale]/system/tooling/builder/repository";
 
 const config: BuildConfig = {
   // Folders to clean before building
@@ -25,8 +25,7 @@ const config: BuildConfig = {
   // Build the CLI as an executable using Bun
   filesToCompile: [
     {
-      input:
-        "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+      input: "src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts",
       output: ".dist/bin/vibe-runtime.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       modulesToExternalize: [
@@ -57,7 +56,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -71,7 +70,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -84,7 +83,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
+        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -98,8 +97,7 @@ const config: BuildConfig = {
     // ── Vibe Frame: browser IIFE (script tag) ───────────────────────────────
     // Exposes window.VibeFrame for <script src="/vibe-frame/vibe-frame.js"> usage.
     {
-      input:
-        "src/app/api/[locale]/system/unified-interface/vibe-frame/embed.ts",
+      input: "src/app/api/[locale]/system/platforms/vibe-frame/embed.ts",
       output: "public/vibe-frame/vibe-frame.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -114,7 +112,7 @@ const config: BuildConfig = {
     // Library entry - no auto-init, no window exposure, full type exports.
     {
       input:
-        "src/app/api/[locale]/system/unified-interface/vibe-frame/embed-package.ts",
+        "src/app/api/[locale]/system/platforms/vibe-frame/embed-package.ts",
       output: "public/vibe-frame/vibe-frame.esm.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -129,7 +127,7 @@ const config: BuildConfig = {
     // Provides window.bridgeCall for widget code to call privileged parent APIs.
     {
       input:
-        "src/app/api/[locale]/system/unified-interface/vibe-frame/inside-bridge.ts",
+        "src/app/api/[locale]/system/platforms/vibe-frame/inside-bridge.ts",
       output: "public/vibe-frame/vibe-frame-inside-bridge.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],

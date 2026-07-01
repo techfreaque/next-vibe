@@ -1,0 +1,203 @@
+/**
+ * Run tests Endpoint Definition
+ * Production-ready endpoint for run tests
+ */
+
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { scopedTranslation } from "next-vibe/tooling/check/testing/test/i18n";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+const TestResultWidget = lazyWidget(() =>
+  import("next-vibe/tooling/check/testing/test/widget").then((m) => ({
+    default: m.TestResultWidget,
+  })),
+);
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "tooling", "check", "testing", "test"],
+  title: "title",
+  titleShort: "title",
+  description: "description",
+  category: "devTools",
+  subCategory: "Check",
+  tags: ["tag"],
+  icon: "test-tube",
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.WEB_OFF,
+    UserRole.PRODUCTION_OFF,
+    UserRole.AI_TOOL_OFF,
+  ],
+  aliases: ["test", "t"],
+
+  cli: {
+    firstCliArgKey: "path",
+  },
+
+  fields: customWidgetObject({
+    render: TestResultWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
+      // === REQUEST FIELDS ===
+      path: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.path.label",
+        description: "fields.path.description",
+        placeholder: "fields.path.placeholder",
+        columns: 6,
+        schema: z.string().optional().default("src/"),
+      }),
+
+      verbose: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.verbose.label",
+        description: "fields.verbose.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
+
+      watch: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.watch.label",
+        description: "fields.watch.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
+
+      coverage: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.coverage.label",
+        description: "fields.coverage.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
+
+      // === RESPONSE FIELDS ===
+      success: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.success",
+        schema: z.boolean(),
+      }),
+
+      output: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.output",
+        schema: z.string(),
+      }),
+
+      duration: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.duration",
+        schema: z.coerce.number(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "errors.validation.title",
+      description: "errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "errors.internal.title",
+      description: "errors.internal.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "errors.server.title",
+      description: "errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "success.title",
+    description: "success.description",
+  },
+
+  examples: {
+    requests: {
+      default: {
+        verbose: false,
+        watch: false,
+      },
+      verbose: {
+        verbose: true,
+        watch: false,
+      },
+      watch: {
+        path: "src/app/api/[locale]/system/tooling/check",
+        verbose: true,
+        watch: true,
+      },
+    },
+    responses: {
+      default: {
+        success: true,
+        output: "Tests completed successfully",
+        duration: 1500,
+      },
+      verbose: {
+        success: true,
+        output: "Tests completed with detailed output",
+        duration: 2000,
+      },
+      watch: {
+        success: true,
+        output: "Tests running in watch mode",
+        duration: 500,
+      },
+    },
+  },
+});
+
+// Export types following migration guide pattern
+export type TestRequestInput = typeof POST.types.RequestInput;
+export type TestRequestOutput = typeof POST.types.RequestOutput;
+export type TestResponseInput = typeof POST.types.ResponseInput;
+export type TestResponseOutput = typeof POST.types.ResponseOutput;
+
+const endpoints = { POST };
+export default endpoints;

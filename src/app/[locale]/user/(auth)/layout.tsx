@@ -1,4 +1,4 @@
-import { PageLayout } from "next-vibe-ui/ui/page-layout";
+import { PageLayout } from "next-vibe/ui/web/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 export interface AuthLayoutData {

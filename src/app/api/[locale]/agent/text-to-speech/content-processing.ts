@@ -3,17 +3,16 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import { getTranslatorFromEndpoint } from "next-vibe-ui/unified/_shared/field-helpers";
+import { definitionLoader } from "next-vibe/core/definition/loader";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { getTranslatorFromEndpoint } from "next-vibe/unified-ui/_shared/field-helpers";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { parseError } from "../../shared/utils";
-import type { JwtPayloadType } from "../../user/auth/types";
 
 /**
  * Strip <think> tags from content

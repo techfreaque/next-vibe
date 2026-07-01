@@ -5,28 +5,28 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
-import { Home } from "next-vibe-ui/ui/icons/Home";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
-import { Star } from "next-vibe-ui/ui/icons/Star";
-import { Upload } from "next-vibe-ui/ui/icons/Upload";
-import { Wand2 } from "next-vibe-ui/ui/icons/Wand2";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Span } from "next-vibe-ui/ui/span";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
+import { Home } from "next-vibe/ui/web/ui/icons/Home";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { SquareCheck } from "next-vibe/ui/web/ui/icons/SquareCheck";
+import { Star } from "next-vibe/ui/web/ui/icons/Star";
+import { Upload } from "next-vibe/ui/web/ui/icons/Upload";
+import { Wand2 } from "next-vibe/ui/web/ui/icons/Wand2";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetForm,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import { CortexNav } from "../_shared/cortex-nav";
 import { formatBytes } from "../_shared/format-bytes";

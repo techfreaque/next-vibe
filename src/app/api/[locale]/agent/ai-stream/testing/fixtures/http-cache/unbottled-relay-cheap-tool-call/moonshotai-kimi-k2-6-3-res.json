@@ -1,0 +1,29 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a14098cbdebbdbdb-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 22:27:12 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782858431-CCQL3tXiaJEoZkZvaYL5"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782858431-CCQL3tXiaJEoZkZvaYL5\",\"object\":\"chat.completion.chunk\",\"created\":1782858431,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The second call returned a non-empty tools array with 12 tools. Each tool has a name and description. The categories list also looked right. Everything looks correct.\\n\\nI should end with STEP_OK.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The second call returned a non-empty tools array with 12 tools. Each tool has a name and description. The categories list also looked right. Everything looks correct.\\n\\nI should end with STEP_OK.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858431-CCQL3tXiaJEoZkZvaYL5\",\"object\":\"chat.completion.chunk\",\"created\":1782858431,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858431-CCQL3tXiaJEoZkZvaYL5\",\"object\":\"chat.completion.chunk\",\"created\":1782858431,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782858431-CCQL3tXiaJEoZkZvaYL5\",\"object\":\"chat.completion.chunk\",\"created\":1782858431,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":8193,\"completion_tokens\":44,\"total_tokens\":8237,\"cost\":0.00555742,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00555742,\"upstream_inference_prompt_cost\":0.00540738,\"upstream_inference_completions_cost\":0.00015004},\"completion_tokens_details\":{\"reasoning_tokens\":40,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

@@ -1,29 +1,31 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
-import { Info } from "next-vibe-ui/ui/icons/Info";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Span } from "next-vibe-ui/ui/span";
-import { H4, P } from "next-vibe-ui/ui/typography";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { Calendar } from "next-vibe/ui/web/ui/icons/Calendar";
+import { Coins } from "next-vibe/ui/web/ui/icons/Coins";
+import { Info } from "next-vibe/ui/web/ui/icons/Info";
+import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H4, P } from "next-vibe/ui/web/ui/typography";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -49,8 +51,6 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { useTranslation } from "@/i18n/core/client";
 
 import { CreditsTabHeader } from "./credits-tab-header";
 

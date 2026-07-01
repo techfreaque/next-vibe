@@ -8,9 +8,15 @@
 
 "use client";
 
-import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { useResizeObserver } from "next-vibe-ui/hooks/use-resize-observer";
-import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { usePathname, useRouter } from "next-vibe/ui/web/hooks/use-navigation";
+import { useResizeObserver } from "next-vibe/ui/web/hooks/use-resize-observer";
+import { useSafeAreaInsets } from "next-vibe/ui/web/hooks/use-safe-area-insets";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,15 +26,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe-ui/ui/alert-dialog";
-import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
+} from "next-vibe/ui/web/ui/alert-dialog";
+import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
+import { KeyboardAvoidingView } from "next-vibe/ui/web/ui/keyboard-avoiding-view";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -49,13 +55,7 @@ import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
-import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { platform } from "@/config/env-client";
-import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";

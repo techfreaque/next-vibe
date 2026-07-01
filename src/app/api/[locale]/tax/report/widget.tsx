@@ -1,17 +1,16 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
 import type { TaxReportResponseOutput } from "./definition";

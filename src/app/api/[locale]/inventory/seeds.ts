@@ -4,6 +4,9 @@
  */
 
 import { and, eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
 import {
@@ -11,10 +14,7 @@ import {
   CompanyType,
 } from "@/app/api/[locale]/companies/enum";
 import { catalogProducts } from "@/app/api/[locale]/products/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { users } from "@/app/api/[locale]/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { stockLevels, warehouses } from "./db";
 

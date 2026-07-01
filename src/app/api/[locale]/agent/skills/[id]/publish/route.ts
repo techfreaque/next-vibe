@@ -3,8 +3,8 @@
  * PATCH /agent/skills/[id]/publish
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import { SkillsRepository } from "../../repository";
 import definitions from "./definition";

@@ -5,28 +5,28 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Database } from "next-vibe-ui/ui/icons/Database";
-import { Minus } from "next-vibe-ui/ui/icons/Minus";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3 } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Database } from "next-vibe/ui/web/ui/icons/Database";
+import { Minus } from "next-vibe/ui/web/ui/icons/Minus";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3 } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import type { JSX } from "react";
 
 import type definition from "./definition";

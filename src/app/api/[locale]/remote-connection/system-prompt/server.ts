@@ -2,12 +2,12 @@ import "server-only";
 
 import { count } from "drizzle-orm";
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { db } from "@/app/api/[locale]/system/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
 

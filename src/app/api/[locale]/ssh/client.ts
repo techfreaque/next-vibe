@@ -9,17 +9,16 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import type { Client as Ssh2Client, ClientChannel } from "ssh2";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { ConnectionCreateRepository } from "./connections/create/repository";
 import { sshConnections } from "./db";

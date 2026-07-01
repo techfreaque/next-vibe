@@ -4,14 +4,13 @@
  */
 
 import { eq } from "drizzle-orm";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { db } from "next-vibe/database";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { DefaultFolderId } from "../../config";
 import { chatFolders } from "../../db";

@@ -4,9 +4,8 @@ import { desc, eq } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 
 import { leadMagnetCaptures, leadMagnetConfigs } from "../db";
 import type { CapturesListResponseOutput } from "./definition";

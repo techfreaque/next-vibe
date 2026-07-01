@@ -23,14 +23,14 @@ import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import favoritesCreateDefinitions from "@/app/api/[locale]/agent/skills/favorites/create/definition";
 import favoritesDefinitions from "@/app/api/[locale]/agent/skills/favorites/definition";
 import remoteConnectionByIdDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   ATLAS_INSTANCE_ID,

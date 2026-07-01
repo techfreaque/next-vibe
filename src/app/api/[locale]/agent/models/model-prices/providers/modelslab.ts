@@ -16,7 +16,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { musicGenModelDefinitions } from "../../../music-generation/models";

@@ -3,29 +3,28 @@
  * Add or remove roles from a specific user (admin only)
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   UserPermissionRole,
   UserPermissionRoleOptions,
   UserRole,
   UserRoleDB,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
 

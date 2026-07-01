@@ -1,12 +1,12 @@
 "use client";
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
 import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ThreadsPathPageData } from "./page";
 

@@ -1,8 +1,7 @@
 "use client";
 
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { useContext } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { LoggerContext } from "./logger-provider";
 

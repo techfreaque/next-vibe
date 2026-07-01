@@ -3,14 +3,23 @@
  * Defines endpoints for GET, PATCH (update), and DELETE operations on a single skill
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import { skillVariantsSchema } from "@/app/api/[locale]/agent/skills/db";
-import { success } from "@/app/api/[locale]/shared/types/response.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  dateSchema,
+  iconSchema,
+  translatedValueSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  SpacingSize,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { success } from "next-vibe/core/route/response.schema";
+import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -20,25 +29,13 @@ import {
   responseField,
   submitButton,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  SpacingSize,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  UserPermissionRole,
-  UserRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import {
-  dateSchema,
-  iconSchema,
-  translatedValueSchema,
-} from "../../../shared/types/common.schema";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import { skillVariantsSchema } from "@/app/api/[locale]/agent/skills/db";
+
 import { getBestChatModel } from "../../ai-stream/models";
 import {
   SKILL_DELETE_ALIAS,
@@ -99,7 +96,7 @@ const { DELETE } = createEndpoint({
       onSuccess: async (data) => {
         // Import apiClient, navigation store, and skills list GET endpoint
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const skillsDefinition = await import("../definition");
         const removedSkillIds = [data.pathParams.id];
 
@@ -294,7 +291,7 @@ const { DELETE } = createEndpoint({
       onEvent: async ({ urlPathParams, logger }) => {
         const deletedId = urlPathParams.id;
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,
@@ -380,7 +377,7 @@ const { PATCH } = createEndpoint({
       onSuccess: async (data) => {
         // Import apiClient, skills list GET endpoint, and repository client
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const skillsDefinition = await import("../definition");
         const skillSingleDefinitions = await import("./definition");
         const updatedSkillIds = [data.pathParams.id];
@@ -815,7 +812,7 @@ const { PATCH } = createEndpoint({
           { SkillsRepositoryClient },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("next-vibe/platforms/react/hooks/store"),
           import("../repository-client"),
           import("../i18n"),
         ]);

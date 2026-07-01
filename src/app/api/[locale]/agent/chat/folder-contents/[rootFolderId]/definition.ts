@@ -4,15 +4,25 @@
  * sorted by sort_order so items can be interleaved.
  */
 
-import { lazy } from "react";
-import { z } from "zod";
-
 import {
   dateSchema,
   iconSchema,
-} from "@/app/api/[locale]/shared/types/common.schema";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import {
+  UserPermissionRoleOptions,
+  UserRole,
+  UserRoleDB,
+} from "next-vibe/identity/roles/enum";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 import {
   backButton,
   customWidgetObject,
@@ -22,20 +32,9 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import {
-  UserPermissionRoleOptions,
-  UserRole,
-  UserRoleDB,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
 import { DefaultFolderId } from "../../config";
 import {

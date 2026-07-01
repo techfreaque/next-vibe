@@ -6,6 +6,17 @@
 
 import "server-only";
 
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+
 import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
@@ -19,17 +30,7 @@ import {
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import type { ChatModelId } from "../models";
 

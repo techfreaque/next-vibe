@@ -6,28 +6,28 @@
 import "server-only";
 
 import { and, desc, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type {
+  ChannelDecision,
+  RemoteEventHandlerProps,
+} from "next-vibe/core/route/handler";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type {
-  ChannelDecision,
-  RemoteEventHandlerProps,
-} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../../config";
 import {

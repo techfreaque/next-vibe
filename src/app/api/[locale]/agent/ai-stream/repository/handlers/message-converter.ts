@@ -6,19 +6,19 @@ import "server-only";
 
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
 import type { JSONValue, ModelMessage, ToolCallPart, ToolResultPart } from "ai";
+import type {
+  ContentBlock,
+  ErrorResponseType,
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
-import type {
-  ContentBlock,
-  ErrorResponseType,
-} from "@/app/api/[locale]/shared/types/response.schema";
-import { parseError } from "@/app/api/[locale]/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
@@ -688,6 +688,8 @@ export class MessageConverter {
         msg,
         logger,
         modelConfig,
+        undefined,
+        resolvedDispatchToolCallIds,
       );
       if (converted === null) {
         // Message was filtered (e.g. empty assistant) - skip metadata injection too

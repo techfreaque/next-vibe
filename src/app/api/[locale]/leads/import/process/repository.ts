@@ -6,17 +6,16 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { csvImportJobs } from "../db";
 import { CsvImportJobStatus } from "../enum";
@@ -123,8 +122,7 @@ export class LeadsImportProcessRepository {
           .limit(1);
 
         if (stillPending) {
-          const { cronTasks } =
-            await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+          const { cronTasks } = await import("next-vibe/tasks/cron/db");
           await db
             .update(cronTasks)
             .set({ enabled: true, updatedAt: new Date() })

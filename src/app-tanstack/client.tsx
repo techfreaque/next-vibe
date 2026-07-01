@@ -8,7 +8,7 @@ import { hydrateRoot } from "react-dom/client";
 hydrateStart()
   .then(async (router) => {
     const { preloadAllWidgets } =
-      await import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/widget-preloader");
+      await import("next-vibe/ui/renderers/react/widget-preloader");
     await Promise.all([
       ...router.state.matches.flatMap((match) => {
         const route =

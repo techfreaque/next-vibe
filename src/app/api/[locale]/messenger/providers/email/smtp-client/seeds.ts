@@ -9,15 +9,14 @@
  */
 
 import { eq } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-
+import { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
-} from "@/app/api/[locale]/leads/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Countries, Languages } from "@/i18n/core/config";
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { leadsCampaignsEnv } from "../../../../leads/campaigns/env";
 import { messengerAccounts } from "../../../accounts/db";

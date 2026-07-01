@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to:\n1. Call execute-tool with toolName='tool-help', callbackMode='endLoop'\n2. After receiving the result, try to call tool-help again\n3. Check that only ONE tool-help call was executed (the loop should have stopped)\n4. The result should have a non-empty tools array\n5. End reply with STEP_OK or FAILED\n\nThe key here is that callbackMode='endLoop' should stop the entire turn after the first call. So when I call execute-tool with callbackMode='endLoop', the system should stop processing and NOT execute the second tool-help call.\n\nBut wait - I'm an AI assistant in a conversation. The instruction says \"After receiving the result, try to call the tool-help tool again.\" But if callbackMode='endLoop' works correctly, I won't be able to make that second call because the turn\n\nUser: [T5d wait-inline] Call execute-tool with toolName='generate_image', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nAssistant: <think>The user wants me to call execute-tool with toolName='generate_image', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Then check that the result has an imageUrl (not a taskId). End with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason>.</think>\n\nAssistant: <think>The result contains an imageUrl string \"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/14a9e810-ed58-41a1-938d-2bfdc44ef85f/66c332a1-d342-4fb4-a20c-81da5a61b8e0.png\". It is present and non-empty. No taskId. This looks correct.</think>STEP_OK\n\nUser: [T6a wakeUp-phase1] Call execute-tool with toolName='generate_image', input={'prompt':'wakeup-test'}, callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no image yet - end your reply with STEP_OK if you see taskId and no image URL, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived you will see the generate_image result containing the image — the URL may appear either as an \"imageUrl\" field OR as a rendered markdown image link ![...](https://...). EITHER form counts. Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.",
+    "encoding_format": "float"
+  }
+}

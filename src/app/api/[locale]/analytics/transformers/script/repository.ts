@@ -6,15 +6,14 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-
-import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
 import type {
   DataPoint,
   Resolution,
   TimeSeries,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+} from "next-vibe/core/utils/dataflow/shared/fields";
 
 export class ScriptTransformerRepository {
   /**

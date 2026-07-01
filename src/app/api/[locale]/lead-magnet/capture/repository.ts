@@ -6,17 +6,17 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 
 import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadMagnetCaptures, leadMagnetConfigs } from "../db";
 import type { LeadMagnetCaptureStatusValue } from "../enum";

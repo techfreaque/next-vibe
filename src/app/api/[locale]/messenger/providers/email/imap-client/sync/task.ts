@@ -4,18 +4,12 @@
  */
 import "server-only";
 
-import {
-  CRON_SCHEDULES,
-  TASK_TIMEOUTS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/constants";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { CRON_SCHEDULES, TASK_TIMEOUTS } from "next-vibe/tasks/constants";
+import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 import {
   createCronTask,
   type Task,
-} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+} from "next-vibe/tasks/unified-runner/types";
 
 import definitions from "./definition";
 import { tools } from "./route";

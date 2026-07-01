@@ -5,19 +5,19 @@
  * Type-safe hooks for newsletter subscription management
  */
 
-import type { InputChangeEvent } from "next-vibe-ui/ui/input";
-import { useCallback, useMemo } from "react";
-
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import {
   createCustomStateKey,
   useCustomState,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+} from "next-vibe/platforms/react/hooks/store";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import type { InputChangeEvent } from "next-vibe/ui/web/ui/input";
+import { useCallback, useMemo } from "react";
+
 import { useLogger } from "@/hooks/use-logger";
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";

@@ -3,7 +3,9 @@
  * Handles answering as AI in both incognito and server modes
  */
 
-import { parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamPostRequestOutput } from "@/app/api/[locale]/agent/ai-stream/stream/definition";
@@ -13,8 +15,6 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 
 import type { StartStreamFn } from "./shared";
 

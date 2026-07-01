@@ -22,7 +22,9 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { Platform } from "next-vibe/core/definition/platform";
+import { isCliPlatform } from "next-vibe/core/definition/platform";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   type ContentBlock,
   type ContentResponse,
@@ -30,13 +32,11 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { env } from "@/config/env";
 
 import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";

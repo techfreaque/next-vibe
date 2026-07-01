@@ -12,6 +12,10 @@
 
 "use client";
 
+import { Methods } from "next-vibe/core/definition/enums";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,28 +25,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe-ui/ui/alert-dialog";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
+} from "next-vibe/ui/web/ui/alert-dialog";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
-import { SectionGroup } from "next-vibe-ui/ui/section-group";
-import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { Switch } from "next-vibe-ui/ui/switch";
-import { Code, P } from "next-vibe-ui/ui/typography";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+} from "next-vibe/ui/web/ui/card";
+import { DetailField, DetailGrid } from "next-vibe/ui/web/ui/detail-grid";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
+import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
+import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
+import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
+import { Switch } from "next-vibe/ui/web/ui/switch";
+import { Code, P } from "next-vibe/ui/web/ui/typography";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,
@@ -51,23 +55,18 @@ import {
   useWidgetNavigation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";

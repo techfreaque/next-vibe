@@ -12,13 +12,13 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { tool } from "ai";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import TurndownService from "turndown";
 import { z } from "zod";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";
@@ -457,7 +457,7 @@ export class FetchUrlContentRepository {
     t: FetchUrlContentT,
   ): Promise<ResponseType<FetchUrlContentGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
-      await import("next-vibe/shared/types/response.schema");
+      await import("next-vibe/core/route/response.schema");
 
     if (!url || typeof url !== "string" || url.trim() === "") {
       return fail({

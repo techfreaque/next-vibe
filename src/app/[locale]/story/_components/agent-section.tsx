@@ -1,23 +1,22 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { H2, P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { H2, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

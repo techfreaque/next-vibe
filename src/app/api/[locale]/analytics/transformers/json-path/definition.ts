@@ -6,20 +6,14 @@
  * so this transformer returns an empty series.
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -27,8 +21,10 @@ import {
   resolutionRequestField,
   timeSeriesRequestField,
   timeSeriesResponseField,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { TRANSFORMER_JSON_PATH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

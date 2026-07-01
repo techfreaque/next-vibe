@@ -40,18 +40,18 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
+import { leads } from "next-vibe/identity/lead/db";
+import { type UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import { leads } from "@/app/api/[locale]/leads/db";
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { users } from "@/app/api/[locale]/user/db";
-import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
 import type { TtsModelId } from "../text-to-speech/models";

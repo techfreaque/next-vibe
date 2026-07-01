@@ -13,7 +13,7 @@
  *                        Detected via `template-hash` frontmatter field.
  */
 
-import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 
 export interface CortexSeedItem {
   /** Stable unique ID - used for update tracking and deduplication */

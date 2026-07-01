@@ -1,12 +1,12 @@
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CreatorGetResponseOutput } from "@/app/api/[locale]/user/public/creator/[userId]/definition";
 import creatorEndpoints from "@/app/api/[locale]/user/public/creator/[userId]/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 export interface CreatorPageData {
   locale: CountryLanguage;

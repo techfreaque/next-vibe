@@ -1,20 +1,20 @@
 "use client";
 
-import { openUrl } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
-import { Link } from "next-vibe-ui/ui/link";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { openUrl } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { SiDiscord } from "next-vibe/ui/web/ui/icons/SiDiscord";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import contactDefinitions from "@/app/api/[locale]/contact/definition";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as pageT } from "./i18n";
 

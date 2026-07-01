@@ -17,15 +17,15 @@ import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
 import { and, eq, sql } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { setFetchCacheContext } from "../../ai-stream/testing/fetch-cache";
 import {
@@ -142,7 +142,7 @@ describe(
       if (testUser) {
         try {
           const { sendTestRequest } =
-            await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+            await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
           const connByIdDef = (
             await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
           ).default;

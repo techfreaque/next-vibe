@@ -6,21 +6,21 @@
 import "server-only";
 
 import { and, count, eq, isNull, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatSettings } from "./db";
 import type {

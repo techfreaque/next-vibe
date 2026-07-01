@@ -3,9 +3,8 @@
  * Using createEnumOptions pattern for i18n-friendly select options
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
-
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "next-vibe/logger/error-monitor/logs/i18n";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
 /**
  * Status filter for error logs

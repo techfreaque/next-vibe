@@ -3,15 +3,15 @@
  */
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React from "react";
 
 import type definition from "./definition";

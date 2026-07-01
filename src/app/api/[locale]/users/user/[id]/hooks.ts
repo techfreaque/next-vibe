@@ -3,11 +3,11 @@
  * React hook for individual user operations (get, update, delete)
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
 import definitions from "./definition";
 
 /**

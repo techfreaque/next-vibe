@@ -4,25 +4,31 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { DetailField } from "next-vibe-ui/ui/detail-grid";
-import { Div } from "next-vibe-ui/ui/div";
-import { Activity } from "next-vibe-ui/ui/icons/Activity";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { Play } from "next-vibe-ui/ui/icons/Play";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { MetricCard } from "next-vibe-ui/ui/metric-card";
-import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
-import { ResultBanner } from "next-vibe-ui/ui/result-banner";
-import { SectionGroup } from "next-vibe-ui/ui/section-group";
-import { Span } from "next-vibe-ui/ui/span";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { scopedTranslation as leadsI18n } from "next-vibe/identity/lead/i18n";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { DetailField } from "next-vibe/ui/web/ui/detail-grid";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { Play } from "next-vibe/ui/web/ui/icons/Play";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/web/ui/progress-block";
+import { ResultBanner } from "next-vibe/ui/web/ui/result-banner";
+import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -30,16 +36,8 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
-
-import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 
@@ -363,8 +361,7 @@ export function CampaignStatsWidget(): React.JSX.Element {
   const handleRun = React.useCallback(
     (taskId: string): void => {
       void (async (): Promise<void> => {
-        const m =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition");
+        const m = await import("next-vibe/tasks/cron/[id]/definition");
         navigate(m.default.PUT, {
           urlPathParams: { id: taskId },
           renderInModal: true,

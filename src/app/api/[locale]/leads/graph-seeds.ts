@@ -7,15 +7,16 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
+import type {
+  GraphConfig,
+  GraphSeedEntry,
+} from "next-vibe/core/utils/dataflow/graph/types";
+
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import type {
-  GraphConfig,
-  GraphSeedEntry,
-} from "../system/unified-interface/vibe-sense/graph/types";
 import { LEADS_ACTIVE_ALIAS } from "./data-sources/leads-active/constants";
 import { LEADS_BOUNCED_ALIAS } from "./data-sources/leads-bounced/constants";
 import { LEADS_CAMPAIGN_RUNNING_ALIAS } from "./data-sources/leads-campaign-running/constants";

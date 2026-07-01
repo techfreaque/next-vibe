@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, H4 } from "next-vibe-ui/ui/typography";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, H4 } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetLocale,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type definition from "./definition";

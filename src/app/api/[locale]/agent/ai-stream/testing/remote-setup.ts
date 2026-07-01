@@ -22,18 +22,18 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -227,7 +227,7 @@ export async function resolveDevUser(
   const { UserRepository } = await import("@/app/api/[locale]/user/repository");
   const { UserDetailLevel } = await import("@/app/api/[locale]/user/enum");
   const { userRoles } = await import("@/app/api/[locale]/user/db");
-  const { userLeadLinks } = await import("@/app/api/[locale]/leads/db");
+  const { userLeadLinks } = await import("next-vibe/identity/lead/db");
   const { eq: eqUser } = await import("drizzle-orm");
   const { UserRoleDB } =
     await import("@/app/api/[locale]/user/user-roles/enum");
@@ -366,7 +366,7 @@ export async function ensureRemoteUserCredits(
   minCredits: number,
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const adminAddDefinitions = (
     await import("@/app/api/[locale]/credits/admin-add/definition")
   ).default;
@@ -413,7 +413,7 @@ export async function connectToHermes(
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
 
   // Pre-clean both sides so connect never hits a 409 conflict.
   // Restore atlas identity first — a prior headless run may have left
@@ -485,7 +485,7 @@ export async function connectToHermes(
   // relayStream() opens a per-stream dedicated WS instead.
   // reloadWsProviderConnector() handles any instanceId variant (e.g. "hermes-rn5-*").
   const { reloadWsProviderConnector } =
-    await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+    await import("next-vibe/realtime/connector");
   reloadWsProviderConnector();
 
   // Trigger hermes to reconnect its atlas WS — this is the real connect event
@@ -567,7 +567,7 @@ export async function connectToHermesLocalAi(
   await connectToHermes(user, remoteUrl);
 
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
@@ -607,7 +607,7 @@ async function waitForHermesConnectorReady(
   timeoutMs = 30_000,
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
@@ -649,7 +649,7 @@ export async function disconnectFromHermesLocalAi(
   // PATCH endpoint so its WS connector closes cleanly.
   try {
     const { sendTestRequest } =
-      await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+      await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
     const connByIdDef = (
       await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
     ).default;
@@ -674,7 +674,7 @@ export async function disconnectFromHermesLocalAi(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function disconnectFromHermes(_userId: string): Promise<void> {
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     return;
@@ -718,7 +718,7 @@ export async function unregisterDevFromHermes(
   // WS and releases the in-memory sync slot — a direct DB delete would skip that
   // and leave a stuck sync slot ("pull-on-connect skipped - already in flight").
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     return;
@@ -807,7 +807,7 @@ export async function restoreHermesIdentity(
  */
 export async function restoreAtlasIdentity(): Promise<void> {
   const { sendTestRequest } =
-    await import("@/app/api/[locale]/system/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const selfRenameDef = (
     await import("@/app/api/[locale]/remote-connection/self/rename/definition")
   ).default;

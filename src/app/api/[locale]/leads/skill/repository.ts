@@ -5,14 +5,13 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { LeadsRepository } from "next-vibe/identity/lead/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
-import { LeadsRepository } from "../repository";
 import type {
   LeadSkillPatchRequestOutput,
   LeadSkillPatchResponseOutput,

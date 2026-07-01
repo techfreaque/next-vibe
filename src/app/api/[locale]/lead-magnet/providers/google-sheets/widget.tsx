@@ -4,30 +4,30 @@ import {
   assignUrl,
   getCurrentUrl,
   silentReplaceState,
-} from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Table } from "next-vibe-ui/ui/icons/Table";
-import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
+} from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
+import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { Table } from "next-vibe/ui/web/ui/icons/Table";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Label } from "next-vibe/ui/web/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -79,7 +79,7 @@ export function GoogleSheetsWidget(): JSX.Element {
     void (async (): Promise<void> => {
       try {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const sheetsListDef = await import("./sheets-list/definition");
         if (!user) {
           return;
@@ -125,7 +125,7 @@ export function GoogleSheetsWidget(): JSX.Element {
     void (async (): Promise<void> => {
       try {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const def = await import("./definition");
         if (!user) {
           return;

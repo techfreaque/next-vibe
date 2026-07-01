@@ -4,40 +4,38 @@
  */
 
 "use client";
-
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { History } from "next-vibe-ui/ui/icons/History";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { UserCheck } from "next-vibe-ui/ui/icons/UserCheck";
-import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { Span } from "next-vibe-ui/ui/span";
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { CreditCard } from "next-vibe/ui/web/ui/icons/CreditCard";
+import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { History } from "next-vibe/ui/web/ui/icons/History";
+import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
+import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { UserCheck } from "next-vibe/ui/web/ui/icons/UserCheck";
+import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
-import { MultiSelectFieldWidget } from "next-vibe-ui/unified/form-fields/multiselect-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
+import { MultiSelectFieldWidget } from "next-vibe/unified-ui/form-fields/multiselect-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 

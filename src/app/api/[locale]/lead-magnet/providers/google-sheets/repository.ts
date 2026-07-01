@@ -1,12 +1,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 
 import { leadMagnetConfigs } from "../../db";
 import type { LeadMagnetT } from "../../i18n";

@@ -10,11 +10,11 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type {
   KagiSearchGetRequestOutput,

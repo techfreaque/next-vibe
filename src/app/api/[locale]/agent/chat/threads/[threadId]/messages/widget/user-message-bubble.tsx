@@ -1,16 +1,18 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Film } from "next-vibe-ui/ui/icons/Film";
-import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
-import { Music } from "next-vibe-ui/ui/icons/Music";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Span } from "next-vibe-ui/ui/span";
-import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Film } from "next-vibe/ui/web/ui/icons/Film";
+import { Image as ImageIcon } from "next-vibe/ui/web/ui/icons/Image";
+import { Music } from "next-vibe/ui/web/ui/icons/Music";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { useWidgetItem } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { memo, useCallback, useState } from "react";
 
@@ -21,9 +23,6 @@ import {
 } from "@/app/[locale]/chat/lib/design-tokens";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type messagesDefinition from "../definition";
 import { scopedTranslation } from "../i18n";

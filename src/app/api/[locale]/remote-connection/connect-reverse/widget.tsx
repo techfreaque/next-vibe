@@ -11,13 +11,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Server } from "next-vibe-ui/ui/icons/Server";
-import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Server } from "next-vibe/ui/web/ui/icons/Server";
+import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { UrlFieldWidget } from "next-vibe/unified-ui/form-fields/url-field/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import type definitions from "./definition";

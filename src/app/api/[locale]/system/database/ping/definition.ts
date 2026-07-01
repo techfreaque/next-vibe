@@ -1,0 +1,224 @@
+/**
+ * Database Ping Command Endpoint Definition
+ * Production-ready endpoint for checking database connectivity
+ */
+
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { scopedTranslation } from "next-vibe/database/ping/i18n";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "database", "ping"],
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
+  category: "database",
+  subCategory: "Tools",
+  tags: ["tag"],
+  icon: "database",
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
+  aliases: ["ping", "db:ping"],
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      // === REQUEST FIELDS ===
+      silent: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.silent.title",
+        description: "fields.silent.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
+      keepConnectionOpen: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.keepConnectionOpen.title",
+        description: "fields.keepConnectionOpen.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
+      // === RESPONSE FIELDS ===
+      success: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.success.title",
+        schema: z.boolean(),
+      }),
+
+      isAccessible: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.isAccessible.title",
+        schema: z.boolean(),
+      }),
+
+      output: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.output.title",
+        schema: z.string(),
+      }),
+
+      totalConnections: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.connectionInfo.totalConnections.content",
+        schema: z.coerce.number(),
+      }),
+
+      idleConnections: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.connectionInfo.idleConnections.content",
+        schema: z.coerce.number(),
+      }),
+
+      waitingClients: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.connectionInfo.waitingClients.content",
+        schema: z.coerce.number(),
+      }),
+    },
+  }),
+
+  // === ERROR HANDLING ===
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+  },
+
+  // === SUCCESS HANDLING ===
+  successTypes: {
+    title: "post.success.title",
+    description: "post.success.description",
+  },
+
+  // === EXAMPLES ===
+  examples: {
+    requests: {
+      default: {
+        silent: false,
+        keepConnectionOpen: false,
+      },
+      success: {
+        silent: false,
+        keepConnectionOpen: false,
+      },
+      failure: {
+        silent: false,
+        keepConnectionOpen: false,
+      },
+      silent: {
+        silent: true,
+        keepConnectionOpen: false,
+      },
+      keepOpen: {
+        silent: false,
+        keepConnectionOpen: true,
+      },
+    },
+    responses: {
+      default: {
+        success: true,
+        isAccessible: true,
+        output: "✅ Database connection successful",
+        totalConnections: 10,
+        idleConnections: 8,
+        waitingClients: 0,
+      },
+      success: {
+        success: true,
+        isAccessible: true,
+        output: "✅ Database is accessible",
+        totalConnections: 5,
+        idleConnections: 3,
+        waitingClients: 0,
+      },
+      failure: {
+        success: false,
+        isAccessible: false,
+        output: "❌ Database connection failed",
+        totalConnections: 0,
+        idleConnections: 0,
+        waitingClients: 0,
+      },
+      silent: {
+        success: true,
+        isAccessible: true,
+        output: "",
+        totalConnections: 10,
+        idleConnections: 8,
+        waitingClients: 0,
+      },
+      keepOpen: {
+        success: true,
+        isAccessible: true,
+        output: "✅ Database connection successful (kept open)",
+        totalConnections: 11,
+        idleConnections: 7,
+        waitingClients: 0,
+      },
+    },
+  },
+});
+
+export type PingRequestInput = typeof POST.types.RequestInput;
+export type PingRequestOutput = typeof POST.types.RequestOutput;
+export type PingResponseInput = typeof POST.types.ResponseInput;
+export type PingResponseOutput = typeof POST.types.ResponseOutput;
+
+const endpoints = { POST };
+export default endpoints;

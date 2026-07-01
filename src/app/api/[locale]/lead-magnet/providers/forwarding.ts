@@ -1,7 +1,4 @@
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
 import type { ForwardLeadFn, LeadData } from "./types";
 

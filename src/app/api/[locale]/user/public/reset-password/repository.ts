@@ -9,19 +9,19 @@ import { randomBytes } from "node:crypto";
 
 import { and, eq, gt, lt, or } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   success,
   ErrorResponseTypes,
   fail,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import { env } from "@/config/env";
-import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 import type { ResetPasswordT } from "./i18n";

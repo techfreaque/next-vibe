@@ -7,7 +7,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { enableDebugLogger } from "@/app/api/[locale]/system/logger/debug";
+import { enableDebugLogger } from "next-vibe/logger/debug";
 
 const DEBUG_DIR = join(process.cwd(), ".tmp", "ai-debug-runs");
 let requestSeq = 0;

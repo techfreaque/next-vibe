@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13e980d4d9bdbab-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 16:37:11 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782837430-ptDSUzAfNDHa2XWn88D7"
+  },
+  "body": {
+    "id": "gen-1782837430-ptDSUzAfNDHa2XWn88D7",
+    "object": "chat.completion",
+    "created": 1782837430,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second audio clip of a piece of hip-hop music. The music has a moderate tempo, estimated at around 90 BPM, and is in a major key, possibly C major. The overall production style is polished, with a clear and crisp mix.\n\n**Instrumentation:**\n*   **Drums:** The drum track is the most prominent element, featuring a steady, driving rhythm. There's a persistent, bright hi-hat playing a fast 16th-note pattern, a punchy kick drum, and a clean, sharp snare on beats 2 and 4. The hi-hat has a distinct, somewhat metallic quality.\n*   **Synth Bass:** A synth bass provides the low-end foundation. It plays a simple, repetitive two-note pattern, contributing to the laid-back groove.\n*   **Synth Melody:** A bright, percussive synth plays a simple, repetitive melody in the higher register. It sounds somewhat like a marimba or kalimba, adding a playful and slightly tropical feel.\n*   **Pads/Strings:** In the background, there's a subtle, sustained synth pad or string sound that adds a layer of warmth and atmosphere.\n\n**Song Structure and Dynamics:**\nThe clip itself functions as a loop, establishing a consistent groove and melody. There are no significant changes in dynamics or instrumentation throughout this short segment, suggesting it's part of a longer track or an introductory loop.\n\n**Mood and Emotional Arc:**\nThe music conveys a chill, relaxed, and slightly positive mood. The bright synth melody and steady beat create a feeling that could be described as laid-back or cruising. There's a subtle sense of anticipation perhaps, but it remains firmly in a comfortable, easy-going zone.\n\n**Sound Quality and Recording Environment:**\nThe sound quality is excellent, indicating a professional studio recording environment. There are no noticeable background noises or artifacts.\n\nNo speech or other non-musical audio events are present.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 413,
+      "total_tokens": 1485,
+      "cost": 0.0018791,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018791,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0010325
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

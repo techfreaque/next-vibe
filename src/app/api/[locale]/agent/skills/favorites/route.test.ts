@@ -10,14 +10,13 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { testEndpoint } from "next-vibe/tooling/check/testing/testing-suite/test-endpoint";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite/test-endpoint";
-import { db } from "@/app/api/[locale]/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { isUuid } from "../../chat/slugify";
 import { IntelligenceLevel, ModelSelectionType } from "../enum";

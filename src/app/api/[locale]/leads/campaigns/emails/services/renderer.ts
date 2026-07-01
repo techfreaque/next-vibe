@@ -5,20 +5,24 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { env } from "@/config/env";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-
-import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
+import type {
+  Countries,
+  CountryLanguage,
+  Languages,
+} from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
   LeadSource,
   LeadStatus,
-} from "../../../enum";
-import type { LeadWithEmailType } from "../../../types";
+} from "next-vibe/identity/lead/enum";
+import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { env } from "@/config/env";
+
+import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation } from "../journeys/i18n";
 import { newsletterMay2026JourneyTemplates } from "../journeys/newsletter-may-2026.email";
 import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";

@@ -3,10 +3,18 @@
  * Defines endpoints for specific user operations
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+// // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -17,18 +25,9 @@ import {
   responseArrayField,
   responseField,
   submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-// // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { dateSchema } from "../../../shared/types/common.schema";
 import {
   USER_DELETE_ALIAS,
   USER_UPDATE_ALIAS,
@@ -428,7 +427,7 @@ const { PUT } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const listDefinition = await import("../../list/definition");
 
         // Optimistically update user in list
@@ -724,7 +723,7 @@ const { DELETE } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const listDefinition = await import("../../list/definition");
 
         // Optimistically remove deleted user from list

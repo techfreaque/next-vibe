@@ -5,17 +5,19 @@
 
 "use client";
 
-import { useCallback, useMemo } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import {
+  Countries,
+  type CountryLanguage,
+} from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   EndpointReturn,
   FormAlertState,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { Countries, type CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useCallback, useMemo } from "react";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import type { UserStatsResponseOutput as UsersStatsResponseType } from "./definition";
 import definitions from "./definition";
 

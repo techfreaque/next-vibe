@@ -23,6 +23,9 @@ import type {
   ToolResultPart,
 } from "ai";
 import { generateText as aiGenerateText } from "ai";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
@@ -33,9 +36,6 @@ import type { ModelOptionTokenBased } from "@/app/api/[locale]/agent/models/mode
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessage } from "../../../chat/db";
 import type { ChatModelId, ChatModelOption } from "../../models";

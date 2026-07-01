@@ -1,13 +1,13 @@
 import "server-only";
 
+import { Methods } from "next-vibe/core/definition/enums";
 /**
  * Leads Export API Route Handler
  * Handles CSV/Excel export operations for leads
  */
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+import { LeadsRepository } from "next-vibe/identity/lead/repository";
 
-import { LeadsRepository } from "../repository";
 import definitions from "./definition";
 
 export const { GET, tools } = endpointsHandler({

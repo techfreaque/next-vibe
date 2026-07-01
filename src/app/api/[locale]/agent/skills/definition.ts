@@ -3,12 +3,20 @@
  * Defines endpoint for listing skills
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -18,23 +26,12 @@ import {
   responseArrayField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  UserPermissionRole,
-  UserRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import {
-  iconSchema,
-  translatedValueSchema,
-} from "../../shared/types/common.schema";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+
 import { allModelDefinitions } from "../models/all-models";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {

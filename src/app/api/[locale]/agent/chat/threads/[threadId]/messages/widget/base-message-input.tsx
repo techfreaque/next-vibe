@@ -5,27 +5,29 @@
  * Shared UI for message editing/branching and replying.
  * Receives all computed state as props - hooks are self-contained here.
  */
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import type { DivRefObject } from "next-vibe-ui/ui/div";
-import { Div } from "next-vibe-ui/ui/div";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { Phone } from "next-vibe-ui/ui/icons/Phone";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Kbd } from "next-vibe-ui/ui/kbd";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/web/ui/button";
+import type { DivRefObject } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Form } from "next-vibe/ui/web/ui/form/form";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { Phone } from "next-vibe/ui/web/ui/icons/Phone";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Kbd } from "next-vibe/ui/web/ui/kbd";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
-} from "next-vibe-ui/ui/textarea";
-import { Textarea } from "next-vibe-ui/ui/textarea";
+} from "next-vibe/ui/web/ui/textarea";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+} from "next-vibe/ui/web/ui/tooltip";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -34,15 +36,12 @@ import { CallModeIndicator } from "@/app/api/[locale]/agent/ai-stream/stream/hoo
 import { FileUploadButton } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/file-upload-button";
 import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
-import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
+import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector/index";
 import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/tools-button";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 

@@ -3,7 +3,7 @@
  * Only SMTP-specific sort/filter enums live here.
  * Channel/status/security/health/campaign enums are in ../accounts/enum.
  */
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
 import { scopedTranslation } from "./i18n";
 

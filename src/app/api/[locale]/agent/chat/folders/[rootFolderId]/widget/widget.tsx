@@ -5,36 +5,38 @@
  */
 
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { Button } from "next-vibe-ui/ui/button";
+import { cn } from "next-vibe/core/utils/utils";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe-ui/ui/dialog";
-import { Div } from "next-vibe-ui/ui/div";
-import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Input, type InputRefObject } from "next-vibe-ui/ui/input";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/dialog";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { FolderPlus } from "next-vibe/ui/web/ui/icons/FolderPlus";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { MessageSquarePlus } from "next-vibe/ui/web/ui/icons/MessageSquarePlus";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Input, type InputRefObject } from "next-vibe/ui/web/ui/input";
+import { ScrollArea } from "next-vibe/ui/web/ui/scroll-area";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+} from "next-vibe/ui/web/ui/tooltip";
 import {
   useWidgetContext,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -49,9 +51,6 @@ import {
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import cortexSearchDefinitions from "@/app/api/[locale]/agent/cortex/search/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { useChatBootContext } from "../../../hooks/context";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";

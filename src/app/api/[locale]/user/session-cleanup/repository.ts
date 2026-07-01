@@ -6,23 +6,23 @@
 import "server-only";
 
 import { lt, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { sessions } from "next-vibe/identity/session/db";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
   RESET_TOKEN_EXPIRY,
 } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
 import type {
   SessionCleanupPostRequestOutput,

@@ -1,16 +1,15 @@
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
 // Import and re-export enum from separate file to avoid circular dependency

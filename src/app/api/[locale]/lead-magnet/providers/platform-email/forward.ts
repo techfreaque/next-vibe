@@ -1,4 +1,4 @@
-import { success } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
 import React from "react";
 
 import type { ForwardLeadFn } from "../types";

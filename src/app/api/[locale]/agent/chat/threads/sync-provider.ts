@@ -13,7 +13,11 @@ import "server-only";
  * the correct local subfolder UUID at upsert time.
  */
 import { and, asc, eq, inArray, isNull, max, sql } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -27,10 +31,6 @@ import {
   type SyncProvider,
   toThreadsCursor,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   chatFolders,
@@ -164,7 +164,7 @@ export async function pushThreadSync(
     // onRemoteEvent (which re-runs updateThread).
     const [{ createEndpointEmitter }, { default: threadsByIdDefinitions }] =
       await Promise.all([
-        import("@/app/api/[locale]/system/unified-interface/websocket/emitter"),
+        import("next-vibe/realtime/emitter"),
         import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition"),
       ]);
     const user: JwtPrivatePayloadType = {

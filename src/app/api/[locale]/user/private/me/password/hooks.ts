@@ -1,10 +1,11 @@
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { ApiFormReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
-import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "@/i18n/core/client";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ApiFormReturn } from "next-vibe/platforms/react/hooks/types";
 
-import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
-import type { JwtPayloadType } from "../../../auth/types";
+import { useToast } from "@/hooks/use-toast";
+
+import { useApiForm } from "../../../../system/platforms/react/hooks/use-api-mutation-form";
 import passwordEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 

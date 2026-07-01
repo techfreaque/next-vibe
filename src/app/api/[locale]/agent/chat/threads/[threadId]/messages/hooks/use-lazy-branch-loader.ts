@@ -11,17 +11,20 @@
  * in message metadata, set server-side on the boundary messages.
  */
 
-import { parseError } from "next-vibe/shared/utils";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import {
+  getCurrentUrl,
+  silentReplaceState,
+} from "next-vibe/ui/web/lib/location";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../../../config";
 import type { ChatThread, MessageMetadata } from "../../../../db";

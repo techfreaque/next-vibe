@@ -19,11 +19,11 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 
@@ -295,6 +295,7 @@ export class RemoteConnectionRepository {
       leadId,
       instanceId: rawInstanceId,
       remoteInstanceId,
+      remoteUserId,
       isReverseEntry = false,
       transportMode,
       isInferenceProvider,
@@ -630,6 +631,31 @@ export class RemoteConnectionRepository {
         ? RemoteConnectionRepository.decryptToken(row.token)
         : null,
     };
+  }
+
+  /**
+   * How the PEER reaches this side over the given connection (the mirror of the
+   * peer's own transportMode). Drives whether this side runs the reverse-ws
+   * connector: open one exactly when this returns "reverse-ws". Null if no row.
+   */
+  static async getRemoteTransportMode(
+    userId: string,
+    instanceId: string,
+  ): Promise<"reverse-ws" | "direct-http" | "cloud-only" | null> {
+    const [row] = await db
+      .select({ remoteTransportMode: remoteConnections.remoteTransportMode })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.isActive, true),
+          or(
+            eq(remoteConnections.instanceId, instanceId),
+            eq(remoteConnections.remoteInstanceId, instanceId),
+          ),
+        ),
+      );
+    return row?.remoteTransportMode ?? null;
   }
 
   /**

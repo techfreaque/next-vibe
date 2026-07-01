@@ -2,14 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { Metadata } from "next";
-import { Container } from "next-vibe-ui/ui/container";
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Container } from "next-vibe/ui/web/ui/container";
+import { Div } from "next-vibe/ui/web/ui/div";
 import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { FrameworkContent } from "../framework/_components/framework-content";
 import { scopedTranslation } from "./i18n";

@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dcb42f7f | Posted:Jun 30, 10:41]",
+            "text": "[Context: ID:60683b8d | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -80,7 +80,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f7e141c4 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:41]",
+            "text": "[Context: ID:09bbdfb4 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -93,7 +93,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7f1f6ca2 | Posted:Jun 30, 10:41]",
+            "text": "[Context: ID:19055a8a | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -118,7 +118,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"hint\":\"69 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"matchedCount\":69,\"tools\":[{\"description\":\"Retrieve the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\"},{\"description\":\"Update the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\"},{\"description\":\"Public threads shared with the community\",\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\"},{\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_chat_skills_moderation_PATCH\",\"title\":\"Moderate Skill\"},{\"description\":\"Create a new chat thread\",\"name\":\"agent_chat_threads_POST\",\"title\":\"New Thread\"},{\"description\":\"Update the title and preview of a chat thread\",\"name\":\"agent_chat_threads_rename_PATCH\",\"title\":\"Rename Thread\"},{\"description\":\"Delete a chat thread\",\"name\":\"agent_chat_threads_threadId_DELETE\",\"title\":\"Delete Chat Thread\"},{\"description\":\"Retrieve a specific chat thread by ID\",\"name\":\"agent_chat_threads_threadId_GET\",\"title\":\"Get Chat Thread\"},{\"description\":\"Delete a message from the thread\",\"name\":\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"title\":\"Delete Message\"},{\"description\":\"Retrieve a specific message by ID\",\"name\":\"agent_chat_threads_threadId_messages_messageId_GET\",\"title\":\"Get Message\"},{\"description\":\"Update a message's content\",\"name\":\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"title\":\"Update Message\"},{\"description\":\"Upvote or downvote a message\",\"name\":\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"title\":\"Vote on Message\"},{\"description\":\"Retrieve messages following a specific conversation path\",\"name\":\"agent_chat_threads_threadId_messages_path_GET\",\"title\":\"Get Conversation Path\"},{\"description\":\"Create a new message in a chat thread\",\"name\":\"agent_chat_threads_threadId_messages_POST\",\"title\":\"Create Message\"},{\"description\":\"Search messages within a specific thread using full-text search\",\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\"},{\"description\":\"Update an existing chat thread\",\"name\":\"agent_chat_threads_threadId_PATCH\",\"title\":\"Update Chat Thread\"},{\"description\":\"Retrieve the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_GET\",\"title\":\"Get Thread Permissions\"},{\"description\":\"Update the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_PATCH\",\"title\":\"Update Thread Permissions\"},{\"description\":\"Revoke an active share link\",\"name\":\"agent_chat_threads_threadId_share-links_DELETE\",\"title\":\"Revoke Share Link\"},{\"description\":\"Update an existing share link\",\"name\":\"agent_chat_threads_threadId_share-links_PATCH\",\"title\":\"Update Share Link\"},{\"description\":\"Create a new share link for a thread\",\"name\":\"agent_chat_threads_threadId_share-links_POST\",\"title\":\"Create Share Link\"},{\"description\":\"Retrieve a paginated list of chat threads with filtering options\",\"name\":\"agent-chat-threads\",\"title\":\"Threads\"},{\"description\":\"Search messages across all threads using full-text search\",\"name\":\"agent-search-messages\",\"title\":\"Global Message Search\"},{\"description\":\"Search across thread titles, previews, and system prompts using full-text search\",\"name\":\"agent-search-threads\",\"title\":\"Search Threads\"},{\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"name\":\"agent-view-image\",\"title\":\"View Image\"},{\"aliases\":[\"run-ai\"],\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.\",\"name\":\"ai-run\",\"title\":\"Run AI Agent\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"title\":\"Search the Web\"},{\"description\":\"Retrieve user's chat settings and preferences\",\"name\":\"chat-settings\",\"title\":\"Settings\"},{\"description\":\"Update user's chat settings and preferences\",\"name\":\"chat-settings-update\",\"title\":\"Save Settings\"},{\"aliases\":[\"claude-code\"],\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"title\":\"Run Coding Agent\"},{\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\"},{\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\"},{\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"name\":\"dismiss-task\"},{\"description\":\"Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.\",\"name\":\"execute-tool\"},{\"description\":\"Create a new favorite character configuration\",\"name\":\"favorite-create\",\"title\":\"Create Favorite\"},{\"description\":\"Remove a favorite configuration\",\"name\":\"favorite-delete\",\"title\":\"Delete Favorite\"},{\"description\":\"Retrieve a specific favorite configuration\",\"name\":\"favorite-get\",\"title\":\"Get Favorite\"},{\"description\":\"Update an existing favorite configuration\",\"name\":\"favorite-update\",\"title\":\"Update Favorite\"},{\"description\":\"Retrieve all your saved favorite character configurations\",\"name\":\"favorites\",\"title\":\"Get Favorites\"},{\"description\":\"Update the order of your favorite configurations\",\"name\":\"favorites-reorder\",\"title\":\"Reorder Favorites\"},{\"aliases\":[\"fetch\"],\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\"},{\"aliases\":[\"get-folder\"],\"description\":\"Retrieve merged list of folders and threads for a given folder level\",\"name\":\"folder-contents\",\"title\":\"Get Folder Contents\"},{\"description\":\"Create a new folder\",\"name\":\"folder-create\",\"title\":\"Create Folder\"},{\"description\":\"Delete a folder by ID\",\"name\":\"folder-delete\",\"title\":\"Delete Folder\"},{\"description\":\"Get a folder by ID\",\"name\":\"folder-get\",\"title\":\"Get Folder\"},{\"description\":\"Move a folder to a different parent\",\"name\":\"folder-move\",\"title\":\"Move Folder\"},{\"description\":\"Compute permissions for a root folder\",\"name\":\"folder-permissions\",\"title\":\"Get Root Folder Permissions\"},{\"description\":\"Rename an existing folder\",\"name\":\"folder-rename\",\"title\":\"Rename Folder\"},{\"description\":\"Update an existing folder\",\"name\":\"folder-update\",\"title\":\"Update Folder\"},{\"aliases\":[\"folders\"],\"description\":\"Retrieve all folders for the current root folder\",\"name\":\"folders-list\",\"title\":\"Get Folders\"},{\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\"},{\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\"},{\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\"},{\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"title\":\"Search with Kagi\"},{\"aliases\":[\"list-models\"],\"description\":\"Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.\",\"name\":\"models\"},{\"description\":\"Create a new custom skill\",\"name\":\"skill-create\",\"title\":\"Create Skill\"},{\"description\":\"Delete a custom skill\",\"name\":\"skill-delete\",\"title\":\"Delete skill\"},{\"description\":\"Retrieve a specific skill by ID\",\"name\":\"skill-get\",\"title\":\"Get skill\"},{\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"title\":\"Reported Skills\"},{\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"title\":\"Publish Skill\"},{\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"title\":\"Report Skill\"},{\"description\":\"Modify an existing custom skill\",\"name\":\"skill-update\",\"title\":\"Update skill\"},{\"description\":\"Toggle upvote on a community skill. Idempotent - call again to remove your vote.\",\"name\":\"skill-vote\",\"title\":\"Vote for Skill\"},{\"description\":\"Get all available skills (default + custom)\",\"name\":\"skills\"},{\"description\":\"Render the full system prompt for a given user context. Admin/dev only.\",\"name\":\"system-prompt-debug\"},{\"description\":\"Retrieve all messages in a chat thread\",\"name\":\"thread-messages\",\"title\":\"List Thread Messages\"},{\"description\":\"Retrieve all share links for a thread\",\"name\":\"thread-share-links\",\"title\":\"Get Share Links\"},{\"aliases\":[\"help\"],\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.\",\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"name\":\"web-search\",\"title\":\"Search the Web\"}],\"totalCount\":530}}",
+        "content": "{\"result\":{\"hint\":\"69 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"matchedCount\":69,\"tools\":[{\"description\":\"Retrieve the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\"},{\"description\":\"Update the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\"},{\"description\":\"Public threads shared with the community\",\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\"},{\"description\":\"Create a new chat thread\",\"name\":\"agent_chat_threads_POST\",\"title\":\"New Thread\"},{\"description\":\"Update the title and preview of a chat thread\",\"name\":\"agent_chat_threads_rename_PATCH\",\"title\":\"Rename Thread\"},{\"description\":\"Delete a chat thread\",\"name\":\"agent_chat_threads_threadId_DELETE\",\"title\":\"Delete Chat Thread\"},{\"description\":\"Retrieve a specific chat thread by ID\",\"name\":\"agent_chat_threads_threadId_GET\",\"title\":\"Get Chat Thread\"},{\"description\":\"Delete a message from the thread\",\"name\":\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"title\":\"Delete Message\"},{\"description\":\"Retrieve a specific message by ID\",\"name\":\"agent_chat_threads_threadId_messages_messageId_GET\",\"title\":\"Get Message\"},{\"description\":\"Update a message's content\",\"name\":\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"title\":\"Update Message\"},{\"description\":\"Upvote or downvote a message\",\"name\":\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"title\":\"Vote on Message\"},{\"description\":\"Retrieve messages following a specific conversation path\",\"name\":\"agent_chat_threads_threadId_messages_path_GET\",\"title\":\"Get Conversation Path\"},{\"description\":\"Create a new message in a chat thread\",\"name\":\"agent_chat_threads_threadId_messages_POST\",\"title\":\"Create Message\"},{\"description\":\"Search messages within a specific thread using full-text search\",\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\"},{\"description\":\"Update an existing chat thread\",\"name\":\"agent_chat_threads_threadId_PATCH\",\"title\":\"Update Chat Thread\"},{\"description\":\"Retrieve the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_GET\",\"title\":\"Get Thread Permissions\"},{\"description\":\"Update the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_PATCH\",\"title\":\"Update Thread Permissions\"},{\"description\":\"Revoke an active share link\",\"name\":\"agent_chat_threads_threadId_share-links_DELETE\",\"title\":\"Revoke Share Link\"},{\"description\":\"Update an existing share link\",\"name\":\"agent_chat_threads_threadId_share-links_PATCH\",\"title\":\"Update Share Link\"},{\"description\":\"Create a new share link for a thread\",\"name\":\"agent_chat_threads_threadId_share-links_POST\",\"title\":\"Create Share Link\"},{\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_skills_moderation_PATCH\",\"title\":\"Moderate Skill\"},{\"description\":\"Retrieve a paginated list of chat threads with filtering options\",\"name\":\"agent-chat-threads\",\"title\":\"Threads\"},{\"description\":\"Search messages across all threads using full-text search\",\"name\":\"agent-search-messages\",\"title\":\"Global Message Search\"},{\"description\":\"Search across thread titles, previews, and system prompts using full-text search\",\"name\":\"agent-search-threads\",\"title\":\"Search Threads\"},{\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"name\":\"agent-view-image\",\"title\":\"View Image\"},{\"aliases\":[\"run-ai\"],\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.\",\"name\":\"ai-run\",\"title\":\"Run AI Agent\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"title\":\"Search the Web\"},{\"description\":\"Retrieve user's chat settings and preferences\",\"name\":\"chat-settings\",\"title\":\"Settings\"},{\"description\":\"Update user's chat settings and preferences\",\"name\":\"chat-settings-update\",\"title\":\"Save Settings\"},{\"aliases\":[\"claude-code\"],\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"title\":\"Run Coding Agent\"},{\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\"},{\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\"},{\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"name\":\"dismiss-task\"},{\"description\":\"Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.\",\"name\":\"execute-tool\"},{\"description\":\"Create a new favorite character configuration\",\"name\":\"favorite-create\",\"title\":\"Create Favorite\"},{\"description\":\"Remove a favorite configuration\",\"name\":\"favorite-delete\",\"title\":\"Delete Favorite\"},{\"description\":\"Retrieve a specific favorite configuration\",\"name\":\"favorite-get\",\"title\":\"Get Favorite\"},{\"description\":\"Update an existing favorite configuration\",\"name\":\"favorite-update\",\"title\":\"Update Favorite\"},{\"description\":\"Retrieve all your saved favorite character configurations\",\"name\":\"favorites\",\"title\":\"Get Favorites\"},{\"description\":\"Update the order of your favorite configurations\",\"name\":\"favorites-reorder\",\"title\":\"Reorder Favorites\"},{\"aliases\":[\"fetch\"],\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\"},{\"aliases\":[\"get-folder\"],\"description\":\"Retrieve merged list of folders and threads for a given folder level\",\"name\":\"folder-contents\",\"title\":\"Get Folder Contents\"},{\"description\":\"Create a new folder\",\"name\":\"folder-create\",\"title\":\"Create Folder\"},{\"description\":\"Delete a folder by ID\",\"name\":\"folder-delete\",\"title\":\"Delete Folder\"},{\"description\":\"Get a folder by ID\",\"name\":\"folder-get\",\"title\":\"Get Folder\"},{\"description\":\"Move a folder to a different parent\",\"name\":\"folder-move\",\"title\":\"Move Folder\"},{\"description\":\"Compute permissions for a root folder\",\"name\":\"folder-permissions\",\"title\":\"Get Root Folder Permissions\"},{\"description\":\"Rename an existing folder\",\"name\":\"folder-rename\",\"title\":\"Rename Folder\"},{\"description\":\"Update an existing folder\",\"name\":\"folder-update\",\"title\":\"Update Folder\"},{\"aliases\":[\"folders\"],\"description\":\"Retrieve all folders for the current root folder\",\"name\":\"folders-list\",\"title\":\"Get Folders\"},{\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\"},{\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\"},{\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\"},{\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"title\":\"Search with Kagi\"},{\"aliases\":[\"list-models\"],\"description\":\"Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.\",\"name\":\"models\"},{\"description\":\"Create a new custom skill\",\"name\":\"skill-create\",\"title\":\"Create Skill\"},{\"description\":\"Delete a custom skill\",\"name\":\"skill-delete\",\"title\":\"Delete skill\"},{\"description\":\"Retrieve a specific skill by ID\",\"name\":\"skill-get\",\"title\":\"Get skill\"},{\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"title\":\"Reported Skills\"},{\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"title\":\"Publish Skill\"},{\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"title\":\"Report Skill\"},{\"description\":\"Modify an existing custom skill\",\"name\":\"skill-update\",\"title\":\"Update skill\"},{\"description\":\"Vote up or down on a community skill. Re-sending your current direction removes the vote; sending the opposite flips it.\",\"name\":\"skill-vote\",\"title\":\"Vote for Skill\"},{\"description\":\"Get all available skills (default + custom)\",\"name\":\"skills\"},{\"description\":\"Render the full system prompt for a given user context. Admin/dev only.\",\"name\":\"system-prompt-debug\"},{\"description\":\"Retrieve all messages in a chat thread\",\"name\":\"thread-messages\",\"title\":\"List Thread Messages\"},{\"description\":\"Retrieve all share links for a thread\",\"name\":\"thread-share-links\",\"title\":\"Get Share Links\"},{\"aliases\":[\"help\"],\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.\",\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"name\":\"web-search\",\"title\":\"Search the Web\"}],\"totalCount\":530}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:2"
@@ -126,7 +126,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3afde5c0 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:41]",
+            "text": "[Context: ID:e3251f68 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -139,7 +139,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4b20e581 | Posted:Jun 30, 10:41]",
+            "text": "[Context: ID:2181d968 | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -172,7 +172,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:15ec22e1 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:37609900 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -189,7 +189,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f6b4a2bc | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:5f5ef85d | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -222,7 +222,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:514da051 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:08bde6ac | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:57]",
             "type": "text"
           }
         ],
@@ -235,7 +235,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:8b46cce6 | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:2d6ee66b | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -248,7 +248,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:50da1e2c | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:7f20349e | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -261,7 +261,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1a980b40 | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:37c4ea2c | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -306,7 +306,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/b74fcc6b-a353-4352-b9cc-d2a28a11f63b.mp4\"}",
+        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/a5890753-6474-40ed-aa7c-761a0a1d31b5.mp4\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:6"
@@ -314,7 +314,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:fa68ff4e | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:3b78c72a | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -327,7 +327,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:51301ecb | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:fd97c9aa | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -352,7 +352,7 @@
         ]
       },
       {
-        "content": "{\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"local-bg-det-000001\"}",
+        "content": "{\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"local-bg-functions-execute-tool-9\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:9"
@@ -360,7 +360,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2502c5de | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:496bda9a | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -373,14 +373,14 @@
       {
         "content": [
           {
-            "text": "[Context: ID:be0e6a60 | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:9fc24dfd | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T5b await-task] Call the await-task tool with taskId='local-bg-det-000001'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b await-task] Call the await-task tool with taskId='local-bg-functions-execute-tool-9'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -389,37 +389,37 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"taskId\":\"local-bg-det-000001\"},\"toolName\":\"await-task\"}",
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"taskId\":\"local-bg-functions-execute-tool-9\"},\"toolName\":\"await-task\"}",
               "name": "execute-tool"
             },
-            "id": "functions.execute-tool:10",
+            "id": "functions.execute-tool:7",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"result\":{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/d478608c-1fa5-414d-bf27-cdfb790920ce.png\"},\"status\":\"status.completed\",\"waiting\":false}}",
+        "content": "{\"result\":{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/82bcb10e-c642-45be-b3a5-03c23f89d389.png\"},\"status\":\"status.completed\",\"waiting\":false}}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "functions.execute-tool:10"
+        "tool_call_id": "functions.execute-tool:7"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:ab012d45 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:de98bcd2 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "The `await-task` result contains an `imageUrl` string: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/f8414e03-92a5-4bd0-a2d0-5720c78d3a23.png`.\n\nSTEP_OK",
+        "content": "The `await-task` result contains `result.imageUrl` — a non-empty string (`http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/d635bae5-afce-4a0e-9439-fadf9dc22f62/0efbcd22-18c5-4951-abcb-5a624cb867e0.png`). Everything looks correct.\n\nSTEP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:a7446f3a | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:d17ddc63 | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -452,7 +452,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:5a9392e0 | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:2926c239 | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -485,7 +485,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/b4922805-0338-4f83-8718-af891d147e4f.png",
+            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/37286f36-af73-46a1-97bc-5b8f8ff55600.png",
             "type": "text"
           }
         ],
@@ -496,7 +496,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:009b40a8 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:53627c4f | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -509,7 +509,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a95a1c1b | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:67e9fcf9 | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -542,7 +542,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/4352399e-d02e-41ae-b182-9a849fb963e6.png",
+            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/be871ee6-0a20-4b36-908a-7a6f14f9d641.png",
             "type": "text"
           }
         ],
@@ -553,7 +553,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:122d84ce | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:ca693ee1 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -566,7 +566,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f04b7fc3 | Posted:Jun 30, 10:42]",
+            "text": "[Context: ID:a28a3cdc | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -599,7 +599,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/b1f9218c-d43d-45ff-aee3-d0216d5802a9.png",
+            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/15642105-c615-4a96-8aec-6e6bda5cf76a.png",
             "type": "text"
           }
         ],
@@ -610,7 +610,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d9b4cc2a | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:44]",
+            "text": "[Context: ID:f50f1209 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:58]",
             "type": "text"
           }
         ],
@@ -623,7 +623,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1517bbb4 | Posted:Jun 30, 10:44]",
+            "text": "[Context: ID:a613c1aa | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
@@ -656,7 +656,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/86f6586c-f7d1-4463-be7c-9dd69011c413.png",
+            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/9436f14b-d2e2-4db0-a7a3-b070193a09e9.png",
             "type": "text"
           }
         ],
@@ -667,7 +667,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6b9f5a7e | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:46]",
+            "text": "[Context: ID:6e9066bc | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
@@ -680,7 +680,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d0ff73d0 | Posted:Jun 30, 10:46]",
+            "text": "[Context: ID:120c771c | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
@@ -727,7 +727,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/b1558ee9-f9a4-4f3f-ae7d-663536175c03.png",
+            "text": "imageUrl: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/72669d03-918f-4fb8-920b-b633895cff6f/8b9d670c-c8b2-4b2b-93fd-ed63b921513e.png",
             "type": "text"
           }
         ],
@@ -738,7 +738,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d75ab4bd | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:48]",
+            "text": "[Context: ID:bdb41e76 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
@@ -751,14 +751,14 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4098c906 | Posted:Jun 30, 10:48]",
+            "text": "[Context: ID:f9f98fa7 | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[CF1] Call the contact-form tool right now with: name='Test User', subject=GENERAL_INQUIRY, message='Automated integration test. Please ignore.' Do not explain, just call the tool.",
+        "content": "[CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.",
         "role": "user"
       },
       {
@@ -767,7 +767,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"toolName\":\"contact-form\"},\"toolName\":\"tool-help\"}",
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"message\":\"Automated integration test. Please ignore.\",\"name\":\"Test User\",\"subject\":\"subject.generalInquiry\"},\"toolName\":\"contact-form\"}",
               "name": "execute-tool"
             },
             "id": "functions.execute-tool:18",
@@ -776,68 +776,41 @@
         ]
       },
       {
-        "content": "{\"result\":{\"hint\":\"Call as: execute-tool toolName=\\\"contact-form\\\". CLI: vibe contact-form [--field=value].\",\"matchedCount\":1,\"tools\":[{\"category\":\"messenger\",\"description\":\"Something isn't working, or you just want to talk to a real person. We're here. Describe what you need and a human on our team will read it and reply.\",\"examples\":{\"inputs\":{\"default\":{\"email\":\"john.doe@example.com\",\"message\":\"I would like to learn more about your social media management services.\",\"name\":\"John Doe\",\"priority\":\"priority.medium\",\"subject\":\"subject.generalInquiry\"},\"general\":{\"email\":\"bob@startup.io\",\"message\":\"Can we schedule a demo of your platform?\",\"name\":\"Bob Wilson\",\"priority\":\"priority.medium\",\"subject\":\"subject.featureRequest\"},\"success\":{\"email\":\"jane.smith@company.com\",\"message\":\"We are interested in discussing a potential partnership.\",\"name\":\"Jane Smith\",\"priority\":\"priority.high\",\"subject\":\"subject.partnership\"}},\"responses\":{\"default\":{\"success\":\"Thank you for contacting us! We've received your message and will get back to you soon.\"},\"general\":{\"success\":\"Thank you for contacting us! We've received your message and will get back to you soon.\"},\"success\":{\"success\":\"Thank you for contacting us! We've received your message and will get back to you soon.\"}}},\"name\":\"contact-form\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{\"email\":{\"description\":\"Where we should reply. Leave blank if you're logged in - we'll use your account email.\",\"format\":\"email\",\"pattern\":\"^(?!\\\\.)(?!.*\\\\.\\\\.)([A-Za-z0-9_'+\\\\-\\\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\\\-]*\\\\.)+[A-Za-z]{2,}$\",\"type\":\"string\"},\"message\":{\"description\":\"Full text of the inquiry. Minimum 10 characters. Be specific about your needs.\",\"minLength\":10,\"type\":\"string\"},\"name\":{\"description\":\"Full name of the person submitting the contact form. Minimum 2 characters.\",\"minLength\":2,\"type\":\"string\"},\"priority\":{\"description\":\"Urgency level for the inquiry. High or Urgent requests receive faster responses.\",\"enum\":[\"priority.low\",\"priority.medium\",\"priority.high\",\"priority.urgent\"],\"type\":\"string\"},\"subject\":{\"default\":\"subject.helpSupport\",\"description\":\"Category of the inquiry - used to route the message to the correct team.\",\"enum\":[\"subject.helpSupport\",\"subject.generalInquiry\",\"subject.technicalSupport\",\"subject.accountQuestion\",\"subject.billingQuestion\",\"subject.salesInquiry\",\"subject.featureRequest\",\"subject.bugReport\",\"subject.feedback\",\"subject.complaint\",\"subject.partnership\",\"subject.other\"],\"type\":\"string\"}},\"required\":[\"name\",\"message\"],\"type\":\"object\"},\"requiresConfirmation\":true,\"title\":\"Talk to a Human\"}],\"totalCount\":530}}",
+        "content": "{\"_hint\":\"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\",\"result\":{\"success\":\"Thank you for contacting us! We've received your message and will get back to you soon.\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:18"
       },
       {
-        "content": "",
-        "role": "assistant",
-        "tool_calls": [
-          {
-            "function": {
-              "arguments": "{\"callbackMode\":\"endLoop\",\"input\":{\"message\":\"Automated integration test. Please ignore.\",\"name\":\"Test User\",\"subject\":\"subject.generalInquiry\"},\"toolName\":\"contact-form\"}",
-              "name": "execute-tool"
-            },
-            "id": "functions.execute-tool:19",
-            "type": "function"
-          }
-        ]
-      },
-      {
-        "content": "{\"_hint\":\"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\",\"result\":{\"success\":\"response.success\"}}",
-        "name": "execute-tool",
-        "role": "tool",
-        "tool_call_id": "functions.execute-tool:19"
-      },
-      {
-        "content": "",
-        "role": "assistant",
-        "tool_calls": [
-          {
-            "function": {
-              "arguments": "{\"callbackMode\":\"endLoop\",\"input\":{\"message\":\"Automated integration test. Please ignore.\",\"name\":\"Test User\",\"subject\":\"subject.generalInquiry\"},\"toolName\":\"contact-form\"}",
-              "name": "execute-tool"
-            },
-            "id": "functions.execute-tool:20",
-            "type": "function"
-          }
-        ]
-      },
-      {
-        "content": "{\"result\":{\"status\":\"waiting_for_confirmation\",\"toolName\":\"contact-form\"}}",
-        "name": "execute-tool",
-        "role": "tool",
-        "tool_call_id": "functions.execute-tool:20"
-      },
-      {
         "content": [
           {
-            "text": "[Context: ID:3724f6b4 | Posted:Jun 30, 10:50]",
+            "text": "[Context: ID:90447d07 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T8 parallel-tools] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='green square'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools returned correct results, or FAILED: <reason> if either tool failed or only one ran.",
+        "content": "The contact form was submitted successfully after confirmation.\n\n**Result:** \"Thank you for contacting us! We've received your message and will get back to you soon.\"",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:8e3058e9 | Posted:Jun 30, 16:59]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T8 parallel-tools] In a single response, call BOTH at the same time: (1) the tool-help tool with query='image' to look up tools matching 'image' (this returns a tools array, NOT categories), and (2) the generate_image tool with prompt='green square'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. tool-help WITH a query returns a tools array; an empty array only means no match, not a failure. Check that tool-help returned a tools array (any length) and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.",
         "role": "user"
       },
       {
         "content": [
           {
-            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory sync test. · Marker: rws-mqlflpj2\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (80)\n│   ├── delete-test/ (1 files)\n│   │   └── observe.md\n│   ├── e2e-sync-mql2z4ta/ (1 files)\n│   │   └── test-doc.md\n│   ├── e2e-sync-mql3zib6/ (1 files)\n│   │   └── test-doc.md\n│   ├── edit-test/ (6 files)\n│   │   ├── frontmatter.md\n│   │   ├── size-recompute.md\n│   │   ├── line-replace.md\n│   │   ├── no-match.md\n│   │   ├── multi-replace.md\n│   │   └── single-replace.md\n│   ├── list-test/ (1 files)\n│   │   └── root-probe.md\n│   ├── move-test/ (2 files)\n│   │   ├── conflict-dst.md\n│   │   └── conflict-src.md\n│   ├── read-test/ (3 files)\n│   │   ├── multibyte.md\n│   │   ├── long.md\n│   │   └── basic.md\n│   ├── search-test/ (1 files)\n│   │   └── quantum-flux.md\n│   ├── tree-test/ (2 files)\n│   │   ├── docs-probe.md\n│   │   └── root-probe.md\n│   ├── write-test/ (5 files)\n│   │   ├── size.md\n│   │   ├── frontmatter.md\n│   │   ├── overwrite.md\n│   │   ├── roundtrip.md\n│   │   └── create.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 3 · 1118 background)\n├── skills/ (10 created)\n│   ├── WS Push Skill (ws-push-skill-6) (created)\n│   ├── Reverse Skill (reverse-skill-6) (created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-13) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-12) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-12) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-11) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── WS Push Skill (ws-push-skill-5) (created)\n│   ├── Reverse Skill (reverse-skill-5) (created)\n│   └── Code Reviewer (code-reviewer-11) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── favorites/ (active: thea-brilliant)\n│   ├── thea-2\n│   │   model: skill:thea\n│   ├── thea-3\n│   │   model: skill:thea\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── financial-advisor-elon-tusk\n│   │   model: skill:financial-advisor\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── thea-4\n│   │   model: skill:thea\n│   ├── thea-brilliant\n│   │   model: skill:thea [ACTIVE]\n│   ├── thea-cheap\n│   │   model: skill:thea\n│   ├── thea-oracle\n│   │   model: skill:thea\n│   └── +26 more\n└── /uploads/ (217 - images, documents, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.",
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory sync test. · Marker: rws-mqlflpj2\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (80)\n│   ├── delete-test/ (1 files)\n│   │   └── observe.md\n│   ├── e2e-sync-mql2z4ta/ (1 files)\n│   │   └── test-doc.md\n│   ├── e2e-sync-mql3zib6/ (1 files)\n│   │   └── test-doc.md\n│   ├── edit-test/ (6 files)\n│   │   ├── frontmatter.md\n│   │   ├── size-recompute.md\n│   │   ├── line-replace.md\n│   │   ├── no-match.md\n│   │   ├── multi-replace.md\n│   │   └── single-replace.md\n│   ├── list-test/ (1 files)\n│   │   └── root-probe.md\n│   ├── move-test/ (2 files)\n│   │   ├── conflict-dst.md\n│   │   └── conflict-src.md\n│   ├── read-test/ (3 files)\n│   │   ├── multibyte.md\n│   │   ├── long.md\n│   │   └── basic.md\n│   ├── search-test/ (1 files)\n│   │   └── quantum-flux.md\n│   ├── tree-test/ (2 files)\n│   │   ├── docs-probe.md\n│   │   └── root-probe.md\n│   ├── write-test/ (5 files)\n│   │   ├── size.md\n│   │   ├── frontmatter.md\n│   │   ├── overwrite.md\n│   │   ├── roundtrip.md\n│   │   └── create.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 6 · 1193 background)\n├── skills/ (10 created)\n│   ├── Code Reviewer (code-reviewer-17) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-16) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-16) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-15) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-15) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-14) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-14) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-13) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── WS Push Skill (ws-push-skill-6) (created)\n│   └── Reverse Skill (reverse-skill-6) (created)\n├── tasks/ (2)\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled]\n│   └── Dreaming\n│       0 2 * * * [disabled]\n├── favorites/ (active: thea-cheap)\n│   ├── thea-brilliant\n│   │   model: skill:thea\n│   ├── thea-cheap\n│   │   model: skill:thea [ACTIVE]\n│   ├── thea-oracle\n│   │   model: skill:thea\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-budget\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   └── +12 more\n├── /uploads/ (343 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.",
             "type": "text"
           }
         ],
@@ -850,7 +823,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:7ccf8499 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:50]",
+            "text": "[Context: ID:0fb76068 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 16:59]",
             "type": "text"
           }
         ],

@@ -6,20 +6,20 @@
 import "server-only";
 
 import { and, eq, ne } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { leads } from "next-vibe/identity/lead/db";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { campaignSchedulerService } from "@/app/api/[locale]/leads/campaigns/emails/services/scheduler";
-import { leads } from "@/app/api/[locale]/leads/db";
-import { LeadStatus } from "@/app/api/[locale]/leads/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { newsletterSubscriptions } from "../../db";
 import { NewsletterSubscriptionStatus } from "../../enum";

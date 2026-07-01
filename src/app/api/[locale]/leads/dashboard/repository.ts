@@ -11,14 +11,13 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { leads } from "next-vibe/identity/lead/db";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import { leads } from "../db";
-import { LeadStatus } from "../enum";
 import type { LeadsDashboardResponseOutput } from "./definition";
 import type { LeadsDashboardT } from "./i18n";
 

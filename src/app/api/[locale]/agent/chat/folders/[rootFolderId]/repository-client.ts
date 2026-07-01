@@ -6,20 +6,20 @@
 
 "use client";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import type { FolderContentsItem } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
-import { parseError } from "@/app/api/[locale]/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../config";
 import type { ChatFolder } from "../../db";

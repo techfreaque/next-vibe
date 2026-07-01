@@ -1,0 +1,92 @@
+"use client";
+
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Alert, AlertDescription } from "next-vibe/ui/web/ui/alert";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
+} from "next-vibe/unified-ui/_shared/react-types";
+import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import {
+  useWidgetContext,
+  useWidgetForm,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import type {
+  AlertWidgetConfig,
+  AlertWidgetSchema,
+} from "next-vibe/unified-ui/display-only/alert/types";
+import type { JSX } from "react";
+
+/**
+ * Displays alert messages with configurable variants.
+ * Value should be a translation key string.
+ */
+export function AlertWidget<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
+  TUsage extends FieldUsageConfig,
+>(
+  props: TUsage extends { response: true }
+    ? ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
+      >
+    : TUsage extends { request?: never; response?: never }
+      ? ReactStaticWidgetProps<
+          TEndpoint,
+          TUsage,
+          AlertWidgetConfig<TKey, never, TUsage, "widget">
+        >
+      : ReactWidgetPropsNoValue<
+          TEndpoint,
+          TUsage,
+          AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
+        >,
+): JSX.Element | null {
+  const { t: tField } = useWidgetContext();
+  const form = useWidgetForm();
+  const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
+  const {
+    variant = "default",
+    className,
+    content: hardcodedContent,
+  } = props.field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
+
+  let content: string | undefined;
+  if (value) {
+    content = tField(value);
+  } else if (hardcodedContent) {
+    content = tField(hardcodedContent);
+  }
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <Alert variant={variant} className={className}>
+      <AlertDescription>{content}</AlertDescription>
+    </Alert>
+  );
+}
+
+AlertWidget.displayName = "AlertWidget";
+
+export default AlertWidget;

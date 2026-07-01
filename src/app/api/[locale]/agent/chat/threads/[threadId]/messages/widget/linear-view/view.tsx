@@ -4,11 +4,13 @@
  */
 
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
 import type { JSX } from "react";
 import React, { memo, useMemo } from "react";
 
@@ -18,9 +20,6 @@ import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";

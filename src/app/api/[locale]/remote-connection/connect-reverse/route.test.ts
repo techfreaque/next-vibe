@@ -14,11 +14,10 @@
 
 import "server-only";
 
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { describe, expect, it } from "vitest";
-
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import definitions from "./definition";
 import updateDefinitions from "./update/definition";

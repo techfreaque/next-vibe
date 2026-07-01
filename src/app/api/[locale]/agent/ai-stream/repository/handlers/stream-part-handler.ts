@@ -5,11 +5,11 @@
 import "server-only";
 
 import type { JSONValue, TextStreamPart, ToolSet } from "ai";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { AiStreamT } from "../../stream/i18n";
@@ -308,7 +308,7 @@ export class StreamPartHandler {
               const { db: dbInst } =
                 await import("@/app/api/[locale]/system/db");
               const { cronTasks: cronTasksTable } =
-                await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+                await import("next-vibe/tasks/cron/db");
               const { eq: drizzleEq } = await import("drizzle-orm");
               await dbInst
                 .update(cronTasksTable)

@@ -1,0 +1,64 @@
+/**
+ * Resizable Component for React Native
+ * Simple fixed-width container (React Native doesn't support mouse drag-to-resize)
+ */
+import { GripVertical } from "lucide-react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/core/utils/utils";
+import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import type {
+  ResizableContainerProps,
+  ResizableHandleProps,
+} from "next-vibe/ui/web/ui/resizable";
+import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
+import React from "react";
+import { View } from "react-native";
+
+// Type-safe View with className support (NativeWind)
+const StyledView = styled(View, { className: "style" });
+
+export function ResizableContainer({
+  children,
+  className,
+  defaultWidth = 260,
+}: ResizableContainerProps): React.JSX.Element {
+  return (
+    <StyledView
+      className={cn("relative h-full flex-shrink-0", className)}
+      style={{ width: defaultWidth }}
+    >
+      {children}
+    </StyledView>
+  );
+}
+
+ResizableContainer.displayName = "ResizableContainer";
+
+export function ResizableHandle({
+  withHandle,
+  className,
+  style,
+}: ResizableHandleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+  return (
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "absolute top-0 right-0 bottom-0 w-px items-center justify-center bg-border",
+          className,
+        ),
+      })}
+    >
+      {withHandle && (
+        <StyledView className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
+          <GripVertical size={10} color="currentColor" />
+        </StyledView>
+      )}
+    </StyledView>
+  );
+}
+
+ResizableHandle.displayName = "ResizableHandle";
+
+export type { ResizableContainerProps, ResizableHandleProps };

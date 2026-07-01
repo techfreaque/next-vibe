@@ -1,0 +1,270 @@
+/**
+ * Server Start Command Endpoint Definition
+ * Production-ready endpoint for starting the production server
+ */
+
+import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  ServerFramework,
+  ServerFrameworkOptions,
+} from "next-vibe/server/server/enum";
+import { scopedTranslation } from "next-vibe/server/server/start/i18n";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { START_ALIASES } from "./constants";
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "server", "server", "start"],
+  aliases: START_ALIASES,
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
+  category: "devTools",
+  subCategory: "serverManagement",
+  tags: ["tags.start"],
+  icon: "zap",
+  timeoutMs: 0,
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
+  ],
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      // === REQUEST FIELDS ===
+      mode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.mode.title",
+        description: "post.fields.mode.description",
+        columns: 12,
+        options: [
+          { value: "all", label: "post.fields.mode.options.all" },
+          { value: "web", label: "post.fields.mode.options.web" },
+          { value: "tasks", label: "post.fields.mode.options.tasks" },
+        ],
+        schema: z.enum(["all", "web", "tasks"]).optional().default("all"),
+      }),
+
+      seed: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.seed.title",
+        description: "post.fields.seed.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      dbSetup: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.dbSetup.title",
+        description: "post.fields.dbSetup.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      taskRunner: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.taskRunner.title",
+        description: "post.fields.taskRunner.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      nextServer: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.nextServer.title",
+        description: "post.fields.nextServer.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      port: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.fields.port.title",
+        description: "post.fields.port.description",
+        columns: 12,
+        schema: z.coerce.number().optional(),
+      }),
+
+      profile: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.profile.title",
+        description: "post.fields.profile.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
+      framework: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.framework.title",
+        description: "post.fields.framework.description",
+        columns: 6,
+        options: ServerFrameworkOptions,
+        schema: z.enum(ServerFramework).default(ServerFramework.NEXT),
+      }),
+
+      // === RESPONSE FIELDS ===
+
+      responseMessage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.output.title",
+        schema: translatedValueSchema,
+      }),
+    },
+  }),
+
+  // === ERROR HANDLING ===
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+  },
+
+  // === SUCCESS HANDLING ===
+  successTypes: {
+    title: "post.success.title",
+    description: "post.success.description",
+  },
+
+  // === EXAMPLES ===
+  examples: {
+    requests: {
+      default: {
+        mode: "all",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        profile: false,
+        framework: ServerFramework.NEXT,
+      },
+      webOnly: {
+        mode: "web",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        profile: false,
+        framework: ServerFramework.NEXT,
+      },
+      tasksOnly: {
+        mode: "tasks",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        profile: false,
+        framework: ServerFramework.NEXT,
+      },
+      withPort: {
+        mode: "all",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        port: 3000,
+        profile: false,
+        framework: ServerFramework.NEXT,
+      },
+      tanstackStart: {
+        mode: "all",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        profile: false,
+        framework: ServerFramework.TANSTACK,
+      },
+    },
+    responses: {
+      default: {
+        responseMessage: "post.fields.output.title",
+      },
+      webOnly: {
+        responseMessage: "post.fields.output.title",
+      },
+      tasksOnly: {
+        responseMessage: "post.fields.output.title",
+      },
+      withPort: {
+        responseMessage: "post.fields.output.title",
+      },
+      tanstackStart: {
+        responseMessage: "post.fields.output.title",
+      },
+    },
+  },
+});
+
+// Export types for use in repository
+export type ServerStartRequestInput = typeof POST.types.RequestInput;
+export type ServerStartRequestOutput = typeof POST.types.RequestOutput;
+export type ServerStartResponseInput = typeof POST.types.ResponseInput;
+export type ServerStartResponseOutput = typeof POST.types.ResponseOutput;
+
+const startDefinition = { POST };
+export default startDefinition;

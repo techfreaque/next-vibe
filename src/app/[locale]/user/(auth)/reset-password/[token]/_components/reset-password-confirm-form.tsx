@@ -1,20 +1,20 @@
 "use client";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
 import type { JSX } from "react";
 
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/reset-password/confirm/i18n";
 import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;

@@ -11,19 +11,18 @@
  * on messagesDefinition.GET), NOT from this hook.
  */
 
-import { parseError } from "next-vibe/shared/utils";
-import { toast } from "next-vibe-ui/hooks/use-toast";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { toast } from "next-vibe/ui/web/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useCallback, useMemo } from "react";
 
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-
-import { buildWsChannel } from "../../../../system/unified-interface/websocket/channel";
-import { preWarmChannel } from "../../../../system/unified-interface/websocket/client";
+import { buildWsChannel } from "../../../../system/realtime/channel";
+import { preWarmChannel } from "../../../../system/realtime/client";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";

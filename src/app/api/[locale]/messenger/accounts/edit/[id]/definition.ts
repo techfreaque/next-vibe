@@ -2,15 +2,28 @@
  * Unified Messenger Account Edit API Definition (GET + PUT)
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import {
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "next-vibe/core/i18n/core/config";
+import {
+  EmailCampaignStage,
+  EmailCampaignStageOptions,
+  EmailJourneyVariant,
+  EmailJourneyVariantOptions,
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -21,27 +34,14 @@ import {
   requestUrlPathParamsResponseField,
   responseField,
   submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import {
-  EmailCampaignStage,
-  EmailCampaignStageOptions,
-  EmailJourneyVariant,
-  EmailJourneyVariantOptions,
-} from "../../../../leads/enum";
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/messenger/accounts/enum";
+
 import {
   EmailImapAuthMethodDB,
   EmailImapAuthMethodOptions,
@@ -1022,7 +1022,7 @@ const { DELETE } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const listDefinition = await import("../../list/definition");
         apiClient.updateEndpointData(
           listDefinition.default.GET,

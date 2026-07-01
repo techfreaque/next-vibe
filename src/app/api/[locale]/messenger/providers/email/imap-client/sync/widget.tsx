@@ -4,21 +4,21 @@
 
 "use client";
 
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { Div } from "next-vibe-ui/ui/div";
-import { Label } from "next-vibe-ui/ui/label";
-import { Span } from "next-vibe-ui/ui/span";
+import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetForm,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React from "react";
 
 import type { MessengerAccountsListGETResponseOutput } from "@/app/api/[locale]/messenger/accounts/list/definition";

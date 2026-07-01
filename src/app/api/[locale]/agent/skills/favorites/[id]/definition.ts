@@ -3,6 +3,35 @@
  * Defines endpoints for getting, updating, and deleting a single favorite
  */
 
+import {
+  dateSchema,
+  iconSchema,
+  translatedValueSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  SpacingSize,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  backButton,
+  customWidgetObject,
+  deleteButton,
+  navigateButtonField,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -24,35 +53,6 @@ import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-gen
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import {
-  dateSchema,
-  iconSchema,
-  translatedValueSchema,
-} from "@/app/api/[locale]/shared/types/common.schema";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  deleteButton,
-  navigateButtonField,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-  widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  SpacingSize,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "../../../ai-stream/models";
 import type {
@@ -101,7 +101,7 @@ const { DELETE } = createEndpoint({
       onSuccess: async (data) => {
         // Import apiClient and favorites list GET endpoint
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition = await import("../../definition");
 
@@ -313,7 +313,7 @@ const { DELETE } = createEndpoint({
         }
         const [{ apiClient }, favoritesDefinition, charactersDefinition] =
           await Promise.all([
-            import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+            import("next-vibe/platforms/react/hooks/store"),
             import("../definition"),
             import("../../definition"),
           ]);
@@ -416,7 +416,7 @@ const { PATCH } = createEndpoint({
 
         // Import dependencies
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
@@ -951,7 +951,7 @@ const { PATCH } = createEndpoint({
           skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
         ] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("next-vibe/platforms/react/hooks/store"),
           import("../definition"),
           import("../../[id]/definition"),
           import("../repository-client"),

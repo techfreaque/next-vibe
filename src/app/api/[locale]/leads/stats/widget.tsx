@@ -4,26 +4,36 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { Div } from "next-vibe-ui/ui/div";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { Filter } from "next-vibe-ui/ui/icons/Filter";
-import { List } from "next-vibe-ui/ui/icons/List";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Upload } from "next-vibe-ui/ui/icons/Upload";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
-import { MetricCard } from "next-vibe-ui/ui/metric-card";
-import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { SectionGroup } from "next-vibe-ui/ui/section-group";
-import { Span } from "next-vibe-ui/ui/span";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { cn } from "next-vibe/core/utils/utils";
+import {
+  LeadSource,
+  LeadSourceFilter,
+  LeadStatus,
+  LeadStatusFilter,
+} from "next-vibe/identity/lead/enum";
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "next-vibe/identity/lead/i18n";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Download } from "next-vibe/ui/web/ui/icons/Download";
+import { Filter } from "next-vibe/ui/web/ui/icons/Filter";
+import { List } from "next-vibe/ui/web/ui/icons/List";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Upload } from "next-vibe/ui/web/ui/icons/Upload";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
+import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -32,24 +42,12 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
-
-import {
-  LeadSource,
-  LeadSourceFilter,
-  LeadStatus,
-  LeadStatusFilter,
-} from "@/app/api/[locale]/leads/enum";
-import {
-  type LeadsTranslationKey,
-  scopedTranslation as leadsScopedTranslation,
-} from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 

@@ -1,9 +1,9 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { Markdown } from "next-vibe-ui/ui/markdown";
+import { cn } from "next-vibe/core/utils/utils";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
 import type { JSX } from "react";
 import React, { useCallback, useMemo } from "react";
 
@@ -16,7 +16,6 @@ import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hoo
 import debugDefinition from "@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import { scopedTranslation } from "../../i18n";
 import type { DebugSystemPromptParts } from "../debug-component";

@@ -3,11 +3,13 @@
  * Interfaces for supporting multiple payment processors
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  Countries,
+  CountryLanguage,
+} from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
 import type { ProductIds } from "../../products/repository-client";
 import type { PaymentProviderValue } from "../enum";

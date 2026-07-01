@@ -1,29 +1,31 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
-import { Gift } from "next-vibe-ui/ui/icons/Gift";
-import { History } from "next-vibe-ui/ui/icons/History";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Link } from "next-vibe-ui/ui/link";
-import { MetricCard } from "next-vibe-ui/ui/metric-card";
-import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { Span } from "next-vibe-ui/ui/span";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { cn } from "next-vibe/core/utils/utils";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Calendar } from "next-vibe/ui/web/ui/icons/Calendar";
+import { Coins } from "next-vibe/ui/web/ui/icons/Coins";
+import { Gift } from "next-vibe/ui/web/ui/icons/Gift";
+import { History } from "next-vibe/ui/web/ui/icons/History";
+import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
+import { ShoppingCart } from "next-vibe/ui/web/ui/icons/ShoppingCart";
+import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
+import { Skeleton } from "next-vibe/ui/web/ui/skeleton";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/app/[locale]/subscription/i18n";
@@ -32,9 +34,6 @@ import {
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { useTranslation } from "@/i18n/core/client";
 
 import creditsDefinition from "./definition";
 import { scopedTranslation } from "./i18n";

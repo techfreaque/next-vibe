@@ -6,14 +6,13 @@
 
 "use client";
 
+import cronTaskDefinitions from "next-vibe/tasks/cron/[id]/definition";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   useWidgetLocale,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useMemo } from "react";
-
-import cronTaskDefinitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 interface TaskDetailWidgetProps {
   path: string;

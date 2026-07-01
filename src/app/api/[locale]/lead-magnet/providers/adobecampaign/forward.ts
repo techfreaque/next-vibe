@@ -3,7 +3,7 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import type { LeadMagnetT } from "../../i18n";
 import type { ForwardLeadFn } from "../types";

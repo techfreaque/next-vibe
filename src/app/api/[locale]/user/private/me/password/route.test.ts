@@ -1,10 +1,10 @@
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 
 import passwordEndpoints from "./definition";

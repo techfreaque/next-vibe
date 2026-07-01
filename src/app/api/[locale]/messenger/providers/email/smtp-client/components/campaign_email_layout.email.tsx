@@ -13,9 +13,8 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";

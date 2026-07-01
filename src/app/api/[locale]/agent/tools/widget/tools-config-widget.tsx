@@ -12,41 +12,40 @@
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
-import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
-import { Switch } from "next-vibe-ui/ui/switch";
+import { cn } from "next-vibe/core/utils/utils";
+import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition";
+import helpDefinitions from "next-vibe/help-tool/definition";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
+import { EyeOff } from "next-vibe/ui/web/ui/icons/EyeOff";
+import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Switch } from "next-vibe/ui/web/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/tooltip";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import type { HelpToolMetadataSerialized } from "@/app/api/[locale]/system/help/definition";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

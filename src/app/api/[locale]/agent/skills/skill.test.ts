@@ -24,6 +24,12 @@ import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fe
 installFetchCache();
 
 import { and, eq, ilike } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { resolveFavorite } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
@@ -47,12 +53,6 @@ import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/skills/favorit
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { defaultLocale } from "@/i18n/core/config";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

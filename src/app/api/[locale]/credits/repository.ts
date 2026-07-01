@@ -45,30 +45,30 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
   leadLeadLinks,
   leads,
   userLeadLinks,
-} from "@/app/api/[locale]/leads/db";
-import { LeadSource, LeadStatus } from "@/app/api/[locale]/leads/enum";
+} from "next-vibe/identity/lead/db";
+import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import { paymentInvoices } from "@/app/api/[locale]/payment/db";
 import type { CreditPackCheckoutSession } from "@/app/api/[locale]/payment/providers/types";
-import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import {
   type ChatModelId,
@@ -82,8 +82,8 @@ import type {
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
-import { withTransaction } from "../system/db/utils/repository-helpers";
-import { createEndpointEmitter } from "../system/unified-interface/websocket/emitter";
+import { withTransaction } from "../system/database/utils/repository-helpers";
+import { createEndpointEmitter } from "../system/realtime/emitter";
 import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,

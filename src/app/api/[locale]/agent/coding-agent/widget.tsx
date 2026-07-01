@@ -6,26 +6,25 @@
  */
 
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Markdown } from "next-vibe-ui/ui/markdown";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
+import { Markdown } from "next-vibe/ui/web/ui/markdown";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+} from "next-vibe/ui/web/ui/tooltip";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -37,9 +36,9 @@ import {
   useWidgetResponse,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

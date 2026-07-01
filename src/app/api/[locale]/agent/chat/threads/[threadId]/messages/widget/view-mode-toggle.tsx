@@ -1,19 +1,18 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Bug } from "next-vibe-ui/ui/icons/Bug";
-import { Hash } from "next-vibe-ui/ui/icons/Hash";
-import { List } from "next-vibe-ui/ui/icons/List";
-import { Network } from "next-vibe-ui/ui/icons/Network";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Bug } from "next-vibe/ui/web/ui/icons/Bug";
+import { Hash } from "next-vibe/ui/web/ui/icons/Hash";
+import { List } from "next-vibe/ui/web/ui/icons/List";
+import { Network } from "next-vibe/ui/web/ui/icons/Network";
 import type React from "react";
 
 import {
   ViewMode,
   type ViewModeValue,
 } from "@/app/api/[locale]/agent/chat/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 

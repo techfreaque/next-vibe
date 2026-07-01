@@ -1,22 +1,22 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { copyToClipboard } from "next-vibe-ui/lib/clipboard";
-import { getElementById } from "next-vibe-ui/lib/dom";
-import { getCurrentUrl } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
-import { ArrowBigUp } from "next-vibe-ui/ui/icons/ArrowBigUp";
-import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Share2 } from "next-vibe-ui/ui/icons/Share2";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Span } from "next-vibe-ui/ui/span";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { getElementById } from "next-vibe/ui/web/lib/dom";
+import { getCurrentUrl } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowBigDown } from "next-vibe/ui/web/ui/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe/ui/web/ui/icons/ArrowBigUp";
+import { CornerDownRight } from "next-vibe/ui/web/ui/icons/CornerDownRight";
+import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { Share2 } from "next-vibe/ui/web/ui/icons/Share2";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { Volume2 } from "next-vibe/ui/web/ui/icons/Volume2";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
@@ -25,7 +25,6 @@ import {
   useChatNavigationStore,
 } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";

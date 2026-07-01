@@ -12,24 +12,23 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ChartType as SharedChartType,
+  type HistoricalDataPointType,
+} from "next-vibe/core/core-utils/stats-filtering.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ChartType as SharedChartType,
-  type HistoricalDataPointType,
-} from "next-vibe/shared/types/stats-filtering.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { ActivityType, UserAssociation } from "next-vibe/identity/lead/enum";
+import { EngagementLevel } from "next-vibe/identity/tracking/engagement/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import { ActivityType, UserAssociation } from "../../../leads/enum";
-import { EngagementLevel } from "../../../leads/tracking/engagement/enum";
-import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../db";
 import {
   mapMessageStatusFilter,

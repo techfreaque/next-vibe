@@ -9,21 +9,21 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe-ui/ui/alert-dialog";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, H4, P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/alert-dialog";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H3, H4, P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/form-fields/entity-picker-field/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX, useState } from "react";
 
 import { BillStatus } from "@/app/api/[locale]/payment/enum";

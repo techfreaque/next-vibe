@@ -4,22 +4,22 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+} from "next-vibe/core/definition/enums";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
@@ -27,8 +27,8 @@ import {
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "@/app/api/[locale]/agent/skills/enum";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { UserRole } from "../../../user-roles/enum";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const CreatorProfileWidget = lazyWidget(() =>

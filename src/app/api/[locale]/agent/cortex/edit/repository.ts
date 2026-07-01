@@ -6,21 +6,23 @@ import "server-only";
  */
 import { and, eq } from "drizzle-orm";
 import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import type { EndpointLogger } from "../../../system/logger/types";
-import { UserPermissionRole } from "../../../user/user-roles/enum";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";

@@ -4,12 +4,13 @@
  * Includes autosave functionality to persist drafts across page refreshes
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { DivRefObject } from "next-vibe-ui/ui/div";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { DivRefObject } from "next-vibe/ui/web/ui/div";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
-} from "next-vibe-ui/ui/textarea";
+} from "next-vibe/ui/web/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -18,7 +19,6 @@ import {
   saveDraft,
 } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-input-autosave";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { loadMessageAttachments } from "./load-message-attachments";
 

@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-import { Languages } from "next-vibe-ui/ui/icons/Languages";
-import { Palette } from "next-vibe-ui/ui/icons/Palette";
-import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
-import { Link } from "next-vibe-ui/ui/link";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { Code } from "next-vibe/ui/web/ui/icons/Code";
+import { DollarSign } from "next-vibe/ui/web/ui/icons/DollarSign";
+import { Languages } from "next-vibe/ui/web/ui/icons/Languages";
+import { Palette } from "next-vibe/ui/web/ui/icons/Palette";
+import { ShieldOff } from "next-vibe/ui/web/ui/icons/ShieldOff";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, Muted, P } from "next-vibe/ui/web/ui/typography";
 import type { ComponentType, JSX } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 

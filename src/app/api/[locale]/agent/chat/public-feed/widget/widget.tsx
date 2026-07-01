@@ -4,27 +4,26 @@
  */
 
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
-import { ArrowBigUp } from "next-vibe-ui/ui/icons/ArrowBigUp";
-import { Award } from "next-vibe-ui/ui/icons/Award";
-import { Flame } from "next-vibe-ui/ui/icons/Flame";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/core/utils/utils";
+import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowBigDown } from "next-vibe/ui/web/ui/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe/ui/web/ui/icons/ArrowBigUp";
+import { Award } from "next-vibe/ui/web/ui/icons/Award";
+import { Flame } from "next-vibe/ui/web/ui/icons/Flame";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Search } from "next-vibe/ui/web/ui/icons/Search";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetSelector,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 
 import { DefaultFolderId } from "../../config";

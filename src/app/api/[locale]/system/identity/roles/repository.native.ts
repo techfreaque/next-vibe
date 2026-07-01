@@ -1,0 +1,125 @@
+/**
+ * Native User Roles Repository
+ * Implements UserRolesRepository interface for React Native
+ */
+
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import type { NewUserRole, UserRole } from "@/app/api/[locale]/user/db";
+
+import type { UserRole as UserRoleEnum } from "./enum";
+import { type UserPermissionRoleValue } from "./enum";
+import type { UserRolesRepositoryType } from "./repository";
+
+/**
+ * Native User Roles Repository
+ */
+export class UserRolesRepository {
+  static async findByUserId(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<UserRole[]>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserId is not implemented on native");
+  }
+
+  static async findByUserIds(
+    // oxlint-disable-next-line no-unused-vars
+    _userIds: string[],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<Map<string, UserRole[]>>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserIds is not implemented on native");
+  }
+
+  static async deleteByUserId(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<void>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deleteByUserId is not implemented on native");
+  }
+
+  static async findByUserIdAndRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<UserRole>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserIdAndRole is not implemented on native");
+  }
+
+  static async addRole(
+    // oxlint-disable-next-line no-unused-vars
+    _data: NewUserRole,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<UserRole>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("addRole is not implemented on native");
+  }
+
+  static async removeRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<boolean>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("removeRole is not implemented on native");
+  }
+
+  static async hasRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<boolean>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("hasRole is not implemented on native");
+  }
+
+  static async getUserRoles(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserRoles is not implemented on native");
+  }
+}
+
+// Compile-time type check
+const _typeCheck: UserRolesRepositoryType = UserRolesRepository;
+void _typeCheck;

@@ -5,10 +5,11 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 
 import {
   type ChatModelId,
@@ -17,10 +18,6 @@ import {
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { AiStreamT } from "../../stream/i18n";
 import {

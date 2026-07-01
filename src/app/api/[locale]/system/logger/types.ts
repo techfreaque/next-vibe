@@ -1,4 +1,4 @@
-import type { ErrorResponseType } from "../../shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 
 /**
  * Logger metadata - structured data for logging

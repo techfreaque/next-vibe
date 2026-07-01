@@ -6,23 +6,23 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { sessions } from "next-vibe/identity/session/db";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { sessions } from "../session/db";
 import type { SessionDeleteResponseOutput } from "./[id]/definition";
 import type {
   SessionsGetResponseOutput,
@@ -175,7 +175,7 @@ export class SessionManagementRepository {
     request: Request | undefined,
     t: PrivateSessionsT,
   ): Promise<ResponseType<SessionsGetResponseOutput>> {
-    const { cookies } = await import("next-vibe-ui/lib/headers");
+    const { cookies } = await import("next-vibe/ui/web/lib/headers");
     let currentToken: string | undefined;
     if (request) {
       const authHeader = request.headers.get("authorization");

@@ -1,9 +1,8 @@
 "use client";
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { useMemo } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { formatFavoritesSummary } from "../favorites-formatter";
 import type { FavoriteSummaryItem } from "../system-prompt/prompt";

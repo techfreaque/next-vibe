@@ -3,6 +3,25 @@
  * Defines endpoint for creating new favorites
  */
 
+import {
+  iconSchema,
+  translatedValueSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  backButton,
+  customWidgetObject,
+  requestField,
+  responseField,
+  submitButton,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -21,26 +40,7 @@ import {
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  backButton,
-  customWidgetObject,
-  requestField,
-  responseField,
-  submitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  iconSchema,
-  translatedValueSchema,
-} from "../../../../shared/types/common.schema";
 import { parseSkillId } from "../../../chat/slugify";
 import type {
   FiltersModelSelection,
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
         availability,
       }) => {
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition = await import("../../definition");
         const characterSingleDefinitions =
@@ -430,24 +430,28 @@ const { POST } = createEndpoint({
       // navigation renders instantly. Character display fields (name/tagline/icon)
       // are resolved from the skills [id] cache when present, else fill in on the
       // next list refetch.
-      onEvent: async ({ responseData, requestData, logger, locale, user }) => {
+      onEvent: async ({
+        responseData,
+        requestData,
+        logger,
+        locale,
+        user,
+        agentEnvAvailability,
+      }) => {
         const [
           { apiClient },
           favoritesDefinition,
           charactersDefinition,
           skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
-          { getEnvAvailability },
         ] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("next-vibe/platforms/react/hooks/store"),
           import("../definition"),
           import("../../definition"),
           import("../../[id]/definition"),
           import("../repository-client"),
-          import("../../../env-availability"),
         ]);
 
-        const availability = getEnvAvailability();
         const { skillId: baseSkillId, variantId } = parseSkillId(
           requestData.skillId ?? "default",
         );

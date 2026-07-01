@@ -4,29 +4,29 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import { hashPassword } from "next-vibe/shared/utils/password";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { hashPassword } from "next-vibe/identity/auth/password";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
+import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { SessionRepository } from "next-vibe/identity/session/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
 import { translations } from "@/config/i18n/en";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { contactClientRepository } from "../contact/repository-client";
-import { leads, userLeadLinks } from "../leads/db";
-import { LeadSource, LeadStatus } from "../leads/enum";
-import { parseError } from "../shared/utils";
-import { AuthRepository } from "./auth/repository";
 import type { NewUser } from "./db";
 import { users } from "./db";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "./dev-seed-users";
 import { UserDetailLevel } from "./enum";
-import { SessionRepository } from "./private/session/repository";
 import { UserRepository } from "./repository";
 import type { StandardUserType } from "./types";
-import { UserRole } from "./user-roles/enum";
-import { UserRolesRepository } from "./user-roles/repository";
 
 /**
  * Helper function to create user seed data

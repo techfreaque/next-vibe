@@ -10,17 +10,16 @@
 
 "use client";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { parseError } from "../../../../../../shared/utils";
 import type { ChatMessage } from "../../../../db";
 import { getMessagesForThread } from "../../../../incognito/storage";
 import type { PathGetRequestOutput, PathGetResponseOutput } from "./definition";

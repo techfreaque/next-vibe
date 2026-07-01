@@ -9,13 +9,21 @@ import "server-only";
 
 import { and, eq, isNull, like, or, sql } from "drizzle-orm";
 import Imap from "imap";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { leads } from "next-vibe/identity/lead/db";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
+import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
 import { messengerAccounts as imapAccounts } from "@/app/api/[locale]/messenger/accounts/db";
 import {
@@ -23,21 +31,7 @@ import {
   messengerFolders as imapFolders,
 } from "@/app/api/[locale]/messenger/messages/db";
 import { SpecialFolderType as ImapSpecialUseType } from "@/app/api/[locale]/messenger/messages/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import {
-  cronTasks,
-  type NewCronTask,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
-import { leads } from "../../db";
-import { LeadStatus } from "../../enum";
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import type {

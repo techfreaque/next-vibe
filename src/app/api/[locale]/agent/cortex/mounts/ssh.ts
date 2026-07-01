@@ -19,6 +19,7 @@ import "server-only";
  * Read-only. Manage connections via ssh_connections_* tools.
  */
 import { and, asc, count as drizzleCount, desc, eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
 
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
@@ -26,7 +27,6 @@ import type { ClientT } from "@/app/api/[locale]/ssh/client";
 import { sshConnectionMounts, sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole, SshAuthType } from "@/app/api/[locale]/ssh/enum";
 import { getSessionsForConnection } from "@/app/api/[locale]/ssh/session/pool";
-import { db } from "@/app/api/[locale]/system/db";
 
 import type {
   VirtualDeleteResult,

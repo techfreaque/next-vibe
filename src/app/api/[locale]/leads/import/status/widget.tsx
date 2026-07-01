@@ -4,18 +4,18 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Activity } from "next-vibe-ui/ui/icons/Activity";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Span } from "next-vibe-ui/ui/span";
-import { Strong } from "next-vibe-ui/ui/strong";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Strong } from "next-vibe/ui/web/ui/strong";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -23,15 +23,14 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React from "react";
 
 import {
   CsvImportJobStatus,
   type CsvImportJobStatusValue,
 } from "@/app/api/[locale]/leads/import/enum";
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";

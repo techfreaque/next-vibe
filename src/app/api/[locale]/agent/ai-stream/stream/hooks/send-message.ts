@@ -3,9 +3,16 @@
  * Handles sending new messages in both incognito and server modes
  */
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { success } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import {
+  getCurrentUrl,
+  silentReplaceState,
+} from "next-vibe/ui/web/lib/location";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -19,10 +26,6 @@ import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";

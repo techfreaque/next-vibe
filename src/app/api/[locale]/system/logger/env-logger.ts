@@ -3,7 +3,7 @@
  * Simple logger for environment validation that works in both browser and server contexts
  */
 
-import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
+import type { ExplicitAnyType } from "next-vibe/core/utils/type-utils";
 
 import type { EndpointLogger } from "./types";
 

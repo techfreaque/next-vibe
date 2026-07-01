@@ -2,7 +2,7 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import type { ForwardLeadFn } from "../types";
 
@@ -41,7 +41,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
       accessToken = refreshed.accessToken;
       // Fire-and-forget: update stored credentials
       void (async (): Promise<void> => {
-        const db = await import("@/app/api/[locale]/system/db");
+        const db = await import("next-vibe/database");
         const drizzle = await import("drizzle-orm");
         const { leadMagnetConfigs } = await import("../../db");
         const rows = await db.db

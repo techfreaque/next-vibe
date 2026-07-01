@@ -21,10 +21,10 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import { ApiProvider } from "../../models";

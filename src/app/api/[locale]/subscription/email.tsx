@@ -11,20 +11,20 @@ import {
   Section,
   Text as Span,
 } from "@react-email/components";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { UserRole } from "next-vibe/identity/roles/enum";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { FEATURED_MODELS } from "../agent/ai-stream/models";
 import { contactClientRepository } from "../contact/repository-client";

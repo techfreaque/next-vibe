@@ -25,7 +25,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
+import type { WsWireMessage } from "next-vibe/realtime/types";
 
 import { registerWsContextHook, registerWsStrictHook } from "./fetch-cache";
 

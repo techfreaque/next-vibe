@@ -1,0 +1,32 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a1409ef42fdc18ed-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 22:31:24 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782858683-0lX0aa5wG5yJTOOd8VMJ"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to call execute-tool with toolName='generate_image', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Then check that the result has an imageUrl (not a taskId). End with STEP_OK if imageUrl is present\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to call execute-tool with toolName='generate_image', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Then check that the result has an imageUrl (not a taskId). End with STEP_OK if imageUrl is present\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" and non-empty, or FAILED: <reason>.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" and non-empty, or FAILED: <reason>.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:10\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"wait\\\",\\\"input\\\":{\\\"prompt\\\":\\\"wait-inline-test\\\"},\\\"toolName\\\":\\\"generate_image\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782858683-0lX0aa5wG5yJTOOd8VMJ\",\"object\":\"chat.completion.chunk\",\"created\":1782858683,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":14032,\"completion_tokens\":94,\"total_tokens\":14126,\"cost\":0.004694108,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":9472,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.004694108,\"upstream_inference_prompt_cost\":0.004373568,\"upstream_inference_completions_cost\":0.00032054},\"completion_tokens_details\":{\"reasoning_tokens\":62,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

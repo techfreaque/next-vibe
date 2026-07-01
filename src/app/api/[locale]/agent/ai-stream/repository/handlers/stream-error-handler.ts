@@ -3,13 +3,9 @@
  */
 
 import type { JSONValue } from "ai";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
 import { StreamErrorType } from "../core/constants";

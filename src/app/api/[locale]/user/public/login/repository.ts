@@ -5,36 +5,36 @@
 import "server-only";
 
 import { and, count, eq, gt, isNull, or } from "drizzle-orm";
-import type { NextRequest } from "next-vibe-ui/lib/request";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { verifyPassword } from "next-vibe/shared/utils/password";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { verifyPassword } from "next-vibe/identity/auth/password";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import { type CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
-import type { LeadsT } from "../../../leads/i18n";
-import { scopedTranslation as leadsScopedTranslation } from "../../../leads/i18n";
-import type { Platform } from "../../../system/unified-interface/shared/types/platform";
-import { AuthRepository } from "../../auth/repository";
+import type { LeadsT } from "next-vibe/identity/lead/i18n";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import type { Platform } from "next-vibe/core/definition/platform";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type {
   JWTPublicPayloadType,
   JwtPrivatePayloadType,
-} from "../../auth/types";
+} from "next-vibe/identity/auth/types";
 import { loginAttempts, users } from "../../db";
 import { UserDetailLevel } from "../../enum";
-import { SessionRepository } from "../../private/session/repository";
+import { SessionRepository } from "next-vibe/identity/session/repository";
 import { UserRepository } from "../../repository";
-import { UserPermissionRole } from "../../user-roles/enum";
-import { UserRolesRepository } from "../../user-roles/repository";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
@@ -79,7 +79,7 @@ export class LoginRepository {
   private static async getDummyHash(): Promise<string> {
     if (!LoginRepository.dummyHash) {
       const { hashPassword } =
-        await import("@/app/api/[locale]/shared/utils/password");
+        await import("next-vibe/identity/auth/password");
       LoginRepository.dummyHash = await hashPassword(
         "__dummy_constant_time_placeholder__",
       );
@@ -358,7 +358,7 @@ export class LoginRepository {
       // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
       const { LeadAuthRepository } =
-        await import("@/app/api/[locale]/leads/auth/repository");
+        await import("next-vibe/identity/lead/device-auth");
       await LeadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
       // Merge lead wallet into user wallet immediately
@@ -715,7 +715,7 @@ export class LoginRepository {
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
       const { LeadsRepository } =
-        await import("@/app/api/[locale]/leads/repository");
+        await import("next-vibe/identity/lead/repository");
       const convertResult = await LeadsRepository.convertLead(
         leadId,
         {

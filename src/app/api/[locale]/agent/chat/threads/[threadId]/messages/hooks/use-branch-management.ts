@@ -9,9 +9,8 @@
 
 "use client";
 
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { ChatMessage } from "../../../../db";
 

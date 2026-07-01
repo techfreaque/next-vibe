@@ -1,0 +1,4 @@
+import { UserX as LucideUserX } from "lucide-react";
+import { type IconComponent } from "next-vibe/ui/web/lib/helper";
+
+export const UserX: IconComponent = LucideUserX;

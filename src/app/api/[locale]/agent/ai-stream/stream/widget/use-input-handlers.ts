@@ -3,14 +3,14 @@
  * Handles input submission, keyboard events, model changes, and prompt filling
  */
 
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import type { TextareaKeyboardEvent } from "next-vibe/ui/web/ui/textarea";
 import { useCallback, useMemo, useRef } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useChatInputStore } from "../hooks/input-store";
 import { clearDraft } from "../hooks/use-input-autosave";

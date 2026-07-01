@@ -3,7 +3,7 @@
  * Platform and action type definitions with full type safety
  */
 
-import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
 import { scopedTranslation } from "../i18n";
 

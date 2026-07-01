@@ -5,11 +5,12 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
+import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -17,12 +18,10 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
 

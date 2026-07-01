@@ -1,14 +1,13 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
+import { Platform } from "next-vibe/core/definition/platform";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetPlatform,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 interface ContentBlock {
   type: string;

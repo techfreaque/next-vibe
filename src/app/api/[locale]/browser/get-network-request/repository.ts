@@ -4,17 +4,16 @@
 
 import "server-only";
 
+import type { Platform } from "next-vibe/core/definition/platform";
 import type {
   ContentResponse,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import {
   isContentResponse,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";

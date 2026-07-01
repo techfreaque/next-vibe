@@ -1,12 +1,12 @@
 "use client";
 
-import { assignUrl } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import { P } from "next-vibe-ui/ui/typography";
+import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { assignUrl } from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";
-import { type CountryLanguage } from "@/i18n/core/config";
 
 export function SupportButton({
   supportEmail,

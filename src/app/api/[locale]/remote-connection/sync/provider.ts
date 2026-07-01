@@ -12,7 +12,7 @@ import "server-only";
  *  - Cursor-first protocol: local sends cursors → remote returns only newer records
  *  - Orchestrating serialize/upsert across all providers
  */
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { StandardSyncCursor, SyncCursor, ThreadsSyncCursor } from "../db";
 

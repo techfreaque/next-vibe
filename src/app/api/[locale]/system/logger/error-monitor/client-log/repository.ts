@@ -5,18 +5,16 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-
-import { persistErrorLog } from "@/app/api/[locale]/system/logger/db-persist";
-import { isFileLoggingEnabled } from "@/app/api/[locale]/system/logger/debug";
-import { clientFileLog } from "@/app/api/[locale]/system/logger/file";
-import type { CountryLanguage } from "@/i18n/core/config";
-
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import { persistErrorLog } from "next-vibe/logger/db-persist";
+import { isFileLoggingEnabled } from "next-vibe/logger/debug";
 import type {
   ClientLogRequestOutput,
   ClientLogResponseOutput,
-} from "./definition";
+} from "next-vibe/logger/error-monitor/client-log/definition";
+import { clientFileLog } from "next-vibe/logger/file";
 
 function extractTabId(
   metadata: ClientLogRequestOutput["metadata"],

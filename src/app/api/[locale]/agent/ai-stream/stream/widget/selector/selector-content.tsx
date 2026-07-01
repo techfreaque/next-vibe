@@ -1,11 +1,13 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
@@ -16,8 +18,6 @@ import {
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import favoritesEndpoint from "@/app/api/[locale]/agent/skills/favorites/definition";
 import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 const SelectorOnboarding = lazy(() =>
   import("./selector-onboarding").then((mod) => ({

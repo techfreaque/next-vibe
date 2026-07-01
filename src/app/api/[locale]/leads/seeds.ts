@@ -4,16 +4,8 @@
  */
 
 import { eq, sql } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Countries, Languages } from "@/i18n/core/config";
-
-import {
-  CampaignType,
-  type CampaignTypeValue,
-} from "../messenger/accounts/enum";
-import { MessageStatus } from "../messenger/messages/enum";
+import { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
 import {
   emailCampaigns,
   emailJourneyVariants,
@@ -22,14 +14,21 @@ import {
   type NewEmailCampaign,
   type NewLead,
   type NewLeadEngagement,
-} from "./db";
+} from "next-vibe/identity/lead/db";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
   EngagementTypes,
   LeadSource,
   LeadStatus,
-} from "./enum";
+} from "next-vibe/identity/lead/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import {
+  CampaignType,
+  type CampaignTypeValue,
+} from "../messenger/accounts/enum";
+import { MessageStatus } from "../messenger/messages/enum";
 
 /**
  * Controls what gets seeded in the dev environment:

@@ -1,21 +1,20 @@
-import { cn } from "next-vibe/shared/utils";
-import type { BadgeVariant } from "next-vibe-ui/ui/badge";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import { cn } from "next-vibe/core/utils/utils";
+import type { BadgeVariant } from "next-vibe/ui/web/ui/badge";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/tooltip";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type { JSX, ReactNode } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { scopedTranslation, type StoryComponentsTranslationKey } from "../i18n";
 import type { NavPaths } from "./nav-constants";

@@ -42,16 +42,16 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";

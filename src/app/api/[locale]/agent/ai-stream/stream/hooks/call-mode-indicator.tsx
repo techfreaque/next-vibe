@@ -5,12 +5,11 @@
  * Shows when call mode is active with description
  */
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Phone } from "next-vibe-ui/ui/icons/Phone";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Phone } from "next-vibe/ui/web/ui/icons/Phone";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 

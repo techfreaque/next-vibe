@@ -8,17 +8,18 @@
 import "server-only";
 
 import { and, eq, isNull, like, ne, or, sql } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesGetEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { createThreadsGetEmitter } from "@/app/api/[locale]/agent/chat/threads/emitter";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { AbortReason, StreamAbortError } from "./constants";
 
@@ -226,7 +227,7 @@ export async function clearStreamingState(
     .limit(1);
 
   const { hasPendingCallForThread } =
-    await import("@/app/api/[locale]/system/unified-interface/execute-tool/pending-calls");
+    await import("next-vibe/execute-tool/pending-calls");
 
   const nextState: ThreadStreamingState.IDLE | ThreadStreamingState.WAITING =
     activeTask || resumePending || (await hasPendingCallForThread(threadId))

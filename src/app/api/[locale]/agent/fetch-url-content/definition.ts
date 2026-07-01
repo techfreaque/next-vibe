@@ -3,23 +3,23 @@
  * Web scraping capability for AI agents
  */
 
-import { z } from "zod";
-
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 
 import { FETCH_URL_ALIAS, FETCH_URL_SHORT_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

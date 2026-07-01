@@ -1,22 +1,22 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Calendar } from "next-vibe-ui/ui/calendar";
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { DatePicker } from "next-vibe-ui/ui/date-picker";
-import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
+import { Calendar } from "next-vibe/ui/web/ui/calendar";
+import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
+import { DatePicker } from "next-vibe/ui/web/ui/date-picker";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Input } from "next-vibe/ui/web/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "next-vibe-ui/ui/input-otp";
-import { Label } from "next-vibe-ui/ui/label";
-import { MultiSelect } from "next-vibe-ui/ui/multi-select";
-import { NumberInput } from "next-vibe-ui/ui/number-input";
-import { PhoneField } from "next-vibe-ui/ui/phone-field";
-import { RadioGroup, RadioGroupItem } from "next-vibe-ui/ui/radio-group";
-import { Section } from "next-vibe-ui/ui/section";
+} from "next-vibe/ui/web/ui/input-otp";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { MultiSelect } from "next-vibe/ui/web/ui/multi-select";
+import { NumberInput } from "next-vibe/ui/web/ui/number-input";
+import { PhoneField } from "next-vibe/ui/web/ui/phone-field";
+import { RadioGroup, RadioGroupItem } from "next-vibe/ui/web/ui/radio-group";
+import { Section } from "next-vibe/ui/web/ui/section";
 import {
   Select,
   SelectContent,
@@ -26,11 +26,11 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Slider } from "next-vibe-ui/ui/slider";
-import { Switch } from "next-vibe-ui/ui/switch";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H2, H3, Muted, P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/select";
+import { Slider } from "next-vibe/ui/web/ui/slider";
+import { Switch } from "next-vibe/ui/web/ui/switch";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { H2, H3, Muted, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

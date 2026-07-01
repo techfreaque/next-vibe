@@ -11,18 +11,18 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   clearStreamingState,
@@ -167,8 +167,10 @@ export class cancelRepository {
                 })
                 .where(eq(chatMessages.id, waitingTask.wakeUpToolMessageId));
 
-              createMessagesEmitter(logger, user)("tool-result", {
-                urlPathParams: { threadId },
+              createMessagesEmitter(logger, user, {
+                threadId,
+                rootFolderId: thread.rootFolderId,
+              })("tool-result", {
                 responseData: {
                   messages: [
                     {
@@ -222,8 +224,10 @@ export class cancelRepository {
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.
         await clearStreamingState(threadId, logger, user);
-        createMessagesEmitter(logger, user)("stream-finished", {
-          urlPathParams: { threadId },
+        createMessagesEmitter(logger, user, {
+          threadId,
+          rootFolderId: thread.rootFolderId,
+        })("stream-finished", {
           responseData: { streamingState: ThreadStreamingState.IDLE },
         });
         logger.info(

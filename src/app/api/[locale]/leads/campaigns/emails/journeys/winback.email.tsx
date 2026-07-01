@@ -4,6 +4,7 @@
  * Tone: Honest, no pressure, offering value. Focus on what has changed/improved since they left, special offer to return.
  */
 
+import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
 import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
@@ -11,7 +12,6 @@ import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smt
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { configScopedTranslation } from "@/config/i18n";
 
-import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,
   EmailTemplateFunction,

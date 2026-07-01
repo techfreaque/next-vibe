@@ -20,7 +20,7 @@ import {
   getCurrentUrl,
   silentPushState,
   silentReplaceState,
-} from "next-vibe-ui/lib/location";
+} from "next-vibe/ui/web/lib/location";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";

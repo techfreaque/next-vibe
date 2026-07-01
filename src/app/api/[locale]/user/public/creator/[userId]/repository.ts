@@ -11,8 +11,8 @@ import {
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
@@ -27,12 +27,12 @@ import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models"
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import type { CreatorGetResponseOutput } from "./definition";
 import type { CreatorT } from "./i18n";

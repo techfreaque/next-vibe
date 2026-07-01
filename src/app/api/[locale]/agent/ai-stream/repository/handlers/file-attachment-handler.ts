@@ -9,11 +9,10 @@ import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import { db } from "../../../../system/db";
+import { db } from "../../../../system/database";
 import { chatMessages } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 

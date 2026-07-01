@@ -12,9 +12,8 @@ import "server-only";
  * Skills with no variants or a single default variant use <skill-slug>.md
  */
 import { and, count as drizzleCount, eq, inArray, or } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
 
 import type {
   MountWriteContext,

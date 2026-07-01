@@ -3,7 +3,28 @@
  * Production-ready endpoints for user profile management
  */
 
-import { dateSchema } from "next-vibe/shared/types/common.schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { leadId } from "next-vibe/identity/lead/types";
+import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
+import { userRoleResponseSchema } from "next-vibe/identity/roles/types";
+import {
+  customWidgetObject,
+  objectField,
+  objectOptionalField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
 import { lazy } from "react";
 import { z } from "zod";
 
@@ -13,28 +34,7 @@ import {
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "@/app/api/[locale]/agent/skills/enum";
-import { leadId } from "@/app/api/[locale]/leads/types";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  objectOptionalField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { UserRole, UserRoleDB } from "../../user-roles/enum";
-import { userRoleResponseSchema } from "../../user-roles/types";
 import { USER_ME_ALIAS } from "./constants";
 
 const MeUpdateWidget = lazy(() =>

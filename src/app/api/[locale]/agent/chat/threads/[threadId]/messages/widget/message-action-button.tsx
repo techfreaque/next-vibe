@@ -5,8 +5,8 @@
 
 "use client";
 
-import type { IconComponent } from "next-vibe-ui/lib/helper";
-import { Button } from "next-vibe-ui/ui/button";
+import type { IconComponent } from "next-vibe/ui/web/lib/helper";
+import { Button } from "next-vibe/ui/web/ui/button";
 import type { JSX } from "react";
 
 interface MessageActionButtonProps {

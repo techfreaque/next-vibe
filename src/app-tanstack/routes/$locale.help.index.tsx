@@ -1,21 +1,18 @@
 // AUTO-GENERATED from src/app/[locale]/help/page.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { JSX } from "react";
-
+import { toNextParams } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
 import { TanstackPage as Page } from "@/app/[locale]/help/page";
-import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) => {
     const { tanstackLoader } = await import("@/app/[locale]/help/page");
-    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+        return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
-function PageComponent(): JSX.Element {
-  return <Page {...Route.useLoaderData()} />;
-}
+function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }
 
 export const Route = createFileRoute("/$locale/help/")({
   staleTime: 0,

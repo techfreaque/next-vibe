@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think> The user wants me to report the exact words from the audio. The transcription/description of the audio says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana, and I need to fill up the last few seconds and it will be...\" The audio cuts off.\n\nThe user asks me to repeat back the exact word(s) and end with STEP_OK if the transcription contained the word 'banana', or FAILED if not.\n\nThe transcription clearly contains \"banana banana\". So I should repeat the exact message and end with STEP_OK.\n\nLet me make sure I include the exact text as described:\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana, and I need to fill up the last few seconds and it \n\nUser: [T11 native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.\n\nAssistant: <think></think>\n\nUser: [T11b follow-up] You may or may not have generated an image previously. Say STEP_OK and continue the conversation.",
+    "encoding_format": "float"
+  }
+}

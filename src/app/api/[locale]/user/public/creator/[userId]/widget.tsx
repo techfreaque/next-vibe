@@ -1,16 +1,16 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
-import { Link } from "next-vibe-ui/ui/link";
-import { Nav } from "next-vibe-ui/ui/nav";
-import { Span } from "next-vibe-ui/ui/span";
-import { H2, P } from "next-vibe-ui/ui/typography";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/web/ui/avatar";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Nav } from "next-vibe/ui/web/ui/nav";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H2, P } from "next-vibe/ui/web/ui/typography";
 import { type JSX, useCallback, useMemo, useState } from "react";
 
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
 import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/skills/widget";
 import skillsDef from "@/app/api/[locale]/agent/skills/definition";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
@@ -21,8 +21,8 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-value";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
 import {
   DEFAULT_ACCENT,
   ProfileBio,
@@ -65,7 +65,7 @@ function CreatorLeadCaptureForm({
     void (async (): Promise<void> => {
       try {
         const [{ apiClient }, captureDef] = await Promise.all([
-          import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
+          import("next-vibe/platforms/react/hooks/store"),
           import("@/app/api/[locale]/lead-magnet/capture/definition"),
         ]);
         const result = await apiClient.mutate(

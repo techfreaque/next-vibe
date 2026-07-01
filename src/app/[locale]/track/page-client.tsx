@@ -1,18 +1,18 @@
 "use client";
 
-import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
-import { assignUrl } from "next-vibe-ui/lib/location";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { LeadSource } from "next-vibe/identity/lead/enum";
+import trackingEndpoints from "next-vibe/identity/tracking/engagement/definition";
+import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
+import { useSearchParams } from "next-vibe/ui/web/hooks/use-navigation";
+import { assignUrl } from "next-vibe/ui/web/lib/location";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { P } from "next-vibe/ui/web/ui/typography";
 import type React from "react";
 
 import { scopedTranslation } from "@/app/[locale]/track/i18n";
-import { LeadSource } from "@/app/api/[locale]/leads/enum";
-import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
-import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogger } from "@/hooks/use-logger";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Tracking Page - Records click engagement and handles referral codes

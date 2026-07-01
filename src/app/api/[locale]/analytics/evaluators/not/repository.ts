@@ -5,10 +5,9 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-
-import type { SignalEvent } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import type { SignalEvent } from "next-vibe/core/utils/dataflow/shared/fields";
 
 export class NotEvaluatorRepository {
   static computeNot(signal: SignalEvent[]): SignalEvent[] {

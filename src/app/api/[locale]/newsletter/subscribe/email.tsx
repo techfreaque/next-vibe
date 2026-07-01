@@ -4,11 +4,12 @@
  */
 
 import { Button, Hr, Link, Section } from "@react-email/components";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
@@ -17,7 +18,6 @@ import { contactClientRepository } from "@/app/api/[locale]/contact/repository-c
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";
 import {

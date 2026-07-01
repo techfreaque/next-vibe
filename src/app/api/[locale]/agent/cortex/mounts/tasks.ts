@@ -5,9 +5,8 @@ import "server-only";
  * Renders cron tasks as markdown files at /tasks/<taskId>.md
  */
 import { count as drizzleCount, eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { db } from "next-vibe/database";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 

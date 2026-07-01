@@ -5,27 +5,26 @@
 import "server-only";
 
 import { and, eq, gt, ne } from "drizzle-orm";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { detectWakeUpConfirmRace } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/wakeup-confirm";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/execute-tool/constants";
+import { detectWakeUpConfirmRace } from "next-vibe/execute-tool/handlers/wakeup-confirm";
+import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
 
-import { db } from "../../../../system/db";
+import { db } from "../../../../system/database";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages, chatThreads } from "../../../chat/db";

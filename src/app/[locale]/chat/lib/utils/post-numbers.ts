@@ -3,7 +3,7 @@
  * Generates and stores sequential post numbers for messages
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { scopedTranslation as chatScopedTranslation } from "../../i18n";
 

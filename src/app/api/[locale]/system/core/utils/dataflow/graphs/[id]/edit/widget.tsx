@@ -1,0 +1,3063 @@
+/**
+ * Vibe Sense - Edit Graph Widget
+ *
+ * Three-panel React Flow builder:
+ *   Left sidebar  - Node Palette (endpoints grouped by category)
+ *   Center        - React Flow canvas (drag, connect, position)
+ *   Right panel   - Unified Node Inspector OR Graph Settings
+ *   Top bar       - Back, palette toggle, unsaved badge, node count, Save
+ *
+ * Every node is an endpoint. No node type system.
+ * Creates a new version (branch) on save - never mutates.
+ */
+
+"use client";
+
+import "@xyflow/react/dist/style.css";
+
+import {
+  addEdge,
+  Background,
+  BaseEdge,
+  type Connection,
+  Controls,
+  type Edge,
+  EdgeLabelRenderer,
+  type EdgeProps,
+  type EdgeTypes,
+  getBezierPath,
+  Handle,
+  MiniMap,
+  type Node,
+  type NodeProps,
+  type NodeTypes,
+  type OnEdgesChange,
+  type OnNodesChange,
+  Position,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
+} from "@xyflow/react";
+import { FieldDataType } from "next-vibe/core/definition/enums";
+import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
+import type { GraphNodeConfig } from "next-vibe/core/utils/dataflow/graph/schema";
+import type {
+  GraphConfig,
+  GraphEdge,
+  NodePosition,
+  TriggerConfig,
+} from "next-vibe/core/utils/dataflow/graph/types";
+import parentDefinitions from "next-vibe/core/utils/dataflow/graphs/[id]/data/definition";
+import versionsDefinitions from "next-vibe/core/utils/dataflow/graphs/[id]/versions/definition";
+import type { Resolution } from "next-vibe/core/utils/dataflow/shared/fields";
+import { ResolutionValues } from "next-vibe/core/utils/dataflow/shared/fields";
+import { cn } from "next-vibe/core/utils/utils";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
+import { addWindowListener } from "next-vibe/ui/web/lib/dom";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Card } from "next-vibe/ui/web/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe/ui/web/ui/dialog";
+import { Div, type DivDragEvent } from "next-vibe/ui/web/ui/div";
+import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { Check } from "next-vibe/ui/web/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
+import { Database } from "next-vibe/ui/web/ui/icons/Database";
+import { EyeOff } from "next-vibe/ui/web/ui/icons/EyeOff";
+import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
+import { History } from "next-vibe/ui/web/ui/icons/History";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { PanelLeftClose } from "next-vibe/ui/web/ui/icons/PanelLeftClose";
+import { PanelLeftOpen } from "next-vibe/ui/web/ui/icons/PanelLeftOpen";
+import { Save } from "next-vibe/ui/web/ui/icons/Save";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { Trash } from "next-vibe/ui/web/ui/icons/Trash";
+import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Label } from "next-vibe/ui/web/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { P } from "next-vibe/ui/web/ui/typography";
+import {
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { pathToAliasMap } from "@/generated/alias-map";
+import { getEndpoint } from "@/generated/endpoint";
+import { endpointsMeta } from "@/generated/endpoints-meta/en";
+
+import type definition from "./definition";
+
+// ─── Endpoint Node Info ──────────────────────────────────────────────────────
+
+interface HandleInfo {
+  inputs: string[];
+  outputs: string[];
+}
+
+type NodeCategory =
+  | "data-source"
+  | "indicator"
+  | "transformer"
+  | "evaluator"
+  | "other";
+
+/**
+ * Metadata for a non-TIME_SERIES param field extracted from the endpoint definition.
+ * Used to render proper form controls (number input, select, etc.) in the inspector.
+ */
+interface ParamFieldMeta {
+  fieldType: FieldDataType;
+  /** Human-readable label (derived from key if not resolvable from i18n) */
+  label: string;
+  /** Zod enum values for SELECT fields */
+  enumOptions?: string[];
+  /** Numeric constraint hints */
+  min?: number;
+  max?: number;
+  isInt?: boolean;
+}
+
+interface EndpointNodeInfo {
+  handles: HandleInfo;
+  category: NodeCategory;
+  /** Non-TIME_SERIES request param fields, keyed by field name */
+  paramFields: Record<string, ParamFieldMeta>;
+  /** All response field names (for outputField picker) */
+  outputFields: string[];
+}
+
+const DEFAULT_HANDLES: HandleInfo = { inputs: ["source"], outputs: ["result"] };
+const DEFAULT_INFO: EndpointNodeInfo = {
+  handles: DEFAULT_HANDLES,
+  category: "other",
+  paramFields: {},
+  outputFields: ["result"],
+};
+
+/**
+ * Humanize a camelCase or kebab-case field key into a readable label.
+ * e.g. "stdDev" → "Std Dev", "period" → "Period", "op" → "Op"
+ */
+function humanizeFieldKey(key: string): string {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+/**
+ * Attempt to extract constraints from a Zod schema using runtime introspection.
+ * This is safe - we only read `_def` properties, never mutate.
+ */
+function extractZodConstraints(schema: {
+  _def?: {
+    typeName?: string;
+    values?: string[];
+    checks?: Array<{ kind: string; value?: number }>;
+    innerType?: {
+      _def?: {
+        typeName?: string;
+        checks?: Array<{ kind: string; value?: number }>;
+      };
+    };
+  };
+}): { enumOptions?: string[]; min?: number; max?: number; isInt?: boolean } {
+  if (!schema?._def) {
+    return {};
+  }
+  // Unwrap ZodOptional / ZodNullable / ZodDefault wrappers
+  let def = schema._def;
+  while (
+    def.typeName === "ZodOptional" ||
+    def.typeName === "ZodNullable" ||
+    def.typeName === "ZodDefault"
+  ) {
+    def = def.innerType?._def ?? def;
+    break; // one level only
+  }
+
+  if (def.typeName === "ZodEnum") {
+    return { enumOptions: def.values ?? [] };
+  }
+  if (def.typeName === "ZodNumber") {
+    const checks = def.checks ?? [];
+    let min: number | undefined;
+    let max: number | undefined;
+    let isInt = false;
+    for (const check of checks) {
+      if (check.kind === "min") {
+        min = check.value;
+      } else if (check.kind === "max") {
+        max = check.value;
+      } else if (check.kind === "int") {
+        isInt = true;
+      }
+    }
+    return { min, max, isInt };
+  }
+  return {};
+}
+
+/**
+ * Extract TIME_SERIES handles from an endpoint definition's field tree.
+ * Input handles = TIME_SERIES fields with request usage.
+ * Output handles = TIME_SERIES fields with response usage.
+ */
+function extractHandles(
+  fields: Record<
+    string,
+    {
+      fieldType?: FieldDataType;
+      usage?: { request?: string; response?: boolean };
+    }
+  >,
+): HandleInfo {
+  const inputs: string[] = [];
+  const outputs: string[] = [];
+
+  let hasAnyResponseField = false;
+  for (const [name, field] of Object.entries(fields)) {
+    const usage = field.usage;
+    if (usage?.response === true) {
+      hasAnyResponseField = true;
+    }
+    if (field.fieldType !== FieldDataType.TIME_SERIES) {
+      continue;
+    }
+    if (!usage) {
+      continue;
+    }
+    if (usage.request === "data" || usage.request === "data&urlPathParams") {
+      inputs.push(name);
+    }
+    if (usage.response === true) {
+      outputs.push(name);
+    }
+  }
+
+  if (inputs.length === 0 && outputs.length === 0) {
+    return DEFAULT_HANDLES;
+  }
+  // If there are inputs but no TIME_SERIES outputs (e.g. evaluators with custom response),
+  // add a generic "result" output so the node can be an edge source.
+  if (outputs.length === 0 && hasAnyResponseField) {
+    outputs.push("result");
+  }
+  return { inputs, outputs };
+}
+
+/**
+ * Extract non-TIME_SERIES param fields and output field names from the endpoint field tree.
+ */
+function extractParamFields(
+  fields: Record<
+    string,
+    {
+      fieldType?: FieldDataType;
+      usage?: { request?: string; response?: boolean };
+      label?: string;
+      schema?: {
+        _def?: {
+          typeName?: string;
+          values?: string[];
+          checks?: Array<{ kind: string; value?: number }>;
+          innerType?: {
+            _def?: {
+              typeName?: string;
+              checks?: Array<{ kind: string; value?: number }>;
+            };
+          };
+        };
+      };
+    }
+  >,
+): { paramFields: Record<string, ParamFieldMeta>; outputFields: string[] } {
+  // Fields to skip - these are handled separately by the inspector
+  const SKIP_FIELDS = new Set([
+    "resolution",
+    "range",
+    "lookback",
+    "meta",
+    "source",
+    "result",
+    "signals",
+  ]);
+
+  const paramFields: Record<string, ParamFieldMeta> = {};
+  const outputFields: string[] = [];
+
+  for (const [name, field] of Object.entries(fields)) {
+    const usage = field.usage;
+
+    // Collect output field names
+    if (
+      usage?.response === true &&
+      field.fieldType !== FieldDataType.TIME_SERIES
+    ) {
+      if (!SKIP_FIELDS.has(name)) {
+        outputFields.push(name);
+      }
+    }
+    if (
+      usage?.response === true &&
+      field.fieldType === FieldDataType.TIME_SERIES
+    ) {
+      outputFields.push(name);
+    }
+
+    // Only param fields: request usage, not TIME_SERIES, not a system field
+    if (
+      field.fieldType === FieldDataType.TIME_SERIES ||
+      !usage?.request ||
+      SKIP_FIELDS.has(name)
+    ) {
+      continue;
+    }
+
+    const constraints = field.schema ? extractZodConstraints(field.schema) : {};
+    paramFields[name] = {
+      fieldType: field.fieldType ?? FieldDataType.TEXT,
+      label: humanizeFieldKey(name),
+      ...constraints,
+    };
+  }
+
+  return {
+    paramFields,
+    outputFields: outputFields.length > 0 ? outputFields : ["result"],
+  };
+}
+
+/** Infer category from the endpoint path (alias or route path segments) */
+function categoryFromEndpoint(endpointPath: string): NodeCategory {
+  const lower = endpointPath.toLowerCase();
+  if (lower.includes("data-source") || lower.includes("datasource")) {
+    return "data-source";
+  }
+  if (lower.includes("evaluator")) {
+    return "evaluator";
+  }
+  if (lower.includes("transformer")) {
+    return "transformer";
+  }
+  if (lower.includes("indicator")) {
+    return "indicator";
+  }
+  return "other";
+}
+
+/**
+ * Hook: loads handle info + category for all unique endpoint paths in the graph.
+ * Returns a Map<endpointPath, EndpointNodeInfo>.
+ */
+function useEndpointNodeInfo(
+  endpointPaths: string[],
+): Map<string, EndpointNodeInfo> {
+  const [infoMap, setInfoMap] = useState<Map<string, EndpointNodeInfo>>(
+    new Map(),
+  );
+  const endpointPathsKey = useMemo(
+    () => [...new Set(endpointPaths)].join(","),
+    [endpointPaths],
+  );
+
+  useEffect(() => {
+    const uniquePaths = endpointPathsKey ? endpointPathsKey.split(",") : [];
+    let cancelled = false;
+
+    const load = async (): Promise<void> => {
+      const results = await Promise.all(
+        uniquePaths.map(async (path) => {
+          const endpoint = await getEndpoint(path);
+          if (!endpoint) {
+            return { path, info: DEFAULT_INFO };
+          }
+          // Follow codebase pattern: "children" in endpoint.fields
+          const children =
+            "children" in endpoint.fields
+              ? (endpoint.fields.children as Record<
+                  string,
+                  {
+                    fieldType?: FieldDataType;
+                    usage?: { request?: string; response?: boolean };
+                    label?: string;
+                    schema?: {
+                      _def?: {
+                        typeName?: string;
+                        values?: string[];
+                        checks?: Array<{ kind: string; value?: number }>;
+                        innerType?: {
+                          _def?: {
+                            typeName?: string;
+                            checks?: Array<{ kind: string; value?: number }>;
+                          };
+                        };
+                      };
+                    };
+                  }
+                >)
+              : undefined;
+          const handles = children ? extractHandles(children) : DEFAULT_HANDLES;
+          const { paramFields, outputFields } = children
+            ? extractParamFields(children)
+            : { paramFields: {}, outputFields: ["result"] };
+          const endpointCategory = categoryFromEndpoint(path);
+          return {
+            path,
+            info: {
+              handles,
+              category: endpointCategory,
+              paramFields,
+              outputFields,
+            },
+          };
+        }),
+      );
+      if (cancelled) {
+        return;
+      }
+      const next = new Map<string, EndpointNodeInfo>();
+      for (const { path, info } of results) {
+        next.set(path, info);
+      }
+      setInfoMap(next);
+    };
+    void load();
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [endpointPathsKey]);
+
+  return infoMap;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatResolution(resolution: Resolution): string {
+  // Resolution enum values are i18n keys like "enums.resolution.1d"
+  // Strip the prefix and uppercase for display
+  const short = resolution.replace("enums.resolution.", "");
+  return short.toUpperCase();
+}
+
+function isValidCron(cron: string): boolean {
+  return /^(\S+\s){4}\S+$/.test(cron.trim());
+}
+
+// ─── Visual tokens per category ──────────────────────────────────────────────
+
+interface NodeVisuals {
+  badge: string;
+  border: string;
+  header: string;
+  icon: React.ReactNode;
+}
+
+const CATEGORY_VISUALS: Record<NodeCategory, NodeVisuals> = {
+  "data-source": {
+    badge: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+    border: "border-sky-400/70 dark:border-sky-600/70",
+    header: "bg-sky-500/10 border-b border-sky-500/20",
+    icon: <Database className="h-3 w-3" />,
+  },
+  indicator: {
+    badge:
+      "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+    border: "border-violet-400/70 dark:border-violet-600/70",
+    header: "bg-violet-500/10 border-b border-violet-500/20",
+    icon: <Activity className="h-3 w-3" />,
+  },
+  transformer: {
+    badge:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    border: "border-purple-400/70 dark:border-purple-600/70",
+    header: "bg-purple-500/10 border-b border-purple-500/20",
+    icon: <Wrench className="h-3 w-3" />,
+  },
+  evaluator: {
+    badge:
+      "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+    border: "border-orange-400/70 dark:border-orange-600/70",
+    header: "bg-orange-500/10 border-b border-orange-500/20",
+    icon: <Zap className="h-3 w-3" />,
+  },
+  other: {
+    badge: "bg-success/10 text-success",
+    border: "border-green-400/70 dark:border-green-600/70",
+    header: "bg-green-500/10 border-b border-green-500/20",
+    icon: <Globe className="h-3 w-3" />,
+  },
+};
+
+function getVisuals(category: NodeCategory): NodeVisuals {
+  return CATEGORY_VISUALS[category];
+}
+
+// ─── Display-override helper ──────────────────────────────────────────────────
+
+interface DisplayOverride {
+  color?: string;
+  pane?: number | null;
+}
+
+function withDisplayOverride(
+  node: GraphNodeConfig,
+  override: DisplayOverride,
+): GraphNodeConfig {
+  return { ...node, ...override };
+}
+
+// ─── Layout helpers ─────────────────────────────────────────────────────────
+
+function autoLayout(
+  nodes: Record<string, GraphNodeConfig>,
+): Record<string, NodePosition> {
+  const positions: Record<string, NodePosition> = {};
+  const ids = Object.keys(nodes);
+  const cols = Math.max(1, Math.ceil(Math.sqrt(ids.length)));
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (id !== undefined) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      positions[id] = { x: col * 300, y: row * 140 };
+    }
+  }
+  return positions;
+}
+
+/**
+ * Generate a short, readable node ID from an endpoint alias or path.
+ * "vibe-sense-indicator-ema" → "ema_1"
+ * "/vibe-sense/indicator/ema" → "ema_1"
+ */
+function generateNodeId(
+  endpointAlias: string,
+  existing: Record<string, GraphNodeConfig>,
+): string {
+  // Extract the last meaningful segment
+  const slug =
+    endpointAlias
+      .replace(
+        /^vibe-sense-(indicator|evaluator|transformer|data-source)-?/,
+        "",
+      )
+      .replace(/^.*\//, "") // take last path segment
+      .replace(/[^a-zA-Z0-9]/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .toLowerCase()
+      .slice(0, 20) || "node";
+
+  let idx = 1;
+  while (`${slug}_${String(idx)}` in existing) {
+    idx++;
+  }
+  return `${slug}_${String(idx)}`;
+}
+
+/** Convert a display name to a URL-safe slug */
+function nameToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 64);
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type TriggerType = "manual" | "cron";
+
+type EditResponseOutput = typeof definition.PUT.types.ResponseOutput;
+
+interface VibeNodeData {
+  nodeId: string;
+  nodeConfig: GraphConfig["nodes"][string];
+  label: string;
+  handles: HandleInfo;
+  category: NodeCategory;
+  selected?: boolean;
+  [key: string]:
+    | string
+    | GraphConfig["nodes"][string]
+    | HandleInfo
+    | NodeCategory
+    | boolean
+    | undefined;
+}
+
+type VibeNode = Node<VibeNodeData>;
+type VibeEdge = Edge;
+
+// ─── Config ↔ Flow ──────────────────────────────────────────────────────────
+
+function configToFlow(
+  config: GraphConfig,
+  infoMap: Map<string, EndpointNodeInfo>,
+): {
+  nodes: VibeNode[];
+  edges: VibeEdge[];
+} {
+  const positions =
+    config.positions && Object.keys(config.positions).length > 0
+      ? config.positions
+      : autoLayout(config.nodes);
+
+  const nodes: VibeNode[] = Object.entries(config.nodes).map(
+    ([nodeId, nodeConfig]) => {
+      const info = infoMap.get(nodeConfig.endpointPath ?? "") ?? DEFAULT_INFO;
+      return {
+        id: nodeId,
+        type: "vibeNode",
+        position: positions[nodeId] ?? { x: 0, y: 0 },
+        data: {
+          nodeId,
+          nodeConfig,
+          label: nodeConfig.endpointPath ?? "",
+          handles: info.handles,
+          category: info.category,
+        },
+      };
+    },
+  );
+
+  const edges: VibeEdge[] = config.edges.map((e, idx) => {
+    // Resolve missing handle IDs - when there's a single handle, auto-assign it
+    // so React Flow can find the handle even if the graph config omits fromHandle/toHandle.
+    let sourceHandle: string | null = e.fromHandle ?? null;
+    let targetHandle: string | null = e.toHandle ?? null;
+
+    if (!sourceHandle) {
+      const srcNode = config.nodes[e.from];
+      const srcInfo = srcNode
+        ? infoMap.get(srcNode.endpointPath ?? "")
+        : undefined;
+      if (srcInfo && srcInfo.handles.outputs.length === 1) {
+        sourceHandle = srcInfo.handles.outputs[0];
+      }
+    }
+    if (!targetHandle) {
+      const tgtNode = config.nodes[e.to];
+      const tgtInfo = tgtNode
+        ? infoMap.get(tgtNode.endpointPath ?? "")
+        : undefined;
+      if (tgtInfo && tgtInfo.handles.inputs.length === 1) {
+        targetHandle = tgtInfo.handles.inputs[0];
+      }
+    }
+
+    return {
+      id: `${e.from}->${e.to}-${String(idx)}`,
+      source: e.from,
+      target: e.to,
+      sourceHandle,
+      targetHandle,
+      animated: true,
+      style: {
+        strokeDasharray: "4 2",
+        stroke: "hsl(var(--primary))",
+        opacity: 0.7,
+      },
+    };
+  });
+
+  return { nodes, edges };
+}
+
+function flowToConfig(
+  original: GraphConfig,
+  nodes: VibeNode[],
+  edges: VibeEdge[],
+): GraphConfig {
+  const positions: Record<string, NodePosition> = {};
+  const nodeConfigs: Record<string, GraphNodeConfig> = {};
+  for (const node of nodes) {
+    positions[node.id] = { x: node.position.x, y: node.position.y };
+    if (node.data.nodeConfig) {
+      nodeConfigs[node.id] = node.data.nodeConfig;
+    }
+  }
+
+  const graphEdges: GraphEdge[] = edges.map((e) => ({
+    from: e.source,
+    to: e.target,
+    ...(e.sourceHandle ? { fromHandle: e.sourceHandle } : {}),
+    ...(e.targetHandle ? { toHandle: e.targetHandle } : {}),
+  }));
+
+  return {
+    ...original,
+    nodes: { ...original.nodes, ...nodeConfigs } as GraphConfig["nodes"],
+    edges: graphEdges,
+    positions,
+  };
+}
+
+// ─── Custom Node Card ─────────────────────────────────────────────────────────
+
+const VibeNodeCard = React.memo(function VibeNodeCard({
+  data,
+}: NodeProps<VibeNode>): React.JSX.Element {
+  const { category, handles } = data;
+  const visuals = getVisuals(category);
+  const isSelected = data.selected === true;
+  const resolution = data.nodeConfig.resolution;
+  const { inputs, outputs } = handles;
+
+  return (
+    <Div
+      className={cn(
+        "rounded-xl border-2 bg-card shadow-sm min-w-[190px] max-w-[270px] overflow-hidden transition-shadow",
+        visuals.border,
+        isSelected
+          ? "shadow-lg ring-2 ring-primary/50 ring-offset-1 ring-offset-background"
+          : "hover:shadow-md",
+      )}
+    >
+      {/* Colored header strip with category icon + label */}
+      <Div
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1.5",
+          visuals.header,
+        )}
+      >
+        <Div
+          className={cn(
+            "flex-shrink-0",
+            visuals.badge.split(" ").slice(2).join(" "),
+          )}
+        >
+          {visuals.icon}
+        </Div>
+        <Badge
+          variant="secondary"
+          className={cn("text-[9px] px-1 py-0 leading-none h-4", visuals.badge)}
+        >
+          {category}
+        </Badge>
+        <Div className="flex items-center gap-1 ml-auto">
+          {resolution && (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4"
+            >
+              {formatResolution(resolution)}
+            </Badge>
+          )}
+          {/* Color dot */}
+          {data.nodeConfig.color && (
+            <Span
+              style={{
+                backgroundColor: data.nodeConfig.color,
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+          )}
+          {/* Pane badge or no-chart indicator */}
+          {data.nodeConfig.pane === null ? (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4 text-muted-foreground/50 border-muted-foreground/30"
+            >
+              <EyeOff className="h-2.5 w-2.5" />
+            </Badge>
+          ) : data.nodeConfig.pane !== undefined && data.nodeConfig.pane > 0 ? (
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 leading-none h-4"
+            >
+              P{String(data.nodeConfig.pane)}
+            </Badge>
+          ) : null}
+        </Div>
+      </Div>
+
+      {/* Body with handles */}
+      <Div className="relative px-2.5 py-2">
+        <P className="text-xs font-mono font-semibold truncate text-foreground leading-tight">
+          {data.nodeId}
+        </P>
+        <P className="text-[10px] text-muted-foreground truncate mt-0.5 leading-tight">
+          {(pathToAliasMap as Record<string, string>)[data.label] ?? data.label}
+        </P>
+        {/* Param summary - show up to 2 key params */}
+        {data.nodeConfig.params &&
+          Object.keys(data.nodeConfig.params).length > 0 && (
+            <P className="text-[9px] text-muted-foreground/60 truncate mt-0.5 font-mono leading-tight">
+              {Object.entries(data.nodeConfig.params)
+                .slice(0, 2)
+                .map(([k, v]) => `${k}:${String(v)}`)
+                .join(" · ")}
+              {Object.keys(data.nodeConfig.params).length > 2 && " …"}
+            </P>
+          )}
+
+        {/* Handle labels */}
+        {(inputs.length > 1 || outputs.length > 1) && (
+          <Div className="flex justify-between mt-1.5 gap-2">
+            <Div className="flex flex-col gap-0.5">
+              {inputs.map((name) => (
+                <P
+                  key={name}
+                  className="text-[8px] font-mono text-muted-foreground leading-tight"
+                >
+                  {name}
+                </P>
+              ))}
+            </Div>
+            <Div className="flex flex-col gap-0.5 items-end">
+              {outputs.map((name) => (
+                <P
+                  key={name}
+                  className="text-[8px] font-mono text-muted-foreground leading-tight"
+                >
+                  {name}
+                </P>
+              ))}
+            </Div>
+          </Div>
+        )}
+      </Div>
+
+      {/* Input handles (left edge) */}
+      {inputs.map((name, idx) => (
+        <Handle
+          key={`in-${name}`}
+          id={name}
+          type="target"
+          position={Position.Left}
+          className="!w-3 !h-3 !bg-primary/60 !border-2 !border-background !rounded-full"
+          style={{
+            top: `${String(((idx + 1) / (inputs.length + 1)) * 100)}%`,
+          }}
+        />
+      ))}
+
+      {/* Output handles (right edge) */}
+      {outputs.map((name, idx) => (
+        <Handle
+          key={`out-${name}`}
+          id={name}
+          type="source"
+          position={Position.Right}
+          className="!w-3 !h-3 !bg-primary/60 !border-2 !border-background !rounded-full"
+          style={{
+            top: `${String(((idx + 1) / (outputs.length + 1)) * 100)}%`,
+          }}
+        />
+      ))}
+    </Div>
+  );
+});
+
+const nodeTypes: NodeTypes = { vibeNode: VibeNodeCard };
+
+// ─── Custom Edge with Delete Button ──────────────────────────────────────────
+
+/** Module-level ref so the edge component can signal dirty state back to the form */
+let edgeDirtyCallback: (() => void) | null = null;
+
+function DeletableEdge({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style,
+  markerEnd,
+  selected,
+}: EdgeProps): React.JSX.Element {
+  const reactFlowInstance = useReactFlow();
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  const onDeleteEdge = useCallback(() => {
+    reactFlowInstance.setEdges((eds) => eds.filter((e) => e.id !== id));
+    edgeDirtyCallback?.();
+  }, [id, reactFlowInstance]);
+
+  return (
+    <>
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      {selected && (
+        <EdgeLabelRenderer>
+          <Div
+            onClick={onDeleteEdge}
+            style={{
+              transform: `translate(-50%, -50%) translate(${String(labelX)}px,${String(labelY)}px)`,
+              position: "absolute",
+              pointerEvents: "all",
+              cursor: "pointer",
+              width: 20,
+              height: 20,
+              borderRadius: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "hsl(var(--destructive))",
+              color: "hsl(var(--destructive-foreground))",
+            }}
+          >
+            <X className="h-3 w-3" />
+          </Div>
+        </EdgeLabelRenderer>
+      )}
+    </>
+  );
+}
+
+const edgeTypes: EdgeTypes = { default: DeletableEdge };
+
+// ─── Palette Section ──────────────────────────────────────────────────────────
+
+const PaletteSection = React.memo(function PaletteSection({
+  title,
+  badge,
+  icon,
+  children,
+  defaultOpen,
+}: {
+  title: string;
+  badge: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}): React.JSX.Element {
+  const [open, setOpen] = useState(defaultOpen ?? true);
+
+  return (
+    <Div className="border-b border-border/40">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(!open)}
+        className="w-full justify-between px-3 py-2 h-auto text-xs font-medium hover:bg-accent/50"
+      >
+        <Div className="flex items-center gap-2">
+          <Div
+            className={cn("flex-shrink-0", badge.split(" ").slice(2).join(" "))}
+          >
+            {icon}
+          </Div>
+          <Span className="font-semibold text-[11px] uppercase tracking-wide text-muted-foreground">
+            {title}
+          </Span>
+        </Div>
+        <ChevronDown
+          className={cn(
+            "h-3 w-3 text-muted-foreground transition-transform",
+            !open && "-rotate-90",
+          )}
+        />
+      </Button>
+      {open && (
+        <Div className="px-2 pb-2 flex flex-col gap-0.5">{children}</Div>
+      )}
+    </Div>
+  );
+});
+
+const PaletteSubSection = React.memo(function PaletteSubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  return (
+    <Div className="ml-1 border-l border-border/30 pl-1 mb-0.5">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(!open)}
+        className="w-full justify-between px-2 py-1 h-auto text-[10px] font-medium hover:bg-accent/30"
+      >
+        <Span className="text-[10px] text-muted-foreground/70 uppercase tracking-wide">
+          {title}
+        </Span>
+        <ChevronDown
+          className={cn(
+            "h-2.5 w-2.5 text-muted-foreground/50 transition-transform",
+            !open && "-rotate-90",
+          )}
+        />
+      </Button>
+      {open && <Div className="flex flex-col gap-0.5 pb-1">{children}</Div>}
+    </Div>
+  );
+});
+
+const PaletteItem = React.memo(function PaletteItem({
+  label,
+  detail,
+  domain,
+  alias,
+  onClick,
+}: {
+  label: string;
+  detail: string;
+  domain?: string;
+  alias: string;
+  onClick: () => void;
+}): React.JSX.Element {
+  const onDragStartCb = useCallback(
+    (e: DivDragEvent) => {
+      e.dataTransfer.setData("application/vibe-node", alias);
+      e.dataTransfer.effectAllowed = "move";
+    },
+    [alias],
+  );
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      draggable
+      onDragStart={onDragStartCb}
+      className="w-full justify-start h-auto py-1.5 px-2 text-left hover:bg-accent rounded-md cursor-grab active:cursor-grabbing group"
+    >
+      <Div className="flex flex-col gap-0 min-w-0 w-full">
+        <Div className="flex items-center gap-1 min-w-0">
+          {domain && (
+            <Span className="text-[9px] font-mono text-primary/70 shrink-0">
+              {domain}.
+            </Span>
+          )}
+          <P className="text-[11px] font-medium truncate group-hover:text-foreground">
+            {domain ? label.replace(`${domain}.`, "") : label}
+          </P>
+        </Div>
+        {detail && (
+          <P className="text-[9px] text-muted-foreground truncate">{detail}</P>
+        )}
+      </Div>
+    </Button>
+  );
+});
+
+// ─── Inspector shared components ──────────────────────────────────────────────
+
+type TFn = (
+  key: (typeof definition.PUT)["scopedTranslation"]["ScopedTranslationKey"],
+) => string;
+
+function InspectorSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div>
+      <Div className="flex items-center gap-2 mb-2">
+        <P className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider shrink-0">
+          {label}
+        </P>
+        <Div className="flex-1 h-px bg-border/40" />
+      </Div>
+      {children}
+    </Div>
+  );
+}
+
+// ─── Smart Param Field Control ────────────────────────────────────────────────
+
+/**
+ * Renders the appropriate input widget for a single param field based on its type.
+ */
+function ParamFieldControl({
+  fieldName,
+  meta,
+  value,
+  onChange,
+}: {
+  fieldName: string;
+  meta: ParamFieldMeta;
+  value: string | number | boolean | null | undefined;
+  onChange: (v: string | number | boolean | null) => void;
+}): React.JSX.Element {
+  if (meta.fieldType === FieldDataType.SELECT && meta.enumOptions) {
+    const strValue = value !== null && value !== undefined ? String(value) : "";
+    return (
+      <Select<string> value={strValue} onValueChange={(v) => onChange(v)}>
+        <SelectTrigger className="h-7 text-[11px]">
+          <SelectValue placeholder={`Select ${meta.label}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {meta.enumOptions.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  if (meta.fieldType === FieldDataType.BOOLEAN) {
+    const boolValue = value === true || value === "true";
+    return (
+      <Div className="flex items-center gap-0.5 border rounded-md overflow-hidden bg-muted/30">
+        {([true, false] as const).map((opt) => (
+          <Button
+            key={String(opt)}
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange(opt)}
+            className={cn(
+              "h-6 flex-1 text-[10px] rounded-none border-0 px-2 gap-0.5",
+              boolValue === opt
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {opt ? (
+              <Check className="h-3 w-3 mr-0.5" />
+            ) : (
+              <X className="h-3 w-3 mr-0.5" />
+            )}
+            {opt ? "Yes" : "No"}
+          </Button>
+        ))}
+      </Div>
+    );
+  }
+
+  // NUMBER / INT / TEXT fallthrough
+  const isNumeric =
+    meta.fieldType === FieldDataType.NUMBER ||
+    meta.fieldType === FieldDataType.INT;
+  const strValue = value !== null && value !== undefined ? String(value) : "";
+  const placeholder =
+    meta.min !== undefined && meta.max !== undefined
+      ? `${String(meta.min)}–${String(meta.max)}`
+      : meta.min !== undefined
+        ? `≥${String(meta.min)}`
+        : meta.max !== undefined
+          ? `≤${String(meta.max)}`
+          : fieldName;
+
+  return (
+    <Input
+      value={strValue}
+      onChangeText={(v) => {
+        if (!isNumeric) {
+          onChange(v || null);
+          return;
+        }
+        if (v === "" || v === "-") {
+          onChange(null);
+          return;
+        }
+        const parsed = meta.isInt ? parseInt(v, 10) : parseFloat(v);
+        onChange(isNaN(parsed) ? null : parsed);
+      }}
+      className="h-7 text-[11px] font-mono"
+      placeholder={placeholder}
+    />
+  );
+}
+
+// ─── Unified Node Inspector ──────────────────────────────────────────────────
+
+const NodeInspector = React.memo(function NodeInspector({
+  nodeId,
+  nodeConfig,
+  category,
+  endpointInfo,
+  edges,
+  onUpdate,
+  onDelete,
+  onClose,
+  onOpenEndpoint,
+  onSelectNode,
+  t,
+  deleteConfirmNodeId,
+  setDeleteConfirmNodeId,
+}: {
+  nodeId: string;
+  nodeConfig: GraphNodeConfig;
+  category: NodeCategory;
+  endpointInfo: EndpointNodeInfo;
+  edges: GraphEdge[];
+  onUpdate: (nodeId: string, updated: GraphNodeConfig) => void;
+  onDelete: (nodeId: string) => void;
+  onClose: () => void;
+  onOpenEndpoint: (endpointId: string) => void;
+  onSelectNode: (nodeId: string) => void;
+  t: TFn;
+  deleteConfirmNodeId: string | null;
+  setDeleteConfirmNodeId: (id: string | null) => void;
+}): React.JSX.Element {
+  const visuals = getVisuals(category);
+  const isConfirmingDelete = deleteConfirmNodeId === nodeId;
+
+  const { paramFields, outputFields } = endpointInfo;
+
+  // Build connections map for this node
+  const incomingEdges = edges.filter((e) => e.to === nodeId);
+  const outgoingEdges = edges.filter((e) => e.from === nodeId);
+
+  // Determine which param keys exist in config but NOT in paramFields (legacy/manual)
+  const knownParamKeys = new Set(Object.keys(paramFields));
+  const manualParams = Object.entries(nodeConfig.params ?? {}).filter(
+    ([k]) => !knownParamKeys.has(k),
+  );
+
+  const updateParam = useCallback(
+    (key: string, val: string | number | boolean | null) => {
+      const newParams = { ...(nodeConfig.params ?? {}), [key]: val };
+      onUpdate(nodeId, { ...nodeConfig, params: newParams });
+    },
+    [nodeId, nodeConfig, onUpdate],
+  );
+
+  // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string
+  const extraParamsLabel =
+    Object.keys(paramFields).length > 0
+      ? "Extra Params"
+      : t("widget.inspector.params");
+
+  return (
+    <Div className="flex flex-col gap-0 h-full">
+      {/* Header */}
+      <Div
+        className={cn(
+          "flex items-center justify-between px-3 py-2 border-b",
+          visuals.header,
+        )}
+      >
+        <Div className="flex items-center gap-1.5 min-w-0">
+          <Div
+            className={cn(
+              "flex-shrink-0",
+              visuals.badge.split(" ").slice(2).join(" "),
+            )}
+          >
+            {visuals.icon}
+          </Div>
+          <Badge
+            variant="secondary"
+            className={cn("text-[9px] px-1 py-0 shrink-0", visuals.badge)}
+          >
+            {category}
+          </Badge>
+          <P className="text-[11px] font-mono font-semibold truncate text-foreground ml-0.5">
+            {nodeId}
+          </P>
+        </Div>
+        <Div className="flex items-center gap-1 shrink-0">
+          {isConfirmingDelete ? (
+            <>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="h-6 px-2 text-[10px]"
+                onClick={() => {
+                  setDeleteConfirmNodeId(null);
+                  onDelete(nodeId);
+                }}
+              >
+                {t("widget.inspector.deleteConfirmYes")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-[10px]"
+                onClick={() => setDeleteConfirmNodeId(null)}
+              >
+                {t("widget.inspector.deleteConfirmNo")}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              title={t("widget.inspector.deleteConfirm")}
+              onClick={() => setDeleteConfirmNodeId(nodeId)}
+            >
+              <Trash className="h-3 w-3 text-destructive" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0"
+            onClick={onClose}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </Div>
+      </Div>
+
+      {/* Body */}
+      <Div className="flex flex-col gap-4 p-3 overflow-y-auto flex-1">
+        {/* Endpoint info */}
+        <InspectorSection label={t("widget.inspector.endpoint")}>
+          <Div className="flex flex-col gap-1.5">
+            <Div className="flex items-center gap-1.5 min-w-0">
+              <P className="text-[11px] font-mono text-muted-foreground truncate flex-1 bg-muted/40 rounded px-2 py-1 leading-tight">
+                {nodeConfig.endpointPath ?? ""}
+              </P>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 shrink-0"
+                onClick={() => {
+                  void copyToClipboard(nodeConfig.endpointPath ?? "");
+                }}
+                title="Copy path"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </Div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 text-[10px] w-full gap-1"
+              onClick={() => onOpenEndpoint(nodeConfig.endpointPath ?? "")}
+            >
+              <Globe className="h-2.5 w-2.5" />
+              {t("widget.inspector.openEndpoint")}
+            </Button>
+          </Div>
+        </InspectorSection>
+
+        {/* Connections - read-only wiring map */}
+        {(incomingEdges.length > 0 || outgoingEdges.length > 0) && (
+          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- section label is UI chrome
+          <InspectorSection label="Connections">
+            <Div className="flex flex-col gap-1">
+              {endpointInfo.handles.inputs.map((handle) => {
+                const connectedEdge = incomingEdges.find(
+                  (e) => (e.toHandle ?? "source") === handle,
+                );
+                return (
+                  <Div
+                    key={`in-${handle}`}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
+                    <P className="text-[10px] font-mono text-muted-foreground w-12 shrink-0 truncate">
+                      {handle}
+                    </P>
+                    <ArrowLeft className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                    {connectedEdge ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 px-1 text-[10px] font-mono text-primary hover:text-primary hover:underline truncate max-w-[80px]"
+                        onClick={() => onSelectNode(connectedEdge.from)}
+                        title={connectedEdge.from}
+                      >
+                        {connectedEdge.from}
+                      </Button>
+                    ) : (
+                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      <P className="text-[9px] text-muted-foreground/40 italic">
+                        {"unconnected"}
+                      </P>
+                    )}
+                  </Div>
+                );
+              })}
+              {endpointInfo.handles.outputs.map((handle) => {
+                const connectedTo = outgoingEdges
+                  .filter((e) => (e.fromHandle ?? "result") === handle)
+                  .map((e) => e.to);
+                return (
+                  <Div
+                    key={`out-${handle}`}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Div className="w-1.5 h-1.5 rounded-full bg-sky-400/60 shrink-0" />
+                    <P className="text-[10px] font-mono text-muted-foreground w-12 shrink-0 truncate">
+                      {handle}
+                    </P>
+                    <ArrowRight className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                    {connectedTo.length > 0 ? (
+                      <Div className="flex flex-wrap gap-0.5">
+                        {connectedTo.map((toId) => (
+                          <Button
+                            key={toId}
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 px-1 text-[10px] font-mono text-sky-500 hover:text-sky-400 hover:underline truncate max-w-[70px]"
+                            onClick={() => onSelectNode(toId)}
+                            title={toId}
+                          >
+                            {toId}
+                          </Button>
+                        ))}
+                      </Div>
+                    ) : (
+                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      <P className="text-[9px] text-muted-foreground/40 italic">
+                        {"unconnected"}
+                      </P>
+                    )}
+                  </Div>
+                );
+              })}
+            </Div>
+          </InspectorSection>
+        )}
+
+        {/* Resolution - shown for data-sources and indicators that have time-series output */}
+        {(category === "data-source" ||
+          category === "indicator" ||
+          category === "transformer" ||
+          category === "other") && (
+          <InspectorSection label={t("widget.inspector.resolution")}>
+            <Select<Resolution>
+              value={nodeConfig.resolution ?? GraphResolution.ONE_DAY}
+              onValueChange={(r) => {
+                onUpdate(nodeId, { ...nodeConfig, resolution: r });
+              }}
+            >
+              <SelectTrigger className="h-7 text-[11px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ResolutionValues.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {formatResolution(r)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </InspectorSection>
+        )}
+
+        {/* Lookback - only for indicators and transformers that consume a rolling window */}
+        {(category === "indicator" || category === "transformer") && (
+          <InspectorSection label={t("widget.inspector.lookback")}>
+            <Input
+              value={nodeConfig.lookback ? String(nodeConfig.lookback) : ""}
+              onChangeText={(v) => {
+                const num = parseInt(v, 10);
+                onUpdate(nodeId, {
+                  ...nodeConfig,
+                  lookback: v === "" || isNaN(num) ? undefined : num,
+                });
+              }}
+              className="h-7 text-[11px] font-mono"
+              placeholder="auto"
+            />
+          </InspectorSection>
+        )}
+
+        {/* Output field - select from known fields or text fallback */}
+        {outputFields.length > 1 && (
+          <InspectorSection label={t("widget.inspector.output")}>
+            <Select<string>
+              value={nodeConfig.outputField ?? "result"}
+              onValueChange={(v) => {
+                onUpdate(nodeId, {
+                  ...nodeConfig,
+                  outputField: v === "result" ? undefined : v,
+                });
+              }}
+            >
+              <SelectTrigger className="h-7 text-[11px] font-mono">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {outputFields.map((f) => (
+                  <SelectItem
+                    key={f}
+                    value={f}
+                    className="font-mono text-[11px]"
+                  >
+                    {f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </InspectorSection>
+        )}
+
+        {/* Persist */}
+        <InspectorSection label={t("widget.inspector.persist")}>
+          <Div className="flex items-center gap-0.5 border rounded-md overflow-hidden bg-muted/30">
+            {(["always", "never", "snapshot"] as const).map((mode) => (
+              <Button
+                key={mode}
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  onUpdate(nodeId, { ...nodeConfig, persist: mode })
+                }
+                className={cn(
+                  "h-6 flex-1 text-[10px] rounded-none border-0 px-1",
+                  (nodeConfig.persist ?? "always") === mode
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {mode}
+              </Button>
+            ))}
+          </Div>
+        </InspectorSection>
+
+        {/* Parameters - smart form from endpoint metadata */}
+        {Object.keys(paramFields).length > 0 && (
+          <InspectorSection label={t("widget.inspector.params")}>
+            <Div className="flex flex-col gap-2">
+              {Object.entries(paramFields).map(([key, meta]) => (
+                <Div key={key}>
+                  <Div className="flex items-center justify-between mb-0.5">
+                    <Label className="text-[10px] font-medium text-foreground">
+                      {meta.label}
+                    </Label>
+                    {(meta.min !== undefined || meta.max !== undefined) && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1 py-0 h-4 font-mono leading-none text-muted-foreground/60"
+                      >
+                        {meta.min !== undefined && meta.max !== undefined
+                          ? `${String(meta.min)}-${String(meta.max)}`
+                          : meta.min !== undefined
+                            ? `min ${String(meta.min)}`
+                            : `max ${String(meta.max)}`}
+                      </Badge>
+                    )}
+                  </Div>
+                  <ParamFieldControl
+                    fieldName={key}
+                    meta={meta}
+                    value={nodeConfig.params?.[key]}
+                    onChange={(v) => updateParam(key, v)}
+                  />
+                </Div>
+              ))}
+            </Div>
+          </InspectorSection>
+        )}
+
+        {/* Manual params - for extra/legacy params not in schema */}
+        {(manualParams.length > 0 || Object.keys(paramFields).length === 0) && (
+          <InspectorSection label={extraParamsLabel}>
+            <Div className="flex flex-col gap-2">
+              {manualParams.map(([field, value]) => (
+                <Div key={field} className="rounded-lg border bg-muted/20 p-2">
+                  <Div className="flex items-center justify-between mb-1.5">
+                    <P className="text-[10px] font-mono font-semibold text-foreground">
+                      {field}
+                    </P>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0"
+                      onClick={() => {
+                        const newParams = { ...(nodeConfig.params ?? {}) };
+                        delete newParams[field];
+                        onUpdate(nodeId, {
+                          ...nodeConfig,
+                          params:
+                            Object.keys(newParams).length > 0
+                              ? newParams
+                              : undefined,
+                        });
+                      }}
+                    >
+                      <X className="h-2.5 w-2.5 text-muted-foreground" />
+                    </Button>
+                  </Div>
+                  <Input
+                    value={value !== null ? String(value) : ""}
+                    onChangeText={(v) => {
+                      const parsed = Number(v);
+                      const typed: string | number | boolean | null =
+                        v === "true"
+                          ? true
+                          : v === "false"
+                            ? false
+                            : v === ""
+                              ? null
+                              : !isNaN(parsed) && v.trim() !== ""
+                                ? parsed
+                                : v;
+                      onUpdate(nodeId, {
+                        ...nodeConfig,
+                        params: {
+                          ...(nodeConfig.params ?? {}),
+                          [field]: typed,
+                        },
+                      });
+                    }}
+                    className="h-6 text-[10px]"
+                    placeholder="value"
+                  />
+                </Div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px] w-full border-dashed"
+                onClick={() => {
+                  const newParams = { ...(nodeConfig.params ?? {}) };
+                  const fieldName = `param_${String(
+                    Object.keys(newParams).length + 1,
+                  )}`;
+                  newParams[fieldName] = "";
+                  onUpdate(nodeId, { ...nodeConfig, params: newParams });
+                }}
+              >
+                {t("widget.addField")}
+              </Button>
+            </Div>
+          </InspectorSection>
+        )}
+
+        {/* Display options */}
+        <InspectorSection label={t("widget.inspector.display")}>
+          <Div className="flex flex-col gap-2">
+            {/* Color picker */}
+            <Div className="flex items-center gap-2">
+              <Label className="text-[11px] w-14 text-muted-foreground shrink-0">
+                {t("widget.inspector.color")}
+              </Label>
+              <Div className="flex items-center gap-1.5 flex-1">
+                <Input
+                  type="color"
+                  value={nodeConfig.color ?? "#3b82f6"}
+                  onChangeText={(v) => {
+                    onUpdate(
+                      nodeId,
+                      withDisplayOverride(nodeConfig, { color: v }),
+                    );
+                  }}
+                  className="h-6 w-8 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                />
+                <Input
+                  value={nodeConfig.color ?? ""}
+                  onChangeText={(v) => {
+                    onUpdate(
+                      nodeId,
+                      withDisplayOverride(nodeConfig, {
+                        color: v || undefined,
+                      }),
+                    );
+                  }}
+                  className="h-6 text-[10px] flex-1 font-mono"
+                  placeholder="#3b82f6"
+                />
+              </Div>
+            </Div>
+            {/* Pane selector - "–" = no chart, 0/1/2 = pane number */}
+            <Div className="flex items-center gap-2">
+              <Label className="text-[11px] w-14 text-muted-foreground shrink-0">
+                {t("widget.inspector.pane")}
+              </Label>
+              <Div className="flex items-center gap-0.5 border rounded-md overflow-hidden bg-muted/30">
+                {/* No-chart button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  title={t("widget.inspector.paneNone")}
+                  onClick={() =>
+                    onUpdate(
+                      nodeId,
+                      withDisplayOverride(nodeConfig, { pane: null }),
+                    )
+                  }
+                  className={cn(
+                    "h-6 w-7 p-0 text-[11px] rounded-none border-0",
+                    nodeConfig.pane === null
+                      ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <EyeOff className="h-3 w-3" />
+                </Button>
+                {/* Pane 0/1/2 */}
+                {[0, 1, 2].map((pane) => {
+                  const current =
+                    nodeConfig.pane === null ? null : (nodeConfig.pane ?? 0);
+                  return (
+                    <Button
+                      key={pane}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        onUpdate(
+                          nodeId,
+                          withDisplayOverride(nodeConfig, { pane }),
+                        )
+                      }
+                      className={cn(
+                        "h-6 w-7 p-0 text-[11px] rounded-none border-0",
+                        current === pane
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {pane}
+                    </Button>
+                  );
+                })}
+              </Div>
+            </Div>
+          </Div>
+        </InspectorSection>
+      </Div>
+    </Div>
+  );
+});
+
+// ─── Graph Settings Panel ─────────────────────────────────────────────────────
+
+const GraphSettingsPanel = React.memo(function GraphSettingsPanel({
+  name,
+  slug,
+  description,
+  triggerType,
+  cronSchedule,
+  isNew,
+  onNameChange,
+  onSlugChange,
+  onDescriptionChange,
+  onTriggerTypeChange,
+  onCronScheduleChange,
+  t,
+}: {
+  name: string;
+  slug: string;
+  description: string;
+  triggerType: "manual" | "cron";
+  cronSchedule: string;
+  isNew: boolean;
+  onNameChange: (v: string) => void;
+  onSlugChange: (v: string) => void;
+  onDescriptionChange: (v: string) => void;
+  onTriggerTypeChange: (v: TriggerType) => void;
+  onCronScheduleChange: (v: string) => void;
+  t: TFn;
+}): React.JSX.Element {
+  const nameEmpty = name.trim().length === 0;
+
+  return (
+    <Div className="flex flex-col gap-0 h-full">
+      {/* Header */}
+      <Div className="flex items-center gap-2 px-3 py-2 border-b bg-muted/30">
+        <Settings className="h-3.5 w-3.5 text-muted-foreground" />
+        <P className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {t("widget.graphSettings")}
+        </P>
+      </Div>
+
+      {/* First-time hint for new graphs */}
+      {isNew && (
+        <Div className="px-3 py-2 border-b bg-primary/5 border-primary/10">
+          <P className="text-[10px] text-primary/70 leading-relaxed">
+            {t("widget.graphSettingsHint")}
+          </P>
+        </Div>
+      )}
+
+      <Div className="flex flex-col gap-4 p-3 overflow-y-auto flex-1">
+        {/* Name - required, highlighted when empty on new graph */}
+        <Div className="flex flex-col gap-1.5">
+          <Div className="flex items-center gap-1">
+            <Label className="text-[11px] font-medium">
+              {t("widget.nameLabel")}
+            </Label>
+            {isNew && nameEmpty && (
+              <Span className="text-[9px] text-destructive font-medium leading-none">
+                *
+              </Span>
+            )}
+          </Div>
+          <Input
+            value={name}
+            onChangeText={onNameChange}
+            className={cn(
+              "h-8 text-xs",
+              isNew &&
+                nameEmpty &&
+                "border-destructive/50 focus:border-destructive",
+            )}
+            placeholder={t("widget.namePlaceholder")}
+          />
+        </Div>
+
+        {/* Slug - auto-derived, editable */}
+        <Div className="flex flex-col gap-1.5">
+          <Label className="text-[11px] font-medium">
+            {t("widget.slugLabel")}
+          </Label>
+          <Input
+            value={slug}
+            onChangeText={onSlugChange}
+            className="h-8 text-xs font-mono"
+            placeholder={t("widget.slugPlaceholder")}
+          />
+        </Div>
+
+        {/* Description */}
+        <Div className="flex flex-col gap-1.5">
+          <Label className="text-[11px] font-medium">
+            {t("widget.descriptionLabel")}
+          </Label>
+          <Input
+            value={description}
+            onChangeText={onDescriptionChange}
+            className="h-8 text-xs"
+            placeholder={t("widget.descriptionPlaceholder")}
+          />
+        </Div>
+
+        {/* Trigger */}
+        <Div className="flex flex-col gap-1.5">
+          <Label className="text-[11px] font-medium">
+            {t("widget.trigger")}
+          </Label>
+          <Select<TriggerType>
+            value={triggerType}
+            onValueChange={onTriggerTypeChange}
+          >
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="manual">
+                {t("widget.triggerManual")}
+              </SelectItem>
+              <SelectItem value="cron">{t("widget.triggerCron")}</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {triggerType === "cron" && (
+            <Div className="flex flex-col gap-1">
+              <Input
+                value={cronSchedule}
+                onChangeText={onCronScheduleChange}
+                className={cn(
+                  "h-8 text-xs font-mono",
+                  !isValidCron(cronSchedule) && "border-destructive",
+                )}
+                placeholder="0 6 * * *"
+              />
+              {!isValidCron(cronSchedule) && (
+                <P className="text-[10px] text-destructive">
+                  {t("widget.cronInvalid")}
+                </P>
+              )}
+            </Div>
+          )}
+        </Div>
+      </Div>
+    </Div>
+  );
+});
+
+// ─── Node Palette ──────────────────────────────────────────────────────────────
+
+const NodePalette = React.memo(function NodePalette({
+  paletteSearch,
+  setPaletteSearch,
+  paletteGroups,
+  onAddNode,
+  t,
+}: {
+  paletteSearch: string;
+  setPaletteSearch: (v: string) => void;
+  paletteGroups: PaletteGroup[];
+  onAddNode: (alias: string) => void;
+  t: TFn;
+}): React.JSX.Element {
+  return (
+    <Div className="w-60 border-r bg-muted/10 overflow-y-auto shrink-0 flex flex-col">
+      {/* Search */}
+      <Div className="px-2 pt-2 pb-1 relative">
+        <Input
+          value={paletteSearch}
+          onChangeText={setPaletteSearch}
+          className="h-6 text-[10px] pr-6"
+          placeholder={t("widget.palette.searchPlaceholder")}
+        />
+        {paletteSearch && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 p-0"
+            onClick={() => setPaletteSearch("")}
+          >
+            <X className="h-2.5 w-2.5" />
+          </Button>
+        )}
+      </Div>
+
+      {/* Two-level: category → subCategory → items, all start collapsed */}
+      {paletteGroups.map((group) => {
+        const visuals = getVisuals(group.nodeCategory);
+        const totalEntries = group.subGroups.reduce(
+          (n, sg) => n + sg.entries.length,
+          0,
+        );
+        if (totalEntries === 0) {
+          return null;
+        }
+        return (
+          <PaletteSection
+            key={group.category}
+            title={group.category}
+            badge={visuals.badge}
+            icon={visuals.icon}
+            defaultOpen={false}
+          >
+            {group.subGroups.map((sg) => (
+              <PaletteSubSection key={sg.subCategory} title={sg.subCategory}>
+                {sg.entries.map((entry) => (
+                  <PaletteItem
+                    key={entry.alias}
+                    label={entry.label}
+                    detail={entry.description}
+                    alias={entry.alias}
+                    onClick={() => onAddNode(entry.alias)}
+                  />
+                ))}
+              </PaletteSubSection>
+            ))}
+          </PaletteSection>
+        );
+      })}
+      {paletteGroups.length === 0 && (
+        <P className="text-[10px] text-muted-foreground/50 px-3 py-4 text-center">
+          {t("widget.palette.noIndicators")}
+        </P>
+      )}
+    </Div>
+  );
+});
+
+// ─── Canvas Empty Hint ────────────────────────────────────────────────────────
+
+function CanvasEmptyHint({ t }: { t: TFn }): React.JSX.Element {
+  return (
+    <Div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+      <Div className="flex flex-col items-center gap-3 select-none">
+        {/* Minimal node graph illustration */}
+        <Div className="relative">
+          {/* Node A */}
+          <Div className="absolute -top-6 -left-8 w-12 h-8 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-background/60 flex items-center justify-center">
+            <Database className="h-3 w-3 text-muted-foreground/20" />
+          </Div>
+          {/* Node B */}
+          <Div className="absolute -top-6 right-0 w-12 h-8 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-background/60 flex items-center justify-center">
+            <Activity className="h-3 w-3 text-muted-foreground/20" />
+          </Div>
+          {/* Center node */}
+          <Div className="w-14 h-9 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-background/80 flex items-center justify-center mt-6">
+            <Zap className="h-4 w-4 text-muted-foreground/25" />
+          </Div>
+        </Div>
+        <Div className="text-center mt-2">
+          <P className="text-sm font-medium text-muted-foreground/50 mb-1">
+            {t("widget.canvasEmpty")}
+          </P>
+          <P className="text-xs text-muted-foreground/35">
+            {t("widget.canvasEmptyHint")}
+          </P>
+        </Div>
+      </Div>
+    </Div>
+  );
+}
+
+function KeyboardHints({ t }: { t: TFn }): React.JSX.Element {
+  return (
+    <Div className="absolute bottom-12 right-2 flex flex-col items-end gap-1 pointer-events-none z-10 select-none">
+      {[t("widget.shortcutDelete"), t("widget.shortcutSave")].map((hint) => (
+        <Div
+          key={hint}
+          className="flex items-center gap-0.5 opacity-50 hover:opacity-70 transition-opacity"
+        >
+          {hint.split(" - ").map((part, i, arr) => (
+            <React.Fragment key={part}>
+              <Span className="text-[9px] font-mono text-muted-foreground bg-muted/70 border border-border/50 rounded px-1 py-0 shadow-[0_1px_0_0_hsl(var(--border))]">
+                {part}
+              </Span>
+              {i < arr.length - 1 && (
+                <Span className="text-[9px] text-muted-foreground/50 mx-0.5">
+                  —
+                </Span>
+              )}
+            </React.Fragment>
+          ))}
+        </Div>
+      ))}
+    </Div>
+  );
+}
+
+// ─── Palette endpoint grouping ────────────────────────────────────────────────
+
+interface PaletteEntry {
+  alias: string;
+  category: string; // top-level translated category e.g. "Analytics"
+  subCategory: string; // sub-level translated category e.g. "Indicators"
+  nodeCategory: NodeCategory; // derived for visuals
+  label: string;
+  description: string;
+}
+
+/**
+ * Derive a NodeCategory (for visuals) from the endpoint's category + subCategory strings.
+ */
+function nodeTypeFromCategory(
+  category: string,
+  subCategory: string,
+): NodeCategory {
+  const cat = category.toLowerCase();
+  const sub = subCategory.toLowerCase();
+  if (
+    sub.includes("indicator") ||
+    sub.includes("evaluator") ||
+    sub.includes("transformer")
+  ) {
+    if (sub.includes("evaluator")) {
+      return "evaluator";
+    }
+    if (sub.includes("transformer")) {
+      return "transformer";
+    }
+    return "indicator";
+  }
+  if (
+    cat.includes("data source") ||
+    sub.includes("data source") ||
+    cat.includes("analytics: data")
+  ) {
+    return "data-source";
+  }
+  if (cat.includes("analytics") || sub.includes("analytics")) {
+    return "indicator";
+  }
+  return "other";
+}
+
+/** Human-readable label derived from toolName: strip common prefix, prettify */
+function toolNameToLabel(toolName: string): string {
+  // e.g. "vibe-sense-indicator-ema" → "EMA"
+  //      "vibe-sense-transformer-window-avg" → "Window Avg"
+  const stripped = toolName
+    .replace(/^vibe-sense-(indicator|evaluator|transformer|data-source)-?/, "")
+    .replace(/-/g, " ")
+    .trim();
+  if (!stripped) {
+    return toolName;
+  }
+  return stripped.toUpperCase().length <= 5
+    ? stripped.toUpperCase()
+    : stripped.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Vibe-sense graph management endpoints to exclude from the palette
+const EXCLUDED_TOOL_SUBSTRINGS = [
+  "vibe-sense_graphs",
+  "vibe-sense_cleanup",
+  "vibe-sense-run-config",
+];
+
+function buildPaletteEntries(): PaletteEntry[] {
+  // Show ALL endpoints except vibe-sense graph management endpoints themselves
+  const metas = endpointsMeta.filter((m) => {
+    const tool = m.toolName.toLowerCase();
+    return !EXCLUDED_TOOL_SUBSTRINGS.some((p) => tool.includes(p));
+  });
+
+  const seen = new Set<string>();
+  const entries: PaletteEntry[] = [];
+
+  for (const meta of metas) {
+    // Prefer the first alias; fall back to toolName
+    const alias =
+      meta.aliases.length > 0
+        ? (meta.aliases[0] ?? meta.toolName)
+        : meta.toolName;
+    if (seen.has(alias)) {
+      continue;
+    }
+    seen.add(alias);
+
+    const category = meta.category ?? "Other";
+    const subCategory = meta.subCategory ?? category;
+    const nodeType = nodeTypeFromCategory(category, subCategory);
+    const label = meta.title
+      ? meta.title.replace(/^Vibe Sense\s*[-–]\s*/i, "")
+      : toolNameToLabel(meta.toolName);
+
+    entries.push({
+      alias,
+      category,
+      subCategory,
+      nodeCategory: nodeType,
+      label,
+      description: meta.description,
+    });
+  }
+  return entries.toSorted((a, b) => a.label.localeCompare(b.label));
+}
+
+interface PaletteSubGroup {
+  subCategory: string;
+  entries: PaletteEntry[];
+}
+
+interface PaletteGroup {
+  category: string;
+  nodeCategory: NodeCategory;
+  subGroups: PaletteSubGroup[];
+}
+
+function groupByCategory(entries: PaletteEntry[]): PaletteGroup[] {
+  // Top-level: keyed by category
+  const catMap = new Map<
+    string,
+    { nodeCategory: NodeCategory; subMap: Map<string, PaletteEntry[]> }
+  >();
+
+  for (const entry of entries) {
+    let cat = catMap.get(entry.category);
+    if (!cat) {
+      cat = { nodeCategory: entry.nodeCategory, subMap: new Map() };
+      catMap.set(entry.category, cat);
+    }
+    const sub = cat.subMap.get(entry.subCategory) ?? [];
+    sub.push(entry);
+    cat.subMap.set(entry.subCategory, sub);
+  }
+
+  // Priority categories shown first (analytics primitives), rest alphabetical
+  const PRIORITY_CATEGORIES = [
+    "Analytics: Data Sources",
+    "Indicators",
+    "Transformers",
+    "Evaluators",
+  ];
+
+  return [...catMap.entries()]
+    .toSorted(([a], [b]) => {
+      const ia = PRIORITY_CATEGORIES.indexOf(a);
+      const ib = PRIORITY_CATEGORIES.indexOf(b);
+      if (ia !== -1 && ib !== -1) {
+        return ia - ib;
+      }
+      if (ia !== -1) {
+        return -1;
+      }
+      if (ib !== -1) {
+        return 1;
+      }
+      return a.localeCompare(b);
+    })
+    .map(([category, { nodeCategory, subMap }]) => ({
+      category,
+      nodeCategory,
+      subGroups: [...subMap.entries()]
+        .toSorted(([a], [b]) => a.localeCompare(b))
+        .map(([subCategory, subEntries]) => ({
+          subCategory,
+          entries: subEntries,
+        })),
+    }));
+}
+
+// ─── Edit Form Inner ──────────────────────────────────────────────────────────
+
+function EditFormInner({
+  savedResponse,
+}: {
+  savedResponse: EditResponseOutput | null | undefined;
+}): React.JSX.Element {
+  const t = useWidgetTranslation<typeof definition.PUT>();
+  const navigation = useWidgetNavigation();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const form = useWidgetForm<typeof definition.PUT>();
+  const onSubmit = useWidgetOnSubmit();
+  const isSubmitting = useWidgetIsSubmitting() ?? false;
+  const reactFlow = useReactFlow();
+
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const [dirty, setDirty] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [triggerType, setTriggerType] = useState<"manual" | "cron">("manual");
+  const [cronSchedule, setCronSchedule] = useState("0 6 * * *");
+  const [confirmBackOpen, setConfirmBackOpen] = useState(false);
+  const [deleteConfirmNodeId, setDeleteConfirmNodeId] = useState<string | null>(
+    null,
+  );
+  const [paletteSearch, setPaletteSearch] = useState("");
+
+  const graphId = form.getValues("id") ?? "";
+  const isNewGraph = !graphId || graphId === "new";
+
+  // ── Version chain for undo/redo ──
+  const versionsOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { id: graphId },
+        queryOptions: {
+          enabled: !isNewGraph,
+          refetchOnWindowFocus: false,
+          staleTime: 60_000,
+        },
+      },
+    }),
+    [graphId, isNewGraph],
+  );
+  const versionsEndpoint = useEndpoint(
+    versionsDefinitions,
+    versionsOptions,
+    logger,
+    user,
+  );
+  const versionChain = versionsEndpoint.read?.data?.versions ?? [];
+  const currentVersionIndex = versionChain.findIndex((v) => v.id === graphId);
+  const prevVersionId =
+    currentVersionIndex > 0
+      ? versionChain[currentVersionIndex - 1]?.id
+      : undefined;
+  const nextVersionId =
+    currentVersionIndex >= 0 && currentVersionIndex < versionChain.length - 1
+      ? versionChain[currentVersionIndex + 1]?.id
+      : undefined;
+
+  // Register dirty callback for edge delete button
+  useEffect((): (() => void) => {
+    edgeDirtyCallback = (): void => {
+      setDirty(true);
+    };
+    return (): void => {
+      edgeDirtyCallback = null;
+    };
+  }, []);
+
+  // ── React to successful save ──
+  useEffect(() => {
+    if (!savedResponse?.newId) {
+      return;
+    }
+    setDirty(false);
+    void (async (): Promise<void> => {
+      const dataDef = await import("../data/definition");
+      navigation.push(dataDef.default.GET, {
+        urlPathParams: { id: savedResponse.newId },
+      });
+    })();
+  }, [savedResponse?.newId, navigation]);
+
+  // ── Load parent graph ──
+  const parentOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { id: graphId },
+        initialState: {
+          resolution: GraphResolution.ONE_DAY,
+          cursor: undefined,
+        },
+        queryOptions: {
+          enabled: !isNewGraph,
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000,
+        },
+      },
+    }),
+    [graphId, isNewGraph],
+  );
+
+  const parentEndpoint = useEndpoint(
+    parentDefinitions,
+    parentOptions,
+    logger,
+    user,
+  );
+
+  const parentGraph = parentEndpoint.read?.data?.graph;
+
+  const graphConfig = useMemo<GraphConfig>(
+    () =>
+      parentGraph?.config ?? {
+        nodes: {},
+        edges: [],
+        trigger: { type: "manual" },
+      },
+    [parentGraph?.config],
+  );
+
+  const [workingNodes, setWorkingNodes] = useState<
+    Record<string, GraphNodeConfig>
+  >({});
+
+  const isLoading = !isNewGraph && (parentEndpoint.read?.isLoading ?? true);
+
+  // Pre-fill when parent data loads
+  useEffect(() => {
+    if (parentGraph) {
+      setName(parentGraph.name);
+      setSlug(parentGraph.slug);
+      setDescription(parentGraph.description ?? "");
+      setWorkingNodes(parentGraph.config.nodes);
+      if (parentGraph.config.trigger.type === "cron") {
+        setTriggerType("cron");
+        setCronSchedule(parentGraph.config.trigger.schedule);
+      }
+    }
+  }, [parentGraph]);
+
+  // ── Endpoint node info (handles + categories) ──
+  const endpointPaths = useMemo(
+    () =>
+      Object.values(workingNodes)
+        .map((n) => n.endpointPath)
+        .filter((p): p is string => p !== undefined),
+    [workingNodes],
+  );
+  const endpointInfoMap = useEndpointNodeInfo(endpointPaths);
+
+  // ── React Flow state ──
+  const initial = useMemo(
+    () => configToFlow(graphConfig, endpointInfoMap),
+    [graphConfig, endpointInfoMap],
+  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
+  const loadingRef = useRef(true);
+  const dirtyRef = useRef(false);
+  dirtyRef.current = dirty;
+
+  // Full reset from server config - only when NOT dirty (no unsaved local changes)
+  useEffect(() => {
+    if (!isLoading && !dirtyRef.current) {
+      loadingRef.current = true;
+      const flow = configToFlow(graphConfig, endpointInfoMap);
+      setNodes(flow.nodes);
+      setEdges(flow.edges);
+      setDirty(false);
+      setTimeout((): void => {
+        reactFlow.fitView({ padding: 0.2 });
+        setTimeout((): void => {
+          loadingRef.current = false;
+          setDirty(false);
+        }, 300);
+      }, 100);
+    }
+  }, [graphConfig, isLoading, endpointInfoMap, reactFlow, setNodes, setEdges]);
+
+  // When endpointInfoMap resolves new entries (e.g. after adding a node),
+  // patch handles/category in-place without wiping unsaved local state.
+  useEffect(() => {
+    if (endpointInfoMap.size === 0) {
+      return;
+    }
+    setNodes((prev) =>
+      prev.map((node) => {
+        const info = endpointInfoMap.get(node.data.label);
+        if (!info) {
+          return node;
+        }
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            handles: info.handles,
+            category: info.category,
+          },
+        };
+      }),
+    );
+  }, [endpointInfoMap, setNodes]);
+
+  const selectedNodeConfig = selectedNodeId
+    ? workingNodes[selectedNodeId]
+    : null;
+
+  const showNodeInspector =
+    selectedNodeConfig !== null && selectedNodeId !== null;
+
+  // Derive GraphEdge[] from current React Flow edges for the connections display
+  const currentGraphEdges = useMemo<GraphEdge[]>(
+    () =>
+      edges.map((e) => ({
+        from: e.source,
+        to: e.target,
+        ...(e.sourceHandle ? { fromHandle: e.sourceHandle } : {}),
+        ...(e.targetHandle ? { toHandle: e.targetHandle } : {}),
+      })),
+    [edges],
+  );
+
+  const handleSelectNode = useCallback(
+    (nodeId: string): void => {
+      setSelectedNodeId(nodeId);
+      // Also select the node in React Flow for visual highlight
+      setNodes((nds) => nds.map((n) => ({ ...n, selected: n.id === nodeId })));
+    },
+    [setNodes],
+  );
+
+  // ── Palette entries ──
+  const allPaletteEntries = useMemo(() => buildPaletteEntries(), []);
+
+  // Group by real endpoint category, filtered by search
+  const paletteGroups = useMemo(() => {
+    if (!paletteSearch.trim()) {
+      return groupByCategory(allPaletteEntries);
+    }
+    const q = paletteSearch.toLowerCase();
+    const filtered = allPaletteEntries.filter(
+      (e) =>
+        e.label.toLowerCase().includes(q) ||
+        e.alias.toLowerCase().includes(q) ||
+        e.description.toLowerCase().includes(q),
+    );
+    return groupByCategory(filtered);
+  }, [allPaletteEntries, paletteSearch]);
+
+  // ── Handlers ──
+  const handleNodesChange = useCallback<OnNodesChange<VibeNode>>(
+    (changes) => {
+      onNodesChange(changes);
+
+      // Batch state updates: only check non-position changes to avoid work per drag frame
+      let shouldDirty = false;
+      let selectId: string | null = null;
+
+      for (const c of changes) {
+        if (c.type === "position" && !c.dragging && !loadingRef.current) {
+          shouldDirty = true;
+        } else if (c.type === "remove" && !loadingRef.current) {
+          shouldDirty = true;
+        } else if (c.type === "select" && c.selected) {
+          selectId = c.id;
+        }
+      }
+
+      if (shouldDirty) {
+        setDirty(true);
+      }
+      if (selectId !== null) {
+        setSelectedNodeId(selectId);
+      }
+    },
+    [onNodesChange],
+  );
+
+  const handleEdgesChange = useCallback<OnEdgesChange<VibeEdge>>(
+    (changes) => {
+      onEdgesChange(changes);
+      if (changes.some((c) => c.type === "remove")) {
+        setDirty(true);
+      }
+    },
+    [onEdgesChange],
+  );
+
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...params,
+            animated: true,
+            style: {
+              strokeDasharray: "4 2",
+              stroke: "hsl(var(--primary))",
+              opacity: 0.7,
+            },
+          },
+          eds,
+        ),
+      );
+      setDirty(true);
+    },
+    [setEdges],
+  );
+
+  const addNode = useCallback(
+    (aliasOrPath: string, position?: { x: number; y: number }) => {
+      // Resolve alias → endpoint path. pathToAliasMap is path→alias, so we invert.
+      const resolvedPath =
+        Object.entries(pathToAliasMap).find(
+          ([, alias]) => alias === aliasOrPath,
+        )?.[0] ?? aliasOrPath;
+
+      const nodeId = generateNodeId(aliasOrPath, workingNodes);
+      const nodeConfig: GraphNodeConfig = {
+        endpointPath: resolvedPath,
+        method: "POST",
+      };
+
+      let pos: { x: number; y: number };
+      if (position) {
+        pos = position;
+      } else {
+        const viewport = reactFlow.getViewport();
+        pos = {
+          x: (-viewport.x + 400) / viewport.zoom,
+          y: (-viewport.y + 250) / viewport.zoom,
+        };
+      }
+
+      const info = endpointInfoMap.get(resolvedPath) ?? DEFAULT_INFO;
+      const newNode: VibeNode = {
+        id: nodeId,
+        type: "vibeNode",
+        position: pos,
+        data: {
+          nodeId,
+          nodeConfig: nodeConfig as GraphConfig["nodes"][string],
+          label: resolvedPath,
+          handles: info.handles,
+          category: info.category,
+        },
+      };
+
+      setNodes((nds) => [...nds, newNode]);
+      setWorkingNodes((prev) => ({ ...prev, [nodeId]: nodeConfig }));
+      setSelectedNodeId(nodeId);
+      setDirty(true);
+    },
+    [reactFlow, setNodes, workingNodes, endpointInfoMap],
+  );
+
+  const handlePaneClick = useCallback((): void => {
+    setSelectedNodeId(null);
+  }, []);
+
+  const handleNameChange = useCallback(
+    (v: string): void => {
+      setName(v);
+      // Auto-derive slug from name if slug is still the auto-generated one
+      // (i.e. user hasn't manually edited it)
+      if (isNewGraph) {
+        setSlug((prev) => {
+          const expectedSlug = nameToSlug(name);
+          // Only auto-update if slug matches the previous auto-derivation
+          if (
+            prev === "" ||
+            prev === expectedSlug ||
+            prev === nameToSlug(name)
+          ) {
+            return nameToSlug(v);
+          }
+          return prev;
+        });
+      }
+      setDirty(true);
+    },
+    [isNewGraph, name],
+  );
+
+  const handleSlugChange = useCallback((v: string): void => {
+    setSlug(v);
+    setDirty(true);
+  }, []);
+
+  const handleDescriptionChange = useCallback((v: string): void => {
+    setDescription(v);
+    setDirty(true);
+  }, []);
+
+  const handleTriggerTypeChange = useCallback((v: TriggerType): void => {
+    setTriggerType(v);
+    setDirty(true);
+  }, []);
+
+  const handleCronScheduleChange = useCallback((v: string): void => {
+    setCronSchedule(v);
+    setDirty(true);
+  }, []);
+
+  // Stable ref wrapper for addNode - prevents palette from re-rendering when workingNodes changes
+  const addNodeRef = useRef(addNode);
+  addNodeRef.current = addNode;
+  const stableAddNode = useCallback(
+    (alias: string, position?: { x: number; y: number }): void => {
+      addNodeRef.current(alias, position);
+    },
+    [],
+  );
+
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const alias = e.dataTransfer.getData("application/vibe-node");
+      if (!alias) {
+        return;
+      }
+      const position = reactFlow.screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+      stableAddNode(alias, position);
+    },
+    [stableAddNode, reactFlow],
+  );
+
+  const updateNodeConfig = useCallback(
+    (nodeId: string, updated: GraphNodeConfig) => {
+      setWorkingNodes((prev) => ({ ...prev, [nodeId]: updated }));
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === nodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  nodeConfig: updated as GraphConfig["nodes"][string],
+                  label: updated.endpointPath ?? "",
+                },
+              }
+            : n,
+        ),
+      );
+      setDirty(true);
+    },
+    [setNodes],
+  );
+
+  const deleteNode = useCallback(
+    (nodeId: string) => {
+      setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+      setEdges((eds) =>
+        eds.filter((e) => e.source !== nodeId && e.target !== nodeId),
+      );
+      setWorkingNodes((prev) => {
+        const next = { ...prev };
+        delete next[nodeId];
+        return next;
+      });
+      if (selectedNodeId === nodeId) {
+        setSelectedNodeId(null);
+      }
+      setDirty(true);
+    },
+    [setNodes, setEdges, selectedNodeId],
+  );
+
+  const handleOpenEndpoint = useCallback(
+    (endpointId: string): void => {
+      void getEndpoint(endpointId).then((endpoint) => {
+        if (!endpoint) {
+          return undefined;
+        }
+        navigation.push(endpoint, { renderInModal: true });
+        return undefined;
+      });
+    },
+    [navigation],
+  );
+
+  const handleBack = useCallback((): void => {
+    if (dirty) {
+      setConfirmBackOpen(true);
+      return;
+    }
+    if (navigation.canGoBack) {
+      navigation.pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../../definition");
+        navigation.push(listDef.default.GET);
+      })();
+    }
+  }, [navigation, dirty]);
+
+  const handleVersionUndo = useCallback((): void => {
+    if (!prevVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const editDef = await import("./definition");
+      navigation.push(editDef.default.PUT, {
+        urlPathParams: { id: prevVersionId },
+      });
+    })();
+  }, [prevVersionId, navigation]);
+
+  const handleVersionRedo = useCallback((): void => {
+    if (!nextVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const editDef = await import("./definition");
+      navigation.push(editDef.default.PUT, {
+        urlPathParams: { id: nextVersionId },
+      });
+    })();
+  }, [nextVersionId, navigation]);
+
+  const handleConfirmLeave = useCallback((): void => {
+    setConfirmBackOpen(false);
+    if (navigation.canGoBack) {
+      navigation.pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../../definition");
+        navigation.push(listDef.default.GET);
+      })();
+    }
+  }, [navigation]);
+
+  const syncFormValues = useCallback((): void => {
+    if (!form) {
+      return;
+    }
+    const configWithWorkingNodes: GraphConfig = {
+      ...graphConfig,
+      nodes: workingNodes as GraphConfig["nodes"],
+    };
+    const newConfig = flowToConfig(configWithWorkingNodes, nodes, edges);
+    const trigger: TriggerConfig =
+      triggerType === "cron"
+        ? { type: "cron", schedule: cronSchedule }
+        : { type: "manual" };
+    newConfig.trigger = trigger;
+    form.setValue("name", name || undefined);
+    form.setValue("slug", slug || undefined);
+    form.setValue("description", description || undefined);
+    form.setValue("config", newConfig);
+  }, [
+    form,
+    nodes,
+    edges,
+    graphConfig,
+    workingNodes,
+    name,
+    slug,
+    description,
+    triggerType,
+    cronSchedule,
+  ]);
+
+  // Keyboard shortcut: Cmd+S / Ctrl+S → save
+  useEffect(() => {
+    const handler = (e: KeyboardEvent): void => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        syncFormValues();
+        // Schedule submit after form values are synced
+        setTimeout(() => onSubmit?.(), 0);
+      }
+    };
+    const cleanup = addWindowListener("keydown", handler);
+    return cleanup;
+  }, [syncFormValues, onSubmit]);
+
+  if (isLoading) {
+    return (
+      <Div className="flex flex-col h-[calc(100vh-12rem)] min-h-[500px] animate-pulse">
+        {/* Toolbar skeleton */}
+        <Div className="flex items-center gap-2 px-3 py-1.5 border-b bg-background shrink-0 h-11">
+          <Div className="h-6 w-16 bg-muted rounded" />
+          <Div className="h-6 w-6 bg-muted rounded" />
+          <Div className="flex-1" />
+          <Div className="h-6 w-20 bg-muted rounded" />
+          <Div className="h-7 w-24 bg-muted rounded" />
+        </Div>
+        {/* Three-panel skeleton */}
+        <Div className="flex flex-1 min-h-0">
+          <Div className="w-60 border-r bg-muted/10 flex flex-col gap-2 p-2 shrink-0">
+            <Div className="h-6 bg-muted rounded" />
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Div key={i} className="h-7 bg-muted/60 rounded" />
+            ))}
+          </Div>
+          <Div className="flex-1 bg-muted/5" />
+          <Div className="w-70 border-l flex flex-col gap-3 p-3 shrink-0">
+            {[0, 1, 2, 3].map((i) => (
+              <Div key={i} className="h-12 bg-muted rounded" />
+            ))}
+          </Div>
+        </Div>
+      </Div>
+    );
+  }
+
+  const nodeCount = Object.keys(workingNodes).length;
+
+  return (
+    <Div className="flex flex-col h-[calc(100vh-12rem)] min-h-[500px]">
+      {/* Unsaved changes dialog */}
+      <Dialog open={confirmBackOpen} onOpenChange={setConfirmBackOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("widget.confirmBackTitle")}</DialogTitle>
+          </DialogHeader>
+          <P className="text-sm text-muted-foreground">
+            {t("widget.confirmBackDescription")}
+          </P>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmBackOpen(false)}>
+              {t("widget.confirmBackStay")}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmLeave}>
+              {t("widget.confirmBackLeave")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Top Toolbar */}
+      <Div className="flex items-center gap-2 px-3 py-1.5 border-b bg-background shrink-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="gap-1 h-7 shrink-0"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          {t("widget.back")}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setPaletteOpen(!paletteOpen)}
+          className="h-7 w-7 p-0 shrink-0"
+          title={t("widget.palette.toggle")}
+        >
+          {paletteOpen ? (
+            <PanelLeftClose className="h-3.5 w-3.5" />
+          ) : (
+            <PanelLeftOpen className="h-3.5 w-3.5" />
+          )}
+        </Button>
+        <Div className="flex-1" />
+        {/* Version history navigation - only when chain exists */}
+        {versionChain.length > 1 && (
+          <>
+            <Div
+              className="flex items-center gap-0 shrink-0"
+              title="Version history"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionUndo}
+                disabled={!prevVersionId}
+                className="h-7 w-7 p-0"
+                title="Previous version"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Div className="flex items-center gap-0.5 px-1">
+                <History className="h-3 w-3 text-muted-foreground/50" />
+                <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
+                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
+                </Span>
+              </Div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionRedo}
+                disabled={!nextVersionId}
+                className="h-7 w-7 p-0"
+                title="Next version"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </Div>
+            <Div className="h-4 w-px bg-border shrink-0" />
+          </>
+        )}
+        {dirty && (
+          <Badge
+            variant="outline"
+            className="text-[10px] text-orange-500 border-orange-300 shrink-0"
+          >
+            {t("widget.unsaved")}
+          </Badge>
+        )}
+        {nodeCount > 0 && (
+          <Badge variant="outline" className="text-[10px] shrink-0">
+            {String(nodeCount)} {t("widget.nodes")}
+          </Badge>
+        )}
+        <Button
+          type="submit"
+          variant="default"
+          size="sm"
+          onClick={syncFormValues}
+          disabled={isSubmitting || name.trim().length === 0}
+          title={name.trim().length === 0 ? t("widget.nameMissing") : undefined}
+          className="gap-1 h-7 shrink-0"
+        >
+          {isSubmitting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Save className="h-3.5 w-3.5" />
+          )}
+          {isSubmitting
+            ? t("widget.saving")
+            : isNewGraph
+              ? t("widget.saveNew")
+              : t("widget.save")}
+        </Button>
+      </Div>
+
+      {/* Three-panel layout */}
+      <Div className="flex flex-1 min-h-0">
+        {/* Left Sidebar - Node Palette (240px) */}
+        {paletteOpen && (
+          <NodePalette
+            paletteSearch={paletteSearch}
+            setPaletteSearch={setPaletteSearch}
+            paletteGroups={paletteGroups}
+            onAddNode={stableAddNode}
+            t={t}
+          />
+        )}
+
+        {/* Center - React Flow Canvas */}
+        <Div className="flex-1 min-w-0 relative">
+          {nodeCount === 0 && <CanvasEmptyHint t={t} />}
+          <KeyboardHints t={t} />
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={handleEdgesChange}
+            onConnect={onConnect}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            fitView
+            colorMode="system"
+            deleteKeyCode={["Delete", "Backspace"]}
+            style={{ width: "100%", height: "100%" }}
+            onPaneClick={handlePaneClick}
+          >
+            <Background />
+            <Controls />
+            <MiniMap />
+          </ReactFlow>
+        </Div>
+
+        {/* Right Panel - Node Inspector or Graph Settings (280px) */}
+        <Card className="w-70 border-l border-t-0 border-b-0 border-r-0 rounded-none overflow-hidden shrink-0 flex flex-col">
+          {showNodeInspector ? (
+            <NodeInspector
+              nodeId={selectedNodeId}
+              nodeConfig={selectedNodeConfig}
+              category={
+                endpointInfoMap.get(selectedNodeConfig.endpointPath ?? "")
+                  ?.category ?? "other"
+              }
+              endpointInfo={
+                endpointInfoMap.get(selectedNodeConfig.endpointPath ?? "") ??
+                DEFAULT_INFO
+              }
+              edges={currentGraphEdges}
+              onUpdate={updateNodeConfig}
+              onDelete={deleteNode}
+              onClose={handlePaneClick}
+              onOpenEndpoint={handleOpenEndpoint}
+              onSelectNode={handleSelectNode}
+              t={t}
+              deleteConfirmNodeId={deleteConfirmNodeId}
+              setDeleteConfirmNodeId={setDeleteConfirmNodeId}
+            />
+          ) : (
+            <GraphSettingsPanel
+              name={name}
+              slug={slug}
+              description={description}
+              triggerType={triggerType}
+              cronSchedule={cronSchedule}
+              isNew={isNewGraph}
+              onNameChange={handleNameChange}
+              onSlugChange={handleSlugChange}
+              onDescriptionChange={handleDescriptionChange}
+              onTriggerTypeChange={handleTriggerTypeChange}
+              onCronScheduleChange={handleCronScheduleChange}
+              t={t}
+            />
+          )}
+        </Card>
+      </Div>
+    </Div>
+  );
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+
+export function EditGraphWidget(): React.JSX.Element {
+  const savedResponse = useWidgetValue<typeof definition.PUT>();
+  return (
+    <ReactFlowProvider>
+      <EditFormInner savedResponse={savedResponse} />
+    </ReactFlowProvider>
+  );
+}

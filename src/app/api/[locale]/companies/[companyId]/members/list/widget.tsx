@@ -1,20 +1,20 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Span } from "next-vibe-ui/ui/span";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
+import { Users } from "next-vibe/ui/web/ui/icons/Users";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { CompanyMemberRoleValue } from "../../../enum";

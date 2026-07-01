@@ -33,17 +33,17 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
+import { Platform } from "next-vibe/core/definition/platform";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { setFetchCacheContext } from "../../testing/fetch-cache";
 import {

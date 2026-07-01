@@ -3,22 +3,21 @@
  * Batch update positions for favorites
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { FAVORITES_REORDER_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
@@ -129,7 +128,7 @@ const { POST } = createEndpoint({
           requestData.positions.map((p) => [p.id, p.position] as const),
         );
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,

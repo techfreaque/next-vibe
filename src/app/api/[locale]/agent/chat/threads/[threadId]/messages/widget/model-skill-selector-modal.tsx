@@ -1,22 +1,21 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Send } from "next-vibe-ui/ui/icons/Send";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Send } from "next-vibe/ui/web/ui/icons/Send";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { H3, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
+import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector/index";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MessagesTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";

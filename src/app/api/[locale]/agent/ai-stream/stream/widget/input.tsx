@@ -4,39 +4,42 @@
  * Chat Input Component
  * Main input area for sending messages with voice support
  */
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { Phone } from "next-vibe-ui/ui/icons/Phone";
-import { Send } from "next-vibe-ui/ui/icons/Send";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Kbd } from "next-vibe-ui/ui/kbd";
+import { cn } from "next-vibe/core/utils/utils";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
+import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Form } from "next-vibe/ui/web/ui/form/form";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { Phone } from "next-vibe/ui/web/ui/icons/Phone";
+import { Send } from "next-vibe/ui/web/ui/icons/Send";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Kbd } from "next-vibe/ui/web/ui/kbd";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
-import { Textarea } from "next-vibe-ui/ui/textarea";
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
-import { P } from "next-vibe-ui/ui/typography";
+} from "next-vibe/ui/web/ui/tooltip";
+import { P } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -76,10 +79,6 @@ import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-butt
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
-import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
 import { FileUploadButton } from "../hooks/file-upload-button";

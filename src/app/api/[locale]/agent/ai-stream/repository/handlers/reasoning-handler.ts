@@ -2,8 +2,9 @@
  * ReasoningHandler - Handles reasoning blocks for o1-style models
  */
 
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { MessageDbWriter } from "../core/message-db-writer";
 

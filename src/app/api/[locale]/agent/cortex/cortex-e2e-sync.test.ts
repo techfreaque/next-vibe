@@ -24,6 +24,12 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
@@ -56,13 +62,7 @@ import {
   collectCursors,
   ensureProvidersRegistered,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
@@ -3179,9 +3179,9 @@ describe("Mount hierarchy: /tasks", () => {
     }
 
     const { cronTasks } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+      await import("next-vibe/tasks/cron/db");
     const { CronTaskPriority, TaskCategory } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+      await import("next-vibe/tasks/enum");
     await db
       .insert(cronTasks)
       .values({
@@ -3204,7 +3204,7 @@ describe("Mount hierarchy: /tasks", () => {
       return;
     }
     const { cronTasks } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+      await import("next-vibe/tasks/cron/db");
     await db.delete(cronTasks).where(eq(cronTasks.id, TK_TASK_ID));
   }, MOUNT_TIMEOUT);
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
-import { H2, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Card, CardContent } from "next-vibe/ui/web/ui/card";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H2, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

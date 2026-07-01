@@ -1,6 +1,5 @@
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
-
-import { defaultLocale } from "@/i18n/core/config";
 
 import { NotFoundBackButton } from "./[...notFound]/not-found-client";
 

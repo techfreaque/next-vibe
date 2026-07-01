@@ -1,14 +1,13 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { cn } from "next-vibe/core/utils/utils";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 import { useMemo, useSyncExternalStore } from "react";
 
@@ -23,11 +22,12 @@ function useIsClient(): boolean {
   );
 }
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import {
   type ChatModelId,
@@ -36,7 +36,6 @@ import {
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { SkillGetResponseOutput } from "../../../../skills/[id]/definition";
 import { useSkill } from "../../../../skills/[id]/hooks";

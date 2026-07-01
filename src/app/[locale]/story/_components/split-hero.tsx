@@ -1,24 +1,24 @@
 "use client";
 
-import { getElementById } from "next-vibe-ui/lib/dom";
-import { Br } from "next-vibe-ui/ui/br";
-import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Server } from "next-vibe-ui/ui/icons/Server";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getElementById } from "next-vibe/ui/web/lib/dom";
+import { Br } from "next-vibe/ui/web/ui/br";
+import type { ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { Code } from "next-vibe/ui/web/ui/icons/Code";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { Server } from "next-vibe/ui/web/ui/icons/Server";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, P } from "next-vibe/ui/web/ui/typography";
 import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

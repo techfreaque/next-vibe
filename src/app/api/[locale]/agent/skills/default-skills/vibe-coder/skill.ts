@@ -1,3 +1,8 @@
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
+
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
 import {
@@ -8,10 +13,6 @@ import {
 } from "@/app/api/[locale]/agent/cortex/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/web-search/constants";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

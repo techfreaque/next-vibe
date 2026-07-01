@@ -6,12 +6,11 @@
  * Used in flat and threaded views when a user clicks "Reply".
  */
 
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
 import type { JSX } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useReplyEditor } from "../hooks/use-reply-editor";
 import { BaseMessageInput } from "./base-message-input";

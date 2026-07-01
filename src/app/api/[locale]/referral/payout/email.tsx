@@ -5,12 +5,14 @@
 
 import { Hr, Section, Text as Span } from "@react-email/components";
 import { eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -21,10 +23,8 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { db } from "@/app/api/[locale]/system/db";
 import { users } from "@/app/api/[locale]/user/db";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../config";
 import { PayoutCurrency } from "../enum";

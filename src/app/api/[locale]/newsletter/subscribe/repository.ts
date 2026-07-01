@@ -6,20 +6,19 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
-import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { getNewsletterSubscriptionStatus } from "next-vibe/identity/lead/enum";
+import { LeadsRepository } from "next-vibe/identity/lead/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";

@@ -22,20 +22,20 @@ import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
 import { eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { CallbackMode } from "next-vibe/execute-tool/constants";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { CodingAgentT } from "./i18n";

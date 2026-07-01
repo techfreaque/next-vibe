@@ -4,9 +4,8 @@
  * Each thread (including 'new' threads per folder) gets its own draft storage
  */
 
-import { storage } from "next-vibe-ui/lib/storage";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { storage } from "next-vibe/ui/web/lib/storage";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";

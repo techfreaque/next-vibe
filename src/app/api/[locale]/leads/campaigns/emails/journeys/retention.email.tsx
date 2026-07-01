@@ -4,6 +4,7 @@
  * Tone: Supportive, value-reinforcing. Focus on new features, tips, celebrating usage milestones, encouraging continued subscription.
  */
 
+import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
@@ -13,7 +14,6 @@ import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smt
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { configScopedTranslation } from "@/config/i18n";
 
-import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,
   EmailTemplateFunction,

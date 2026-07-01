@@ -1,7 +1,10 @@
 "use client";
 
 // Inspired by react-hot-toast library
-import type { ToastActionElement, ToastRootProps } from "next-vibe-ui/ui/toast";
+import type {
+  ToastActionElement,
+  ToastRootProps,
+} from "next-vibe/ui/web/ui/toast";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 

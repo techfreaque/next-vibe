@@ -12,16 +12,13 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { streamText } from "ai";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { type ChatModelId, getChatModelById } from "../../models";
 import { AbortReason, StreamAbortError } from "../core/constants";
@@ -165,7 +162,7 @@ export class MidStreamCompactingHandler {
     const pendingTail = [...ctx.pendingToolMessages.values()].at(-1);
     let compactingParentId = pendingTail?.messageId ?? ctx.currentParentId;
     if (!pendingTail) {
-      const { db } = await import("@/app/api/[locale]/system/db");
+      const { db } = await import("next-vibe/database");
       const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
       const { eq, desc } = await import("drizzle-orm");
       const [dbLeaf] = await db

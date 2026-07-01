@@ -7,8 +7,8 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/regis
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
 import { scopedTranslation as resetPasswordScopedTranslation } from "../i18n";

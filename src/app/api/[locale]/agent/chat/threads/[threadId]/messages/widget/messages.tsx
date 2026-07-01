@@ -1,24 +1,29 @@
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { parseError } from "next-vibe/shared/utils";
-import { getElementById, querySelector } from "next-vibe-ui/lib/dom";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/lib/location";
-import { Button } from "next-vibe-ui/ui/button";
-import type { DivRefObject } from "next-vibe-ui/ui/div";
-import { Div } from "next-vibe-ui/ui/div";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Span } from "next-vibe-ui/ui/span";
+import { success } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { cn } from "next-vibe/core/utils/utils";
+import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { getElementById, querySelector } from "next-vibe/ui/web/lib/dom";
+import {
+  getCurrentUrl,
+  silentReplaceState,
+} from "next-vibe/ui/web/lib/location";
+import { Button } from "next-vibe/ui/web/ui/button";
+import type { DivRefObject } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useWidgetSelector } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -38,7 +43,6 @@ import {
 } from "@/app/[locale]/chat/lib/config/constants";
 import {
   buildMessagePath,
-  getDirectReplies,
   getRootMessages,
 } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
@@ -48,14 +52,13 @@ import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context"
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import { getDirectReplies } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import characterDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { platform } from "@/config/env-client";
 
 import type { MessageMetadata } from "../../../../db";

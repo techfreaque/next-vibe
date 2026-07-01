@@ -12,7 +12,7 @@ import { execFile as execFileCb } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   type ContentBlock,
   type ContentResponse,
@@ -20,11 +20,11 @@ import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuid } from "uuid";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 
 import type { DesktopT } from "../i18n";
 

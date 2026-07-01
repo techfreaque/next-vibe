@@ -5,18 +5,18 @@
 
 "use client";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import { useToast } from "next-vibe-ui/hooks/use-toast";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/payment/utils/redirect";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { configScopedTranslation } from "@/config/i18n";
-import { useTranslation } from "@/i18n/core/client";
 
 import definitions, { type CreditsGetResponseOutput } from "./definition";
 import historyDefinitions from "./history/definition";

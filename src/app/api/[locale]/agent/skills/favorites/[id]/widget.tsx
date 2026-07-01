@@ -4,28 +4,30 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { Film } from "next-vibe-ui/ui/icons/Film";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
-import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { Span } from "next-vibe-ui/ui/span";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import helpDefinitions from "next-vibe/help-tool/definition";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
+import { Film } from "next-vibe/ui/web/ui/icons/Film";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Input } from "next-vibe/ui/web/ui/input";
+import { Label } from "next-vibe/ui/web/ui/label";
+import { Skeleton } from "next-vibe/ui/web/ui/skeleton";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -35,12 +37,12 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
-import { IconFieldWidget } from "next-vibe-ui/unified/form-fields/icon-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -80,8 +82,6 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import {
   chatManualModelSelectionSchema,

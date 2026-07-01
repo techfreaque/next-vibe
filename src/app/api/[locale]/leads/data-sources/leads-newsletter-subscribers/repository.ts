@@ -10,18 +10,16 @@ import { and, count, isNotNull, lt } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
+} from "next-vibe/core/route/response.schema";
 import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
-
-import { leads } from "../../db";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { RESOLUTION_MS } from "next-vibe/core/utils/dataflow/shared/fields";
+import { fillGaps } from "next-vibe/core/utils/dataflow/shared/range";
+import { db } from "next-vibe/database";
+import { leads } from "next-vibe/identity/lead/db";
 
 export class QueryLeadsNewsletterSubscribersRepository {
   static async queryLeadsNewsletterSubscribers(data: {

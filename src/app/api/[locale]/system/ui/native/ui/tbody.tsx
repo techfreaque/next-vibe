@@ -1,0 +1,37 @@
+import { styled } from "nativewind";
+import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import type { TbodyProps } from "next-vibe/ui/web/ui/tbody";
+import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
+import * as React from "react";
+import { View } from "react-native";
+
+// Type-safe View with className support (NativeWind)
+const StyledView = styled(View);
+
+/**
+ * Platform-agnostic Tbody component for native
+ * On native, this is a View component (table tbody doesn't exist in RN)
+ * Part of the table component structure
+ * Supports both className (via NativeWind) and style (via React.CSSProperties)
+ */
+export function Tbody({
+  children,
+  className,
+  style,
+  id,
+}: TbodyProps): React.JSX.Element {
+  // Convert CSS style to React Native ViewStyle if provided
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  return (
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
+      nativeID={id}
+    >
+      {children}
+    </StyledView>
+  );
+}

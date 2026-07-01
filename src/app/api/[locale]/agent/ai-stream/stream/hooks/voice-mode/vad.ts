@@ -6,7 +6,7 @@
 
 "use client";
 
-import { getMicrophoneStream } from "next-vibe-ui/lib/media";
+import { getMicrophoneStream } from "next-vibe/ui/web/lib/media";
 
 export interface VadConfig {
   /** How long silence must hold before triggering send (ms). Default: 800 */

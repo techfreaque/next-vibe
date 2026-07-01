@@ -4,9 +4,8 @@
 
 import "server-only";
 
+import { defineEnv } from "next-vibe/env/define-env";
 import { z } from "zod";
-
-import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
 import { AwsSnsAwsRegions } from "./providers/aws-sns-enum";
 import { SmsProviders } from "./utils-enum";

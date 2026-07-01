@@ -3,18 +3,18 @@
  * Implements ThreadByIdRepository static interface for React Native
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   ThreadDeleteResponseOutput,

@@ -1,18 +1,18 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Scale } from "next-vibe-ui/ui/icons/Scale";
-import { Li } from "next-vibe-ui/ui/li";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
-import { Ul } from "next-vibe-ui/ui/ul";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { Scale } from "next-vibe/ui/web/ui/icons/Scale";
+import { Li } from "next-vibe/ui/web/ui/li";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { Ul } from "next-vibe/ui/web/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { TermsClientInteraction } from "./_components/terms-client-content";
 import { TermsContactButton } from "./_components/terms-contact-button";

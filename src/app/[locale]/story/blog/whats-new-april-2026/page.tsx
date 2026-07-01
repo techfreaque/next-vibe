@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { Link } from "next-vibe-ui/ui/link";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { H1, H2, Muted, P } from "next-vibe/ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/skills/config";
 import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 

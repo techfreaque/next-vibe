@@ -14,13 +14,13 @@
 import "server-only";
 
 import type { GeneratedFile } from "ai";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 import type { ToolCall } from "../../../chat/db";
 import type { StreamContext } from "../core/stream-context";

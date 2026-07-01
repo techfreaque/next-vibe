@@ -1,11 +1,11 @@
 import "server-only";
 
+import { Methods } from "next-vibe/core/definition/enums";
 /**
  * Batch Operations API Route Handler
  * Handles PATCH requests for batch updating leads
  */
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import definitions from "./definition";
 import { BatchRepository } from "./repository";

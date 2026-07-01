@@ -1,6 +1,5 @@
 import { Redirect } from "expo-router";
-
-import { defaultLocale } from "@/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 
 /**
  * Root Index - Redirects to default locale

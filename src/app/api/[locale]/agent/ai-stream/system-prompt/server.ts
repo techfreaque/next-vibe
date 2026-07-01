@@ -1,6 +1,11 @@
 import "server-only";
 
 import { and, count, eq, like } from "drizzle-orm";
+import { languageConfig } from "next-vibe/core/i18n";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { db } from "next-vibe/database";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
 import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
@@ -15,13 +20,8 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { db } from "@/app/api/[locale]/system/db";
-import { cronTasks as cronTasksTable } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
-import { languageConfig } from "@/i18n";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import type { PromptContextData } from "./prompt";
 

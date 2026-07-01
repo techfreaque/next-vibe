@@ -5,17 +5,17 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { useToast } from "next-vibe-ui/hooks/use-toast";
+import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 import { useMemo, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { FormAlertState } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import type { ApiFormReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
-import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
-import { useTranslation } from "@/i18n/core/client";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { FormAlertState } from "next-vibe/platforms/react/hooks/endpoint-types";
+import type { ApiFormReturn } from "next-vibe/platforms/react/hooks/types";
+import { useApiForm } from "next-vibe/platforms/react/hooks/use-api-mutation-form";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 
 import resetPasswordRequestEndpoint from "./definition";
-import type { JwtPayloadType } from "../../../auth/types";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { scopedTranslation } from "./i18n";
 
 /****************************

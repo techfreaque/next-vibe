@@ -12,7 +12,7 @@
  * Nothing is written to DB. Everything resolves at request time.
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { CortexViewType } from "../enum";
 import { scopedTranslation } from "../i18n";

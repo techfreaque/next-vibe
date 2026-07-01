@@ -1,10 +1,11 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
@@ -12,7 +13,6 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { ViewModeToggle } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/view-mode-toggle";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatToolbarProps {
   locale: CountryLanguage;

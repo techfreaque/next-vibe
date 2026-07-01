@@ -17,7 +17,7 @@ import "server-only";
 
 // Load env vars (.env) and derive NEXT_PUBLIC_AGENT_* flags BEFORE any
 // module that reads agentEnvAvailability is imported.
-import { loadEnvironment } from "@/app/api/[locale]/system/unified-interface/cli/runtime/environment";
+import { loadEnvironment } from "next-vibe/platforms/cli/runtime/environment";
 
 loadEnvironment();
 

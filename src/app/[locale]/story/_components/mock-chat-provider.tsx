@@ -6,9 +6,12 @@
  * can render without the full chat infrastructure.
  */
 
-import type { ReactWidgetContext } from "next-vibe-ui/unified/_shared/react-types";
-import { WidgetContextStoreContext } from "next-vibe-ui/unified/_shared/use-widget-context";
-import type { WidgetContextStoreType } from "next-vibe-ui/unified/_shared/widget-context-store";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import type { ReactWidgetContext } from "next-vibe/unified-ui/_shared/react-types";
+import { WidgetContextStoreContext } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { WidgetContextStoreType } from "next-vibe/unified-ui/_shared/widget-context-store";
 import type { JSX, ReactNode } from "react";
 import { useMemo, useRef } from "react";
 import { create } from "zustand";
@@ -17,9 +20,6 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
   total: 0,

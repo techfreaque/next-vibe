@@ -1,11 +1,12 @@
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+
 import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   SKILL_CREATOR_ID,
   SKILLS_LIST_ALIAS,
 } from "@/app/api/[locale]/agent/skills/constants";
-import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 
 import {
   CHAT_SETTINGS_GET_ALIAS,

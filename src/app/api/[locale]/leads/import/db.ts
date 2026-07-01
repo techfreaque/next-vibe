@@ -14,10 +14,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-
-import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
-
-import { users } from "../../user/db";
+import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
 import {
   EmailCampaignStage,
   EmailCampaignStageDB,
@@ -25,7 +22,9 @@ import {
   LeadSourceDB,
   LeadStatus,
   LeadStatusDB,
-} from "../enum";
+} from "next-vibe/identity/lead/enum";
+
+import { users } from "../../user/db";
 import { CsvImportJobStatus, CsvImportJobStatusDB } from "./enum";
 
 /**

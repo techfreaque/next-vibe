@@ -1,10 +1,11 @@
 /* eslint-disable i18next/no-literal-string */
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+
 import type {
   MediaCapabilitiesParams,
   SystemPromptFragment,
 } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 // ─── Unified prompt context data ──────────────────────────────────────────────
 // All fields loaded by server.ts / client.ts - used across all fragments in this module.

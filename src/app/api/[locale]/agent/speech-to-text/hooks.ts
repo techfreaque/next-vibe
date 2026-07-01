@@ -5,20 +5,20 @@
 
 "use client";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import { downloadBinaryFile } from "next-vibe-ui/lib/download";
-import { getMicrophoneStream, getUserAgent } from "next-vibe-ui/lib/media";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { downloadBinaryFile } from "next-vibe/ui/web/lib/download";
+import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/web/lib/media";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import speechToTextDefinitions from "./definition";
 

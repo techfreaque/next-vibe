@@ -7,7 +7,7 @@ import "server-only";
  */
 import { createHash } from "node:crypto";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 

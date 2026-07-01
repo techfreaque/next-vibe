@@ -7,7 +7,12 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { Div } from "next-vibe/ui/web/ui/div";
 import type { JSX } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
@@ -21,14 +26,9 @@ import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/skills/[id
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./i18n";
 import {
@@ -265,7 +265,7 @@ export async function tanstackLoader({
   // direct DB lookup for the skill's userId to handle PUBLIC-owned skills too.
   let leadMagnetConfig: LeadMagnetConfigData | null = null;
   {
-    const { db } = await import("@/app/api/[locale]/system/db");
+    const { db } = await import("next-vibe/database");
     const { leadMagnetConfigs } =
       await import("@/app/api/[locale]/lead-magnet/db");
     const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");

@@ -11,7 +11,12 @@
 
 import "server-only";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
@@ -22,11 +27,6 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { MessageMetadata, ToolCall } from "../../../chat/db";
 import type { ThreadStreamingState } from "../../../chat/enum";

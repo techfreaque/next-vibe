@@ -3,11 +3,17 @@
  * Defines endpoints for listing and creating chat threads
  */
 
-import { lazy } from "react";
-import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
+import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 import {
   customWidgetObject,
   objectField,
@@ -15,18 +21,12 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
-import { dateSchema } from "../../../shared/types/common.schema";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+
 import { DefaultFolderId } from "../config";
 import {
   ThreadStatus,
@@ -680,7 +680,7 @@ const { POST } = createEndpoint({
           requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
         const threadId = requestData.id;
         const { apiClient } =
-          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          await import("next-vibe/platforms/react/hooks/store");
         if (!threadId) {
           return;
         }

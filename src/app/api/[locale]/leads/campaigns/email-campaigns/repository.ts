@@ -7,42 +7,36 @@ import "server-only";
 
 import { render } from "@react-email/render";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { Environment } from "next-vibe/shared/utils/env-util";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { Environment } from "next-vibe/env/env-util";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { emailJourneyVariants, leads } from "next-vibe/identity/lead/db";
+import type { EmailCampaignStageValue } from "next-vibe/identity/lead/enum";
+import {
+  EmailCampaignStage as EmailCampaignStageEnum,
+  EmailProvider,
+  LeadStatus,
+} from "next-vibe/identity/lead/enum";
+import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
+import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import {
-  cronTasks,
-  type NewCronTask,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
-import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
-import { emailJourneyVariants, leads } from "../../db";
-import type { EmailCampaignStageValue } from "../../enum";
-import {
-  EmailCampaignStage as EmailCampaignStageEnum,
-  EmailProvider,
-  LeadStatus,
-} from "../../enum";
-import type { LeadWithEmailType } from "../../types";
 import { emailRendererService } from "../emails/services/renderer";
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import type {

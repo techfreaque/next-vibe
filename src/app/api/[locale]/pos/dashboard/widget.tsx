@@ -1,17 +1,17 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
-import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
-import { Span } from "next-vibe-ui/ui/span";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Monitor } from "next-vibe/ui/web/ui/icons/Monitor";
+import { ShoppingCart } from "next-vibe/ui/web/ui/icons/ShoppingCart";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { posTerminalNameMap } from "../terminal/list/widget";

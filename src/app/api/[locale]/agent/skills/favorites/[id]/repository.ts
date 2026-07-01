@@ -6,13 +6,22 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
@@ -20,12 +29,6 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import {
   ensureUniqueSlug,

@@ -14,16 +14,16 @@
  */
 
 import { eq } from "drizzle-orm";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { companies, companyMembers } from "../../companies/db";
 import { CompanyMemberRole } from "../../companies/enum";

@@ -1,24 +1,23 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { Div } from "next-vibe-ui/ui/div";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
-import { Square } from "next-vibe-ui/ui/icons/Square";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
-import { X } from "next-vibe-ui/ui/icons/X";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
+import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
+import { Square } from "next-vibe/ui/web/ui/icons/Square";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Volume2 } from "next-vibe/ui/web/ui/icons/Volume2";
+import { X } from "next-vibe/ui/web/ui/icons/X";
+import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type React from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";

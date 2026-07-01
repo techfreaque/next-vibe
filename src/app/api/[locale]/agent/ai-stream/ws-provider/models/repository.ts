@@ -3,7 +3,7 @@ import "server-only";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";

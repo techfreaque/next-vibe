@@ -5,25 +5,25 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Div } from "next-vibe-ui/ui/div";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Pre } from "next-vibe-ui/ui/pre";
-import { Span } from "next-vibe-ui/ui/span";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
+import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
+import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
+import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
+import { SquareCheck } from "next-vibe/ui/web/ui/icons/SquareCheck";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { Pre } from "next-vibe/ui/web/ui/pre";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetDisabled,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
 import { CortexNav } from "../_shared/cortex-nav";
 import type definition from "./definition";

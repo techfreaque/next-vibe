@@ -5,16 +5,16 @@
 
 "use client";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { useEndpointCreate } from "next-vibe/platforms/react/hooks/use-endpoint-create";
 import { useCallback } from "react";
 
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { type TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { useEndpointCreate } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint-create";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";

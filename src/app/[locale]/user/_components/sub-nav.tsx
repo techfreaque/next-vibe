@@ -1,14 +1,13 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { Link } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
 

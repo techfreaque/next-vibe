@@ -8,13 +8,13 @@
 
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetSelector,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, {
   useCallback,
   useContext,
@@ -92,7 +92,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
       return;
     }
     const { executeQuery } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/query-executor");
+      await import("next-vibe/platforms/react/hooks/query-executor");
     const response = await executeQuery<typeof messagesDefinition.GET>({
       endpoint: messagesDefinition.GET,
       logger,

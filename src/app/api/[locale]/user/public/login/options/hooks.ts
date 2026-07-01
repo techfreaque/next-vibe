@@ -1,9 +1,9 @@
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 
 import loginEndpoints from "./definition";
-import type { JwtPayloadType } from "../../../auth/types";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 /**
  * Hook to fetch login options from the API

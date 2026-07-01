@@ -13,7 +13,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { sttModelDefinitions } from "../../../speech-to-text/models";
 import { ApiProvider } from "../../models";

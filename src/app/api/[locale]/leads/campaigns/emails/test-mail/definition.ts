@@ -3,9 +3,21 @@
  * Defines endpoint for sending test emails with custom lead data
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "next-vibe/core/i18n/core/config";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -15,34 +27,22 @@ import {
   LeadSourceOptions,
   LeadStatus,
   LeadStatusOptions,
-} from "@/app/api/[locale]/leads/enum";
-import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+} from "next-vibe/identity/lead/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
   objectField,
   requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
 import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/messenger/accounts/enum";
 
 import { scopedTranslation } from "./i18n";
 

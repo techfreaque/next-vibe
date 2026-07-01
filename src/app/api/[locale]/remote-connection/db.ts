@@ -17,9 +17,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import { z } from "zod";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { users } from "@/app/api/[locale]/user/db";
 
 /**
@@ -93,7 +93,6 @@ export const SYNC_DOMAINS = [
   "skills",
   "favorites",
   "threads",
-  "chat",
 ] as const;
 
 export type SyncDomain = (typeof SYNC_DOMAINS)[number];
@@ -245,7 +244,7 @@ export const remoteConnections = pgTable(
     // ── Transport configuration ─────────────────────────────────────────────
 
     /**
-     * How this connection communicates with the remote.
+     * How THIS side reaches the remote (our send leg).
      * Auto-detected on connect (ping → direct-http if reachable, else reverse-ws).
      */
     transportMode: text("transport_mode", {
@@ -253,6 +252,19 @@ export const remoteConnections = pgTable(
     })
       .notNull()
       .default("reverse-ws"),
+
+    /**
+     * How the REMOTE reaches THIS side (the peer's send leg — mirror of the
+     * peer's own transportMode). Kept in sync with the peer on connect/edit.
+     * Drives which side opens the reverse-ws connector: a side opens an outbound
+     * connector (subscribing to the peer's hub) exactly when the peer reaches it
+     * via reverse-ws, i.e. remoteTransportMode === "reverse-ws".
+     */
+    remoteTransportMode: text("remote_transport_mode", {
+      enum: ["reverse-ws", "direct-http", "cloud-only"],
+    })
+      .notNull()
+      .default("direct-http"),
 
     /**
      * Where threads created over this connection are stored.

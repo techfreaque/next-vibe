@@ -7,19 +7,19 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 import { desc, eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next-vibe-ui/lib/request";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import type { NextRequest } from "next-vibe/ui/web/lib/request";
 
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";

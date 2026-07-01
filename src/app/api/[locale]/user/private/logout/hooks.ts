@@ -5,19 +5,19 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { useToast } from "next-vibe-ui/hooks/use-toast";
-import { assignUrl } from "next-vibe-ui/lib/location";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
+import { authClientRepository } from "next-vibe/identity/auth/repository-client";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useToast } from "next-vibe/ui/web/hooks/use-toast";
+import { assignUrl } from "next-vibe/ui/web/lib/location";
 import { useCallback } from "react";
 
 import definitions from "@/app/api/[locale]/credits/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useTranslation } from "@/i18n/core/client";
 
-import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
-import { scopedTranslation as authScopedTranslation } from "../../auth/i18n";
-import { authClientRepository } from "../../auth/repository-client";
-import type { JwtPayloadType } from "../../auth/types";
+import { useApiMutation } from "../../../system/platforms/react/hooks/use-api-mutation";
 import logoutEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 

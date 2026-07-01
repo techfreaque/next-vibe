@@ -12,17 +12,16 @@
 import "server-only";
 
 import { and, eq, or } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { remoteConnections } from "../../db";
 import type { ReverseUpdatePatchRequestOutput } from "./definition";
@@ -108,11 +107,11 @@ export class ReverseConnectionUpdateRepository {
     if (remoteTransportMode !== undefined) {
       if (remoteTransportMode === "reverse-ws") {
         const { restartConnection } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+          await import("next-vibe/realtime/connector");
         await restartConnection(localInstanceId);
       } else {
         const { closeConnection } =
-          await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+          await import("next-vibe/realtime/connector");
         closeConnection(localInstanceId);
       }
     }

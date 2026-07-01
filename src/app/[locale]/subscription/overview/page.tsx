@@ -1,8 +1,7 @@
 export const dynamic = "force-dynamic";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { subscriptionLoader } from "../shared-loader";
 import { OverviewPageClient } from "./page-client";

@@ -10,16 +10,15 @@ import { and, eq, gte, lte, sql, sum } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
+} from "next-vibe/core/route/response.schema";
 import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
+} from "next-vibe/core/utils/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/core/utils/dataflow/shared/query-utils";
+import { fillGaps } from "next-vibe/core/utils/dataflow/shared/range";
+import { db } from "next-vibe/database";
 
 import { paymentTransactions } from "../../db";
 import { PaymentStatus } from "../../enum";

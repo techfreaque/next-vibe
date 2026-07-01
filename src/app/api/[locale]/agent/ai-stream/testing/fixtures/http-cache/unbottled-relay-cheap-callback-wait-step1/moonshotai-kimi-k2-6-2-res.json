@@ -1,0 +1,31 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a1409bf2794718ed-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 22:29:21 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782858560-JrCbwhGKu7Ffaof6kpn5"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782858560-JrCbwhGKu7Ffaof6kpn5\",\"object\":\"chat.completion.chunk\",\"created\":1782858560,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The result shows a taskId: \\\"local-bg-functions-execute-tool-7\\\". It does NOT have an imageUrl. The immediate result is just a hint and taskId. This looks correct.\\n\\nI should respond with STEP_OK and the taskId.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The result shows a taskId: \\\"local-bg-functions-execute-tool-7\\\". It does NOT have an imageUrl. The immediate result is just a hint and taskId. This looks correct.\\n\\nI should respond with STEP_OK and the taskId.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858560-JrCbwhGKu7Ffaof6kpn5\",\"object\":\"chat.completion.chunk\",\"created\":1782858560,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"STEP\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858560-JrCbwhGKu7Ffaof6kpn5\",\"object\":\"chat.completion.chunk\",\"created\":1782858560,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_OK taskId=local-bg-functions-execute-tool-7\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782858560-JrCbwhGKu7Ffaof6kpn5\",\"object\":\"chat.completion.chunk\",\"created\":1782858560,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782858560-JrCbwhGKu7Ffaof6kpn5\",\"object\":\"chat.completion.chunk\",\"created\":1782858560,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":12400,\"completion_tokens\":66,\"total_tokens\":12466,\"cost\":0.002861028,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":10752,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.002861028,\"upstream_inference_prompt_cost\":0.002635968,\"upstream_inference_completions_cost\":0.00022506},\"completion_tokens_details\":{\"reasoning_tokens\":51,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

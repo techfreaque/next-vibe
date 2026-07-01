@@ -3,7 +3,7 @@
  * Centralized utilities for handling ErrorResponseType serialization/deserialization
  */
 
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 
 /**
  * Serialize ErrorResponseType to JSON string for storage/transmission

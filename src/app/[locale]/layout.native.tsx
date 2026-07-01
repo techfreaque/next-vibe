@@ -9,13 +9,13 @@
 
 import { PortalHost } from "@rn-primitives/portal";
 import { Slot, useLocalSearchParams } from "expo-router";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Body } from "next-vibe/ui/native/ui/body";
 import type { JSX } from "react";
 
 import { RootProviders } from "@/app/[locale]/layout-shared";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { Body } from "@/packages/next-vibe-ui/native/ui/body";
 
 const nativeAvailability: AgentEnvAvailability = {
   openRouter: envClient.NEXT_PUBLIC_AGENT_OPEN_ROUTER,

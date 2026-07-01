@@ -1,0 +1,133 @@
+"use client";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { cn } from "next-vibe/core/utils/utils";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "next-vibe/ui/web/ui/avatar";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "next-vibe/unified-ui/_shared/react-types";
+import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { getTextSizeClassName } from "next-vibe/unified-ui/_shared/widget-helpers";
+import type { JSX } from "react";
+
+import type { AvatarWidgetConfig } from "./types";
+
+/**
+ * Avatar Widget - Displays user avatars with image and fallback support
+ *
+ * Renders circular avatar with image URL and fallback initials.
+ * Automatically translates alt text values.
+ *
+ * Features:
+ * - Image display with automatic loading and error handling
+ * - Fallback text (initials) when image unavailable
+ * - Accessible with alt text support
+ * - Circular styling with proper aspect ratio
+ * - Graceful degradation to initials
+ *
+ * UI Config Options:
+ * - src: Image URL or field name containing URL
+ * - alt: Translation key for alt text (TKey)
+ * - fallback: Fallback text/initials (e.g., "JD", "?")
+ *
+ * Data Format:
+ * - string: Direct image URL
+ * - object: { src: string, fallback?: string, alt?: string }
+ *   - src: Image URL (not translated)
+ *   - fallback: Initials or fallback text (not translated)
+ *   - alt: Alt text (translated via context.t)
+ * - null/undefined: Shows fallback initials
+ *
+ * @param value - Avatar data (URL or avatar object)
+ * @param field - Field definition with UI config
+ * @param context - Rendering context with translator
+ * @param className - Optional CSS classes
+ */
+
+export default function AvatarWidget<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
+  TUsage extends FieldUsageConfig,
+  TSchema extends StringWidgetSchema,
+>(
+  props:
+    | ReactStaticWidgetProps<
+        TEndpoint,
+        TUsage,
+        AvatarWidgetConfig<TKey, TUsage, "widget", never>
+      >
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        AvatarWidgetConfig<TKey, TUsage, "primitive", TSchema>
+      >,
+): JSX.Element {
+  const t = useWidgetTranslation<TEndpoint>();
+  const form = useWidgetForm();
+  const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
+  const {
+    src: configSrc,
+    alt: altKey,
+    fallback: configFallback,
+    size,
+    fallbackSize,
+    className,
+  } = field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value: string | undefined;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value ?? undefined;
+    }
+  } else if ("value" in field) {
+    value = field.value ?? undefined;
+  }
+
+  // Get classes from config (no hardcoding!)
+  const fallbackSizeClass = getTextSizeClassName(fallbackSize);
+
+  // Avatar size mapping
+  const avatarSizeClass =
+    size === "xs"
+      ? "h-6 w-6"
+      : size === "sm"
+        ? "h-8 w-8"
+        : size === "lg"
+          ? "h-12 w-12"
+          : size === "xl"
+            ? "h-16 w-16"
+            : "h-10 w-10";
+
+  // Use config values as fallback, then data values
+  const src = value || configSrc;
+  const fallback = configFallback || "?";
+  const alt = altKey ? t(altKey) : value || "Avatar";
+
+  return (
+    <Avatar className={cn(avatarSizeClass, className)}>
+      {src && <AvatarImage src={src} alt={alt} />}
+      <AvatarFallback
+        className={cn("font-medium", fallbackSizeClass || "text-sm")}
+      >
+        {fallback}
+      </AvatarFallback>
+    </Avatar>
+  );
+}
+
+AvatarWidget.displayName = "AvatarWidget";

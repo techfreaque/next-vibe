@@ -3,21 +3,17 @@
  * POST endpoint to prune old error logs (called by cron daily)
  */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { scopedTranslation } from "next-vibe/tasks/i18n";
+import { objectField, responseField } from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
 

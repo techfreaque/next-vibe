@@ -4,16 +4,17 @@
  */
 
 "use client";
-
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { List } from "next-vibe-ui/ui/icons/List";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/core/utils/utils";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
+import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
+import { List } from "next-vibe/ui/web/ui/icons/List";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -21,18 +22,15 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { useCallback } from "react";
-
-import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 
@@ -85,8 +83,7 @@ export function LeadsBatchUpdateContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },
@@ -412,8 +409,7 @@ export function LeadsBatchDeleteContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },

@@ -2,9 +2,8 @@
  * Contact Module Client Environment Configuration
  */
 
+import { defineEnvClient } from "next-vibe/env/define-env-client";
 import { z } from "zod";
-
-import { defineEnvClient } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env-client";
 
 export const {
   envClient: contactClientEnv,

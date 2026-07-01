@@ -4,13 +4,13 @@
  */
 
 import { eq as eqOp } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contactClientRepository } from "../contact/repository-client";
 import { creditPacks } from "../credits/db";

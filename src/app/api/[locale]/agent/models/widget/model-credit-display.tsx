@@ -11,16 +11,18 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
-import { Strong } from "next-vibe-ui/ui/strong";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Strong } from "next-vibe/ui/web/ui/strong";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
@@ -33,8 +35,6 @@ import { musicGenModelOptions } from "@/app/api/[locale]/agent/music-generation/
 import { sttModelOptions } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelOptions } from "@/app/api/[locale]/agent/video-generation/models";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "../../../products/constants";
 import {

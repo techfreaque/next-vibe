@@ -1,18 +1,18 @@
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { buildSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/builder";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

@@ -3,15 +3,14 @@
  * Similar to useMessageEditor but starts empty and uses parentMessageId as draft key
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { DivRefObject } from "next-vibe-ui/ui/div";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { DivRefObject } from "next-vibe/ui/web/ui/div";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
-} from "next-vibe-ui/ui/textarea";
+} from "next-vibe/ui/web/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 export interface UseReplyEditorOptions {
   parentMessageId: string;

@@ -1,8 +1,9 @@
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+
 import {
   computeLevelPercentages,
   REFERRAL_CONFIG,
 } from "@/app/api/[locale]/referral/config";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ReferralPageT } from ".";
 

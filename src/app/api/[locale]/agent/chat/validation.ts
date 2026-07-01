@@ -5,14 +5,14 @@
 
 import "server-only";
 
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 /**
  * Validate that thread is not incognito

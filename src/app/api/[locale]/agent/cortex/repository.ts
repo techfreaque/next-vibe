@@ -5,9 +5,8 @@ import "server-only";
  * Path utilities and common operations for the virtual filesystem
  */
 import { and, eq, like, sql } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
 
 import { type CortexNode, cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";

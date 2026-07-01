@@ -3,10 +3,23 @@
  * Defines endpoints for listing folders
  */
 
-import { lazy } from "react";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  dateSchema,
+  iconSchema,
+} from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import {
+  UserPermissionRoleOptions,
+  UserRole,
+  UserRoleDB,
+} from "next-vibe/identity/roles/enum";
 import {
   customWidgetObject,
   objectField,
@@ -14,21 +27,10 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  UserPermissionRoleOptions,
-  UserRole,
-  UserRoleDB,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/unified-ui/_shared/utils";
+import { lazy } from "react";
+import { z } from "zod";
 
-import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";
 

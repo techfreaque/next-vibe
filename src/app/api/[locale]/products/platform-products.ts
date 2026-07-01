@@ -3,16 +3,16 @@
  * Single source of truth for all pricing and product data across the platform
  */
 
-import type { JSX } from "react";
-
-import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
-import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import type {
   Countries,
   CountryLanguage,
   Currencies,
-} from "@/i18n/core/config";
-import { getCountryFromLocale } from "@/i18n/core/language-utils";
+} from "next-vibe/core/i18n/core/config";
+import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import type { JSX } from "react";
+
+import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
+import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 
 import type { PaymentInterval } from "../payment/providers/types";
 import type { ProductsTranslationKey } from "./i18n";

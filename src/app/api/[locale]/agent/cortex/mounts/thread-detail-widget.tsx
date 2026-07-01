@@ -7,15 +7,15 @@
 
 "use client";
 
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   useWidgetLocale,
   useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useMemo } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import messagesDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 interface ThreadDetailWidgetProps {
   path: string;

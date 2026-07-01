@@ -1,9 +1,9 @@
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useEffect } from "react";
 
 import { useLogger } from "@/hooks/use-logger";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 type ErrorWithDigest = Error & { digest?: string };
 

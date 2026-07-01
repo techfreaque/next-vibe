@@ -3,9 +3,8 @@
  * Used by providers that don't support native tool calling (Venice.ai, Uncensored.ai, etc.)
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   CORTEX_DELETE_ALIAS,

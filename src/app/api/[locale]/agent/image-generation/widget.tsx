@@ -1,17 +1,17 @@
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Image } from "next-vibe-ui/ui/image";
-import { ExternalLink } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { H3 } from "next-vibe-ui/ui/typography";
+import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
+import { Download } from "next-vibe/ui/web/ui/icons/Download";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
+import { Image } from "next-vibe/ui/web/ui/image";
+import { ExternalLink } from "next-vibe/ui/web/ui/link";
+import { Span } from "next-vibe/ui/web/ui/span";
+import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { H3 } from "next-vibe/ui/web/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -19,10 +19,10 @@ import {
   useWidgetLocale,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

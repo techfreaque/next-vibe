@@ -1,13 +1,11 @@
+import { getFullPath, getPreferredName } from "next-vibe/core/core-utils/path";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { loadTools } from "next-vibe/platforms/ai/tools-loader";
+
 import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import {
-  getFullPath,
-  getPreferredName,
-} from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { getDefaultToolIdsForFolder } from "../../../chat/constants";

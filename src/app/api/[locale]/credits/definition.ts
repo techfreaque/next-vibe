@@ -3,22 +3,21 @@
  * Defines endpoint for retrieving user credit balance
  */
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  customWidgetObject,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { dateSchema } from "../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
 
 const CreditsBalanceContainer = lazyWidget(() =>
@@ -141,6 +140,7 @@ const { GET } = createEndpoint({
   // === WS EVENTS ===
   // Emitted by CreditRepository after every deduction - carries actual server balance.
   // Framework merges partial into GET response cache. No client-side math needed.
+  channel: { scope: "user" } as const,
   events: {
     "credits-balance-updated": {
       responseFields: [

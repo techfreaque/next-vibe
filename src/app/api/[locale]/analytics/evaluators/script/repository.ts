@@ -5,13 +5,12 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
 import type {
   SignalEvent,
   TimeSeries,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+} from "next-vibe/core/utils/dataflow/shared/fields";
 
 export class ScriptEvaluatorRepository {
   static computeScript(source: TimeSeries, fn: string): SignalEvent[] {

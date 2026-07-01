@@ -11,11 +11,10 @@
 import "server-only";
 
 import { and, eq, gt, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
-
-import { leadLeadLinks, userLeadLinks } from "@/app/api/[locale]/leads/db";
-import { defineDbFunction } from "@/app/api/[locale]/system/db/db-functions/define";
-import type { Plv8Global } from "@/app/api/[locale]/system/db/db-functions/types";
-import { db } from "@/app/api/[locale]/system/db/index";
+import { defineDbFunction } from "next-vibe/database/db-functions/define";
+import type { Plv8Global } from "next-vibe/database/db-functions/types";
+import { db } from "next-vibe/database/index";
+import { leadLeadLinks, userLeadLinks } from "next-vibe/identity/lead/db";
 
 import { creditPacks, creditTransactions, creditWallets } from "./db";
 

@@ -1,10 +1,9 @@
 "use client";
 
-import { useWidgetUser } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { useWidgetUser } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CompanionStep } from "./companion-step";
 import { GuestStep } from "./guest-step";

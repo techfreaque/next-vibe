@@ -3,10 +3,9 @@
  * Provides seed data for newsletter subscriptions
  */
 
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";

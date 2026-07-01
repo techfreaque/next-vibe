@@ -27,43 +27,46 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Compass } from "next-vibe-ui/ui/icons/Compass";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { Star } from "next-vibe-ui/ui/icons/Star";
-import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Compass } from "next-vibe/ui/web/ui/icons/Compass";
+import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
+import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
+import { Star } from "next-vibe/ui/web/ui/icons/Star";
+import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/popover";
+import { Span } from "next-vibe/ui/web/ui/span";
 import {
   arrayFieldPath,
   withValue,
-} from "next-vibe-ui/unified/_shared/field-helpers";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+} from "next-vibe/unified-ui/_shared/field-helpers";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetSelector,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
-import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
-import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
+import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
+import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
 import {
   Icon,
   type IconKey,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
@@ -71,10 +74,7 @@ import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { cn } from "../../../shared/utils";
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import { getTtsModelById } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";

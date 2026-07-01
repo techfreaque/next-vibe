@@ -1,11 +1,9 @@
 "use client";
-
-import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { Mic } from "next-vibe-ui/ui/icons/Mic";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { cn } from "next-vibe/core/utils/utils";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
 import type { JSX } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 
