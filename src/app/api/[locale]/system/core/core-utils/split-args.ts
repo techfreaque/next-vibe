@@ -14,8 +14,9 @@
  * If the endpoint cannot be resolved the entire object is passed as data (safe fallback).
  */
 
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { WidgetData } from "next-vibe/core/utils/json";
+
+import { getEndpoint } from "@/generated/endpoint";
 
 import { getFullPath } from "./path";
 

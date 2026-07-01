@@ -20,7 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   CronStatsGetRequestOutput,
   CronStatsGetResponseOutput,
-} from "next-vibe/tasks/cron/stats/definition";
+} from "./definition";
 import type { CronStatsT } from "next-vibe/tasks/cron/stats/i18n";
 import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
 

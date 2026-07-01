@@ -23,7 +23,7 @@ import { z } from "zod";
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
 const ConfigCreateWidget = React.lazy(() =>
-  import("next-vibe/tooling/check/config/create/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.ConfigCreateWidget,
   })),
 );

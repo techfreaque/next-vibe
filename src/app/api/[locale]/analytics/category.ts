@@ -3,7 +3,7 @@
  * Covers pipeline graphs, KPI indicators, evaluators, transformers, and data sources.
  */
 
-import { VIBE_SENSE_GRAPHS_ALIAS } from "next-vibe/core/utils/dataflow/graphs/constants";
+import { VIBE_SENSE_GRAPHS_ALIAS } from "next-vibe/dataflow/graphs/constants";
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 

@@ -241,6 +241,13 @@ export const remoteConnections = pgTable(
     // The instanceId the remote uses to identify itself (from register endpoint)
     remoteInstanceId: text("remote_instance_id"),
 
+    // The PEER-side userId (the same account has a different userId on each
+    // instance's DB). Learned once on the connect/register handshake and stable
+    // thereafter. Lets the reverse-ws connector subscribe to the peer's concrete
+    // `user/{remoteUserId}` channel directly — the bridge transport is a regular
+    // scope:"user" event, so it rides that channel like any other.
+    remoteUserId: text("remote_user_id"),
+
     // ── Transport configuration ─────────────────────────────────────────────
 
     /**

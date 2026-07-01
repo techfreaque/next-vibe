@@ -97,6 +97,22 @@ const { POST } = createEndpoint({
         }),
       }),
 
+      renamed: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.string(),
+        }),
+      }),
+
+      deleted: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.string(),
+        }),
+      }),
+
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().optional(),
@@ -162,6 +178,10 @@ const { POST } = createEndpoint({
           "src/app/api/[locale]/products/catalog/list/definition.ts",
         ],
         skipped: [],
+        renamed: [
+          "src/app/api/[locale]/products/old/route.ts -> src/app/api/[locale]/products/catalog/route.ts",
+        ],
+        deleted: ["src/generated/tanstack/products/old/route.ts"],
       },
     },
   },

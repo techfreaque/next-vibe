@@ -11,11 +11,7 @@ import {
   Info,
 } from "lucide-react-native";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "next-vibe/ui/native/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "../alert";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 // Import all public types from web version (web is source of truth)
 import type { FormAlertProps } from "next-vibe/ui/web/ui/form/form-alert";

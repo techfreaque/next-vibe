@@ -18,13 +18,13 @@
 import {
   getRawCookieString,
   setRawCookieString,
-} from "next-vibe-ui/lib/cookies";
+} from "next-vibe/ui/web/lib/cookies";
 import {
   addWindowListener,
   getScrollX,
   getScrollY,
   scrollToPosition,
-} from "next-vibe-ui/lib/dom";
+} from "next-vibe/ui/web/lib/dom";
 import {
   assignUrl,
   getCurrentSearch,
@@ -32,7 +32,7 @@ import {
   openWithTarget,
   replaceUrl,
   silentReplaceState,
-} from "next-vibe-ui/lib/location";
+} from "next-vibe/ui/web/lib/location";
 import {
   getLocalItem,
   getSessionItem,
@@ -40,7 +40,7 @@ import {
   removeSessionItem,
   setLocalItem,
   setSessionItem,
-} from "next-vibe-ui/lib/storage";
+} from "next-vibe/ui/web/lib/storage";
 
 import type {
   BridgeAction,

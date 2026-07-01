@@ -31,7 +31,9 @@ const EXPORT_CLASS_RE = /^export\s+(?:abstract\s+)?class\s+([A-Za-z_]\w*)/;
 const EXPORT_FUNCTION_RE = /^export\s+(?:async\s+)?function\s+([A-Za-z_]\w*)/;
 const EXPORT_CONST_RE = /^export\s+const\s+([A-Za-z_]\w*)\s*[:=]/;
 const EXPORT_TYPE_RE = /^export\s+(?:type|interface)\s+([A-Za-z_]\w*)/;
-// Static method inside a class body: `  static foo(` / `  static async foo(`
+// Static method inside a class body: `  static foo(` / `  static async foo(`.
+// Capture the access modifier so private/protected statics (internal helpers,
+// never a cross-file "public surface") can be excluded from dead-symbol checks.
 const STATIC_METHOD_RE =
   /^\s+(?:public\s+|private\s+|protected\s+)?static\s+(?:async\s+)?([A-Za-z_]\w*)\s*[(<]/;
 const CLASS_OPEN_RE = /\bclass\s+([A-Za-z_]\w*)/;

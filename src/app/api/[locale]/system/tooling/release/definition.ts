@@ -37,7 +37,7 @@ import {
 import { z } from "zod";
 
 const ReleaseResultWidget = lazyWidget(() =>
-  import("next-vibe/tooling/release/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.ReleaseResultWidget,
   })),
 );

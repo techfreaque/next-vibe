@@ -15,16 +15,15 @@ import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { sql } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db/index";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   formatDatabase,
   formatDuration,
   formatError,
-} from "@/app/api/[locale]/system/logger/formatters";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { db } from "..";
 import type { DbFunction } from "./define";
 import type { PgType } from "./types";
 

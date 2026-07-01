@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/web/ui/table";
+} from "./table";
 import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { ReactElement } from "react";
 import * as React from "react";

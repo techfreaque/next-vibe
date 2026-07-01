@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
-import { create } from "zustand";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { Methods } from "next-vibe/core/definition/enums";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   EndpointReturn,
   OptionsOptional,
@@ -15,6 +11,9 @@ import type {
   UseEndpointOptionsBase,
 } from "./endpoint-types";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { create } from "zustand";
+
 import { useEndpoint as useEndpointOriginal } from "./use-endpoint-implementation";
 
 type AnyEndpointMap = Partial<Record<Methods, CreateApiEndpointAny>>;

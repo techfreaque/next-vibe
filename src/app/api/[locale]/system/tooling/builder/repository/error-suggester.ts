@@ -3,7 +3,7 @@
  * Provides actionable suggestions based on error messages
  */
 
-import type { scopedTranslation } from "../i18n";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 

@@ -50,8 +50,16 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
 
   const staged = value.staged ?? [];
   const skipped = value.skipped ?? [];
+  const partiallyStaged = value.partiallyStaged ?? [];
+  const renamed = value.renamed ?? [];
+  const deleted = value.deleted ?? [];
   const isDryRun = !!value.message;
-  const isEmpty = staged.length === 0 && skipped.length === 0;
+  const isEmpty =
+    staged.length === 0 &&
+    skipped.length === 0 &&
+    partiallyStaged.length === 0 &&
+    renamed.length === 0 &&
+    deleted.length === 0;
 
   // ── MCP: compact, no ANSI ──────────────────────────────────
   if (isMcp) {
@@ -82,6 +90,30 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
       }
     }
 
+    if (partiallyStaged.length > 0) {
+      lines.push("");
+      lines.push(`${t("widget.partiallyStaged")}:`);
+      for (const f of partiallyStaged) {
+        lines.push(`~ ${f}`);
+      }
+    }
+
+    if (renamed.length > 0) {
+      lines.push("");
+      lines.push(`${t("widget.renamed")}:`);
+      for (const f of renamed) {
+        lines.push(`» ${f}`);
+      }
+    }
+
+    if (deleted.length > 0) {
+      lines.push("");
+      lines.push(`${t("widget.deleted")}:`);
+      for (const f of deleted) {
+        lines.push(`- ${f}`);
+      }
+    }
+
     if (skipped.length > 0) {
       lines.push("");
       lines.push(`${t("widget.skipped")}:`);
@@ -107,12 +139,35 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
     );
   }
 
+  const colorFor = (prefix: string): ((s: string) => string) => {
+    switch (prefix) {
+      case "+":
+        return chalk.green;
+      case "~":
+        return chalk.blue;
+      case "»":
+        return chalk.magenta;
+      case "-":
+        return chalk.red;
+      default:
+        return chalk.yellow;
+    }
+  };
+
   const renderFileList = (files: string[], prefix: string): string => {
     const shown = files.slice(0, MAX_SHOW);
     const rest = files.length - shown.length;
+    const paint = colorFor(prefix);
+    // Rename entries are "old -> new" — shorten both sides, keep the arrow.
+    const shortenEntry = (f: string): string =>
+      f.includes(" -> ")
+        ? f
+            .split(" -> ")
+            .map((p) => shortenPath(p))
+            .join(" -> ")
+        : shortenPath(f);
     const lines = shown.map(
-      (f) =>
-        `  ${prefix === "+" ? chalk.green(prefix) : chalk.yellow(prefix)} ${chalk.dim(shortenPath(f))}`,
+      (f) => `  ${paint(prefix)} ${chalk.dim(shortenEntry(f))}`,
     );
     if (rest > 0) {
       lines.push(`  ${chalk.dim(`... and ${String(rest)} more`)}`);
@@ -140,12 +195,52 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
           `${String(skipped.length)} ${t("widget.skippedCount")}`,
         )
       : chalk.dim(`0 ${t("widget.skippedCount")}`);
-  parts.push(`${stagedStr}  ${skippedStr}`);
+  const summaryExtra: string[] = [];
+  if (partiallyStaged.length > 0) {
+    summaryExtra.push(
+      chalk.blue.bold(
+        `${String(partiallyStaged.length)} ${t("widget.partiallyStaged_count")}`,
+      ),
+    );
+  }
+  if (renamed.length > 0) {
+    summaryExtra.push(
+      chalk.magenta.bold(
+        `${String(renamed.length)} ${t("widget.renamedCount")}`,
+      ),
+    );
+  }
+  if (deleted.length > 0) {
+    summaryExtra.push(
+      chalk.red.bold(`${String(deleted.length)} ${t("widget.deletedCount")}`),
+    );
+  }
+  parts.push(
+    [stagedStr, ...summaryExtra, skippedStr].filter(Boolean).join("  "),
+  );
 
   if (staged.length > 0) {
     parts.push("");
     parts.push(chalk.green(`${t("widget.staged")}:`));
     parts.push(renderFileList(staged, "+"));
+  }
+
+  if (partiallyStaged.length > 0) {
+    parts.push("");
+    parts.push(chalk.blue(`${t("widget.partiallyStaged")}:`));
+    parts.push(renderFileList(partiallyStaged, "~"));
+  }
+
+  if (renamed.length > 0) {
+    parts.push("");
+    parts.push(chalk.magenta(`${t("widget.renamed")}:`));
+    parts.push(renderFileList(renamed, "»"));
+  }
+
+  if (deleted.length > 0) {
+    parts.push("");
+    parts.push(chalk.red(`${t("widget.deleted")}:`));
+    parts.push(renderFileList(deleted, "-"));
   }
 
   if (skipped.length > 0) {

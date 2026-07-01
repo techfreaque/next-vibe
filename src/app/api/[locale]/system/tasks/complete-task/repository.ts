@@ -25,7 +25,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   CompleteTaskRequestOutput,
   CompleteTaskResponseOutput,
-} from "next-vibe/tasks/complete-task/definition";
+} from "./definition";
 import type { NewCronTask } from "next-vibe/tasks/cron/db";
 import {
   cronTaskExecutions,

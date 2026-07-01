@@ -4,26 +4,25 @@
  * All validation is handled by genericHandler
  */
 
+import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
+import { validateData } from "next-vibe/core/core-utils/validation";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
 import {
   errorResponseSchema,
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { validateData } from "next-vibe/shared/utils";
-import { NextResponse } from "next-vibe-ui/lib/request";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { NextResponse } from "next-vibe/ui/web/lib/request";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
-import { Platform } from "../shared/types/platform";
-import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 
 /**
  * Wraps a validated success response in NextResponse

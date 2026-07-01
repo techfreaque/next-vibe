@@ -37,7 +37,7 @@ import {
   instanceIdentities,
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
-import selfRenameDefinitions from "@/app/api/[locale]/remote-connection/self/rename/definition";
+import selfRenameDefinitions from "./definition";
 import { env } from "@/config/env";
 
 import {

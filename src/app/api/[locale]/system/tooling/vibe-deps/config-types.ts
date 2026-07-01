@@ -47,4 +47,12 @@ export interface VibeDepsConfig {
   allow: VibeDepsAllow;
   /** Per-kind severity. `off` excludes that kind from violation reports. */
   severity: Readonly<Record<VibeDepsViolationKind, VibeDepsSeverity>>;
+  /**
+   * Path prefixes (src-relative posix) whose files are settled and should NOT be
+   * flagged for relocation. These files still count as importers of others — an
+   * ignored file reaching a candidate still contributes to that candidate's
+   * usage/spread — they're just never themselves proposed to move. Use for areas
+   * already in their correct home (e.g. the web UI primitive lib).
+   */
+  ignore?: ReadonlyArray<string>;
 }

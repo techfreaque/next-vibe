@@ -4,9 +4,9 @@
  * Used by both global and scoped translation systems
  */
 
-import { translationsKeyMode } from "@/config/debug";
-
 import type { TParams, TranslationElement } from "./static-types";
+
+import { translationsKeyMode } from "@/config/debug";
 
 /**
  * Nested translation value type supporting deep nesting

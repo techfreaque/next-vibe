@@ -46,6 +46,11 @@ installFetchCache();
 import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { cronTasks } from "next-vibe/tasks/cron/db";
+import { CronTaskStatus } from "next-vibe/tasks/enum";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -75,11 +80,6 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 
 // ── Atlas / Hermes liveness check ─────────────────────────────────────────────

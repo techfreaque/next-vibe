@@ -26,7 +26,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   ElectronBuildRequestOutput,
   ElectronBuildResponseOutput,
-} from "next-vibe/server/server/electron/build/definition";
+} from "./definition";
 import type { ElectronBuildT } from "next-vibe/server/server/electron/build/i18n";
 
 export class ElectronBuildRepository {

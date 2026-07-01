@@ -28,7 +28,7 @@ import { z } from "zod";
 import { PULSE_HISTORY_ALIAS } from "./constants";
 
 const PulseHistoryContainer = lazyWidget(() =>
-  import("next-vibe/tasks/pulse/history/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.PulseHistoryContainer,
   })),
 );

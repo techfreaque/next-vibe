@@ -15,8 +15,7 @@ export async function loadFavoritesData(
   }
 
   try {
-    const { ChatFavoritesRepository } =
-      await import("@/app/api/[locale]/agent/skills/favorites/repository");
+    const { ChatFavoritesRepository } = await import("../repository");
     const favorites: FavoriteSummaryItem[] =
       await ChatFavoritesRepository.loadFavoritesItems({
         userId,

@@ -21,7 +21,7 @@ import {
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import type { AnyModelId } from "@/app/api/[locale]/agent/models/models";
+import type { AnyModelId } from "../models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 
 import type definition from "./definition";

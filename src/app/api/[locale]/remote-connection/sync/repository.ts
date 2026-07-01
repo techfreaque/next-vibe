@@ -25,12 +25,12 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import type { SyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import type { SyncCursor } from "../db";
 import {
   RemoteToolCapabilitySchema,
   StandardSyncCursorSchema,
   ThreadsSyncCursorSchema,
-} from "@/app/api/[locale]/remote-connection/db";
+} from "../db";
 
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -159,11 +159,9 @@ export class TaskSyncRepository {
     }
 
     const { RemoteConnectionRepository: RemoteRepoReport } =
-      await import("@/app/api/[locale]/remote-connection/repository");
-    const { remoteConnections: connTable } =
-      await import("@/app/api/[locale]/remote-connection/db");
-    const { buildSyncPayloads } =
-      await import("@/app/api/[locale]/remote-connection/sync/provider");
+      await import("../repository");
+    const { remoteConnections: connTable } = await import("../db");
+    const { buildSyncPayloads } = await import("./provider");
 
     // Find the connection record for this user
     const conditions = [
@@ -292,8 +290,7 @@ export class TaskSyncRepository {
           }
         }
         if (Object.keys(scopedPushed).length > 0) {
-          const { applySyncPayloads } =
-            await import("@/app/api/[locale]/remote-connection/sync/provider");
+          const { applySyncPayloads } = await import("./provider");
           const counts = await applySyncPayloads(scopedPushed, user.id, logger);
           logger.debug("Applied pushed payloads", { instanceId, counts });
         }

@@ -13,10 +13,7 @@ import { fail, success } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type {
-  ReportRequestOutput,
-  ReportResponseOutput,
-} from "next-vibe/execute-tool/complete/definition";
+import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
 import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/task-completion-handler";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -80,8 +77,7 @@ export class TaskReportRepository {
     // Complete the in-memory pending call first: wakes await-task waiters
     // and yields a revival override if await-task attached one. "duplicate"
     // means the deadline (or another path) already finalized — skip revival.
-    const { completePendingCall } =
-      await import("next-vibe/execute-tool/pending-calls");
+    const { completePendingCall } = await import("../pending-calls");
     const outcome = completePendingCall(data.taskId, {
       status: finalStatus === CronTaskStatus.COMPLETED ? "completed" : "failed",
       output: data.output ?? null,

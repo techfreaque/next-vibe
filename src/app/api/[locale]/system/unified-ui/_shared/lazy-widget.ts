@@ -3,7 +3,7 @@
  *
  * Usage in definition.ts:
  *   const MyWidget = lazyWidget(() =>
- *     import("./widget").then((m) => ({ default: m.MyWidget })),
+ *     import("next-vibe/server/server/rebuild/widget").then((m) => ({ default: m.MyWidget })),
  *   );
  *
  * HMR (Vite dev): The `widget-hmr` Vite plugin injects `import.meta.hot.accept()`

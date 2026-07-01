@@ -6,17 +6,8 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "next-vibe/ui/web/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe/ui/web/ui/tabs";
+import { Dialog, DialogContent, DialogTrigger } from "./dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import type { CategoryKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import {
   Icon,

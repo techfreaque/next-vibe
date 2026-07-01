@@ -10,7 +10,7 @@ import type {
   BaseWidgetProps,
   ConstrainedChildUsage,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "./types";
 import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type z from "zod";

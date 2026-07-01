@@ -5,12 +5,10 @@
  */
 
 import { CronExpressionParser as cronParser } from "cron-parser";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation } from "./i18n";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation } from "next-vibe/tasks/i18n";
 
 /**
  * Convert a cron expression to human-readable text

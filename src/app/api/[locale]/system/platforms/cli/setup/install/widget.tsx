@@ -54,7 +54,6 @@ export function SetupInstallWidget({ field }: CustomWidgetProps): JSX.Element {
       )}
 
       <Div className="flex flex-col gap-3">
-        <BooleanFieldWidget fieldName="force" field={children.force} />
         <BooleanFieldWidget fieldName="verbose" field={children.verbose} />
       </Div>
 

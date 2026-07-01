@@ -12,10 +12,7 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type {
-  AlertWidgetConfig,
-  AlertWidgetSchema,
-} from "next-vibe/unified-ui/display-only/alert/types";
+import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 /**

@@ -22,10 +22,7 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  MusicGenModelId,
-  MusicGenModelIdOptions,
-} from "@/app/api/[locale]/agent/music-generation/models";
+import { MusicGenModelId, MusicGenModelIdOptions } from "./models";
 
 import { MUSIC_GEN_ALIAS } from "./constants";
 import {

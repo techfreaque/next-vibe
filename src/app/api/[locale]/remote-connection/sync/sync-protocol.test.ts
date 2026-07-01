@@ -42,15 +42,15 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import type { SyncScope } from "../db";
+import { remoteConnections } from "../db";
 import {
   applySyncPayloads,
   buildSyncPayloads,
   ensureProvidersRegistered,
   registerSyncProvider,
   type SyncProvider,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
+} from "./provider";
 import { env } from "@/config/env";
 
 import {

@@ -2,11 +2,11 @@
  * Web implementation of client-side storage using cookies
  * Provides async interface for consistency with native AsyncStorage
  */
-
-import { Environment } from "next-vibe/shared/utils";
+import { Environment } from "next-vibe/env/env-util";
 
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import { envClient, platform } from "@/config/env-client";
+import { platform } from "@/config/env-client";
+import { envClient } from "@/config/env-client";
 
 /**
  * Get a cookie value by name (async for platform consistency)

@@ -1,18 +1,17 @@
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import type { CountryLanguage } from "@/i18n/core/config";
-
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   type AuthContext,
   BaseAuthHandler,
-} from "../../shared/server-only/auth/base-auth-handler";
+} from "next-vibe/identity/auth/base-auth-handler";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   deleteSessionFile,
   readSessionFile,
   writeSessionFile,
 } from "./session-file";
+
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 
 /**
  * CLI/MCP Authentication Handler

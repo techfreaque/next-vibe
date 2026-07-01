@@ -23,14 +23,8 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import {
-  parseRequestBody,
-  parseSearchParams,
-} from "next-vibe/platforms/next-api/request-parser";
-import {
-  wrapErrorResponse,
-  wrapSuccessResponse,
-} from "next-vibe/platforms/next-api/response";
+import { parseRequestBody, parseSearchParams } from "./request-parser";
+import { wrapErrorResponse, wrapSuccessResponse } from "./response";
 import type { NextRequest } from "next-vibe/ui/web/lib/request";
 import { NextResponse } from "next-vibe/ui/web/lib/request";
 

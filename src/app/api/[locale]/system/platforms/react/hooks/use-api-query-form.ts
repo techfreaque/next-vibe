@@ -1,0 +1,900 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as hooksScopedTranslation } from "next-vibe/platforms/react/hooks/i18n";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
+import type { ApiStore, FormQueryParams } from "./store";
+import { deserializeQueryParams, useApiStore } from "./store";
+import type {
+  ApiQueryFormOptions,
+  ApiQueryFormReturn,
+  ApiQueryOptions,
+  SubmitFormFunction,
+  SubmitFormFunctionOptions,
+} from "./types";
+import { storage } from "next-vibe/ui/web/lib/storage";
+import { extractSchemaDefaults } from "next-vibe/unified-ui/_shared/utils";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useForm, type UseFormProps } from "react-hook-form";
+
+import { useApiQuery } from "./use-api-query";
+
+/**
+ * Deep merge saved data with defaults
+ * Uses default values for any undefined/null values in saved data
+ */
+function mergeWithDefaults<T>(saved: T, defaults: T): T {
+  if (defaults === null || defaults === undefined) {
+    return saved;
+  }
+  if (saved === null || saved === undefined) {
+    return defaults;
+  }
+  if (typeof defaults !== "object" || typeof saved !== "object") {
+    // For primitives, use saved if it has a value, otherwise use default
+    return saved ?? defaults;
+  }
+  if (Array.isArray(defaults)) {
+    // For arrays, use saved if it exists
+    return saved;
+  }
+
+  // For objects, recursively merge
+  const result = { ...defaults };
+
+  for (const key of Object.keys(saved)) {
+    if (key in saved && key in defaults) {
+      const savedValue = saved[key as keyof typeof saved];
+      const defaultValue = defaults[key as keyof typeof defaults];
+
+      if (
+        savedValue !== undefined &&
+        savedValue !== null &&
+        savedValue !== ""
+      ) {
+        // Saved value exists and is not empty - use it (with recursive merge for objects)
+        if (
+          typeof savedValue === "object" &&
+          !Array.isArray(savedValue) &&
+          savedValue !== null &&
+          typeof defaultValue === "object" &&
+          !Array.isArray(defaultValue) &&
+          defaultValue !== null
+        ) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          (result as Record<string, unknown>)[key] = mergeWithDefaults(
+            savedValue,
+            defaultValue,
+          );
+        } else {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          (result as Record<string, unknown>)[key] = savedValue;
+        }
+      }
+    }
+    // If savedValue is undefined/null/empty, we keep the default (already in result)
+  }
+  return result;
+}
+
+/**
+ * Creates a form that automatically updates a query based on form values
+ * Useful for search forms, filters, and other query parameter-based APIs
+ *
+ * Features:
+ * - Form validation using Zod schema
+ * - Form persistence using platform-agnostic storage (enabled by default)
+ * - Automatic query updates based on form values
+ * - Debounced form submissions to prevent excessive API calls
+ *
+ * @param endpoint - The API endpoint to use
+ * @param urlPathParams - URL variables for the endpoint
+ * @param formOptions - Form options including defaultValues and persistence options
+ * @param queryOptions - API query options
+ * @returns Form and query for API interaction with enhanced error handling
+ */
+export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
+  endpoint,
+  urlPathParams,
+  requestData,
+  formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
+  queryOptions = { enabled: true },
+  logger,
+  user,
+}: {
+  endpoint: TEndpoint;
+  urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  requestData: CacheKeyRequestData<TEndpoint>;
+  user: JwtPayloadType;
+  formOptions?: ApiQueryFormOptions<TEndpoint["types"]["FormValues"]> & {
+    /**
+     * Whether to enable form persistence
+     * @default true
+     */
+    persistForm?: boolean;
+    /**
+     * The key to use for storing form data in storage
+     * If not provided, a key will be generated based on the endpoint
+     */
+    persistenceKey?: string;
+  };
+  queryOptions: ApiQueryOptions<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  >;
+  logger: EndpointLogger;
+}): ApiQueryFormReturn<
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"],
+  TEndpoint["types"]["FormValues"]
+> {
+  if (!endpoint) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
+    throw new Error("Endpoint is required");
+  }
+  const { locale } = useTranslation();
+  const { t: hooksT } = useMemo(
+    () => hooksScopedTranslation.scopedT(locale),
+    [locale],
+  );
+  const {
+    autoSubmit = true,
+    debounceMs = 500,
+    persistForm = true,
+    persistenceKey,
+    ...restFormOptions
+  } = formOptions;
+  // Get Zustand store methods
+  const { setFormQueryParams } = useApiStore();
+
+  // For query state - use number type instead of NodeJS.Timeout
+  const debounceTimerRef = useRef<number | null>(null);
+
+  // formId / storageKey: both include urlPathParams + cacheKey fields so the Zustand
+  // form store and localStorage are scoped per resource (not shared across users/items).
+  const storageKey =
+    persistenceKey ||
+    buildKey("query-form", endpoint, urlPathParams, logger, requestData);
+  const formId = storageKey;
+  // Recursively extract default values from the Zod schema
+  // This traverses the entire schema tree and builds an object with all default values
+  // Works even when the top-level schema has required fields without defaults
+  const schemaDefaultValues = useMemo<TEndpoint["types"]["FormValues"]>(() => {
+    // Step 1: Extract defaults recursively from schema structure. Use the
+    // combined formSchema so url-path-param form fields get initial values too.
+    // forFormInit=true gives empty defaults for primitives (e.g. "" for strings).
+    const extracted = extractSchemaDefaults<TEndpoint["types"]["FormValues"]>(
+      endpoint.formSchema,
+      logger,
+      "",
+      true,
+    );
+    const baseDefaults = (extracted ?? {}) as TEndpoint["types"]["FormValues"];
+
+    // Step 2: Pass through Zod's parse to validate and apply transformations
+    // This ensures coercions (z.coerce.number()) and other transforms work
+    const parsed = endpoint.formSchema.safeParse(baseDefaults);
+    if (parsed.success) {
+      return parsed.data as TEndpoint["types"]["FormValues"];
+    }
+
+    // If validation fails, return the extracted defaults as-is
+    return baseDefaults;
+  }, [endpoint.formSchema, logger]);
+
+  // Merge schema defaults with provided defaultValues
+  const mergedDefaultValues = useMemo<TEndpoint["types"]["FormValues"]>(() => {
+    const provided = restFormOptions.defaultValues;
+    if (
+      provided &&
+      typeof provided === "object" &&
+      Object.keys(provided).length > 0
+    ) {
+      // Merge provided values over schema defaults
+      return {
+        ...schemaDefaultValues,
+        ...provided,
+      } as TEndpoint["types"]["FormValues"];
+    }
+    return schemaDefaultValues;
+  }, [schemaDefaultValues, restFormOptions.defaultValues]);
+
+  // Get query params reactively using a memoized selector with stable default
+  // Use mergedDefaultValues (schema defaults + provided defaults) as the default query params
+  const defaultQueryParams = useMemo(
+    () => mergedDefaultValues,
+    [mergedDefaultValues],
+  );
+  // Selector must return stable references - just get raw params from store
+  const rawQueryParamsSelector = useMemo(
+    () =>
+      (state: ApiStore): FormQueryParams | undefined =>
+        state.forms[formId]?.queryParams,
+    [formId],
+  );
+  const rawQueryParams = useApiStore(rawQueryParamsSelector);
+
+  // Deserialize outside selector to avoid infinite loop from new object references
+  const queryParams = useMemo((): TEndpoint["types"]["RequestOutput"] => {
+    if (!rawQueryParams) {
+      return defaultQueryParams;
+    }
+    // Deserialize JSON-stringified nested objects back to their original form
+    return deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
+      rawQueryParams,
+    );
+  }, [rawQueryParams, defaultQueryParams]);
+
+  // Create a function to update query params in the store
+  const setQueryParams = useCallback(
+    (params: TEndpoint["types"]["RequestOutput"]) => {
+      // Type-safe conversion for form query params
+      if (params === undefined || params === null) {
+        setFormQueryParams(formId, {});
+      } else if (typeof params === "object") {
+        // Convert object to FormQueryParams
+        const safeParams: FormQueryParams = {};
+        for (const [key, value] of Object.entries(
+          params as {
+            [key: string]: string | number | boolean | null | undefined;
+          },
+        )) {
+          if (
+            typeof value === "string" ||
+            typeof value === "number" ||
+            typeof value === "boolean"
+          ) {
+            safeParams[key] = value;
+          } else if (value !== undefined && value !== null) {
+            // Convert other types to string safely
+            if (typeof value === "object") {
+              // Try to serialize object safely, skip if it fails
+              try {
+                safeParams[key] = JSON.stringify(value);
+              } catch {
+                // Skip objects that can't be serialized
+                continue;
+              }
+            } else {
+              safeParams[key] = String(value);
+            }
+          }
+        }
+        setFormQueryParams(formId, safeParams);
+      } else {
+        // For primitive types, create a simple object
+        setFormQueryParams(formId, { value: String(params) });
+      }
+    },
+    [formId, setFormQueryParams],
+  );
+
+  // Form selectors and state management
+  const formSelector = useMemo(
+    () =>
+      (
+        state: ApiStore,
+      ):
+        | {
+            formError: ErrorResponseType | null;
+            isSubmitting: boolean;
+          }
+        | undefined =>
+        state.forms[formId],
+    [formId],
+  );
+
+  const formState = useApiStore(formSelector) ?? {
+    formError: null,
+    isSubmitting: false,
+  };
+
+  // Extract store methods for error handling
+  const setFormErrorStore = useApiStore((state) => state.setFormError);
+  const clearFormErrorStore = useApiStore((state) => state.clearFormError);
+
+  // Create form configuration with schema defaults. The form holds the merged
+  // form values (request-data ∪ url-path-params) and is validated by the
+  // combined formSchema — the concrete z.ZodObject zodResolver accepts. Query
+  // params are still derived by filtering through requestSchema below, so only
+  // request-data fields become query parameters.
+  const formConfigWithDefaults: UseFormProps<TEndpoint["types"]["FormValues"]> =
+    {
+      ...restFormOptions,
+      resolver: zodResolver(endpoint.formSchema),
+      defaultValues: mergedDefaultValues,
+    };
+
+  // Initialize form with the proper configuration including schema defaults
+  const formMethods = useForm<TEndpoint["types"]["FormValues"]>(
+    formConfigWithDefaults,
+  );
+  // Stable ref so effects don't re-run every render when react-hook-form
+  // returns a new formMethods object reference on each render.
+  const formMethodsRef = useRef(formMethods);
+  formMethodsRef.current = formMethods;
+  const { watch } = formMethods;
+
+  // Implement form persistence directly
+  const clearSavedForm = useCallback((): void => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    void (async (): Promise<void> => {
+      try {
+        // Clear from storage
+        await storage.removeItem(storageKey);
+        // Reset the form to default values if available, otherwise empty
+        const resetData: TEndpoint["types"]["RequestOutput"] =
+          (restFormOptions.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
+          ({} as TEndpoint["types"]["RequestOutput"]);
+        formMethodsRef.current.reset(resetData);
+        // Update query params with reset data
+        setQueryParams(resetData);
+      } catch {
+        // Handle error silently - we don't want to break the UI for storage errors
+        // In a production app, this would use a proper error logging service
+      }
+    })();
+  }, [storageKey, setQueryParams, restFormOptions.defaultValues]);
+
+  // Sync form default values to store on mount AND whenever mergedDefaultValues changes.
+  // This ensures the queryFn always picks up the correct initial values
+  // even when a previous instance left stale params in the global store,
+  // and also handles prop changes (e.g. switching to a different user's data
+  // where includeInCacheKey fields like targetUserId change).
+  const prevMergedDefaultsRef = useRef<
+    TEndpoint["types"]["RequestOutput"] | undefined
+  >(undefined);
+  useEffect(() => {
+    const prev = prevMergedDefaultsRef.current;
+    const hasChanged =
+      prev === undefined ||
+      JSON.stringify(prev) !== JSON.stringify(mergedDefaultValues);
+    if (hasChanged) {
+      prevMergedDefaultsRef.current = mergedDefaultValues;
+      setQueryParams(mergedDefaultValues);
+      formMethodsRef.current.reset(mergedDefaultValues, {
+        keepDirty: false,
+        keepTouched: false,
+      });
+    }
+  }, [mergedDefaultValues, setQueryParams]);
+
+  // Load saved form values on mount - merge with schema defaults
+  useEffect(() => {
+    if (!persistForm || typeof window === "undefined") {
+      return;
+    }
+
+    void (async (): Promise<void> => {
+      try {
+        const savedFormData = await storage.getItem(storageKey);
+        if (savedFormData) {
+          const parsedData = JSON.parse(
+            savedFormData,
+          ) as TEndpoint["types"]["RequestOutput"];
+          // Merge saved data with schema defaults - defaults take precedence for undefined/null values.
+          // mergedDefaultValues already includes initialState (from URL), so it wins over localStorage.
+          const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
+          formMethodsRef.current.reset(mergedData);
+          // Update query params with merged data
+          setQueryParams(mergedData);
+        }
+      } catch {
+        // Handle error silently - we don't want to break the UI for storage errors
+        // In a production app, this would use a proper error logging service
+      }
+    })();
+  }, [storageKey, persistForm, setQueryParams, mergedDefaultValues]);
+
+  // Save form values when they change
+  useEffect(() => {
+    if (!persistForm || typeof window === "undefined") {
+      return;
+    }
+
+    let persistDebounceTimer: number | null = null;
+    const persistDebounceMs = 500; // 500ms debounce for persistence
+
+    const subscription = formMethodsRef.current.watch((formValues) => {
+      if (formValues && Object.keys(formValues).length > 0) {
+        // Clear any existing timer
+        if (persistDebounceTimer !== null) {
+          clearTimeout(persistDebounceTimer);
+        }
+
+        // Set a new timer
+        persistDebounceTimer = setTimeout(() => {
+          void (async (): Promise<void> => {
+            try {
+              await storage.setItem(storageKey, JSON.stringify(formValues));
+            } catch {
+              // Handle error silently - we don't want to break the UI for storage errors
+              // In a production app, this would use a proper error logging service
+            }
+          })();
+        }, persistDebounceMs);
+      }
+    });
+
+    return (): void => {
+      subscription.unsubscribe();
+      if (persistDebounceTimer !== null) {
+        clearTimeout(persistDebounceTimer);
+      }
+    };
+  }, [storageKey, persistForm]);
+
+  // Error management functions
+  const clearFormError = useCallback(
+    () => clearFormErrorStore(formId),
+    [clearFormErrorStore, formId],
+  );
+
+  const setError = useCallback(
+    (error: Error | null) => {
+      if (error) {
+        // Convert Error to ErrorResponseType
+        const errorResponse = fail({
+          message: hooksT("queryForm.errors.validation_failed"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { formId, message: error.message },
+        });
+        setFormErrorStore(formId, errorResponse);
+      } else {
+        setFormErrorStore(formId, null);
+      }
+    },
+    [setFormErrorStore, formId, hooksT],
+  );
+
+  // When urlPathParams are present, or a custom queryKey is used, always use mergedDefaultValues
+  // as requestData so the correct params are used immediately on mount - before the async
+  // setQueryParams effect runs. Without this, the global Zustand form store (keyed by endpoint
+  // only) may still hold stale params from a previous render with different values
+  // (e.g. switching root folder tabs, or navigating to a different thread).
+  const hasUrlPathParamsForQuery =
+    urlPathParams !== undefined &&
+    urlPathParams !== null &&
+    typeof urlPathParams === "object" &&
+    Object.keys(urlPathParams as FormQueryParams).length > 0;
+  const effectiveRequestData =
+    hasUrlPathParamsForQuery || queryOptions.queryKey
+      ? mergedDefaultValues
+      : queryParams;
+
+  // Use API query with form values as parameters from the store
+  const query = useApiQuery({
+    endpoint,
+    requestData: effectiveRequestData,
+    urlPathParams: urlPathParams,
+    logger,
+    user,
+    options: {
+      ...queryOptions,
+      // Narrow refetchInterval to the simpler type accepted by useApiQuery
+      refetchInterval:
+        typeof queryOptions.refetchInterval === "number" ||
+        queryOptions.refetchInterval === false
+          ? queryOptions.refetchInterval
+          : undefined,
+      // Respect staleTime and cacheTime from queryOptions
+      // Don't hardcode to 0 as this breaks caching for all read endpoints
+      // Custom onSuccess handler to merge response data into form
+      onSuccess: (
+        data,
+      ): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+        // Merge response data into form so FormFieldWidget can display it
+        const responseData = data.responseData;
+        const currentFormData = formMethods.getValues();
+
+        // First merge current form data with response data
+        const mergedData = {
+          ...currentFormData,
+          ...responseData,
+        };
+
+        // Then parse with request schema to filter out response-only fields
+        // This ensures only fields that are valid request fields stay in form
+        // Prevents response fields from overwriting request fields (like filters)
+        const requestSchemaResult =
+          endpoint.requestSchema.safeParse(mergedData);
+
+        if (requestSchemaResult.success) {
+          // Parse current form data through requestSchema to get the user's
+          // current request field values (e.g. paginationInfo.page, filters).
+          // These must win over defaults injected from the response merge.
+          const currentRequestResult =
+            endpoint.requestSchema.safeParse(currentFormData);
+          const currentRequestData = currentRequestResult.success
+            ? (currentRequestResult.data as TEndpoint["types"]["RequestOutput"])
+            : ({} as TEndpoint["types"]["RequestOutput"]);
+
+          // Merge: response-derived request defaults first, then current form
+          // values on top - so the user's current page/filter state is preserved.
+          const filteredData = Object.assign(
+            {},
+            requestSchemaResult.data,
+            currentRequestData,
+          ) as TEndpoint["types"]["RequestOutput"];
+
+          // Update form with filtered data
+          // This will trigger auto-submit watcher, but watcher filters through requestSchema
+          // so only request fields are sent back to API (preventing 431 error)
+          formMethods.reset(filteredData, {
+            keepDirty: false,
+            keepTouched: false,
+          });
+        } else {
+          // If merge failed validation, don't reset form - keep current values
+          logger.debug("Response data merge failed request schema validation", {
+            endpoint: endpoint.path.join("/"),
+            errors: requestSchemaResult.error,
+          });
+        }
+
+        // Call the user's onSuccess handler if provided
+        if (queryOptions.onSuccess) {
+          return queryOptions.onSuccess(data, user, logger);
+        }
+      },
+      // Use a custom onError handler
+      onError: ({ error }): void => {
+        if (queryOptions.onError) {
+          // Call the user's onError handler with the error
+          queryOptions.onError({
+            error,
+            requestData: queryParams,
+            urlPathParams: urlPathParams,
+          });
+        }
+      },
+      // Ensure retry is a number if provided
+      retry:
+        typeof queryOptions.retry === "boolean"
+          ? queryOptions.retry
+            ? 3
+            : 0
+          : typeof queryOptions.retry === "function"
+            ? 3
+            : queryOptions.retry,
+    },
+  });
+
+  // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
+  const prevQueryParamsRef = useRef<
+    TEndpoint["types"]["RequestOutput"] | undefined
+  >(undefined);
+  useEffect(() => {
+    // Skip the first render (initial load)
+    if (
+      prevQueryParamsRef.current &&
+      queryParams &&
+      typeof queryParams === "object"
+    ) {
+      // Deep compare to avoid infinite rerenders
+      const hasChanged =
+        JSON.stringify(prevQueryParamsRef.current) !==
+        JSON.stringify(queryParams);
+      if (hasChanged && Object.keys(queryParams).length > 0) {
+        // queryParams changed means a filter/search changed - always refetch.
+        // Don't gate on isCachedData: that check was only meant to prevent
+        // double-fetching on SSR hydration, but it also blocks filter-driven refetches.
+        // Skip when staleTime is Infinity - the caller explicitly opted out of refetching
+        // (e.g. optimistically pre-seeded messages cache for a new thread).
+        if (!query.isLoading && queryOptions.staleTime !== Infinity) {
+          void query.refetch();
+        }
+      }
+    }
+    prevQueryParamsRef.current = queryParams;
+  }, [queryParams, query, queryOptions.staleTime]);
+
+  // Watch for form changes and update query params (debounced)
+  useEffect(() => {
+    if (autoSubmit) {
+      let isMounted = true;
+
+      const subscription = watch((formData) => {
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+          debounceTimerRef.current = null;
+        }
+
+        debounceTimerRef.current = setTimeout(() => {
+          if (!isMounted) {
+            return;
+          }
+
+          if (formData) {
+            // Filter formData through requestSchema to remove response-only fields
+            // This prevents sending response data back to the API as query params.
+            // If parsing fails (e.g. a field is mid-edit), skip the update — the
+            // previous valid params stay in the store and the query keeps its last result.
+            const parsed = endpoint.requestSchema.safeParse(formData);
+            if (parsed.success) {
+              setQueryParams(parsed.data);
+            }
+          }
+        }, debounceMs);
+      });
+
+      return (): void => {
+        isMounted = false;
+        subscription.unsubscribe();
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+          debounceTimerRef.current = null;
+        }
+      };
+    }
+    return;
+  }, [watch, autoSubmit, debounceMs, setQueryParams, endpoint.requestSchema]);
+
+  // Track the last submission time to prevent excessive API calls
+  const lastSubmitTimeRef = useRef<number>(0);
+  const isSubmittingRef = useRef<boolean>(false);
+  const minSubmitInterval = 2000; // Minimum 2 seconds between submissions
+
+  // Create a submit handler that validates and submits the form
+  const submitForm: SubmitFormFunction<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  > = useCallback(
+    (
+      inputOptions?: SubmitFormFunctionOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
+    ): void => {
+      // Create a properly typed options object with urlParamVariables
+      const options: SubmitFormFunctionOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      > = {
+        ...(inputOptions || {}),
+        urlParamVariables: inputOptions?.urlParamVariables,
+      };
+      // Define the internal submit function that will be called after validation
+      const _submitForm = async (): Promise<void> => {
+        try {
+          // Check if we're already submitting to prevent duplicate requests
+          if (isSubmittingRef.current) {
+            logger.debug("Already submitting, skipping duplicate request", {
+              endpoint: endpoint.path.join("/"),
+            });
+            return;
+          }
+
+          // Get the current time for throttling
+          const currentTime = Date.now();
+
+          // Check if we're submitting too frequently
+          if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
+            // We're submitting too frequently, throttle by waiting
+            logger.debug("Throttling form submission", {
+              endpoint: endpoint.path.join("/"),
+            });
+            await new Promise<void>((resolve) => {
+              setTimeout(() => resolve(), minSubmitInterval);
+            });
+          }
+
+          // Mark as submitting - use a synchronized approach to avoid race conditions
+          // First, store the current state
+          const wasSubmitting = isSubmittingRef.current;
+
+          // Only update if not already submitting
+          if (!wasSubmitting) {
+            // Set the submitting flag atomically
+            isSubmittingRef.current = true;
+          }
+
+          // Update the last submit time
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+
+          lastSubmitTimeRef.current = Date.now();
+
+          // Get form data
+          const formData: TEndpoint["types"]["RequestOutput"] =
+            formMethods.getValues();
+
+          // Clear any previous errors
+          clearFormError();
+
+          // Update query params in the store
+          // The useApiQuery hook reads directly from the store using getState(),
+          // so the refetch will use the updated values immediately
+          setQueryParams(formData);
+
+          // Refetch with the new params (reads from store directly)
+          const response = await query.refetch();
+          // Convert the response to a proper ResponseType
+          const result =
+            typeof response === "object" &&
+            response !== null &&
+            "success" in response
+              ? response
+              : success(response);
+
+          // Call the onSuccess callback if provided and the result is successful
+          if (result.success && options.onSuccess) {
+            logger.debug("Calling onSuccess callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            options.onSuccess({
+              responseData: result.data,
+              pathParams: options.urlParamVariables!,
+              requestData: formData,
+            });
+          } else if (!result.success && options.onError) {
+            logger.debug("Calling onError callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            // If the result is not successful, call the onError callback
+            options.onError({
+              error: result,
+              requestData: formData,
+              pathParams: options.urlParamVariables,
+            });
+          }
+        } catch (error) {
+          // Handle any errors that occur during submission
+          const errorMessage = parseError(error).message;
+          logger.error("Error in submitForm", {
+            endpoint: endpoint.path.join("/"),
+            error: errorMessage,
+          });
+
+          const errorResponse = fail({
+            message: hooksT("queryForm.errors.network_failure"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: { formId, error: errorMessage },
+          });
+
+          // Set the error in the form state
+          setError(new Error(errorResponse.message));
+
+          // Call the onError callback if provided
+          if (options.onError) {
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams: options.urlParamVariables,
+            });
+          }
+        } finally {
+          // Mark as no longer submitting
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+
+          isSubmittingRef.current = false;
+        }
+      };
+
+      // Use the form's handleSubmit method to validate before submitting
+      void formMethods.handleSubmit(
+        // Success handler - form is valid
+        _submitForm,
+        // Error handler - form is invalid
+        (errors) => {
+          if (options.onError) {
+            // Create a proper error response for validation errors with translation key
+            const errorResponse = fail({
+              message: hooksT("queryForm.errors.validation_failed"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: { formId, errors: JSON.stringify(errors) },
+            });
+
+            // Call the onError callback with the validation error
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams: options.urlParamVariables,
+            });
+          }
+        },
+      )();
+    },
+    [
+      formMethods,
+      formId,
+      endpoint,
+      logger,
+      hooksT,
+      query,
+      setError,
+      clearFormError,
+      setQueryParams,
+    ],
+  );
+
+  // Create a result object that combines form and query functionality
+  const queryError = query.error;
+  const formError = formState.formError;
+  const queryErrorMessage: string = queryError ? queryError.message : "";
+  const formErrorMessage: string = formError ? formError.message : "";
+  const errorMessage: string | undefined =
+    queryErrorMessage || formErrorMessage || undefined;
+
+  const submitError = query.error || formState.formError || undefined;
+
+  // Stable setErrorType - depends only on stable refs
+  const setErrorType = useCallback(
+    (error: ErrorResponseType | null): void => {
+      setFormErrorStore(formId, error);
+      if (query.setErrorType) {
+        query.setErrorType(error);
+      }
+    },
+    [setFormErrorStore, formId, query],
+  );
+
+  return useMemo(
+    () => ({
+      form: formMethods,
+      response: query.response,
+      isSubmitSuccessful: query.isSuccess,
+      submitError,
+      errorMessage,
+      data: query.data,
+      error: query.error,
+      isError: query.isError,
+      isSuccess: query.isSuccess,
+      isSubmitting: query.isLoading,
+      isLoading: query.isLoading,
+      isLoadingFresh: query.isLoadingFresh,
+      isFetching: query.isFetching,
+      isCachedData: query.isCachedData,
+      status: query.status,
+      refetch: query.refetch,
+      remove: query.remove,
+      submitForm,
+      setErrorType,
+      clearSavedForm,
+      cacheKey: query.cacheKey,
+    }),
+    [
+      query.response,
+      query.isSuccess,
+      query.data,
+      query.error,
+      query.isError,
+      query.isLoading,
+      query.isLoadingFresh,
+      query.isFetching,
+      query.isCachedData,
+      query.status,
+      query.refetch,
+      query.remove,
+      query.cacheKey,
+      submitError,
+      errorMessage,
+      formMethods,
+      submitForm,
+      clearSavedForm,
+      setErrorType,
+    ],
+  );
+}

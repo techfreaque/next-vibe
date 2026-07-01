@@ -7,10 +7,12 @@
  */
 
 import { useFocus } from "ink";
+import {
+  useFocusScopeRegister,
+  useShouldFocus,
+} from "next-vibe/ui/cli/ui/dialog";
 import type { JSX, ReactNode } from "react";
 import React from "react";
-
-import { useFocusScopeRegister, useShouldFocus } from "../ui/dialog";
 
 export function CliFocusManager({
   children,

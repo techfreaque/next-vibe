@@ -20,7 +20,7 @@ import {
   ApiProvider,
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
-import { getMusicGenModelById } from "@/app/api/[locale]/agent/music-generation/models";
+import { getMusicGenModelById } from "./models";
 
 import {
   checkMediaBalance,

@@ -17,7 +17,7 @@ import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,
   CRON_UPDATE_ALIAS,
-} from "next-vibe/tasks/cron/[id]/constants";
+} from "./constants";
 import { scopedTranslation } from "next-vibe/tasks/cron/[id]/i18n";
 import {
   CronTaskPriority,
@@ -860,7 +860,7 @@ const { PUT } = createEndpoint({
         });
 
         // Update the individual task GET cache
-        const idDef = await import("next-vibe/tasks/cron/[id]/definition");
+        const idDef = await import("./definition");
         apiClient.updateEndpointData(
           idDef.default.GET,
           logger,

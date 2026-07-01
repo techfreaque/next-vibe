@@ -8,10 +8,7 @@
  */
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import {
-  useFocusScopeRegister,
-  useShouldFocus,
-} from "next-vibe/ui/cli/ui/dialog";
+import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,

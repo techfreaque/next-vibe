@@ -5,26 +5,27 @@
  * command: vibe generate:env
  */
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { validateEnv } from "next-vibe/env/env-util";
-import { envValidationLogger } from "next-vibe/logger/env-logger";
 import type { z } from "zod";
+
+import { envValidationLogger } from "next-vibe/logger/env-logger";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 
 // Import client env modules
 import {
   contactClientEnv,
-  contactClientEnvExamples,
   contactClientEnvSchema,
+  contactClientEnvExamples,
 } from "../app/api/[locale]/contact/env-client";
 import {
   paymentClientEnv,
-  paymentClientEnvExamples,
   paymentClientEnvSchema,
+  paymentClientEnvExamples,
 } from "../app/api/[locale]/payment/env-client";
 import {
   envClient as env_envClient,
-  envClientExamples,
   envClientSchema as env_envClientSchema,
+  envClientExamples,
 } from "../config/env-client";
 
 // Platform detection (will be set at runtime)

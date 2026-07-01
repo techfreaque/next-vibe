@@ -4,10 +4,9 @@
  * @deprecated This file should no longer be used and will be removed in the future.
  */
 
-import { dateSchema } from "next-vibe/shared/types/common.schema";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import { z } from "zod";
-
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Re-export dateSchema for consistency
 export { dateSchema };

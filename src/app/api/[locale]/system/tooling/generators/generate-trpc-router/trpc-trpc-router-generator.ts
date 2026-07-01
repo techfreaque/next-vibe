@@ -14,17 +14,16 @@ declare const process: {
 import fs from "node:fs";
 import path from "node:path";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
-} from "@/app/api/[locale]/system/logger/formatters";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { findRouteFiles } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
-
-import { parseError } from "../../../shared/utils";
-import { stripProjectRoot } from "../shared/utils";
+} from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { findRouteFiles } from "next-vibe/tooling/generators/shared/scanner";
+import { stripProjectRoot } from "next-vibe/tooling/generators/shared/utils";
 
 // RouteFileStructure represents a route module with HTTP method handlers
 interface RouteFileStructure {
@@ -486,8 +485,8 @@ function generateRouterCode(
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
-import { wrapToolsForTRPC } from "@/app/api/[locale]/system/unified-interface/trpc/wrapper";
+import { router } from "next-vibe/platforms/trpc/setup";
+import { wrapToolsForTRPC } from "next-vibe/platforms/trpc/wrapper";
 ${imports.join("\n")}
 
 ${constants.join("\n")}

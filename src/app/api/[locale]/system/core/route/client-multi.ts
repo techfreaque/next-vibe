@@ -4,8 +4,9 @@
  * Mirrors server multi.ts structure
  */
 
-import type { CreateApiEndpointAny } from "../../types/endpoint-base";
-import { Methods } from "../../types/enums";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Methods } from "next-vibe/core/definition/enums";
+
 import type {
   ClientHandlerFunction,
   ClientHandlerReturnType,

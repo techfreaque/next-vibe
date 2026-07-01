@@ -54,11 +54,11 @@ import {
   VIBE_START_PID_FILE,
   VIBE_SUPERVISOR_PID_FILE,
   writePidFile,
-} from "next-vibe/server/server/pid";
+} from "../pid";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
-} from "next-vibe/server/server/start/definition";
+} from "./definition";
 import type { ServerStartT } from "next-vibe/server/server/start/i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
 

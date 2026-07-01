@@ -7,11 +7,11 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
+import { GraphResolution } from "next-vibe/dataflow/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
-} from "next-vibe/core/utils/dataflow/graph/types";
+} from "next-vibe/dataflow/graph/types";
 import { COMPLETE_TASK_ALIAS } from "next-vibe/tasks/complete-task/constants";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";

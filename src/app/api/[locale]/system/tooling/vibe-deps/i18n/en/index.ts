@@ -7,6 +7,7 @@ export const translations = {
   tag: "analysis",
 
   mode: {
+    report: "Report",
     files: "Files",
     categories: "Categories",
     unused: "Unused",

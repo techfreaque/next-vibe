@@ -17,12 +17,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { agentEnv } from "../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
+import { getInstanceAvailability } from "../env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestTtsModel } from "./models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { CreditRepository } from "../../credits/repository";

@@ -18,7 +18,7 @@ import {
 import type {
   CodeQualitySummarySchema,
   CodeQualitySummaryWidgetConfig,
-} from "next-vibe/unified-ui/display-only/code-quality-summary/types";
+} from "./types";
 import type { ReactElement } from "react";
 
 /**

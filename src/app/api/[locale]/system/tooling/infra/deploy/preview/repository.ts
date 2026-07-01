@@ -14,7 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   DeployPreviewRequestOutput,
   DeployPreviewResponseOutput,
-} from "next-vibe/tooling/infra/deploy/preview/definition";
+} from "./definition";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
 
 export class DeployPreviewRepository {

@@ -69,7 +69,7 @@ import React, {
 } from "react";
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import { type ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { type ChatModelId } from "../models";
 import { platform } from "@/config/env-client";
 import { getEndpoint } from "@/generated/endpoint";
 

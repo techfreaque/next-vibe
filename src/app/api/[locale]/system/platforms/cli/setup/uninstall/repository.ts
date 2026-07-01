@@ -22,7 +22,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type {
   UninstallRequestOutput,
   UninstallResponseOutput,
-} from "next-vibe/platforms/cli/setup/uninstall/definition";
+} from "./definition";
 import type { SetupUninstallT } from "next-vibe/platforms/cli/setup/uninstall/i18n";
 
 /**

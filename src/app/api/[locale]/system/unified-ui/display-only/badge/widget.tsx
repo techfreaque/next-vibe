@@ -17,10 +17,7 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type {
-  BadgeWidgetConfig,
-  BadgeWidgetSchema,
-} from "next-vibe/unified-ui/display-only/badge/types";
+import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 import type { JSX } from "react";
 import type z from "zod";
 

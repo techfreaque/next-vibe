@@ -19,7 +19,7 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
 import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
-import { GenerateAllRepository } from "next-vibe/tooling/generators/generate-all/repository";
+import { runGenerators } from "next-vibe/tooling/generators/shared/run";
 import type { LiveIndex } from "next-vibe/tooling/generators/shared/live-index";
 import {
   buildLiveIndex,

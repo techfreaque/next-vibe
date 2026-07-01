@@ -19,7 +19,7 @@ import {
   resolutionRequestField,
   signalsResponseField,
   timeSeriesRequestField,
-} from "next-vibe/core/utils/dataflow/shared/fields";
+} from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";

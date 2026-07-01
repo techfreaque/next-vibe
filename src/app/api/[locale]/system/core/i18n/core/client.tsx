@@ -1,11 +1,21 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { setCookie } from "next-vibe-ui/lib/cookies";
-import { getDocumentLang, setDocumentLang } from "next-vibe-ui/lib/css-vars";
-import { storage } from "next-vibe-ui/lib/storage";
+import type { CountryInfo, CountryLanguage, Languages } from "./config";
+import {
+  availableCountries,
+  Countries,
+  defaultLocaleConfig,
+  globalCountryInfo,
+} from "./config";
+import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
+import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
+import { setCookie } from "next-vibe/ui/web/lib/cookies";
+import {
+  getDocumentLang,
+  setDocumentLang,
+} from "next-vibe/ui/web/lib/css-vars";
+import { storage } from "next-vibe/ui/web/lib/storage";
 import {
   createContext,
   type JSX,
@@ -18,13 +28,6 @@ import {
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 
 import { languageConfig } from "..";
-import type { CountryInfo, CountryLanguage, Languages } from "./config";
-import {
-  availableCountries,
-  Countries,
-  defaultLocaleConfig,
-  globalCountryInfo,
-} from "./config";
 
 // Translation context type with country support
 interface TranslationContextType {

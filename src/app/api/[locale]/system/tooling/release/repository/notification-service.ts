@@ -3,8 +3,7 @@
  * Send notifications via webhooks (Slack, Discord, Teams, Mattermost, Google Chat, etc.)
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   NotificationConfig,
   NotificationData,

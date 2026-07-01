@@ -1,10 +1,8 @@
+import { validateData } from "next-vibe/core/core-utils/validation";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { validateData } from "./validation";
 
 interface EnvHint {
   example: string | false;

@@ -12,8 +12,12 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { z } from "zod";
-
+import {
+  FieldDataType,
+  type FieldUsage,
+  LayoutType,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
 import {
   objectField,
   objectOptionalField,
@@ -23,13 +27,8 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  FieldDataType,
-  type FieldUsage,
-  LayoutType,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

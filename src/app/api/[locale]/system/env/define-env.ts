@@ -13,11 +13,11 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
-import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
 import { decryptEnvObject, loadOrCreateKey } from "./env-crypto";
+import { validateEnv } from "./env-util";
 
 /** Built-in generators for autoGenerate field */
 function runAutoGenerate(type: "hex32" | "hex64"): string {
@@ -133,8 +133,8 @@ function getDecryptedEnv(): NodeJS.ProcessEnv {
   return _decryptedEnv;
 }
 
-import { envValidationLogger } from "@/app/api/[locale]/system/logger/env-logger";
-import { defaultLocale } from "@/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { envValidationLogger } from "next-vibe/logger/env-logger";
 
 /** Concrete env var value type — all env vars resolve to one of these primitives. */
 export type EnvValue = string | number | boolean | undefined;

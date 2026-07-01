@@ -39,12 +39,14 @@ import type definition from "./definition";
 // Sub-components
 // ============================================================
 
-type FileRowVariant = "staged" | "partial" | "skipped";
+type FileRowVariant = "staged" | "partial" | "skipped" | "renamed" | "deleted";
 
 const FILE_ROW_SIGIL: Record<FileRowVariant, string> = {
   staged: "+",
   partial: "~",
   skipped: "!",
+  renamed: "»",
+  deleted: "-",
 };
 
 const FILE_ROW_SIGIL_CLASS: Record<FileRowVariant, string> = {
@@ -54,6 +56,10 @@ const FILE_ROW_SIGIL_CLASS: Record<FileRowVariant, string> = {
     "text-blue-600 dark:text-blue-400 font-mono text-xs font-bold w-4 shrink-0",
   skipped:
     "text-amber-600 dark:text-amber-400 font-mono text-xs font-bold w-4 shrink-0",
+  renamed:
+    "text-violet-600 dark:text-violet-400 font-mono text-xs font-bold w-4 shrink-0",
+  deleted:
+    "text-rose-600 dark:text-rose-400 font-mono text-xs font-bold w-4 shrink-0",
 };
 
 const FILE_ROW_BADGE_CLASS: Record<FileRowVariant, string> = {
@@ -63,6 +69,10 @@ const FILE_ROW_BADGE_CLASS: Record<FileRowVariant, string> = {
     "text-xs shrink-0 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-0",
   skipped:
     "text-xs shrink-0 border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400",
+  renamed:
+    "text-xs shrink-0 bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 border-0",
+  deleted:
+    "text-xs shrink-0 bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300 border-0",
 };
 
 function FileRow({
@@ -151,12 +161,16 @@ export function VibeStageWidget(): React.JSX.Element {
   const staged = data?.staged ?? [];
   const partiallyStaged = data?.partiallyStaged ?? [];
   const skipped = data?.skipped ?? [];
+  const renamed = data?.renamed ?? [];
+  const deleted = data?.deleted ?? [];
   const hasResult = data !== null && data !== undefined;
   const isEmpty =
     hasResult &&
     staged.length === 0 &&
     partiallyStaged.length === 0 &&
-    skipped.length === 0;
+    skipped.length === 0 &&
+    renamed.length === 0 &&
+    deleted.length === 0;
   const isDryRun = hasResult && !!data.message?.includes("Dry run");
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
@@ -212,8 +226,45 @@ export function VibeStageWidget(): React.JSX.Element {
       }
     }
 
-    if (skipped.length > 0) {
+    if (renamed.length > 0) {
       if (!isMcp && (staged.length > 0 || partiallyStaged.length > 0)) {
+        lines.push("");
+      }
+      if (!isMcp) {
+        lines.push(
+          `${t("widget.renamed")} (${String(renamed.length)} ${t("widget.renamedCount")}):`,
+        );
+      }
+      for (const f of renamed) {
+        lines.push(isMcp ? `» ${f}` : `  » ${f}`);
+      }
+    }
+
+    if (deleted.length > 0) {
+      if (
+        !isMcp &&
+        (staged.length > 0 || partiallyStaged.length > 0 || renamed.length > 0)
+      ) {
+        lines.push("");
+      }
+      if (!isMcp) {
+        lines.push(
+          `${t("widget.deleted")} (${String(deleted.length)} ${t("widget.deletedCount")}):`,
+        );
+      }
+      for (const f of deleted) {
+        lines.push(isMcp ? `- ${f}` : `  - ${f}`);
+      }
+    }
+
+    if (skipped.length > 0) {
+      if (
+        !isMcp &&
+        (staged.length > 0 ||
+          partiallyStaged.length > 0 ||
+          renamed.length > 0 ||
+          deleted.length > 0)
+      ) {
         lines.push("");
       }
       if (!isMcp) {
@@ -234,6 +285,12 @@ export function VibeStageWidget(): React.JSX.Element {
           ? [
               `${String(partiallyStaged.length)} ${t("widget.partiallyStaged_count")}`,
             ]
+          : []),
+        ...(renamed.length > 0
+          ? [`${String(renamed.length)} ${t("widget.renamedCount")}`]
+          : []),
+        ...(deleted.length > 0
+          ? [`${String(deleted.length)} ${t("widget.deletedCount")}`]
           : []),
         `${String(skipped.length)} ${t("widget.skippedCount")}`,
       ];
@@ -336,6 +393,28 @@ export function VibeStageWidget(): React.JSX.Element {
             fileLabel={t("widget.partialFile")}
             icon={
               <GitMerge className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            }
+          />
+
+          {/* Renamed files (moves) */}
+          <FileSection
+            title={t("widget.renamed")}
+            files={renamed}
+            variant="renamed"
+            fileLabel={t("widget.renameFile")}
+            icon={
+              <MoveRight className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+            }
+          />
+
+          {/* Deleted files (generated/fixtures) */}
+          <FileSection
+            title={t("widget.deleted")}
+            files={deleted}
+            variant="deleted"
+            fileLabel={t("widget.deleteFile")}
+            icon={
+              <Trash2 className="h-4 w-4 text-rose-600 dark:text-rose-400" />
             }
           />
 

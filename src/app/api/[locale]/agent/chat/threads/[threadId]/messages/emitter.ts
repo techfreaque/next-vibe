@@ -27,9 +27,7 @@ export function createMessagesGetEmitter(
 }
 
 /**
- * Build a batching emitter for the messages channel of a thread.
- * High-frequency events (content-delta, compacting-delta) accumulate into a
- * single WS frame. The batcher is flushed by the TTS handler at stream end.
+ * Build an emitter for the messages channel of a thread.
  *
  * When fanOut=false (connector replaying a peer stream), remote relay is
  * suppressed to break echo loops.

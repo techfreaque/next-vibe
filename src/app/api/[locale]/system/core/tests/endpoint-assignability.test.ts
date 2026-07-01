@@ -1074,7 +1074,7 @@ const test8_1: Test8_1_Result = "PASS"; // Intersection preserves variance from 
 // LEVEL 10: Test with actual createEndpoint-returned value (same as task.ts)
 // ============================================================================
 
-import type cleanupDefinitions from "next-vibe/core/utils/dataflow/cleanup/definition";
+import type cleanupDefinitions from "next-vibe/dataflow/cleanup/definition";
 
 type ActualEndpoint = typeof cleanupDefinitions.POST;
 

@@ -31,7 +31,7 @@ import {
   DEFAULT_REMOTE_TOOL_IDS,
   getDefaultToolIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
-import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
+import { invalidateUnbottledCache } from "../transport";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/app/api/[locale]/user/public/login/definition";

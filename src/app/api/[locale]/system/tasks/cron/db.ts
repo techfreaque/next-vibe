@@ -21,7 +21,7 @@ import {
   CronTaskStatusDB,
   TaskCategoryDB,
   TaskOutputModeDB,
-} from "next-vibe/tasks/enum";
+} from "../enum";
 import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
 import { z } from "zod";
 

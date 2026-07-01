@@ -6,23 +6,27 @@
 
 import "server-only";
 
+import { validateData } from "next-vibe/core/core-utils/validation";
+import type { Methods } from "next-vibe/core/definition/enums";
+import {
+  isAgentPlatform,
+  isCliPlatform,
+  Platform,
+} from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError, validateData } from "next-vibe/shared/utils";
+} from "./response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { CountryLanguageValues } from "@/i18n/core/config";
-
-import type { Methods } from "../../types/enums";
-import { isAgentPlatform, isCliPlatform, Platform } from "../../types/platform";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 
 /**
  * Validate locale using the standard schema

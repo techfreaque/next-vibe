@@ -1,13 +1,9 @@
 import { parse } from "jsonc-parser";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as sharedScopedTranslation } from "../i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 
 /**
  * JSON Parser with Comment Support

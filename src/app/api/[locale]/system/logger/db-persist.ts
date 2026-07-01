@@ -17,10 +17,7 @@ import {
   MAX_STACK_LENGTH,
   type NewErrorLog,
 } from "next-vibe/logger/error-monitor/db";
-import {
-  type ErrorLogLevel,
-  type LoggerMetadata,
-} from "next-vibe/logger/types";
+import { type ErrorLogLevel, type LoggerMetadata } from "./types";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
 function truncate(str: string | undefined | null, maxLen: number): string {

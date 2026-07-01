@@ -31,7 +31,7 @@ import type {
   TypecheckIssue,
   TypecheckRequestOutput,
   TypecheckResponseOutput,
-} from "next-vibe/tooling/check/typecheck/definition";
+} from "./definition";
 import type { CheckTypecheckT } from "next-vibe/tooling/check/typecheck/i18n";
 import { z } from "zod";
 

@@ -11,7 +11,7 @@ import {
   rangeRequestField,
   resolutionRequestField,
   timeSeriesResponseField,
-} from "next-vibe/core/utils/dataflow/shared/fields";
+} from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/data-sources/cron-executions-succeeded/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";

@@ -31,8 +31,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
 
   const jsx = React.createElement(LeadNotificationEmail, props);
 
-  const { createEndpointLogger } =
-    await import("@/app/api/[locale]/system/logger/server");
+  const { createEndpointLogger } = await import("next-vibe/logger/server");
   const logger = createEndpointLogger(false, "en-GLOBAL");
 
   await EmailSendingRepository.sendEmail(

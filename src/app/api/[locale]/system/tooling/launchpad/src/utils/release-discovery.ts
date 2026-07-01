@@ -4,7 +4,7 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import type { ReleaseTarget } from "../types/types.js";
+import type { ReleaseTarget } from "next-vibe/tooling/launchpad/src/types/types";
 
 // Type for release config structure
 interface ReleaseConfig {

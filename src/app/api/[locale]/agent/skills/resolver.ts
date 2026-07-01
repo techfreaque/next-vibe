@@ -10,8 +10,8 @@ import { db } from "next-vibe/database";
 
 import type { BridgeSkill } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { isUuid, parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
+import { DEFAULT_SKILLS } from "./config";
+import { customSkills } from "./db";
 
 /**
  * Resolve a BridgeSkill from a raw skillId (supports "slug__variantId" format).

@@ -66,7 +66,7 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { useProviderAvailability } from "../env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 
@@ -2123,8 +2123,7 @@ export function SkillFavoriteActions({
 
   const handleAddAnother = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const { apiClient } = await import("next-vibe/platforms/react/hooks/store");
     const skillSingleDefinitions = await import("./[id]/definition");
     const createFavoriteDefinitions =
       await import("./favorites/create/definition");

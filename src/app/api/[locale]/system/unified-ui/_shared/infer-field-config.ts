@@ -5,12 +5,13 @@
  * It extracts the WidgetConfig from UnifiedField and converts it to FieldConfig.
  */
 
-import type { CreateApiEndpointAny } from "../types/endpoint-base";
-import { FieldDataType, WidgetType } from "../types/enums";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
 import {
   type EndpointFieldStructure,
   getFieldStructureByPath,
 } from "./endpoint-field-types";
+
 import type { FieldConfig } from "./field-config-types";
 
 /**

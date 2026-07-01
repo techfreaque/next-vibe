@@ -21,7 +21,7 @@ import {
 import { z } from "zod";
 
 const TestResultWidget = lazyWidget(() =>
-  import("next-vibe/tooling/check/testing/test/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.TestResultWidget,
   })),
 );

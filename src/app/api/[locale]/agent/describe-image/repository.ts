@@ -26,7 +26,7 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "../env-availability";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import {
   chatFavorites,

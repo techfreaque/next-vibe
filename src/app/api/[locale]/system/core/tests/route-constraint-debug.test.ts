@@ -4,22 +4,20 @@
  * Tests constraint validation for endpoint creation and field configuration.
  */
 
+import type { CreateApiEndpoint } from "next-vibe/core/definition/create";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { Methods } from "next-vibe/core/definition/enums";
+import { WidgetType } from "next-vibe/core/definition/enums";
+import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
+import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+import type { RequestResponseWidgetConfig } from "next-vibe/unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
+} from "next-vibe/unified-ui/_shared/types";
+import { objectField } from "next-vibe/unified-ui/_shared/utils";
 import type { z } from "zod";
-
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { EndpointEventsMap } from "../../../websocket/structured-events";
-import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import { objectField } from "../../field/utils";
-import type { UnifiedField } from "../../types/endpoint";
-import { WidgetType } from "../../types/enums";
-import type { RequestResponseWidgetConfig } from "../../widgets/configs";
-import type { CreateApiEndpointAny } from "../endpoint-base";
-import type { Methods } from "../enums";
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",
 };

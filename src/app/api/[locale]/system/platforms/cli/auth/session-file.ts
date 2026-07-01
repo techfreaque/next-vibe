@@ -1,19 +1,17 @@
 import { promises as fs } from "node:fs";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { SessionData } from "../../shared/server-only/auth/base-auth-handler";
-import { scopedTranslation as cliScopedTranslation } from "../i18n";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { SessionData } from "next-vibe/identity/auth/base-auth-handler";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
 
 /**
  * Session file path

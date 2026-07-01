@@ -5,21 +5,20 @@
 
 "use client";
 
-import { createContext, useContext } from "react";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { type UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
-
-import type { ReactWidgetContext } from "./react-types";
-import type { BaseWidgetContext } from "./types";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { type UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import type {
   WidgetContextStore,
   WidgetContextStoreType,
 } from "./widget-context-store";
+import { createContext, useContext } from "react";
+
+import type { ReactWidgetContext } from "./react-types";
+import type { BaseWidgetContext } from "./types";
 
 /**
  * React Context for the Zustand store
@@ -368,7 +367,7 @@ export {
 // CLI surface helpers - safe to call from cli/ui components
 // ---------------------------------------------------------------------------
 
-import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { isAgentPlatform } from "next-vibe/core/definition/platform";
 
 export type CliSurface = "cli" | "mcp";
 

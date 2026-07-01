@@ -1,5 +1,10 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
-import { cn } from "next-vibe/shared/utils/utils";
+import { cn } from "next-vibe/core/utils/utils";
+// Import ALL types from web version (web is source of truth)
+import type {
+  ProgressIndicatorProps,
+  ProgressRootProps,
+} from "next-vibe/ui/web/ui/progress";
 import * as React from "react";
 import Animated, {
   Extrapolation,
@@ -8,12 +13,6 @@ import Animated, {
   useDerivedValue,
   withSpring,
 } from "react-native-reanimated";
-
-// Import ALL types from web version (web is source of truth)
-import type {
-  ProgressIndicatorProps,
-  ProgressRootProps,
-} from "@/packages/next-vibe-ui/web/ui/progress";
 // Re-export types for consistency
 export type { ProgressIndicatorProps, ProgressRootProps };
 

@@ -1,9 +1,8 @@
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import { z } from "zod";
 
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
-
-import { type SharedTranslationKey } from "../i18n";
+import { type SharedTranslationKey } from "@/app/[locale]/shared/i18n";
 
 /**
  * Create a standardized error response with a translation key

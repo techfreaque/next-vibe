@@ -22,10 +22,7 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  ImageGenModelId,
-  ImageGenModelIdOptions,
-} from "@/app/api/[locale]/agent/image-generation/models";
+import { ImageGenModelId, ImageGenModelIdOptions } from "./models";
 
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {

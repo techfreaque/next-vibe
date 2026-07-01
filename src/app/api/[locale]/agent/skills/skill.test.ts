@@ -41,16 +41,16 @@ import {
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
+import { customSkills } from "./db";
 import {
   ContentLevel,
   IntelligenceLevel,
   SkillCategory,
-} from "@/app/api/[locale]/agent/skills/enum";
+} from "./enum";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/skills/favorites/i18n";
 import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/skills/favorites/repository";
-import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
+import { SkillsRepository } from "./repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 

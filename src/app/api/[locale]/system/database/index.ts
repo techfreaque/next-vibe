@@ -6,7 +6,7 @@ import {
   drizzle as drizzlePglite,
   type PgliteDatabase,
 } from "drizzle-orm/pglite";
-import * as vibeSenseSchema from "next-vibe/core/utils/dataflow/db";
+import * as vibeSenseSchema from "next-vibe/dataflow/db";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import * as leadsSchema from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";

@@ -13,35 +13,33 @@ import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "next-vibe-ui/unified/_shared/types";
-import type { z } from "zod";
-
-import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+} from "next-vibe/unified-ui/_shared/types";
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "next-vibe/unified-ui/_shared/utils";
+import type { z } from "zod";
+
+import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
 
 const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
-import type {
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
+import type { FieldUsage } from "next-vibe/core/definition/enums";
 import {
   LayoutType,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
+import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
 import type {
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+} from "next-vibe/unified-ui/_shared/configs";
 
 // Legacy ObjectField type alias for backward compatibility in tests
 // ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>

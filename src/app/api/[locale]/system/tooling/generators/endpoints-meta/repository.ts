@@ -71,7 +71,7 @@ interface EndpointsMetaResponseType {
  * The shape of each entry in the generated metadata array.
  * Kept as a plain interface (no Zod) - this lives in generated files only.
  */
-interface EndpointMeta {
+export interface EndpointMeta {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */
   toolName: string;
   method: string;

@@ -2,7 +2,7 @@
  * Production-ready error handling for Vibe CLI
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 /**
  * Error context type

@@ -23,26 +23,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "next-vibe/ui/web/ui/form/form";
+} from "./form";
 import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
+} from "../select";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "../tooltip";
 import type {
   FieldConfig,
   FieldStyleClassName,

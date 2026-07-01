@@ -35,7 +35,7 @@ import {
   type VideoVisionModelOption,
   videoVisionModelOptions,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "../env-availability";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   type ImageGenModelOption,

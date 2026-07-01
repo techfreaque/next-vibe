@@ -6,7 +6,7 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { CREDITS_ALIAS } from "@/app/api/[locale]/credits/constants";
+import { CREDITS_ALIAS } from "./constants";
 
 export const category: CategoryDefinition = {
   key: "credits",

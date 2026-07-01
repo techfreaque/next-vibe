@@ -6,22 +6,22 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { parseError } from "next-vibe/shared/utils";
+import { getFullPath } from "next-vibe/core/core-utils/path";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ContentBlock } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { RouteExecutionResult } from "next-vibe/platforms/cli/runtime/route-executor";
+import { renderToString as fastRenderToString } from "next-vibe/ui/renderers/cli/response/fast-ink-renderer/renderer";
 import React from "react";
 
-import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { getEndpoint } from "@/generated/endpoint";
 
-import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
-import { EXECUTE_TOOL_ALIAS } from "../../../../execute-tool/constants";
-import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { CliErrorFormatter } from "./error-formatter";
-import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 import { CliRenderTree } from "./render-tree";
 
 /**

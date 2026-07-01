@@ -19,7 +19,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
-} from "next-vibe/server/server/health/definition";
+} from "./definition";
 import type { ServerHealthT } from "next-vibe/server/server/health/i18n";
 
 import { getCurrentEnvironmentInfo } from "../environment";

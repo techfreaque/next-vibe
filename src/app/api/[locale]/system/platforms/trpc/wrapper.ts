@@ -4,17 +4,17 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import {
-  ErrorResponseTypes,
-  isStreamingResponse,
-} from "next-vibe/shared/types/response.schema";
-
-import { scopedTranslation as cliScopedTranslation } from "../cli/i18n";
+import { Platform } from "next-vibe/core/definition/platform";
 import type {
   EndpointDefinitionsConstraint,
   ToolsObject,
-} from "../shared/endpoints/route/multi";
-import { Platform } from "../shared/types/platform";
+} from "next-vibe/core/route/multi";
+import {
+  ErrorResponseTypes,
+  isStreamingResponse,
+} from "next-vibe/core/route/response.schema";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+
 import { publicProcedure } from "./setup";
 
 /**

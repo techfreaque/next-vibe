@@ -255,18 +255,9 @@ export class ToolConfirmationHandler {
         });
       }
 
-      // wakeUp confirm: execute-tool returned {taskId, status:'pending'} immediately.
-      // Two sub-cases depending on whether the wakeUp result arrived before or after confirm:
-      //
-      // Case A - wakeUp completed BEFORE confirm (newer sequence exists from revival AI turn):
-      //   The deferred result is already in a new sequence. Confirm should insert another
-      //   deferred message as the leaf child (handled below in the non-wakeUp deferred path).
-      //
-      // Case B - confirm fires BEFORE wakeUp completes (no newer sequence yet, goroutine running):
-      //   DO NOT touch the tool message - setting isDeferred=true here would race with
-      //   resume-stream's idempotency check and cause it to skip the revival entirely.
-      //   Just update the task row so handleTaskCompletion backfills the right message,
-      //   then return wakeUpPending=true so the confirm stream skips this tool (revival handles it).
+      // wakeUp confirm race: execute-tool returned {taskId, status:'pending'} immediately.
+      // detectWakeUpConfirmRace determines whether the goroutine is still running (Case B)
+      // or already landed its result (Case A). See handlers/wakeup-confirm.ts for full rationale.
       if (
         isWakeUpConfirm &&
         toolResult !== undefined &&
@@ -391,6 +382,7 @@ export class ToolConfirmationHandler {
             { toolMessageId: toolConfirmation.messageId },
           );
         }
+        // Case A: fall through to the deferred insertion path below.
       }
 
       // Non-wakeUp pending: remote task (queue path).
@@ -401,7 +393,6 @@ export class ToolConfirmationHandler {
       const confirmedToolCallBase: Omit<ToolCall, "isDeferred"> = {
         ...toolCall,
         // Keep original args (with original callbackMode='approve') so AI sees what it actually called.
-        // finalArgs overrides callbackMode to 'wait' for execution only - don't expose that to AI.
         args: baseArgs,
         result: toolResult,
         error: toolError,

@@ -25,21 +25,20 @@ import {
   useInput,
   useStdin,
 } from "ink";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { LoggerProvider } from "@/hooks/logger-provider";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
-import { QueryProvider } from "../../../react/hooks/query-provider";
-import { Platform } from "../../../shared/types/platform";
-import { EndpointsPage } from "../react/EndpointsPage";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
 

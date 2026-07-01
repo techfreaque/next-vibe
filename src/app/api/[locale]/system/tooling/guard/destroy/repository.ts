@@ -17,7 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GuardDestroyRequestOutput,
   GuardDestroyResponseOutput,
-} from "next-vibe/tooling/guard/destroy/definition";
+} from "./definition";
 import type { GuardDestroyT } from "next-vibe/tooling/guard/destroy/i18n";
 
 /**

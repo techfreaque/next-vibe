@@ -590,7 +590,8 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
       try {
         const { apiClient } =
           await import("next-vibe/platforms/react/hooks/store");
-        const generateKeyDef = await import("./generate-key/definition");
+        const generateKeyDef =
+          await import("next-vibe/env/settings/generate-key/definition");
         const result = await apiClient.fetch(
           generateKeyDef.default.GET,
           logger,

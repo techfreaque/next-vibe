@@ -7,11 +7,8 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
-import { GraphResolution } from "next-vibe/core/utils/dataflow/enum";
-import type {
-  Resolution,
-  TimeSeries,
-} from "next-vibe/core/utils/dataflow/shared/fields";
+import { GraphResolution } from "next-vibe/dataflow/enum";
+import type { Resolution, TimeSeries } from "next-vibe/dataflow/shared/fields";
 
 export class EmaIndicatorRepository {
   /**

@@ -32,7 +32,7 @@ import {
 import type {
   TaskIndexRequestOutput,
   TaskIndexResponseOutput,
-} from "next-vibe/tooling/generators/task-index/definition";
+} from "./definition";
 import type { GeneratorsTaskIndexT } from "next-vibe/tooling/generators/task-index/i18n";
 
 export class TaskIndexGeneratorRepository {

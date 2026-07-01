@@ -41,7 +41,7 @@ import { taskOwnerSchema } from "../db";
 import { CRON_QUEUE_ALIAS } from "./constants";
 
 const CronQueueContainer = lazyWidget(() =>
-  import("next-vibe/tasks/cron/queue/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.CronQueueContainer,
   })),
 );

@@ -10,11 +10,8 @@ import type {
   ParsedVersion,
   ReleaseConfig,
   RetryConfig,
-} from "next-vibe/tooling/release/definition";
-import {
-  MESSAGES,
-  RETRY_DEFAULTS,
-} from "next-vibe/tooling/release/repository/constants";
+} from "../definition";
+import { MESSAGES, RETRY_DEFAULTS } from "./constants";
 
 // ============================================================================
 // Type Definitions for Type Guards

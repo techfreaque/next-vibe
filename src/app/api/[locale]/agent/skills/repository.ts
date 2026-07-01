@@ -38,8 +38,8 @@ import type { z } from "zod";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "../env-availability";
+import { getInstanceAvailability } from "../env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";

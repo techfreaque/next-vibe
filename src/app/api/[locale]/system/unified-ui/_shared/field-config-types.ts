@@ -5,12 +5,13 @@
  * This is the shared version - platform-specific code should import from here
  */
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type {
+  Countries,
+  CountryLanguage,
+} from "next-vibe/core/i18n/core/config";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
-
-import type { Countries, CountryLanguage } from "@/i18n/core/config";
-
-import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 export interface EndpointFormFieldProps<
   TEndpoint extends CreateApiEndpointAny,

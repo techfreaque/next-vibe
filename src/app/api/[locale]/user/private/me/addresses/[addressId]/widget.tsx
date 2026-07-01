@@ -20,8 +20,7 @@ export function UserAddressPatchContainer(): JSX.Element {
 
   const handleBack = (): void => {
     void (async (): Promise<void> => {
-      const listDef =
-        await import("@/app/api/[locale]/user/private/me/addresses/definition");
+      const listDef = await import("../definition");
       navigation.push(listDef.default.GET, {});
     })();
   };
@@ -47,8 +46,7 @@ export function UserAddressDeleteContainer(): JSX.Element {
 
   const handleBack = (): void => {
     void (async (): Promise<void> => {
-      const listDef =
-        await import("@/app/api/[locale]/user/private/me/addresses/definition");
+      const listDef = await import("../definition");
       navigation.push(listDef.default.GET, {});
     })();
   };

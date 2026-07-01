@@ -13,16 +13,16 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
+import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
-import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TaskOwner } from "./db";
 

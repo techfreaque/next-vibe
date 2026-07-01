@@ -21,7 +21,7 @@ import {
 import type {
   CodeQualityListSchema,
   CodeQualityListWidgetConfig,
-} from "next-vibe/unified-ui/display-only/code-quality-list/types";
+} from "./types";
 import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type { z } from "zod";

@@ -20,15 +20,9 @@ import { maybeColorize, semantic } from "next-vibe/logger/colors";
 import { serverFileLog } from "next-vibe/logger/file";
 import { createNextjsFormatter } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  BuildProfile,
-  FileToCompile,
-} from "next-vibe/tooling/builder/definition";
+import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
-import {
-  PROFILE_DEFAULTS,
-  ROOT_DIR,
-} from "next-vibe/tooling/builder/repository/constants";
+import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,

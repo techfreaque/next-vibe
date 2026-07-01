@@ -8,7 +8,7 @@ import {
   BottomSheetContent,
   BottomSheetOpenTrigger,
   BottomSheetView,
-} from "next-vibe/ui/native/ui/bottom-sheet";
+} from "./bottom-sheet";
 import { Calendar as CalendarIcon } from "next-vibe/ui/native/ui/icons/Calendar";
 import { X } from "next-vibe/ui/native/ui/icons/X";
 import {
@@ -18,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/native/ui/select";
+} from "./select";
 import { styledNative } from "next-vibe/ui/native/utils/style-converter";
 // Import ALL form types from web - ZERO definitions here
 import type {

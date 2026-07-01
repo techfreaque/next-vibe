@@ -52,7 +52,7 @@ import {
   ThreadsFilter,
   UserSortField,
   UserStatusFilter,
-} from "@/app/api/[locale]/users/enum";
+} from "../enum";
 
 import type { UserListRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

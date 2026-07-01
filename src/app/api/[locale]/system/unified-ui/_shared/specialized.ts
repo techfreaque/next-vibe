@@ -5,13 +5,12 @@
  * countries, and timezones using predefined data sources.
  */
 
-import type { MultiSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/multiselect-field/types";
-import type { SelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/select-field/types";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import type { MultiSelectFieldWidgetConfig } from "next-vibe/unified-ui/form-fields/multiselect-field/types";
+import type { SelectFieldWidgetConfig } from "next-vibe/unified-ui/form-fields/select-field/types";
 import { z } from "zod";
 
 import type { AppLocaleTranslationKey } from "@/app/[locale]/i18n";
-
-import { FieldDataType, WidgetType } from "../types/enums";
 
 // ============================================================================
 // CURRENCY UTILITIES

@@ -18,7 +18,7 @@ import {
 import type {
   CodeQualityFilesSchema,
   CodeQualityFilesWidgetConfig,
-} from "next-vibe/unified-ui/display-only/code-quality-files/types";
+} from "./types";
 import type { ReactElement } from "react";
 import type { z } from "zod";
 

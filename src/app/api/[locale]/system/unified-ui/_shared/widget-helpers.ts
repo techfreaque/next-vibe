@@ -4,7 +4,7 @@
  * Pure functions with no side effects - can be used in any environment
  */
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { WidgetData } from "next-vibe/core/utils/json";
 
 /**
  * Layout Configuration Types

@@ -22,7 +22,7 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
+import { VideoGenModelId } from "./models";
 
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

@@ -305,8 +305,7 @@ export class StreamPartHandler {
           const toolMsgId = result.pendingToolMessage.messageId;
           void (async (): Promise<void> => {
             try {
-              const { db: dbInst } =
-                await import("@/app/api/[locale]/system/db");
+              const { db: dbInst } = await import("next-vibe/database");
               const { cronTasks: cronTasksTable } =
                 await import("next-vibe/tasks/cron/db");
               const { eq: drizzleEq } = await import("drizzle-orm");

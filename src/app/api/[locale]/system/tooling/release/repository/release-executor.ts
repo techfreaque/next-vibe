@@ -35,7 +35,7 @@ import type {
   ReleaseResponseType,
   RequestType,
   Timings,
-} from "next-vibe/tooling/release/definition";
+} from "../definition";
 import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 
 import { assetZipper } from "./asset-zipper";

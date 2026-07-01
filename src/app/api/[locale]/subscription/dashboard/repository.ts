@@ -19,8 +19,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { subscriptions } from "../db";
+import { SubscriptionStatus } from "../enum";
 
 import type { SubscriptionDashboardResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

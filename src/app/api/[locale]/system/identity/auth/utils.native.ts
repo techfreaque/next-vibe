@@ -6,16 +6,15 @@
  * will be implemented in a future update using native-specific auth flows.
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "next-vibe/core/route/response.schema";
+import type { AuthT } from "next-vibe/identity/auth/i18n";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { CompleteUserType } from "../types";
-import type { AuthT } from "./i18n";
+import type { CompleteUserType } from "@/app/api/[locale]/user/types";
 
 /**
  * Require an authenticated admin user - Native stub

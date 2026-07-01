@@ -178,8 +178,7 @@ export class ConnectionDetailRepository {
       logger.info(`Updated SSH connection ${id} for user ${user.id!}`);
 
       // Auto-materialize a default mount if none configured yet
-      const { ensureDefaultMount } =
-        await import("@/app/api/[locale]/ssh/connections/mounts-bootstrap");
+      const { ensureDefaultMount } = await import("../mounts-bootstrap");
       await ensureDefaultMount(id, user.id!);
 
       return success({ updatedAt: updated.updatedAt });

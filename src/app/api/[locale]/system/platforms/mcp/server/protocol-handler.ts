@@ -5,20 +5,19 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
+import type { IDefinitionLoader } from "next-vibe/core/definition/loader";
+import { Platform } from "next-vibe/core/definition/platform";
 import {
   definitionsRegistry,
   type IDefinitionsRegistry,
-} from "../../shared/endpoints/definitions/registry";
-import { permissionsRegistry } from "../../shared/endpoints/permissions/registry";
-import { Platform } from "../../shared/types/platform";
+} from "next-vibe/core/definitions/registry";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import { endpointToMCPTool } from "../converter";
 import { MCPRegistry, mcpRegistry } from "../registry";
 import type {

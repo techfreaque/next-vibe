@@ -70,9 +70,6 @@ import { runRelayBranch } from "./relay-branch";
 import { setupAiStream } from "./stream-setup";
 import { buildSystemPrompt } from "./system-prompt/builder";
 
-/**
- * AI Stream Repository Implementation
- */
 export class AiStreamRepository {
   /**
    * Maximum duration for streaming responses (in seconds)
@@ -697,7 +694,10 @@ export class AiStreamRepository {
         ctx.onCleanup(unsubscribeWakeUp);
 
         try {
-          // Check if compacting is needed (fetches branch messages from DB/storage)
+          // Check if compacting is needed (fetches branch messages from DB/storage).
+          // Revival streams (wakeUp/wait acknowledgment) never compact: they are short
+          // one-line responses confirming async task results. Compacting before "your
+          // image is ready" is wasteful. The next user-initiated turn compacts if needed.
           const compactingCheck =
             await MessageContextBuilder.shouldTriggerCompacting({
               threadId: threadResultThreadId,
@@ -1168,7 +1168,7 @@ export class AiStreamRepository {
           });
           // wakeUp revival: insert deferred (single stream = no race) then revive.
           // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
-          // Also filter out payloads intercepted by wait-for-task (delivered inline).
+          // Also filter out payloads intercepted by await-task (delivered inline).
           const headlessSuppressed =
             streamContext.suppressedWakeUpToolMessageIds;
           const headlessPendingWakeUps = headlessSuppressed
@@ -1255,7 +1255,7 @@ export class AiStreamRepository {
 
           // Skip wakeUp revival if the stream was cancelled by the user.
           // A wakeUp signal may have arrived mid-stream but the user aborted - don't revive.
-          // Also filter out payloads intercepted by wait-for-task (delivered inline).
+          // Also filter out payloads intercepted by await-task (delivered inline).
           const wasAborted = streamAbortController.signal.aborted;
           const suppressed = streamContext.suppressedWakeUpToolMessageIds;
           const pendingWakeUps = suppressed

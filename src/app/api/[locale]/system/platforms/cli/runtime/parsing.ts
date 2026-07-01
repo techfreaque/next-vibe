@@ -3,16 +3,14 @@
  * Static class for parsing CLI arguments and handling input data processing
  */
 
-import { parseError } from "next-vibe/shared/utils";
-import { hasChildren } from "next-vibe-ui/unified/_shared/type-guards";
+import { isEmptySchema } from "next-vibe/core/core-utils/validation";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { SchemaUIHandler } from "next-vibe/ui/renderers/cli/response/schema-handler";
+import { hasChildren } from "next-vibe/unified-ui/_shared/type-guards";
 import type { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
-import { isEmptySchema } from "../../../../shared/utils/validation";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { SchemaUIHandler } from "../../unified-ui/renderers/cli/response/schema-handler";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling

@@ -294,7 +294,6 @@ export class StreamExecutionHandler {
                 return {};
               }
 
-              // === MID-STREAM COMPACTING ===
               // Runs before cortex refresh so the refreshed context is applied
               // to the compacted messages (not the full accumulated history).
               let activeMessages = stepMessages;
@@ -829,15 +828,6 @@ export class StreamExecutionHandler {
       usageData.outputTokenDetails?.reasoningTokens ??
       0;
 
-    // Use our per-step accumulators for accurate billing:
-    // - uncachedInputTokens: sum of per-step uncached input (what we actually pay for)
-    // - cachedInputTokens: sum of per-step cached reads (cheap/free depending on provider)
-    // - cacheWriteTokens: sum of per-step cache writes
-    // - outputTokens: sum of per-step output tokens (always fully billed)
-    // - lastInputTokens: full prompt size on the last step (for display/threshold)
-    //
-    // The AI SDK's streamResult.usage.inputTokens is the SUM of all steps' full prompts —
-    // this massively over-counts because each step re-sends the cached history.
     // providerMeta cacheWriteTokens fallback for claude-code provider.
     const providerCacheWriteTokens =
       (

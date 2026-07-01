@@ -1,12 +1,12 @@
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as sharedScopedTranslation } from "../i18n";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "../types/response.schema";
+} from "next-vibe/core/route/response.schema";
+
+import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 
 /**
  * Converts a time string in HH:MM format to seconds since midnight

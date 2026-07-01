@@ -7,11 +7,7 @@
  */
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
-import {
-  isOverlayOpen,
-  useFocusScopeRegister,
-  useShouldFocus,
-} from "next-vibe/ui/cli/ui/dialog";
+import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type { ButtonProps } from "next-vibe/ui/web/ui/button";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";

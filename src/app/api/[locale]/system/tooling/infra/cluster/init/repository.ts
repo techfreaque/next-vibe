@@ -13,7 +13,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   ClusterInitRequestOutput,
   ClusterInitResponseOutput,
-} from "next-vibe/tooling/infra/cluster/init/definition";
+} from "./definition";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
 import { buildInfraConfig } from "next-vibe/tooling/infra/shared/pulumi/config";
 import { provisionAll } from "next-vibe/tooling/infra/shared/pulumi/index";

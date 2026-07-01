@@ -21,7 +21,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
-} from "next-vibe/tooling/check/config/create/definition";
+} from "./definition";
 import type { ConfigCreateT } from "next-vibe/tooling/check/config/create/i18n";
 
 import { ConfigRepositoryImpl } from "../repository";

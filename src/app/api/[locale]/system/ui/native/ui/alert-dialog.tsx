@@ -1,9 +1,6 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  buttonTextVariants,
-  buttonVariants,
-} from "next-vibe/ui/native/ui/button";
+import { buttonTextVariants, buttonVariants } from "./button";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 import type {
   AlertDialogActionProps,

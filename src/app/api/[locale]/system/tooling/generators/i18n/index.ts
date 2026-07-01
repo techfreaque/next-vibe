@@ -8,7 +8,9 @@ export const scopedTranslation = createScopedTranslation({
   pl: () => require("next-vibe/tooling/generators/i18n/pl").translations,
 });
 
-export type GeneratorsTranslationKey =
+export type GeneratorsGenerateAllTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type GeneratorsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export type GeneratorsGenerateAllT = ReturnType<
+  typeof scopedTranslation.scopedT
+>["t"];

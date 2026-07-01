@@ -5,21 +5,21 @@
  * Renders response data using endpoint definitions for pretty output.
  */
 
-import { parseError } from "next-vibe/shared/utils";
+import { getFullPath } from "next-vibe/core/core-utils/path";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { renderToString as fastRenderToString } from "next-vibe/ui/renderers/cli/response/fast-ink-renderer/renderer";
+import { prewarmLazyWidgets } from "next-vibe/ui/renderers/cli/response/result-formatter";
 import React from "react";
 
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { getEndpoint } from "@/generated/endpoint";
 
-import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
-import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
-import { prewarmLazyWidgets } from "../cli/response/result-formatter";
 import { McpRenderTree } from "./render-tree";
 
 /**

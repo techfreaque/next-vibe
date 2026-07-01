@@ -19,7 +19,7 @@ import type {
   LintIssue,
   LintRequestOutput,
   LintResponseOutput,
-} from "next-vibe/tooling/check/lint/definition";
+} from "./definition";
 import {
   calculateFilteredSummary,
   filterIssues,

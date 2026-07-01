@@ -32,11 +32,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import {
-  ChatModelId,
-  ChatModelIdOptions,
-  getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
 import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 
 import { DefaultFolderId } from "../../chat/config";

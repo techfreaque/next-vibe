@@ -5,11 +5,7 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { Plus, X } from "next-vibe/ui/native/ui/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/native/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
 import type { InputKeyboardEvent } from "next-vibe/ui/web/ui/input";
 import type { TagOption, TagsFieldProps } from "next-vibe/ui/web/ui/tags-field";

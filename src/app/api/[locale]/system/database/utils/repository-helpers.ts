@@ -1,9 +1,9 @@
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "@/app/api/[locale]/system/db/index";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { db } from "..";
 
 /**
  * Transaction Utilities

@@ -46,8 +46,7 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
     );
 
     // Import once outside the loop - dynamic to avoid circular dependencies at module load time
-    const { PulseHealthRepository } =
-      await import("next-vibe/tasks/pulse/repository");
+    const { PulseHealthRepository } = await import("./repository");
 
     let pulseCount = 0;
 

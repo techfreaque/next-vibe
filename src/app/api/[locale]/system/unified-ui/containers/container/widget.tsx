@@ -54,7 +54,7 @@ import type {
   ContainerArrayWidgetConfig,
   ContainerObjectWidgetConfig,
   ContainerUnionWidgetConfig,
-} from "next-vibe/unified-ui/containers/container/types";
+} from "./types";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { type JSX } from "react";

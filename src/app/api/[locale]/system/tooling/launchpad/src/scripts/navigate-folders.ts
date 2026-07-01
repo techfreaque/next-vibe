@@ -6,14 +6,12 @@ import { promisify } from "node:util";
 
 import chalk from "chalk";
 import inquirer from "inquirer";
-
 import type {
   LaunchpadConfig,
   LaunchpadFolder,
   LaunchpadPackage,
-} from "../types/types.js";
-import { cloneRepo } from "../utils/repo-utils.js";
-
+} from "next-vibe/tooling/launchpad/src/types/types";
+import { cloneRepo } from "next-vibe/tooling/launchpad/src/utils/repo-utils";
 const execAsync = promisify(exec);
 
 // Simple logger for launchpad CLI output

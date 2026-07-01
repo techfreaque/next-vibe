@@ -188,7 +188,7 @@ export class GraphSeedsIndexGeneratorRepository {
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { GraphSeedEntry } from "next-vibe/core/utils/dataflow/graph/types";
+import type { GraphSeedEntry } from "next-vibe/dataflow/graph/types";
 
 ${imports.join("\n")}
 

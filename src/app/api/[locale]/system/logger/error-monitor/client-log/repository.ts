@@ -13,7 +13,7 @@ import { isFileLoggingEnabled } from "next-vibe/logger/debug";
 import type {
   ClientLogRequestOutput,
   ClientLogResponseOutput,
-} from "next-vibe/logger/error-monitor/client-log/definition";
+} from "./definition";
 import { clientFileLog } from "next-vibe/logger/file";
 
 function extractTabId(

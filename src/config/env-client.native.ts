@@ -2,8 +2,8 @@
 import Constants from "expo-constants";
 import { Environment } from "next-vibe/env/env-util";
 
-import { DEFAULT_PROJECT_URL } from "@/config/constants";
-import type { EnvClient } from "@/config/env-client";
+import { DEFAULT_PROJECT_URL } from "./constants";
+import type { EnvClient } from "./env-client";
 
 // React Native global type
 declare const __DEV__: boolean;

@@ -1,22 +1,21 @@
 import "server-only";
 
-import {
-  hasChild,
-  hasChildren,
-} from "next-vibe-ui/unified/_shared/type-guards";
-import type { SchemaTypes } from "next-vibe-ui/unified/_shared/types";
-import { z } from "zod";
-
+import { getPreferredToolName } from "next-vibe/core/core-utils/path";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import {
   enrichJsonSchemaFromFields,
   zodSchemaToJsonSchema,
-} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
-import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/core/definition/endpoint-to-metadata";
+import { FieldUsage } from "next-vibe/core/definition/enums";
+import { Platform } from "next-vibe/core/definition/platform";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  hasChild,
+  hasChildren,
+} from "next-vibe/unified-ui/_shared/type-guards";
+import type { SchemaTypes } from "next-vibe/unified-ui/_shared/types";
+import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 import type { MCPTool } from "./types";
 

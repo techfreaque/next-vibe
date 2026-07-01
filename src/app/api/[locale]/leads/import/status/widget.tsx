@@ -27,10 +27,7 @@ import {
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React from "react";
 
-import {
-  CsvImportJobStatus,
-  type CsvImportJobStatusValue,
-} from "@/app/api/[locale]/leads/import/enum";
+import { CsvImportJobStatus, type CsvImportJobStatusValue } from "../enum";
 
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";
@@ -292,8 +289,7 @@ export function ImportStatusContainer({
 
   const handleNewImport = (): void => {
     void (async (): Promise<void> => {
-      const importDef =
-        await import("@/app/api/[locale]/leads/import/definition");
+      const importDef = await import("../definition");
       navigate(importDef.default.POST);
     })();
   };

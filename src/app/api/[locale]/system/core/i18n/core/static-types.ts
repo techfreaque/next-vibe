@@ -1,4 +1,4 @@
-import type { ExplicitObjectType } from "next-vibe/shared/types/utils";
+import type { ExplicitObjectType } from "next-vibe/core/utils/type-utils";
 
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;

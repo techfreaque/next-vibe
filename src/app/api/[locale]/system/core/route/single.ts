@@ -5,16 +5,16 @@
 
 import "server-only";
 
-import {
-  createNextHandler,
-  type NextHandlerReturnType,
-} from "../../../next-api/handler";
-import type { CreateApiEndpointAny } from "../../types/endpoint-base";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import {
   type ApiHandlerOptions,
   createGenericHandler,
   type GenericHandlerReturnType,
 } from "./handler";
+import {
+  createNextHandler,
+  type NextHandlerReturnType,
+} from "next-vibe/platforms/next-api/handler";
 
 /**
  * API handler return type that supports both Next.js and tRPC

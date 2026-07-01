@@ -59,10 +59,7 @@ const { PATCH } = createEndpoint({
       addressId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/user/private/me/addresses/definition")
-          ).default.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "label",
         label: "update.fields.addressId.label" as const,
         description: "update.fields.addressId.description" as const,
@@ -313,10 +310,7 @@ const { DELETE } = createEndpoint({
       addressId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/user/private/me/addresses/definition")
-          ).default.GET,
+        listEndpoint: async () => (await import("../definition")).default.GET,
         labelField: "label",
         label: "delete.fields.addressId.label" as const,
         description: "delete.fields.addressId.description" as const,

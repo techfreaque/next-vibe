@@ -14,7 +14,7 @@ import type {
   ChartDataPointSchema,
   ChartSeriesSchema,
   ChartWidgetSchema,
-} from "next-vibe/unified-ui/display-only/chart/types";
+} from "./types";
 import type { z } from "zod";
 
 /**

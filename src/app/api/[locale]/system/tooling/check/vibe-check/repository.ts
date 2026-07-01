@@ -32,7 +32,7 @@ import { TypecheckRepository } from "next-vibe/tooling/check/typecheck/repositor
 import type {
   VibeCheckRequestOutput,
   VibeCheckResponseOutput,
-} from "next-vibe/tooling/check/vibe-check/definition";
+} from "./definition";
 import type {
   CheckVibeCheckT,
   CheckVibeCheckTranslationKey,

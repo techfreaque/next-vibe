@@ -23,7 +23,7 @@ import type {
   FileToCompile,
   FileToCompileWithPlugins,
   NpmPackageConfig,
-} from "next-vibe/tooling/builder/definition";
+} from "../definition";
 
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";

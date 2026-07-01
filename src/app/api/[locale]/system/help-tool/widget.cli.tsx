@@ -12,7 +12,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
-} from "next-vibe/help-tool/definition";
+} from "./definition";
 import {
   useWidgetLocale,
   useWidgetPlatform,

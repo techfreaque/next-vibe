@@ -7,7 +7,7 @@ import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
-import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
+import { FEATURED_MODELS } from "../models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";

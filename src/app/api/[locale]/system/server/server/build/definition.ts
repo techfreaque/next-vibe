@@ -29,7 +29,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
 
 const BuildResultWidget = lazyWidget(() =>
-  import("next-vibe/server/server/build/widget").then((m) => ({ default: m.BuildResultWidget })),
+  import("./widget").then((m) => ({ default: m.BuildResultWidget })),
 );
 
 const { POST } = createEndpoint({

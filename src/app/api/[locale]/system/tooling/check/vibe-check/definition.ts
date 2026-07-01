@@ -12,10 +12,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { Environment } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  VIBE_CHECK_ALIAS,
-  VIBE_CHECK_ALIAS_SHORT,
-} from "next-vibe/tooling/check/vibe-check/constants";
+import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 import { scopedTranslation } from "next-vibe/tooling/check/vibe-check/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
@@ -31,7 +28,7 @@ import { z } from "zod";
 import { envClient } from "@/config/env-client";
 
 const CheckResultWidget = lazyWidget(() =>
-  import("next-vibe/tooling/check/vibe-check/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.CheckResultWidget,
   })),
 );

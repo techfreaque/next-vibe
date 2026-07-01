@@ -4,9 +4,8 @@
  * Separate from React context to maintain type safety
  */
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type { InkWidgetContext } from "./cli-types";
 

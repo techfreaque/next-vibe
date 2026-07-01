@@ -20,7 +20,7 @@ import type {
   ErrorLogsPatchResponseOutput,
   ErrorLogsRequestOutput,
   ErrorLogsResponseOutput,
-} from "next-vibe/logger/error-monitor/logs/definition";
+} from "./definition";
 import type { ErrorLogsT } from "next-vibe/logger/error-monitor/logs/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 

@@ -8,11 +8,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type {
-  EndpointLogger,
-  ErrorLogLevel,
-  LoggerMetadata,
-} from "next-vibe/logger/types";
+import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
 
 import { colors, maybeColorize, semantic } from "./colors";
 import { enableDebugLogger, mcpSilentMode } from "./debug";

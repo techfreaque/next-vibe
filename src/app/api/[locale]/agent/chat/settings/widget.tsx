@@ -74,8 +74,8 @@ import {
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { DefaultFolderId } from "../config";
+import { parseSkillId } from "../slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";

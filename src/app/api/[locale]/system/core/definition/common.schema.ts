@@ -1,7 +1,6 @@
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
-
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 // Common reusable schemas
 

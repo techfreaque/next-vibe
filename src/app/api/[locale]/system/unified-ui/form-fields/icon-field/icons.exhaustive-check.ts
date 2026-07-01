@@ -3,7 +3,7 @@
  * This file will fail to compile if any icon is missing from the registry
  */
 
-import * as Icons from "next-vibe-ui/ui/icons";
+import * as Icons from "next-vibe/ui/web/ui/icons";
 
 import type { ICON_REGISTRY } from "./icons";
 

@@ -1,14 +1,12 @@
 /**
  * Shared styling utilities for form field widgets
  */
-
-import { cn } from "next-vibe/shared/utils";
-
+import { cn } from "next-vibe/core/utils/utils";
 import type {
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-} from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
+} from "next-vibe/unified-ui/_shared/field-config-types";
 
 /**
  * Get field styling classes based on validation state and theme

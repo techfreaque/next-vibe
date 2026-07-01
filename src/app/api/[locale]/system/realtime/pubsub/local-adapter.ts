@@ -6,9 +6,10 @@
  * because in-process delivery is handled by the channel registry in server.ts.
  */
 
+import type { PubSubAdapter, PubSubMessageHandler } from "./types";
+
 import { broadcastLocalToAll } from "../server";
 import type { AnyEndpointEventEnvelope } from "../structured-events";
-import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 export class LocalPubSubAdapter implements PubSubAdapter {
   publish(

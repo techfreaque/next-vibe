@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Test to debug variance issue with CreateApiEndpointAny
+import type { CreateApiEndpoint } from "next-vibe/core/definition/create";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { Methods } from "next-vibe/core/definition/enums";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
+import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
+} from "next-vibe/unified-ui/_shared/types";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { EndpointEventsMap } from "../../../websocket/structured-events";
-import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import { objectField, requestField } from "../../field/utils";
-import type { UnifiedField } from "../../widgets/configs";
-import type { CreateApiEndpointAny } from "../endpoint-base";
-import type { Methods } from "../enums";
-import { FieldDataType, WidgetType } from "../enums";
 
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",

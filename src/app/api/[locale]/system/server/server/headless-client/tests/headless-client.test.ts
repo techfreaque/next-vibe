@@ -21,6 +21,11 @@ import "server-only";
 import { readFileSync } from "node:fs";
 
 import { and, eq } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -39,12 +44,7 @@ import {
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

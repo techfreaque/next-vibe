@@ -18,8 +18,8 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { DefaultFolderId } from "../config";
+import { chatFolders, chatThreads } from "../db";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 import { chatSettings } from "./db";

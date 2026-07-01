@@ -10,15 +10,11 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "next-vibe/ui/web/ui/command";
+} from "./command";
 import { Check } from "next-vibe/ui/web/ui/icons/Check";
 import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
 import { X } from "next-vibe/ui/web/ui/icons/X";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 

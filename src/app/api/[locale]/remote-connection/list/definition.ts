@@ -20,7 +20,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
+import { ConnectionHealthSchema } from "../db";
 
 import { REMOTE_CONNECTIONS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

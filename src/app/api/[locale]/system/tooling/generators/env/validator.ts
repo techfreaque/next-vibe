@@ -7,7 +7,7 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
-import { stripProjectRoot } from "../shared/utils";
+import { stripProjectRoot } from "next-vibe/tooling/generators/shared/utils";
 
 /**
  * Entry for .env.example generation

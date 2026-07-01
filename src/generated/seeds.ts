@@ -45,7 +45,7 @@ export async function getSeedModule(
     case "subscription":
       return (await import("../app/api/[locale]/subscription/seeds")) as EnvironmentSeeds;
     case "dataflow":
-      return (await import("../app/api/[locale]/system/core/utils/dataflow/seeds")) as EnvironmentSeeds;
+      return (await import("../app/api/[locale]/system/dataflow/seeds")) as EnvironmentSeeds;
     case "pulse":
       return (await import("../app/api/[locale]/system/tasks/pulse/seeds")) as EnvironmentSeeds;
     case "tasks":

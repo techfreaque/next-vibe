@@ -34,7 +34,7 @@ import type {
   VibeFrameConfigRequestOutput,
   VibeFrameConfigResponseOutput,
   WidgetResponse,
-} from "next-vibe/platforms/vibe-frame/mount/definition";
+} from "./definition";
 import { scopedTranslation } from "next-vibe/platforms/vibe-frame/mount/i18n";
 
 import { envClient } from "@/config/env-client";

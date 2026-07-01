@@ -3,10 +3,9 @@
  * This runs once after all tests complete
  */
 
-import { parseError } from "next-vibe/shared/utils";
-
-import { closeDatabase } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { closeDatabase } from "next-vibe/database/index";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { stopServer } from "./test-server";
 

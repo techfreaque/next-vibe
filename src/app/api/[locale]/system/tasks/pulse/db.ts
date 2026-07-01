@@ -13,10 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import {
-  PulseExecutionStatusDB,
-  PulseHealthStatusDB,
-} from "next-vibe/tasks/enum";
+import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";
 
 /**
  * Pulse Health Table

@@ -13,14 +13,14 @@
 
 import "server-only";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { db } from "next-vibe/database";
+import { cronTasks } from "next-vibe/tasks/cron/db";
 import {
   CronTaskPriority,
   CronTaskStatus,
   TaskCategory,
   TaskOutputMode,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+} from "next-vibe/tasks/enum";
 
 export async function createEscalationTask(opts: {
   callbackMode: string;

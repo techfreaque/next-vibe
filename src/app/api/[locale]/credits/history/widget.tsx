@@ -15,7 +15,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { PaginationWidget } from "next-vibe/unified-ui/containers/pagination/widget";
 
-import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
+import { CreditsTabHeader } from "../credits-tab-header";
 
 import type definition from "./definition";
 

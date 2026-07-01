@@ -14,7 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GuardStopRequestOutput,
   GuardStopResponseOutput,
-} from "next-vibe/tooling/guard/stop/definition";
+} from "./definition";
 import type { GuardStopT } from "next-vibe/tooling/guard/stop/i18n";
 
 /**

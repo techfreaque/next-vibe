@@ -8,21 +8,20 @@
 import { existsSync, mkdirSync, renameSync, statSync } from "node:fs";
 import { dirname, parse, resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import type { scopedTranslation } from "../i18n";
+} from "next-vibe/core/route/response.schema";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, FileToCompileWithPlugins } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
+
 import { outputFormatter } from "./output-formatter";
 
 // ============================================================================

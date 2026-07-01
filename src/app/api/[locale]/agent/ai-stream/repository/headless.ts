@@ -17,7 +17,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import { getBestChatModel } from "../models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 

@@ -24,7 +24,7 @@ import {
 import { z } from "zod";
 
 const CheckResultWidget = lazyWidget(() =>
-  import("next-vibe/tooling/check/oxlint/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.CheckResultWidget,
   })),
 );

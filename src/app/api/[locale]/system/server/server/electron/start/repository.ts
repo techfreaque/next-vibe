@@ -22,7 +22,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   ElectronStartRequestOutput,
   ElectronStartResponseOutput,
-} from "next-vibe/server/server/electron/start/definition";
+} from "./definition";
 import type { ElectronStartT } from "next-vibe/server/server/electron/start/i18n";
 
 export class ElectronStartRepository {

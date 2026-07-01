@@ -5,11 +5,7 @@
  */
 
 import type { LeadGetResponseOutput } from "next-vibe/identity/lead/[id]/definition";
-import type {
-  EmailCampaignStage,
-  LeadSource,
-  LeadStatus,
-} from "next-vibe/identity/lead/enum";
+import type { EmailCampaignStage, LeadSource, LeadStatus } from "./enum";
 import { z } from "zod";
 
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/leads/list/definition";

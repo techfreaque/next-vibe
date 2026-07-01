@@ -8,7 +8,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "next-vibe/ui/web/ui/toast";
+} from "./toast";
 import type { JSX } from "react";
 
 export function Toaster(): JSX.Element {

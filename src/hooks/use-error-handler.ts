@@ -3,7 +3,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useEffect } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "./use-logger";
 
 type ErrorWithDigest = Error & { digest?: string };
 

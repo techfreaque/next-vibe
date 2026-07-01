@@ -439,19 +439,27 @@ function buildNeedsMoveLines(
     return [t("response.needsMove.emptyState")];
   }
   const lines: string[] = [];
-  let currentArea = "";
+  // Category headers so the two issue kinds are visually separated. colocate
+  // (→) = "move next to its consumers"; promote (↗) = "shared, lift into vibe".
+  let currentKind: string | null = null;
   for (const e of entries) {
-    const area = e.moveTo ?? "(undecided)";
-    if (area !== currentArea && !isMcp) {
-      currentArea = area;
-      lines.push("");
-      lines.push(`▸ ${area}`);
-    }
     const kind = e.moveKind === "relocate" ? "↗" : "→";
+    if (kind !== currentKind && !isMcp) {
+      currentKind = kind;
+      lines.push("");
+      lines.push(
+        kind === "→"
+          ? "▸ COLOCATE — used from one folder, move next to consumers"
+          : "▸ PROMOTE — shared across domains, lift into vibe",
+      );
+      lines.push(`${"─".repeat(6)}  ${"─".repeat(60)}`);
+    }
+    const count = String(e.importedByCount).padStart(5);
+    const note = e.moveNote ? `  (${e.moveNote})` : "";
     lines.push(
       isMcp
-        ? `${kind} ${area}  ${shortPath(e.path)}`
-        : `  ${kind}  ${shortPath(e.path)}`,
+        ? `${kind} ${String(e.importedByCount)} ${shortPath(e.path)} → ${e.moveTo ?? "?"}`
+        : `${kind} ${count}  ${shortPath(e.path)}\n         → ${e.moveTo ?? "?"}${note}`,
     );
   }
   return lines;

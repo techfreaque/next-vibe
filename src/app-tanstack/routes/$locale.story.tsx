@@ -2,7 +2,7 @@
 import type { JSX } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { toNextParams } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
+import { toNextParams } from "../nextjs-compat-wrapper";
 import { TanstackPage as Layout } from "@/app/[locale]/story/layout";
 
 const loadData = createServerFn({ method: "GET" })
@@ -12,7 +12,13 @@ const loadData = createServerFn({ method: "GET" })
     return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
-function LayoutComponent(): JSX.Element { return <Layout {...Route.useLoaderData()}><Outlet /></Layout>; }
+function LayoutComponent(): JSX.Element {
+  return (
+    <Layout {...Route.useLoaderData()}>
+      <Outlet />
+    </Layout>
+  );
+}
 
 export const Route = createFileRoute("/$locale/story")({
   staleTime: 0,

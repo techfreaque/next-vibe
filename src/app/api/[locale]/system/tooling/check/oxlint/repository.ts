@@ -23,7 +23,7 @@ import type {
   OxlintIssue,
   OxlintRequestOutput,
   OxlintResponseOutput,
-} from "next-vibe/tooling/check/oxlint/definition";
+} from "./definition";
 import type { CheckOxlintT } from "next-vibe/tooling/check/oxlint/i18n";
 import {
   calculateFilteredSummary,

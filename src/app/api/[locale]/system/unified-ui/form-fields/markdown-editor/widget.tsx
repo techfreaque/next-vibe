@@ -23,7 +23,7 @@ import {
 import type {
   MarkdownEditorWidgetConfig,
   MarkdownEditorWidgetSchema,
-} from "next-vibe/unified-ui/form-fields/markdown-editor/types";
+} from "./types";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -18,7 +18,7 @@ import { PulseExecutionStatus } from "next-vibe/tasks/enum";
 import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
-} from "next-vibe/tasks/pulse/history/definition";
+} from "./definition";
 import type { PulseHistoryT } from "next-vibe/tasks/pulse/history/i18n";
 
 import { pulseExecutions } from "../db";

@@ -1,15 +1,22 @@
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { Environment, parseError } from "next-vibe/shared/utils";
-import { cookies } from "next-vibe-ui/lib/headers";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { Environment } from "next-vibe/env/env-util";
+import {
+  type AuthContext,
+  BaseAuthHandler,
+} from "next-vibe/identity/auth/base-auth-handler";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+import { cookies } from "next-vibe/ui/web/lib/headers";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
@@ -17,13 +24,6 @@ import {
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import { env } from "@/config/env";
-import { type CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as cliScopedTranslation } from "../cli/i18n";
-import {
-  type AuthContext,
-  BaseAuthHandler,
-} from "../shared/server-only/auth/base-auth-handler";
 
 /**
  * Web Authentication Handler

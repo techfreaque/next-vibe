@@ -4,7 +4,7 @@
  * When the AI model calls a tool not in the visible tools set (e.g. discovered
  * via tool-help), the AI SDK emits a tool-error. This handler catches that
  * case and either:
- * 1. Executes the tool via RouteExecutionExecutor (if it's in availableTools)
+ * 1. Executes the tool via execute-tool (RouteExecuteRepository) if it's in availableTools
  * 2. Returns a "tool disabled by user" error to the model (if not in availableTools)
  * 3. Handles confirmation requirements (if tool requires confirmation)
  */
@@ -327,7 +327,7 @@ export class ToolErrorHandler {
   }
 
   /**
-   * Execute a tool via RouteExecutionExecutor.
+   * Execute a discovered tool via execute-tool (the single execution path).
    * Returns { data } on success, { error } on failure so callers can forward errors to the model.
    */
   private static async executeTool(params: {
@@ -395,8 +395,6 @@ export class ToolErrorHandler {
           messageParams: result.messageParams,
           args: JSON.stringify(args ?? {}).slice(0, 500),
         });
-        // Return the error so the model can see it and retry with correct params.
-        // Avoid duplicating if messageParams.error is already embedded in message.
         const extraDetail = result.messageParams?.error;
         const errorMsg =
           extraDetail && !result.message.includes(extraDetail as string)

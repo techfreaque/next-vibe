@@ -87,12 +87,10 @@ export async function sendBrowserTestRequest<
     if (user) {
       testUser = user;
     } else if (endpoint.requiresAuthentication()) {
-      const { resolveTestAdminUser } =
-        await import("next-vibe/tooling/check/testing/testing-suite/resolve-test-user");
+      const { resolveTestAdminUser } = await import("./resolve-test-user");
       testUser = await resolveTestAdminUser();
     } else {
-      const { resolveTestAdminUser } =
-        await import("next-vibe/tooling/check/testing/testing-suite/resolve-test-user");
+      const { resolveTestAdminUser } = await import("./resolve-test-user");
       const admin = await resolveTestAdminUser();
       testUser = {
         isPublic: true,
@@ -128,8 +126,7 @@ export async function sendBrowserTestRequest<
     const widgetUrl = `http://localhost:${port}/en-US/tools/${urlSegment}${urlParams ? `?${urlParams}` : ""}`;
 
     // ── 3. Browser tool runner (delegates to sendTestRequest) ──────────────
-    const { sendTestRequest } =
-      await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    const { sendTestRequest } = await import("./send-test-request");
 
     const browserRun = async <TDef extends CreateApiEndpointAny>(
       def: TDef,

@@ -153,8 +153,7 @@ export function ThreadShareDialog({
       );
 
       // Persist
-      const threadDef =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+      const threadDef = await import("../definition");
       await apiClient.mutate(
         threadDef.default.PATCH,
         logger,

@@ -4,10 +4,14 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
 import {
-  getSpacingClassName,
-  getTextSizeClassName,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "next-vibe/ui/web/ui/card";
+import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe/ui/web/ui/chart";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
@@ -22,14 +26,8 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import {
-  type ChartDataPoint,
-  extractChartData,
-} from "next-vibe/unified-ui/display-only/chart/shared";
-import type {
-  ChartWidgetConfig,
-  ChartWidgetSchema,
-} from "next-vibe/unified-ui/display-only/chart/types";
+import { type ChartDataPoint, extractChartData } from "./shared";
+import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 import type { JSX } from "react";
 import type z from "zod";
 

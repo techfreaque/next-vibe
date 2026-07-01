@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
-import type { SignalEvent } from "next-vibe/core/utils/dataflow/shared/fields";
+import type { SignalEvent } from "next-vibe/dataflow/shared/fields";
 
 export class AndEvaluatorRepository {
   static computeAnd(signals: SignalEvent[][]): SignalEvent[] {

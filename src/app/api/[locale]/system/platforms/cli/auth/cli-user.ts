@@ -4,24 +4,23 @@
  * Eliminates 5+ duplicate implementations across the codebase
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
-} from "@/app/api/[locale]/user/auth/types";
+} from "next-vibe/identity/auth/types";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
+} from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
 
-import { scopedTranslation as cliScopedTranslation } from "../i18n";
+import { env } from "@/config/env";
 
 /**
  * Default CLI user configuration
@@ -102,7 +101,7 @@ export async function getCliUser(
 
     if (sessionData?.token) {
       const { AuthRepository } =
-        await import("@/app/api/[locale]/user/auth/repository");
+        await import("next-vibe/identity/auth/repository");
 
       // verifyJwt checks JWT signature + expiry (jose library)
       const verifyResult = await AuthRepository.verifyJwt(
@@ -173,12 +172,12 @@ export async function getCliUser(
     // We can't use getLeadIdFromDb() here because it tries to access cookies
     try {
       const { getLanguageAndCountryFromLocale } =
-        await import("@/i18n/core/language-utils");
+        await import("next-vibe/core/i18n/core/language-utils");
       const { language, country } = getLanguageAndCountryFromLocale(locale);
-      const { db } = await import("@/app/api/[locale]/system/db");
-      const { leads } = await import("@/app/api/[locale]/leads/db");
+      const { db } = await import("next-vibe/database");
+      const { leads } = await import("next-vibe/identity/lead/db");
       const { LeadStatus, LeadSource } =
-        await import("@/app/api/[locale]/leads/enum");
+        await import("next-vibe/identity/lead/enum");
 
       const [newLead] = await db
         .insert(leads)
@@ -224,7 +223,7 @@ export async function getCliUser(
   // Email is set, authenticate from database
   try {
     const { AuthRepository } =
-      await import("@/app/api/[locale]/user/auth/repository");
+      await import("next-vibe/identity/auth/repository");
 
     const authResult = await AuthRepository.authenticateUserByEmail(
       cliUserEmail,

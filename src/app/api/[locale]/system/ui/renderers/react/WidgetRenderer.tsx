@@ -1,40 +1,36 @@
 "use client";
 
-import type { ReactWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import type { ReactWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
-import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
-import ContainerWidget from "next-vibe-ui/unified/containers/container/widget";
-import AlertWidget from "next-vibe-ui/unified/display-only/alert/widget";
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
-import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
-import SeparatorWidget from "next-vibe-ui/unified/display-only/separator/widget";
-import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
-import TitleWidget from "next-vibe-ui/unified/display-only/title/widget";
-import BooleanFieldWidget from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import EntityPickerFieldWidget from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
-import IconFieldWidget from "next-vibe-ui/unified/form-fields/icon-field/widget";
-import SelectFieldWidget from "next-vibe-ui/unified/form-fields/select-field/widget";
-import TextFieldWidget from "next-vibe-ui/unified/form-fields/text-field/widget";
-import TextareaFieldWidget from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import UuidFieldWidget from "next-vibe-ui/unified/form-fields/uuid-field/widget";
-import ButtonWidget from "next-vibe-ui/unified/interactive/button/widget";
-import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget";
-import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import SearchBarWidget from "next-vibe-ui/unified/interactive/search-bar/widget";
-import SubmitButtonWidget from "next-vibe-ui/unified/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/_shared/types";
+import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
+import ContainerWidget from "next-vibe/unified-ui/containers/container/widget";
+import AlertWidget from "next-vibe/unified-ui/display-only/alert/widget";
+import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
+import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
+import SeparatorWidget from "next-vibe/unified-ui/display-only/separator/widget";
+import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
+import TitleWidget from "next-vibe/unified-ui/display-only/title/widget";
+import BooleanFieldWidget from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import EntityPickerFieldWidget from "next-vibe/unified-ui/form-fields/entity-picker-field/widget";
+import IconFieldWidget from "next-vibe/unified-ui/form-fields/icon-field/widget";
+import SelectFieldWidget from "next-vibe/unified-ui/form-fields/select-field/widget";
+import TextFieldWidget from "next-vibe/unified-ui/form-fields/text-field/widget";
+import TextareaFieldWidget from "next-vibe/unified-ui/form-fields/textarea-field/widget";
+import UuidFieldWidget from "next-vibe/unified-ui/form-fields/uuid-field/widget";
+import ButtonWidget from "next-vibe/unified-ui/interactive/button/widget";
+import FormAlertWidget from "next-vibe/unified-ui/interactive/form-alert/widget";
+import NavigateButtonWidget from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import SearchBarWidget from "next-vibe/unified-ui/interactive/search-bar/widget";
+import SubmitButtonWidget from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { type JSX, Suspense } from "react";
 import type { z } from "zod";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import {
-  FieldDataType,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { WidgetErrorBoundary } from "./ErrorBoundary";
 import { resolvedCache } from "./widget-preloader";

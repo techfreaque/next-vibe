@@ -20,7 +20,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   generateSkillAiRunMarkdown,
   generateSkillSkillMarkdown,
-} from "next-vibe/platforms/ai/skills/markdown-generator";
+} from "../markdown-generator";
 
 const CACHE_MAX_AGE = 300; // 5 minutes
 

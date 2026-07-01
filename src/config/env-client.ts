@@ -7,7 +7,7 @@ import { Environment } from "next-vibe/env/env-util";
 import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
 import { z } from "zod";
 
-import { DEFAULT_PROJECT_URL } from "@/config/constants";
+import { DEFAULT_PROJECT_URL } from "./constants";
 
 const isServer = typeof window === "undefined";
 const isBrowser = !isServer && typeof document !== "undefined";

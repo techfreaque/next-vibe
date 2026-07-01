@@ -18,7 +18,7 @@ import {
   releaseAllCommand,
   showReleaseStatusCommand,
   weeklyUpdateCommand,
-} from "next-vibe/tooling/launchpad/src/scripts/release-orchestration";
+} from "./release-orchestration";
 import type { VersionBumpType } from "next-vibe/tooling/launchpad/src/types/types";
 import {
   getRootDirectory,

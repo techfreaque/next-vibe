@@ -18,7 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   TRPCValidationRequestOutput,
   TRPCValidationResponseOutput,
-} from "next-vibe/tooling/generators/generate-trpc-router/validation/definition";
+} from "./definition";
 import type { TrpcValidationT } from "next-vibe/tooling/generators/generate-trpc-router/validation/i18n";
 
 /**
@@ -338,12 +338,8 @@ export class TRPCValidationRepository {
       // Check for definition import
       /* eslint-disable i18next/no-literal-string */
       validation.hasDefinition =
-        content.includes(
-          'from "next-vibe/tooling/generators/generate-trpc-router/validation/definition"',
-        ) ||
-        content.includes(
-          'from "next-vibe/tooling/generators/generate-trpc-router/validation/definition.ts"',
-        );
+        content.includes('from "./definition"') ||
+        content.includes('from "./definition"');
 
       // Check for enhanced handler usage
       validation.hasEnhancedHandler = content.includes("endpointsHandler(");

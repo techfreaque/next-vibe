@@ -2782,7 +2782,7 @@ function CreatorOtherSkills({
       try {
         const [{ apiClient }, listDef] = await Promise.all([
           import("next-vibe/platforms/react/hooks/store"),
-          import("@/app/api/[locale]/agent/skills/definition"),
+          import("../definition"),
         ]);
 
         const result = await apiClient.fetch(

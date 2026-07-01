@@ -8,20 +8,13 @@
  * - Field extraction from endpoint definitions
  */
 
-import type { z, ZodTypeAny } from "zod";
-
-import type {
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TParams } from "@/i18n/core/static-types";
-
-import { hasChildren } from "./type-guards";
+import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { FieldUsage } from "next-vibe/core/definition/enums";
+import { WidgetType } from "next-vibe/core/definition/enums";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
@@ -30,6 +23,10 @@ import type {
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
+import type { z, ZodTypeAny } from "zod";
+
+import type { UnifiedField } from "./configs";
+import { hasChildren } from "./type-guards";
 
 /**
  * Constrained field type for extractAllFields.

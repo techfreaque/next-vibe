@@ -19,8 +19,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
+import type { Modality } from "../enum";
+import type { ModelDefinition } from "../models";
 
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";

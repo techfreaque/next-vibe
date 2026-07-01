@@ -14,7 +14,7 @@ import type { InfraT } from "next-vibe/tooling/infra/i18n";
 import type {
   ScaleReplicasRequestOutput,
   ScaleReplicasResponseOutput,
-} from "next-vibe/tooling/infra/scale/replicas/definition";
+} from "./definition";
 import { scaleDeploymentInCluster } from "next-vibe/tooling/infra/shared/pulumi/app/index";
 
 import { sshConnections } from "@/app/api/[locale]/ssh/db";

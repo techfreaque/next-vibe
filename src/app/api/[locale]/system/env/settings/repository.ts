@@ -20,14 +20,14 @@ import {
   encryptEnvValue,
   isEncryptedValue,
   loadOrCreateKey,
-} from "next-vibe/env/env-crypto";
+} from "../env-crypto";
 import type {
   SystemSettingsGetResponseOutput,
   SystemSettingsPatchRequestInput,
   SystemSettingsPatchResponseOutput,
   SystemSettingsPostRequestOutput,
   SystemSettingsPostResponseOutput,
-} from "next-vibe/env/settings/definition";
+} from "./definition";
 import type { SystemSettingsT } from "next-vibe/env/settings/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ZodTypeAny } from "zod";

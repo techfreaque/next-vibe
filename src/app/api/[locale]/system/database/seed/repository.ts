@@ -11,10 +11,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type {
-  SeedRequestOutput,
-  SeedResponseOutput,
-} from "next-vibe/database/seed/definition";
+import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
 import type { SeedT } from "next-vibe/database/seed/i18n";
 import { scopedTranslation } from "next-vibe/database/seed/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";

@@ -75,7 +75,7 @@ import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/
 import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/skills/[id]/i18n";
 import { ModelGroup } from "@/app/api/[locale]/agent/skills/[id]/widget";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
+import { getBestChatModelForFavorite } from "./definition";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
@@ -446,8 +446,7 @@ export function FavoriteEditContainer({
 
     // Get modelId from the favorites list
     // We need to fetch it from the favorites list GET endpoint
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const { apiClient } = await import("next-vibe/platforms/react/hooks/store");
     const favoritesDefinition = await import("../definition");
 
     const favoritesData = apiClient.getEndpointData(

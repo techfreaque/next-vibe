@@ -38,19 +38,18 @@ import "server-only";
 
 import { getTableName, sql } from "drizzle-orm";
 import type { PgTableWithColumns } from "drizzle-orm/pg-core";
-import { parseError } from "next-vibe/shared/utils";
-
-import { db } from "@/app/api/[locale]/system/db/index";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
-import { isPlaceholder } from "./context";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type {
   InferRecord,
   PgType,
   QueryProxy,
   TypedQueryBuilder,
 } from "./types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { db } from "..";
+import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
+import { isPlaceholder } from "./context";
 
 // ---------------------------------------------------------------------------
 // Public types

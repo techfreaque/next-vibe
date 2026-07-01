@@ -27,19 +27,16 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { useProviderAvailability } from "../env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
-import {
-  getBestVideoGenModel,
-  getVideoGenModelById,
-} from "@/app/api/[locale]/agent/video-generation/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";
+import type { VideoGenModelSelection } from "./models";
+import { getBestVideoGenModel, getVideoGenModelById } from "./models";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

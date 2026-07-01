@@ -4,10 +4,7 @@
  * Used by both React and CLI implementations
  */
 
-import type {
-  StatFormat,
-  StatVariant,
-} from "next-vibe/unified-ui/display-only/stat/types";
+import type { StatFormat, StatVariant } from "./types";
 
 /**
  * Format stat value based on format type and locale

@@ -6,11 +6,12 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-import type { scopedTranslation } from "../i18n";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, BuildReport, BuildStepResult } from "../definition";
+
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 

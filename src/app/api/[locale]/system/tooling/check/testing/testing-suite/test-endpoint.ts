@@ -1,35 +1,34 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import type {
-  AnyChildrenConstrain,
-  FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
-import { beforeAll, describe, expect, it } from "vitest";
-import type { z } from "zod";
-
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
   InferResponseOutput,
   InferUrlVariablesOutput,
-} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
+} from "next-vibe/core/definition/create";
+import type { Methods } from "next-vibe/core/definition/enums";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "@/app/api/[locale]/user/auth/types";
+} from "next-vibe/identity/auth/types";
 import {
   UserPermissionRole,
   UserRole,
   type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/identity/roles/enum";
+import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
+import type { TestEndpointOptions, TestRunner } from "./types";
+import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "next-vibe/unified-ui/_shared/types";
+import { beforeAll, describe, expect, it } from "vitest";
+import type { z } from "zod";
 
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
-import type { TestEndpointOptions, TestRunner } from "./types";
 
 /**
  * Type for example entry

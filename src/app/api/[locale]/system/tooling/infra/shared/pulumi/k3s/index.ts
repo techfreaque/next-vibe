@@ -15,11 +15,8 @@ import {
   patchKubeconfig,
   READ_KUBECONFIG,
   READ_NODE_TOKEN,
-} from "next-vibe/tooling/infra/shared/pulumi/k3s/scripts";
-import {
-  writeClusterState,
-  writeKubeconfig,
-} from "next-vibe/tooling/infra/shared/pulumi/state";
+} from "./scripts";
+import { writeClusterState, writeKubeconfig } from "../state";
 
 import type { ClientT } from "@/app/api/[locale]/ssh/client";
 import {

@@ -5,15 +5,18 @@
 
 import { resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
+import { npmPackageGenerator } from "next-vibe/tooling/builder/repository/vibe-package/npm-package-generator";
+import { PackageEndpointGeneratorRepository } from "next-vibe/tooling/builder/repository/vibe-package/package-endpoint-generator";
+import { createPackagePlugins } from "next-vibe/tooling/builder/repository/vibe-package/package-plugins";
 
 import type {
   BuildConfig,
@@ -28,7 +31,6 @@ import type {
 import { isBunBuildType } from "../definition";
 import { BunBuildTypeEnum } from "../enum";
 import { BuildProfileEnum, StepStatusEnum } from "../enum";
-import type { scopedTranslation } from "../i18n";
 import { bunCompiler } from "./bun-compiler";
 import { bundleAnalyzer } from "./bundle-analyzer";
 import { configLoader } from "./config-loader";
@@ -39,9 +41,6 @@ import { folderCleaner } from "./folder-cleaner";
 import { outputFormatter } from "./output-formatter";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
-import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
-import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
-import { createPackagePlugins } from "./vibe-package/package-plugins";
 import { viteCompiler } from "./vite-compiler";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];

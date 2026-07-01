@@ -26,14 +26,14 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { useProviderAvailability } from "../env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import type { MusicGenModelSelection } from "./models";
+import { getBestMusicGenModel } from "./models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";

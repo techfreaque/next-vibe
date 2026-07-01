@@ -7,57 +7,58 @@
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { EnvExample, EnvRecord } from "next-vibe/env/define-env";
 import { validateEnv } from "next-vibe/env/env-util";
-import { envValidationLogger } from "next-vibe/logger/env-logger";
 import type { z } from "zod";
+
+import type { EnvExample, EnvRecord } from "next-vibe/env/define-env";
+import { envValidationLogger } from "next-vibe/logger/env-logger";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 
 // Import env modules
 import {
   agentEnv,
-  agentEnvExamples,
   agentEnvSchema,
+  agentEnvExamples,
 } from "../app/api/[locale]/agent/env";
 import {
   browserEnv,
-  browserEnvExamples,
   browserEnvSchema,
+  browserEnvExamples,
 } from "../app/api/[locale]/browser/env";
 import {
   leadsCampaignsEnv,
-  leadsCampaignsEnvExamples,
   leadsCampaignsEnvSchema,
+  leadsCampaignsEnvExamples,
 } from "../app/api/[locale]/leads/campaigns/env";
 import {
   messengerEnv,
-  messengerEnvExamples,
   messengerEnvSchema,
+  messengerEnvExamples,
 } from "../app/api/[locale]/messenger/env";
 import {
   imapClientEnv,
-  imapClientEnvExamples,
   imapClientEnvSchema,
+  imapClientEnvExamples,
 } from "../app/api/[locale]/messenger/providers/email/imap-client/env";
 import {
   paymentEnv,
-  paymentEnvExamples,
   paymentEnvSchema,
+  paymentEnvExamples,
 } from "../app/api/[locale]/payment/env";
 import {
   smsEnv,
-  smsEnvExamples,
   smsEnvSchema,
+  smsEnvExamples,
 } from "../app/api/[locale]/sms/env";
 import {
   serverSystemEnv,
-  serverSystemEnvExamples,
   serverSystemEnvSchema,
+  serverSystemEnvExamples,
 } from "../app/api/[locale]/system/server/server/env";
 import {
   env as env_env,
-  envExamples,
   envSchema as env_envSchema,
+  envExamples,
 } from "../config/env";
 
 // Platform detection

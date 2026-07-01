@@ -39,14 +39,14 @@ import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18
 import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
-} from "next-vibe/tasks/unified-runner/definition";
+} from "./definition";
 import type {
   CronTaskAny,
   ResolveRouteIdResult,
   Task,
   TaskRunner,
   TaskStatus,
-} from "next-vibe/tasks/unified-runner/types";
+} from "./types";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
@@ -792,8 +792,7 @@ export class UnifiedTaskRunnerRepository {
     const { taskRegistry } = await import("@/generated/tasks-index");
 
     // Upsert task definitions into DB so they appear in the UI
-    const { prod: seedTasks } =
-      await import("next-vibe/core/utils/dataflow/seeds");
+    const { prod: seedTasks } = await import("next-vibe/dataflow/seeds");
     await seedTasks(logger);
 
     const abortController = new AbortController();

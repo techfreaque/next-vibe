@@ -15,9 +15,9 @@ import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "next-vibe/core/utils/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/core/utils/dataflow/shared/fields";
-import { fillGaps } from "next-vibe/core/utils/dataflow/shared/range";
+} from "next-vibe/dataflow/shared/fields";
+import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
+import { fillGaps } from "next-vibe/dataflow/shared/range";
 import { db } from "next-vibe/database";
 import { leads } from "next-vibe/identity/lead/db";
 

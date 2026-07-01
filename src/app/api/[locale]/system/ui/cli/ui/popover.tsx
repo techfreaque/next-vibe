@@ -32,7 +32,7 @@ import {
   useFocusScopeRegister,
   useOverlayLock,
   useShouldFocus,
-} from "next-vibe/ui/cli/ui/dialog";
+} from "./dialog";
 import type {
   PopoverAnchorProps,
   PopoverCloseProps,

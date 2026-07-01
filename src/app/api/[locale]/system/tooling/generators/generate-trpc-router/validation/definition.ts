@@ -16,7 +16,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   TRPCValidationOperationType,
   TRPCValidationOperationTypeOptions,
-} from "next-vibe/tooling/generators/generate-trpc-router/validation/enum";
+} from "./enum";
 import { scopedTranslation } from "next-vibe/tooling/generators/generate-trpc-router/validation/i18n";
 import {
   objectField,

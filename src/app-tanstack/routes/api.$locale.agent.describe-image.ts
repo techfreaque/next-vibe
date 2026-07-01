@@ -1,11 +1,9 @@
 // AUTO-GENERATED from src/app/api/[locale]/agent/describe-image/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
-import { wrapNextApiRoute } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
+import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/agent/describe-image",
-)({
+export const Route = createFileRoute("/api/$locale/agent/describe-image")({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/agent/describe-image/route"),

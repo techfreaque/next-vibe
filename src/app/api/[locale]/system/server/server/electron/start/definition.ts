@@ -16,7 +16,7 @@ import {
   ELECTRON_ALIAS,
   ELECTRON_START_ALIAS,
   ELECTRON_START_DEV_ALIAS,
-} from "next-vibe/server/server/electron/start/constants";
+} from "./constants";
 import { scopedTranslation } from "next-vibe/server/server/electron/start/i18n";
 import {
   objectField,

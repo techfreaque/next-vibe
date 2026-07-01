@@ -6,21 +6,20 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { PackageJson, ReleasePackage } from "../definition";
-import { scopedTranslation } from "../i18n";
-import { MESSAGES } from "./constants";
+import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import { parsePackageJson, safeJsonParse } from "./utils";
+
+import { MESSAGES } from "./constants";
 
 export class PackageService {
   getPackageJson(

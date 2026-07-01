@@ -2,19 +2,7 @@
  * MultiSelect Component for React Native
  * Imports types from web and provides native implementation
  */
-import { cn } from "next-vibe/shared/utils/utils";
-import * as React from "react";
-import { Pressable, View } from "react-native";
-
-// Import ALL types from web (source of truth)
-import type {
-  MultiSelectOption,
-  MultiSelectProps,
-} from "@/packages/next-vibe-ui/web/ui/multi-select";
-
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { Badge } from "./badge";
-import { Button } from "./button";
+import { cn } from "next-vibe/core/utils/utils";
 import {
   Command,
   CommandEmpty,
@@ -23,8 +11,19 @@ import {
   CommandItem,
   CommandList,
 } from "./command";
-import { Check, ChevronDown, X } from "./icons";
+import { Check, ChevronDown, X } from "next-vibe/ui/native/ui/icons";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+// Import ALL types from web (source of truth)
+import type {
+  MultiSelectOption,
+  MultiSelectProps,
+} from "next-vibe/ui/web/ui/multi-select";
+import * as React from "react";
+import { Pressable, View } from "react-native";
+
+import { Badge } from "./badge";
+import { Button } from "./button";
 
 export function MultiSelect({
   options,

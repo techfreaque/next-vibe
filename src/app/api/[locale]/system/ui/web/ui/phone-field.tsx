@@ -16,12 +16,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "next-vibe/ui/web/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+} from "./command";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";

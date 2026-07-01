@@ -11,10 +11,7 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type {
-  MetadataWidgetConfig,
-  MetadataWidgetSchema,
-} from "next-vibe/unified-ui/display-only/metadata/types";
+import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 /**

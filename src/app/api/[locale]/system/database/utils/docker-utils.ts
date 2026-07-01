@@ -1,9 +1,8 @@
 import { spawn } from "node:child_process";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation } from "./i18n";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation } from "next-vibe/database/utils/i18n";
+import { createEndpointLogger } from "next-vibe/logger/server";
 
 /**
  * Docker log patterns to hide in development mode

@@ -15,7 +15,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { scopedTranslation } from "next-vibe/env/settings/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { type EnvKeyMeta } from "next-vibe/tooling/generators/env-keys/repository";
+import { type EnvKeyMeta } from "next-vibe/env/generator";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
@@ -31,10 +31,14 @@ import { type EnvFieldType } from "@/generated/env-keys";
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
 
 const SystemSettingsWidget = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),
+  import("./widget").then((m) => ({
+    default: m.SystemSettingsWidget,
+  })),
 );
 const SystemSettingsPatchWidget = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.SystemSettingsPatchWidget })),
+  import("./widget").then((m) => ({
+    default: m.SystemSettingsPatchWidget,
+  })),
 );
 
 // Build one requestField per env key at runtime.
@@ -128,7 +132,7 @@ const settingModuleSchema = z.object({
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "runtime", "settings"] as const,
+  path: ["system", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
   title: "get.title" as const,
@@ -279,7 +283,7 @@ export const { GET } = createEndpoint({
 export const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["system", "runtime", "settings"] as const,
+  path: ["system", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "patch.title" as const,
   titleShort: "patch.titleShort" as const,
@@ -383,7 +387,7 @@ export const { PATCH } = createEndpoint({
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "runtime", "settings"] as const,
+  path: ["system", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,

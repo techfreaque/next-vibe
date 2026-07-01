@@ -3,12 +3,11 @@
  * This runs once before all test files
  */
 
-import { parseError } from "next-vibe/shared/utils";
-
-import { closeDatabase } from "@/app/api/[locale]/system/db";
-import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { loadEnvironment } from "@/app/api/[locale]/system/unified-interface/cli/runtime/environment";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { closeDatabase } from "next-vibe/database/index";
+import { SeedRepository } from "next-vibe/database/seed/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { loadEnvironment } from "next-vibe/platforms/cli/runtime/environment";
 
 import teardown from "./global-teardown";
 import { startServer } from "./test-server";

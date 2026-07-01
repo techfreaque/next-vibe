@@ -16,7 +16,7 @@ import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
   UnifiedField,
-} from "next-vibe/unified-ui/_shared/configs";
+} from "./configs";
 import type { Path } from "react-hook-form";
 import type z from "zod";
 

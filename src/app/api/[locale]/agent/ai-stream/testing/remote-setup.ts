@@ -79,7 +79,7 @@ export function readServerPort(pidFile: string): number | null {
 
 /**
  * Returns true if a server is reachable: pid file exists with a PORT line
- * and a GET /api/en-US/system/server/health returns 200.
+ * and a GET /api/en-US/system/runtime/server/health returns 200.
  */
 export async function isServerRunning(
   url: string,
@@ -229,8 +229,7 @@ export async function resolveDevUser(
   const { userRoles } = await import("@/app/api/[locale]/user/db");
   const { userLeadLinks } = await import("next-vibe/identity/lead/db");
   const { eq: eqUser } = await import("drizzle-orm");
-  const { UserRoleDB } =
-    await import("@/app/api/[locale]/user/user-roles/enum");
+  const { UserRoleDB } = await import("next-vibe/identity/roles/enum");
   const logger = createEndpointLogger(false, defaultLocale);
   const result = await UserRepository.getUserByEmail(
     email,
@@ -1136,10 +1135,8 @@ export async function assertProdDbHasMessages(
  * Asserts at least one exists and all have lastExecutionStatus = "completed".
  */
 export async function assertCronTaskCompleted(threadId: string): Promise<void> {
-  const { cronTasks } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
-  const { CronTaskStatus } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+  const { cronTasks } = await import("next-vibe/tasks/cron/db");
+  const { CronTaskStatus } = await import("next-vibe/tasks/enum");
 
   const tasks = await db
     .select({
@@ -1199,8 +1196,7 @@ export async function assertThreadIdle(threadId: string): Promise<void> {
 export async function assertNoOrphanPendingTasks(
   threadId: string,
 ): Promise<void> {
-  const { cronTasks } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+  const { cronTasks } = await import("next-vibe/tasks/cron/db");
 
   const orphans = await db
     .select({

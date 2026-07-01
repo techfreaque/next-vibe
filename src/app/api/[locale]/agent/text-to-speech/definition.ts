@@ -19,10 +19,7 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  TtsModelId,
-  TtsModelIdOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { TtsModelId, TtsModelIdOptions } from "./models";
 
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import { scopedTranslation } from "./i18n";

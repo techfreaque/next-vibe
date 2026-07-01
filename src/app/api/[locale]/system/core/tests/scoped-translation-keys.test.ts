@@ -14,26 +14,25 @@
  * DO NOT DELETE.
  */
 
-import { z } from "zod";
-
-import {
-  type ContactTranslationKey,
-  scopedTranslation,
-} from "@/app/api/[locale]/contact/i18n";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
-
-import { createEndpoint } from "../../endpoints/definition/create";
-import { objectField, requestField } from "../../field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "../../types/enums";
+} from "next-vibe/core/definition/enums";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ExtractScopedKeyType } from "next-vibe/core/i18n/core/static-types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import {
+  type ContactTranslationKey,
+  scopedTranslation,
+} from "@/app/api/[locale]/contact/i18n";
 
 // ============================================================================
 // PROGRESSIVE TYPE TESTS - Isolating where property-level errors break

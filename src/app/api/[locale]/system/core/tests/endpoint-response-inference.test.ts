@@ -11,25 +11,24 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { z } from "zod";
-
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { InferSchemaFromField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
+import type { FieldUsage } from "next-vibe/core/definition/enums";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

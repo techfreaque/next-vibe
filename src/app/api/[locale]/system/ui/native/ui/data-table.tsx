@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/native/ui/table";
+} from "./table";
 import { styledNative } from "next-vibe/ui/native/utils/style-converter";
 import type { DataTableProps } from "next-vibe/ui/web/ui/data-table";
 import type { JSX } from "react";

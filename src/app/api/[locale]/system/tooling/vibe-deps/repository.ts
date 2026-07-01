@@ -19,12 +19,7 @@ import type {
   VibeDepsResponseOutput,
 } from "./definition";
 import type { CheckVibeDepsT } from "./i18n";
-import {
-  allowedEdgeNote,
-  classifyFile,
-  isSelf,
-  resolveMoveTarget,
-} from "./placement";
+import { domainOf, isSelf, placementOf, usageProfile } from "./placement";
 import {
   buildUsageIndex,
   extractSymbols,
@@ -738,43 +733,87 @@ function buildImporterBreakdown(
 // Lens: needs-move (the reorg move-list driver)
 // ============================================================
 
+/** Sort entries by importer count desc, then path. */
+function byImporterCount(a: DepsEntry, b: DepsEntry): number {
+  return b.importedByCount !== a.importedByCount
+    ? b.importedByCount - a.importedByCount
+    : a.path.localeCompare(b.path);
+}
+
+/** Is a file in a settled/ignored area (never proposed for relocation)? */
+function isIgnored(
+  key: string,
+  ignorePrefixes: ReadonlyArray<string>,
+): boolean {
+  return ignorePrefixes.some(
+    (p) => key === p || key.startsWith(`${p}/`) || key.includes(`/${p}/`),
+  );
+}
+
+/** Annotate a move note with "who uses it" so the layer is obvious at a glance. */
+function withUsage(note: string, importers: ReadonlyArray<string>): string {
+  const prof = usageProfile(importers);
+  return `${note}  ·  used-by ${prof.usedByLabel}`;
+}
+
 /**
- * For every file in scope that is NOT already placed, report where it should
- * move. Ordered top-to-bottom by destination area, then path — so the output
- * reads as the move list to execute. Files already in their correct final
- * position (the in-tool whitelist) are silent.
+ * The relocation TODO list — no whitelist, computed from the graph. Every judged
+ * file resolves to colocate / promote / (silent) in-place|unused.
+ *
+ * The result is CATEGORY-BALANCED: instead of one flat by-frequency list, we
+ * return the top-N of EACH category interleaved (colocate first, then promote),
+ * so the report shows a bit of every issue kind rather than 100 promotes burying
+ * the colocates. Each entry's note carries a "used-by route:N repository:M …"
+ * profile so you can tell what layer the file belongs to.
+ *
+ * `scope` restricts WHICH files are judged; importers are always read from the
+ * FULL graph (cross-domain reach preserved). `ignorePrefixes` are settled areas
+ * that still count as importers but are never themselves proposed to move.
  */
-function buildNeedsMove(graph: Graph): DepsEntry[] {
-  const entries: DepsEntry[] = [];
+function buildNeedsMove(
+  graph: Graph,
+  scope: string,
+  ignorePrefixes: ReadonlyArray<string>,
+  perCategory: number,
+): DepsEntry[] {
+  const colocate: DepsEntry[] = [];
+  const promote: DepsEntry[] = [];
+
   for (const key of graph.keys()) {
-    const status = classifyFile(key);
-    // The TODO list covers everything actionable. The ONLY silent skips are the
-    // tool's own files and files already placed (resolved). `needs-move` and
-    // `relocate-later` both appear — packages/ is listed, never blanket-ignored.
-    if (status === "self" || status === "placed" || status === "domain") {
+    if (isSelf(key)) {
       continue;
     }
-    const target = resolveMoveTarget(key);
+    if (scope && !key.includes(scope)) {
+      continue;
+    }
+    if (isIgnored(key, ignorePrefixes)) {
+      continue;
+    }
     const node = graph.get(key)!;
-    entries.push({
+    const importers = [...node.importedBy].toSorted();
+    const verdict = placementOf(key, importers);
+    if (verdict.kind === "in-place" || verdict.kind === "unused") {
+      continue;
+    }
+    const entry: DepsEntry = {
       path: key,
       imports: [],
-      importedBy: [...node.importedBy].toSorted(),
+      importedBy: importers,
       importCount: node.imports.size,
       importedByCount: node.importedBy.size,
       isUnused: node.importedBy.size === 0,
-      moveTo: target.area ?? "(undecided)",
-      moveNote: target.note,
-      moveKind: target.kind,
-    });
+      moveTo: verdict.suggestedDir ?? "(undecided)",
+      moveNote: withUsage(verdict.note, importers),
+      moveKind: verdict.kind === "colocate" ? "reorganize" : "relocate",
+    };
+    (verdict.kind === "colocate" ? colocate : promote).push(entry);
   }
-  // Group by destination area (the move batches), then path.
-  entries.sort((a, b) => {
-    const aa = a.moveTo ?? "";
-    const bb = b.moveTo ?? "";
-    return aa !== bb ? aa.localeCompare(bb) : a.path.localeCompare(b.path);
-  });
-  return entries;
+
+  colocate.sort(byImporterCount);
+  promote.sort(byImporterCount);
+
+  // Category-balanced: top-N of each, colocate first.
+  return [...colocate.slice(0, perCategory), ...promote.slice(0, perCategory)];
 }
 
 // ============================================================
@@ -782,76 +821,78 @@ function buildNeedsMove(graph: Graph): DepsEntry[] {
 // ============================================================
 
 /**
- * Every cross-domain import edge that is NOT an allowed pattern. Each is a
- * candidate to move into vibe (engine/core) or otherwise decouple — surfaced as
- * a TODO, never hidden. Grouped by target (the shared thing being reached for),
- * most-reached first — that ranking is the "promote this" signal.
+ * Every file reached across a DOMAIN boundary, ranked by how many distinct
+ * domains reach it. No whitelist — every cross-domain target is a candidate.
+ * The wider the spread, the stronger the "promote into vibe" signal.
  *
- * "domain" here = top-level category from getCat(); an edge crossing categories
- * where neither side is the same is cross-domain. Allowed framework primitives
- * (response.schema, shared utils, i18n core, engine enums) are reported under a
- * separate allowed tally so the count of *real* candidates is honest.
+ * "domain" = domainOf() — a product domain (agent, leads, …) or a framework
+ * area (system/core, system/ui, …). An edge crossing domains is cross-domain.
+ * The `domainSpread` (distinct source domains) is the ranking key.
  */
-function buildCrossDomain(graph: Graph): {
+function buildCrossDomain(
+  graph: Graph,
+  scope: string,
+  ignorePrefixes: ReadonlyArray<string>,
+): {
   entries: DepsEntry[];
   allowedCount: number;
 } {
-  // target → { cat, importers:Map<sourceCat, Set<file>> }
-  const byTarget = new Map<string, { importers: Map<string, Set<string>> }>();
-  let allowedCount = 0;
+  // target → importers grouped by source domain
+  const byTarget = new Map<string, Map<string, Set<string>>>();
 
   for (const [source, node] of graph) {
     if (isSelf(source)) {
       continue;
     }
-    const srcCat = getCat(source);
+    const srcDomain = domainOf(source);
     for (const target of node.imports) {
-      if (isSelf(target)) {
+      if (isSelf(target) || isIgnored(target, ignorePrefixes)) {
         continue;
       }
-      const tgtCat = getCat(target);
-      if (srcCat === tgtCat) {
+      // Only judge targets in scope (default system/), but count every
+      // cross-domain importer — including domain files reaching into system.
+      if (scope && !target.includes(scope)) {
+        continue;
+      }
+      if (domainOf(target) === srcDomain) {
         continue; // intra-domain — fine
       }
-      if (allowedEdgeNote(source, target)) {
-        allowedCount++;
-        continue; // explicitly allowed primitive — counted, not listed
+      let byDomain = byTarget.get(target);
+      if (!byDomain) {
+        byDomain = new Map();
+        byTarget.set(target, byDomain);
       }
-      let rec = byTarget.get(target);
-      if (!rec) {
-        rec = { importers: new Map() };
-        byTarget.set(target, rec);
-      }
-      const set = rec.importers.get(srcCat) ?? new Set<string>();
+      const set = byDomain.get(srcDomain) ?? new Set<string>();
       set.add(source);
-      rec.importers.set(srcCat, set);
+      byDomain.set(srcDomain, set);
     }
   }
 
   const entries: DepsEntry[] = [];
-  for (const [target, rec] of byTarget) {
-    const allImporters = [...rec.importers.values()].flatMap((s) => [...s]);
-    const fromCats = [...rec.importers.keys()].toSorted();
+  for (const [target, byDomain] of byTarget) {
+    const allImporters = [...byDomain.values()].flatMap((s) => [...s]);
+    const fromDomains = [...byDomain.keys()].toSorted();
     entries.push({
       path: target,
       imports: [],
       importedBy: allImporters.toSorted(),
-      importCount: 0,
+      importCount: fromDomains.length, // reuse as domainSpread
       importedByCount: allImporters.length,
       isUnused: false,
-      targetPackage: getCat(target),
-      // reuse moveNote to carry the "reached from N domains" signal
-      moveNote: `from ${String(fromCats.length)} domains: ${fromCats.join(", ")}`,
+      targetPackage: domainOf(target),
+      moveNote: `${String(fromDomains.length)} domains: ${fromDomains.join(", ")}  ·  used-by ${usageProfile(allImporters).usedByLabel}`,
       offenders: allImporters.toSorted(),
     });
   }
-  // Most-reached target first (strongest candidate to promote).
+  // Widest domain spread first (strongest candidate to promote), then raw count.
   entries.sort((a, b) =>
-    b.importedByCount !== a.importedByCount
-      ? b.importedByCount - a.importedByCount
-      : a.path.localeCompare(b.path),
+    b.importCount !== a.importCount
+      ? b.importCount - a.importCount
+      : b.importedByCount !== a.importedByCount
+        ? b.importedByCount - a.importedByCount
+        : a.path.localeCompare(b.path),
   );
-  return { entries, allowedCount };
+  return { entries, allowedCount: 0 };
 }
 
 // ============================================================
@@ -1027,9 +1068,29 @@ export class VibeDepsRepository {
         }
       }
 
+      // Relocation scope: which files the move/cross-domain lenses JUDGE.
+      // Importers are always read from the full graph, so a system file used
+      // from a domain still shows its true cross-domain spread. When a path is
+      // given (`vibe deps <path>`) we scope to it (normalized to a src-relative
+      // substring); otherwise default to system/ — the framework is the focus.
+      const moveScope = focus
+        ? toPosixPath(focus)
+            .replace(/^.*?\/src\//, "src/")
+            .replace(/\/+$/, "")
+        : "system/";
+
+      const config = loadConfig(logger);
+      const ignorePrefixes = (config.ignore ?? []).map((p) => toPosixPath(p));
+
       // ── Reorg move-list ─────────────────────────────────────
       if (mode === "needs-move") {
-        const entries = buildNeedsMove(graph).slice(0, effectiveLimit);
+        // Category-balanced: top `limit` of EACH category (colocate, promote).
+        const entries = buildNeedsMove(
+          graph,
+          moveScope,
+          ignorePrefixes,
+          effectiveLimit,
+        );
         logger.info(`vibe-deps: needs-move — ${entries.length} files to move`);
         return success({
           view,
@@ -1044,7 +1105,11 @@ export class VibeDepsRepository {
 
       // ── Cross-domain candidates (entanglements to review) ──
       if (mode === "cross-domain") {
-        const { entries, allowedCount } = buildCrossDomain(graph);
+        const { entries, allowedCount } = buildCrossDomain(
+          graph,
+          moveScope,
+          ignorePrefixes,
+        );
         const sliced = entries.slice(0, effectiveLimit);
         logger.info(
           `vibe-deps: cross-domain — ${entries.length} candidate targets, ${allowedCount} allowed edges`,
@@ -1090,8 +1155,6 @@ export class VibeDepsRepository {
         mode === "shared-candidates" ||
         mode === "importers"
       ) {
-        const config = loadConfig(logger);
-
         if (mode === "shared-candidates") {
           const candidates = buildSharedCandidates(graph, config);
           const sliced = candidates.slice(0, effectiveLimit);
@@ -1208,7 +1271,7 @@ export class VibeDepsRepository {
       // Apply focus filter
       let keys = [...viewGraph.keys()];
       if (focus) {
-        const normalizedFocus = toPosixPath(focus);
+        const normalizedFocus = toPosixPath(focus).replace(/\/+$/, "");
         const focusMatches = keys.filter((k) =>
           matchesFocus(k, normalizedFocus),
         );
@@ -1220,8 +1283,16 @@ export class VibeDepsRepository {
           });
         }
 
+        // A DIRECTORY focus (matches a folder prefix / many files) is a SCOPE —
+        // show exactly the files under it, never depth-expand into neighbouring
+        // domains. Depth-expansion only makes sense to explore a single file's
+        // neighbourhood, so it applies only to a pinpoint (single-file) focus.
+        const isDirectoryScope =
+          keys.some((k) => k.startsWith(`${normalizedFocus}/`)) ||
+          focusMatches.length > 1;
+
         // Expand outward by depth
-        if (effectiveDepth > 0) {
+        if (effectiveDepth > 0 && !isDirectoryScope) {
           const expanded = new Set(focusMatches);
           let frontier = new Set(focusMatches);
           for (let d = 0; d < effectiveDepth; d++) {

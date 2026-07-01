@@ -26,13 +26,10 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  getBestImageGenModel,
-  getImageGenModelById,
-} from "@/app/api/[locale]/agent/image-generation/models";
+import { useProviderAvailability } from "../env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
+import type { ImageGenModelSelection } from "./models";
+import { getBestImageGenModel, getImageGenModelById } from "./models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,

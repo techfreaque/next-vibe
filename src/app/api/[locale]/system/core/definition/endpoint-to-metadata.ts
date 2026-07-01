@@ -7,7 +7,7 @@
 
 import { z } from "zod";
 
-import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { FieldDataType } from "./enums";
 
 /**
  * Convert Zod schema to JSON Schema

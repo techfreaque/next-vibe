@@ -43,7 +43,7 @@ interface EnvKeysResponseType {
   outputFile?: string;
 }
 
-interface EnvKeyMeta {
+export interface EnvKeyMeta {
   key: string;
   /** The module name this key belongs to (e.g. "env", "agent") */
   module: string;

@@ -6,12 +6,13 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 
-import type { scopedTranslation } from "../i18n";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-import type { BundleAnalysis } from "../definition";
 import { ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
+
+import type { BundleAnalysis } from "../definition";
 import { outputFormatter } from "./output-formatter";
 
 // ============================================================================

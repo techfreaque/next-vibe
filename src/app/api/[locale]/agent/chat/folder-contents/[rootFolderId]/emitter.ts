@@ -11,6 +11,13 @@ import folderContentsDefinitions, {
 } from "./definition";
 import { FolderContentsRepository } from "./repository";
 
+/**
+ * Folder-contents emitter, bound to one `rootFolderId` channel. The folder's
+ * trust class (PUBLIC/SHARED → shared resource channel, else the owner's own)
+ * resolves the channel kind — the same trust the subscribe-side resolveChannel
+ * applies — so list events for a public/shared folder reach all its viewers.
+ * folder-contents GET is `scope:"resolved"`, so the kind binds here as kindOverride.
+ */
 export function createFolderContentsEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,

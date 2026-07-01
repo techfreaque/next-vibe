@@ -18,7 +18,7 @@
 
 import http from "node:http";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 

@@ -9,7 +9,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { GraphSeedEntry } from "next-vibe/core/utils/dataflow/graph/types";
+import type { GraphSeedEntry } from "next-vibe/dataflow/graph/types";
 
 import { graphSeeds as seedModule0 } from "../app/api/[locale]/agent/chat/graph-seeds";
 import { graphSeeds as seedModule1 } from "../app/api/[locale]/credits/graph-seeds";
@@ -19,7 +19,7 @@ import { graphSeeds as seedModule4 } from "../app/api/[locale]/newsletter/graph-
 import { graphSeeds as seedModule5 } from "../app/api/[locale]/payment/graph-seeds";
 import { graphSeeds as seedModule6 } from "../app/api/[locale]/referral/graph-seeds";
 import { graphSeeds as seedModule7 } from "../app/api/[locale]/subscription/graph-seeds";
-import { graphSeeds as seedModule8 } from "../app/api/[locale]/system/core/utils/dataflow/graph-seeds";
+import { graphSeeds as seedModule8 } from "../app/api/[locale]/system/dataflow/graph-seeds";
 import { graphSeeds as seedModule9 } from "../app/api/[locale]/user/graph-seeds";
 
 /**

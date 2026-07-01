@@ -1,17 +1,16 @@
 "use client";
+import { scopedTranslation } from "next-vibe/platforms/react/i18n";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe-ui/ui/accordion";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
-import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { Pre } from "next-vibe-ui/ui/pre";
-import { type WidgetErrorBoundaryProps } from "next-vibe-ui/unified/_shared/react-types";
+} from "next-vibe/ui/web/ui/accordion";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/web/ui/alert";
+import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
+import { Pre } from "next-vibe/ui/web/ui/pre";
+import { type WidgetErrorBoundaryProps } from "next-vibe/unified-ui/_shared/react-types";
 import { Component, type ErrorInfo, type ReactNode } from "react";
-
-import { scopedTranslation } from "../../../react/i18n";
 /**
  * Widget Error Boundary State
  */

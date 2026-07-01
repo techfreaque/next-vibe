@@ -6,7 +6,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe/ui/web/ui/accordion";
+} from "./accordion";
 import { Info } from "next-vibe/ui/web/ui/icons/Info";
 import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
 import type { ErrorInfo, JSX, ReactNode } from "react";

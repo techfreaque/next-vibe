@@ -12,7 +12,7 @@ import {
   type ResponseType,
 } from "next-vibe/core/route/response.schema";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { DefaultFolderId } from "./config";
 
 /**
  * Validate that thread is not incognito

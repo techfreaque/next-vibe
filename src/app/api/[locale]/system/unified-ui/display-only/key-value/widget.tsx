@@ -12,10 +12,7 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type {
-  KeyValueWidgetConfig,
-  KeyValueWidgetSchema,
-} from "next-vibe/unified-ui/display-only/key-value/types";
+import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 /**

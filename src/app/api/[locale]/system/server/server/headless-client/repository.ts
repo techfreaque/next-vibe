@@ -18,7 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   HeadlessClientRequestOutput,
   HeadlessClientResponseOutput,
-} from "next-vibe/server/server/headless-client/definition";
+} from "./definition";
 import { scopedTranslation } from "next-vibe/server/server/headless-client/i18n";
 
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";

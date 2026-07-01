@@ -65,10 +65,10 @@ import {
   ImageGenModelId,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import { type AnyModelOptionWithVision } from "@/app/api/[locale]/agent/models/all-models";
-import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
-import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
+import { type AnyModelOptionWithVision } from "../all-models";
+import type { Modality, ModelRole } from "../enum";
+import { ModelUtility } from "../enum";
+import { getModelPrice } from "../models";
 import {
   type AnyModelId,
   type AnyModelOption,
@@ -77,7 +77,7 @@ import {
   isModelProviderAvailable,
   modelProviders,
   type ModelType,
-} from "@/app/api/[locale]/agent/models/models";
+} from "../models";
 import {
   filterMusicGenModels,
   getBestMusicGenModel,

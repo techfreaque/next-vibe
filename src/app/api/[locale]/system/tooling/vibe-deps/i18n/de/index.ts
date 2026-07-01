@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
   tag: "analyse",
 
   mode: {
+    report: "Bericht",
     files: "Dateien",
     categories: "Kategorien",
     unused: "Ungenutzt",

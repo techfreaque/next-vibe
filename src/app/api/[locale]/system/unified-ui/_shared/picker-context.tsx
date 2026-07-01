@@ -1,9 +1,8 @@
 "use client";
 
+import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JSX } from "react";
 import { createContext, type ReactNode, useContext } from "react";
-
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /**
  * Picker context — carries the selection callback when a widget is opened in picker mode.

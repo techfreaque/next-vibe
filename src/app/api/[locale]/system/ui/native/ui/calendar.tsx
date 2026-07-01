@@ -1,16 +1,11 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/shared/utils/utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+// Import ALL types from web version (web is source of truth)
+import type { CalendarProps, DateRange } from "next-vibe/ui/web/ui/calendar";
+import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { Text as RNText, View } from "react-native";
-
-// Import ALL types from web version (web is source of truth)
-import type {
-  CalendarProps,
-  DateRange,
-} from "@/packages/next-vibe-ui/web/ui/calendar";
-
-import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export types for consistency
 export type { CalendarProps, DateRange };

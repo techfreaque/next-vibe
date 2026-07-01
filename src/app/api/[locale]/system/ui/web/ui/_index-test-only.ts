@@ -15,15 +15,10 @@ export {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe/ui/web/ui/accordion";
+} from "./accordion";
 
 // alert
-export {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  alertVariants,
-} from "next-vibe/ui/web/ui/alert";
+export { Alert, AlertDescription, AlertTitle, alertVariants } from "./alert";
 
 // alert-dialog
 export {
@@ -38,7 +33,7 @@ export {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "next-vibe/ui/web/ui/alert-dialog";
+} from "./alert-dialog";
 
 // aspect-ratio
 export { AspectRatio } from "./aspect-ratio";
@@ -47,11 +42,7 @@ export { AspectRatio } from "./aspect-ratio";
 export { AutocompleteField } from "./autocomplete-field";
 
 // avatar
-export {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "next-vibe/ui/web/ui/avatar";
+export { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 
 // badge
 export { Badge, badgeVariants } from "./badge";
@@ -68,14 +59,10 @@ export {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "next-vibe/ui/web/ui/breadcrumb";
+} from "./breadcrumb";
 
 // button
-export {
-  Button,
-  buttonTextVariants,
-  buttonVariants,
-} from "next-vibe/ui/web/ui/button";
+export { Button, buttonTextVariants, buttonVariants } from "./button";
 
 // calendar
 export { Calendar } from "./calendar";
@@ -88,7 +75,7 @@ export {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
+} from "./card";
 
 // carousel
 export {
@@ -97,7 +84,7 @@ export {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "next-vibe/ui/web/ui/carousel";
+} from "./carousel";
 
 // chart
 export {
@@ -114,7 +101,7 @@ export {
   Pie,
   Theme,
   useChart,
-} from "next-vibe/ui/web/ui/chart";
+} from "./chart";
 
 // checkbox
 export { Checkbox, CheckboxIndicator } from "./checkbox";
@@ -124,7 +111,7 @@ export {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe/ui/web/ui/collapsible";
+} from "./collapsible";
 
 // command
 export {
@@ -137,7 +124,7 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "next-vibe/ui/web/ui/command";
+} from "./command";
 
 // container
 export { Container } from "./container";
@@ -159,7 +146,7 @@ export {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "next-vibe/ui/web/ui/context-menu";
+} from "./context-menu";
 
 // data-table
 export { DataTable } from "./data-table";
@@ -176,7 +163,7 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from "next-vibe/ui/web/ui/dialog";
+} from "./dialog";
 
 // div
 export { Div } from "./div";
@@ -193,7 +180,7 @@ export {
   DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
-} from "next-vibe/ui/web/ui/drawer";
+} from "./drawer";
 
 // dropdown-item
 export { DropdownItem } from "./dropdown-item";
@@ -215,7 +202,7 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe/ui/web/ui/dropdown-menu";
+} from "./dropdown-menu";
 
 // ============================================================================
 // Form Components
@@ -258,7 +245,7 @@ export {
   HoverCardContent,
   HoverCardPortal,
   HoverCardTrigger,
-} from "next-vibe/ui/web/ui/hover-card";
+} from "./hover-card";
 
 // html
 export { Html } from "./html";
@@ -275,7 +262,7 @@ export {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "next-vibe/ui/web/ui/input-otp";
+} from "./input-otp";
 
 // kbd
 export { Kbd } from "./kbd";
@@ -313,7 +300,7 @@ export {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "next-vibe/ui/web/ui/menubar";
+} from "./menubar";
 
 // motion
 export {
@@ -322,7 +309,7 @@ export {
   MotionDiv,
   MotionImg,
   MotionSpan,
-} from "next-vibe/ui/web/ui/motion";
+} from "./motion";
 
 // multi-select
 export { MultiSelect } from "./multi-select";
@@ -337,7 +324,7 @@ export {
   NavigationMenuList,
   NavigationMenuTrigger,
   NavigationMenuViewport,
-} from "next-vibe/ui/web/ui/navigation-menu";
+} from "./navigation-menu";
 
 // number-input
 export { NumberInput } from "./number-input";
@@ -357,7 +344,7 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "next-vibe/ui/web/ui/pagination";
+} from "./pagination";
 
 // phone-field
 export { COUNTRIES, PhoneField } from "./phone-field";
@@ -370,7 +357,7 @@ export {
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+} from "./popover";
 
 // pre
 export { Pre } from "./pre";
@@ -382,16 +369,10 @@ export { Progress, ProgressIndicator } from "./progress";
 export { RadioGroup, RadioGroupItem } from "./radio-group";
 
 // range-slider
-export {
-  RangeSlider,
-  type RangeSliderProps,
-} from "next-vibe/ui/web/ui/range-slider";
+export { RangeSlider, type RangeSliderProps } from "./range-slider";
 
 // resizable
-export {
-  ResizableContainer,
-  ResizableHandle,
-} from "next-vibe/ui/web/ui/resizable";
+export { ResizableContainer, ResizableHandle } from "./resizable";
 
 // root-stack
 export { RootStack } from "./root-stack";
@@ -414,7 +395,7 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
+} from "./select";
 
 // separator
 export { Separator } from "./separator";
@@ -431,7 +412,7 @@ export {
   SheetPortal,
   SheetTitle,
   SheetTrigger,
-} from "next-vibe/ui/web/ui/sheet";
+} from "./sheet";
 
 // sidebar
 export { SidebarLayout } from "./sidebar";
@@ -440,12 +421,7 @@ export { SidebarLayout } from "./sidebar";
 export { Skeleton } from "./skeleton";
 
 // slider
-export {
-  Slider,
-  SliderRange,
-  SliderThumb,
-  SliderTrack,
-} from "next-vibe/ui/web/ui/slider";
+export { Slider, SliderRange, SliderThumb, SliderTrack } from "./slider";
 
 // span
 export { Span } from "./span";
@@ -463,15 +439,10 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/web/ui/table";
+} from "./table";
 
 // tabs
-export {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe/ui/web/ui/tabs";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 // tags-field
 export { TagsField } from "./tags-field";
@@ -494,17 +465,13 @@ export {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "next-vibe/ui/web/ui/toast";
+} from "./toast";
 
 // toaster
 export { Toaster } from "./toaster";
 
 // toggle
-export {
-  Toggle,
-  toggleTextVariants,
-  toggleVariants,
-} from "next-vibe/ui/web/ui/toggle";
+export { Toggle, toggleTextVariants, toggleVariants } from "./toggle";
 
 // toggle-group
 export { ToggleGroup, ToggleGroupItem } from "./toggle-group";
@@ -515,7 +482,7 @@ export {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "./tooltip";
 
 // typography
 export {
@@ -530,7 +497,7 @@ export {
   Muted,
   P,
   Small,
-} from "next-vibe/ui/web/ui/typography";
+} from "./typography";
 
 // ul
 export { Ul } from "./ul";

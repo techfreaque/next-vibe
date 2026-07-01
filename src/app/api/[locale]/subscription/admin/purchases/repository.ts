@@ -35,7 +35,7 @@ import {
   CreditPackTypeAdminFilter,
   PurchaseSortField,
   SortOrder,
-} from "@/app/api/[locale]/subscription/admin/enum";
+} from "../enum";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type {

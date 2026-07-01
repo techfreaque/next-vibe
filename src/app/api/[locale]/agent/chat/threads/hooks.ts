@@ -10,7 +10,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { DefaultFolderId } from "../config";
 
 import definitions from "./definition";
 

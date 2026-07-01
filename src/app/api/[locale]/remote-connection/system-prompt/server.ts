@@ -49,8 +49,7 @@ export async function loadRemoteInstancesData(
   }
 
   try {
-    const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+    const { RemoteConnectionRepository } = await import("../repository");
     const { sshConnections } = await import("@/app/api/[locale]/ssh/db");
 
     const [connections, localId, sshCountResult] = await Promise.all([

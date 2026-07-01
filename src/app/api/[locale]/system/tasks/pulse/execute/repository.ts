@@ -17,7 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   PulseExecuteRequestOutput,
   PulseExecuteResponseOutput,
-} from "next-vibe/tasks/pulse/execute/definition";
+} from "./definition";
 import type { PulseExecuteT } from "next-vibe/tasks/pulse/execute/i18n";
 
 import { PulseHealthRepository } from "../repository";

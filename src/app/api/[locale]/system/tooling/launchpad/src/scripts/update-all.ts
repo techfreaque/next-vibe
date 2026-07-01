@@ -1,11 +1,10 @@
 /// <reference types="node" />
 import { join } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
-import type { LaunchpadConfig } from "../types/types.js";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as launchpadScopedTranslation } from "next-vibe/tooling/launchpad/i18n";
+import type { LaunchpadConfig } from "next-vibe/tooling/launchpad/src/types/types";
 import {
   cloneRepo,
   closePrompt,
@@ -13,7 +12,7 @@ import {
   repoExists,
   updateRepo,
   updateRootRepo,
-} from "../utils/repo-utils.js";
+} from "next-vibe/tooling/launchpad/src/utils/repo-utils";
 
 export async function updateAllRepos(
   logger: EndpointLogger,

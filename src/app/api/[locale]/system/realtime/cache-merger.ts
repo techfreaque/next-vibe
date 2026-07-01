@@ -12,8 +12,8 @@
  * the React Query cache without unnecessary re-renders.
  */
 
-import type { WidgetData } from "../shared/types/json";
-import type { DeepPartial } from "./structured-events";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { DeepPartial } from "next-vibe/core/utils/type-utils";
 
 interface WithId {
   id: string | number;

@@ -976,8 +976,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleNavigateGraphs = useCallback((): void => {
     void (async (): Promise<void> => {
-      const graphsDef =
-        await import("next-vibe/core/utils/dataflow/graphs/definition");
+      const graphsDef = await import("next-vibe/dataflow/graphs/definition");
       navigate(graphsDef.default.GET, {
         data: { search: "cron" },
       });

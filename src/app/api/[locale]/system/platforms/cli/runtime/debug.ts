@@ -2,10 +2,10 @@
  * Production-ready debug utilities for CLI performance monitoring and resource cleanup
  */
 
-import { mcpSilentMode } from "@/app/api/[locale]/system/logger/debug";
-import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { mcpSilentMode } from "next-vibe/logger/debug";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { binaryStartTime } from "../run-cli";
 import type { RouteExecutionResult } from "./route-executor";
@@ -374,7 +374,7 @@ export class CliResourceManager {
     // Register database cleanup - this is critical for preventing hanging
     this.cleanupRegistry.register(async () => {
       try {
-        const { closeDatabase } = await import("@/app/api/[locale]/system/db");
+        const { closeDatabase } = await import("next-vibe/database");
         await closeDatabase(logger);
       } catch {
         // Database might not be imported yet

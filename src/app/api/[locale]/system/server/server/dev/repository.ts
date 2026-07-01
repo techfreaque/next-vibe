@@ -52,7 +52,7 @@ import {
   killPreviousInstance,
   removePidFromFile,
   writePidFile,
-} from "next-vibe/server/server/pid";
+} from "../pid";
 import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
 import type { Task } from "next-vibe/tasks/unified-runner/types";

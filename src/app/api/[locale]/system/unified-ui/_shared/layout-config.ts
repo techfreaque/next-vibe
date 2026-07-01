@@ -3,7 +3,7 @@
  * Shared across multiple widgets to avoid circular dependencies
  */
 
-import type { LayoutType, SpacingSize } from "../types/enums";
+import type { LayoutType, SpacingSize } from "next-vibe/core/definition/enums";
 
 /**
  * Layout configuration for containers and widgets

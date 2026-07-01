@@ -1,11 +1,11 @@
 "use client";
 
+import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
+import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { resolveEndpoint } from "next-vibe/platforms/react/utils/resolve-endpoint";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { NavigationStackEntry } from "../../shared/types/endpoint";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { endpointToUrlSegment } from "../../shared/utils/path";
-import { resolveEndpoint } from "../utils/resolve-endpoint";
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
 
 // ── Serialization ─────────────────────────────────────────────────────────────

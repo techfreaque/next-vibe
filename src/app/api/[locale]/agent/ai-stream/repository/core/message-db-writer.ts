@@ -7,6 +7,10 @@
  * DB throttle strategy: debounce content updates within THROTTLE_MS window so
  * rapid deltas don't hammer the DB. flush() / flushAll() cancel the timer and
  * write immediately - always called before stream ends or on error.
+ *
+ * This file is the public FACADE. It keeps the exact public API and the
+ * cross-cutting public fields, constructing a shared `WriterState` plus focused
+ * helper instances (under ./db-writer) and delegating every method to them.
  */
 
 import "server-only";
@@ -19,7 +23,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
+import type { MessageVariant } from "./modality-resolver";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
@@ -344,9 +348,6 @@ export class MessageDbWriter {
 
   /**
    * Emit a lightweight TOKENS_UPDATED SSE event with an estimated completion token count.
-   * SSE-only, no DB write. Used mid-stream (during content delta) to give the UI a
-   * live approximation before the real count arrives from the API at step finish.
-   * Estimate: chars / 4 (rough GPT-style average).
    */
   emitEstimatedTokens(
     messageId: string,
@@ -642,8 +643,6 @@ export class MessageDbWriter {
 
   /**
    * Emit a streaming tool-input-delta WS event.
-   * Sends the accumulated argsText so the UI can render the partial arguments.
-   * No DB write - too frequent. DB is updated on the final tool-call event.
    */
   emitToolInputDelta(toolMessageId: string, toolCall: ToolCall): void {
     this.wsEmit("tool-input-delta", {
@@ -653,8 +652,6 @@ export class MessageDbWriter {
 
   /**
    * Update an existing tool message with final parsed args after streaming completes.
-   * Emits message-created (merge) with the finalized toolCall metadata and
-   * updates the DB row. Called when tool-call arrives after tool-input-start.
    */
   async emitToolCallUpdate(params: {
     toolMessageId: string;
@@ -713,8 +710,6 @@ export class MessageDbWriter {
 
   /**
    * Emit TOOL_WAITING SSE (tool requires user confirmation before execution).
-   * No-op: tool-waiting is not a declared event on the messages channel.
-   * The UI derives waiting state from the tool message's metadata.toolCall field.
    */
   emitToolWaiting(): void {
     // intentional no-op
@@ -885,7 +880,6 @@ export class MessageDbWriter {
 
   /**
    * Emit VOICE_TRANSCRIBED SSE and optionally CREDITS_DEDUCTED for STT cost.
-   * Also emits THREAD_TITLE_UPDATED when threadId + isNewThread are provided.
    */
   emitVoiceTranscribed(params: {
     messageId: string;
@@ -918,7 +912,6 @@ export class MessageDbWriter {
 
   /**
    * Emit TOOL_RESULT SSE events for a batch of pre-confirmed tool calls.
-   * Returns the set of message IDs emitted (to prevent duplicate emission during streaming).
    */
   emitBatchToolResults(
     toolResults: Array<{
@@ -966,9 +959,7 @@ export class MessageDbWriter {
 
   /**
    * Emit MESSAGE_CREATED (USER role) SSE so the frontend adds the user message
-   * to state with the correct parentId/depth. The DB record already exists
-   * (created in setupAiStream); this only emits the SSE event.
-   * For incognito the user message is also not in DB so nothing extra needed.
+   * to state with the correct parentId/depth.
    */
   emitUserMessageCreated(params: {
     messageId: string;
@@ -1107,10 +1098,7 @@ export class MessageDbWriter {
   }
 
   /**
-   * Mark a compacting message as failed: emits SSE so live clients exit loading state,
-   * and updates DB so the next session shows the failed state.
-   * Sets metadata.compactingFailed = true and errorMessage so the UI can show a failed state,
-   * and the next send can detect it and retry compacting as a sibling.
+   * Mark a compacting message as failed.
    */
   async emitCompactingFailed(params: {
     messageId: string;
@@ -1261,15 +1249,6 @@ export class MessageDbWriter {
 
   /**
    * Emit MESSAGE_CREATED SSE for an ERROR message, save to DB.
-   * Used by error handlers to show errors in the chat UI.
-   *
-   * The MESSAGE_CREATED event is sufficient for the client to display the error bubble.
-   * Do NOT emit a trailing ERROR SSE here - that would cause a duplicate message
-   * because the client's ERROR handler also creates a new chat message.
-   *
-   * Pass `content` to override the default serialized ErrorResponseType content.
-   * When `content` is a plain translation key string, the bubble renders it without
-   * an error type label or error code (clean informational message).
    */
   async emitErrorMessage(params: {
     threadId: string;
@@ -1334,7 +1313,6 @@ export class MessageDbWriter {
 
   /**
    * Create an ASSISTANT message for generated media (image/audio).
-   * Emits MESSAGE_CREATED SSE with generatedMedia metadata, inserts to DB.
    */
   async emitGeneratedMediaMessage(params: {
     messageId: string;
@@ -1425,8 +1403,6 @@ export class MessageDbWriter {
 
   /**
    * Attach generated media to an existing assistant message (no new message created).
-   * Emits GENERATED_MEDIA_ADDED SSE and updates the DB metadata JSONB.
-   * Used when an LLM emits text first, then a file part - both belong in the same bubble.
    */
   async emitGeneratedMediaOnExistingMessage(params: {
     messageId: string;
@@ -1485,7 +1461,6 @@ export class MessageDbWriter {
 
   /**
    * Emit TOOL_RESULT_UPDATED SSE and update the DB row with the real result.
-   * Called when an async job completes and the previously-pending tool result is ready.
    */
   async emitToolResultUpdated(params: {
     messageId: string;
@@ -1521,9 +1496,6 @@ export class MessageDbWriter {
 
   /**
    * Emit a partial tool result to the parent thread's WS channel and persist to DB.
-   * The tool message stays in "Executing" state (isPartial=true) but partial result
-   * data is available to the widget. Used by long-running tools (e.g. ai-run) to
-   * stream intermediate state (like a sub-thread ID) before the tool finishes.
    */
   async emitPartialToolResult(params: {
     toolMessageId: string;
@@ -1557,9 +1529,6 @@ export class MessageDbWriter {
 
   /**
    * Write a synthetic TOOL message row for a natively-generated file part.
-   * The LLM emitted a file directly (e.g. Gemini Flash Image); this creates
-   * a sibling TOOL message so subsequent turns see the file URL in tool-result context.
-   * Emits a TOOL_RESULT WS event so the frontend renders the generated media.
    */
   async emitSyntheticToolMessage(params: {
     messageId: string;
@@ -1618,8 +1587,6 @@ export class MessageDbWriter {
 
   /**
    * Emit STREAMING_STATE_CHANGED SSE event.
-   * Used to mark the thread as "streaming" before gap-fill begins so the UI
-   * shows an activity indicator during potentially long bridge calls.
    */
   emitStreamingStateChanged(params: {
     threadId: string;
@@ -1632,7 +1599,6 @@ export class MessageDbWriter {
 
   /**
    * Emit GAP_FILL_STARTED SSE event.
-   * Called when a modality bridge begins running on a message attachment.
    */
   emitGapFillStarted(params: {
     messageId: string;
@@ -1657,7 +1623,6 @@ export class MessageDbWriter {
 
   /**
    * Emit GAP_FILL_COMPLETED SSE event and persist the variant to DB.
-   * Called when a modality bridge finishes and the text variant is ready.
    */
   async emitGapFillCompleted(params: {
     messageId: string;
@@ -1706,7 +1671,6 @@ export class MessageDbWriter {
 
   /**
    * Emit a CONTENT_DONE SSE event only (no DB writes).
-   * Use for fallback/empty stop events where there is no DB message to update.
    */
   emitContentDoneRaw(params: {
     messageId: string;
@@ -1733,8 +1697,6 @@ export class MessageDbWriter {
 
   /**
    * Sync a tool result (web search, gen) to cortex_nodes for vector search.
-   * Called fire-and-forget from the tool result handler.
-   * Queries the message directly by ID - no list traversal.
    */
   async syncToolResultEmbedding(
     userId: string,
@@ -1839,8 +1801,6 @@ export class MessageDbWriter {
 
   /**
    * Sync a file upload to cortex_nodes for vector search.
-   * Called fire-and-forget from FileUploadEventHandler after upload completes.
-   * Queries the message directly by ID - no list traversal.
    */
   async syncUploadEmbedding(
     userId: string,
@@ -1924,8 +1884,6 @@ export class MessageDbWriter {
 
   /**
    * Sync the current thread to cortex_nodes for vector search.
-   * Uses dynamic imports to avoid circular dependencies.
-   * Fire-and-forget safe - errors are silently caught by the caller.
    */
   async syncThreadEmbedding(): Promise<void> {
     if (!this.lastThreadId) {

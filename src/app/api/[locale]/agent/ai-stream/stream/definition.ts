@@ -28,12 +28,12 @@ import {
   ChatModelId,
   ChatModelIdOptions,
   chatModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+} from "../models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+} from "../vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";

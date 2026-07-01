@@ -1,7 +1,6 @@
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 
 /**
  * Custom error class that preserves error type and translation parameters

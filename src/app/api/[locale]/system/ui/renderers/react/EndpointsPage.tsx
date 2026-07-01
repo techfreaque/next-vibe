@@ -29,10 +29,7 @@ import {
   useNavigationStack,
 } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { scopedTranslation } from "next-vibe/platforms/react/i18n";
-import {
-  EndpointRenderer,
-  type SubmitButtonConfig,
-} from "next-vibe/ui/renderers/react/EndpointRenderer";
+import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 import { Dialog, DialogContent } from "next-vibe/ui/web/ui/dialog";
 import { Div } from "next-vibe/ui/web/ui/div";
 import {

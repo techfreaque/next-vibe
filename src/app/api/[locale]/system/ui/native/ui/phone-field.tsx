@@ -5,11 +5,7 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { ChevronDown, Phone } from "next-vibe/ui/native/ui/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/native/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
 // Import all types and constants from web (web is source of truth)

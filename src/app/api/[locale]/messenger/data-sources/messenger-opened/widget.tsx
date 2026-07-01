@@ -4,7 +4,7 @@
 
 "use client";
 
-import { DataSourceChartWidget } from "next-vibe/core/utils/dataflow/shared/data-source-widget";
+import { DataSourceChartWidget } from "next-vibe/dataflow/shared/data-source-widget";
 import { useWidgetTranslation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 

@@ -28,12 +28,8 @@ import type {
   CronTaskRow,
   NewCronTask,
   NewCronTaskExecution,
-} from "next-vibe/tasks/cron/db";
-import {
-  cronTaskExecutions,
-  cronTasks,
-  dbUserIdToOwner,
-} from "next-vibe/tasks/cron/db";
+} from "./db";
+import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
 import type { CronTaskRecentExecution } from "next-vibe/tasks/cron/history/definition";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 import type { CronTaskResponseType as CronTaskResponse } from "next-vibe/tasks/cron/tasks/definition";

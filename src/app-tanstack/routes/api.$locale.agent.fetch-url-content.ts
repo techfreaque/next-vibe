@@ -1,11 +1,9 @@
 // AUTO-GENERATED from src/app/api/[locale]/agent/fetch-url-content/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
-import { wrapNextApiRoute } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
+import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/agent/fetch-url-content",
-)({
+export const Route = createFileRoute("/api/$locale/agent/fetch-url-content")({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/agent/fetch-url-content/route"),

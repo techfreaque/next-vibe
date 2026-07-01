@@ -1,20 +1,16 @@
-import { Environment } from "next-vibe/shared/utils";
-import { useMemo } from "react";
-
-import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
-import {
-  ALL_METHODS,
-  Methods,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { clearFormsAfterSuccessInDev } from "@/config/debug";
-import { envClient } from "@/config/env-client";
-
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { ALL_METHODS, Methods } from "next-vibe/core/definition/enums";
+import type { DeepPartial } from "next-vibe/core/utils/type-utils";
+import { Environment } from "next-vibe/env/env-util";
 import type {
   AutoPrefillConfig,
   FormDataPriority,
   FormDataSources,
 } from "./endpoint-types";
+import { useMemo } from "react";
+
+import { clearFormsAfterSuccessInDev } from "@/config/debug";
+import { envClient } from "@/config/env-client";
 
 /**
  * Utility to detect available HTTP methods from endpoints object

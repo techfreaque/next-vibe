@@ -130,9 +130,9 @@ Budget allocation (default):
   overhead       →  100 tokens  (headers, labels, examples)
 ```
 
-**Trim policy**: When a section exceeds its budget, files are trimmed equally - not by dropping low-priority items first, but by proportionally shortening all items. This preserves the full shape of memory at the cost of depth, rather than silently dropping whole files. The AI sees a breadth-first view, not a depth-first one.
+**Real nodes** (`/memories/`, `/documents/`) live in `cortex_nodes`. The AI can write them. They sync across instances.
 
-**Near-budget warning**: When total usage exceeds 90%, a visible indicator is added to the section: `[memory near limit - some content trimmed]`. The AI knows to be selective about what it writes vs. reads on demand.
+**Virtual mounts** are read-only materializations of other tables — they exist for search and system prompt injection only. No data is duplicated into `cortex_nodes`. The AI reads them via `cortex-read`; it cannot write to them directly. Skills are edited via the skills endpoint; threads via the thread endpoints; etc.
 
 **Per-skill override**: Skills can increase or decrease the total budget and per-section allocations. A research skill may want more thread context. A focused coding skill may want fewer memories.
 
@@ -166,14 +166,14 @@ The AI decides what to pin. It is editing its own context.
 
 All cortex nodes (except directories) have a 3072-dimensional embedding vector (qwen3-embedding-8b).
 
-**Embedding triggers:**
+**Triggers:** every `cortex-write` and `cortex-edit` queues an embedding update. Hash-gated: `contentHash` (SHA-256 of path + content) is checked first — no API call if already current.
 
 1. **Any write or edit** - every `cortex-write` and `cortex-edit` queues an embedding update, regardless of who triggered it (user, AI, dreamer, autopilot, API)
 2. **Hash-gated** - `contentHash` (SHA-256 of path + content) is checked before the API call; if it matches the stored hash, the embedding is already current and no call is made
 3. **Backfill** - background batch process fills NULL embeddings for nodes that were created before embedding was available (~100 nodes/min)
 4. **Pre-computed** - system templates and built-in skills ship with embeddings baked into source files via `vibe gen`; zero API cost per user at seed time
 
-**Search is hybrid:**
+**Search (hybrid):** vector similarity (60%) + full-text (40%). Path-type boost: memories 1.2×, skills 1.1×. Recency boost: linear decay over 30 days. Minimum score: 0.2.
 
 - Vector similarity (60% weight) + full-text search (40% weight)
 - Path-type boost: memories 1.2x, skills 1.1x, others 1.0x
@@ -252,12 +252,12 @@ The dreamer's output (dream log) is the autopilot's input. The autopilot's outpu
 
 ## Sync & Isolation
 
-**Sync policy** is per-node (inherited from parent if unset):
+**Provider keys:** `memories` (paths under `/memories/`) and `documents` (paths under `/documents/`) — split so users opt into each independently. Nodes with `syncPolicy = LOCAL` never leave the instance.
 
 - `SYNC` - replicated to connected remote instances (e.g. Hermes)
 - `LOCAL` - stays on this instance only
 
-**Incognito mode** - cortex fragment returns empty. No memories, no context, no logging. The AI has no persistent knowledge of the user in incognito sessions.
+**Incognito:** sync suspended. Cortex fragment returns empty.
 
 **Multi-user isolation** - all queries are scoped by `userId`. Cross-user reads are architecturally impossible.
 

@@ -32,7 +32,7 @@ import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
 import type {
   TaskExecuteRequestOutput,
   TaskExecuteResponseOutput,
-} from "next-vibe/tasks/execute/definition";
+} from "./definition";
 import type { TaskExecuteT } from "next-vibe/tasks/execute/i18n";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
 

@@ -2,17 +2,20 @@
 import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { toNextParams } from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";
+import { toNextParams } from "../nextjs-compat-wrapper";
 import { TanstackPage as Page } from "@/app/[locale]/story/careers/page";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) => {
-    const { tanstackLoader } = await import("@/app/[locale]/story/careers/page");
-        return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+    const { tanstackLoader } =
+      await import("@/app/[locale]/story/careers/page");
+    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
-function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }
+function PageComponent(): JSX.Element {
+  return <Page {...Route.useLoaderData()} />;
+}
 
 export const Route = createFileRoute("/$locale/story/careers/")({
   staleTime: 0,

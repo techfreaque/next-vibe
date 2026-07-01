@@ -17,20 +17,17 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { agentEnv } from "../env";
 import {
   buildMissingKeyMessage,
   getEnvAvailability,
   getInstanceAvailability,
   PROVIDER_SETUP_INSTRUCTIONS,
-} from "@/app/api/[locale]/agent/env-availability";
+} from "../env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  getBestSttModel,
-  type SttModelSelection,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
+import type { SttModelId } from "./models";
+import { getBestSttModel, type SttModelSelection } from "./models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { CreditRepository } from "../../credits/repository";

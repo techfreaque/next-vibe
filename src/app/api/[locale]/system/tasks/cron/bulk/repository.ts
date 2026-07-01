@@ -21,7 +21,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   CronBulkRequestOutput,
   CronBulkResponseOutput,
-} from "next-vibe/tasks/cron/bulk/definition";
+} from "./definition";
 import type { CronBulkT } from "next-vibe/tasks/cron/bulk/i18n";
 import { scopedTranslation as executeTranslation } from "next-vibe/tasks/execute/i18n";
 import { TaskExecuteRepository } from "next-vibe/tasks/execute/repository";

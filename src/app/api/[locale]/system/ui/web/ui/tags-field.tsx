@@ -11,11 +11,7 @@ import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translat
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import { cn } from "next-vibe/core/utils/utils";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 

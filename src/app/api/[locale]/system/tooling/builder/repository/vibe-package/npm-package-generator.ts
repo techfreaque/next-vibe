@@ -6,16 +6,16 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
-import type { scopedTranslation } from "../../i18n";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type {
   NpmPackageConfig,
   PackageExportCondition,
-} from "../../definition";
+} from "next-vibe/tooling/builder/definition";
+
 import { ROOT_DIR } from "../constants";
 import { outputFormatter } from "../output-formatter";
 

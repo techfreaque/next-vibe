@@ -20,8 +20,8 @@ import { tasks as taskModule1 } from "../app/api/[locale]/agent/models/model-pri
 import { tasks as taskModule2 } from "../app/api/[locale]/credits/expire/task";
 import { tasks as taskModule3 } from "../app/api/[locale]/messenger/providers/email/imap-client/sync/task";
 import { tasks as taskModule4 } from "../app/api/[locale]/newsletter/unsubscribe/task";
-import { tasks as taskModule5 } from "../app/api/[locale]/system/core/utils/dataflow/task";
-import { tasks as taskModule6 } from "../app/api/[locale]/system/database/health/task";
+import { tasks as taskModule5 } from "../app/api/[locale]/system/database/health/task";
+import { tasks as taskModule6 } from "../app/api/[locale]/system/dataflow/task";
 import { tasks as taskModule7 } from "../app/api/[locale]/system/identity/attribution/task";
 import { tasks as taskModule8 } from "../app/api/[locale]/system/logger/error-monitor/cleanup/task";
 import { tasks as taskModule9 } from "../app/api/[locale]/user/session-cleanup/task";

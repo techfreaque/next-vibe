@@ -1,22 +1,17 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { EndpointReadOptions } from "next-vibe/core/definition/create";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-import { useCallback, useMemo, useRef } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTranslation } from "@/i18n/core/client";
-
-import type { EndpointReadOptions } from "../../shared/endpoints/definition/create";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import type { ReactHooksTranslationKey } from "./i18n";
-import { executeQuery } from "./query-executor";
+} from "next-vibe/core/route/response.schema";
+import { success } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ReactHooksTranslationKey } from "next-vibe/platforms/react/hooks/i18n";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import {
   deserializeQueryParams,
@@ -24,6 +19,11 @@ import {
   queryClient,
   useApiStore,
 } from "./store";
+import { useCallback, useMemo, useRef } from "react";
+
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+
+import { executeQuery } from "./query-executor";
 import type { ApiQueryReturn } from "./types";
 
 /**

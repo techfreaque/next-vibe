@@ -5,41 +5,39 @@
  * Noob-proof schedule builder: preset grid + custom frequency builder.
  * No raw cron expressions shown to the user.
  */
-
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Input } from "next-vibe-ui/ui/input";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
+import { cn } from "next-vibe/core/utils/utils";
+import { scopedTranslation as cronIdScopedTranslation } from "next-vibe/tasks/cron/[id]/i18n";
+import {
+  calculateNextExecutionTime,
+  formatCronSchedule,
+  formatCronScheduleShort,
+  validateCronSchedule,
+} from "next-vibe/tasks/cron-formatter";
+import { Button } from "next-vibe/ui/web/ui/button";
+import { Div } from "next-vibe/ui/web/ui/div";
+import { Calendar } from "next-vibe/ui/web/ui/icons/Calendar";
+import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
+import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
+import { Input } from "next-vibe/ui/web/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+} from "next-vibe/ui/web/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
+} from "next-vibe/ui/web/ui/select";
+import { Span } from "next-vibe/ui/web/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 
-import {
-  calculateNextExecutionTime,
-  formatCronSchedule,
-  formatCronScheduleShort,
-  validateCronSchedule,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { useLogger } from "@/hooks/use-logger";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getDefaultTimezone } from "@/i18n/core/localization-utils";
-
-import { scopedTranslation as cronIdScopedTranslation } from "../i18n";
 
 // ---------------------------------------------------------------------------
 // Preset definitions

@@ -8,13 +8,13 @@
 
 "use client";
 
-import type { InlineButtonInfo } from "next-vibe-ui/unified/_shared/field-helpers";
+import type { InlineButtonInfo } from "next-vibe/unified-ui/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
+} from "next-vibe/unified-ui/_shared/types";
 import React from "react";
 import type { z } from "zod";
 

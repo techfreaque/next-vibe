@@ -17,11 +17,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import {
-  getImageGenModelById,
-  type ImageGenModelId,
-} from "@/app/api/[locale]/agent/image-generation/models";
+import { getEnvAvailability } from "../env-availability";
+import { getImageGenModelById, type ImageGenModelId } from "./models";
 import {
   ApiProvider,
   isModelOptionImageBased,

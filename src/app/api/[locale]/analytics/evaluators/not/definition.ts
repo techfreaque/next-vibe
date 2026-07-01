@@ -15,7 +15,7 @@ import {
 import {
   signalsRequestField,
   signalsResponseField,
-} from "next-vibe/core/utils/dataflow/shared/fields";
+} from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { objectField } from "next-vibe/unified-ui/_shared/utils";
 

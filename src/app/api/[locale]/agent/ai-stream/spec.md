@@ -30,7 +30,7 @@ The task queue path always produces the same end state as if the tool had run lo
 
 Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
-**`waiting`** - stream is dead but a task is still in flight. Stop button stays visible. No content arrives until revival.
+**`waiting`** — stream is dead but a task is still in flight. Stop button stays visible. No content arrives until revival.
 
 - Set when: task-queue path activates (`waitingForRemoteResult=true` + stream aborts with `REMOTE_TOOL_WAIT`)
 - Cleared when: revival fires (atomically claims `idle|waiting → streaming`)
@@ -46,7 +46,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool executing. Stream pauses, then continues with the result. Seamless.
 
-**AI sees**: result returned inline, loop continues - always. For the task-queue path, the stream revives and the AI picks up from where it left off; the deferred mechanics are invisible to the AI.
+**AI sees**: result returned inline, loop continues — always.
 
 | Transport                | Stream behavior                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------- |
@@ -55,7 +55,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote queue**         | Stream aborts → `waiting`. Task executes remotely. On completion: see lifecycle below. |
 | **Escalated (>timeout)** | Same as remote queue path.                                                             |
 
-**Tool message lifecycle - task-queue path:**
+**Tool message lifecycle — escalated path:**
 
 - At call time: tool message created, `status: "pending"` (UI shows executing)
 - While waiting: message stays `pending`, thread stays `waiting`
@@ -70,7 +70,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool dispatched, stream continues immediately. Result bubble updates in background when done.
 
-**AI sees**: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` - always.
+**AI sees**: `{ taskId, status: "pending", hint: "use await-task(taskId) if you need the result" }` — always.
 
 | Transport         | Stream behavior                                                       |
 | ----------------- | --------------------------------------------------------------------- |
@@ -78,7 +78,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote direct** | Non-blocking HTTP. AI gets taskId immediately.                        |
 | **Remote queue**  | Task created. AI gets taskId immediately.                             |
 
-**Tool message**: created `pending`. On completion: backfilled with result, `TASK_COMPLETED` WS event. No revival. AI can upgrade by calling `wait-for-task(taskId)`.
+**Tool message**: created `pending`. On completion: backfilled with result, `TASK_COMPLETED` WS event. No revival. AI can upgrade by calling `await-task(taskId)`.
 
 ---
 
@@ -86,7 +86,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool dispatched, stream continues immediately. When result arrives, a new AI turn starts automatically.
 
-**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready - do NOT call wait-for-task" }` - always.
+**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call await-task" }` — always.
 
 | Transport         | Stream behavior                                                                                              |
 | ----------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -110,9 +110,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `endLoop`
 
-**User sees**: tool executing, then stream ends. Background task visible until complete.
-
-**AI sees**: result returned, then loop stops - always.
+**User sees**: tool executing, then stream ends.
 
 | Transport         | Stream behavior                                                                                                                                                 |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -157,7 +155,7 @@ Every thread has a per-thread message queue. All async results and user messages
 - `handleTaskCompletion` for wakeUp/wait → result appended to queue
 - Cross-agent messages from remote agents → appended to queue (future)
 
-**Queue executor - runs after every enqueue:**
+**Queue executor — runs after every enqueue:**
 
 1. If thread is `streaming`: hand the item to the live stream as the next step. Stream picks it up at the end of the current tool batch.
 2. If thread is `idle` or `waiting`: drain the full queue in one shot - fire a revival run with all queued items as context (tool results first, then user messages in order).
@@ -204,11 +202,11 @@ When waiting for a remote result (task-queue path, `wait-for-task`, escalated to
 - Thread → `waiting`. Revival delivers result when task completes via queue.
 - `pendingTimeoutMs = 0` → no timer (wait forever)
 
-**Default: 90s.** Covers a full task-queue pulse cycle.
+**Default: 90s.** Covers a full tool execution window.
 
-**Per-tool override**: `streamTimeoutMs: 0` in endpoint definition for interactive tools (shells, long-running agents).
+**Per-tool override**: `streamTimeoutMs: 0` in endpoint definition for long-running interactive tools.
 
-**Direct HTTP `wait` mode**: no timer - the HTTP connection is the timeout.
+**`reverse-ws` and `direct-http` `wait` mode**: no timer — the connection itself is the timeout.
 
 ---
 
@@ -218,7 +216,7 @@ For tools that may run longer than the configured timeout:
 
 **Fast path**: returns within timeout → result returned normally. Zero overhead.
 
-**Escalation**: tool calls `context.escalateToTask(callbackMode)` before the long-running work:
+**Escalation**: tool calls `context.escalateToTask(options?)` before long-running work:
 
 1. Creates task row with `callbackMode`, stores `leafMessageId`
 2. Sets `waitingForRemoteResult=true`, `pendingTimeoutMs` from endpoint definition

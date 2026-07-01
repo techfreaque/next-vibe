@@ -344,7 +344,7 @@ function isAllowedRouteImport(source: string): boolean {
     return true;
   }
   // Shared dataflow (vibe-sense) repository: graph endpoints delegate to the one
-  // canonical VibeSenseRepository (core/utils/dataflow/repository).
+  // canonical VibeSenseRepository (dataflow/repository).
   if (/(^|\/)dataflow\/repository$/.test(source)) {
     return true;
   }

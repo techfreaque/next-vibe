@@ -17,7 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
+import { getVideoGenModelById } from "./models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 
 import {

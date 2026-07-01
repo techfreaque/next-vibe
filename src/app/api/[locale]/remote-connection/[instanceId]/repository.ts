@@ -20,7 +20,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { invalidateUnbottledCache } from "@/app/api/[locale]/remote-connection/transport";
+import { invalidateUnbottledCache } from "../transport";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 
 import { remoteConnections } from "../db";
@@ -290,8 +290,7 @@ export class RemoteConnectionInstanceRepository {
         await import("next-vibe/realtime/connector");
       await restartConnection(targetInstanceId);
     } else {
-      const { closeConnection } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+      const { closeConnection } = await import("next-vibe/realtime/connector");
       closeConnection(targetInstanceId);
     }
 
@@ -649,8 +648,7 @@ export class RemoteConnectionInstanceRepository {
 
     // Step 5: Restart the live channel so it reconnects with the NEW token —
     // otherwise the open WS keeps authenticating with the rotated-out one.
-    const { restartConnection } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/connector");
+    const { restartConnection } = await import("next-vibe/realtime/connector");
     await restartConnection(instanceId);
 
     logger.info("[REAUTH] Token refreshed and channel restarted", {
@@ -679,8 +677,7 @@ export class RemoteConnectionInstanceRepository {
       );
 
     // Update cron tasks targeting old instanceId
-    const { cronTasks } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+    const { cronTasks } = await import("next-vibe/tasks/cron/db");
     await db
       .update(cronTasks)
       .set({ targetInstance: newInstanceId })

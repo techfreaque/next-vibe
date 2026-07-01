@@ -22,9 +22,9 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
-import type { TransportMode } from "@/app/api/[locale]/remote-connection/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
+import type { TransportMode } from "./db";
+import { remoteConnections } from "./db";
+import { RemoteConnectionRepository } from "./repository";
 
 // ─── Unbottled availability cache ─────────────────────────────────────────────
 // Instance-global: tracks whether any active connection provides inference.

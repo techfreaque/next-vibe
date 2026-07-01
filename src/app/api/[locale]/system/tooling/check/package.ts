@@ -44,8 +44,8 @@ const manifest: PackageManifest = {
     "./lint": "src/app/api/[locale]/system/tooling/check/lint/repository.ts",
     "./typecheck":
       "src/app/api/[locale]/system/tooling/check/typecheck/repository.ts",
-    // Types used by check.config.ts (imported as @next-vibe/checker/system/tooling/check/config/types)
-    "./system/tooling/check/config/types":
+    // Types used by check.config.ts (imported as @next-vibe/checker/tooling/check/config/types)
+    "./tooling/check/config/types":
       "src/app/api/[locale]/system/tooling/check/config/types.ts",
     // Custom oxlint JS plugins - referenced in check.config.ts jsPlugins array
     "./oxlint-plugins/restricted-syntax":

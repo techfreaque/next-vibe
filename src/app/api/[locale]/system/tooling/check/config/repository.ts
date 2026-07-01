@@ -31,7 +31,7 @@ import type {
   EnsureConfigResult,
   GenerateVSCodeSettingsResult,
   OxlintJsPlugin,
-} from "next-vibe/tooling/check/config/types";
+} from "./types";
 
 // ============================================================
 // Repository Implementation

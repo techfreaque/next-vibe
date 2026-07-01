@@ -15,9 +15,9 @@ import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "next-vibe/core/utils/dataflow/shared/fields";
-import { resolutionBucketExpr } from "next-vibe/core/utils/dataflow/shared/query-utils";
-import { fillGaps } from "next-vibe/core/utils/dataflow/shared/range";
+} from "next-vibe/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
+import { fillGaps } from "next-vibe/dataflow/shared/range";
 import { db } from "next-vibe/database";
 
 import { paymentInvoices } from "../../db";

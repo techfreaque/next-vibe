@@ -1,8 +1,18 @@
 /**
  * Vibe Stage Repository
  *
- * Finds unstaged boilerplate candidates (route.ts, i18n/{en,de,pl}/index.ts),
- * runs the boilerplate oxlint plugin on them, and git-adds files with 0 violations.
+ * Auto-stages the changes that are always safe to stage, and nothing else:
+ *  1. Renames (moves) — detected via git's own similarity matcher (even for a
+ *     plain `mv`), staged as real renames. Pure moves stage fully; a moved-and-
+ *     edited file stages the rename plus only its import-only content, leaving
+ *     any real edit unstaged.
+ *  2. Generated/fixture deletions — removed from the index.
+ *  3. Boilerplate candidates (route.ts, i18n/{en,de,pl}/index.ts) that pass the
+ *     boilerplate oxlint plugin with 0 violations, and generated output.
+ *  4. Import-only changes — static AND dynamic `import(...)` edits — staged in
+ *     full, or partially (import hunks only) for files that also carry real code.
+ *
+ * Diffs that add/remove suppression comments are never auto-staged.
  */
 
 import "server-only";
@@ -34,9 +44,18 @@ import type { CheckVibeStageT } from "./i18n";
 // ============================================================
 
 /** Run a shell command and resolve with stdout. Rejects on non-zero exit. */
-function runCommand(cmd: string, args: string[], cwd: string): Promise<string> {
+function runCommand(
+  cmd: string,
+  args: string[],
+  cwd: string,
+  env?: Record<string, string>,
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    const proc = spawn(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    const proc = spawn(cmd, args, {
+      cwd,
+      env: env ? { ...process.env, ...env } : process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let stdout = "";
     let stderr = "";
     proc.stdout.on("data", (chunk: Buffer) => {
@@ -65,9 +84,14 @@ function runCommandCapture(
   cmd: string,
   args: string[],
   cwd: string,
+  env?: Record<string, string>,
 ): Promise<string> {
   return new Promise((resolve) => {
-    const proc = spawn(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    const proc = spawn(cmd, args, {
+      cwd,
+      env: env ? { ...process.env, ...env } : process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let stdout = "";
     proc.stdout.on("data", (chunk: Buffer) => {
       stdout += chunk.toString();
@@ -102,6 +126,32 @@ const IMPORT_START_PATTERN =
 // Also handles `} from "..."` with optional trailing semicolon/comment.
 const IMPORT_CLOSE_PATTERN = /^}\s*from\s+["'`]/;
 
+// Matches a dynamic `import("literal")` call line. The line must START with the
+// call after an optional binding/return/await prefix — an `import()` used as a
+// call ARGUMENT (`doThing(await import(...))`) or condition (`if (await import…`)
+// does NOT match, so unsafe surrounding code is never mis-classified as import.
+// Handles, all as single changed lines:
+//   const mod = await import("./foo");
+//   const { bar } = await import('./foo');
+//   await import("./side-effect");
+//   return import("./Icon") as Promise<IconModule>;   (return + as-cast)
+//   import("./widget").then((m) => ({                 (multi-line .then opener)
+// A trailing `as T` cast, `.method(...)` chain, and an unterminated opening
+// `(`/`{`/`=>` (multi-line continuation) are all allowed.
+const DYNAMIC_IMPORT_PATTERN =
+  /^\s*(?:(?:export\s+)?(?:const|let|var)\s+[\w${},[\]\s:]+=\s*)?(?:return\s+)?(?:await\s+)?import\s*\(\s*["'`][^"'`]*["'`]\s*\)(?:\s+as\s+[\w.<>[\], ]+)?[\s\S]*?[;,{(]?\s*(?:=>\s*[({]?\s*)?$/;
+// Bare assignment opener whose value continues on the NEXT line:
+//   const listDef =
+// Accepted only in an import context (its continuation is a dynamic import line).
+const ASSIGN_OPENER_PATTERN =
+  /^\s*(?:export\s+)?(?:const|let|var)\s+[\w${},[\]\s:]+=\s*$/;
+// Comment-only line — always safe to stage inside an import group (formatters and
+// code-mods move `// ...` banners around with the imports they annotate).
+const COMMENT_LINE_PATTERN = /^\s*(?:\/\/|\/\*|\*)/;
+// Closer of a multi-line dynamic-import destructure: `} = await import(...)`.
+const DYNAMIC_IMPORT_CLOSE_PATTERN =
+  /^[\s})\]]*=\s*(?:await\s+)?import\s*\(\s*["'`][^"'`]*["'`]\s*\)\s*[\w.()]*[;,]?\s*$/;
+
 /**
  * Returns true if a raw diff content line (sigil already stripped, NOT trimmed)
  * belongs to an import statement. Tracks open-brace state across lines via `state`.
@@ -116,11 +166,25 @@ const IMPORT_CLOSE_PATTERN = /^}\s*from\s+["'`]/;
  *    closing `}` on the same line — so false-positives require the unusual pattern
  *    of `} from "..."` appearing as a changed line in non-import code.
  */
-function isImportLine(line: string, state: { inside: boolean }): boolean {
+function isImportLine(
+  line: string,
+  state: { inside: boolean; dynamic: boolean },
+): boolean {
   // Blank lines between imports are always acceptable — formatters insert them
   // between import groups and they appear as changed lines in reorder diffs.
   if (line.trim() === "") {
     return true;
+  }
+
+  // Inside a multi-line dynamic-import destructure: `const {` … `} = await import(...)`.
+  // Accept member/blank lines until the `= await import(...)` closer.
+  if (state.dynamic) {
+    if (DYNAMIC_IMPORT_CLOSE_PATTERN.test(line)) {
+      state.dynamic = false;
+      return true;
+    }
+    // Only bare destructure members (indented identifiers) are allowed inside.
+    return isStrictImportMemberLine(line);
   }
 
   if (state.inside) {
@@ -135,6 +199,32 @@ function isImportLine(line: string, state: { inside: boolean }): boolean {
   // `} from "..."` can appear as the start of a hunk when the `import {` opener
   // didn't change — treat it as an import line without entering `inside` state.
   if (IMPORT_CLOSE_PATTERN.test(line.trimStart())) {
+    return true;
+  }
+
+  // Comment lines accompany imports (banner comments, code-mod annotations).
+  if (COMMENT_LINE_PATTERN.test(line)) {
+    return true;
+  }
+
+  // Dynamic import (single line or multi-line .then/opener):
+  //   const x = await import("..."); | return import("..") as T; | import("..").then((m) => ({
+  if (DYNAMIC_IMPORT_PATTERN.test(line)) {
+    return true;
+  }
+
+  // Bare assignment opener `const listDef =` whose value is a dynamic import on
+  // the next line. Accept it (its continuation is verified independently); if it
+  // were a non-import assignment, that continuation line would fail and reject
+  // the whole group.
+  if (ASSIGN_OPENER_PATTERN.test(line)) {
+    return true;
+  }
+
+  // Opener of a multi-line dynamic-import destructure: `const {` with no `}` yet.
+  // Enter `dynamic` state so following member lines are accepted up to the closer.
+  if (/^\s*(?:export\s+)?(?:const|let|var)\s*\{[^}]*$/.test(line)) {
+    state.dynamic = true;
     return true;
   }
 
@@ -180,7 +270,16 @@ function isLineGroupAllImports(lines: string[]): boolean {
     return true;
   }
 
-  const state = { inside: false };
+  const state = { inside: false, dynamic: false };
+
+  // All-dynamic-import groups: every line is a single-line dynamic import (or blank).
+  // Common when a code-mod adds/removes `const x = await import(...)` lines.
+  if (
+    lines.every((l) => l.trim() === "" || DYNAMIC_IMPORT_PATTERN.test(l)) &&
+    lines.some((l) => l.trim() !== "")
+  ) {
+    return true;
+  }
 
   const lastNonEmpty = [...lines].toReversed().find((l) => l.trim() !== "");
 
@@ -327,6 +426,60 @@ function parseDiff(
   return { headerLines, hunks };
 }
 
+/**
+ * Run ONE `git diff --unified=0` for all tracked files (optionally scoped to
+ * pathspecs) and split the combined output into a per-file map keyed by the new
+ * path. One subprocess instead of one-per-file — the difference between seconds
+ * and minutes on a large working tree.
+ *
+ * Splitting is by `diff --git a/… b/…` record boundaries; the new path is taken
+ * from the `+++ b/…` line (falling back to the `diff --git` b-side) so renames
+ * and quoted paths resolve to the same key analyzeFileDiff/apply use.
+ */
+async function batchUnstagedDiffs(
+  cwd: string,
+  pathspecs: string[],
+): Promise<Map<string, string>> {
+  const args = ["diff", "--unified=0", "--no-color", "--no-ext-diff"];
+  if (pathspecs.length > 0) {
+    args.push("--", ...pathspecs);
+  }
+  const combined = await runCommandCapture("git", args, cwd);
+  const map = new Map<string, string>();
+  if (!combined.trim()) {
+    return map;
+  }
+
+  const lines = combined.split("\n");
+  let current: string[] = [];
+  let currentPath: string | null = null;
+
+  const flush = (): void => {
+    if (currentPath !== null && current.length > 0) {
+      map.set(currentPath, current.join("\n"));
+    }
+  };
+
+  for (const line of lines) {
+    if (line.startsWith("diff --git ")) {
+      flush();
+      current = [line];
+      // b-side of "diff --git a/<x> b/<y>" as a provisional key.
+      const m = /^diff --git a\/(.+) b\/(.+)$/.exec(line);
+      currentPath = m ? (m[2] ?? null) : null;
+    } else {
+      current.push(line);
+      // Prefer the exact "+++ b/<path>" path when present (handles /dev/null etc.).
+      if (line.startsWith("+++ b/")) {
+        currentPath = line.slice("+++ b/".length);
+      }
+    }
+  }
+  flush();
+
+  return map;
+}
+
 /** Extract the @@ line target range start from a hunk header. */
 function hunkNewStart(hunkHeader: string): number {
   // @@ -a,b +c,d @@ ...  →  c
@@ -377,21 +530,10 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
  * when `git apply --cached` is used — the index IS the base, so hunks apply cleanly.
  */
-async function analyzeFileDiff(
-  filePath: string,
-  cwd: string,
-): Promise<{
+function analyzeFileDiff(u0Unstaged: string): {
   importOnly: boolean;
   importHunksPatch: string | null;
-} | null> {
-  // WC vs index: exactly the unstaged changes, with line numbers relative to the index.
-  // This is the correct base for `git apply --cached`.
-  const u0Unstaged = await runCommandCapture(
-    "git",
-    ["diff", "--unified=0", "--", filePath],
-    cwd,
-  );
-
+} | null {
   if (!u0Unstaged.trim()) {
     return null;
   }
@@ -508,37 +650,383 @@ function diffHasSuppression(diff: string): boolean {
 }
 
 /**
- * Get unstaged/untracked files from git status --porcelain.
- * Returns relative paths from project root.
+ * One parsed entry from `git status --porcelain -z`.
+ *  - index:    the X column (staged status) — " ", "M", "A", "D", "R", "?" …
+ *  - worktree: the Y column (worktree status)
+ *  - path:     destination path (for a git-detected rename this is the new path)
+ *  - origPath: original path when git already reports a rename ("R"), else null
  */
-async function getUnstagedFiles(cwd: string): Promise<string[]> {
-  const output = await runCommand("git", ["status", "--porcelain", "-u"], cwd);
-  const files: string[] = [];
+interface GitStatusEntry {
+  index: string;
+  worktree: string;
+  path: string;
+  origPath: string | null;
+}
 
-  for (const line of output.split("\n")) {
-    if (!line) {
+/**
+ * Parse `git status --porcelain -z` into structured entries.
+ *
+ * `-z` is used so paths with spaces/newlines parse unambiguously: records are
+ * NUL-separated, and a rename record is TWO NUL-separated tokens (new, then old).
+ */
+async function getGitStatus(cwd: string): Promise<GitStatusEntry[]> {
+  const output = await runCommand(
+    "git",
+    ["status", "--porcelain", "-z", "-u"],
+    cwd,
+  );
+  const tokens = output.split("\0");
+  const entries: GitStatusEntry[] = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const record = tokens[i];
+    if (!record) {
       continue;
     }
-    const unstagedStatus = line[1];
-    const rawPath = line.slice(3).trim();
+    const index = record[0] ?? " ";
+    const worktree = record[1] ?? " ";
+    const path = record.slice(3);
 
-    // Renames appear as "old -> new" — extract just the destination path
-    const filePath = rawPath.includes(" -> ")
-      ? (rawPath.split(" -> ")[1] ?? rawPath)
-      : rawPath;
-
-    // Include modified unstaged (M), untracked (?), added unstaged (A), or renamed (R)
+    // A rename/copy record (index or worktree = R/C) is followed by the ORIGINAL
+    // path in the very next NUL-separated token.
+    let origPath: string | null = null;
     if (
-      unstagedStatus === "M" ||
-      unstagedStatus === "A" ||
-      unstagedStatus === "?" ||
-      unstagedStatus === "R"
+      index === "R" ||
+      index === "C" ||
+      worktree === "R" ||
+      worktree === "C"
     ) {
-      files.push(filePath);
+      origPath = tokens[i + 1] ?? null;
+      i++;
     }
+
+    entries.push({ index, worktree, path, origPath });
   }
 
+  return entries;
+}
+
+/**
+ * Files eligible for content-analysis staging: unstaged modifications and
+ * untracked/added files. Renames already reconciled elsewhere.
+ */
+function collectContentFiles(entries: GitStatusEntry[]): string[] {
+  const files: string[] = [];
+  for (const e of entries) {
+    // Untracked or worktree-modified/added → candidate for import-only analysis.
+    if (
+      e.worktree === "M" ||
+      e.worktree === "A" ||
+      e.worktree === "?" ||
+      e.index === "A"
+    ) {
+      files.push(e.path);
+    }
+  }
   return files;
+}
+
+/** True for files whose deletion is always safe to auto-stage (generated/fixtures). */
+function isAutoStageableDeletion(filePath: string): boolean {
+  return GENERATED_PATTERN.test(filePath) || FIXTURES_PATTERN.test(filePath);
+}
+
+/** Read a blob's contents from a git tree-ish (e.g. "HEAD:path"). Null if absent. */
+async function readGitBlob(ref: string, cwd: string): Promise<string | null> {
+  try {
+    return await runCommand("git", ["show", ref], cwd);
+  } catch {
+    return null;
+  }
+}
+
+/** Read a working-tree file's contents. Null on error. */
+async function readWorktreeFile(
+  filePath: string,
+  cwd: string,
+): Promise<string | null> {
+  try {
+    return await fsp.readFile(resolvePath(cwd, filePath), "utf8");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Similarity classification between an old (pre-move) blob and the new file's
+ * current content — used to decide whether a delete+add pair is really a rename.
+ *
+ *  - "identical": byte-for-byte equal → pure move.
+ *  - "import-safe": differ only in import statements (classified via the same
+ *    hunk analysis used for in-place edits) → rename + safe partial content.
+ *  - "different": substantive non-import changes, or too dissimilar → not paired.
+ */
+type RenameSimilarity = "identical" | "import-safe" | "different";
+
+function classifyRenamePair(
+  oldContent: string,
+  newContent: string,
+): RenameSimilarity {
+  if (oldContent === newContent) {
+    return "identical";
+  }
+  // Reject if the delta touches suppression comments.
+  const oldLines = oldContent.split("\n");
+  const newLines = newContent.split("\n");
+  // Cheap similarity floor: if less than half the old lines survive, it's a
+  // rewrite, not a move — don't pair it as a rename.
+  const newSet = new Set(newLines);
+  const surviving = oldLines.filter((l) => newSet.has(l)).length;
+  if (oldLines.length > 0 && surviving / oldLines.length < 0.5) {
+    return "different";
+  }
+  const changed = diffChangedLines(oldLines, newLines);
+  if (changed.some((l) => SUPPRESSION_PATTERN.test(l.slice(1)))) {
+    return "different";
+  }
+  return allLinesAreImports(changed) && changed.length > 0
+    ? "import-safe"
+    : "different";
+}
+
+/**
+ * Minimal changed-line extraction between two versions of a file, formatted like
+ * unified-diff sigil lines ("+added" / "-removed") for reuse with allLinesAreImports.
+ * Uses an LCS-free line-set difference — adequate because classifyRenamePair only
+ * needs to know WHICH lines differ, not their order.
+ */
+function diffChangedLines(oldLines: string[], newLines: string[]): string[] {
+  const oldCount = new Map<string, number>();
+  for (const l of oldLines) {
+    oldCount.set(l, (oldCount.get(l) ?? 0) + 1);
+  }
+  const newCount = new Map<string, number>();
+  for (const l of newLines) {
+    newCount.set(l, (newCount.get(l) ?? 0) + 1);
+  }
+  const changed: string[] = [];
+  for (const [line, n] of oldCount) {
+    const kept = newCount.get(line) ?? 0;
+    for (let i = 0; i < n - kept; i++) {
+      changed.push(`-${line}`);
+    }
+  }
+  for (const [line, n] of newCount) {
+    const kept = oldCount.get(line) ?? 0;
+    for (let i = 0; i < n - kept; i++) {
+      changed.push(`+${line}`);
+    }
+  }
+  return changed;
+}
+
+/**
+ * Stage a rename old→new so git records it as R (rename), keeping any unsafe
+ * worktree edits UNSTAGED.
+ *
+ * Mechanic: put the OLD file's original blob into the index at the NEW path and
+ * remove OLD from the index. index-vs-HEAD then reads as a pure rename; the
+ * worktree-vs-index delta (the content edits) stays unstaged for later selective
+ * (import-only) staging.
+ */
+async function stageRename(
+  oldPath: string,
+  newPath: string,
+  oldBlobSha: string,
+  cwd: string,
+): Promise<boolean> {
+  try {
+    // Remove old from index (whether it was tracked or already staged-deleted).
+    await runCommand("git", ["rm", "--cached", "--quiet", "--", oldPath], cwd);
+  } catch {
+    // Old may already be absent from the index (e.g. deletion pre-staged) — ok.
+  }
+  try {
+    // Point the index entry for new at old's original content → rename vs HEAD.
+    await runCommand(
+      "git",
+      [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        `100644,${oldBlobSha},${newPath}`,
+      ],
+      cwd,
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** A reconciled rename: old path, new path, and how their contents relate. */
+interface ReconciledRename {
+  oldPath: string;
+  newPath: string;
+  similarity: RenameSimilarity;
+}
+
+/**
+ * Pair deleted paths (worktree ` D` or already-staged `D `) with created paths
+ * (untracked `??` or already-staged `A `) that share content, and stage each pair
+ * as a rename BEFORE any content analysis runs.
+ *
+ * Content source per side:
+ *  - old deleted file: its HEAD blob (the pre-move content).
+ *  - new file: its current worktree content (falling back to the staged blob if
+ *    the worktree copy is gone).
+ *
+ * Matching is greedy by best similarity: identical wins over import-safe. Only
+ * "identical" and "import-safe" pairs are reconciled — anything more divergent is
+ * left as separate delete/add for the caller to handle normally.
+ */
+async function reconcileRenames(
+  cwd: string,
+  dryRun: boolean,
+  logger: EndpointLogger,
+): Promise<ReconciledRename[]> {
+  // Let git's own (fast, C-implemented, similarity-based) rename detector do the
+  // pairing — it matches a worktree-deleted file to an untracked/added file even
+  // when the content was edited, in a single call. We only decide staging safety.
+  const pairs = await detectRenamePairs(cwd);
+  if (pairs.length === 0) {
+    return [];
+  }
+
+  const reconciled: ReconciledRename[] = [];
+
+  for (const pair of pairs) {
+    // "identical" (git similarity R100) → pure move: staging the rename fully
+    // captures it. Otherwise the move carries content edits — only stage the
+    // rename if those edits are import-safe; the edit itself is left unstaged
+    // (Phase 3 partial-stages the import hunks).
+    let similarity: RenameSimilarity = pair.identical
+      ? "identical"
+      : "different";
+
+    if (!pair.identical) {
+      const oldContent = await readGitBlob(pair.oldSha, cwd);
+      const newContent = await readWorktreeFile(pair.newPath, cwd);
+      if (oldContent === null || newContent === null) {
+        continue;
+      }
+      similarity = classifyRenamePair(oldContent, newContent);
+      if (similarity === "different") {
+        // Edited move with unsafe changes — leave as separate delete/add.
+        continue;
+      }
+    }
+
+    if (!dryRun) {
+      const ok = await stageRename(
+        pair.oldPath,
+        pair.newPath,
+        pair.oldSha,
+        cwd,
+      );
+      if (!ok) {
+        logger.warn(
+          `[VIBE-STAGE] Failed to stage rename ${pair.oldPath} -> ${pair.newPath}`,
+        );
+        continue;
+      }
+    }
+    logger.debug(
+      `[VIBE-STAGE] Rename (${similarity}) ${pair.oldPath} -> ${pair.newPath}`,
+    );
+    reconciled.push({
+      oldPath: pair.oldPath,
+      newPath: pair.newPath,
+      similarity,
+    });
+  }
+
+  return reconciled;
+}
+
+/** A rename pair detected by git: old→new plus old's HEAD blob SHA and exactness. */
+interface RenamePair {
+  oldPath: string;
+  newPath: string;
+  oldSha: string;
+  identical: boolean;
+}
+
+/**
+ * Detect rename pairs (moves) across the whole tree — including UNSTAGED manual
+ * `mv`s (worktree-delete + untracked-create) — using git's own C-implemented,
+ * similarity-based rename detector. Fast and authoritative.
+ *
+ * Why a temp index: `git status` only pairs a delete with an add when BOTH are
+ * in the same view. A manual `mv` leaves one side in the worktree and the other
+ * untracked, which git does NOT auto-pair. So we build a THROWAWAY index —
+ * copy the real index, `git add -A` everything into the copy — then read renames
+ * as index-vs-HEAD. The real index is never touched; the temp file is deleted.
+ *
+ * v2 rename record (fields space-separated, then TWO NUL-separated paths):
+ *   `2 <XY> <sub> <mH> <mI> <mW> <hH> <hI> <Xscore> <newPath>\0<origPath>`
+ * We read `<hH>` (HEAD blob SHA) as the pre-move content, the `Xscore` (e.g.
+ * `R100`) to tell exact moves from edited ones, and the two paths.
+ */
+async function detectRenamePairs(cwd: string): Promise<RenamePair[]> {
+  // Locate the real index and a sibling temp path inside the git dir.
+  const gitDir = (
+    await runCommand("git", ["rev-parse", "--absolute-git-dir"], cwd)
+  ).trim();
+  const realIndex = resolvePath(gitDir, "index");
+  const tmpIndex = resolvePath(gitDir, "vibe-stage-rename-index");
+
+  try {
+    // Seed the temp index from the real one (if it exists), then stage everything
+    // into the COPY so index-vs-HEAD carries both sides of each move.
+    if (existsSync(realIndex)) {
+      await fsp.copyFile(realIndex, tmpIndex);
+    } else {
+      await fsp.rm(tmpIndex, { force: true });
+    }
+    const env: Record<string, string> = { GIT_INDEX_FILE: tmpIndex };
+    await runCommandCapture("git", ["add", "-A"], cwd, env);
+
+    const out = await runCommandCapture(
+      "git",
+      ["status", "--porcelain=v2", "--find-renames=40%", "-z"],
+      cwd,
+      env,
+    );
+    const tokens = out.split("\0");
+    const pairs: RenamePair[] = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      const record = tokens[i];
+      if (record === undefined || record === "") {
+        continue;
+      }
+      // Only "2 " records are renames/copies; each consumes the NEXT token (origPath).
+      if (!record.startsWith("2 ")) {
+        continue;
+      }
+      const origPath = tokens[i + 1];
+      i++;
+      if (origPath === undefined) {
+        continue;
+      }
+      const fields = record.split(" ");
+      // fields: [ "2", XY, sub, mH, mI, mW, hH, hI, Xscore, ...newPathParts ]
+      const headSha = fields[6];
+      const scoreField = fields[8] ?? "";
+      // newPath is everything after the 9th field (paths may contain spaces).
+      const newPath = fields.slice(9).join(" ");
+      if (!headSha || newPath === "") {
+        continue;
+      }
+      const identical = scoreField === "R100" || scoreField === "C100";
+      pairs.push({ oldPath: origPath, newPath, oldSha: headSha, identical });
+    }
+
+    return pairs;
+  } finally {
+    await fsp.rm(tmpIndex, { force: true });
+  }
 }
 
 interface OxlintDiagnostic {
@@ -651,43 +1139,135 @@ export class VibeStageRepository {
         await fsp.mkdir(tmpDir, { recursive: true });
       }
 
-      // Get unstaged files
-      const unstagedFiles = await getUnstagedFiles(cwd);
-      logger.debug(
-        `[VIBE-STAGE] ${String(unstagedFiles.length)} unstaged files total`,
-      );
+      // Structured status: both index (X) and worktree (Y) columns, rename origins.
+      const status = await getGitStatus(cwd);
+      logger.debug(`[VIBE-STAGE] ${String(status.length)} status entries`);
 
-      // Filter candidates by optional path filters
+      // Optional path filters — a rename matches if EITHER side is under a filter.
       const rawPaths = data.paths;
       const pathFilters: string[] = rawPaths
         ? Array.isArray(rawPaths)
           ? rawPaths
           : [rawPaths]
         : [];
+      const underFilter = (p: string): boolean =>
+        pathFilters.length === 0 || pathFilters.some((f) => p.startsWith(f));
 
-      let allFiles = unstagedFiles;
-      if (pathFilters.length > 0) {
-        allFiles = allFiles.filter((f) =>
-          pathFilters.some((p) => f.startsWith(p)),
-        );
+      const staged: string[] = [];
+      const partiallyStaged: string[] = [];
+      const skipped: string[] = [];
+      const renamed: string[] = [];
+      const deleted: string[] = [];
+
+      // ── Phase 1: reconcile renames (moves) first, safely ──────────────────
+      // Pair deletes (worktree OR already-staged) with creates (untracked OR
+      // already-staged) by content; stage each as a real rename. Pure moves stage
+      // fully; moved-and-edited files get the rename + import-only content only.
+      const renames = (
+        await reconcileRenames(cwd, data.dryRun ?? false, logger)
+      ).filter((r) => underFilter(r.oldPath) || underFilter(r.newPath));
+
+      const reconciledNewPaths = new Set(renames.map((r) => r.newPath));
+      const reconciledOldPaths = new Set(renames.map((r) => r.oldPath));
+      for (const r of renames) {
+        renamed.push(`${r.oldPath} -> ${r.newPath}`);
       }
 
-      if (allFiles.length === 0) {
+      // Renames git already detected as fully staged (R  old -> new, e.g. `git mv`)
+      // are surfaced too, and their new path skipped from content analysis.
+      for (const e of status) {
+        if (
+          e.index === "R" &&
+          e.origPath !== null &&
+          !reconciledNewPaths.has(e.path) &&
+          (underFilter(e.origPath) || underFilter(e.path))
+        ) {
+          renamed.push(`${e.origPath} -> ${e.path}`);
+          reconciledNewPaths.add(e.path);
+        }
+      }
+
+      // ── Phase 2: auto-stage generated/fixture DELETIONS ───────────────────
+      // Plain deletions (not part of a reconciled rename) of generated output and
+      // fixtures are safe to remove from the index.
+      const deletionsToStage = status
+        .filter(
+          (e) =>
+            (e.worktree === "D" || e.index === "D") &&
+            !reconciledOldPaths.has(e.path) &&
+            isAutoStageableDeletion(e.path) &&
+            underFilter(e.path),
+        )
+        .map((e) => e.path);
+
+      if (!data.dryRun && deletionsToStage.length > 0) {
+        // `git rm --cached` for still-tracked, plus index-remove for worktree-gone.
+        await runCommand(
+          "git",
+          [
+            "rm",
+            "--cached",
+            "--quiet",
+            "--ignore-unmatch",
+            "--",
+            ...deletionsToStage,
+          ],
+          cwd,
+        );
+      }
+      for (const d of deletionsToStage) {
+        deleted.push(d);
+      }
+
+      // ── Phase 3: content analysis for the remaining files ─────────────────
+      // Import-safe renames still need their content diff staged (import hunks
+      // only). Pure-move ("identical") renames are already fully staged.
+      const importSafeRenameNewPaths = renames
+        .filter((r) => r.similarity === "import-safe")
+        .map((r) => r.newPath);
+
+      let allFiles = collectContentFiles(status).filter((f) => {
+        if (!underFilter(f)) {
+          return false;
+        }
+        // Skip new paths already fully handled as pure moves.
+        if (
+          reconciledNewPaths.has(f) &&
+          !importSafeRenameNewPaths.includes(f)
+        ) {
+          return false;
+        }
+        return true;
+      });
+      // Include import-safe rename destinations for partial content staging.
+      for (const p of importSafeRenameNewPaths) {
+        if (!allFiles.includes(p) && underFilter(p)) {
+          allFiles.push(p);
+        }
+      }
+
+      if (
+        allFiles.length === 0 &&
+        renamed.length === 0 &&
+        deleted.length === 0
+      ) {
         return success({
           staged: [],
           partiallyStaged: [],
           skipped: [],
+          renamed: [],
+          deleted: [],
           message: t("response.noChanges"),
         });
       }
 
-      // Analyze all files for import-only diffs
-      const diffAnalyses = await Promise.all(
-        allFiles.map(async (f) => ({
-          file: f,
-          analysis: await analyzeFileDiff(f, cwd),
-        })),
-      );
+      // Analyze all files for import-only diffs. One batched `git diff` for the
+      // whole set (scoped to allFiles as pathspecs) instead of one spawn per file.
+      const diffMap = await batchUnstagedDiffs(cwd, allFiles);
+      const diffAnalyses = allFiles.map((f) => ({
+        file: f,
+        analysis: analyzeFileDiff(diffMap.get(f) ?? ""),
+      }));
 
       // Separate into: boilerplate candidates, import-only full files, partial import files
       const boilerplateCandidates: string[] = [];
@@ -723,10 +1303,6 @@ export class VibeStageRepository {
         boilerplateCandidates.length > 0
           ? await checkBoilerplateCompliance(boilerplateCandidates, cwd, logger)
           : new Set<string>();
-
-      const staged: string[] = [];
-      const partiallyStaged: string[] = [];
-      const skipped: string[] = [];
 
       // Full-file staging: clean boilerplate + import-only files
       for (const candidate of boilerplateCandidates) {
@@ -765,12 +1341,23 @@ export class VibeStageRepository {
         logger.debug(`[VIBE-STAGE] Staged ${String(staged.length)} files`);
       }
 
-      const message =
-        data.dryRun && (staged.length > 0 || partiallyStaged.length > 0)
-          ? t("response.dryRunNote")
-          : undefined;
+      const anyStaged =
+        staged.length > 0 ||
+        partiallyStaged.length > 0 ||
+        renamed.length > 0 ||
+        deleted.length > 0;
 
-      return success({ staged, partiallyStaged, skipped, message });
+      const message =
+        data.dryRun && anyStaged ? t("response.dryRunNote") : undefined;
+
+      return success({
+        staged,
+        partiallyStaged,
+        skipped,
+        renamed,
+        deleted,
+        message,
+      });
     } catch (err) {
       logger.error(`[VIBE-STAGE] Error: ${parseError(err)}`);
       return fail({

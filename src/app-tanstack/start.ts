@@ -133,7 +133,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     return next();
   }
 
-  const { proxy, config } = await import("@/proxy");
+  const { proxy, config } = await import("../proxy");
 
   // Check if this path matches the proxy matcher config
   const matcher = config.matcher;

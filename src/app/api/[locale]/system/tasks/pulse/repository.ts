@@ -54,13 +54,13 @@ import type {
   PulseExecution,
   PulseHealth,
   PulseNotification,
-} from "next-vibe/tasks/pulse/db";
+} from "./db";
 import {
   pulseExecutions,
   pulseHealth,
   pulseNotifications,
   selectPulseNotificationSchema,
-} from "next-vibe/tasks/pulse/db";
+} from "./db";
 import type { PulseStatusResponseOutput } from "next-vibe/tasks/pulse/status/definition";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

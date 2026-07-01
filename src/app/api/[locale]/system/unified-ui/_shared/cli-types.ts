@@ -5,13 +5,7 @@
  * Mirrors React widget architecture for consistency.
  */
 
-import type { MutableRefObject } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
-import type z from "zod";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type {
   AnyChildrenConstrain,
   BaseWidgetContext,
@@ -20,6 +14,11 @@ import type {
   DispatchField,
   FieldUsageConfig,
 } from "./types";
+import type { MutableRefObject } from "react";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type z from "zod";
+
+import type { UnifiedField } from "./configs";
 
 /**
  * Ink form state management (simplified version of UseFormReturn)

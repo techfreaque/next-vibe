@@ -13,8 +13,8 @@ import { useEndpointCreate } from "next-vibe/platforms/react/hooks/use-endpoint-
 import { useCallback } from "react";
 
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { type TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_TTS_VOICE_ID } from "./constants";
+import { type TtsModelId } from "./models";
 
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";

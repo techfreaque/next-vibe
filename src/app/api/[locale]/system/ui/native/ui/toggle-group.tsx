@@ -2,10 +2,7 @@ import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  toggleTextVariants,
-  toggleVariants,
-} from "next-vibe/ui/native/ui/toggle";
+import { toggleTextVariants, toggleVariants } from "./toggle";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 import {
   type ToggleSize,

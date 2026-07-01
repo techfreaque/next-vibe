@@ -17,7 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GuardStatusRequestOutput,
   GuardStatusResponseOutput,
-} from "next-vibe/tooling/guard/status/definition";
+} from "./definition";
 import type { GuardStatusT } from "next-vibe/tooling/guard/status/i18n";
 
 /**

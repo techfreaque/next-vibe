@@ -5,7 +5,7 @@
 
 import { createEndpoint } from "next-vibe/core/definition/create";
 import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
-import { dataSourceWidget } from "next-vibe/core/utils/dataflow/shared/fields";
+import { dataSourceWidget } from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
 
 import { CHAT_UPVOTES_TOTAL_ALIAS } from "./constants";

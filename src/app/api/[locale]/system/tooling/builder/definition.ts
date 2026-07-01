@@ -33,7 +33,7 @@ import {
   ViteLibFormatEnum,
   ViteLibFormatOptions,
   ViteMinifyOptions,
-} from "next-vibe/tooling/builder/enum";
+} from "./enum";
 import { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";
 import {
@@ -906,7 +906,7 @@ const { POST } = createEndpoint({
 
                     // Module aliases: maps import specifier → resolved file path.
                     // Applied as resolve.alias in Vite (works for both client and SSR runner).
-                    // Example: { "next/navigation": "src/packages/next-vibe/ui/tanstack/hooks/use-navigation.tsx" }
+                    // Example: { "next/navigation": "src/app/api/[locale]/system/ui/tanstack/hooks/use-navigation.tsx" }
                     moduleAliases: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,

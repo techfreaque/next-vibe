@@ -1536,13 +1536,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const mirrorStart = Date.now();
           for (;;) {
             const snapshot = await getMessages(tid);
-            // Two convergence conditions, both must clear:
+            // Three convergence conditions, all must clear:
             //  1. No pending async tool (detach/wakeUp result not yet mirrored).
             //  2. No dead-end compacting message — a compacting node with no
             //     child means the owner's re-parent of the following turn has
             //     not synced yet (the turn still points at the pre-compacting
             //     leaf locally). Both resolve once sync applies the
             //     owner-authoritative state.
+            //  3. This turn's assistant reply has mirrored back. The relayed
+            //     loop runs on the remote and the final assistant message arrives
+            //     via the sync/WS mirror AFTER the relay HTTP response returns —
+            //     so without this, a no-tool turn (e.g. T-SYS "reply RELAY_OK")
+            //     breaks before the reply lands and `messages` has no assistant.
             const childIds = new Set(
               snapshot
                 .map((m) => m.parentId)

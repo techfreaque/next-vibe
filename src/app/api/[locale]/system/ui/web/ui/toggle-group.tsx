@@ -2,11 +2,7 @@
 
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  type ToggleSize,
-  type ToggleVariant,
-  toggleVariants,
-} from "next-vibe/ui/web/ui/toggle";
+import { type ToggleSize, type ToggleVariant, toggleVariants } from "./toggle";
 import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 

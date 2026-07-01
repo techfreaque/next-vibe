@@ -6,9 +6,9 @@ import { cwd } from "node:process";
 import { parse } from "node:url";
 
 import next from "next";
-import { parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { env } from "@/config/env";
 
 // Server state (singleton)

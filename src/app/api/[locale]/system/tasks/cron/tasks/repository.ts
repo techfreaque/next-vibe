@@ -36,7 +36,7 @@ import type {
   CronTaskListRequestOutput,
   CronTaskListResponseOutput,
   CronTaskResponseType,
-} from "next-vibe/tasks/cron/tasks/definition";
+} from "./definition";
 import type { CronTasksT } from "next-vibe/tasks/cron/tasks/i18n";
 import { calculateNextExecutionTime } from "next-vibe/tasks/cron-formatter";
 import {

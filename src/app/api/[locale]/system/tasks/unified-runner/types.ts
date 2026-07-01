@@ -15,11 +15,7 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CronTaskPriority,
-  TaskCategory,
-  TaskOutputMode,
-} from "next-vibe/tasks/enum";
+import type { CronTaskPriority, TaskCategory, TaskOutputMode } from "../enum";
 import type { z } from "zod";
 
 /**

@@ -7,10 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
-import type {
-  SignalEvent,
-  TimeSeries,
-} from "next-vibe/core/utils/dataflow/shared/fields";
+import type { SignalEvent, TimeSeries } from "next-vibe/dataflow/shared/fields";
 
 export class ThresholdEvaluatorRepository {
   static computeThreshold(

@@ -282,6 +282,7 @@ export class RemoteConnectionRepository {
     leadId: string;
     instanceId?: string;
     remoteInstanceId?: string;
+    remoteUserId?: string;
     isReverseEntry?: boolean;
     transportMode?: TransportMode;
     isInferenceProvider?: boolean;
@@ -330,6 +331,7 @@ export class RemoteConnectionRepository {
         leadId,
         instanceId,
         remoteInstanceId: remoteInstanceId ?? null,
+        remoteUserId: remoteUserId ?? null,
         isActive: true,
         isReverseEntry,
         // Mirror threads on both sides by default so local and remote folders
@@ -347,6 +349,9 @@ export class RemoteConnectionRepository {
           token: encryptedToken,
           leadId,
           remoteInstanceId: remoteInstanceId ?? null,
+          // Only overwrite the stored peer userId when we actually learned one,
+          // so a reconnect that omits it doesn't null out a known value.
+          ...(remoteUserId ? { remoteUserId } : {}),
           isActive: true,
           isReverseEntry,
           ...(transportMode ? { transportMode } : {}),
@@ -405,6 +410,7 @@ export class RemoteConnectionRepository {
       capabilitiesVersion: string | null;
       sentCapabilitiesVersion: string | null;
       remoteInstanceId: string | null;
+      remoteUserId: string | null;
       localUrl: string | null;
       transportMode: "reverse-ws" | "direct-http" | "cloud-only";
       syncScope: SyncScope | null;
@@ -433,6 +439,7 @@ export class RemoteConnectionRepository {
         capabilitiesVersion: r.capabilitiesVersion ?? null,
         sentCapabilitiesVersion: r.sentCapabilitiesVersion ?? null,
         remoteInstanceId: r.remoteInstanceId ?? null,
+        remoteUserId: r.remoteUserId ?? null,
         localUrl: r.localUrl ?? null,
         transportMode: r.transportMode,
         syncScope: r.syncScope ?? null,

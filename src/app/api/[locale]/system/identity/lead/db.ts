@@ -28,7 +28,7 @@ import {
   LeadSourceDB,
   LeadStatus,
   LeadStatusDB,
-} from "next-vibe/identity/lead/enum";
+} from "./enum";
 import type { z } from "zod";
 
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";

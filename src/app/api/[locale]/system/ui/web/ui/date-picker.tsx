@@ -7,11 +7,7 @@
 
 import { CalendarIcon } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useState } from "react";

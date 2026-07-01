@@ -11,22 +11,21 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
-} from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { InferJwtPayloadTypeFromRoles } from "../../endpoints/route/handler";
+} from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { objectField } from "next-vibe/unified-ui/_shared/utils";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

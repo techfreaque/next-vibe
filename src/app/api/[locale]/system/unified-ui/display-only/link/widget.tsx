@@ -21,10 +21,7 @@ import {
   getTextSizeClassName,
   isExternalUrl,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import type {
-  LinkWidgetConfig,
-  LinkWidgetSchema,
-} from "next-vibe/unified-ui/display-only/link/types";
+import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 import { extractLinkData } from "./shared";

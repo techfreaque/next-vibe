@@ -4,6 +4,7 @@
  */
 
 import type { BuildConfig, BuildProfile } from "../definition";
+
 import { PROFILE_DEFAULTS } from "./constants";
 
 /** Profile settings type inferred from PROFILE_DEFAULTS */

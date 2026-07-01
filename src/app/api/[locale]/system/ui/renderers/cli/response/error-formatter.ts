@@ -3,12 +3,12 @@
  * Static class for formatting errors and error chains
  */
 
-import { scopedTranslation as cliScopedTranslation } from "@/app/api/[locale]/system/unified-interface/cli/i18n";
-import type { RouteExecutionResult } from "@/app/api/[locale]/system/unified-interface/cli/runtime/route-executor";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import { formatValidationErrorDetails } from "next-vibe/core/core-utils/format-validation-error";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+import type { RouteExecutionResult } from "next-vibe/platforms/cli/runtime/route-executor";
 
 /**
  * Static class for error formatting

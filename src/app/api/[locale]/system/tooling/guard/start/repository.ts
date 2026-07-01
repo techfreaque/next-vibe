@@ -17,7 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GuardStartRequestOutput,
   GuardStartResponseOutput,
-} from "next-vibe/tooling/guard/start/definition";
+} from "./definition";
 import type { GuardStartT } from "next-vibe/tooling/guard/start/i18n";
 
 /**

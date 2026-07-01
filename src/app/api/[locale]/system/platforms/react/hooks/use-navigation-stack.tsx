@@ -1,11 +1,10 @@
 "use client";
 
+import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import { createContext, type ReactNode, useContext, useRef } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
-
-import type { NavigationStackEntry } from "../../shared/types/endpoint";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import type { WidgetData } from "../../shared/types/json";
 
 /**
  * Navigation options

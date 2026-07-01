@@ -42,13 +42,11 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
   if (user) {
     testUser = user;
   } else if (endpoint.requiresAuthentication()) {
-    const { resolveTestAdminUser } =
-      await import("next-vibe/tooling/check/testing/testing-suite/resolve-test-user");
+    const { resolveTestAdminUser } = await import("./resolve-test-user");
     testUser = await resolveTestAdminUser();
   } else {
     // Resolve the admin user to get a valid leadId, then create a public variant
-    const { resolveTestAdminUser } =
-      await import("next-vibe/tooling/check/testing/testing-suite/resolve-test-user");
+    const { resolveTestAdminUser } = await import("./resolve-test-user");
     const admin = await resolveTestAdminUser();
     testUser = {
       isPublic: true,

@@ -27,7 +27,7 @@ import { CronTaskStatus } from "../enum";
 import { TASK_EXECUTE_ALIAS } from "./constants";
 
 const TaskExecuteContainer = lazyWidget(() =>
-  import("next-vibe/tasks/execute/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.TaskExecuteContainer,
   })),
 );

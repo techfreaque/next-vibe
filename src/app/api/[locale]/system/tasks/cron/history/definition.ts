@@ -27,7 +27,7 @@ import { z } from "zod";
 import { CRON_HISTORY_ALIAS } from "./constants";
 
 const CronHistoryContainer = lazyWidget(() =>
-  import("next-vibe/tasks/cron/history/widget").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.CronHistoryContainer,
   })),
 );

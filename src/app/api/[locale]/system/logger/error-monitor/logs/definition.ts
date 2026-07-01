@@ -17,7 +17,7 @@ import {
   ErrorLogStatusFilter,
   ErrorLogStatusFilterDB,
   ErrorLogStatusFilterOptions,
-} from "next-vibe/logger/error-monitor/logs/enum";
+} from "./enum";
 import { scopedTranslation } from "next-vibe/logger/error-monitor/logs/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {

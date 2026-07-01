@@ -5,12 +5,12 @@
 
 import { format } from "date-fns";
 import { de, enUS, type Locale, pl } from "date-fns/locale";
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import type { CountryLanguage, Currencies } from "./config";
 import type z from "zod";
 
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { configScopedTranslation } from "@/config/i18n";
 
-import type { CountryLanguage, Currencies } from "./config";
 import { getCountryFromLocale } from "./language-utils";
 
 /**

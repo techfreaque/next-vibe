@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/native/ui/tooltip";
+} from "./tooltip";
 import {
   convertCSSToViewStyle,
   styledNative,

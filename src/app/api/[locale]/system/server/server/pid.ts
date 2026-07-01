@@ -13,7 +13,7 @@ import {
 } from "node:fs";
 import { dirname } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 /**
  * Internal Next.js port offset above the public-facing port.

@@ -23,7 +23,7 @@ import type {
   CronQueueListRequestOutput,
   CronQueueListResponseOutput,
   CronQueueTask,
-} from "next-vibe/tasks/cron/queue/definition";
+} from "./definition";
 import type { CronQueueT } from "next-vibe/tasks/cron/queue/i18n";
 import { calculateNextExecutionTime } from "next-vibe/tasks/cron-formatter";
 import {

@@ -1,5 +1,5 @@
 import { Text } from "ink";
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 
 export interface CodeProps {

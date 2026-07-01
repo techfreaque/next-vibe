@@ -19,7 +19,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import type { NextRequest } from "next-vibe/ui/web/lib/request";
 
-import { type ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
+import { type ChatModelOption } from "../models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getBestImageGenModel,
@@ -418,7 +418,7 @@ export async function setupAiStream(params: {
     parentSignal: params.parentAbortSignal,
   });
 
-  // ── Load favorite ONCE for all downstream resolution ──────────────────
+  // ── Load favorite ONCE for all downstream resolution
   const resolvedFavoriteConfig = await loadFavoriteOnce(
     userId,
     data.favoriteConfig,

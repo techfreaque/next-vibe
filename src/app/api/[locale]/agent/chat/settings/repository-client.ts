@@ -401,8 +401,7 @@ export class ChatSettingsRepositoryClient {
     const { favoriteId, modelId, skillId, logger, locale, user, availability } =
       params;
 
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const { apiClient } = await import("next-vibe/platforms/react/hooks/store");
     const settingsDefinition = await import("./definition");
     const favoritesDefinition =
       await import("../../skills/favorites/definition");

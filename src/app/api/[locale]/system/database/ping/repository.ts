@@ -11,10 +11,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type {
-  PingRequestOutput,
-  PingResponseOutput,
-} from "next-vibe/database/ping/definition";
+import type { PingRequestOutput, PingResponseOutput } from "./definition";
 import type { PingT } from "next-vibe/database/ping/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 

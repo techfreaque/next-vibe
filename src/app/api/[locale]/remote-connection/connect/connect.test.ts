@@ -31,7 +31,7 @@ import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import {
   instanceIdentities,
   remoteConnections,
-} from "@/app/api/[locale]/remote-connection/db";
+} from "../db";
 import { env } from "@/config/env";
 
 import {
@@ -164,7 +164,7 @@ if (_remoteUrl) {
       // transport.ts step 2 traverses folder ancestors back to the REMOTE root
       // and matches the top-level name to a connection's instanceId.
       const { RemoteTransport } =
-        await import("@/app/api/[locale]/remote-connection/transport");
+        await import("../transport");
       const { createEndpointLogger } =
         await import("next-vibe/logger/server");
       const target = await RemoteTransport.resolveTarget({

@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type {
   IpMatchLinkingPostRequestOutput,
   IpMatchLinkingPostResponseOutput,
-} from "next-vibe/identity/attribution/definition";
+} from "./definition";
 import type { IpMatchLinkingT } from "next-vibe/identity/attribution/i18n";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { LeadsRepository } from "next-vibe/identity/lead/repository";

@@ -13,10 +13,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  TestRequestOutput,
-  TestResponseOutput,
-} from "next-vibe/tooling/check/testing/test/definition";
+import type { TestRequestOutput, TestResponseOutput } from "./definition";
 import type { TestingTestT } from "next-vibe/tooling/check/testing/test/i18n";
 
 /**

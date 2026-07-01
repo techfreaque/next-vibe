@@ -3,10 +3,7 @@
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useFocus, useInput } from "ink";
-import {
-  useFocusScopeRegister,
-  useShouldFocus,
-} from "next-vibe/ui/cli/ui/dialog";
+import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type {
   SelectContentProps,
   SelectGroupProps,

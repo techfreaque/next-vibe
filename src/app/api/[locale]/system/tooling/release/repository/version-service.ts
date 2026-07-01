@@ -6,8 +6,7 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   PackageJson,
   ReleaseConfig,
@@ -16,6 +15,7 @@ import type {
   VersionIncrement,
   VersionInfo,
 } from "../definition";
+
 import { MESSAGES } from "./constants";
 
 // ============================================================================

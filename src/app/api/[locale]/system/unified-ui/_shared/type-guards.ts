@@ -14,17 +14,16 @@
  * context - unlike UnifiedField which requires resolved conditional types.
  */
 
-import type z from "zod";
-
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
+import type { WidgetData } from "next-vibe/core/utils/json";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
+import type z from "zod";
+
+import type { UnifiedField } from "./configs";
 
 // ============================================================================
 // WIDGET CONFIG TYPE GUARDS

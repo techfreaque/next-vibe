@@ -5,10 +5,7 @@
 
 import { resolve } from "node:path";
 
-import type {
-  BuildProfile,
-  SourcemapMode,
-} from "next-vibe/tooling/builder/definition";
+import type { BuildProfile, SourcemapMode } from "../definition";
 
 // ============================================================================
 // Path Constants

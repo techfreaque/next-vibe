@@ -17,10 +17,7 @@ import {
 } from "next-vibe/identity/middleware/lead-id/index";
 import type { LanguageMiddlewareOptions } from "next-vibe/server/middleware/language/index";
 import { detectLocale } from "next-vibe/server/middleware/language/index";
-import {
-  extractLocaleFromPath,
-  shouldSkipPath,
-} from "next-vibe/server/middleware/utils";
+import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
 

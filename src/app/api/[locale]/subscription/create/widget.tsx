@@ -65,12 +65,8 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/platform-products";
-import {
-  BillingInterval,
-  SubscriptionPlan,
-  SubscriptionStatus,
-} from "@/app/api/[locale]/subscription/enum";
-import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
+import { useSubscription } from "../hooks";
 
 import type definition from "./definition";
 

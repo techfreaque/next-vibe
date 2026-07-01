@@ -63,6 +63,8 @@ export interface Step {
   placement?: string;
   disableBeacon?: boolean;
   disableOverlay?: boolean;
+  skipBeacon?: boolean;
+  blockTargetInteraction?: boolean;
   event?: string;
   offset?: number;
   spotlightClicks?: boolean;

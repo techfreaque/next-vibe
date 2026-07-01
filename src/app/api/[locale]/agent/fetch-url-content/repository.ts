@@ -18,7 +18,7 @@ import TurndownService from "turndown";
 import { z } from "zod";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { agentEnv } from "../env";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";

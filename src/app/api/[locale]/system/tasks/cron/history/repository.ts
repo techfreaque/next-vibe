@@ -33,7 +33,7 @@ import type {
   CronHistoryExecution,
   CronHistoryRequestOutput,
   CronHistoryResponseOutput,
-} from "next-vibe/tasks/cron/history/definition";
+} from "./definition";
 import type { CronHistoryT } from "next-vibe/tasks/cron/history/i18n";
 import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
 

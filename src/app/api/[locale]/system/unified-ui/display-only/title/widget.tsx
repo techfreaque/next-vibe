@@ -28,10 +28,7 @@ import {
   getTextSizeClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
 import { formatIfDate } from "next-vibe/unified-ui/display-only/text/shared";
-import type {
-  TitleWidgetConfig,
-  TitleWidgetSchema,
-} from "next-vibe/unified-ui/display-only/title/types";
+import type { TitleWidgetConfig, TitleWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 import { extractTitleData } from "./shared";

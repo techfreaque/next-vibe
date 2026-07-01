@@ -16,7 +16,7 @@ import {
 import type {
   StatusIndicatorWidgetConfig,
   StatusIndicatorWidgetSchema,
-} from "next-vibe/unified-ui/display-only/status-indicator/types";
+} from "./types";
 import type { JSX } from "react";
 
 /**

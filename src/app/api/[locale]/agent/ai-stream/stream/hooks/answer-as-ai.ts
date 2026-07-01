@@ -8,7 +8,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { AiStreamPostRequestOutput } from "@/app/api/[locale]/agent/ai-stream/stream/definition";
+import type { AiStreamPostRequestOutput } from "../definition";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";

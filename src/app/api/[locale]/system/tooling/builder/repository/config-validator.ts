@@ -6,7 +6,7 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { scopedTranslation } from "../i18n";
+import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 

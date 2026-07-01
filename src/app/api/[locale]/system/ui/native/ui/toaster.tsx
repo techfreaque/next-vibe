@@ -10,7 +10,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "next-vibe/ui/native/ui/toast";
+} from "./toast";
 import React from "react";
 import { View } from "react-native";
 

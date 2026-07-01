@@ -15,7 +15,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GenerateTrpcRouterRequestOutput,
   GenerateTrpcRouterResponseOutput,
-} from "next-vibe/tooling/generators/generate-trpc-router/definition";
+} from "./definition";
 import { scopedTranslation } from "next-vibe/tooling/generators/generate-trpc-router/i18n";
 
 /**
@@ -91,7 +91,7 @@ export class GenerateTrpcRouterRepository {
 
       // Import the tRPC router generator
       const { generateTRPCRouter } =
-        await import("next-vibe/tooling/generators/generate-trpc-router/trpc-trpc-router-generator");
+        await import("./trpc-trpc-router-generator");
 
       // Prepare options for the generator
       const generatorOptions = {

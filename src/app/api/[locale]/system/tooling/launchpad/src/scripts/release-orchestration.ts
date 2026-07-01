@@ -1,23 +1,21 @@
 /// <reference types="node" />
 import inquirer from "inquirer";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as launchpadScopedTranslation } from "next-vibe/tooling/launchpad/i18n";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseTarget,
   VersionBumpType,
-} from "../types/types";
+} from "next-vibe/tooling/launchpad/src/types/types";
 import {
   discoverReleaseTargets,
   findTargetByGitTag,
   getCurrentGitTag,
   validateReleaseTarget,
-} from "../utils/release-discovery";
-import { ReleaseExecutor } from "../utils/release-executor";
-import { StateManager } from "../utils/state-manager";
+} from "next-vibe/tooling/launchpad/src/utils/release-discovery";
+import { ReleaseExecutor } from "next-vibe/tooling/launchpad/src/utils/release-executor";
+import { StateManager } from "next-vibe/tooling/launchpad/src/utils/state-manager";
 
 /**
  * CI Release Command - releases specific package based on git tag

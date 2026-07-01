@@ -5,17 +5,16 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
+import { Platform } from "next-vibe/core/definition/platform";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
 import {
   useWidgetLocale,
   useWidgetPlatform,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { CliIcon } from "next-vibe-ui/unified/form-fields/icon-field/cli-icons";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { CliIcon } from "next-vibe/unified-ui/form-fields/icon-field/cli-icons";
 import type { JSX } from "react";
 import { useMemo } from "react";
 import terminalLink from "terminal-link";
-
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 export interface CodeQualityItem {
   file: string;

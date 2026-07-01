@@ -14,8 +14,7 @@ export async function loadSkillData(
   }
 
   try {
-    const { SkillsRepository } =
-      await import("@/app/api/[locale]/agent/skills/repository");
+    const { SkillsRepository } = await import("../repository");
     const result = await SkillsRepository.getSkillById(
       { id: skillId },
       user,
