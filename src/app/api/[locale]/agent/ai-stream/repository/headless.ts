@@ -1,46 +1,34 @@
 /**
  * Headless AI Stream
- * Thin wrapper around AiStreamRepository.createAiStream with headless: true.
- * Runs the full AI pipeline (compacting, tool loops, DB persistence) without SSE.
- * Used by cron step executor for ai_agent steps.
+ * Thin adapter around AiStreamRepository.createAiStream({ headless: true }).
+ * Resolves model/skill/favorite, builds the synthetic request data and shapes
+ * the HeadlessAiStreamResult. All real work — preCall injection, operation
+ * derivation, parent resolution, the agent loop — lives in createAiStream and
+ * its setup layer: headless rides the exact same code path as interactive,
+ * differing only by props, and returns the last assistant message when done.
  */
 
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getBestChatModel } from "../models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 
 import { DefaultFolderId } from "../../chat/config";
-import type { MessageMetadata } from "../../chat/db";
-import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import { isUuid, parseSkillId } from "../../chat/slugify";
-import { ThreadsRepository } from "../../chat/threads/repository";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
-import { NO_SKILL_ID } from "../../skills/constants";
-import {
-  isFiltersSelection,
-  isManualSelection,
-} from "../../skills/create/definition";
-import {
-  chatFavorites,
-  FAVORITE_CONFIG_COLUMNS,
-  type FavoriteConfig,
-} from "../../skills/favorites/db";
+import type { FavoriteConfig } from "../../skills/favorites/db";
+import { resolveFavorite } from "../../skills/resolver";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
+import { getBestChatModel } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
@@ -57,32 +45,25 @@ export interface HeadlessPreCall {
 
 export interface HeadlessAiStreamParams {
   /**
-   * Favorite ID to load model + skill from.
-   * When provided, model and skill are resolved from the saved favorite.
-   * Explicit model/skill fields override the favorite if also provided.
+   * Favorite ID to load model + skill from. When provided, model and skill
+   * are resolved from the saved favorite; explicit model/skill fields
+   * override the favorite if also provided.
    */
   favoriteId?: string;
-  /**
-   * AI model to use. Required unless favoriteId is provided.
-   * Overrides the model from the favorite when both are given.
-   */
+  /** AI model to use. Required unless favoriteId is provided. */
   model?: ChatModelId;
-  /**
-   * Skill/persona for system prompt. Required unless favoriteId is provided.
-   * Overrides the skill from the favorite when both are given.
-   */
+  /** Skill/persona for system prompt. Required unless favoriteId is provided. */
   skill?: string;
   /** User prompt - the main question/instruction */
   prompt: string;
   /** Full favorite config for model/tool/context resolution. null = use skill/system defaults. */
   favoriteConfig: FavoriteConfig | null;
   /**
-   * Extra text injected into the headless system prompt section.
-   * Use this to prime the model with task-specific context:
-   * e.g. "Running via cron job. Schedule: every day at 3am UTC. Task: summarise new leads."
+   * Extra text injected into the headless system prompt section, e.g.
+   * "Running via cron job. Schedule: every day at 3am UTC. Task: ...".
    */
   headlessInstructions?: string;
-  /** Max tool call rounds before stopping */
+  /** Max tool-call rounds before the agent loop stops (caps stepCountIs). */
   maxTurns?: number;
   /** Thread ID to continue (for "append" mode) */
   threadId?: string;
@@ -91,50 +72,36 @@ export interface HeadlessAiStreamParams {
   /** Override root folder (defaults to INCOGNITO for none, CRON for new/append) */
   rootFolderId: DefaultFolderId;
   /**
-   * Pre-fetched tool call results to inject as tool messages before the AI runs.
-   * Written to the thread DB so they appear in UI exactly like regular tool calls.
+   * Pre-fetched tool call results to inject as tool messages before the AI
+   * runs. Written to the thread DB so they appear in UI like regular tool calls.
    */
   preCalls?: HeadlessPreCall[];
-  /**
-   * When true, the AI will not see the user's stored memories in its context.
-   * Use for public bots and isolated tasks that should not inherit personal context.
-   */
+  /** When true, the AI will not see the user's stored memories in its context. */
   excludeMemories?: boolean;
   /**
-   * When true, use the "wakeup-resume" operation instead of "answer-as-ai".
-   * This loads DB history normally (walking parent chain from the last message)
-   * but does NOT inject CONTINUE_CONVERSATION_PROMPT - the AI sees the deferred
-   * tool result as the last context item and responds naturally.
-   * Used exclusively by resume-stream for wakeUp revival.
+   * When true, run as a revival with the "wakeup-resume" operation instead of
+   * "answer-as-ai": DB history loads normally but CONTINUE_CONVERSATION_PROMPT
+   * is NOT injected - the AI sees the deferred tool result as the last context
+   * item and responds naturally. Used exclusively by resume-stream.
    */
   wakeUpRevival?: boolean;
   /**
-   * Override the derived operation for test / special-case callers.
-   * When set to "send", the prompt is treated as a new user message appended
-   * to the thread history - parentMessageId is still used for history loading
-   * but the AI receives the prompt as a user turn, not an answer-as-ai continuation.
-   * Use this in integration tests to simulate normal user multi-turn conversations.
+   * Override the derived operation for test / special-case callers. "send"
+   * treats the prompt as a new user message appended to the thread history.
    */
   operationOverride?: "send" | "retry" | "edit";
   /**
-   * Explicit parent message ID for history loading.
-   * When provided, skips the "find last message by createdAt" query and uses
-   * this ID directly as the starting point for building message ancestry.
-   * Critical for WAIT mode resume where the tool message with backfilled result
-   * must be the ancestor chain root - not whatever message was created last.
+   * Explicit parent message ID for history loading. Skips the "find last
+   * message by createdAt" fallback. Critical for WAIT mode resume where the
+   * tool message with the backfilled result must be the ancestry root.
    */
   explicitParentMessageId?: string;
   /**
-   * Force a specific sequenceId for the revival AI message.
-   * Used by resume-stream so the revival response shares the same sequence
-   * as the synthetic assistant + deferred tool pair that precede it.
+   * Force a specific sequenceId for the revival AI message so it shares the
+   * sequence of the synthetic assistant + deferred tool pair preceding it.
    */
   sequenceIdOverride?: string;
-  /**
-   * Override resolved media gen models - bypasses the user-settings cascade.
-   * Used in integration tests to force a specific provider (e.g. modelslab-music-gen)
-   * regardless of what the admin user has saved in their settings.
-   */
+  /** Override resolved media gen models - bypasses the user-settings cascade (tests). */
   mediaModelOverrides?: {
     musicGenModelSelection?: MusicGenModelSelection;
     videoGenModelSelection?: VideoGenModelSelection;
@@ -145,27 +112,21 @@ export interface HeadlessAiStreamParams {
   /** File attachments to include with the user message (images, audio, PDFs, video) */
   attachments?: File[];
   /**
-   * Audio input for STT transcription (voice UI flow).
-   * When provided, the audio is transcribed via SpeechToTextRepository before the AI runs.
-   * The transcribed text replaces the prompt as the user message content.
-   * This is the dedicated STT path - distinct from audio file attachments which go through
-   * the gap-fill audioVisionModel bridge instead.
+   * Audio input for STT transcription (voice UI flow). Transcribed text
+   * replaces the prompt as the user message content - distinct from audio
+   * attachments which go through the gap-fill audioVisionModel bridge.
    */
   audioInput?: File | null;
   /**
-   * Tool confirmations to process before the AI stream starts.
-   * Each entry confirms or rejects a pending tool call by its message ID.
-   * Used to simulate user approval in integration tests for approve-mode tools.
+   * Tool confirmations to process before the AI stream starts. Each entry
+   * confirms or rejects a pending tool call by its message ID (tests).
    */
   toolConfirmations?: Array<{
     messageId: string;
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
   }> | null;
-  /**
-   * Override available tools with custom requiresConfirmation settings.
-   * Used in integration tests to configure confirmation gates for specific tools.
-   */
+  /** Override available tools with custom requiresConfirmation settings (tests). */
   availableTools?: Array<{
     toolId: string;
     requiresConfirmation: boolean;
@@ -179,15 +140,12 @@ export interface HeadlessAiStreamParams {
   /** Translation function for ai-stream module */
   t: AiStreamT;
   /**
-   * Called as soon as the sub-thread ID is determined (before the AI stream starts).
-   * Used by ai-run to emit a partial tool result with the threadId so the parent
-   * UI can start rendering sub-thread messages in real-time.
+   * Called as soon as the sub-thread ID is determined (before the AI stream
+   * starts) - ai-run emits a partial tool result so the parent UI can render
+   * sub-thread messages in real-time.
    */
   onThreadCreated?: (threadId: string) => Promise<void>;
-  /**
-   * Parent stream's abort signal. When the calling stream is cancelled, this
-   * sub-stream aborts too. Works for any headless tool call, not just ai-run.
-   */
+  /** Parent stream's abort signal - this sub-stream aborts when the caller does. */
   abortSignal: AbortSignal;
 }
 
@@ -204,7 +162,7 @@ export interface HeadlessAiStreamResult {
   totalCreditsDeducted?: number;
   /**
    * Number of tool schemas loaded into the AI context window for this stream.
-   * 0 = no tools. Used in tests to assert skill/favorite tool configuration is correct.
+   * 0 = no tools. Used in tests to assert skill/favorite tool configuration.
    */
   pinnedToolCount: number;
 }
@@ -298,7 +256,6 @@ export async function runHeadlessAiStream(
     skill: skillOverride,
     prompt,
     favoriteConfig: favoriteConfigOverride,
-    headlessInstructions,
     threadId: existingThreadId,
     subFolderId,
     rootFolderId: rootFolderIdOverride,
@@ -322,7 +279,7 @@ export async function runHeadlessAiStream(
   const headlessAvailability = await getInstanceAvailability();
 
   try {
-    // ── Resolve model + skill + favorite config ───────────────────────────────
+    // ── Resolve model + skill + favorite config ──────────────────────────
     let model = modelOverride;
     let skill = skillOverride;
     let resolvedFavoriteConfig: FavoriteConfig | null =
@@ -354,7 +311,7 @@ export async function runHeadlessAiStream(
       }
     }
 
-    // ── Apply availableTools override to favoriteConfig ──────────────
+    // ── Apply availableTools override to favoriteConfig ──────────────────
     // Lets integration tests inject requiresConfirmation settings without
     // needing a pre-configured favorite that has those settings saved.
     if (
@@ -551,6 +508,9 @@ export async function runHeadlessAiStream(
         ? "answer-as-ai"
         : operation;
 
+    // ── Synthetic request data — the headless intake phase inside
+    // createAiStream derives operation/parent/userMessageId and injects
+    // preCalls; this adapter only supplies the raw ingredients.
     const syntheticData: AiStreamPostRequestOutput = {
       operation: effectiveOperation,
       rootFolderId,

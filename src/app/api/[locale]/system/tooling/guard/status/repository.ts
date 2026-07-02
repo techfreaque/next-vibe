@@ -14,11 +14,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { GuardStatusT } from "next-vibe/tooling/guard/status/i18n";
+
 import type {
   GuardStatusRequestOutput,
   GuardStatusResponseOutput,
 } from "./definition";
-import type { GuardStatusT } from "next-vibe/tooling/guard/status/i18n";
 
 /**
  * Guard Status Repository

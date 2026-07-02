@@ -18,9 +18,10 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
 
+import { getTemplate } from "@/generated/email/index";
+
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
-import { getTemplate } from "../../registry/generated";
 import {
   getTemplateSubject,
   renderTemplateComponent,

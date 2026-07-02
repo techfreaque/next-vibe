@@ -22,10 +22,9 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import { VideoGenModelId } from "./models";
-
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { VideoGenModelId } from "./models";
 
 const VideoGenerationContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.VideoGenerationContainer })),

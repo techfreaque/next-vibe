@@ -8,12 +8,6 @@ import { cn } from "next-vibe/core/utils/utils";
 import { useIsMobile } from "next-vibe/ui/native/hooks/use-mobile";
 import { PanelLeft } from "next-vibe/ui/native/ui/icons/PanelLeft";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./tooltip";
-import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
@@ -28,6 +22,12 @@ import { Button } from "./button";
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";
 import { Skeleton } from "./skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip";
 
 // Constants
 export const SIDEBAR_COOKIE_NAME = "sidebar:state";

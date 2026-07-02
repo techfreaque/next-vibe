@@ -8,7 +8,6 @@
 
 import "server-only";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { Environment } from "next-vibe/env/env-util";
 import {
@@ -19,7 +18,7 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
 import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
-import { runGenerators } from "next-vibe/tooling/generators/shared/run";
+import { GeneratorRunner } from "next-vibe/tooling/generators/generator";
 import type { LiveIndex } from "next-vibe/tooling/generators/shared/live-index";
 import {
   buildLiveIndex,
@@ -47,7 +46,7 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
-  async run({ logger, signal, systemLocale, skipTanstack }) {
+  async run({ logger, signal, skipTanstack }) {
     if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
       return;
@@ -56,14 +55,14 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
     logger.debug("Starting smart development file watcher...");
 
     try {
-      await startSmartFileWatcher(signal, logger, systemLocale, skipTanstack);
+      await startSmartFileWatcher(signal, logger, skipTanstack);
     } catch (error) {
       const errorMsg = parseError(error).message;
       logger.error(
         "Smart file watcher failed, falling back to polling",
         new Error(errorMsg),
       );
-      await startPollingWatcher(signal, logger, systemLocale, skipTanstack);
+      await startPollingWatcher(signal, logger);
     }
   },
 
@@ -91,7 +90,6 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
 const startSmartFileWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
-  locale: CountryLanguage,
   skipTanstack: boolean,
 ): Promise<void> => {
   const fs = await import("node:fs");
@@ -146,18 +144,36 @@ const startSmartFileWatcher = async (
     const dirtySnapshot = { ...dirty };
     clearDirtyFlags(liveIndex);
 
+    // Map dirty flags → the generator keys they affect.
+    const dirtyKeys = new Set<string>();
+    if (dirtySnapshot.endpoints || dirtySnapshot.clientRoutes) {
+      dirtyKeys.add("endpoint-framework");
+      dirtyKeys.add("remote-capabilities");
+    }
+    if (dirtySnapshot.taskIndex) {
+      dirtyKeys.add("tasks");
+    }
+    if (dirtySnapshot.emailTemplates) {
+      dirtyKeys.add("email");
+    }
+    if (dirtySnapshot.seeds) {
+      dirtyKeys.add("seeds");
+    }
+
     const generatorPromises: Promise<void>[] = [
-      GenerateAllRepository.generateDirty(
-        dirtySnapshot,
-        liveIndex,
+      GeneratorRunner.runGenerators({
         logger,
-        locale,
-      ).catch((error) => {
-        logger.error(
-          "Generator execution failed",
-          new Error(parseError(error).message),
-        );
-      }),
+        live: liveIndex,
+        only: dirtyKeys,
+        noCache: true,
+      })
+        .then(() => undefined)
+        .catch((error) => {
+          logger.error(
+            "Generator execution failed",
+            new Error(parseError(error).message),
+          );
+        }),
     ];
 
     if (runTanstack) {
@@ -396,8 +412,6 @@ const startSmartFileWatcher = async (
 const startPollingWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
-  locale: CountryLanguage,
-  skipTanstack: boolean,
 ): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
@@ -410,20 +424,10 @@ const startPollingWatcher = async (
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
 
-      await GenerateAllRepository.generateAll(
-        {
-          outputDir: "src/generated",
-          verbose: false,
-          skipEndpoints: false,
-          skipSeeds: watchCount !== 1,
-          skipTaskIndex: false,
-          enableTrpc: false,
-          skipTanstack,
-          force: false,
-        },
+      await GeneratorRunner.runGenerators({
         logger,
-        locale,
-      );
+        overrides: watchCount !== 1 ? { seeds: false } : undefined,
+      });
 
       logger.info(`✅ ${action} #${watchCount} completed`);
     } catch (error) {

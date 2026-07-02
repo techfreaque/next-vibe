@@ -17,14 +17,14 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CronStatsGetRequestOutput,
-  CronStatsGetResponseOutput,
-} from "./definition";
 import type { CronStatsT } from "next-vibe/tasks/cron/stats/i18n";
 import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
 
 import { cronTaskExecutions, cronTasks } from "../db";
+import type {
+  CronStatsGetRequestOutput,
+  CronStatsGetResponseOutput,
+} from "./definition";
 
 /**
  * Cron Stats Repository Implementation

@@ -2,7 +2,7 @@ import type { BuildConfig } from "../definition";
 
 export const testDir = "./test-files";
 export const distDir = `${testDir}/dist`;
-export const copyDir = `${testDir}/dist/copy`;
+const copyDir = `${testDir}/dist/copy`;
 
 const buildConfig: BuildConfig = {
   foldersToClean: [distDir],

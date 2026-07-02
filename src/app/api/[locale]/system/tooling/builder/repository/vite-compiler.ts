@@ -20,9 +20,7 @@ import { maybeColorize, semantic } from "next-vibe/logger/colors";
 import { serverFileLog } from "next-vibe/logger/file";
 import { createNextjsFormatter } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
-import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,
@@ -33,6 +31,8 @@ import {
   type PluginOption,
 } from "vite";
 
+import type { BuildProfile, FileToCompile } from "../definition";
+import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
 /** Build Vite `define` entries for all NEXT_PUBLIC_AGENT_* flags.
@@ -183,7 +183,7 @@ function invalidateWithImporters(
   }
 }
 
-export class ViteCompiler {
+class ViteCompiler {
   async compileFile(
     fileConfig: FileToCompile,
     output: string[],
@@ -377,9 +377,9 @@ export class ViteCompiler {
       // then falls back to web/ (shared UI components).
       const tanstackUiDir = resolve(
         ROOT_DIR,
-        "src/packages/next-vibe/ui/web/tanstack",
+        "src/app/api/[locale]/system/ui/tanstack",
       );
-      const webUiDir = resolve(ROOT_DIR, "src/packages/next-vibe/ui/web/web");
+      const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
       plugins.push({
         name: "next-vibe-ui-resolver",
         resolveId(id: string): string | null {
@@ -414,7 +414,7 @@ export class ViteCompiler {
             // next-vibe/* → src/app/api/[locale]/*
             {
               find: /^next-vibe\//,
-              replacement: `${resolve(ROOT_DIR, "src/app/api/[locale]")}/`,
+              replacement: `${resolve(ROOT_DIR, "src/app/api/[locale]/system")}/`,
             },
           ],
         },
@@ -655,12 +655,13 @@ export class ViteCompiler {
     const srcDirectory = fileConfig.input;
 
     const srcDir = resolve(ROOT_DIR, "src");
-    const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
+    const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
+    const nextVibeSystemDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
     const tanstackUiDir = resolve(
       ROOT_DIR,
-      "src/packages/next-vibe/ui/web/tanstack",
+      "src/app/api/[locale]/system/ui/tanstack",
     );
-    const webUiDir = resolve(ROOT_DIR, "src/packages/next-vibe/ui/web/web");
+    const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
     const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
 
     const exts = [
@@ -725,6 +726,16 @@ export class ViteCompiler {
               if (rel) {
                 return resolve(ROOT_DIR, rel);
               }
+            }
+            // General `next-vibe/*` → system/* FIRST, then the locale root
+            // (mirrors tsconfig `"next-vibe/*": ["system/*", "[locale]/*"]`). The
+            // single-string `resolve.alias` below can only map to ONE base, so
+            // framework files that were moved under system/ (e.g.
+            // next-vibe/logger/file → system/logger/file) fail there; this
+            // two-candidate resolver runs `enforce:"pre"` and fixes them.
+            if (id.startsWith("next-vibe/")) {
+              const sub = id.slice("next-vibe/".length);
+              return tryResolve([nextVibeSystemDir, nextVibeDir], sub);
             }
             return null;
           },
@@ -963,7 +974,8 @@ export class ViteCompiler {
         tsconfigPaths: true,
         alias: [
           { find: /^@\//, replacement: `${srcDir}/` },
-          { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
+          // next-vibe/ui/web/* handled by the ui resolver plugin (tanstack-first).
+          { find: /^next-vibe\/(?!ui\/web\/)/, replacement: `${nextVibeDir}/` },
           ...Object.entries(moduleAliases).map(([specifier, relativePath]) => ({
             find: specifier,
             replacement: resolve(ROOT_DIR, relativePath),
@@ -1038,12 +1050,12 @@ export class ViteCompiler {
       const srcDirectory = fileConfig.input;
 
       const srcDir = resolve(ROOT_DIR, "src");
-      const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
+      const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
       const tanstackUiDir = resolve(
         ROOT_DIR,
-        "src/packages/next-vibe/ui/web/tanstack",
+        "src/app/api/[locale]/system/ui/tanstack",
       );
-      const webUiDir = resolve(ROOT_DIR, "src/packages/next-vibe/ui/web/web");
+      const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
       // Module aliases from build.config.ts viteOptions.moduleAliases
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
@@ -1530,6 +1542,23 @@ export class ViteCompiler {
                 }
               }
 
+              // General `next-vibe/*` → system/* FIRST, then the locale root
+              // (mirrors tsconfig `"next-vibe/*": ["system/*", "[locale]/*"]`). The
+              // single-string `resolve.alias` maps `next-vibe/` to the locale root
+              // only, so framework files moved under system/ (e.g.
+              // next-vibe/logger/file → system/logger/file) fail to resolve in the
+              // SSR module runner. This two-candidate resolver fixes them.
+              if (id !== "server-only" && id.startsWith("next-vibe/")) {
+                const sub = id.slice("next-vibe/".length);
+                return tryResolve(
+                  [
+                    resolve(ROOT_DIR, "src/app/api/[locale]/system"),
+                    resolve(ROOT_DIR, "src/app/api/[locale]"),
+                  ],
+                  sub,
+                );
+              }
+
               return null;
             },
           } satisfies PluginOption,
@@ -1757,7 +1786,16 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           tsconfigPaths: true,
           alias: [
             { find: /^@\//, replacement: `${srcDir}/` },
-            { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
+            // `next-vibe/*` → system/*, EXCEPT `next-vibe/ui/web/*`: those are
+            // resolved by the next-vibe-ui-ssr-resolver plugin (tanstack variant
+            // first, web fallback) so TanStack never loads the Next.js-only web
+            // components (e.g. ui/font, which imports the CJS `next/font/google`
+            // that breaks the Vite SSR module runner). The negative lookahead lets
+            // the plugin win for ui/web/ while the alias still fast-paths the rest.
+            {
+              find: /^next-vibe\/(?!ui\/web\/)/,
+              replacement: `${nextVibeDir}/`,
+            },
             // moduleAliases from build.config.ts viteOptions.moduleAliases.
             ...Object.entries(moduleAliases).map(
               ([specifier, relativePath]) => ({
@@ -1801,7 +1839,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 filePath.endsWith("/routeTree.gen.ts") ||
                 filePath.includes("/app-tanstack/routes/") ||
                 filePath.includes("/generated/") ||
-                filePath.endsWith("/messenger/registry/generated.ts") ||
+                filePath.endsWith("/generated/email/index.ts") ||
                 filePath.includes("/app-native/") ||
                 filePath.includes("/test-files/") ||
                 filePath.includes("/testing/") ||

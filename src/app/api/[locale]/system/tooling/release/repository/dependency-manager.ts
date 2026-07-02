@@ -14,14 +14,14 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+
 import type {
   PackageJson,
   PackageManager,
   SecurityScanResult,
 } from "../definition";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import { MESSAGES, TIMEOUTS } from "./constants";
-
 import { toCatchError } from "./utils";
 
 // ============================================================================

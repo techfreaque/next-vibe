@@ -8,6 +8,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { cn } from "next-vibe/core/utils/utils";
+import type { StyleType } from "next-vibe/ui/web/utils/style-type";
+import type { ReactElement } from "react";
+import * as React from "react";
+
 import {
   Table,
   TableBody,
@@ -16,9 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
-import type { ReactElement } from "react";
-import * as React from "react";
 
 export type DataTableProps<TData, TValue = string> = {
   columns: ColumnDef<TData, TValue>[];

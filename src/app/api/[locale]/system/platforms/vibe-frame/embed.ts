@@ -33,18 +33,6 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
-  DEFAULT_SANDBOX,
-  type FrameDisplayMode,
-  type FrameMountConfig,
-  type FrameToParentMessage,
-  generateFrameId,
-  type VibeFrameBatchConfig,
-  type VibeFrameGlobalConfig,
-  type VibeFrameInstance,
-  type VibeFramePublicAPI,
-  type VibeFrameSharedOptions,
-} from "./types";
-import {
   appendToBody,
   createElement,
   onDOMReady,
@@ -60,6 +48,18 @@ import {
   recordDisplay,
 } from "./bridge";
 import { setupTrigger } from "./triggers";
+import {
+  DEFAULT_SANDBOX,
+  type FrameDisplayMode,
+  type FrameMountConfig,
+  type FrameToParentMessage,
+  generateFrameId,
+  type VibeFrameBatchConfig,
+  type VibeFrameGlobalConfig,
+  type VibeFrameInstance,
+  type VibeFramePublicAPI,
+  type VibeFrameSharedOptions,
+} from "./types";
 
 // ─── Frame Registry ──────────────────────────────────────────────────────────
 
@@ -562,6 +562,7 @@ async function fetchFrameConfig(
   }
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- standalone cross-origin embed script: runs on third-party pages, zero-dep, cannot use next-vibe-ui or in-process transport
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -34,13 +34,13 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { skillVariantsSchema } from "../db";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
+import { skillVariantsSchema } from "../db";
 import {
   CATEGORY_CONFIG,
   CategoryOptions,

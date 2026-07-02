@@ -52,6 +52,22 @@ export const { POST, tools } = endpointsHandler({
         if (!sel) {
           return undefined;
         }
+        // MANUAL selection: honor the user's explicit model choice without the
+        // provider-availability filter. Availability is a property of the
+        // EXECUTING instance — this default may be resolved by a dispatching
+        // caller whose local keys differ from the executor's (remote dispatch
+        // pre-resolves caller-context defaults). The handler validates the
+        // model against real availability at execution time.
+        const { videoGenModelSelectionSchema } = await import("./models");
+        const { ModelSelectionType } = await import("../skills/enum");
+        const parsed = videoGenModelSelectionSchema.safeParse(sel);
+        if (
+          parsed.success &&
+          parsed.data.selectionType === ModelSelectionType.MANUAL &&
+          "manualModelId" in parsed.data
+        ) {
+          return parsed.data.manualModelId;
+        }
         const { getInstanceAvailability } = await import("../env-availability");
         const _routeAvailability = await getInstanceAvailability();
         const { getBestVideoGenModel } = await import("./models");

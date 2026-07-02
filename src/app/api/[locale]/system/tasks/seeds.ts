@@ -23,7 +23,7 @@ import { CronTaskPriority } from "./enum";
  * Task runners are excluded (dev-only infrastructure tasks).
  */
 async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
-  const { taskRegistry } = await import("@/generated/tasks-index");
+  const { taskRegistry } = await import("@/generated/tasks/index");
 
   // Only cron tasks go into cronTasks DB table
   // task-runners are dev-only and not persisted

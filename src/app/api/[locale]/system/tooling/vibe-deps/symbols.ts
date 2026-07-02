@@ -25,6 +25,13 @@ export interface SymbolDef {
   file: string;
   /** Line within the file (1-based) for reporting. */
   line: number;
+  /**
+   * For static-method: [openLine, closeLine] of the owning class body (1-based,
+   * inclusive). Lets a caller tell an INTRA-class reference (→ can become
+   * `private`) from an EXTRA-class same-file reference (→ `private` won't
+   * compile; the fix is to inline the sibling wrapper, not narrow visibility).
+   */
+  ownerBody?: readonly [number, number];
 }
 
 const EXPORT_CLASS_RE = /^export\s+(?:abstract\s+)?class\s+([A-Za-z_]\w*)/;
@@ -35,7 +42,7 @@ const EXPORT_TYPE_RE = /^export\s+(?:type|interface)\s+([A-Za-z_]\w*)/;
 // Capture the access modifier so private/protected statics (internal helpers,
 // never a cross-file "public surface") can be excluded from dead-symbol checks.
 const STATIC_METHOD_RE =
-  /^\s+(?:public\s+|private\s+|protected\s+)?static\s+(?:async\s+)?([A-Za-z_]\w*)\s*[(<]/;
+  /^\s+(public\s+|private\s+|protected\s+)?static\s+(?:async\s+)?([A-Za-z_]\w*)\s*[(<]/;
 const CLASS_OPEN_RE = /\bclass\s+([A-Za-z_]\w*)/;
 
 /**
@@ -48,6 +55,10 @@ export function extractSymbols(file: string, source: string): SymbolDef[] {
   let currentClass: string | null = null;
   let braceDepth = 0;
   let classBraceDepth = -1;
+  let classOpenLine = -1;
+  // Static-method symbols awaiting their owning class's close line, so we can
+  // stamp each with the class body range once the `}` is seen.
+  let pendingStatics: SymbolDef[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? "";
@@ -69,17 +80,29 @@ export function extractSymbols(file: string, source: string): SymbolDef[] {
     if (classMatch && classMatch[1] && line.includes("{")) {
       currentClass = classMatch[1];
       classBraceDepth = braceDepth;
+      classOpenLine = ln;
     }
     if (currentClass) {
       const sm = STATIC_METHOD_RE.exec(line);
-      if (sm && sm[1] && sm[1] !== "constructor") {
-        out.push({
-          name: sm[1],
+      const access = sm?.[1]?.trim();
+      const methodName = sm?.[2];
+      // Only PUBLIC (or unmarked) static methods are cross-file surface.
+      // private/protected statics are internal helpers — never "dead public".
+      if (
+        methodName &&
+        methodName !== "constructor" &&
+        access !== "private" &&
+        access !== "protected"
+      ) {
+        const sym: SymbolDef = {
+          name: methodName,
           kind: "static-method",
           owner: currentClass,
           file,
           line: ln,
-        });
+        };
+        out.push(sym);
+        pendingStatics.push(sym);
       }
     }
 
@@ -90,8 +113,16 @@ export function extractSymbols(file: string, source: string): SymbolDef[] {
       } else if (ch === "}") {
         braceDepth--;
         if (currentClass && braceDepth === classBraceDepth) {
+          // Class body spans [classOpenLine, ln]. Stamp its static methods so a
+          // consumer can distinguish intra-class from extra-class references.
+          const body: readonly [number, number] = [classOpenLine, ln];
+          for (const s of pendingStatics) {
+            s.ownerBody = body;
+          }
+          pendingStatics = [];
           currentClass = null;
           classBraceDepth = -1;
+          classOpenLine = -1;
         }
       }
     }
@@ -110,10 +141,22 @@ export interface UsageIndex {
   fileMentions: Map<string, Set<string>>;
   /** "Owner.method" → set of files that reference it. */
   memberMentions: Map<string, Set<string>>;
+  /**
+   * Class names reached DYNAMICALLY — pulled off a module object as
+   * `<lowercaseVar>.ClassName` (e.g. `const mod = await import(...); mod.Foo`)
+   * or destructured from one. Their static methods are then dispatched off the
+   * loaded reference (`(await getX()).method()`) and NEVER appear as the static
+   * `ClassName.method` string, so a member-mention scan would wrongly call them
+   * dead. Any static method whose owner is here must be treated as reachable.
+   */
+  dynamicClassRefs: Set<string>;
 }
 
 const WORD_RE = /[A-Za-z_]\w*/g;
 const MEMBER_RE = /([A-Z][A-Za-z0-9_]*)\.([A-Za-z_]\w*)/g;
+// `<lowercaseVar>.ClassName` — a Capitalized member pulled off a lowercase
+// module-like object. Distinct from MEMBER_RE (which keys ClassName.method).
+const MODULE_MEMBER_RE = /\b([a-z_]\w*)\.([A-Z][A-Za-z0-9_]*)\b/g;
 
 /** Build a corpus-wide usage index in one pass over file sources. */
 export function buildUsageIndex(
@@ -121,6 +164,7 @@ export function buildUsageIndex(
 ): UsageIndex {
   const fileMentions = new Map<string, Set<string>>();
   const memberMentions = new Map<string, Set<string>>();
+  const dynamicClassRefs = new Set<string>();
 
   for (const [file, src] of sources) {
     const seenWords = new Set<string>();
@@ -148,9 +192,16 @@ export function buildUsageIndex(
       }
       set.add(file);
     }
+
+    MODULE_MEMBER_RE.lastIndex = 0;
+    while ((m = MODULE_MEMBER_RE.exec(src)) !== null) {
+      // m[2] is a Capitalized identifier accessed off a lowercase var — treat
+      // as a dynamically-reached class (e.g. `mod.CliResultFormatter`).
+      dynamicClassRefs.add(m[2]);
+    }
   }
 
-  return { fileMentions, memberMentions };
+  return { fileMentions, memberMentions, dynamicClassRefs };
 }
 
 export interface SymbolUsage extends SymbolDef {
@@ -163,6 +214,17 @@ export interface SymbolUsage extends SymbolDef {
 export function usageFor(sym: SymbolDef, index: UsageIndex): SymbolUsage {
   let files: Set<string> | undefined;
   if (sym.kind === "static-method" && sym.owner) {
+    // A static method reached ONLY via a dynamically-loaded class reference
+    // (`const mod = await import(...); mod.Owner.method()`) never writes the
+    // literal `Owner.method`, so the member-mention scan sees zero uses. If the
+    // owning class is referenced dynamically ANYWHERE, the method is reachable —
+    // report the declaring file as a use so it is NOT flagged dead. This is the
+    // static-method analogue of the namespace-import exclusion. (Prevents e.g.
+    // CliResultFormatter.formatResult, dispatched via getResultFormatter(), from
+    // being wrongly deleted.)
+    if (index.dynamicClassRefs.has(sym.owner)) {
+      return { ...sym, usedInFiles: [sym.file], usageCount: 1 };
+    }
     files = index.memberMentions.get(`${sym.owner}.${sym.name}`);
   } else {
     files = index.fileMentions.get(sym.name);

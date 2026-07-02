@@ -9,10 +9,6 @@ import chalk from "chalk";
 import { Box, Text } from "ink";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import type {
-  HelpGetResponseOutput,
-  HelpToolMetadataSerialized,
-} from "./definition";
 import {
   useWidgetLocale,
   useWidgetPlatform,
@@ -20,7 +16,12 @@ import {
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { CATEGORY_REGISTRY } from "@/generated/category-registry";
+import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
+
+import type {
+  HelpGetResponseOutput,
+  HelpToolMetadataSerialized,
+} from "./definition";
 
 // ── Category label lookup ───────────────────────────────────────────────────
 

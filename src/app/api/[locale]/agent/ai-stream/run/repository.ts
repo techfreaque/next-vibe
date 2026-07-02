@@ -27,7 +27,6 @@ import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { type ChatModelId, getBestChatModel } from "../models";
 import {
   DefaultFolderId,
   type ToolExecutionContext,
@@ -52,8 +51,9 @@ import {
 } from "@/app/api/[locale]/agent/skills/favorites/repository";
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 
-import type { HeadlessPreCall } from "../repository/headless";
+import { type ChatModelId, getBestChatModel } from "../models";
 import { runHeadlessAiStream } from "../repository/headless";
+import type { HeadlessPreCall } from "../repository/setup";
 import type { AiStreamT } from "../stream/i18n";
 import type {
   AiStreamRunPostRequestOutput,

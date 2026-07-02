@@ -6,14 +6,6 @@
  */
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type {
-  AnyChildrenConstrain,
-  ArrayChildConstraint,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-  ObjectChildrenConstraint,
-  UnionObjectWidgetConfigConstrain,
-} from "./types";
 import type { CodeOutputWidgetConfig } from "next-vibe/unified-ui/containers/code-output/types";
 import type {
   ContainerUnionWidgetConfig,
@@ -85,6 +77,15 @@ import type { NavigateButtonWidgetConfig } from "next-vibe/unified-ui/interactiv
 import type { SearchBarWidgetConfig } from "next-vibe/unified-ui/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "next-vibe/unified-ui/interactive/submit-button/types";
 import type { z } from "zod";
+
+import type {
+  AnyChildrenConstrain,
+  ArrayChildConstraint,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+  UnionObjectWidgetConfigConstrain,
+} from "./types";
 
 // Union type for all form field widgets
 // TSchema is passed through - each member enforces its own schema constraint

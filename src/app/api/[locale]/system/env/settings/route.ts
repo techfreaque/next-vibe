@@ -20,7 +20,7 @@ export const { GET, PATCH, POST, tools } = endpointsHandler({
       SystemSettingsRepository.patchSettings(data, logger, t),
   },
   [Methods.POST]: {
-    handler: ({ data, logger, t, locale }) =>
-      SystemSettingsRepository.unbottledLogin(data, locale, logger, t),
+    handler: ({ data, user, logger, t, locale }) =>
+      SystemSettingsRepository.unbottledLogin(data, user, locale, logger, t),
   },
 });

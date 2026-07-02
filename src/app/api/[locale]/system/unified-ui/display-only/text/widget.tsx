@@ -21,9 +21,9 @@ import {
   getTextFormatClassName,
   getTextSizeClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import { extractTextData, formatIfDate, formatText } from "./shared";
 import type { JSX } from "react";
 
+import { extractTextData, formatIfDate, formatText } from "./shared";
 import type { TextEmphasis, TextVariant, TextWidgetSchema } from "./types";
 import type { TextWidgetConfig } from "./types";
 

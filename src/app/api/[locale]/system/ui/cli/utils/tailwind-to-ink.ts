@@ -795,13 +795,3 @@ export function mergeTextProps(
 ): InkTextProps {
   return { ...base, ...override };
 }
-
-/**
- * Merge two InkBoxProps objects, later values win.
- */
-export function mergeBoxProps(
-  base: InkBoxProps,
-  override: InkBoxProps,
-): InkBoxProps {
-  return { ...base, ...override };
-}

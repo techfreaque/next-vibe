@@ -42,23 +42,3 @@ export interface SearchBarWidgetConfig<
    */
   size?: "sm" | "default" | "xl";
 }
-
-/**
- * Type-safe search bar field for direct use in custom widgets.
- */
-export type SearchBarField<
-  TEndpoint extends { scopedTranslation: { ScopedTranslationKey: string } },
-> = Pick<
-  SearchBarWidgetConfig<
-    TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    "widget"
-  >,
-  | "fieldName"
-  | "placeholder"
-  | "submitText"
-  | "submitLoadingText"
-  | "submitIcon"
-  | "size"
->;

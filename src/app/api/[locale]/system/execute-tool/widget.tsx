@@ -51,7 +51,7 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type definition from "./definition";
 

@@ -15,6 +15,7 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -26,11 +27,10 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
-
 import type { SyncScope } from "../db";
 import { instanceIdentities, remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { RemoteTransport } from "../transport";
 
 /**
  * Reverse entries default to serving every sync domain. The passive side has
@@ -72,27 +72,27 @@ export class RemoteConnectionRegisterRepository {
     if (!localUrl || !token || !leadId) {
       return false;
     }
-    try {
-      const healthDef =
-        await import("next-vibe/server/server/health/definition");
-      const path = healthDef.default.GET.path.join("/");
-      const url = `${localUrl}/api/${locale}/${path}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
-        },
-        signal: AbortSignal.timeout(30_000),
-      });
-      // Any HTTP answer (even an error status) proves direct reachability.
-      return response.status > 0;
-    } catch {
+    const healthDef = await import("next-vibe/server/server/health/definition");
+    const path = healthDef.default.GET.path.join("/");
+    // Deliberate over-the-wire reachability probe — the point is to prove the URL
+    // is directly reachable, so it must go over HTTP (not runInProcessTyped, which
+    // runs in-process and proves nothing). Uses the sanctioned raw remote primitive.
+    const result = await RemoteTransport.callRaw({
+      remoteUrl: localUrl,
+      apiPath: `${locale}/${path}`,
+      method: Methods.GET,
+      token,
+      leadId,
+    });
+    if (result.networkError) {
       logger.debug(
         "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
         { localUrl },
       );
       return false;
     }
+    // Any HTTP answer (even an error status) proves direct reachability.
+    return result.status > 0;
   }
   static async registerLocalInstance(
     data: RemoteRegisterPostRequestInput,
@@ -104,9 +104,11 @@ export class RemoteConnectionRegisterRepository {
     ResponseType<{
       registered: boolean;
       remoteInstanceId: string;
+      remoteUserId: string;
     }>
   > {
-    const { instanceId, localUrl, reverseToken, reverseLeadId } = data;
+    const { instanceId, localUrl, reverseToken, reverseLeadId, selfUserId } =
+      data;
 
     const selfInstanceId = await RemoteConnectionRepository.getLocalInstanceId(
       user.id,
@@ -153,6 +155,7 @@ export class RemoteConnectionRegisterRepository {
         isActive: true,
         isReverseEntry: true,
         remoteInstanceId: instanceId,
+        remoteUserId: selfUserId ?? null,
         // Mirror threads on both sides by default so remote folder shows history.
         threadMirrorMode: "both",
         // The passive side serves whatever the initiator pulls. Default ALL
@@ -169,6 +172,7 @@ export class RemoteConnectionRegisterRepository {
           isActive: true,
           isReverseEntry: true,
           remoteInstanceId: instanceId,
+          remoteUserId: selfUserId ?? null,
           token: encryptedReverseToken,
           leadId: reverseLeadId,
           // Backfill the scope on re-register if a prior row stored null.
@@ -291,6 +295,9 @@ export class RemoteConnectionRegisterRepository {
     return success({
       registered: true,
       remoteInstanceId: selfInstanceId,
+      // Our own userId — the connecting instance stores it as its connection's
+      // remoteUserId to target our `user/{userId}` channel for the bridge event.
+      remoteUserId: user.id,
     });
   }
 }

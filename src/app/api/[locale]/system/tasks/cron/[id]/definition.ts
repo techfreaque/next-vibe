@@ -13,11 +13,6 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  CRON_DELETE_ALIAS,
-  CRON_GET_ALIAS,
-  CRON_UPDATE_ALIAS,
-} from "./constants";
 import { scopedTranslation } from "next-vibe/tasks/cron/[id]/i18n";
 import {
   CronTaskPriority,
@@ -46,6 +41,11 @@ import {
 import { z } from "zod";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
+import {
+  CRON_DELETE_ALIAS,
+  CRON_GET_ALIAS,
+  CRON_UPDATE_ALIAS,
+} from "./constants";
 
 const CronTaskDetailContainer = lazyWidget(() =>
   import("next-vibe/tasks/cron/[id]/widget/widget").then((m) => ({
@@ -1096,8 +1096,5 @@ export type CronTaskDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type CronTaskDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type CronTaskDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type CronTaskDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-
-// Convenience type for the task object from GET response
-export type IndividualCronTaskType = CronTaskGetResponseOutput["task"];
 
 export default endpoints;

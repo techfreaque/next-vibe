@@ -13,8 +13,9 @@ import {
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 
-import threadPermissionsDefinitions from "./definition";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/i18n";
+
+import threadPermissionsDefinitions from "./definition";
 
 interface ThreadPermissionsDialogProps {
   open: boolean;

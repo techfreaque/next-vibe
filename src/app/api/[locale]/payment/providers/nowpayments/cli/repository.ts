@@ -171,6 +171,7 @@ Or use package managers:
 
   private static async getTunnelUrl(): Promise<string | null> {
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;
       const tunnel = data.tunnels?.find((t) => t.proto === "https");
@@ -202,6 +203,7 @@ Or use package managers:
     ResponseType<ResponseSchema>
   > {
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;
       const tunnel = data.tunnels?.find((t) => t.proto === "https");

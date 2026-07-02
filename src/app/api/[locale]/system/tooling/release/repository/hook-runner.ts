@@ -15,9 +15,9 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { HookContext, ReleaseHook } from "../definition";
 import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 
+import type { HookContext, ReleaseHook } from "../definition";
 import { MESSAGES } from "./constants";
 
 export class HookRunner {

@@ -36,7 +36,6 @@ import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { DefaultFolderId } from "../config";
-
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 

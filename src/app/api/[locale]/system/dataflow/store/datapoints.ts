@@ -8,9 +8,10 @@
 import "server-only";
 
 import { and, between, eq, lt, sql } from "drizzle-orm";
-import { pipelineDatapoints, pipelineRetentionConfig } from "../db";
-import type { DataPoint, TimeRange } from "next-vibe/dataflow/shared/fields";
 import { db } from "next-vibe/database";
+import type { DataPoint, TimeRange } from "next-vibe/dataflow/shared/fields";
+
+import { pipelineDatapoints, pipelineRetentionConfig } from "../db";
 
 // ─── Write ────────────────────────────────────────────────────────────────────
 
@@ -98,30 +99,6 @@ export async function readDatapoints(
 }
 
 // ─── Retention ────────────────────────────────────────────────────────────────
-
-/**
- * Upsert retention config for a node.
- */
-export async function setRetentionConfig(
-  nodeId: string,
-  config: { maxRows?: number; maxAgeDays?: number },
-): Promise<void> {
-  await db
-    .insert(pipelineRetentionConfig)
-    .values({
-      nodeId,
-      maxRows: config.maxRows ?? null,
-      maxAgeDays: config.maxAgeDays ?? null,
-    })
-    .onConflictDoUpdate({
-      target: pipelineRetentionConfig.nodeId,
-      set: {
-        maxRows: config.maxRows ?? null,
-        maxAgeDays: config.maxAgeDays ?? null,
-        updatedAt: new Date(),
-      },
-    });
-}
 
 /**
  * Run retention cleanup for a specific node.

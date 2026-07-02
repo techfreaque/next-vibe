@@ -1,5 +1,6 @@
 "use client";
 
+import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
@@ -9,8 +10,10 @@ import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
@@ -19,6 +22,8 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useState } from "react";
+
+import productLookupEndpoint from "@/app/api/[locale]/pos/product-lookup/definition";
 
 import type definition from "./definition";
 
@@ -44,6 +49,8 @@ export function PosOrderAddItemWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const result = data?.result;
 
   const fmt = (n: number): string =>
@@ -55,8 +62,22 @@ export function PosOrderAddItemWidget({
   const [selectedProduct, setSelectedProduct] =
     useState<SelectedProduct | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SelectedProduct[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  // The submitted query drives the cached product-lookup call; typing does not.
+  const [submittedQuery, setSubmittedQuery] = useState("");
+
+  // Typed, cached product search via the pos/product-lookup endpoint.
+  const productSearch = useApiQuery({
+    endpoint: productLookupEndpoint.GET,
+    requestData: { query: submittedQuery, companyId: undefined },
+    logger,
+    user,
+    options: {
+      enabled: submittedQuery.trim().length > 0,
+      queryKey: `product-lookup:${submittedQuery}`,
+    },
+  });
+  const searchResults: SelectedProduct[] = productSearch.data?.products ?? [];
+  const isSearching = productSearch.isFetching;
 
   // Live preview
   const qty = Number(form?.watch("item.quantity") ?? 1);
@@ -72,22 +93,7 @@ export function PosOrderAddItemWidget({
     if (!searchQuery.trim()) {
       return;
     }
-    setIsSearching(true);
-
-    void (async (): Promise<void> => {
-      try {
-        const url = `/api/${locale}/pos/product-lookup?query=${encodeURIComponent(searchQuery)}`;
-        const response = await fetch(url, { credentials: "include" });
-        if (response.ok) {
-          const json = (await response.json()) as {
-            products?: SelectedProduct[];
-          };
-          setSearchResults(json.products ?? []);
-        }
-      } finally {
-        setIsSearching(false);
-      }
-    })();
+    setSubmittedQuery(searchQuery);
   };
 
   const handleSelectProduct = (product: SelectedProduct): void => {
@@ -101,8 +107,8 @@ export function PosOrderAddItemWidget({
     ) {
       form?.setValue("item.taxRate", product.defaultTaxRate);
     }
-    setSearchResults([]);
     setSearchQuery("");
+    setSubmittedQuery("");
   };
 
   const handleClearProduct = (): void => {

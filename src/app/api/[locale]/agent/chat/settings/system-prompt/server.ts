@@ -5,8 +5,8 @@ import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import { chatSettings } from "../db";
 
+import { chatSettings } from "../db";
 import type { CodingAgentSettingData } from "./prompt";
 
 export async function loadCodingAgentSettingData(

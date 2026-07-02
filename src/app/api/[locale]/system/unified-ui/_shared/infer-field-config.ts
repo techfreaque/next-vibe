@@ -7,11 +7,11 @@
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+
 import {
   type EndpointFieldStructure,
   getFieldStructureByPath,
 } from "./endpoint-field-types";
-
 import type { FieldConfig } from "./field-config-types";
 
 /**

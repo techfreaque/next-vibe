@@ -6,24 +6,26 @@
  *
  * DB throttle strategy: debounce content updates within THROTTLE_MS window so
  * rapid deltas don't hammer the DB. flush() / flushAll() cancel the timer and
- * write immediately - always called before stream ends or on error.
+ * write immediately - always called before stream ends or on error. The
+ * debounce map + low-level DB writes live in the ThrottleEngine class below -
+ * a genuinely distinct mechanism the writer delegates to.
  *
- * This file is the public FACADE. It keeps the exact public API and the
- * cross-cutting public fields, constructing a shared `WriterState` plus focused
- * helper instances (under ./db-writer) and delegating every method to them.
+ * Method groups are organized under section banners (text / tools / media /
+ * compacting / credits / notifications / embedding sync / throttle).
  */
 
 import "server-only";
 
+import { eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { MessageVariant } from "./modality-resolver";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
@@ -32,11 +34,27 @@ import type {
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 
-import type { MessageMetadata, ToolCall } from "../../../chat/db";
-import type { ThreadStreamingState } from "../../../chat/enum";
+import {
+  chatMessages,
+  type MessageMetadata,
+  type ToolCall,
+} from "../../../chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";
+import {
+  syncThreadEmbedding,
+  syncToolResultEmbedding,
+  syncUploadEmbedding,
+} from "./db-writer/embedding-sync";
+import {
+  type EmitThreadTitleFn,
+  type PendingWrite,
+  THROTTLE_MS,
+} from "./db-writer/shared";
+import { buildSseMessageRow } from "./db-writer/sse-row";
+import type { MessageVariant } from "./modality-resolver";
 
 /** Callback for emitting thread-title-updated to sidebar channels. */
 export type EmitThreadTitleFn = (threadId: string, title: string) => void;
@@ -193,7 +211,7 @@ export class MessageDbWriter {
     })();
   }
 
-  // ─── High-level methods (SSE + DB in one call) ────────────────────────────
+  // ─── text ──────────────────────────────────────────────────────────────────
 
   /**
    * Create a new ASSISTANT message: emit MESSAGE_CREATED + CONTENT_DELTA SSE,
@@ -348,6 +366,9 @@ export class MessageDbWriter {
 
   /**
    * Emit a lightweight TOKENS_UPDATED SSE event with an estimated completion token count.
+   * SSE-only, no DB write. Used mid-stream (during content delta) to give the UI a
+   * live approximation before the real count arrives from the API at step finish.
+   * Estimate: chars / 4 (rough GPT-style average).
    */
   emitEstimatedTokens(
     messageId: string,
@@ -912,6 +933,7 @@ export class MessageDbWriter {
 
   /**
    * Emit TOOL_RESULT SSE events for a batch of pre-confirmed tool calls.
+   * Returns the set of message IDs emitted (to prevent duplicate emission during streaming).
    */
   emitBatchToolResults(
     toolResults: Array<{
@@ -932,7 +954,8 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit FILES_UPLOADED SSE event.
+   * Emit TOOL_RESULT_UPDATED SSE and update the DB row with the real result.
+   * Called when an async job completes and the previously-pending tool result is ready.
    */
   emitFilesUploaded(params: {
     messageId: string;
@@ -958,8 +981,10 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit MESSAGE_CREATED (USER role) SSE so the frontend adds the user message
-   * to state with the correct parentId/depth.
+   * Emit a partial tool result to the parent thread's WS channel and persist to DB.
+   * The tool message stays in "Executing" state (isPartial=true) but partial result
+   * data is available to the widget. Used by long-running tools (e.g. ai-run) to
+   * stream intermediate state (like a sub-thread ID) before the tool finishes.
    */
   emitUserMessageCreated(params: {
     messageId: string;
@@ -1002,7 +1027,10 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit MESSAGE_CREATED SSE for a compacting message and insert to DB.
+   * Write a synthetic TOOL message row for a natively-generated file part.
+   * The LLM emitted a file directly (e.g. Gemini Flash Image); this creates
+   * a sibling TOOL message so subsequent turns see the file URL in tool-result context.
+   * Emits a TOOL_RESULT WS event so the frontend renders the generated media.
    */
   async emitCompactingMessageCreated(params: {
     messageId: string;
@@ -1020,12 +1048,10 @@ export class MessageDbWriter {
       messageId,
       threadId,
       parentId,
-      sequenceId,
       model,
       skill,
-      messagesToCompact,
-      createdAt,
-      containsMediaReferences,
+      sequenceId,
+      toolCall,
     } = params;
 
     // SSE
@@ -1070,7 +1096,6 @@ export class MessageDbWriter {
         role: ChatMessageRole.ASSISTANT,
         content: null,
         parentId,
-        sequenceId,
         authorId: params.userId ?? null,
         model,
         skill: skill ?? null,
@@ -1090,15 +1115,17 @@ export class MessageDbWriter {
           }),
           ...(containsMediaReferences && { containsMediaReferences: true }),
         },
-        createdAt,
       });
       // Roll any queued messages forward to this new frontier
       this.advanceQueuedMessages(threadId, messageId);
     }
   }
 
+  // ─── media ─────────────────────────────────────────────────────────────────
+
   /**
-   * Mark a compacting message as failed.
+   * Create an ASSISTANT message for generated media (image/audio).
+   * Emits MESSAGE_CREATED SSE with generatedMedia metadata, inserts to DB.
    */
   async emitCompactingFailed(params: {
     messageId: string;
@@ -1403,6 +1430,8 @@ export class MessageDbWriter {
 
   /**
    * Attach generated media to an existing assistant message (no new message created).
+   * Emits GENERATED_MEDIA_ADDED SSE and updates the DB metadata JSONB.
+   * Used when an LLM emits text first, then a file part - both belong in the same bubble.
    */
   async emitGeneratedMediaOnExistingMessage(params: {
     messageId: string;
@@ -1460,7 +1489,9 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit TOOL_RESULT_UPDATED SSE and update the DB row with the real result.
+   * Emit STREAMING_STATE_CHANGED SSE event.
+   * Used to mark the thread as "streaming" before gap-fill begins so the UI
+   * shows an activity indicator during potentially long bridge calls.
    */
   async emitToolResultUpdated(params: {
     messageId: string;
@@ -1478,6 +1509,7 @@ export class MessageDbWriter {
     // DB: backfill the result into the tool message
     if (!this.isIncognito) {
       try {
+        // Append variant to existing variants array in metadata
         await db
           .update(chatMessages)
           .set({ metadata: { toolCall }, updatedAt: new Date() })
@@ -1494,8 +1526,10 @@ export class MessageDbWriter {
     }
   }
 
+  // ─── compacting ────────────────────────────────────────────────────────────
+
   /**
-   * Emit a partial tool result to the parent thread's WS channel and persist to DB.
+   * Emit MESSAGE_CREATED SSE for a compacting message and insert to DB.
    */
   async emitPartialToolResult(params: {
     toolMessageId: string;
@@ -1544,10 +1578,12 @@ export class MessageDbWriter {
       messageId,
       threadId,
       parentId,
+      sequenceId,
       model,
       skill,
-      sequenceId,
-      toolCall,
+      messagesToCompact,
+      createdAt,
+      containsMediaReferences,
     } = params;
 
     if (this.isIncognito) {
@@ -1586,7 +1622,7 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit STREAMING_STATE_CHANGED SSE event.
+   * Emit COMPACTING_DELTA SSE event.
    */
   emitStreamingStateChanged(params: {
     threadId: string;
@@ -1598,7 +1634,7 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit GAP_FILL_STARTED SSE event.
+   * Finalize compacting: update DB, emit TOKENS_UPDATED, deduct + emit credits, emit COMPACTING_DONE.
    */
   emitGapFillStarted(params: {
     messageId: string;
@@ -1622,7 +1658,7 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit GAP_FILL_COMPLETED SSE event and persist the variant to DB.
+   * Emit THREAD_TITLE_UPDATED SSE so the sidebar immediately shows the new title.
    */
   async emitGapFillCompleted(params: {
     messageId: string;
@@ -1693,7 +1729,7 @@ export class MessageDbWriter {
     });
   }
 
-  // ─── Embedding sync ──────────────────────────────────────────────────────
+  // ─── embedding sync ────────────────────────────────────────────────────────
 
   /**
    * Sync a tool result (web search, gen) to cortex_nodes for vector search.

@@ -32,11 +32,11 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
 import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 
 import { DefaultFolderId } from "../../chat/config";
 import { SKILL_CREATOR_ID } from "../../skills/constants";
+import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
 import { scopedTranslation } from "../stream/i18n";
 import { AI_RUN_ALIAS } from "./constants";
 const AiRunWidget = lazyWidget(() =>

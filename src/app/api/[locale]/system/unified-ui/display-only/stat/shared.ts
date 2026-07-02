@@ -4,7 +4,7 @@
  * Used by both React and CLI implementations
  */
 
-import type { StatFormat, StatVariant } from "./types";
+import type { StatFormat } from "./types";
 
 /**
  * Format stat value based on format type and locale
@@ -49,26 +49,4 @@ export function formatStatValue(
   return new Intl.NumberFormat(locale, {
     maximumFractionDigits: 2,
   }).format(value);
-}
-
-/**
- * Get color name for stat variant (used in CLI rendering)
- */
-export function getStatVariantColor(
-  variant: StatVariant,
-): "blue" | "dim" | "green" | "yellow" | "red" | "default" {
-  switch (variant) {
-    case "success":
-      return "green";
-    case "warning":
-      return "yellow";
-    case "danger":
-      return "red";
-    case "info":
-      return "blue";
-    case "muted":
-      return "dim";
-    default:
-      return "default";
-  }
 }

@@ -18,11 +18,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type {
-  DismissTaskRequestOutput,
-  DismissTaskResponseOutput,
-} from "./definition";
-import { discardPendingCall, getPendingCall } from "../pending-calls";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -30,6 +25,12 @@ import type { AiT } from "next-vibe/platforms/ai/i18n";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
+
+import { discardPendingCall, getPendingCall } from "../pending-calls";
+import type {
+  DismissTaskRequestOutput,
+  DismissTaskResponseOutput,
+} from "./definition";
 
 export class DismissTaskRepository {
   static async dismissTask(

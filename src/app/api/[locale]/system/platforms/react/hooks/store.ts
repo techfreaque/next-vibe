@@ -11,8 +11,6 @@ import type {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
-import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 import { generateStorageKey } from "next-vibe/platforms/react/utils/storage-storage-client";
 import { z } from "zod";
 import { create } from "zustand";
@@ -20,6 +18,8 @@ import { create } from "zustand";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 import { executeQuery } from "./query-executor";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
+import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 
 // Create a single QueryClient instance
 export const queryClient = new QueryClient({

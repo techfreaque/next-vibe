@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { and, count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -23,24 +23,23 @@ import type {
   CronTaskGetResponseOutput,
   CronTaskPutResponseOutput,
 } from "next-vibe/tasks/cron/[id]/definition";
-import type {
-  CronTaskExecution,
-  CronTaskRow,
-  NewCronTask,
-  NewCronTaskExecution,
-} from "./db";
-import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
 import type { CronTaskRecentExecution } from "next-vibe/tasks/cron/history/definition";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 import type { CronTaskResponseType as CronTaskResponse } from "next-vibe/tasks/cron/tasks/definition";
 import type { TasksT } from "next-vibe/tasks/i18n";
 import { scopedTranslation } from "next-vibe/tasks/i18n";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { calculateNextExecutionTime } from "../cron-formatter";
 import { CronTaskStatus } from "../enum";
 import { TaskCategory, TaskCategoryDB } from "../enum";
+import type {
+  CronTaskExecution,
+  CronTaskRow,
+  NewCronTaskExecution,
+} from "./db";
+import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
 import { createTaskEmitters } from "./emitter";
 
 /**
@@ -178,31 +177,6 @@ export class CronTasksRepository {
     };
   }
 
-  static async getAllTasks(
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskRow[]>> {
-    try {
-      logger.debug("Fetching all cron tasks");
-      const tasks = await db
-        .select()
-        .from(cronTasks)
-        .orderBy(desc(cronTasks.createdAt));
-      logger.info(`Successfully fetched ${tasks.length} cron tasks`);
-      return success(tasks);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch cron tasks", {
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("errors.fetchCronTasks"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message },
-      });
-    }
-  }
-
   static async getTaskById(
     id: string,
     user: JwtPayloadType,
@@ -266,111 +240,7 @@ export class CronTasksRepository {
     }
   }
 
-  /** Find a system task (owner.type === "system") by its routeId */
-  static async getSystemTaskByRouteId(
-    routeId: string,
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskRow | null>> {
-    try {
-      const task = await db
-        .select()
-        .from(cronTasks)
-        .where(
-          sql`${cronTasks.routeId} = ${routeId} AND ${cronTasks.userId} IS NULL`,
-        )
-        .limit(1);
-      const result: CronTaskRow | null = task[0] ?? null;
-      return success<CronTaskRow | null>(result);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch system task by routeId", {
-        routeId,
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("errors.fetchCronTasks"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message },
-      });
-    }
-  }
-
-  /** Get all system tasks (userId IS NULL) - for startup sync */
-  static async getAllSystemTasks(
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskRow[]>> {
-    try {
-      const tasks = await db
-        .select()
-        .from(cronTasks)
-        .where(isNull(cronTasks.userId));
-      return success(tasks);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch system tasks", {
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("errors.fetchCronTasks"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message },
-      });
-    }
-  }
-
-  static async createTask<TTaskInput>(
-    task: NewCronTask<TTaskInput>,
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskRow>> {
-    try {
-      logger.debug("Creating new cron task", { routeId: task.routeId });
-      const [newTask] = await db.insert(cronTasks).values(task).returning();
-      logger.info("Successfully created cron task", {
-        id: newTask.id,
-        routeId: newTask.routeId,
-      });
-
-      if (newTask.userId) {
-        void import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual")
-          .then(({ syncVirtualNodeToEmbedding }) => {
-            const embeddingContent = [
-              `# ${newTask.displayName ?? newTask.id}`,
-              newTask.schedule ? `Schedule: ${newTask.schedule}` : "",
-              "",
-              newTask.description ?? "",
-            ]
-              .filter(Boolean)
-              .join("\n");
-            return syncVirtualNodeToEmbedding(
-              newTask.userId!,
-              `/tasks/${newTask.id}.md`,
-              embeddingContent,
-            );
-          })
-          .catch(() => {
-            // Best-effort embedding sync
-          });
-      }
-
-      return success(newTask);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to create cron task", {
-        routeId: task.routeId,
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("errors.createCronTask"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message },
-      });
-    }
-  }
-
-  static async updateTask(
+  private static async updateTask(
     id: string,
     updates: Partial<CronTaskRow>,
     user: JwtPayloadType | null,
@@ -626,144 +496,6 @@ export class CronTasksRepository {
         message: t("common.cronRepositoryExecutionCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: execution.taskId },
-      });
-    }
-  }
-
-  static async updateExecution(
-    id: string,
-    updates: Partial<CronTaskExecution>,
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution>> {
-    try {
-      logger.debug(
-        `Updating execution "${id}" (${Object.keys(updates).join(", ")})`,
-      );
-      const [updatedExecution] = await db
-        .update(cronTaskExecutions)
-        .set(updates)
-        .where(eq(cronTaskExecutions.id, id))
-        .returning();
-
-      if (!updatedExecution) {
-        return fail({
-          message: t("errors.repositoryNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      return success(updatedExecution);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to update cron execution", {
-        id,
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("common.cronRepositoryExecutionUpdateFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, executionId: id },
-      });
-    }
-  }
-
-  static async getExecutionsByTaskId(
-    taskId: string,
-    limit = 50,
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution[]>> {
-    try {
-      logger.debug("Fetching executions by task ID", { taskId, limit });
-      const executions = await db
-        .select()
-        .from(cronTaskExecutions)
-        .where(eq(cronTaskExecutions.taskId, taskId))
-        .orderBy(desc(cronTaskExecutions.startedAt))
-        .limit(limit);
-
-      return success(executions);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch cron executions by task ID", {
-        taskId,
-        limit,
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("common.cronRepositoryExecutionsFetchFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId, limit },
-      });
-    }
-  }
-
-  static async getCronTaskRecentExecutions(
-    limit = 100,
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution[]>> {
-    try {
-      logger.debug("Fetching recent executions", { limit });
-      const executions = await db
-        .select()
-        .from(cronTaskExecutions)
-        .orderBy(desc(cronTaskExecutions.startedAt))
-        .limit(limit);
-
-      return success(executions);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch recent cron executions", {
-        limit,
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("common.cronRepositoryRecentExecutionsFetchFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, limit },
-      });
-    }
-  }
-
-  static async getTaskStatistics(
-    t: TasksT,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      totalTasks: number;
-      enabledTasks: number;
-      disabledTasks: number;
-      averageExecutionTime: number | null;
-    }>
-  > {
-    try {
-      logger.debug("Fetching task statistics");
-      const [stats] = await db
-        .select({
-          totalTasks: count(cronTasks.id),
-          enabledTasks: sql<number>`count(case when ${cronTasks.enabled} = true then 1 end)::int`,
-          disabledTasks: sql<number>`count(case when ${cronTasks.enabled} = false then 1 end)::int`,
-          averageExecutionTime: sql<number>`avg(${cronTasks.averageExecutionTime})::int`,
-        })
-        .from(cronTasks);
-
-      return success({
-        totalTasks: stats.totalTasks,
-        enabledTasks: stats.enabledTasks,
-        disabledTasks: stats.disabledTasks,
-        averageExecutionTime: stats.averageExecutionTime ?? null,
-      });
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch task statistics", {
-        error: parsedError.message,
-      });
-      return fail({
-        message: t("common.cronRepositoryStatisticsFetchFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

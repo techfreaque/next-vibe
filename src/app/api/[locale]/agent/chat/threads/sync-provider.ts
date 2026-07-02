@@ -21,14 +21,13 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DefaultFolderId } from "../config";
-import { ChatMessageRoleDB, ThreadStatusDB } from "../enum";
 import type { ThreadsSyncCursor } from "@/app/api/[locale]/remote-connection/db";
 import {
   type SyncProvider,
   toThreadsCursor,
 } from "@/app/api/[locale]/remote-connection/sync/provider";
 
+import { DefaultFolderId } from "../config";
 import {
   chatFolders,
   type ChatMessage,
@@ -36,6 +35,7 @@ import {
   chatThreads,
   type MessageMetadata,
 } from "../db";
+import { ChatMessageRoleDB, ThreadStatusDB } from "../enum";
 
 // ─── Wire Schemas ─────────────────────────────────────────────────────────────
 

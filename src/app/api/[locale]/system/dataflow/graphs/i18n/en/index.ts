@@ -84,6 +84,7 @@ export const translations = {
     empty: "No graphs yet. Create your first pipeline graph.",
     error: "Failed to load graphs. Please try again.",
     archive: "Archive",
+    delete: "Delete",
     searchPlaceholder: "Search by name, slug, or description\u2026",
     noMatchTitle: "No matching graphs",
     noMatchHint: "Try a different search term",

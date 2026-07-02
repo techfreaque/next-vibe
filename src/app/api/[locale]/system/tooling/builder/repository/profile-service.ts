@@ -4,7 +4,6 @@
  */
 
 import type { BuildConfig, BuildProfile } from "../definition";
-
 import { PROFILE_DEFAULTS } from "./constants";
 
 /** Profile settings type inferred from PROFILE_DEFAULTS */
@@ -14,7 +13,7 @@ type ProfileSettings = (typeof PROFILE_DEFAULTS)[BuildProfile];
 // Interface
 // ============================================================================
 
-export interface IProfileService {
+interface IProfileService {
   /**
    * Get default settings for a profile
    */
@@ -36,7 +35,7 @@ export interface IProfileService {
 }
 
 /** Overrides that can be passed from request */
-export interface ProfileOverrides {
+interface ProfileOverrides {
   minify?: boolean;
   foldersToClean?: string[];
   env?: Record<string, string>;
@@ -46,7 +45,7 @@ export interface ProfileOverrides {
 // Implementation
 // ============================================================================
 
-export class ProfileService implements IProfileService {
+class ProfileService implements IProfileService {
   getDefaults(profile: BuildProfile): ProfileSettings {
     return PROFILE_DEFAULTS[profile];
   }

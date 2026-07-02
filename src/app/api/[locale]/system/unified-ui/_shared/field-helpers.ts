@@ -15,6 +15,10 @@ import { WidgetType } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import type { z, ZodTypeAny } from "zod";
+
+import type { UnifiedField } from "./configs";
+import { hasChildren } from "./type-guards";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
@@ -23,10 +27,6 @@ import type {
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
-import type { z, ZodTypeAny } from "zod";
-
-import type { UnifiedField } from "./configs";
-import { hasChildren } from "./type-guards";
 
 /**
  * Constrained field type for extractAllFields.
@@ -115,34 +115,6 @@ export function arrayFieldPath(
   childPath: string,
 ): string {
   return `${parentPath}.${index}.${childPath}`;
-}
-
-/**
- * Extract a display label from a field definition.
- * Checks label → content → text → href, translating via `t` where applicable.
- * Falls back to `fallbackKey` (typically the raw field name).
- */
-export function getFieldLabel(
-  fieldDef: BaseWidgetConfig<FieldUsageConfig, SchemaTypes> | undefined,
-  fallbackKey: string,
-  t: (key: string) => string,
-): string {
-  if (!fieldDef) {
-    return fallbackKey;
-  }
-  if ("label" in fieldDef && typeof fieldDef.label === "string") {
-    return t(fieldDef.label);
-  }
-  if ("content" in fieldDef && typeof fieldDef.content === "string") {
-    return t(fieldDef.content);
-  }
-  if ("text" in fieldDef && typeof fieldDef.text === "string") {
-    return t(fieldDef.text);
-  }
-  if ("href" in fieldDef && typeof fieldDef.href === "string") {
-    return fieldDef.href;
-  }
-  return fallbackKey;
 }
 
 /**

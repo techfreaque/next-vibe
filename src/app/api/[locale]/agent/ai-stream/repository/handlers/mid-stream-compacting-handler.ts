@@ -10,20 +10,21 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
-import { streamText } from "ai";
+import type { ModelMessage, streamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 
-import { type ChatModelId, getChatModelById } from "../../models";
+import type { ChatModelId } from "../../models";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
-import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";
+import {
+  buildCompactingInstructions,
+  runCompactingLLM,
+} from "./compacting-shared";
 
 /** How many recent non-system messages to preserve verbatim (not summarized). */
 const RECENT_TURNS_TO_KEEP = 8;

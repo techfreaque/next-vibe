@@ -41,13 +41,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 
-import { clearStreamingState } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream-registry";
+import { clearStreamingState } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  chatMessages,
-  chatThreads,
-  type ToolCall,
-} from "@/app/api/[locale]/agent/chat/db";
+import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import {
   ChatMessageRole,
   ThreadStreamingState,
@@ -58,13 +54,14 @@ import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/d
 import { parseSkillId } from "../../chat/slugify";
 import { getInstanceAvailability } from "../../env-availability";
 import { NO_SKILL_ID } from "../../skills/constants";
-import { walkToLeafMessage } from "../repository/core/branch-utils";
-import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
+import { resolveFavorite } from "../../skills/resolver";
+import { walkToLeafMessage } from "../repository/core/infra";
 import {
-  ASYNC_REVIVAL_INSTRUCTIONS,
-  resolveFavorite,
-  runHeadlessAiStream,
-} from "../repository/headless";
+  emitStreamFinished,
+  fireWakeUpRevival,
+  insertDeferredWakeUpMessage,
+  publishWakeUpSignal,
+} from "../repository/revival";
 import type { AiStreamT } from "../stream/i18n";
 import type {
   ResumeStreamRequestOutput,
@@ -748,7 +745,6 @@ export class ResumeStreamRepository {
                 threadId,
                 toolMessageId,
                 deferredId,
-                leafId,
               },
             );
 

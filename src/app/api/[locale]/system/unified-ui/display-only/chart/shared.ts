@@ -10,12 +10,13 @@
  * Pure business logic - no rendering or UI concerns.
  */
 
+import type { z } from "zod";
+
 import type {
   ChartDataPointSchema,
   ChartSeriesSchema,
   ChartWidgetSchema,
 } from "./types";
-import type { z } from "zod";
 
 /**
  * Represents a single data point in a chart

@@ -17,6 +17,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+
 import {
   generateSkillAiRunMarkdown,
   generateSkillSkillMarkdown,

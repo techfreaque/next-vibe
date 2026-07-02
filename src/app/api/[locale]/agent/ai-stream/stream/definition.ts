@@ -24,16 +24,6 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  ChatModelId,
-  ChatModelIdOptions,
-  chatModelSelectionSchema,
-} from "../models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "../vision-models";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
@@ -49,6 +39,16 @@ import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
+import {
+  ChatModelId,
+  ChatModelIdOptions,
+  chatModelSelectionSchema,
+} from "../models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "../vision-models";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

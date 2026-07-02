@@ -13,7 +13,7 @@ import {
 } from "next-vibe/identity/roles/enum";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
-import { COMPANION_SKILLS, DEFAULT_SKILLS } from "@/generated/skills-index";
+import { COMPANION_SKILLS, DEFAULT_SKILLS } from "@/generated/skills/index";
 
 import type { ChatModelSelection } from "../ai-stream/models";
 import type {

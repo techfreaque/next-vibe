@@ -7,13 +7,14 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
+import unsubscribeDefinitions from "@/app/api/[locale]/newsletter/unsubscribe/definition";
 import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 
 import { scopedTranslation } from "../i18n";
-import { UnsubscribePage } from "./_components/unsubscribe-page";
 
 interface PageProps {
   params: Promise<{
@@ -60,7 +61,8 @@ export async function tanstackLoader({
     logger,
   );
 
-  // Get user email if authenticated and not public
+  // The JWT carries no email — fetch it from the profile so a logged-in user's
+  // unsubscribe form comes pre-filled. Seeded into the widget via autoPrefillData.
   let prefilledEmail: string | undefined;
   if (!authUser.isPublic) {
     const { t } = meScopedTranslation.scopedT(locale);

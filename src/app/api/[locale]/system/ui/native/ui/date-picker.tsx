@@ -4,7 +4,6 @@
  */
 import { cn } from "next-vibe/core/utils/utils";
 import { Calendar as CalendarIcon } from "next-vibe/ui/native/ui/icons/Calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 // Import all types from web (web is source of truth)
 import type { DatePickerProps } from "next-vibe/ui/web/ui/date-picker";
@@ -13,6 +12,7 @@ import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { Input } from "./input";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Re-export types for use in other modules

@@ -17,7 +17,7 @@ import type { GenericHandlerBase } from "next-vibe/core/route/handler";
 export async function getRouteHandlerFresh(
   toolName: string,
 ): Promise<GenericHandlerBase | null> {
-  const { routeHotPaths } = await import("@/generated/route-hot-paths");
+  const { routeHotPaths } = await import("@/generated/routes/hot-paths");
   const entry = routeHotPaths[toolName];
   if (!entry) {
     return null;
@@ -37,7 +37,7 @@ export async function getRouteHandlerFresh(
 export async function getEndpointFresh(
   toolName: string,
 ): Promise<CreateApiEndpointAny | null> {
-  const { endpointHotPaths } = await import("@/generated/endpoint-hot-paths");
+  const { endpointHotPaths } = await import("@/generated/endpoints/hot-paths");
   const entry = endpointHotPaths[toolName];
   if (!entry) {
     return null;

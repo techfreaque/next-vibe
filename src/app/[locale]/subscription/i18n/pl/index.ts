@@ -29,6 +29,9 @@ export const translations: typeof enTranslations = {
         button: "Zobacz szczegóły subskrypcji",
         info: "Twoja subskrypcja jest zarządzana przez e-mail. Sprawdź swoją skrzynkę odbiorczą w poszukiwaniu linków do płatności i szczegółów subskrypcji od NOWPayments.",
       },
+      portal: {
+        error: "Nie udało się otworzyć portalu płatności. Spróbuj ponownie.",
+      },
     },
     balance: {
       title: "Saldo kredytów",

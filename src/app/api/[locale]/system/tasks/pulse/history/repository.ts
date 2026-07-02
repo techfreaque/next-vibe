@@ -15,13 +15,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { PulseExecutionStatus } from "next-vibe/tasks/enum";
+import type { PulseHistoryT } from "next-vibe/tasks/pulse/history/i18n";
+
+import { pulseExecutions } from "../db";
 import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
 } from "./definition";
-import type { PulseHistoryT } from "next-vibe/tasks/pulse/history/i18n";
-
-import { pulseExecutions } from "../db";
 
 export class PulseHistoryRepository {
   static async getHistory(

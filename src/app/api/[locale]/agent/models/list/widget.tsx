@@ -21,9 +21,9 @@ import {
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import type { AnyModelId } from "../models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 
+import type { AnyModelId } from "../models";
 import type definition from "./definition";
 import type { ModelListItem } from "./definition";
 import { scopedTranslation } from "./i18n";

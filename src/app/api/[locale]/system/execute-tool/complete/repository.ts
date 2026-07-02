@@ -13,9 +13,8 @@ import { fail, success } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/task-completion-handler";
+import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NewCronTask } from "next-vibe/tasks/cron/db";
 import {
@@ -28,6 +27,7 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode } from "../constants";
+import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 
 export class TaskReportRepository {
   /**

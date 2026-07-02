@@ -11,7 +11,6 @@ import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, BuildReport, BuildStepResult } from "../definition";
-
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
@@ -19,7 +18,7 @@ import { outputFormatter } from "./output-formatter";
 // Interface
 // ============================================================================
 
-export interface IReportGenerator {
+interface IReportGenerator {
   /**
    * Generate a JSON build report
    */
@@ -43,7 +42,7 @@ export interface IReportGenerator {
 // Implementation
 // ============================================================================
 
-export class ReportGenerator implements IReportGenerator {
+class ReportGenerator implements IReportGenerator {
   async generate(
     report: BuildReport,
     output: string[],

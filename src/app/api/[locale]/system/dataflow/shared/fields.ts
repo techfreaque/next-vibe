@@ -10,7 +10,6 @@
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import { GraphResolution, GraphResolutionDB } from "../enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
@@ -18,6 +17,8 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
+
+import { GraphResolution, GraphResolutionDB } from "../enum";
 
 // ─── Core Data Types ─────────────────────────────────────────────────────────
 
@@ -52,7 +53,6 @@ export const NodeMetaSchema = z.object({
   lookbackUsed: z.number().int().min(0),
   sparse: z.boolean().optional(),
 });
-export type NodeMeta = z.infer<typeof NodeMetaSchema>;
 
 // ─── Resolution Milliseconds ─────────────────────────────────────────────────
 
@@ -93,7 +93,6 @@ export const SignalsSchema = z.array(SignalEventSchema);
 export type Signals = z.infer<typeof SignalsSchema>;
 
 export const SignalStreamsSchema = z.array(z.array(SignalEventSchema));
-export type SignalStreams = z.infer<typeof SignalStreamsSchema>;
 
 // ─── Scoped Translation Constraint ───────────────────────────────────────────
 

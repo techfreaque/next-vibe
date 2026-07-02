@@ -12,7 +12,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";
 
 /**
@@ -74,55 +74,6 @@ export const pulseExecutions = pgTable("pulse_executions", {
 });
 
 /**
- * Pulse Notifications Table
- * Stores pulse-related notification records
- */
-export const pulseNotifications = pgTable("pulse_notifications", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  pulseExecutionId: uuid("pulse_execution_id").references(
-    () => pulseExecutions.id,
-    {
-      onDelete: "cascade",
-    },
-  ),
-
-  // Notification details
-  type: text("type").notNull(), // health_degraded, health_critical, recovery
-  severity: text("severity").notNull(), // low, medium, high, critical
-  title: text("title").notNull(),
-  message: text("message").notNull(),
-
-  // Health context
-  healthStatus: text("health_status", { enum: PulseHealthStatusDB }).notNull(),
-  consecutiveFailures: integer("consecutive_failures").default(0),
-
-  // Recipients and channels
-  recipients: jsonb("recipients").notNull().default([]),
-  channels: jsonb("channels").notNull().default([]), // email, slack, webhook
-
-  // Status
-  sent: boolean("sent").notNull().default(false),
-  sentAt: timestamp("sent_at"),
-  error: text("error"),
-
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-/**
- * Zod schemas for validation
- */
-export const insertPulseHealthSchema = createInsertSchema(pulseHealth);
-export const selectPulseHealthSchema = createSelectSchema(pulseHealth);
-
-export const insertPulseExecutionSchema = createInsertSchema(pulseExecutions);
-export const selectPulseExecutionSchema = createSelectSchema(pulseExecutions);
-
-export const insertPulseNotificationSchema =
-  createInsertSchema(pulseNotifications);
-export const selectPulseNotificationSchema =
-  createSelectSchema(pulseNotifications);
-
-/**
  * Type exports for pulse health
  *
  * Use $inferSelect / $inferInsert so that db.select().from(table) and
@@ -133,6 +84,3 @@ export type NewPulseHealth = typeof pulseHealth.$inferInsert;
 
 export type PulseExecution = typeof pulseExecutions.$inferSelect;
 export type NewPulseExecution = typeof pulseExecutions.$inferInsert;
-
-export type PulseNotification = typeof pulseNotifications.$inferSelect;
-export type NewPulseNotification = typeof pulseNotifications.$inferInsert;

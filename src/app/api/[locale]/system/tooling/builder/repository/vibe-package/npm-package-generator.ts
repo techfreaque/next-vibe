@@ -47,7 +47,7 @@ interface GeneratedPackageJson {
 // Interface
 // ============================================================================
 
-export interface INpmPackageGenerator {
+interface INpmPackageGenerator {
   /**
    * Generate package.json for npm distribution
    */
@@ -70,7 +70,7 @@ export interface INpmPackageGenerator {
 // Implementation
 // ============================================================================
 
-export class NpmPackageGenerator implements INpmPackageGenerator {
+class NpmPackageGenerator implements INpmPackageGenerator {
   async generate(
     config: NpmPackageConfig,
     output: string[],

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, lt, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {

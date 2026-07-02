@@ -8,6 +8,7 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -16,15 +17,14 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { invalidateUnbottledCache } from "next-vibe/execute-tool/routing";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { invalidateUnbottledCache } from "../transport";
-import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
-
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectionByIdDeleteResponseOutput,
   RemoteConnectionByIdGetResponseOutput,
@@ -573,8 +573,6 @@ export class RemoteConnectionInstanceRepository {
     if (reverseToken) {
       const registerEndpoints =
         await import("@/app/api/[locale]/remote-connection/connect-reverse/definition");
-      const { BEARER_LEAD_ID_SEPARATOR: sep } =
-        await import("@/config/constants");
       const selfInstanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
       const registerUrl = `${remoteUrl}/api/${locale}/${registerEndpoints.default.POST.path.join("/")}`;

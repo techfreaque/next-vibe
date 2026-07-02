@@ -65,19 +65,6 @@ import {
   ImageGenModelId,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import { type AnyModelOptionWithVision } from "../all-models";
-import type { Modality, ModelRole } from "../enum";
-import { ModelUtility } from "../enum";
-import { getModelPrice } from "../models";
-import {
-  type AnyModelId,
-  type AnyModelOption,
-  ApiProvider,
-  apiProviderDisplayNames,
-  isModelProviderAvailable,
-  modelProviders,
-  type ModelType,
-} from "../models";
 import {
   filterMusicGenModels,
   getBestMusicGenModel,
@@ -112,7 +99,20 @@ import {
   videoGenModelOptions,
 } from "@/app/api/[locale]/agent/video-generation/models";
 
+import { type AnyModelOptionWithVision } from "../all-models";
+import type { Modality, ModelRole } from "../enum";
+import { ModelUtility } from "../enum";
 import { scopedTranslation } from "../i18n";
+import { getModelPrice } from "../models";
+import {
+  type AnyModelId,
+  type AnyModelOption,
+  ApiProvider,
+  apiProviderDisplayNames,
+  isModelProviderAvailable,
+  modelProviders,
+  type ModelType,
+} from "../models";
 import type {
   AnyRoleModelSelection,
   FiltersModelSelection,

@@ -11,19 +11,21 @@ import type {
   GenericHandlerBase,
   GenericHandlerReturnType,
 } from "next-vibe/core/route/handler";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronTaskPriority, TaskCategory, TaskOutputMode } from "../enum";
-import type { z } from "zod";
+import type {
+  CronTaskPriority,
+  TaskCategory,
+  TaskOutputMode,
+} from "next-vibe/tasks/enum";
 
 /**
  * Derives the taskInput type for a cron task from its endpoint types.
  * When both RequestOutput and UrlVariablesOutput are never (no-input endpoints),
  * taskInput accepts undefined. Otherwise it accepts partial merged args.
  */
-export type CronTaskInput<T extends CreateApiEndpointAny> = [
+type CronTaskInput<T extends CreateApiEndpointAny> = [
   T["types"]["RequestOutput"],
 ] extends [never]
   ? [T["types"]["UrlVariablesOutput"]] extends [never]
@@ -35,157 +37,13 @@ export type CronTaskInput<T extends CreateApiEndpointAny> = [
       : T["types"]["RequestOutput"]
     : T["types"]["RequestOutput"] & T["types"]["UrlVariablesOutput"];
 
-/**
- * Task Result
- */
-export interface TaskResult {
-  success: boolean;
-  message?: string;
-  data?: Record<string, string | number | boolean>;
-  error?: string;
-  duration?: number;
-  timestamp?: string;
-}
-
-/**
- * Task Execution Context
- */
-export interface TaskExecutionContext<TConfig> {
-  taskName: string;
-  config: TConfig;
-  signal: AbortSignal;
-  startTime: number;
-  logger: EndpointLogger;
-  /** Fallback locale for the task runner process (e.g. "en-GLOBAL") */
-  systemLocale: CountryLanguage;
-  /** The locale of the user who owns this task; falls back to systemLocale when no real user */
-  userLocale: CountryLanguage;
-  cronUser: JwtPrivatePayloadType;
-}
-
-/**
- * Task Monitoring Configuration
- */
-export interface TaskMonitoring {
-  enabled: boolean;
-  alertOnFailure: boolean;
-  alertOnTimeout: boolean;
-  maxFailures: number;
-  healthCheck?: {
-    enabled: boolean;
-    interval: number;
-    timeout: number;
-  };
-}
-
-/**
- * Task Documentation
- */
-export interface TaskDocumentation {
-  description: string;
-  examples?: string[];
-  troubleshooting?: string[];
-  links?: string[];
-}
-
-/**
- * Cron Task Definition (advanced module format)
- */
-export interface CronTaskDefinition<TConfig, TResult> {
-  name: string;
-  description: string;
-  version?: string;
-  enabled: boolean;
-  schedule: string | (() => Promise<ResponseType<boolean>>);
-  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
-  timeout?: number;
-  retries?: number;
-  defaultConfig: TConfig;
-  configSchema: z.ZodSchema<TConfig>;
-  resultSchema: z.ZodSchema<TResult>;
-  dependencies?: string[];
-  monitoring?: TaskMonitoring;
-  documentation?: TaskDocumentation;
-  tags?: string[];
-  category: string;
-}
-
-/**
- * Task Execution Functions
- */
-export type CronTaskExecuteFunction<TConfig, TResult> = (
-  context: TaskExecutionContext<TConfig>,
-) => Promise<ResponseType<TResult>>;
-
-export type TaskValidateFunction<TConfig> = (
-  config: TConfig,
-) => Promise<ResponseType<boolean>>;
-
-export type TaskRollbackFunction<TConfig> = (
-  context: TaskExecutionContext<TConfig>,
-) => Promise<ResponseType<boolean>>;
-
 /** Notification target for outputMode notifications */
 export interface NotificationTarget {
   type: "email" | "sms" | "webhook";
   target: string;
 }
 
-// ─── Route Resolution ─────────────────────────────────────────────────────────
-
-export type ResolveRouteIdResult =
-  | { kind: "endpoint"; path: string }
-  | { kind: "unknown" };
-
-/** Structured result data returned by a cron task run */
-export interface CronTaskRunResult {
-  [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | Date
-    | CronTaskRunResult
-    | Array<string | number | boolean | null | Date | CronTaskRunResult>;
-}
-
 // ─── Core Task Types ─────────────────────────────────────────────────────────
-
-/**
- * Cron Task - fully generic, inferred from endpoint definition.
- * Not used directly - use `createCronTask()` factory instead.
- *
- * `taskInput` is a flat merge of all default inputs (body + urlPathParams).
- * At execution time, `splitTaskArgs()` splits them by schema into
- * `{ data, urlPathParams }` - no need to track them separately at type level.
- */
-export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
-  type: "cron";
-  /** Stable human-readable task identity (e.g. "db-health"). Distinct from routeId (the endpoint to call). */
-  id: string;
-  name: string;
-  definition: TEndpointDefinition;
-  route: GenericHandlerReturnType<TEndpointDefinition>;
-  description: string;
-  schedule: string;
-  category: (typeof TaskCategory)[keyof typeof TaskCategory];
-  enabled: boolean;
-  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
-  timeout?: number;
-  outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
-  /**
-   * Flat merged default args (body data + urlPathParams combined).
-   * splitTaskArgs() splits these by schema at execution time.
-   */
-  taskInput?: Partial<TEndpointDefinition["types"]["RequestOutput"]> &
-    Partial<TEndpointDefinition["types"]["UrlVariablesOutput"]>;
-  /** When true, task disables itself after first execution (success or failure) */
-  runOnce?: boolean;
-  /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
-  historyInterval?: number;
-  /** When true, task is hidden from AI system prompt and default task list views (boring system maintenance) */
-  hidden?: boolean;
-}
 
 /**
  * Type-erased CronTask for heterogeneous collections (registries, arrays).
@@ -302,32 +160,7 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
   };
 }
 
-/**
- * Create a task runner - long-running background process.
- *
- * Usage: `createTaskRunner({ name: "pulse", run: async ({ signal }) => { ... } })`
- */
-export function createTaskRunner<TScopedTranslationKey extends string>(
-  config: Omit<TaskRunner<TScopedTranslationKey>, "type">,
-): TaskRunner<TScopedTranslationKey> {
-  return {
-    type: "task-runner",
-    ...config,
-  };
-}
-
 // ─── Registry & Discovery ────────────────────────────────────────────────────
-
-export interface TaskModule {
-  tasks: Task[];
-  default?: Task[];
-}
-
-export interface TaskFile {
-  path: string;
-  type: "task" | "task-runner";
-  module: TaskModule;
-}
 
 export interface TaskRegistry {
   cronTasks: CronTaskAny[];
@@ -338,23 +171,6 @@ export interface TaskRegistry {
     Task[]
   >;
   tasksByName: Record<string, Task>;
-}
-
-export interface UnifiedTaskExecutionContext {
-  taskName: string;
-  startTime: Date;
-  signal?: AbortSignal;
-  logger: EndpointLogger;
-}
-
-/**
- * Advanced Cron Task Module format
- */
-export interface CronTaskModule<TConfig, TResult> {
-  taskDefinition: CronTaskDefinition<TConfig, TResult>;
-  execute: CronTaskExecuteFunction<TConfig, TResult>;
-  validate?: TaskValidateFunction<TConfig>;
-  rollback?: TaskRollbackFunction<TConfig>;
 }
 
 /**

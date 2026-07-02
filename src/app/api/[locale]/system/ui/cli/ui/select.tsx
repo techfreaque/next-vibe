@@ -3,7 +3,6 @@
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useFocus, useInput } from "ink";
-import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type {
   SelectContentProps,
   SelectGroupProps,
@@ -25,6 +24,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type {
   SelectContentProps,

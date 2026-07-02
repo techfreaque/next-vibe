@@ -35,12 +35,6 @@ export enum BunBuildTypeEnum {
   MODULE = "module",
 }
 
-/** All build types combined */
-export const BuildTypeEnum = {
-  ...ViteBuildTypeEnum,
-  ...BunBuildTypeEnum,
-} as const;
-
 /** Bun target runtime */
 export enum BunTargetEnum {
   BUN = "bun",

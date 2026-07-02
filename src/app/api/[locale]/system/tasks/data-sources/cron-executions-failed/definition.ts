@@ -19,9 +19,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "./constants";
 const CronExecutionsFailedWidget = lazyWidget(() =>
-  import("next-vibe/tasks/data-sources/cron-executions-failed/widget").then(
-    (m) => ({ default: m.CronExecutionsFailedWidget }),
-  ),
+  import("./widget").then((m) => ({ default: m.CronExecutionsFailedWidget })),
 );
 
 const { POST } = createEndpoint({

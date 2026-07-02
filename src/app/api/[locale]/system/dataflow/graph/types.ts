@@ -5,9 +5,6 @@
  * All nodes are endpoint nodes - dispatched via RouteExecutionExecutor.
  */
 
-import type { Resolution } from "next-vibe/dataflow/shared/fields";
-
-import type { BacktestActionModeType } from "../enum";
 import type { GraphConfigInferred } from "./schema";
 
 // ─── Unified Node Config ──────────────────────────────────────────────────────
@@ -58,14 +55,6 @@ export type TriggerConfig =
 /** The full graph config stored in the DB - derived from graphConfigSchema */
 export type GraphConfig = GraphConfigInferred;
 
-export interface BacktestConfig {
-  graphId: string;
-  graphVersionId: string;
-  range: { from: Date; to: Date };
-  resolution: Resolution;
-  actionMode: BacktestActionModeType;
-}
-
 // ─── Graph Seeds ───────────────────────────────────────────────────────────────
 
 /** Entry for a colocated graph seed (exported from graph-seeds.ts files) */
@@ -104,33 +93,3 @@ export interface GraphDataPayload {
 }
 
 // ─── Repository Return Types ───────────────────────────────────────────────────
-
-/** Return type for listGraphs */
-export interface GraphListResult {
-  graphs: GraphSummary[];
-}
-
-/** Return type for createGraph */
-export interface GraphCreateResult {
-  id: string;
-}
-
-/** Return type for editGraph (branch) */
-export interface GraphEditResult {
-  newId: string;
-}
-
-/** Return type for promoteGraph */
-export interface GraphPromoteResult {
-  promotedId: string;
-}
-
-/** Return type for archiveGraph */
-export interface GraphArchiveResult {
-  archivedId: string;
-}
-
-/** Return type for deleteGraph */
-export interface GraphDeleteResult {
-  deletedId: string;
-}

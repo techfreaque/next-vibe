@@ -15,11 +15,11 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { PackageJson, ReleasePackage } from "../definition";
 import { scopedTranslation } from "next-vibe/tooling/release/i18n";
-import { parsePackageJson, safeJsonParse } from "./utils";
 
+import type { PackageJson, ReleasePackage } from "../definition";
 import { MESSAGES } from "./constants";
+import { parsePackageJson, safeJsonParse } from "./utils";
 
 export class PackageService {
   getPackageJson(

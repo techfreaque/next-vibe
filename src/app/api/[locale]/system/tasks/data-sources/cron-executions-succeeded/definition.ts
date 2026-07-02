@@ -19,11 +19,9 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 
 import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "./constants";
 const CronExecutionsSucceededWidget = lazyWidget(() =>
-  import("next-vibe/tasks/data-sources/cron-executions-succeeded/widget").then(
-    (m) => ({
-      default: m.CronExecutionsSucceededWidget,
-    }),
-  ),
+  import("./widget").then((m) => ({
+    default: m.CronExecutionsSucceededWidget,
+  })),
 );
 
 const { POST } = createEndpoint({

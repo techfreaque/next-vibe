@@ -30,13 +30,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CronTaskCreateRequestOutput,
-  CronTaskCreateResponseOutput,
-  CronTaskListRequestOutput,
-  CronTaskListResponseOutput,
-  CronTaskResponseType,
-} from "./definition";
 import type { CronTasksT } from "next-vibe/tasks/cron/tasks/i18n";
 import { calculateNextExecutionTime } from "next-vibe/tasks/cron-formatter";
 import {
@@ -50,10 +43,17 @@ import {
 } from "next-vibe/tasks/enum";
 import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
+import type {
+  CronTaskCreateRequestOutput,
+  CronTaskCreateResponseOutput,
+  CronTaskListRequestOutput,
+  CronTaskListResponseOutput,
+  CronTaskResponseType,
+} from "./definition";
 
 /**
  * Cron Tasks Repository Implementation

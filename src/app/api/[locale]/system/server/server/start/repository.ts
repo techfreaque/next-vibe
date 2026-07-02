@@ -44,6 +44,12 @@ import {
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { WebSocketServerHandle } from "next-vibe/realtime/server";
+import type { ServerStartT } from "next-vibe/server/server/start/i18n";
+import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
+
+import { env } from "@/config/env";
+
+import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -59,12 +65,6 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
-import type { ServerStartT } from "next-vibe/server/server/start/i18n";
-import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
-
-import { env } from "@/config/env";
-
-import { ServerFramework } from "../enum";
 
 /**
  * Server Start Repository
@@ -1495,6 +1495,7 @@ export class ServerStartRepository {
 
     while (Date.now() - start < timeoutMs) {
       try {
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe (waits for the just-started server to accept requests)
         const response = await fetch(url, { method: "HEAD" });
         if (response.ok || response.status === 404) {
           return;

@@ -22,6 +22,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
+
 import type { TransportMode } from "./db";
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";

@@ -14,28 +14,7 @@ import {
   type ReactT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
 } from "next-vibe/platforms/react/i18n";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./form";
 import { Info } from "next-vibe/ui/native/ui/icons/Info";
-import { Popover, PopoverContent, PopoverTrigger } from "../popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../tooltip";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 import type {
   EndpointFormFieldProps,
@@ -70,11 +49,32 @@ import { IconPicker } from "../icon-picker";
 import { Input } from "../input";
 import { Label } from "../label";
 import { PhoneField } from "../phone-field";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
 
 // Re-export types for module compatibility with web version
 export type { EndpointFormFieldProps, FormFieldError };

@@ -44,10 +44,3 @@ export function isAgentPlatform(platform: Platform): boolean {
     platform === Platform.CRON
   );
 }
-
-/**
- * Check if running from npm package (not local development)
- */
-export function isPackagePlatform(platform: Platform): boolean {
-  return platform === Platform.CLI_PACKAGE;
-}

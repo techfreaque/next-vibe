@@ -18,7 +18,7 @@ import { renderToString as fastRenderToString } from "next-vibe/ui/renderers/cli
 import { prewarmLazyWidgets } from "next-vibe/ui/renderers/cli/response/result-formatter";
 import React from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { McpRenderTree } from "./render-tree";
 

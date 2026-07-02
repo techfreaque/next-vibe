@@ -72,7 +72,7 @@ export class ExportEnvRepository {
     try {
       logger.debug("Generating production env export");
 
-      const { envModules } = await import("@/generated/env");
+      const { envModules } = await import("@/generated/env/index");
 
       // Read raw .env to get encrypted values (need to decrypt them for prod)
       const envPath = ExportEnvRepository.getEnvFilePath();

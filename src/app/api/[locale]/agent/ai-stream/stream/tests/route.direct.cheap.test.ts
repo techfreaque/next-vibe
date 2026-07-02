@@ -1,11 +1,13 @@
 /**
- * AI Stream Integration - Direct (CHEAP) — hermes 3002, transportMode='direct-http'
+ * AI Stream Integration - Direct tools-remote (CHEAP) — hermes 3002,
+ * transportMode='direct-http'.
  *
- * Same suite as route.direct (AI loop on hermes via direct-http relay) but in
- * cheapMode: media-gen steps swap to cortex/tool-help equivalents producing the
- * same observable thread shape, so no media-provider fixtures are needed. Still
- * exercises every callback mode + folder placement across the relay. Get this
- * green first; route.direct (full) records the real media fixtures.
+ * Matrix cell: direct-http × loop-LOCAL × tools-REMOTE.
+ * The AI loop runs on atlas; EVERY tool call routes through
+ * execute-tool(instanceId='hermes') over direct-http (remoteInstanceId drives
+ * the prompt wrapping + assertions). cheapMode swaps media-gen steps for
+ * cortex/tool-help equivalents with the same observable thread shape. All
+ * callback modes exercised against the remote executor.
  */
 
 import "server-only";
@@ -17,6 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 
 import {
   failSuitePrerequisites,
+  HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveRemoteUrlSync,
 } from "../../testing/remote-setup";

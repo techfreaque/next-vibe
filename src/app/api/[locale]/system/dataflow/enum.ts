@@ -22,8 +22,6 @@ export const {
   ONE_MONTH: "enums.resolution.1M",
 } as const);
 
-export type GraphResolutionType = typeof GraphResolutionValue;
-
 export const GraphResolutionDB = [
   GraphResolution.ONE_MINUTE,
   GraphResolution.THREE_MINUTES,
@@ -64,8 +62,6 @@ export const {
   EXECUTE: "enums.backtestActionMode.execute",
 } as const);
 
-export type BacktestActionModeType = typeof BacktestActionModeValue;
-
 export const BacktestActionModeDB = [
   BacktestActionMode.SIMULATE,
   BacktestActionMode.EXECUTE,
@@ -81,8 +77,6 @@ export const {
   USER: "enums.graphOwnerType.user",
 } as const);
 
-export type GraphOwnerTypeType = typeof GraphOwnerTypeValue;
-
 export const GraphOwnerTypeDB = [
   GraphOwnerType.SYSTEM,
   GraphOwnerType.ADMIN,
@@ -97,5 +91,3 @@ export const {
   MANUAL: "enums.triggerType.manual",
   CRON: "enums.triggerType.cron",
 } as const);
-
-export type TriggerTypeType = typeof TriggerTypeValue;

@@ -22,22 +22,23 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type {
-  AwaitTaskRequestOutput,
-  AwaitTaskResponseOutput,
-} from "./definition";
 import type { AwaitTaskT } from "next-vibe/execute-tool/await-task/i18n";
-import { resolveStreamModelId } from "next-vibe/execute-tool/handlers/resolve-stream-model";
+import { resolveStreamModelId } from "next-vibe/execute-tool/handlers/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import { RESUME_STREAM_ALIAS } from "@/app/api/[locale]/agent/ai-stream/resume-stream/constants";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 
 import { CallbackMode } from "../constants";
+import type {
+  AwaitTaskRequestOutput,
+  AwaitTaskResponseOutput,
+} from "./definition";
 
 export class AwaitTaskRepository {
   static async awaitTask(

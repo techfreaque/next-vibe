@@ -12,6 +12,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   const { connectifApiKey } = credentials;
   const { firstName, email } = lead;
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const response = await fetch(apiContactsUrl.replace("{email}", email), {
     method: "PATCH",
     headers: {

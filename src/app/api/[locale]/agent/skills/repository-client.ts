@@ -35,7 +35,6 @@ import {
   type VideoVisionModelOption,
   videoVisionModelOptions,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "../env-availability";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   type ImageGenModelOption,
@@ -74,6 +73,7 @@ import {
 } from "@/app/api/[locale]/agent/video-generation/models";
 
 import { formatSkillId } from "../chat/slugify";
+import type { AgentEnvAvailability } from "../env-availability";
 import type { SkillListItem } from "./definition";
 import {
   ContentLevelDB,

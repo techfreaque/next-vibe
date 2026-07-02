@@ -12,7 +12,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import type { ToolCall } from "../../../chat/db";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { EmitThreadTitleFn } from "./message-db-writer";
-import { StreamContext } from "./stream-context";
+import { StreamContext } from "./stream";
 
 export class StreamContextInitializer {
   /**

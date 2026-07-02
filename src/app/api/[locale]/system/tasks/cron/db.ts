@@ -16,16 +16,17 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
+import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
+import { z } from "zod";
+
+import { users } from "@/app/api/[locale]/user/db";
+
 import {
   CronTaskPriorityDB,
   CronTaskStatusDB,
   TaskCategoryDB,
   TaskOutputModeDB,
 } from "../enum";
-import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
-import { z } from "zod";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 /**
  * Cron Tasks Table

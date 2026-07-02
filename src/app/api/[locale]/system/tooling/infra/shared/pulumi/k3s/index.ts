@@ -7,16 +7,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import {
-  CHECK_K3S,
-  GET_NODES,
-  installK3sAgent,
-  installK3sServer,
-  patchKubeconfig,
-  READ_KUBECONFIG,
-  READ_NODE_TOKEN,
-} from "./scripts";
-import { writeClusterState, writeKubeconfig } from "../state";
 
 import type { ClientT } from "@/app/api/[locale]/ssh/client";
 import {
@@ -26,6 +16,16 @@ import {
 } from "@/app/api/[locale]/ssh/client";
 
 import type { InfraConfig } from "../config";
+import { writeClusterState, writeKubeconfig } from "../state";
+import {
+  CHECK_K3S,
+  GET_NODES,
+  installK3sAgent,
+  installK3sServer,
+  patchKubeconfig,
+  READ_KUBECONFIG,
+  READ_NODE_TOKEN,
+} from "./scripts";
 
 export interface K3sProvisionResult {
   nodesProvisioned: number;

@@ -319,6 +319,12 @@ IMPORTANT guidelines for voice responses:
   },
 };
 
+/**
+ * Extra instructions — ONE path for every mode. Headless callers (revival
+ * instructions, relay tool catalogs) and interactive callers both land here;
+ * previously headless extra text was embedded inside headlessContextFragment
+ * while interactive used this fragment — two code paths for one concept.
+ */
 export const extraInstructionsFragment: SystemPromptFragment<PromptContextData> =
   {
     id: "extra-instructions",

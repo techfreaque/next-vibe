@@ -145,12 +145,14 @@ export function findGeneratorInputs(
       ].toSorted();
 
     case "agent-docs":
-      // Single source file; fingerprint it directly
+      // Single source file; fingerprint it directly. Must match the runtime
+      // import in vibe-coder/generator.ts — if this path is wrong, the file
+      // never appears changed, so the gen-cache skips agent-docs forever and
+      // CLAUDE.md/AGENTS.md only regenerate under --force.
       return [
         join(
           apiDir,
           "agent",
-          "chat",
           "skills",
           "default-skills",
           "vibe-coder",

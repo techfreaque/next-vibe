@@ -11,6 +11,7 @@ import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import type { ToolCall } from "../../../chat/db";
 import { type MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
+import type { WakeUpPayload } from "./wake-up-channel";
 
 export interface PendingToolData {
   messageId: string;

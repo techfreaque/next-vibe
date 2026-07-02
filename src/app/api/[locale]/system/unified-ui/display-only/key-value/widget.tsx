@@ -12,8 +12,9 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 import type { JSX } from "react";
+
+import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 
 /**
  * KeyValue Widget - Displays record/dictionary data as key-value pairs

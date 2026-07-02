@@ -40,14 +40,14 @@ import {
 } from "@/app/api/[locale]/referral/db";
 import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
 import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
+import { users } from "@/app/api/[locale]/user/db";
+
 import {
   PayoutAction,
   PayoutStatusAdminFilter,
   ReferralSortField,
   SortOrder,
 } from "../enum";
-import { users } from "@/app/api/[locale]/user/db";
-
 import type {
   ReferralsGetRequestOutput,
   ReferralsGetResponseOutput,

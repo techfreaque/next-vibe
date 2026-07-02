@@ -293,7 +293,7 @@ function cronToCustomState(cron: string): CustomState | null {
 // Props (same interface as before for drop-in compatibility)
 // ---------------------------------------------------------------------------
 
-export interface ScheduleAutocompleteProps {
+interface ScheduleAutocompleteProps {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;

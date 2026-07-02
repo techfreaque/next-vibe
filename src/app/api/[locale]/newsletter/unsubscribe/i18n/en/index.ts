@@ -3,6 +3,50 @@ export const translations = {
   tags: {
     newsletter: "Newsletter",
   },
+  emailPlaceholder: "Enter your email",
+  subscription: {
+    unsubscribe: {
+      title: "Unsubscribe",
+      confirmButton: "Confirm Unsubscribe",
+      success: "You have been unsubscribed",
+      error: "Failed to unsubscribe",
+    },
+  },
+  unsubscribe: {
+    page: {
+      title: "Unsubscribe from Newsletter",
+      description: "We're sorry to see you go",
+      subtitle: "Manage your newsletter subscription",
+      emailProvided: {
+        title: "Confirm Unsubscribe",
+        description:
+          "Are you sure you want to unsubscribe from our newsletter?",
+      },
+      unsubscribeButton: "Unsubscribe",
+      subscribeText: "Changed your mind?",
+      subscribeLink: "Subscribe again",
+      info: {
+        title: "What Happens Next",
+        description: "Here's what you need to know about unsubscribing:",
+        immediate: {
+          title: "Immediate Effect",
+          description:
+            "You'll stop receiving our newsletter emails immediately.",
+        },
+        resubscribe: {
+          title: "Easy to Resubscribe",
+          description:
+            "You can always subscribe again if you change your mind.",
+        },
+      },
+      alternatives: {
+        title: "Before You Go",
+        description: "Consider these alternatives:",
+        subscribe: "Adjust email frequency instead",
+        contact: "Contact us with feedback",
+      },
+    },
+  },
   email: {
     label: "Email Address",
     description: "The email address to unsubscribe from newsletter",

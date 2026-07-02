@@ -21,7 +21,6 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, FileToCompileWithPlugins } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
-
 import { outputFormatter } from "./output-formatter";
 
 // ============================================================================
@@ -57,7 +56,7 @@ const DEFAULT_EXTERNALS = [
 // Interface
 // ============================================================================
 
-export interface IBunCompiler {
+interface IBunCompiler {
   /**
    * Compile a file using Bun.build
    */
@@ -83,7 +82,7 @@ export interface IBunCompiler {
 // Implementation
 // ============================================================================
 
-export class BunCompiler implements IBunCompiler {
+class BunCompiler implements IBunCompiler {
   async compileFile(
     fileConfig: FileToCompileWithPlugins,
     output: string[],

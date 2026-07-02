@@ -5,6 +5,49 @@ export const translations: typeof enTranslations = {
   tags: {
     newsletter: "Newsletter",
   },
+  emailPlaceholder: "Wprowadź swój e-mail",
+  subscription: {
+    unsubscribe: {
+      title: "Wypisz się",
+      confirmButton: "Potwierdź wypisanie",
+      success: "Zostałeś wypisany",
+      error: "Nie udało się wypisać",
+    },
+  },
+  unsubscribe: {
+    page: {
+      title: "Wypisz się z newslettera",
+      description: "Przykro nam, że odchodzisz",
+      subtitle: "Zarządzaj swoją subskrypcją newslettera",
+      emailProvided: {
+        title: "Potwierdź wypisanie",
+        description: "Czy na pewno chcesz wypisać się z naszego newslettera?",
+      },
+      unsubscribeButton: "Wypisz się",
+      subscribeText: "Zmieniłeś zdanie?",
+      subscribeLink: "Subskrybuj ponownie",
+      info: {
+        title: "Co się stanie dalej",
+        description: "Oto, co musisz wiedzieć o wypisywaniu się:",
+        immediate: {
+          title: "Natychmiastowy efekt",
+          description:
+            "Przestaniesz otrzymywać nasze e-maile z newsletterem natychmiast.",
+        },
+        resubscribe: {
+          title: "Łatwo ponownie subskrybować",
+          description:
+            "Zawsze możesz ponownie subskrybować, jeśli zmienisz zdanie.",
+        },
+      },
+      alternatives: {
+        title: "Zanim odejdziesz",
+        description: "Rozważ te alternatywy:",
+        subscribe: "Dostosuj częstotliwość e-maili",
+        contact: "Skontaktuj się z nami z opiniami",
+      },
+    },
+  },
   email: {
     label: "Adres e-mail",
     description: "Adres e-mail do wypisania z newslettera",

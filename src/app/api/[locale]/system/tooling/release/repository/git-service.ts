@@ -13,9 +13,9 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
 import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 
+import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
 import { MESSAGES } from "./constants";
 
 export class GitService {

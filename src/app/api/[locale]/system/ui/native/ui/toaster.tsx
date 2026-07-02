@@ -3,6 +3,9 @@
  * Renders toast notifications from useToast hook
  */
 import { useToast } from "next-vibe/ui/native/hooks/use-toast";
+import React from "react";
+import { View } from "react-native";
+
 import {
   Toast,
   ToastClose,
@@ -11,8 +14,6 @@ import {
   ToastTitle,
   ToastViewport,
 } from "./toast";
-import React from "react";
-import { View } from "react-native";
 
 export function Toaster(): React.JSX.Element {
   const { toasts } = useToast();

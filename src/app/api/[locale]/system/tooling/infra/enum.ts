@@ -5,52 +5,6 @@
 import { scopedTranslation } from "next-vibe/tooling/infra/i18n";
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
-// ─── Infra Status ─────────────────────────────────────────────────────────────
-
-export const {
-  enum: InfraStatus,
-  options: InfraStatusOptions,
-  Value: InfraStatusValue,
-} = createEnumOptions(scopedTranslation, {
-  PENDING: "enums.infraStatus.pending",
-  PROVISIONING: "enums.infraStatus.provisioning",
-  READY: "enums.infraStatus.ready",
-  DEGRADED: "enums.infraStatus.degraded",
-  ERROR: "enums.infraStatus.error",
-});
-
-export const InfraStatusDB = [
-  InfraStatus.PENDING,
-  InfraStatus.PROVISIONING,
-  InfraStatus.READY,
-  InfraStatus.DEGRADED,
-  InfraStatus.ERROR,
-] as const;
-
-export type InfraStatusType = typeof InfraStatusValue;
-
-// ─── Component Status ─────────────────────────────────────────────────────────
-
-export const {
-  enum: ComponentStatus,
-  options: ComponentStatusOptions,
-  Value: ComponentStatusValue,
-} = createEnumOptions(scopedTranslation, {
-  UNKNOWN: "enums.componentStatus.unknown",
-  HEALTHY: "enums.componentStatus.healthy",
-  DEGRADED: "enums.componentStatus.degraded",
-  DOWN: "enums.componentStatus.down",
-});
-
-export const ComponentStatusDB = [
-  ComponentStatus.UNKNOWN,
-  ComponentStatus.HEALTHY,
-  ComponentStatus.DEGRADED,
-  ComponentStatus.DOWN,
-] as const;
-
-export type ComponentStatusType = typeof ComponentStatusValue;
-
 // ─── Scale Component ──────────────────────────────────────────────────────────
 
 export const {

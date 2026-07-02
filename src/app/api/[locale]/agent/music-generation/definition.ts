@@ -22,8 +22,6 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import { MusicGenModelId, MusicGenModelIdOptions } from "./models";
-
 import { MUSIC_GEN_ALIAS } from "./constants";
 import {
   DEFAULT_MUSIC_DURATION,
@@ -31,6 +29,7 @@ import {
   MusicDurationOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { MusicGenModelId, MusicGenModelIdOptions } from "./models";
 
 const MusicGenerationContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.MusicGenerationContainer })),

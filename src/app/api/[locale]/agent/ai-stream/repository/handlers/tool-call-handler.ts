@@ -13,7 +13,7 @@ import type { ToolCall } from "../../../chat/db";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";
 
-/** Shared return type for both processToolInputStart and processToolCall */
+/** Return type for processToolCall */
 interface ToolCallResult {
   currentAssistantMessageId: string | null;
   currentAssistantContent: string;
@@ -56,7 +56,6 @@ interface AssistantPrepResult {
 export class ToolCallHandler {
   /**
    * Ensure an ASSISTANT message exists and finalize any open reasoning block.
-   * Shared by processToolInputStart and processToolCall (fallback path).
    */
   private static async prepareAssistantMessage(
     params: AssistantPrepParams,

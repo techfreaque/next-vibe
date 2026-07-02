@@ -13,11 +13,12 @@ import {
   useWidgetForm,
   useWidgetTranslation,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   StatusIndicatorWidgetConfig,
   StatusIndicatorWidgetSchema,
 } from "./types";
-import type { JSX } from "react";
 
 /**
  * Maps status to Badge variant

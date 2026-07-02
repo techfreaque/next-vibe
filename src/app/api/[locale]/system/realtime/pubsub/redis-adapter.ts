@@ -11,9 +11,9 @@
  */
 
 import type { Redis } from "ioredis";
-import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 import type { AnyEndpointEventEnvelope } from "../structured-events";
+import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 interface RedisWireMessage {
   readonly event: string;

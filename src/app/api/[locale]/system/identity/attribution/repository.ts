@@ -13,14 +13,15 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type {
-  IpMatchLinkingPostRequestOutput,
-  IpMatchLinkingPostResponseOutput,
-} from "./definition";
 import type { IpMatchLinkingT } from "next-vibe/identity/attribution/i18n";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import type {
+  IpMatchLinkingPostRequestOutput,
+  IpMatchLinkingPostResponseOutput,
+} from "./definition";
 
 export class IpMatchLinkingRepository {
   static async run(

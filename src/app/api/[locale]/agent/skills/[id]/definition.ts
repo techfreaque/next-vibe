@@ -34,7 +34,6 @@ import { z } from "zod";
 
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import { skillVariantsSchema } from "../db";
 
 import { getBestChatModel } from "../../ai-stream/models";
 import {
@@ -42,6 +41,7 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
+import { skillVariantsSchema } from "../db";
 import type { SkillListResponseOutput } from "../definition";
 import {
   CategoryOptions,

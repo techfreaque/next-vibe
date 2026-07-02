@@ -5,8 +5,8 @@
  */
 
 "use client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { storage } from "next-vibe/ui/web/lib/storage";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
@@ -40,9 +40,12 @@ import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import instanceEndpoints from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
+import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
 
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
+import settingsEndpoints from "./definition";
 
 type WizardStep = SystemSettingsGetResponseOutput["wizardSteps"][number];
 type Module = SystemSettingsGetResponseOutput["modules"][number];
@@ -224,10 +227,7 @@ function OpenRouterHint({ t }: { t: (k: string) => string }): JSX.Element {
 }
 
 function UnbottledLoginField({
-  setting,
-  onEdit,
   t,
-  locale,
 }: {
   setting: Setting;
   onEdit: (key: string, value: string) => void;
@@ -408,7 +408,6 @@ function WizardField({
   editedValue,
   onEdit,
   onGenerate,
-  locale,
   t,
 }: {
   setting: Setting;

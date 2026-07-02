@@ -18,7 +18,7 @@ import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
 } from "next-vibe/execute-tool/constants";
-import { detectWakeUpConfirmRace } from "next-vibe/execute-tool/handlers/wakeup-confirm";
+import { detectWakeUpConfirmRace } from "next-vibe/execute-tool/handlers/completion";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -31,7 +31,8 @@ import { chatMessages, chatThreads } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";
-import { walkToLeafMessage } from "../core/branch-utils";
+import { buildSseMessageRow } from "../core/db-writer/sse-row";
+import { walkToLeafMessage } from "../core/infra";
 
 export class ToolConfirmationHandler {
   /**
@@ -257,7 +258,7 @@ export class ToolConfirmationHandler {
 
       // wakeUp confirm race: execute-tool returned {taskId, status:'pending'} immediately.
       // detectWakeUpConfirmRace determines whether the goroutine is still running (Case B)
-      // or already landed its result (Case A). See handlers/wakeup-confirm.ts for full rationale.
+      // or already landed its result (Case A). See handlers/completion.ts for full rationale.
       if (
         isWakeUpConfirm &&
         toolResult !== undefined &&
@@ -458,6 +459,7 @@ export class ToolConfirmationHandler {
             ...confirmedToolCallBase,
             isDeferred: false,
           };
+          // Preserve sibling metadata keys - only replace the toolCall object.
           await db
             .update(chatMessages)
             .set({ metadata: { toolCall: inPlaceToolCall } })
@@ -625,6 +627,7 @@ export class ToolConfirmationHandler {
             ...rejectedToolCallBase,
             isDeferred: false,
           };
+          // Preserve sibling metadata keys - only replace the toolCall object.
           await db
             .update(chatMessages)
             .set({ metadata: { toolCall: inPlaceRejected } })

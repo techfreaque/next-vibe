@@ -3,7 +3,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { formatDatabase, formatDuration } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds";
+import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds/index";
 
 export type SeedFn = (
   logger: EndpointLogger,

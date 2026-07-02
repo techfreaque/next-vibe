@@ -16,6 +16,8 @@
  *   </script>
  */
 
+import { addWindowListener, onDOMReady } from "next-vibe/ui/web/lib/dom";
+
 import type {
   BridgeAction,
   PayloadFor,
@@ -24,7 +26,6 @@ import type {
   TypedBridgeResponse,
 } from "./types";
 import { generateRequestId, isBridgeResponse } from "./types";
-import { addWindowListener, onDOMReady } from "next-vibe/ui/web/lib/dom";
 
 // ─── Pending Request Registry ────────────────────────────────────────────────
 

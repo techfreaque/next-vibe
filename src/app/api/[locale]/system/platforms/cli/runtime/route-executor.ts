@@ -41,7 +41,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { createCliBypassUser } from "next-vibe/platforms/cli/auth/cli-bypass-user";
 import type { getCliUser } from "next-vibe/platforms/cli/auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import { CliInputParser, type CliUrlParams } from "./parsing";
 import {
   CliTarget,
   type CliTargetValue,
@@ -53,7 +52,9 @@ import {
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { CliInputParser, type CliUrlParams } from "./parsing";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
 let _getCliUser: typeof getCliUser | null = null;
@@ -261,7 +262,7 @@ export class RouteDelegationHandler {
       // getEndpoint() then returns near-instantly with no TDZ risk.
       logger.debug("[ROUTE] endpoint load start");
       const endpointLoadStart = Date.now();
-      const { getRouteHandler } = await import("@/generated/route-handlers");
+      const { getRouteHandler } = await import("@/generated/routes/handlers");
       const routeHandler = await getRouteHandler(resolvedCommand);
       const peekedEndpoint = await getEndpoint(resolvedCommand);
       const endpointLoadMs = Date.now() - endpointLoadStart;

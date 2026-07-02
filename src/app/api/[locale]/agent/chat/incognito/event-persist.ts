@@ -15,9 +15,8 @@
 
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ChatFolder, ChatThread } from "../db";
-
 import { DefaultFolderId } from "../config";
+import type { ChatFolder, ChatThread } from "../db";
 import { ThreadStreamingState } from "../enum";
 
 // ─── Imperative helpers ───────────────────────────────────────────────────────

@@ -171,11 +171,6 @@ export const availableCountries: readonly CountryInfo[] = [
   languageConfig.countryInfo.US as CountryInfo,
   languageConfig.countryInfo.GLOBAL as CountryInfo,
 ];
-export const availableLanguages = Object.values(languageConfig.languages);
-
-export interface TranslationsConfig<TTranslationSchema> {
-  [key: string]: TTranslationSchema;
-}
 export interface LanguageConfig {
   debug: boolean;
   countries: {

@@ -314,7 +314,7 @@ export function getPidOnPort(port: number): number | undefined {
  * Returns true if any process is currently bound to the given TCP port.
  * Non-destructive - does not kill anything.
  */
-export function isPortInUse(port: number): boolean {
+function isPortInUse(port: number): boolean {
   return getPidOnPort(port) !== undefined;
 }
 

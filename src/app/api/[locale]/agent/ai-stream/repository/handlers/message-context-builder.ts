@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { JSONValue, ModelMessage, streamText } from "ai";
+import type { ModelMessage, streamText } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -13,8 +13,8 @@ import {
   type ChatModelOption,
   getChatModelById,
 } from "../../models";
-import { fetchAncestorBranch } from "../core/branch-utils";
 import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
+import { estimateModelMessageTokens, fetchAncestorBranch } from "../core/infra";
 import {
   CONTEXT_LINE_PREFIX,
   formatAbsoluteTimestamp,
@@ -1085,7 +1085,7 @@ export class MessageContextBuilder {
     reservedOutputTokens = 4096,
   ): ModelMessage[] {
     // Compute overhead tokens (system prompt + tool schemas) using same divisors
-    // as calculateTotalTokens so estimates are consistent across the codebase.
+    // as estimateChatMessageTokens so estimates are consistent across the codebase.
     const systemTokens = Math.ceil(systemPrompt.length / 3.5);
     const toolsTokens = tools
       ? Math.ceil(JSON.stringify(tools).length / 2.5)

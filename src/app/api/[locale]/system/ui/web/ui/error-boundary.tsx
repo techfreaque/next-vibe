@@ -1,17 +1,17 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Info } from "next-vibe/ui/web/ui/icons/Info";
+import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
+import type { ErrorInfo, JSX, ReactNode } from "react";
+import { Component } from "react";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./accordion";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
-import type { ErrorInfo, JSX, ReactNode } from "react";
-import { Component } from "react";
-
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
 import { Div } from "./div";

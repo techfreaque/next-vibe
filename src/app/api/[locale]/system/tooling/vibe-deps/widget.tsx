@@ -465,6 +465,46 @@ function buildNeedsMoveLines(
   return lines;
 }
 
+/**
+ * The all-in-one report: TODO sections (COLOCATE / PROMOTE / DEAD FILE / DEAD
+ * SYMBOL), each rendered as a header + its entries. Move entries show the
+ * suggested target + used-by note; dead-symbol entries show the symbol.
+ */
+function buildReportLines(groups: Group[], isMcp: boolean): string[] {
+  if (groups.length === 0) {
+    return ["✓ nothing to do — no relocation or dead-code findings in scope"];
+  }
+  const lines: string[] = [];
+  for (const g of groups) {
+    lines.push("");
+    lines.push(isMcp ? `# ${g.package}` : `▸ ${g.package}`);
+    if (!isMcp) {
+      lines.push(`${"─".repeat(6)}  ${"─".repeat(60)}`);
+    }
+    for (const e of g.entries) {
+      if (e.symbol) {
+        // dead file / dead symbol
+        const owner = e.symbolOwner ? `${e.symbolOwner}.` : "";
+        const label =
+          e.symbolKind === "file"
+            ? shortPath(e.path)
+            : `${owner}${e.symbol}  [${e.symbolKind ?? "?"}]  ${shortPath(e.path)}`;
+        lines.push(isMcp ? `- ${label}` : `  ✗  ${label}`);
+      } else {
+        // colocate / promote
+        const count = String(e.importedByCount).padStart(5);
+        const note = e.moveNote ? `  (${e.moveNote})` : "";
+        lines.push(
+          isMcp
+            ? `- ${String(e.importedByCount)} ${shortPath(e.path)} → ${e.moveTo ?? "?"}`
+            : `  ${count}  ${shortPath(e.path)}\n         → ${e.moveTo ?? "?"}${note}`,
+        );
+      }
+    }
+  }
+  return lines;
+}
+
 function buildCrossDomainLines(
   entries: Entry[],
   isMcp: boolean,
@@ -542,6 +582,7 @@ export function VibeDepsWidget(): React.JSX.Element {
   const hasResult = data !== null && data !== undefined;
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
+  const isReport = view === "report";
   const isBoundary = view === "boundaries";
   const isLayers = view === "layers";
   const isShared = view === "shared-candidates";
@@ -585,7 +626,9 @@ export function VibeDepsWidget(): React.JSX.Element {
     }
     lines.push("");
 
-    if (isBoundary) {
+    if (isReport) {
+      lines.push(...buildReportLines(groups, isMcp));
+    } else if (isBoundary) {
       lines.push(...buildBoundaryLines(groups, violations, isMcp, t));
     } else if (isLayers) {
       lines.push(...buildLayerLines(entries, isMcp, t));

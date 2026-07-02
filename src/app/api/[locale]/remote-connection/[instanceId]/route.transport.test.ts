@@ -32,7 +32,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { remoteConnections } from "../db";
 import { env } from "@/config/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../agent/ai-stream/constants";
@@ -53,6 +52,7 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import { remoteConnections } from "../db";
 
 // ── Remote URL — skip all suites if unreachable ───────────────────────────────
 

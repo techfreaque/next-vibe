@@ -8,6 +8,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
 import type { GraphConfig } from "next-vibe/dataflow/graph/types";
 import type { Resolution, TimeRange } from "next-vibe/dataflow/shared/fields";
 import {
@@ -16,7 +17,6 @@ import {
   writeBacktestSeriesResult,
   writeBacktestSignalResult,
 } from "next-vibe/dataflow/store/backtest";
-import { db } from "next-vibe/database";
 
 import { pipelineDatapoints } from "../db";
 import { runGraph } from "./runner";

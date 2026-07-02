@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 import {
   ErrorResponseTypes,
   fail,

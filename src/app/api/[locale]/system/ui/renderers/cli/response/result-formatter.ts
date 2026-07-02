@@ -19,7 +19,7 @@ import type { RouteExecutionResult } from "next-vibe/platforms/cli/runtime/route
 import { renderToString as fastRenderToString } from "next-vibe/ui/renderers/cli/response/fast-ink-renderer/renderer";
 import React from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CliErrorFormatter } from "./error-formatter";
 import { CliRenderTree } from "./render-tree";

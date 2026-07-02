@@ -5,10 +5,11 @@
  */
 
 import type { LeadGetResponseOutput } from "next-vibe/identity/lead/[id]/definition";
-import type { EmailCampaignStage, LeadSource, LeadStatus } from "./enum";
 import { z } from "zod";
 
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/leads/list/definition";
+
+import type { EmailCampaignStage, LeadSource, LeadStatus } from "./enum";
 
 // Define leadId here so it can be used by both server and client code
 export const leadId = z.uuid();

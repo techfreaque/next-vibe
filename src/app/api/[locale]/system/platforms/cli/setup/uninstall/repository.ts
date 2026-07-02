@@ -19,11 +19,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { SetupUninstallT } from "next-vibe/platforms/cli/setup/uninstall/i18n";
+
 import type {
   UninstallRequestOutput,
   UninstallResponseOutput,
 } from "./definition";
-import type { SetupUninstallT } from "next-vibe/platforms/cli/setup/uninstall/i18n";
 
 /**
  * Setup Uninstall Repository Implementation

@@ -9,17 +9,13 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { createParentBridge, type ParentBridge } from "./bridge";
-import type {
-  FrameError,
-  FrameTheme,
-  FrameToParentMessage,
-  VibeFrameInstance,
-} from "./types";
-import { DEFAULT_SANDBOX, generateFrameId } from "./types";
 import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import { createParentBridge, type ParentBridge } from "./bridge";
+import type { FrameError, FrameTheme, FrameToParentMessage } from "./types";
+import { DEFAULT_SANDBOX, generateFrameId } from "./types";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

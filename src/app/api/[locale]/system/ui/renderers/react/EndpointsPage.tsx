@@ -29,7 +29,6 @@ import {
   useNavigationStack,
 } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { scopedTranslation } from "next-vibe/platforms/react/i18n";
-import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 import { Dialog, DialogContent } from "next-vibe/ui/web/ui/dialog";
 import { Div } from "next-vibe/ui/web/ui/div";
 import {
@@ -44,6 +43,8 @@ import { PickerProvider } from "next-vibe/unified-ui/_shared/picker-context";
 import { useMemo, useState } from "react";
 
 import { useLogger } from "@/hooks/use-logger";
+
+import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 
 /**
  * Extracts mutation options from an endpoint, stripping onSuccess

@@ -15,6 +15,7 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -23,6 +24,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { invalidateUnbottledCache } from "next-vibe/execute-tool/routing";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -31,20 +33,16 @@ import {
   DEFAULT_REMOTE_TOOL_IDS,
   getDefaultToolIdsForUser,
 } from "@/app/api/[locale]/agent/chat/constants";
-import { invalidateUnbottledCache } from "../transport";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/app/api/[locale]/user/public/login/definition";
-import {
-  BEARER_LEAD_ID_SEPARATOR,
-  LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 
 import registerEndpoints from "../connect-reverse/definition";
 import { remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectPostRequestInput,
   RemoteConnectPostResponseOutput,

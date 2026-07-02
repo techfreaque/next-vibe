@@ -23,7 +23,7 @@ import { Div } from "next-vibe/ui/web/ui/div";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

@@ -17,7 +17,6 @@ import {
 } from "next-vibe/identity/middleware/lead-id/index";
 import type { LanguageMiddlewareOptions } from "next-vibe/server/middleware/language/index";
 import { detectLocale } from "next-vibe/server/middleware/language/index";
-import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
 
@@ -27,6 +26,8 @@ import {
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import { env } from "@/config/env";
+
+import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
 /**
  * Add CORS headers to API responses so cross-origin clients (e.g. a local

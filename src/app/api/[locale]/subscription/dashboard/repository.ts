@@ -21,7 +21,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { subscriptions } from "../db";
 import { SubscriptionStatus } from "../enum";
-
 import type { SubscriptionDashboardResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 

@@ -19,7 +19,7 @@
 
 import "server-only";
 
-import { sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 

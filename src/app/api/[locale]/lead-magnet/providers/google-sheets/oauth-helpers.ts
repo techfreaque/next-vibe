@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 /**
  * Google Sheets OAuth helpers
  * Handles OAuth URL construction, state token generation, and token exchange

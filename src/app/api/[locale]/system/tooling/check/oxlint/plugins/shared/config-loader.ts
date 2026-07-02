@@ -277,22 +277,6 @@ export function loadPluginConfig<K extends PluginName>(
 }
 
 /**
- * Get the full CheckConfig (for plugins that need access to all settings)
- */
-export function getCheckConfig(): CheckConfig | null {
-  return loadCheckConfigSync();
-}
-
-/**
- * Clear all cached configurations (useful for testing)
- */
-export function clearConfigCache(): void {
-  cachedCheckConfig = null;
-  configLoadAttempted = false;
-  pluginConfigCache.clear();
-}
-
-/**
  * Create customizable error messages for a plugin
  * Allows users to override default messages via config
  *

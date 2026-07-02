@@ -9,33 +9,6 @@ import type { DataPoint, Resolution, TimeRange } from "./fields";
 import { RESOLUTION_MS } from "./fields";
 
 /**
- * Extend a range backward by N resolution periods.
- */
-export function extendRangeByLookback(
-  range: TimeRange,
-  lookback: number,
-  resolution: Resolution,
-): TimeRange {
-  if (lookback <= 0) {
-    return range;
-  }
-  const periodMs = RESOLUTION_MS[resolution];
-  return {
-    from: new Date(range.from.getTime() - lookback * periodMs),
-    to: range.to,
-  };
-}
-
-/**
- * Trim a series to only include points within the requested range (inclusive).
- */
-export function trimSeries(points: DataPoint[], range: TimeRange): DataPoint[] {
-  return points.filter(
-    (p) => p.timestamp >= range.from && p.timestamp <= range.to,
-  );
-}
-
-/**
  * Scale up (coarsen) a series from a finer resolution to a coarser one.
  */
 export function scaleUpSeries(
@@ -100,53 +73,6 @@ export function scaleUpSeries(
 }
 
 /**
- * Scale down (refine) a series from a coarser resolution to a finer one.
- * Uses forward-fill (step function).
- */
-export function scaleDownSeries(
-  points: DataPoint[],
-  sourceResolution: Resolution,
-  targetResolution: Resolution,
-  range: TimeRange,
-): DataPoint[] {
-  const targetPeriod = RESOLUTION_MS[targetResolution];
-  const sourcePeriod = RESOLUTION_MS[sourceResolution];
-
-  if (targetPeriod >= sourcePeriod) {
-    return points;
-  }
-
-  const alignedFrom =
-    Math.floor(range.from.getTime() / targetPeriod) * targetPeriod;
-  const alignedTo =
-    Math.floor(range.to.getTime() / targetPeriod) * targetPeriod;
-
-  const sorted = [...points].toSorted(
-    (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
-  );
-
-  const result: DataPoint[] = [];
-  let sourceIdx = 0;
-  let lastPoint: DataPoint | null = null;
-
-  for (let ts = alignedFrom; ts <= alignedTo; ts += targetPeriod) {
-    while (
-      sourceIdx < sorted.length &&
-      sorted[sourceIdx]!.timestamp.getTime() <= ts
-    ) {
-      lastPoint = sorted[sourceIdx]!;
-      sourceIdx++;
-    }
-
-    if (lastPoint !== null) {
-      result.push({ timestamp: new Date(ts), value: lastPoint.value });
-    }
-  }
-
-  return result;
-}
-
-/**
  * Check if sourceResolution is finer than targetResolution.
  */
 export function needsScaleUp(
@@ -154,16 +80,6 @@ export function needsScaleUp(
   targetResolution: Resolution,
 ): boolean {
   return RESOLUTION_MS[sourceResolution] < RESOLUTION_MS[targetResolution];
-}
-
-/**
- * Check if sourceResolution is coarser than targetResolution.
- */
-export function needsScaleDown(
-  sourceResolution: Resolution,
-  targetResolution: Resolution,
-): boolean {
-  return RESOLUTION_MS[sourceResolution] > RESOLUTION_MS[targetResolution];
 }
 
 /**

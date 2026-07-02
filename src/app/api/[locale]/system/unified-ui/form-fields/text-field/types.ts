@@ -7,12 +7,6 @@ import type { FieldDataType } from "next-vibe/core/definition/enums";
 import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/form-fields/_shared/types";
-import type { z } from "zod";
-
-/**
- * Text field input type
- */
-export type TextFieldInputType = "text" | "email" | "url" | "tel";
 
 /**
  * Text field widget configuration
@@ -28,8 +22,3 @@ export interface TextFieldWidgetConfig<
     | FieldDataType.URL
     | FieldDataType.TEL;
 }
-
-/**
- * Extract value type from text field schema
- */
-export type TextFieldValue<TSchema extends z.ZodTypeAny> = z.output<TSchema>;

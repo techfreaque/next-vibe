@@ -69,9 +69,8 @@ import React, {
 } from "react";
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import { type ChatModelId } from "../models";
 import { platform } from "@/config/env-client";
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../chat/config";
@@ -85,6 +84,7 @@ import messagesDefinition from "../../chat/threads/[threadId]/messages/definitio
 import type { FavoriteCard } from "../../skills/favorites/definition";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import cancelEndpoints from "../cancel/definition";
+import { type ChatModelId } from "../models";
 import { WidgetChatInput } from "../stream/widget/chat-input";
 import { EmbeddedMessagesView } from "../stream/widget/embedded-messages";
 import type definition from "./definition";

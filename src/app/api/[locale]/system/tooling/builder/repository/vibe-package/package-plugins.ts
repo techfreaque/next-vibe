@@ -12,45 +12,10 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import type { BunPlugin } from "bun";
 
 import type { PackageManifest } from "./types";
-
-// Absolute path to next-vibe/ui/web/cli - resolved relative to this file
-const CLI_UI_DIR = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../../../packages/next-vibe/ui/web/cli",
-);
-
-// ============================================================================
-// next-vibe-ui CLI resolver
-// ============================================================================
-
-/**
- * Resolves next-vibe/ui/web/* imports through cli/ first, then falls back to
- * the normal module resolution (web/ via tsconfig). Mirrors the Vite
- * tanstack/ → web/ resolver pattern for Bun package builds.
- */
-export const nextVibeUiCliResolverPlugin: BunPlugin = {
-  // eslint-disable-next-line i18next/no-literal-string
-  name: "next-vibe-ui-cli-resolver",
-  setup(build) {
-    build.onResolve({ filter: /^next-vibe-ui\// }, ({ path }) => {
-      // eslint-disable-next-line i18next/no-literal-string
-      const sub = path.slice("next-vibe/ui/web/".length);
-      // eslint-disable-next-line i18next/no-literal-string
-      for (const ext of ["", ".ts", ".tsx", "/index.ts", "/index.tsx"]) {
-        const candidate = resolve(CLI_UI_DIR, sub + ext);
-        if (existsSync(candidate)) {
-          return { path: candidate };
-        }
-      }
-      return null;
-    });
-  },
-};
 
 // ============================================================================
 // Scoped generated redirect
@@ -60,7 +25,7 @@ export const nextVibeUiCliResolverPlugin: BunPlugin = {
  * Redirects @/generated/{endpoint,alias-map,route-handlers}
  * to the scoped files written by the preBuild step.
  */
-export function createScopedGeneratedPlugin(generatedDir: string): BunPlugin {
+function createScopedGeneratedPlugin(generatedDir: string): BunPlugin {
   return {
     // eslint-disable-next-line i18next/no-literal-string
     name: "scoped-generated-redirect",
@@ -101,7 +66,7 @@ function buildEndpointsMeta(manifest: PackageManifest): string {
  * Stubs endpoints-meta to only the tools declared in the manifest,
  * so `vibe-check help` shows only the package's own tools.
  */
-export function createScopedEndpointsMetaPlugin(
+function createScopedEndpointsMetaPlugin(
   manifest: PackageManifest,
   generatedDir: string,
 ): BunPlugin {
@@ -169,7 +134,7 @@ function extractNamedExports(filePath: string): string[] {
  *  - If a sibling widget.cli.tsx exists → re-export from it
  *  - Otherwise → no-op stub (prevents React deps from bundling into CLI binary)
  */
-export const widgetStubPlugin: BunPlugin = {
+const widgetStubPlugin: BunPlugin = {
   // eslint-disable-next-line i18next/no-literal-string
   name: "widget-stub",
   setup(build) {
@@ -227,7 +192,7 @@ const NATIVE_STUBS = [
  * The checker never executes SSH or browser code, but those modules are
  * imported transitively and would cause runtime failures if bundled.
  */
-export const nativeStubPlugin: BunPlugin = {
+const nativeStubPlugin: BunPlugin = {
   // eslint-disable-next-line i18next/no-literal-string
   name: "native-stub",
   setup(build) {

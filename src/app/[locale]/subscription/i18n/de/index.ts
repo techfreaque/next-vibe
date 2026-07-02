@@ -29,6 +29,9 @@ export const translations: typeof enTranslations = {
         button: "Abonnement-Details anzeigen",
         info: "Ihr Abonnement wird per E-Mail verwaltet. Bitte überprüfen Sie Ihren Posteingang auf Zahlungslinks und Abonnementdetails von NOWPayments.",
       },
+      portal: {
+        error: "Zahlungsportal ließ sich nicht öffnen. Erneut versuchen.",
+      },
     },
     balance: {
       title: "Credit-Guthaben",

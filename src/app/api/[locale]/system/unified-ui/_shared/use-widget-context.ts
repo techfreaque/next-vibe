@@ -11,14 +11,14 @@ import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translat
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { type UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
-import type {
-  WidgetContextStore,
-  WidgetContextStoreType,
-} from "./widget-context-store";
 import { createContext, useContext } from "react";
 
 import type { ReactWidgetContext } from "./react-types";
 import type { BaseWidgetContext } from "./types";
+import type {
+  WidgetContextStore,
+  WidgetContextStoreType,
+} from "./widget-context-store";
 
 /**
  * React Context for the Zustand store
@@ -123,21 +123,6 @@ export function useWidgetPlatform(): BaseWidgetContext<CreateApiEndpointAny>["pl
         ReactWidgetContext<CreateApiEndpointAny>
       >,
     ) => state.context.platform,
-  );
-}
-
-/**
- * Hook to get endpoint fields from context
- */
-export function useWidgetEndpointFields(): CreateApiEndpointAny["fields"] {
-  const store = useWidgetContextStore();
-  return store(
-    (
-      state: WidgetContextStore<
-        CreateApiEndpointAny,
-        ReactWidgetContext<CreateApiEndpointAny>
-      >,
-    ) => state.context.endpointFields,
   );
 }
 

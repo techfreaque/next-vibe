@@ -19,9 +19,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 
 import { CRON_EXECUTIONS_TOTAL_ALIAS } from "./constants";
 const CronExecutionsTotalWidget = lazyWidget(() =>
-  import("next-vibe/tasks/data-sources/cron-executions-total/widget").then(
-    (m) => ({ default: m.CronExecutionsTotalWidget }),
-  ),
+  import("./widget").then((m) => ({ default: m.CronExecutionsTotalWidget })),
 );
 
 const { POST } = createEndpoint({

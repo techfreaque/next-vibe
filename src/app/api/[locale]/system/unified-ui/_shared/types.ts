@@ -12,31 +12,14 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import type { Path } from "react-hook-form";
+import type z from "zod";
+
 import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
   UnifiedField,
 } from "./configs";
-import type { Path } from "react-hook-form";
-import type z from "zod";
-
-/**
- * Base widget renderer props (before value is added to field)
- * Renderers receive fields without values and augment them internally
- */
-export interface BaseWidgetRendererProps<
-  TEndpoint extends CreateApiEndpointAny,
-  TUsage extends FieldUsageConfig,
-> {
-  fieldName: string;
-  field: UnifiedField<
-    string,
-    z.ZodTypeAny,
-    TUsage,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
-  >;
-  context: BaseWidgetContext<TEndpoint>;
-}
 
 /**
  * Base widget props shared across all platforms.

@@ -20,7 +20,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/task-completion-handler";
+import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -29,16 +29,16 @@ import { cronTasks, dbUserIdToOwner } from "next-vibe/tasks/cron/db";
 import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
 import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
 import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
-import type {
-  TaskExecuteRequestOutput,
-  TaskExecuteResponseOutput,
-} from "./definition";
 import type { TaskExecuteT } from "next-vibe/tasks/execute/i18n";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../enum";
+import type {
+  TaskExecuteRequestOutput,
+  TaskExecuteResponseOutput,
+} from "./definition";
 
 export class TaskExecuteRepository {
   /**
@@ -182,7 +182,7 @@ export class TaskExecuteRepository {
     // 6. Resolve routeId → handler
     const path = getFullPath(task.routeId);
     const handler = path
-      ? await import("@/generated/route-handlers").then((m) =>
+      ? await import("@/generated/routes/handlers").then((m) =>
           m.getRouteHandler(path),
         )
       : null;

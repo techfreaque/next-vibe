@@ -329,6 +329,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       apiUrl: this.apiUrl,
     });
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
     const response = await fetch(`${this.apiUrl}/invoice`, {
       method: "POST",
       headers: {
@@ -595,6 +596,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       });
     }
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
         {
@@ -622,6 +624,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       const subscription: NOWPaymentsSubscription = await response.json();
 
       // Get the subscription plan to determine billing interval
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const planResponse = await fetch(
         `${this.apiUrl}/subscriptions/plans/${subscription.subscription_plan_id}`,
         {
@@ -698,6 +701,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       });
     }
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
         {
@@ -789,6 +793,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
   ): Promise<ResponseType<NOWPaymentsPaymentStatus>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const response = await fetch(`${this.apiUrl}/payment/${paymentId}`, {
         method: "GET",
         headers: {
@@ -866,6 +871,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         queryParams.append("offset", filters.offset.toString());
       }
 
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions?${queryParams.toString()}`,
         {

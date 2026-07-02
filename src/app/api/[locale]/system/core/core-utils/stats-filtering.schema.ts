@@ -102,8 +102,6 @@ export const chartDataSchema = z.object({
   xAxisLabel: z.string().optional(),
 });
 
-export type ChartDataType = z.infer<typeof chartDataSchema>;
-
 /**
  * Date Range Calculation Utilities
  */

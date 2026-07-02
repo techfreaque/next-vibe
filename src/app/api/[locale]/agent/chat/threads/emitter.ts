@@ -5,7 +5,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import type { DefaultFolderId } from "../config";
-
 import threadsDefinitions, {
   type ThreadsGetWsEmit,
   type ThreadsPostWsEmit,

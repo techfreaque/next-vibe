@@ -261,6 +261,7 @@ export function getAwsSnsProvider(): SmsProvider {
         const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
         // Make the request to AWS SNS
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {

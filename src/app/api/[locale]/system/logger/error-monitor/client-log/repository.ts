@@ -10,11 +10,12 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import { persistErrorLog } from "next-vibe/logger/db-persist";
 import { isFileLoggingEnabled } from "next-vibe/logger/debug";
+import { clientFileLog } from "next-vibe/logger/file";
+
 import type {
   ClientLogRequestOutput,
   ClientLogResponseOutput,
 } from "./definition";
-import { clientFileLog } from "next-vibe/logger/file";
 
 function extractTabId(
   metadata: ClientLogRequestOutput["metadata"],

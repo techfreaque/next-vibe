@@ -42,15 +42,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import type { SyncScope } from "../db";
-import { remoteConnections } from "../db";
-import {
-  applySyncPayloads,
-  buildSyncPayloads,
-  ensureProvidersRegistered,
-  registerSyncProvider,
-  type SyncProvider,
-} from "./provider";
 import { env } from "@/config/env";
 
 import {
@@ -67,6 +58,15 @@ import {
   triggerHermesPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import type { SyncScope } from "../db";
+import { remoteConnections } from "../db";
+import {
+  applySyncPayloads,
+  buildSyncPayloads,
+  ensureProvidersRegistered,
+  registerSyncProvider,
+  type SyncProvider,
+} from "./provider";
 
 // ── Skip guard ─────────────────────────────────────────────────────────────────
 

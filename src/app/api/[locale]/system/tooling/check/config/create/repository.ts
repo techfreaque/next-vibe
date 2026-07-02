@@ -18,13 +18,13 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ConfigCreateT } from "next-vibe/tooling/check/config/create/i18n";
+
+import { ConfigRepositoryImpl } from "../repository";
 import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
 } from "./definition";
-import type { ConfigCreateT } from "next-vibe/tooling/check/config/create/i18n";
-
-import { ConfigRepositoryImpl } from "../repository";
 
 export class ConfigCreateRepository {
   static async execute(

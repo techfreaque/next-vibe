@@ -165,6 +165,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // Make the API request
         // eslint-disable-next-line i18next/no-literal-string
         const authValue = `AccessKey ${accessKey}`;
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {

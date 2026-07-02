@@ -27,6 +27,7 @@ import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import type { AiStreamT } from "../../stream/i18n";
+import { buildSseMessageRow } from "./db-writer/sse-row";
 import { QueueRegistry } from "./stream-registry";
 
 /**

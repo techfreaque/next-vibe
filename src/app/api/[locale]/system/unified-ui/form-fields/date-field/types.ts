@@ -7,7 +7,6 @@ import type { FieldDataType } from "next-vibe/core/definition/enums";
 import type { DateWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/form-fields/_shared/types";
-import type { z } from "zod";
 
 export interface DateFieldWidgetConfig<
   out TKey extends string,
@@ -18,5 +17,3 @@ export interface DateFieldWidgetConfig<
   minDate?: Date;
   maxDate?: Date;
 }
-
-export type DateFieldValue<TSchema extends z.ZodTypeAny> = z.output<TSchema>;

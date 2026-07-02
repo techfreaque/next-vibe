@@ -23,7 +23,7 @@ import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/c
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 
 import type { ToolCall } from "../../../chat/db";
-import type { StreamContext } from "../core/stream-context";
+import type { StreamContext } from "../core/stream";
 
 export class FilePartHandler {
   /**

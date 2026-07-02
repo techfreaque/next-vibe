@@ -19,10 +19,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { EmailSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-sending/repository";
+import { getTemplate } from "@/generated/email/index";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
-import { getTemplate } from "../../registry/generated";
 import {
   getTemplateSubject,
   renderTemplateComponent,

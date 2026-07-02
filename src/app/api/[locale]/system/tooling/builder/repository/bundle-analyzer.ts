@@ -10,16 +10,15 @@ import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-import { ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
-
 import type { BundleAnalysis } from "../definition";
+import { ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
 // ============================================================================
 // Interface
 // ============================================================================
 
-export interface IBundleAnalyzer {
+interface IBundleAnalyzer {
   /**
    * Analyze bundle sizes and generate optimization suggestions
    */
@@ -49,7 +48,7 @@ export interface IBundleAnalyzer {
 // Implementation
 // ============================================================================
 
-export class BundleAnalyzer implements IBundleAnalyzer {
+class BundleAnalyzer implements IBundleAnalyzer {
   async analyze(
     outputDir: string,
     output: string[],

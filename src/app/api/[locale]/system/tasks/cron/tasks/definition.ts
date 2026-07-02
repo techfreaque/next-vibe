@@ -15,7 +15,6 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { CronTaskRecentExecution } from "next-vibe/tasks/cron/history/definition";
-import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "next-vibe/tasks/cron/tasks/i18n";
 import {
   CronTaskEnabledFilter,
@@ -47,6 +46,7 @@ import {
 import { z } from "zod";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
+import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 
 const CronTasksContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

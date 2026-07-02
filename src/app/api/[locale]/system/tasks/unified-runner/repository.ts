@@ -6,9 +6,6 @@
 
 import "server-only";
 
-import { and, eq, inArray } from "drizzle-orm";
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -16,70 +13,26 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
-import {
-  isContentResponse,
-  isFileResponse,
-  isStreamingResponse,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
-import { UserPermissionRole, UserRoleDB } from "next-vibe/identity/roles/enum";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import {
-  type CronTaskExecution,
-  dbUserIdToOwner,
-} from "next-vibe/tasks/cron/db";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+
 import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
-import type {
-  CronTaskAny,
-  ResolveRouteIdResult,
-  Task,
-  TaskRunner,
-  TaskStatus,
-} from "./types";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  userRoles as userRolesTable,
-  users as usersTable,
-} from "@/app/api/[locale]/user/db";
-
-import { CronTaskStatus } from "../enum";
-
-interface ExecuteCronTaskResult {
-  status: string;
-  message: string;
-}
+import type { CronTaskAny, Task, TaskRunner, TaskStatus } from "./types";
 
 /**
  * Unified Task Runner Repository
  * Implements the complete unified task runner as per spec.md
  */
 export class UnifiedTaskRunnerRepository {
-  /**
-   * Resolve a routeId to its full endpoint path.
-   * Resolution order:
-   *  1. pathToAliasMap (endpoint aliases/paths) → { kind: "endpoint" }
-   *  2. unknown → { kind: "unknown" }
-   */
-  static async resolveRouteId(routeId: string): Promise<ResolveRouteIdResult> {
-    const path = getFullPath(routeId);
-    if (path !== null) {
-      return { kind: "endpoint", path };
-    }
-
-    return { kind: "unknown" };
-  }
   /**
    * Fallback user for system tasks (userId IS NULL in DB).
    * Only used when a task has no owner - e.g. seeded infrastructure tasks.
@@ -193,377 +146,6 @@ export class UnifiedTaskRunnerRepository {
         message: t("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  // TaskRunnerManager interface implementation
-  static async executeCronTask(
-    task: CronTaskAny,
-  ): Promise<ResponseType<ExecuteCronTaskResult>> {
-    const { t } = tasksScopedTranslation.scopedT(
-      UnifiedTaskRunnerRepository.systemLocale!,
-    );
-    const taskName = task.name;
-
-    // Check if task is already running (overlap prevention)
-    if (UnifiedTaskRunnerRepository.isTaskRunning(taskName)) {
-      return success({
-        status: CronTaskStatus.SKIPPED,
-        reason: "Previous instance still running",
-        message: "Task skipped",
-      });
-    }
-
-    // Mark task as running
-    UnifiedTaskRunnerRepository.markTaskAsRunning(taskName, "cron");
-
-    // Ensure execution context is available
-    if (!UnifiedTaskRunnerRepository.logger) {
-      const errorMsg = "Task runner not properly initialized with logger";
-      UnifiedTaskRunnerRepository.markTaskAsFailed(taskName, errorMsg);
-      return fail({
-        message: t("errors.startTaskRunner"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg, taskName },
-      });
-    }
-
-    // Look up system task DB record by routeId to get its ID, priority, and config
-    const dbTaskResponse = await CronTasksRepository.getSystemTaskByRouteId(
-      taskName,
-      t,
-      UnifiedTaskRunnerRepository.logger!,
-    );
-    const dbTask = dbTaskResponse.success ? dbTaskResponse.data : null;
-
-    // taskInput: DB value overrides file-task default.
-    // splitTaskArgs() splits the flat merged input by URL-param schema at execution time.
-    const resolvedInput: Record<string, WidgetData> =
-      dbTask?.taskInput ?? task.taskInput ?? {};
-
-    const executionId = crypto.randomUUID();
-    const startedAt = new Date();
-
-    // Create execution record in DB (if task is known to DB)
-    let executionDbId: string | null = null;
-    if (dbTask) {
-      const execResponse = await CronTasksRepository.createExecution(
-        {
-          taskId: dbTask.id,
-          taskName,
-          executionId,
-          status: CronTaskStatus.RUNNING,
-          priority: dbTask.priority,
-          startedAt,
-          config: resolvedInput,
-          triggeredBy: "schedule",
-          serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          executedByInstance: null,
-        },
-        t,
-        UnifiedTaskRunnerRepository.logger!,
-      );
-      if (execResponse.success) {
-        executionDbId = execResponse.data.id;
-      }
-    }
-
-    const startTime = Date.now();
-
-    // Resolve user locale and roles: if task has a userId, use their locale and roles;
-    // otherwise fall back to systemLocale and ADMIN system user.
-    let userLocale: CountryLanguage = UnifiedTaskRunnerRepository.systemLocale!;
-    let taskUser: JwtPrivatePayloadType =
-      UnifiedTaskRunnerRepository.systemCronUser;
-
-    const dbTaskOwner = dbUserIdToOwner(dbTask?.userId);
-    if (dbTaskOwner.type === "user") {
-      const ownerRow = await db
-        .select({ locale: usersTable.locale })
-        .from(usersTable)
-        .where(eq(usersTable.id, dbTaskOwner.userId))
-        .limit(1);
-
-      if (ownerRow[0]) {
-        if (ownerRow[0].locale) {
-          userLocale = ownerRow[0].locale;
-        }
-
-        // Load the task owner's actual roles - execute with their permissions,
-        // not the hardcoded ADMIN system user. Prevents privilege escalation
-        // where a CUSTOMER creates a cron task that calls an ADMIN-only endpoint.
-        const roleRows = await db
-          .select({ role: userRolesTable.role })
-          .from(userRolesTable)
-          .where(
-            and(
-              eq(userRolesTable.userId, dbTaskOwner.userId),
-              inArray(userRolesTable.role, [...UserRoleDB]),
-            ),
-          );
-
-        const roles = roleRows.map(
-          (r) => r.role,
-        ) as (typeof UserRoleDB)[number][];
-
-        taskUser = {
-          id: dbTaskOwner.userId,
-          // leadId is not stored on users table (users can have multiple leads).
-          // Use task id as a stable, unique scope for cron-executed AI operations.
-          leadId: dbTaskOwner.userId,
-          isPublic: false,
-          roles: roles.length > 0 ? roles : [UserPermissionRole.CUSTOMER],
-        };
-      }
-    }
-
-    try {
-      // Split flat taskInput into { data, urlPathParams } using the endpoint's URL-param schema.
-      const { splitTaskArgs } =
-        await import("next-vibe/tasks/cron/arg-splitter");
-      const { getPreferredToolName } =
-        await import("next-vibe/core/core-utils/path");
-      const path = getPreferredToolName(task.definition);
-      const { data, urlPathParams } = await splitTaskArgs(path, resolvedInput);
-
-      // Call the route handler directly - no more string-based resolution
-      const taskAbortController = new AbortController();
-      const result = await task.route({
-        data,
-        urlPathParams,
-        user: taskUser,
-        locale: userLocale,
-        logger: UnifiedTaskRunnerRepository.logger!,
-        platform: Platform.CRON,
-        cronTaskId: dbTask?.id,
-        streamContext: {
-          rootFolderId: DefaultFolderId.BACKGROUND,
-          threadId: undefined,
-          aiMessageId: undefined,
-          currentToolMessageId: undefined,
-          callerToolCallId: undefined,
-          pendingToolMessages: undefined,
-          pendingTimeoutMs: undefined,
-          leafMessageId: undefined,
-          skillId: undefined,
-          favoriteId: undefined,
-          headless: undefined,
-          subAgentDepth: 0,
-          waitingForRemoteResult: undefined,
-          abortSignal: taskAbortController.signal,
-          callerCallbackMode: undefined,
-          onEscalatedTaskCancel: undefined,
-          escalateToTask: undefined,
-          isRevival: undefined,
-        },
-      });
-
-      const durationMs = Date.now() - startTime;
-
-      // Cron tasks should not return streaming/file/content responses
-      if (
-        isStreamingResponse(result) ||
-        isFileResponse(result) ||
-        isContentResponse(result)
-      ) {
-        UnifiedTaskRunnerRepository.markTaskAsCompleted(taskName);
-        return success({
-          status: CronTaskStatus.COMPLETED,
-          message: `Task ${taskName} returned a non-standard response`,
-        });
-      }
-
-      if (!result.success) {
-        const errorMsgStr =
-          "message" in result && typeof result.message === "string"
-            ? result.message
-            : "Task failed";
-        const errorMsg =
-          "message" in result && result.message
-            ? result.message
-            : t("errors.executeCronTask");
-        UnifiedTaskRunnerRepository.markTaskAsFailed(taskName, errorMsgStr);
-
-        // Persist failure
-        if (dbTask && executionDbId) {
-          await CronTasksRepository.updateExecution(
-            executionDbId,
-            {
-              status: CronTaskStatus.FAILED,
-              completedAt: new Date(),
-              durationMs,
-              error: fail({
-                message: errorMsg,
-                errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              }),
-            },
-            t,
-            UnifiedTaskRunnerRepository.logger!,
-          );
-          await CronTasksRepository.updateTask(
-            dbTask.id,
-            {
-              lastExecutedAt: startedAt,
-              lastExecutionStatus: CronTaskStatus.FAILED,
-              lastExecutionDuration: durationMs,
-              executionCount: dbTask.executionCount + 1,
-              errorCount: dbTask.errorCount + 1,
-            },
-            null,
-            UnifiedTaskRunnerRepository.systemLocale!,
-            UnifiedTaskRunnerRepository.logger!,
-          );
-
-          // Run-once: disable task after first execution (success or failure)
-          if (dbTask.runOnce) {
-            await CronTasksRepository.updateTask(
-              dbTask.id,
-              { enabled: false },
-              null,
-              UnifiedTaskRunnerRepository.systemLocale!,
-              UnifiedTaskRunnerRepository.logger!,
-            );
-            UnifiedTaskRunnerRepository.logger!.info(
-              `[run-once] Task "${taskName}" disabled after single execution`,
-            );
-          }
-        }
-
-        return fail({
-          message: t("errors.executeCronTask"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errorMsg, taskName },
-        });
-      }
-
-      // If the handler manages its own lifecycle (e.g. interactive coding agent sessions),
-      // leave the task as RUNNING - the handler will mark it done via complete-task.
-      if (result.taskLifecycleManagedExternally) {
-        UnifiedTaskRunnerRepository.logger!.info(
-          `Task "${taskName}" lifecycle managed externally - skipping automatic completion`,
-        );
-        return success({
-          status: CronTaskStatus.RUNNING,
-          message: `Task "${taskName}" running with external lifecycle management`,
-        });
-      }
-
-      UnifiedTaskRunnerRepository.markTaskAsCompleted(taskName);
-
-      // Persist success
-      if (dbTask && executionDbId) {
-        const resultPayload: CronTaskExecution["result"] =
-          result.data !== undefined && result.data !== null
-            ? result.data
-            : null;
-        await CronTasksRepository.updateExecution(
-          executionDbId,
-          {
-            status: CronTaskStatus.COMPLETED,
-            completedAt: new Date(),
-            durationMs,
-            result: resultPayload,
-          },
-          t,
-          UnifiedTaskRunnerRepository.logger!,
-        );
-        // Compute rolling average execution time
-        const prevAvg = dbTask.averageExecutionTime ?? 0;
-        const newCount = dbTask.executionCount + 1;
-        const newAverageExecutionTime = Math.round(
-          (prevAvg * dbTask.executionCount + durationMs) / newCount,
-        );
-
-        await CronTasksRepository.updateTask(
-          dbTask.id,
-          {
-            lastExecutedAt: startedAt,
-            lastExecutionStatus: CronTaskStatus.COMPLETED,
-            lastExecutionDuration: durationMs,
-            executionCount: newCount,
-            successCount: dbTask.successCount + 1,
-            averageExecutionTime: newAverageExecutionTime,
-          },
-          null,
-          UnifiedTaskRunnerRepository.systemLocale!,
-          UnifiedTaskRunnerRepository.logger!,
-        );
-
-        // Run-once: disable task after first execution (success or failure)
-        if (dbTask.runOnce) {
-          await CronTasksRepository.updateTask(
-            dbTask.id,
-            { enabled: false },
-            null,
-            UnifiedTaskRunnerRepository.systemLocale!,
-            UnifiedTaskRunnerRepository.logger!,
-          );
-          UnifiedTaskRunnerRepository.logger!.info(
-            `[run-once] Task "${taskName}" disabled after single execution`,
-          );
-        }
-      }
-
-      return success({
-        status: CronTaskStatus.COMPLETED,
-        message: t("errors.executeCronTask"),
-      });
-    } catch (error) {
-      const errorMsg = parseError(error).message;
-      const durationMs = Date.now() - startTime;
-      UnifiedTaskRunnerRepository.markTaskAsFailed(taskName, errorMsg);
-
-      // Persist failure
-      if (dbTask && executionDbId) {
-        await CronTasksRepository.updateExecution(
-          executionDbId,
-          {
-            status: CronTaskStatus.FAILED,
-            completedAt: new Date(),
-            durationMs,
-            error: fail({
-              message: t("errors.executeCronTask"),
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: { error: errorMsg },
-            }),
-          },
-          t,
-          UnifiedTaskRunnerRepository.logger!,
-        );
-        await CronTasksRepository.updateTask(
-          dbTask.id,
-          {
-            lastExecutedAt: startedAt,
-            lastExecutionStatus: CronTaskStatus.FAILED,
-            lastExecutionDuration: durationMs,
-            executionCount: dbTask.executionCount + 1,
-            errorCount: dbTask.errorCount + 1,
-          },
-          null,
-          UnifiedTaskRunnerRepository.systemLocale!,
-          UnifiedTaskRunnerRepository.logger!,
-        );
-
-        // Run-once: disable task after first execution (success or failure)
-        if (dbTask.runOnce) {
-          await CronTasksRepository.updateTask(
-            dbTask.id,
-            { enabled: false },
-            null,
-            UnifiedTaskRunnerRepository.systemLocale!,
-            UnifiedTaskRunnerRepository.logger!,
-          );
-          UnifiedTaskRunnerRepository.logger!.info(
-            `[run-once] Task "${taskName}" disabled after single execution`,
-          );
-        }
-      }
-
-      return fail({
-        message: t("errors.executeCronTask"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg, taskName },
       });
     }
   }
@@ -789,7 +371,7 @@ export class UnifiedTaskRunnerRepository {
     logger: EndpointLogger,
     skipTanstack: boolean,
   ): Promise<never> {
-    const { taskRegistry } = await import("@/generated/tasks-index");
+    const { taskRegistry } = await import("@/generated/tasks/index");
 
     // Upsert task definitions into DB so they appear in the UI
     const { prod: seedTasks } = await import("next-vibe/dataflow/seeds");
@@ -835,7 +417,7 @@ export class UnifiedTaskRunnerRepository {
     return Promise.reject<never>(new Error("unreachable"));
   }
 
-  static async stop(
+  private static async stop(
     systemLocale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     // Mark parameter as used for now

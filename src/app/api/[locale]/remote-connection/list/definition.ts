@@ -21,7 +21,6 @@ import {
 import { z } from "zod";
 
 import { ConnectionHealthSchema } from "../db";
-
 import { REMOTE_CONNECTIONS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -67,6 +66,7 @@ export const { GET } = createEndpoint({
             /** Local instance URL - set on cloud-side records for direct embedding via vibe-frame */
             localUrl: z.string().nullable(),
             isActive: z.boolean(),
+            isInferenceProvider: z.boolean(),
             lastSyncedAt: z.string().nullable(),
             hasToken: z.boolean(),
             healthStatus: ConnectionHealthSchema,
@@ -141,6 +141,7 @@ export const { GET } = createEndpoint({
             remoteUrl: "https://unbottled.ai",
             localUrl: null,
             isActive: true,
+            isInferenceProvider: true,
             lastSyncedAt: "2026-03-01T12:00:00.000Z",
             hasToken: true,
             healthStatus: "healthy",

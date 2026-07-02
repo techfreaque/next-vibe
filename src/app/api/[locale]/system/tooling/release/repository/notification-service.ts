@@ -4,6 +4,7 @@
  */
 
 import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type {
   NotificationConfig,
   NotificationData,
@@ -607,6 +608,7 @@ export class NotificationService implements INotificationService {
     try {
       // webhookUrl is guaranteed to exist since we validate it in sendNotification
       const webhookUrl = config.webhookUrl ?? "";
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {

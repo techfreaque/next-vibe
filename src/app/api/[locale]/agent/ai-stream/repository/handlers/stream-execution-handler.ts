@@ -64,9 +64,11 @@ import {
   MAX_TOOL_CALLS,
   StreamAbortError,
 } from "../core/constants";
+import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
 import { QueueRegistry } from "../core/stream-registry";
+import { estimateInputTokens } from "../core/token-estimate";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import type { SystemPromptParams } from "../system-prompt/builder";
 import { StreamCompletionHandler } from "./stream-completion-handler";
@@ -261,7 +263,9 @@ export class StreamExecutionHandler {
               // endLoop / approve / wait: stop before the next AI turn starts.
               // The current step (tool calls + results) finishes naturally;
               // this predicate prevents the AI SDK from making another API request.
-              // wakeUp: also yield when a wake-up-ready pub/sub signal has arrived.
+              // (wakeUp results do NOT stop the loop — they are injected into
+              // the next step by prepareStep so the model acknowledges them
+              // in-context.)
               (
                 (): StopCondition<typeof tools> => () =>
                   ctx.shouldStopLoop ||
@@ -711,7 +715,7 @@ export class StreamExecutionHandler {
               reason instanceof Error
                 ? reason
                 : new Error(String(reason ?? "Stream aborted"));
-            const { AbortErrorHandler } = await import("./abort-error-handler");
+            const { AbortErrorHandler } = await import("../errors");
             await AbortErrorHandler.handleAbortError({
               error: abortError,
               ctx,
@@ -750,7 +754,7 @@ export class StreamExecutionHandler {
             : new Error(String(reason ?? "Stream aborted"));
 
         if (!ctx.abortHandled) {
-          const { AbortErrorHandler } = await import("./abort-error-handler");
+          const { AbortErrorHandler } = await import("../errors");
           await AbortErrorHandler.handleAbortError({
             error: abortError,
             ctx,
@@ -787,7 +791,7 @@ export class StreamExecutionHandler {
 
       // Non-abort error: try AbortErrorHandler (handles e.g. "Client disconnected")
       if (streamError instanceof Error) {
-        const { AbortErrorHandler } = await import("./abort-error-handler");
+        const { AbortErrorHandler } = await import("../errors");
         const { wasHandled } = await AbortErrorHandler.handleAbortError({
           error: streamError,
           ctx,

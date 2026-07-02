@@ -12,6 +12,11 @@ import { success } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactHooksTranslationKey } from "next-vibe/platforms/react/hooks/i18n";
+import { useCallback, useMemo, useRef } from "react";
+
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+
+import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import {
   deserializeQueryParams,
@@ -19,11 +24,6 @@ import {
   queryClient,
   useApiStore,
 } from "./store";
-import { useCallback, useMemo, useRef } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-
-import { executeQuery } from "./query-executor";
 import type { ApiQueryReturn } from "./types";
 
 /**

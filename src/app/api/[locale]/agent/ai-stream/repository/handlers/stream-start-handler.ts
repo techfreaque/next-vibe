@@ -15,7 +15,7 @@ import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speec
 import type { ToolCall } from "../../../chat/db";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { EmitThreadTitleFn } from "../core/message-db-writer";
-import type { StreamContext } from "../core/stream-context";
+import type { StreamContext } from "../core/stream";
 import { StreamContextInitializer } from "../core/stream-context-initializer";
 import {
   createStreamingTTSHandler,

@@ -29,15 +29,15 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CronHistoryT } from "next-vibe/tasks/cron/history/i18n";
+import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
+
+import { cronTaskExecutions, cronTasks } from "../db";
 import type {
   CronHistoryExecution,
   CronHistoryRequestOutput,
   CronHistoryResponseOutput,
 } from "./definition";
-import type { CronHistoryT } from "next-vibe/tasks/cron/history/i18n";
-import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
-
-import { cronTaskExecutions, cronTasks } from "../db";
 
 /**
  * Repository implementation

@@ -8,14 +8,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./table";
 import { styledNative } from "next-vibe/ui/native/utils/style-converter";
 import type { DataTableProps } from "next-vibe/ui/web/ui/data-table";
 import type { JSX } from "react";
@@ -28,6 +20,15 @@ import {
   Text as RNText,
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./table";
 
 // Re-export types for consistency
 export type { DataTableProps };

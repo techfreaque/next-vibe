@@ -13,11 +13,6 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  ErrorLogStatusFilter,
-  ErrorLogStatusFilterDB,
-  ErrorLogStatusFilterOptions,
-} from "./enum";
 import { scopedTranslation } from "next-vibe/logger/error-monitor/logs/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
@@ -28,6 +23,11 @@ import {
 import { z } from "zod";
 
 import { ERROR_LOGS_ALIAS } from "./constants";
+import {
+  ErrorLogStatusFilter,
+  ErrorLogStatusFilterDB,
+  ErrorLogStatusFilterOptions,
+} from "./enum";
 
 const ErrorLogsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ErrorLogsContainer })),

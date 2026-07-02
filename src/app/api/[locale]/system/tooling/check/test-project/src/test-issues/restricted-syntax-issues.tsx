@@ -144,16 +144,56 @@ function testNavigator(): string {
   return navigator.userAgent; // Should error: use getUserAgent() from next-vibe/ui/web/utils/browser
 }
 
+// ============================================================================
+// TEST 12: raw fetch (SHOULD ERROR)
+// ============================================================================
+
+async function testRawFetch(): Promise<Response> {
+  return await fetch("https://example.com"); // Should error: raw fetch is not allowed
+}
+
+// ============================================================================
+// TEST 13: window.fetch / globalThis.fetch (SHOULD ERROR)
+// ============================================================================
+
+async function testWindowFetch(): Promise<Response> {
+  return await globalThis.fetch("https://example.com"); // Should error: raw fetch is not allowed
+}
+
+// ============================================================================
+// TEST 14: raw fetch with disable comment (SHOULD PASS)
+// ============================================================================
+
+async function testAllowedFetch(): Promise<Response> {
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+  return await fetch("https://example.com");
+}
+
+// ============================================================================
+// TEST 15: method .fetch() on wrapper objects (SHOULD PASS)
+// ============================================================================
+
+interface FetcherLike {
+  fetch: (url: string) => Promise<Response>;
+}
+async function testMethodFetch(apiClient: FetcherLike): Promise<Response> {
+  return await apiClient.fetch("https://example.com"); // Should NOT error: method call, not global fetch
+}
+
 export {
   configWithIcon,
   configWithJsx,
   configWithParenthesizedJsx,
+  testAllowedFetch,
   testDocument,
   testLocalStorage,
+  testMethodFetch,
   testNavigator,
   testObject,
+  testRawFetch,
   testSessionStorage,
   testThrow,
   testUnknown,
   testWindow,
+  testWindowFetch,
 };

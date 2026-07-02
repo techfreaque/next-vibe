@@ -15,18 +15,19 @@ import {
 } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
-import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-  success,
-} from "./response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
+
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "./response.schema";
 
 /**
  * Validate locale using the standard schema

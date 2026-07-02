@@ -26,10 +26,11 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import { type ChartDataPoint, extractChartData } from "./shared";
-import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 import type { JSX } from "react";
 import type z from "zod";
+
+import { type ChartDataPoint, extractChartData } from "./shared";
+import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 
 // Color palette for charts
 const CHART_COLORS = [

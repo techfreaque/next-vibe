@@ -12,8 +12,8 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ViewModeValue } from "../enum";
 
+import type { ViewModeValue } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,

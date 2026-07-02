@@ -17,11 +17,11 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 import type { JSX } from "react";
 import type z from "zod";
 
 import { findEnumLabel } from "./shared";
+import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 
 /**
  * Badge Widget - Displays badges with variant-based styling

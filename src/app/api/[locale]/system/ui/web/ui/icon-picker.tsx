@@ -6,8 +6,6 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { Dialog, DialogContent, DialogTrigger } from "./dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import type { CategoryKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import {
   Icon,
@@ -18,9 +16,11 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { Button } from "./button";
+import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Div } from "./div";
 import { Input } from "./input";
 import { Span } from "./span";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 /**
  * Icon Picker props interface

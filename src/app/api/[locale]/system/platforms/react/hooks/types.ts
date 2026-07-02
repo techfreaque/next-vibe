@@ -3,7 +3,6 @@ import type {
   QueryKey,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type {
@@ -15,8 +14,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-
-import type { EnhancedMutationResult } from "./use-api-mutation";
 
 /**
  * Utility types to extract types from CreateApiEndpoint definitions

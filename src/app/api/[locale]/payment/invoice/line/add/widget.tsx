@@ -1,5 +1,6 @@
 "use client";
 
+import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { Input } from "next-vibe/ui/web/ui/input";
@@ -7,9 +8,10 @@ import { Span } from "next-vibe/ui/web/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
@@ -18,6 +20,8 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useState } from "react";
+
+import productLookupEndpoint from "@/app/api/[locale]/pos/product-lookup/definition";
 
 import type definition from "./definition";
 
@@ -48,15 +52,31 @@ export function InvoiceLineAddWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
-  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const line = data?.line;
 
   const [selectedProduct, setSelectedProduct] =
     useState<ProductSearchResult | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<ProductSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  // The submitted query drives the cached product-lookup call; typing does not.
+  const [submittedQuery, setSubmittedQuery] = useState("");
+
+  // Typed, cached product search via the pos/product-lookup endpoint.
+  const productSearch = useApiQuery({
+    endpoint: productLookupEndpoint.GET,
+    requestData: { query: submittedQuery, companyId: undefined },
+    logger,
+    user,
+    options: {
+      enabled: submittedQuery.trim().length > 0,
+      queryKey: `product-lookup:${submittedQuery}`,
+    },
+  });
+  const searchResults: ProductSearchResult[] =
+    productSearch.data?.products ?? [];
+  const isSearching = productSearch.isFetching;
+  const hasSearched = submittedQuery.trim().length > 0 && !isSearching;
 
   // Live preview values
   const qty = Number(form?.watch("quantity") ?? 1);
@@ -72,24 +92,7 @@ export function InvoiceLineAddWidget({
     if (!searchQuery.trim()) {
       return;
     }
-    setIsSearching(true);
-    setHasSearched(false);
-
-    void (async (): Promise<void> => {
-      try {
-        const url = `/api/${locale}/pos/product-lookup?query=${encodeURIComponent(searchQuery)}`;
-        const response = await fetch(url, { credentials: "include" });
-        if (response.ok) {
-          const json = (await response.json()) as {
-            products?: ProductSearchResult[];
-          };
-          setSearchResults(json.products ?? []);
-        }
-      } finally {
-        setIsSearching(false);
-        setHasSearched(true);
-      }
-    })();
+    setSubmittedQuery(searchQuery);
   };
 
   const handleSelectProduct = (product: ProductSearchResult): void => {
@@ -103,9 +106,8 @@ export function InvoiceLineAddWidget({
     ) {
       form?.setValue("taxRate", product.defaultTaxRate);
     }
-    setSearchResults([]);
     setSearchQuery("");
-    setHasSearched(false);
+    setSubmittedQuery("");
   };
 
   const handleClearProduct = (): void => {

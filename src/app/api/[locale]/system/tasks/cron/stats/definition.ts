@@ -641,9 +641,5 @@ export type CronStatsGetRequestOutput = typeof GET.types.RequestOutput;
 export type CronStatsGetResponseInput = typeof GET.types.ResponseInput;
 export type CronStatsGetResponseOutput = typeof GET.types.ResponseOutput;
 
-// Aliases for backward compatibility with components
-export type CronStatsRequestType = CronStatsGetRequestOutput;
-export type CronStatsResponseType = CronStatsGetResponseOutput;
-
 const statsEndpoints = { GET };
 export default statsEndpoints;

@@ -32,7 +32,6 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { resolveFavorite } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
   fetchThreadMessages,
@@ -41,18 +40,20 @@ import {
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
+import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/skills/favorites/i18n";
+import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/skills/favorites/repository";
+import { resolveFavorite } from "@/app/api/[locale]/agent/skills/resolver";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+
 import { customSkills } from "./db";
 import {
   ContentLevel,
   IntelligenceLevel,
   SkillCategory,
 } from "./enum";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/skills/favorites/i18n";
-import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/skills/favorites/repository";
 import { SkillsRepository } from "./repository";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

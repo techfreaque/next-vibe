@@ -27,6 +27,9 @@ export const translations = {
         button: "View Subscription Details",
         info: "Your subscription is managed via email. Please check your inbox for payment links and subscription details from NOWPayments.",
       },
+      portal: {
+        error: "Couldn't open the billing portal. Try again.",
+      },
     },
     balance: {
       title: "Credit Balance",

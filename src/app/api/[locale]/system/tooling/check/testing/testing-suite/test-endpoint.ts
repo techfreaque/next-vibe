@@ -18,7 +18,6 @@ import {
   type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
-import type { TestEndpointOptions, TestRunner } from "./types";
 import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
@@ -29,6 +28,7 @@ import type { z } from "zod";
 
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
+import type { TestEndpointOptions, TestRunner } from "./types";
 
 /**
  * Type for example entry

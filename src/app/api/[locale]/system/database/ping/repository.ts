@@ -11,11 +11,11 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type { PingRequestOutput, PingResponseOutput } from "./definition";
 import type { PingT } from "next-vibe/database/ping/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { db, rawPool } from "..";
+import type { PingRequestOutput, PingResponseOutput } from "./definition";
 
 /**
  * Database Ping Repository Implementation

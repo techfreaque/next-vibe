@@ -8,7 +8,6 @@
  */
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,
@@ -17,6 +16,8 @@ import type {
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo, useRef, useState } from "react";
+
+import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type {
   AutocompleteFieldProps,

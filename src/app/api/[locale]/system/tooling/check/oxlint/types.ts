@@ -90,14 +90,6 @@ export interface OxlintRuleContext {
 }
 
 // Type guard helpers for AST nodes
-export function isJSXIdentifier(node: OxlintASTNode): node is JSXIdentifier {
-  return node.type === "JSXIdentifier" || node.type === "Identifier";
-}
-
-export function isJSXLiteral(node: OxlintASTNode): node is JSXLiteral {
-  return node.type === "Literal";
-}
-
 export function isProperty(node: OxlintASTNode): node is Property {
   return (
     node.type === "Property" && typeof (node as Property).method === "boolean"

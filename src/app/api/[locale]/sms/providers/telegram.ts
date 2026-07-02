@@ -81,6 +81,7 @@ export function getTelegramProvider(botToken?: string): SmsProvider {
           parse_mode: "HTML",
         });
 
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(url, {
           method: "POST",
           headers: {

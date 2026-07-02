@@ -20,8 +20,9 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { InstallRequestOutput, InstallResponseOutput } from "./definition";
 import type { SetupInstallT } from "next-vibe/platforms/cli/setup/install/i18n";
+
+import type { InstallRequestOutput, InstallResponseOutput } from "./definition";
 
 /**
  * Setup Install Repository Implementation

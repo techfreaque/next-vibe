@@ -74,8 +74,6 @@ import {
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { DefaultFolderId } from "../config";
-import { parseSkillId } from "../slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
@@ -93,6 +91,8 @@ import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/skills/favorite
 import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 
+import { DefaultFolderId } from "../config";
+import { parseSkillId } from "../slugify";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
 import { useChatSettings } from "./hooks";

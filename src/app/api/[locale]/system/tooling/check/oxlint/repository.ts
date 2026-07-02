@@ -19,16 +19,17 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
 import { sortIssuesByLocation } from "next-vibe/tooling/check/config/shared";
 import type { CheckConfig } from "next-vibe/tooling/check/config/types";
-import type {
-  OxlintIssue,
-  OxlintRequestOutput,
-  OxlintResponseOutput,
-} from "./definition";
 import type { CheckOxlintT } from "next-vibe/tooling/check/oxlint/i18n";
 import {
   calculateFilteredSummary,
   filterIssues,
 } from "next-vibe/tooling/check/shared/filter-utils";
+
+import type {
+  OxlintIssue,
+  OxlintRequestOutput,
+  OxlintResponseOutput,
+} from "./definition";
 
 /**
  * Run Oxlint Repository

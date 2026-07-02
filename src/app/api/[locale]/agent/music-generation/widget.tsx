@@ -26,20 +26,20 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useProviderAvailability } from "../env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import type { MusicGenModelSelection } from "./models";
-import { getBestMusicGenModel } from "./models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
+import { useProviderAvailability } from "../env-availability-context";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { MusicDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
+import type { MusicGenModelSelection } from "./models";
+import { getBestMusicGenModel } from "./models";
 import { getMusicGenModelById, MusicGenModelId } from "./models";
 
 interface CustomWidgetProps {

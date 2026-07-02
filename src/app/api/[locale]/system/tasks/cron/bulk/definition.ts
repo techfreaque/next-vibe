@@ -21,8 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-export const BULK_ACTIONS = ["delete", "enable", "disable", "run"] as const;
-export type BulkAction = (typeof BULK_ACTIONS)[number];
+const BULK_ACTIONS = ["delete", "enable", "disable", "run"] as const;
 
 const { POST } = createEndpoint({
   scopedTranslation,

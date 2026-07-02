@@ -13,7 +13,6 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { scopedTranslation } from "next-vibe/server/server/rebuild/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
@@ -25,6 +24,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { REBUILD_ALIAS } from "./constants";
 
 const RebuildWidget = lazyWidget(() =>

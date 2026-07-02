@@ -30,15 +30,16 @@ import type { TypecheckResponseOutput } from "next-vibe/tooling/check/typecheck/
 import { scopedTranslation as typecheckScopedTranslation } from "next-vibe/tooling/check/typecheck/i18n";
 import { TypecheckRepository } from "next-vibe/tooling/check/typecheck/repository";
 import type {
-  VibeCheckRequestOutput,
-  VibeCheckResponseOutput,
-} from "./definition";
-import type {
   CheckVibeCheckT,
   CheckVibeCheckTranslationKey,
 } from "next-vibe/tooling/check/vibe-check/i18n";
 
 import { env } from "@/config/env";
+
+import type {
+  VibeCheckRequestOutput,
+  VibeCheckResponseOutput,
+} from "./definition";
 
 type CheckType = "oxlint" | "eslint" | "typecheck";
 

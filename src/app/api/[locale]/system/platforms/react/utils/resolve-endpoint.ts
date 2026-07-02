@@ -15,7 +15,7 @@ import { Methods } from "next-vibe/core/definition/enums";
 export async function resolveEndpoint(
   toolName: string,
 ): Promise<CreateApiEndpointAny | null> {
-  const { getEndpoint } = await import("@/generated/endpoint");
+  const { getEndpoint } = await import("@/generated/endpoints/endpoint");
 
   // Try exact alias first (single segment, no slashes)
   const direct = await getEndpoint(toolName);

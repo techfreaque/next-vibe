@@ -10,6 +10,11 @@ import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import { cn } from "next-vibe/core/utils/utils";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+import type { JSX } from "react";
+import React, { useMemo, useState } from "react";
+
+import { Badge } from "./badge";
+import { Button } from "./button";
 import {
   Command,
   CommandEmpty,
@@ -19,11 +24,6 @@ import {
   CommandList,
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
-
-import { Badge } from "./badge";
-import { Button } from "./button";
 
 export enum FormFieldCategory {
   OTHER = "other",

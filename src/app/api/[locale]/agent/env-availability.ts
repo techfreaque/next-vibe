@@ -177,7 +177,7 @@ export function getEnvAvailability(): AgentEnvAvailability {
 
 /**
  * Full instance availability — env flags + live WS inference state.
- * Server-side only (async, reads RemoteTransport).
+ * Server-side only (async, reads the executor's routing state).
  */
 export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
   const { RemoteTransport } =

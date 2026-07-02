@@ -49,7 +49,7 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { useCallback, useEffect, useState } from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type endpoints from "../definition";
 import type { CronTaskGetResponseOutput } from "../definition";

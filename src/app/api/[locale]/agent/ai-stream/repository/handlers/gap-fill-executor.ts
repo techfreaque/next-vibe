@@ -44,13 +44,13 @@ import type {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../../vision-models";
+import { ProviderFactory } from "../core/infra";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import {
   type BridgeContext,
   type MessageVariant,
   ModalityResolver,
 } from "../core/modality-resolver";
-import { ProviderFactory } from "../core/provider-factory";
 
 const BRIDGE_PROMPTS = {
   image: `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.

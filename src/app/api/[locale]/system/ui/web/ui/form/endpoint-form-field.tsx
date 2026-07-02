@@ -17,28 +17,7 @@ import {
   type ReactT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
 } from "next-vibe/platforms/react/i18n";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./form";
 import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Popover, PopoverContent, PopoverTrigger } from "../popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../tooltip";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -71,12 +50,33 @@ import { Label } from "../label";
 import { MultiSelect } from "../multi-select";
 import { NumberInput } from "../number-input";
 import { PhoneField } from "../phone-field";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
 import { RangeSlider } from "../range-slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
 
 // Constants
 const OPTION_KEY_PREFIX = "option-";

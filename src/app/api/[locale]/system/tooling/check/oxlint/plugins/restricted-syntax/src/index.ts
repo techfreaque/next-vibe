@@ -6,6 +6,7 @@
  * - No `object` type
  * - No `throw` statements
  * - No JSX in object literals (except for common React node properties like content, icon, title, etc.)
+ * - No raw `fetch()` (use typed endpoint hooks; external-API calls opt out with a disable comment)
  *
  * Configuration is loaded from check.config.ts via the shared config loader.
  *
@@ -81,6 +82,12 @@ interface MemberExpression extends OxlintASTNode {
   computed?: boolean;
 }
 
+/** AST node for CallExpression */
+interface CallExpression extends OxlintASTNode {
+  type: "CallExpression";
+  callee?: OxlintASTNode;
+}
+
 /** Default error messages (can be customized via config) */
 interface RestrictedSyntaxMessages {
   unknownType: string;
@@ -92,6 +99,7 @@ interface RestrictedSyntaxMessages {
   sessionStorageAccess: string;
   documentAccess: string;
   navigatorAccess: string;
+  rawFetch: string;
 }
 
 // ============================================================
@@ -136,7 +144,9 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
   documentAccess:
     "Direct 'document' access is not allowed. Use next-vibe-ui abstractions: getCookie/setCookie/deleteCookie from 'next-vibe/ui/web/lib/cookies', or getReferrer() from 'next-vibe/ui/web/utils/browser'.",
   navigatorAccess:
-    "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/web/utils/browser', or useWindowSize()/useTouchDevice() hooks from 'next-vibe/tasks/cron/stats/hooks'.",
+    "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/web/utils/browser', or useWindowSize() from 'next-vibe/ui/web/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/web/hooks/use-touch-device'.",
+  rawFetch:
+    "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API'.",
 };
 
 // ============================================================
@@ -611,6 +621,59 @@ function getBrowserGlobal(node: OxlintASTNode): {
 }
 
 /**
+ * Return true if a CallExpression is a raw global `fetch(...)` call.
+ *
+ * Matches bare `fetch(...)`, `window.fetch(...)`, and `globalThis.fetch(...)`.
+ * Does NOT match method calls on other objects (e.g. `apiClient.fetch(...)`,
+ * `sourceCode.fetch(...)`), which are sanctioned wrappers, not the global.
+ */
+function isRawFetchCall(node: OxlintASTNode): boolean {
+  if (node.type !== "CallExpression") {
+    return false;
+  }
+  const callee = (node as CallExpression).callee;
+  if (!callee) {
+    return false;
+  }
+  // Bare `fetch(...)`
+  if (callee.type === "Identifier" && (callee as Identifier).name === "fetch") {
+    return true;
+  }
+  // `window.fetch(...)` / `globalThis.fetch(...)` / `self.fetch(...)`
+  if (callee.type === "MemberExpression") {
+    const mem = callee as MemberExpression;
+    if (mem.computed || mem.object?.type !== "Identifier") {
+      return false;
+    }
+    const objectName = (mem.object as Identifier).name;
+    if (
+      objectName !== "window" &&
+      objectName !== "globalThis" &&
+      objectName !== "self"
+    ) {
+      return false;
+    }
+    const property = mem.property;
+    if (!property) {
+      return false;
+    }
+    if (
+      property.type === "Identifier" &&
+      (property as Identifier).name === "fetch"
+    ) {
+      return true;
+    }
+    if (
+      property.type === "Literal" &&
+      (property as Literal).value === "fetch"
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Check if a node is a JSX element or fragment
  */
 function isJSX(n: OxlintASTNode): boolean {
@@ -641,7 +704,7 @@ const restrictedSyntaxRule = {
     type: "problem",
     docs: {
       description:
-        "Enforces restricted syntax patterns (no unknown, object, throw, JSX in non-React-node properties)",
+        "Enforces restricted syntax patterns (no unknown, object, throw, JSX in non-React-node properties, raw fetch)",
       category: "Best Practices",
       recommended: true,
     },
@@ -765,6 +828,24 @@ const restrictedSyntaxRule = {
             result.propertyName,
             messages,
           ),
+        });
+      },
+
+      // ============================================================
+      // No raw fetch — read endpoint data through typed hooks.
+      // No path is auto-exempt: genuine external-API calls opt out
+      // with an explicit disable comment ("you know it when you see it").
+      // ============================================================
+      CallExpression(node: OxlintASTNode): void {
+        if (!isRawFetchCall(node)) {
+          return;
+        }
+        if (hasDisableComment(context, node)) {
+          return;
+        }
+        context.report({
+          node,
+          message: messages.rawFetch,
         });
       },
     };

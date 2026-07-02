@@ -265,7 +265,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<FrameworkPageData> {
   const { locale } = await params;
-  const { endpointsMeta } = await import("@/generated/endpoints-meta/en");
+  const { endpointsMeta } = await import("@/generated/endpoints/meta/en");
   const snippets = getCodeSnippets(locale);
   return {
     locale,

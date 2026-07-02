@@ -15,7 +15,6 @@ import {
 import { Environment } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/server/server/dev/i18n";
-import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import {
   objectField,
   requestField,
@@ -25,6 +24,7 @@ import { z } from "zod";
 
 import { envClient } from "@/config/env-client";
 
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { DEV_ALIASES } from "./constants";
 
 /**

@@ -43,6 +43,13 @@ import {
   formatWarning,
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
+import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
+import type { Task } from "next-vibe/tasks/unified-runner/types";
+
+import { env } from "@/config/env";
+
+import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   ATLAS_PID_FILE,
@@ -53,13 +60,6 @@ import {
   removePidFromFile,
   writePidFile,
 } from "../pid";
-import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
-import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
-import type { Task } from "next-vibe/tasks/unified-runner/types";
-
-import { env } from "@/config/env";
-
-import { ServerFramework } from "../enum";
 import type { DevRequestOutput } from "./definition";
 
 /**
@@ -975,7 +975,10 @@ export class DevRepository {
       }
       // Ensure the routes directory exists before the TanStack router-generator
       // plugin scans it - it will throw ENOENT if the folder is missing.
-      const routesDir = join(process.cwd(), "src/app-tanstack/routes");
+      const routesDir = join(
+        process.cwd(),
+        "src/generated/app-tanstack/routes",
+      );
       if (!existsSync(routesDir)) {
         mkdirSync(routesDir, { recursive: true });
       }
@@ -1129,7 +1132,7 @@ export class DevRepository {
   ): Promise<void> {
     try {
       // Load the task registry
-      const { taskRegistry } = await import("@/generated/tasks-index");
+      const { taskRegistry } = await import("@/generated/tasks/index");
 
       // Filter tasks for development environment
       const devTasks = DevRepository.filterTasksForDevelopment(

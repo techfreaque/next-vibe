@@ -3,7 +3,7 @@
  *
  * Scans src/app/[locale] (UI) and src/app/api/[locale] (API) for
  * page.tsx, layout.tsx, and route.ts files, and emits flat per-route
- * files into src/app-tanstack/routes/ using TanStack Start's
+ * files into src/generated/app-tanstack/routes/ using TanStack Start's
  * dot-separated flat filename convention.
  *
  * Flat filename convention (dots = path separators):

@@ -19,11 +19,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ElectronStartT } from "next-vibe/server/server/electron/start/i18n";
+
 import type {
   ElectronStartRequestOutput,
   ElectronStartResponseOutput,
 } from "./definition";
-import type { ElectronStartT } from "next-vibe/server/server/electron/start/i18n";
 
 export class ElectronStartRepository {
   private static readonly ELECTRON_DIR =

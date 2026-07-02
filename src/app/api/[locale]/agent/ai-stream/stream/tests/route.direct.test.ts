@@ -1,10 +1,12 @@
 /**
- * AI Stream Integration - Direct (hermes 3002, transportMode='direct-http')
+ * AI Stream Integration - Direct tools-remote (hermes 3002,
+ * transportMode='direct-http')
  *
- * AI loop runs on hermes (loopLocation='server') via direct-http relay.
- * System prompt + tools are built locally (atlas) and sent in the relay POST.
- * Hermes runs the AI loop; tools execute directly on hermes (no execute-tool wrapper).
- * Thread mirrored locally under BACKGROUND root (threadMirrorMode='both').
+ * Matrix cell: direct-http × loop-LOCAL × tools-REMOTE (full, real media).
+ * The AI loop runs on atlas; EVERY tool call routes through
+ * execute-tool(instanceId='hermes') over direct-http. (A plain connectToHermes
+ * connection sets no routing flags — resolveTarget only relays on explicit
+ * instanceId or a REMOTE folder — so the loop genuinely stays local.)
  *
  * Setup is E2E: connectToHermes logs into remote (3002), registers atlas, syncs caps.
  */
@@ -18,6 +20,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 
 import {
   failSuitePrerequisites,
+  HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveRemoteUrlSync,
 } from "../../testing/remote-setup";

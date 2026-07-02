@@ -19,7 +19,7 @@ import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling
 import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
-import { GenerateAllRepository } from "next-vibe/tooling/generators/generate-all/repository";
+import { GenerateAllRepository } from "next-vibe/tooling/generators/repository";
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";

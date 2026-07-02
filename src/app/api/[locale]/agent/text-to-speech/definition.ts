@@ -19,10 +19,9 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import { TtsModelId, TtsModelIdOptions } from "./models";
-
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { TtsModelId, TtsModelIdOptions } from "./models";
 
 const TextToSpeechContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.TextToSpeechContainer })),

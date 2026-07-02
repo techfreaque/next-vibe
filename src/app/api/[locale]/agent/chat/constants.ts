@@ -10,7 +10,7 @@ import { envClient } from "@/config/env-client";
 import {
   DEFAULT_AI_PINNED_IDS,
   DEFAULT_WEB_PINNED_IDS,
-} from "@/generated/endpoints-meta/default-pins";
+} from "@/generated/endpoints/meta/default-pins";
 
 import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import {

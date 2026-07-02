@@ -46,7 +46,7 @@ import {
 } from "next-vibe/platforms/cli/types/cli-target";
 
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
-import { pathToAliasMap } from "@/generated/alias-map";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 export const binaryStartTime = Date.now();
 

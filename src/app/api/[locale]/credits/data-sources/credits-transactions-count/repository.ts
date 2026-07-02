@@ -11,6 +11,7 @@ import {
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 import type {
   DataPoint,
   Resolution,
@@ -18,7 +19,6 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-import { db } from "next-vibe/database";
 
 import { creditTransactions } from "../../db";
 

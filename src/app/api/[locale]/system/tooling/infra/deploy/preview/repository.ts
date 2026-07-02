@@ -11,11 +11,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { InfraT } from "next-vibe/tooling/infra/i18n";
+
 import type {
   DeployPreviewRequestOutput,
   DeployPreviewResponseOutput,
 } from "./definition";
-import type { InfraT } from "next-vibe/tooling/infra/i18n";
 
 export class DeployPreviewRepository {
   static async preview(

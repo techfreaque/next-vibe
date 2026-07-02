@@ -28,7 +28,7 @@ import {
   clearStreamingState,
   setStreamingStateAborting,
   StreamRegistry,
-} from "../repository/core/stream-registry";
+} from "../repository/core/stream";
 import type {
   AiStreamCancelPostRequestOutput,
   AiStreamCancelPostResponseOutput,

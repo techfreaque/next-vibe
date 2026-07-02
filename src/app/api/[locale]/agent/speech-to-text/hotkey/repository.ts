@@ -19,12 +19,12 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { SpeechToTextT } from "@/app/api/[locale]/agent/speech-to-text/i18n";
-import { SpeechToTextRepository } from "../repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
 
 import type { CreditsT as CreditModuleT } from "../../../credits/i18n";
 import { CreditRepository } from "../../../credits/repository";
+import { SpeechToTextRepository } from "../repository";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,

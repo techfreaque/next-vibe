@@ -1,0 +1,649 @@
+/**
+ * tRPC Router Generator
+ * Automatically generates tRPC routers from existing route files
+ * Scans the API directory and creates nested router structure
+ *
+ * Note: This file requires Node.js environment and @types/node
+ */
+
+// Declare Node.js globals for TypeScript
+declare const process: {
+  cwd: () => string;
+};
+
+import fs from "node:fs";
+import path from "node:path";
+
+import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+  formatWarning,
+} from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { findRouteFiles } from "next-vibe/tooling/generators/shared/scanner";
+import { stripProjectRoot } from "next-vibe/tooling/generators/shared/utils";
+
+// RouteFileStructure represents a route module with HTTP method handlers
+interface RouteFileStructure {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  GET?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  POST?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PUT?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PATCH?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  DELETE?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tools?: any;
+}
+
+// Stub validation function - validates route files for tRPC compatibility
+function validateRouteFileForTRPC(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  _routeModule: RouteFileStructure & Record<string, any>,
+): {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+} {
+  // For now, accept all route modules as valid
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+  };
+}
+
+/**
+ * Router generation configuration
+ */
+export interface RouterGenerationConfig {
+  /** Root directory to scan for API routes */
+  apiDir: string;
+
+  /** Output file for the generated router */
+  outputFile: string;
+
+  /** Whether to include validation warnings in output */
+  includeWarnings?: boolean;
+
+  /** Patterns to exclude from scanning */
+  excludePatterns?: string[];
+}
+
+/**
+ * Information about a discovered route file
+ */
+export interface RouteFileInfo {
+  /** Full file path */
+  filePath: string;
+
+  /** Relative path from API directory */
+  relativePath: string;
+
+  /** Router path segments (e.g., ['leads', 'batch']) */
+  routerPath: string[];
+
+  /** Available HTTP methods */
+  methods: string[];
+
+  /** Validation result */
+  validation: {
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+  };
+
+  /** Variable name for import (set during code generation) */
+  varName?: string;
+}
+
+/**
+ * Scan API directory for route files and generate router structure
+ */
+export async function generateTRPCRouter(
+  config: RouterGenerationConfig,
+  logger: EndpointLogger,
+): Promise<{
+  success: boolean;
+  routeFiles: RouteFileInfo[];
+  errors: string[];
+  warnings: string[];
+}> {
+  const startTime = Date.now();
+  // Debug: generateTRPCRouter started with config
+  const {
+    apiDir,
+    outputFile,
+    includeWarnings = true,
+    excludePatterns = [],
+  } = config;
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const routeFiles: RouteFileInfo[] = [];
+
+  try {
+    // Debug: Starting tRPC router generation
+
+    // Scan for route files
+    const discoveredRouteFiles = scanForRouteFiles(apiDir, excludePatterns);
+
+    const routesWithoutDefinition: string[] = [];
+    const discoveredFiles: string[] = [];
+
+    for (const routeFile of discoveredRouteFiles) {
+      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+      // Check if definition exists by trying to construct the path
+      if (fs.existsSync(definitionPath)) {
+        discoveredFiles.push(routeFile);
+      } else {
+        routesWithoutDefinition.push(routeFile);
+      }
+    }
+
+    if (routesWithoutDefinition.length > 0) {
+      const routeList = routesWithoutDefinition
+        .map((r) => `    • ${stripProjectRoot(r)}`)
+        .join("\n");
+      logger.debug(
+        formatWarning(
+          `Skipped ${formatCount(routesWithoutDefinition.length, "route")} without matching definition:\n${routeList}`,
+        ),
+      );
+    }
+
+    // Validate and process each route file
+    // Debug: Processing routes
+
+    let processedCount = 0;
+    for (const filePath of discoveredFiles) {
+      processedCount++;
+      if (processedCount <= 5 || processedCount % 20 === 0) {
+        // Debug: Processing route
+      }
+      try {
+        const routeInfo = await processRouteFile(filePath, apiDir);
+        routeFiles.push(routeInfo);
+
+        if (!routeInfo.validation.isValid) {
+          errors.push(
+            ...routeInfo.validation.errors.map(
+              (err) => `${routeInfo.relativePath}: ${err}`,
+            ),
+          );
+          // Debug first few invalid routes
+          if (errors.length <= 6) {
+            // Debug: Invalid route
+          }
+        } else {
+          // Debug first few valid routes
+          if (routeFiles.filter((r) => r.validation.isValid).length <= 3) {
+            // Debug: Valid route
+          }
+        }
+
+        if (includeWarnings) {
+          warnings.push(
+            ...routeInfo.validation.warnings.map(
+              (warn) => `${routeInfo.relativePath}: ${warn}`,
+            ),
+          );
+        }
+      } catch {
+        const errorMsg = "app.error.general.route_processing_failed";
+        errors.push(errorMsg);
+        // Error processing route - continuing with other routes
+      }
+    }
+
+    // Debug: Processing complete
+
+    // Generate router code
+    const validRoutes = routeFiles.filter((f) => f.validation.isValid);
+    const invalidRoutes = routeFiles.filter((f) => !f.validation.isValid);
+
+    // Log invalid routes with reasons
+    if (invalidRoutes.length > 0) {
+      const invalidList = invalidRoutes
+        .map((r) => {
+          const validationErrors = r.validation.errors.join(", ");
+          return `    • ${r.relativePath}\n      ${validationErrors}`;
+        })
+        .join("\n");
+      logger.warn(
+        formatWarning(
+          `Invalid tRPC ${formatCount(invalidRoutes.length, "route")}:\n${invalidList}`,
+        ),
+      );
+    }
+
+    const routerCode = generateRouterCode(validRoutes, outputFile);
+
+    // Write to output file
+    writeRouterFile(outputFile, routerCode);
+
+    const duration = Date.now() - startTime;
+    logger.info(
+      formatGenerator(
+        `Generated tRPC router with ${formatCount(validRoutes.length, "route")} in ${formatDuration(duration)}`,
+        "🔀",
+      ),
+    );
+
+    // Debug: tRPC router generation completed
+
+    const validRouteCount = routeFiles.filter(
+      (f) => f.validation.isValid,
+    ).length;
+    return {
+      success: validRouteCount > 0, // Success if we have at least one valid route
+      routeFiles,
+      errors,
+      warnings,
+    };
+  } catch (error) {
+    logger.error("tRPC router generation error:", parseError(error));
+    const errorMsg = "app.error.general.router_generation_failed";
+    errors.push(errorMsg);
+    // Error generating router - returning failure
+
+    return {
+      success: false,
+      routeFiles,
+      errors,
+      warnings,
+    };
+  }
+}
+
+/**
+ * Scan directory recursively for route.ts files
+ */
+function scanForRouteFiles(
+  apiDir: string,
+  excludePatterns: string[],
+): string[] {
+  // Use consolidated directory scanner
+  const results = findRouteFiles(apiDir, excludePatterns);
+  return results.map((r) => r.fullPath);
+}
+
+/**
+ * Process a single route file and extract information
+ */
+async function processRouteFile(
+  filePath: string,
+  apiDir: string,
+): Promise<RouteFileInfo> {
+  const relativePath = path.relative(apiDir, filePath);
+
+  // Calculate router path from file path
+  // e.g., /leads/batch/route.ts -> ['leads', 'batch']
+  const routerPath = path
+    .dirname(relativePath)
+    .split(path.sep)
+    .filter((segment: string) => segment !== "." && segment !== "")
+    .filter(
+      (segment: string) => !segment.startsWith("[") || !segment.endsWith("]"),
+    ); // Remove dynamic segments like [locale]
+
+  // Try to import and validate the route file
+  let validation: {
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+  } = {
+    isValid: false,
+    errors: ["app.error.general.route_load_failed"],
+    warnings: [],
+  };
+  let methods: string[] = [];
+
+  try {
+    // Dynamic import of the route file
+    // Convert absolute path to relative path from the current file's directory
+    const currentFileUrl = new URL(import.meta.url);
+    const currentFileDir = path.dirname(currentFileUrl.pathname);
+    const relativeToCurrentFile = path.relative(currentFileDir, filePath);
+    const importPath = relativeToCurrentFile.startsWith(".")
+      ? relativeToCurrentFile
+      : `./${relativeToCurrentFile}`;
+    const routeModule = (await import(importPath)) as RouteFileStructure;
+
+    // Check if route exports 'tools' - skip routes that don't (e.g., webhooks, pixel tracking)
+    if (!routeModule.tools) {
+      validation = {
+        isValid: false,
+        errors: ["Route does not export 'tools' - skipping for tRPC"],
+        warnings: [],
+      };
+      return {
+        filePath,
+        relativePath,
+        routerPath,
+        methods: [],
+        validation,
+      };
+    }
+
+    // Extract available HTTP methods
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter((method) => {
+      const moduleExport = routeModule[method as keyof RouteFileStructure];
+      return moduleExport && typeof moduleExport === "function";
+    });
+
+    // Validate the route file structure
+    validation = validateRouteFileForTRPC(
+      routeModule as RouteFileStructure & Record<string, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    );
+  } catch {
+    validation.errors = ["app.error.general.route_import_failed"];
+  }
+
+  return {
+    filePath,
+    relativePath,
+    routerPath,
+    methods,
+    validation,
+  };
+}
+
+/**
+ * Generate TypeScript code for the router with proper nested structure
+ */
+function generateRouterCode(
+  validRouteFiles: RouteFileInfo[],
+  outputFile: string,
+): string {
+  const routerStructure = buildNestedRouterStructure(validRouteFiles);
+
+  // Collect all routes that are actually used in the router structure
+  const usedRoutes = new Set<RouteFileInfo>();
+  collectUsedRoutes(routerStructure, usedRoutes);
+
+  const imports: string[] = [];
+  const constants: string[] = [];
+
+  // Track used var names to handle collisions (e.g. two routes with same segments)
+  const usedVarNames = new Set<string>();
+
+  // Reserved JS keywords that cannot be used as identifiers
+  const JS_RESERVED = new Set([
+    "break",
+    "case",
+    "catch",
+    "class",
+    "const",
+    "continue",
+    "debugger",
+    "default",
+    "delete",
+    "do",
+    "else",
+    "export",
+    "extends",
+    "finally",
+    "for",
+    "function",
+    "if",
+    "import",
+    "in",
+    "instanceof",
+    "let",
+    "new",
+    "return",
+    "static",
+    "super",
+    "switch",
+    "this",
+    "throw",
+    "try",
+    "typeof",
+    "var",
+    "void",
+    "while",
+    "with",
+    "yield",
+    "enum",
+    "await",
+  ]);
+
+  // Only generate imports and constants for routes that are actually used
+  for (const routeFile of validRouteFiles) {
+    if (!usedRoutes.has(routeFile)) {
+      continue;
+    }
+
+    // Derive a stable var name from the route path segments, e.g.
+    // agent/chat/threads/[threadId]/messages -> agent_chat_threads_messages
+    const segments = routeFile.routerPath
+      .map((seg) => {
+        const parts = seg.split(/[^a-zA-Z0-9]+/);
+        return parts
+          .map((part, i) =>
+            i === 0
+              ? part.toLowerCase()
+              : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+          )
+          .join("");
+      })
+      .filter(Boolean);
+
+    let baseName = segments.join("_");
+    if (!baseName) {
+      baseName = "root";
+    }
+    if (JS_RESERVED.has(baseName)) {
+      baseName = `route_${baseName}`;
+    }
+    // Ensure uniqueness with a numeric suffix only when there is a collision
+    let varName = baseName;
+    let suffix = 2;
+    while (usedVarNames.has(varName)) {
+      varName = `${baseName}_${suffix++}`;
+    }
+    usedVarNames.add(varName);
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const toolsVarName = `${varName}Tools`;
+    // Get the current working directory (only available in Node.js environment)
+    const cwd =
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      typeof process !== "undefined" && process.cwd ? process.cwd() : "";
+    const importPath = path
+      .relative(
+        path.dirname(path.join(cwd, outputFile)),
+        routeFile.filePath.replace(/\.ts$/, ""),
+      )
+      .replaceAll("\\", "/");
+
+    // eslint-disable-next-line i18next/no-literal-string
+    imports.push(`import { tools as ${toolsVarName} } from "${importPath}";`);
+    // eslint-disable-next-line i18next/no-literal-string
+    // Convert generic handlers to tRPC procedures using the wrapper utility
+    constants.push(`const ${varName} = wrapToolsForTRPC(${toolsVarName});`);
+
+    // Store the variable name for later use
+    routeFile.varName = varName;
+  }
+
+  // Generate router structure code
+  const routerCode = generateNestedRouterCode(routerStructure, validRouteFiles);
+
+  // eslint-disable-next-line i18next/no-literal-string
+  return `/**
+ * Auto-generated tRPC Router
+ * Generated from route files in the API directory
+ * DO NOT EDIT MANUALLY - This file is auto-generated
+ */
+
+/* eslint-disable simple-import-sort/imports */
+/* eslint-disable prettier/prettier */
+
+import { router } from "next-vibe/platforms/trpc/setup";
+import { wrapToolsForTRPC } from "next-vibe/platforms/trpc/wrapper";
+${imports.join("\n")}
+
+${constants.join("\n")}
+
+export const appRouter = router({
+${routerCode}
+});
+`;
+}
+
+/**
+ * Recursively collect all routes that are actually used in the router structure
+ */
+function collectUsedRoutes(
+  structure: NestedRouterStructure,
+  usedRoutes: Set<RouteFileInfo>,
+): void {
+  for (const [key, value] of Object.entries(structure)) {
+    if (key === "_root" && Array.isArray(value)) {
+      for (const route of value) {
+        usedRoutes.add(route);
+      }
+    } else if (Array.isArray(value)) {
+      for (const route of value) {
+        usedRoutes.add(route);
+      }
+    } else if (value && typeof value === "object") {
+      collectUsedRoutes(value, usedRoutes);
+    }
+  }
+}
+
+/**
+ * Build nested router structure from route files
+ */
+function buildNestedRouterStructure(
+  routeFiles: RouteFileInfo[],
+): NestedRouterStructure {
+  const structure: NestedRouterStructure = {};
+
+  for (const routeFile of routeFiles) {
+    const { routerPath } = routeFile;
+
+    if (routerPath.length === 0) {
+      // Root level procedures
+      if (!structure._root) {
+        structure._root = [];
+      }
+      structure._root.push(routeFile);
+    } else {
+      // Nested procedures
+      let current = structure;
+
+      // Navigate/create the nested structure
+      for (let i = 0; i < routerPath.length; i++) {
+        const segment = routerPath[i];
+
+        if (i === routerPath.length - 1) {
+          // Last segment - add the route file
+          if (!current[segment]) {
+            current[segment] = [];
+          }
+          if (Array.isArray(current[segment])) {
+            current[segment].push(routeFile);
+          }
+        } else {
+          // Intermediate segment - ensure nested structure exists
+          if (!current[segment]) {
+            current[segment] = {};
+          }
+          current = current[segment] as NestedRouterStructure;
+        }
+      }
+    }
+  }
+
+  return structure;
+}
+
+/**
+ * Generate nested router code from structure
+ */
+function generateNestedRouterCode(
+  structure: NestedRouterStructure,
+  // eslint-disable-next-line oxc/only-used-in-recursion
+  allRouteFiles: RouteFileInfo[],
+  indent = "  ",
+): string {
+  const entries: string[] = [];
+
+  // Handle root level procedures
+  if (structure._root) {
+    for (const routeFile of structure._root) {
+      entries.push(`${indent}...${routeFile.varName},`);
+    }
+  }
+
+  // Handle nested structures
+  for (const [key, value] of Object.entries(structure)) {
+    if (key === "_root") {
+      continue;
+    }
+
+    // Quote key if it contains hyphens or other special characters
+    // eslint-disable-next-line i18next/no-literal-string
+    const quotedKey = /[^a-zA-Z0-9_$]/.test(key) ? `"${key}"` : key;
+
+    if (Array.isArray(value)) {
+      // Direct procedures at this level
+      if (value.length === 1) {
+        // Single route file - spread the procedures object (e.g., { GET: procedure, POST: procedure })
+
+        entries.push(
+          `${indent}${quotedKey}: router({ ...${value[0].varName} }),`,
+        );
+      } else {
+        // Multiple route files at same level - merge them
+        const mergedProcedures = value
+          .map((rf) => `...${rf.varName}`)
+          .join(", ");
+        // eslint-disable-next-line i18next/no-literal-string
+        entries.push(`${indent}${quotedKey}: router({ ${mergedProcedures} }),`);
+      }
+    } else if (value) {
+      // Nested structure
+      const nestedCode = generateNestedRouterCode(
+        value,
+        allRouteFiles,
+        `${indent}  `,
+      );
+      // eslint-disable-next-line i18next/no-literal-string
+      const nestedRouterEntry = `${indent}${quotedKey}: router({\n${nestedCode}\n${indent}}),`;
+      entries.push(nestedRouterEntry);
+    }
+  }
+
+  return entries.join("\n");
+}
+
+/**
+ * Interface for nested router structure
+ */
+interface NestedRouterStructure {
+  [key: string]: NestedRouterStructure | RouteFileInfo[] | undefined;
+  _root?: RouteFileInfo[];
+}
+
+/**
+ * Write the generated router code to file
+ */
+function writeRouterFile(outputFile: string, content: string): void {
+  // Ensure output directory exists
+  const outputDir = path.dirname(outputFile);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  // Write the file
+  fs.writeFileSync(outputFile, content, "utf8");
+}

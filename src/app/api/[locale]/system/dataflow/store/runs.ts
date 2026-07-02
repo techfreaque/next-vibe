@@ -8,10 +8,10 @@
 import "server-only";
 
 import { desc, eq } from "drizzle-orm";
-import { RunStatus, type RunStatusType } from "../enum";
 import { db } from "next-vibe/database";
 
 import { pipelineRuns } from "../db";
+import { RunStatus, type RunStatusType } from "../enum";
 
 // ─── Write ───────────────────────────────────────────────────────────────────
 
@@ -82,35 +82,4 @@ export async function getLatestRun(graphId: string): Promise<{
     .limit(1);
 
   return rows[0] ?? null;
-}
-
-/**
- * List recent runs for a graph.
- */
-export async function listRuns(
-  graphId: string,
-  limit = 20,
-): Promise<
-  Array<{
-    id: string;
-    startedAt: Date;
-    finishedAt: Date | null;
-    status: string;
-    errorCount: number;
-    nodeCount: number;
-  }>
-> {
-  return db
-    .select({
-      id: pipelineRuns.id,
-      startedAt: pipelineRuns.startedAt,
-      finishedAt: pipelineRuns.finishedAt,
-      status: pipelineRuns.status,
-      errorCount: pipelineRuns.errorCount,
-      nodeCount: pipelineRuns.nodeCount,
-    })
-    .from(pipelineRuns)
-    .where(eq(pipelineRuns.graphId, graphId))
-    .orderBy(desc(pipelineRuns.startedAt))
-    .limit(limit);
 }

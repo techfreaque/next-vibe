@@ -4,8 +4,6 @@
  * Pure functions with no side effects - can be used in any environment
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
-
 /**
  * Layout Configuration Types
  */
@@ -15,11 +13,6 @@ export interface LayoutConfig {
   columns?: number;
   alignItems?: "start" | "center" | "end";
 }
-
-/**
- * Trend direction types
- */
-type TrendDirection = "up" | "down" | "neutral";
 
 /**
  * Get layout class name from layout config
@@ -92,39 +85,6 @@ export function getLayoutClassName(config: LayoutConfig): string {
  */
 export function isExternalUrl(url: string): boolean {
   return url.startsWith("http://") || url.startsWith("https://");
-}
-
-/**
- * Extract unit from metric value
- * Used by: MetricCardWidget
- */
-export function extractMetricUnit(value: WidgetData): string | undefined {
-  const isObject =
-    typeof value === "object" && value !== null && !Array.isArray(value);
-
-  if (!isObject) {
-    return undefined;
-  }
-
-  return "unit" in value && typeof value.unit === "string"
-    ? value.unit
-    : undefined;
-}
-
-/**
- * Get trend color class name
- * Used by: MetricCardWidget
- */
-export function getTrendColorClassName(direction?: TrendDirection): string {
-  switch (direction) {
-    case "up":
-      return "text-green-600 dark:text-green-400";
-    case "down":
-      return "text-red-600 dark:text-red-400";
-    case "neutral":
-    default:
-      return "text-muted-foreground";
-  }
 }
 
 /**
@@ -346,25 +306,6 @@ export function getBorderRadiusClassName(
     return "rounded-full";
   }
   return "";
-}
-
-/**
- * Get height CSS class name from config
- * IMPORTANT: FULL class strings for Tailwind purge!
- */
-export function getHeightClassName(
-  size: "xs" | "sm" | "base" | "lg" | undefined,
-): string {
-  if (size === "xs") {
-    return "h-1";
-  }
-  if (size === "sm") {
-    return "h-1.5";
-  }
-  if (size === "lg") {
-    return "h-2.5";
-  }
-  return "h-1.5";
 }
 
 /**

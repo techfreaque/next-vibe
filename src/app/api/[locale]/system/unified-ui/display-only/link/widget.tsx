@@ -21,10 +21,10 @@ import {
   getTextSizeClassName,
   isExternalUrl,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 import type { JSX } from "react";
 
 import { extractLinkData } from "./shared";
+import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 
 /**
  * Link Widget - Renders clickable hyperlinks with external link indicators

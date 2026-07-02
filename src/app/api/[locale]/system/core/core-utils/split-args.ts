@@ -16,7 +16,7 @@
 
 import type { WidgetData } from "next-vibe/core/utils/json";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { getFullPath } from "./path";
 

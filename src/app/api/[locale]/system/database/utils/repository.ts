@@ -12,12 +12,12 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-// Logger will be provided by the route handler
-import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";
 import type { UtilsT } from "next-vibe/database/utils/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { db } from "..";
+// Logger will be provided by the route handler
+import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";
 
 /**
  * Database Utils Repository Implementation

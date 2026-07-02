@@ -5,6 +5,49 @@ export const translations: typeof enTranslations = {
   tags: {
     newsletter: "Newsletter",
   },
+  emailPlaceholder: "Geben Sie Ihre E-Mail ein",
+  subscription: {
+    unsubscribe: {
+      title: "Abmelden",
+      confirmButton: "Abmeldung bestätigen",
+      success: "Sie wurden abgemeldet",
+      error: "Abmeldung fehlgeschlagen",
+    },
+  },
+  unsubscribe: {
+    page: {
+      title: "Vom Newsletter abmelden",
+      description: "Es tut uns leid, Sie gehen zu sehen",
+      subtitle: "Verwalten Sie Ihr Newsletter-Abonnement",
+      emailProvided: {
+        title: "Abmeldung bestätigen",
+        description:
+          "Sind Sie sicher, dass Sie sich von unserem Newsletter abmelden möchten?",
+      },
+      unsubscribeButton: "Abmelden",
+      subscribeText: "Haben Sie Ihre Meinung geändert?",
+      subscribeLink: "Erneut abonnieren",
+      info: {
+        title: "Was als Nächstes passiert",
+        description: "Hier ist, was Sie über die Abmeldung wissen müssen:",
+        immediate: {
+          title: "Sofortige Wirkung",
+          description: "Sie erhalten sofort keine Newsletter-E-Mails mehr.",
+        },
+        resubscribe: {
+          title: "Einfach wieder abonnieren",
+          description:
+            "Sie können jederzeit wieder abonnieren, wenn Sie Ihre Meinung ändern.",
+        },
+      },
+      alternatives: {
+        title: "Bevor Sie gehen",
+        description: "Erwägen Sie diese Alternativen:",
+        subscribe: "E-Mail-Häufigkeit anpassen",
+        contact: "Kontaktieren Sie uns mit Feedback",
+      },
+    },
+  },
   email: {
     label: "E-Mail-Adresse",
     description:

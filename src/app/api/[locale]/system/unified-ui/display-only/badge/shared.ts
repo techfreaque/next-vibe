@@ -5,61 +5,9 @@
 
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { BadgeVariant } from "next-vibe/ui/web/ui/badge";
-import type { BadgeEnumOption, BadgeWidgetSchema } from "./types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type z from "zod";
 
-/**
- * Processed badge data structure
- */
-export interface ProcessedBadge {
-  text: string;
-  variant: BadgeVariant;
-  icon?: IconKey;
-}
-
-/**
- * Extract and validate badge data
- */
-export function extractBadgeData(
-  value: z.output<BadgeWidgetSchema>,
-  context?: { t: (key: string) => string },
-): ProcessedBadge | null {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  if (typeof value === "string") {
-    const text = context ? context.t(value) : value;
-    return {
-      text,
-      variant: "outline",
-    };
-  }
-
-  if (typeof value === "number") {
-    return {
-      text: String(value),
-      variant: "outline",
-    };
-  }
-
-  if (typeof value === "object") {
-    const obj = value;
-    const text = obj.text ? (context ? context.t(obj.text) : obj.text) : "";
-    const variant = obj.variant || "outline";
-    const icon = obj.icon;
-
-    return {
-      text,
-      variant,
-      icon,
-    };
-  }
-
-  return null;
-}
+import type { BadgeEnumOption, BadgeWidgetSchema } from "./types";
 
 /**
  * Find matching enum option label for a value
@@ -76,25 +24,4 @@ export function findEnumLabel<TKey extends string>(
   }
 
   return null;
-}
-
-/**
- * Get color for badge variant (used in CLI rendering)
- */
-export function getBadgeColor(
-  variant: BadgeVariant,
-): "blue" | "dim" | "green" | "yellow" | "red" {
-  switch (variant) {
-    case "notification":
-      return "blue";
-    case "secondary":
-      return "green";
-    case "outline":
-      return "yellow";
-    case "destructive":
-      return "red";
-    case "default":
-    default:
-      return "dim";
-  }
 }

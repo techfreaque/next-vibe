@@ -39,17 +39,338 @@ const SRC_PREFIX = "src/";
 // Sentinel "package" name for any file not owned by a declared package root.
 const APP_PSEUDO_PACKAGE = "app";
 
-const SKIP_DIRS = new Set([
+// BLACKLIST, not whitelist: the scan walks the WHOLE PROJECT from cwd (so that
+// root-level config files like release.config.ts / build.config.ts / vibe-
+// deps.config.ts — which import types from src/ — count as importers and keep
+// those types from looking dead). Only genuinely-irrelevant trees are skipped.
+// Everything not listed IS scanned, including src/, scripts/, types/, root
+// *.config.ts.
+//
+// SKIP_DIRS_ANYWHERE: names that can never hold app source, safe to skip at any
+// depth (a `public/` build dir, `.git`, etc.). Kept minimal + unambiguous.
+const SKIP_DIRS_ANYWHERE = new Set([
   "node_modules",
   ".git",
   ".next",
+  ".next-prod",
   "dist",
   ".dist",
-  "generated",
+  // NOTE: "generated" is intentionally NOT skipped. Generated registries
+  // (route-handlers, tasks-index, seeds, endpoint) are how the framework loads
+  // route.ts / task.ts / definition.ts / seed files by convention — their
+  // imports are the ONLY thing that keeps those files from looking "dead". We
+  // scan generated as an IMPORTER source, but never propose a generated file
+  // itself as a move/dead candidate (see isGenerated).
   ".tmp",
   "todelete",
   "test-project",
+  ".vscode",
+  ".idea",
+  "coverage",
 ]);
+// SKIP_DIRS_ROOT_ONLY: names that ARE legitimate path segments deeper in the
+// tree (e.g. `user/public/`, an endpoint's `docs/`), so they must be skipped
+// ONLY when they sit directly at the project root. Skipping them anywhere would
+// wrongly drop real source subtrees (the bug this replaced: `public` matched
+// `user/public/**`, hiding login/signup and their call sites → false deads).
+const SKIP_DIRS_ROOT_ONLY = new Set([
+  "docs",
+  "public",
+  "k8s",
+  "memory",
+  "false",
+  "drizzle", // SQL migrations + meta journal, not TS importers of src
+]);
+// Retained for the test-file scan (which uses its own skip logic below).
+const SKIP_DIRS = SKIP_DIRS_ANYWHERE;
+
+/** Generated output — counts as an importer, never itself a candidate. */
+function isGenerated(key: string): boolean {
+  return key.includes("/generated/") || key.startsWith("src/generated/");
+}
+
+/**
+ * Framework entrypoints — loaded by CONVENTION (Next.js file-based routing or
+ * the generated endpoint/route registry), not by a static import. A `route.ts`
+ * / `page.tsx` at an app path is the framework's entry for that URL; "0 static
+ * importers" is expected and does NOT mean dead. (This is not hiding: the file's
+ * whole purpose is to be discovered by location.) Their exported symbols are
+ * still checked for dead-symbol.
+ */
+function isFrameworkEntrypoint(key: string): boolean {
+  const base = key.slice(key.lastIndexOf("/") + 1);
+  return (
+    base === "route.ts" ||
+    base === "route.tsx" ||
+    base === "page.tsx" ||
+    base === "layout.tsx"
+  );
+}
+
+/**
+ * Precise entrypoint rules — a file is loaded by a KNOWN framework/tool
+ * mechanism (not a static import), so "0 importers" is expected and does NOT
+ * mean dead. Each rule maps to one concrete loader; no fuzzy string matching
+ * (that would false-negative real dead code). system-relative path (no ext).
+ */
+const SYSTEM_PREFIX = "src/app/api/[locale]/system/";
+function isKnownEntrypoint(key: string): boolean {
+  const sysRel = key.startsWith(SYSTEM_PREFIX)
+    ? key.slice(SYSTEM_PREFIX.length).replace(/\.(tsx?)$/, "")
+    : key.replace(/\.(tsx?)$/, "");
+  return (
+    // Compile-time TYPE-ASSERTION files — exhaustive checks / cross-platform
+    // parity tests. They exist only to fail `tsc` if a contract drifts; nothing
+    // imports them (that IS the point). Names: *.exhaustive-check, *index-test*,
+    // *_index-test*, *-test-only.
+    /(exhaustive-check|index-test|_index-test|-test-only|_index-tests)$/.test(
+      sysRel,
+    ) ||
+    // oxlint JS plugins — loaded by oxlint via check.config.ts jsPlugins paths.
+    /^tooling\/check\/oxlint\/plugins\/[^/]+\/src\/index$/.test(sysRel) ||
+    // ANY *.config file — consumed by its tool/runtime, never imported. Covers
+    // every root-level config (build/check/vite/drizzle/release/vibe-deps/next/
+    // …) without needing to enumerate each; new configs are entrypoints too.
+    /(^|\/)[a-z0-9.-]+\.config$/.test(sysRel) ||
+    // Root-level ambient type decls (global.d.ts, next-env.d.ts, *-env.d.ts) —
+    // picked up by tsconfig, never imported.
+    /(^|\/)[a-z0-9.-]*\.d$/.test(sysRel) ||
+    // Electron bundle entrypoints — `bun build …/main.ts|preload.ts`.
+    /^platforms\/electron\/(main|preload)$/.test(sysRel) ||
+    // Vibe-frame browser bundles — build.config.ts inputs (embed script tags).
+    /^platforms\/vibe-frame\/(embed|embed-package|inside-bridge)$/.test(
+      sysRel,
+    ) ||
+    // The CLI runtime entry — invoked as the `vibe` bin, not imported.
+    sysRel === "platforms/cli/vibe-runtime" ||
+    // Launchpad + guard standalone scripts — spawned as processes.
+    /^tooling\/launchpad\/src\/(index|scripts\/)/.test(sysRel) ||
+    // Test fixtures — inputs for the builder's own tests, not app code.
+    sysRel.includes("/test-files/") ||
+    sysRel.includes("/testing/testing-suite/")
+  );
+}
+
+/**
+ * Platform UI mirror: files under system/ui/{cli,native,tanstack} are the
+ * per-platform mirrors of system/ui/web/**, swapped in by the cli-widget-plugin
+ * / bundler resolution (`next-vibe/ui/web/... → ui/cli/...`). They are never
+ * imported directly, so they always show 0 importers — but a mirror is alive
+ * iff its `ui/web/**` counterpart (same relative path) exists (the base the
+ * plugin swaps). A mirror with NO web base is genuinely dead / native-only and
+ * stays flagged (not hidden). Precise, not a blanket ignore.
+ */
+const UI_MIRROR_RE =
+  /(src\/app\/api\/\[locale\]\/system\/ui\/)(cli|native|tanstack)\/(.+)$/;
+function isUiMirrorWithWebBase(key: string): boolean {
+  const m = UI_MIRROR_RE.exec(key);
+  if (!m) {
+    return false;
+  }
+  const webRel = `${m[1]}web/${m[3]}`.replace(/\.(tsx?)$/, "");
+  return (
+    existsSync(join(PROJECT_ROOT, `${webRel}.ts`)) ||
+    existsSync(join(PROJECT_ROOT, `${webRel}.tsx`))
+  );
+}
+
+/**
+ * Collect files referenced by BUILD CONFIGS as real `src/….ts` paths: bundle
+ * `input:`s AND `moduleAliases`/alias-stub values. A build.config only names
+ * real build files, so ANY `"src/….ts"` literal in one is a genuine entrypoint/
+ * stub — not imported, not dead. Also picks up the tsconfig `server-only` alias
+ * stub. Precise (only build.config.ts + tsconfig*.json), no fuzzy matching.
+ */
+const SRC_PATH_LITERAL_RE = /["'](src\/[^"']+\.tsx?)["']/g;
+function collectBuildInputs(sources: ReadonlyMap<string, string>): Set<string> {
+  const inputs = new Set<string>();
+  const addFrom = (src: string): void => {
+    let m: RegExpExecArray | null;
+    SRC_PATH_LITERAL_RE.lastIndex = 0;
+    while ((m = SRC_PATH_LITERAL_RE.exec(src)) !== null) {
+      inputs.add(toPosixPath(m[1]!));
+    }
+  };
+  for (const [key, src] of sources) {
+    if (key.endsWith("build.config.ts")) {
+      addFrom(src);
+    }
+  }
+  // Config files outside src/ (not in the scanned graph) — read them directly.
+  for (const cfg of [
+    "build.config.ts",
+    "tsconfig.json",
+    "tsconfig.tanstack.json",
+  ]) {
+    const p = join(PROJECT_ROOT, cfg);
+    if (existsSync(p)) {
+      // tsconfig paths use "./src/…"; normalize the leading "./".
+      addFrom(readFileSync(p, "utf8").replace(/["']\.\/src\//g, '"src/'));
+    }
+  }
+  return inputs;
+}
+
+/**
+ * Files pulled in via `import * as X from "…"`. Every export of such a file is
+ * reachable through the namespace (spread into drizzle(schema), re-exported,
+ * etc.) but its individual names never appear in other files — so the
+ * symbol-name usage index misses them. We treat ALL exports of a
+ * namespace-imported file as used (no per-symbol dead check). Returns graph
+ * keys. Resolution reuses resolveImport + the graph's own path lookup.
+ */
+const NAMESPACE_IMPORT_RE = /import\s+\*\s+as\s+\w+\s+from\s+['"]([^'"]+)['"]/g;
+function collectNamespaceImported(
+  sources: ReadonlyMap<string, string>,
+  graphKeys: ReadonlySet<string>,
+): Set<string> {
+  const result = new Set<string>();
+  const resolveToKey = (spec: string, importerKey: string): string | null => {
+    const resolved = resolveImport(spec, join(PROJECT_ROOT, importerKey));
+    if (!resolved) {
+      return null;
+    }
+    for (const cand of [
+      resolved,
+      `${resolved}.ts`,
+      `${resolved}.tsx`,
+      `${resolved}/index.ts`,
+      `${resolved}/index.tsx`,
+    ]) {
+      if (graphKeys.has(cand)) {
+        return cand;
+      }
+    }
+    return null;
+  };
+  for (const [importerKey, src] of sources) {
+    let m: RegExpExecArray | null;
+    NAMESPACE_IMPORT_RE.lastIndex = 0;
+    while ((m = NAMESPACE_IMPORT_RE.exec(src)) !== null) {
+      const key = resolveToKey(m[1]!, importerKey);
+      if (key) {
+        result.add(key);
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Framework-convention export that ships as a SET — flagging one member as dead
+ * is noise (removing it breaks the contract's consistency). Matched by precise
+ * name shape + location, never fuzzy:
+ *   - route handlers: POST/GET/PUT/PATCH/DELETE/default (loaded by the registry)
+ *   - createEndpoint type quad: <Name>{Request,Response}{Input,Output},
+ *     <Name>UrlVariables{Input,Output}, <Name>{Request,Response}Data
+ *   - i18n index contract (files under i18n/): <Name>TranslationKey and the
+ *     `T`-suffixed scoped-translation alias (e.g. GeneratorsGenerateAllT)
+ */
+function isFrameworkBoilerplateSymbol(sym: SymbolDef, file: string): boolean {
+  const n = sym.name;
+  if (
+    n === "POST" ||
+    n === "GET" ||
+    n === "PUT" ||
+    n === "PATCH" ||
+    n === "DELETE" ||
+    n === "default"
+  ) {
+    return true;
+  }
+  // Endpoint type-quad: the halves ship together; only Output is usually read.
+  if (
+    /(?:Request|Response)(?:Input|Output)$/.test(n) ||
+    /UrlVariables(?:Input|Output)$/.test(n) ||
+    /(?:Request|Response)Data$/.test(n)
+  ) {
+    return true;
+  }
+  // i18n contract exports, only inside an i18n/ tree.
+  if (file.includes("/i18n/")) {
+    if (n.endsWith("TranslationKey") || /[A-Z]\w*T$/.test(n)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Build the set of identifier words mentioned across ALL test/fixture files.
+ * A symbol whose only reference is here is `test-only`, not dead. Scanned once,
+ * lazily (the test files aren't in the main graph).
+ */
+function collectTestWords(): Set<string> {
+  const words = new Set<string>();
+  const WORD = /[A-Za-z_]\w*/g;
+  // Also index `Owner.method` member expressions so a static method referenced
+  // by tests (via its qualified name) is recognised — the bare method word alone
+  // collides with common names (`run`/`stop`/`execute`) and would over-match.
+  const MEMBER = /([A-Z][A-Za-z0-9_]*)\.([A-Za-z_]\w*)/g;
+  for (const f of scanTestFiles(SRC_ROOT)) {
+    let src: string;
+    try {
+      src = readFileSync(f, "utf8");
+    } catch {
+      continue;
+    }
+    let m: RegExpExecArray | null;
+    WORD.lastIndex = 0;
+    while ((m = WORD.exec(src)) !== null) {
+      words.add(m[0]);
+    }
+    MEMBER.lastIndex = 0;
+    while ((m = MEMBER.exec(src)) !== null) {
+      words.add(`${m[1]}.${m[2]}`);
+    }
+  }
+  return words;
+}
+
+/** Count whole-word occurrences of `name` in `src`. */
+function countOccurrences(src: string, name: string): number {
+  const re = new RegExp(
+    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    "g",
+  );
+  return (src.match(re) ?? []).length;
+}
+
+/** 1-based line numbers where whole-word `name` occurs in `src`. */
+function occurrenceLines(src: string, name: string): number[] {
+  const re = new RegExp(
+    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    "g",
+  );
+  const lines: number[] = [];
+  const rows = src.split("\n");
+  for (let i = 0; i < rows.length; i++) {
+    re.lastIndex = 0;
+    if (re.test(rows[i] ?? "")) {
+      lines.push(i + 1);
+    }
+  }
+  return lines;
+}
+
+/** Platform-override suffixes the bundler swaps in for the base module. */
+const PLATFORM_VARIANT_RE = /\.(native|cli|web|ios|android)\.(tsx?)$/;
+
+/**
+ * A platform variant like `X.native.ts` / `X.cli.tsx` is resolved by the
+ * bundler when `./X` is imported in that platform — it is NEVER statically
+ * imported, so it always shows 0 importers. It is legitimately "used" iff its
+ * base sibling `X.ts`/`X.tsx` exists (the module the bundler swaps). Only a
+ * variant with NO base sibling is genuinely dead.
+ */
+function isPlatformVariantWithBase(key: string): boolean {
+  const m = PLATFORM_VARIANT_RE.exec(key);
+  if (!m) {
+    return false;
+  }
+  const base = join(PROJECT_ROOT, key.replace(PLATFORM_VARIANT_RE, ""));
+  return existsSync(`${base}.ts`) || existsSync(`${base}.tsx`);
+}
 
 const SKIP_FILE_SUFFIXES = [
   ".test.ts",
@@ -77,16 +398,60 @@ function scanTsFiles(dir: string, results: string[] = []): string[] {
   if (!existsSync(dir)) {
     return results;
   }
+  // Root-only skips (public/, docs/, drizzle/, …) apply just at the project
+  // root; deeper, those same names are real source segments (user/public/**).
+  const atProjectRoot = toPosixPath(dir) === toPosixPath(PROJECT_ROOT);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) {
-        scanTsFiles(join(dir, entry.name), results);
+      if (SKIP_DIRS_ANYWHERE.has(entry.name)) {
+        continue;
       }
+      if (atProjectRoot && SKIP_DIRS_ROOT_ONLY.has(entry.name)) {
+        continue;
+      }
+      scanTsFiles(join(dir, entry.name), results);
     } else if (entry.isFile()) {
       const name = entry.name;
       if (
         (name.endsWith(".ts") || name.endsWith(".tsx")) &&
         !SKIP_FILE_SUFFIXES.some((s) => name.endsWith(s))
+      ) {
+        results.push(toPosixPath(join(dir, name)));
+      }
+    }
+  }
+  return results;
+}
+
+const TEST_SUFFIX_RE = /\.(test|spec)\.(tsx?)$/;
+/**
+ * Scan ONLY the test/spec files (which the main graph skips). Used to build a
+ * separate test-usage index: a symbol referenced solely by tests is not dead —
+ * it is `test-only` (its export exists to be tested). `test-project/` fixtures
+ * are also scanned (they exercise the checker). Returns absolute-ish paths.
+ */
+function scanTestFiles(dir: string, results: string[] = []): string[] {
+  if (!existsSync(dir)) {
+    return results;
+  }
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      // Same skips as the main scan, EXCEPT keep test-project (its check.config
+      // + fixtures reference real symbols) — only truly-irrelevant dirs drop.
+      if (
+        !SKIP_DIRS.has(entry.name) ||
+        entry.name === "test-project" ||
+        entry.name === "test-files"
+      ) {
+        scanTestFiles(join(dir, entry.name), results);
+      }
+    } else if (entry.isFile()) {
+      const name = entry.name;
+      if (
+        TEST_SUFFIX_RE.test(name) ||
+        // test-project's check.config.ts + fixtures aren't *.test but exercise
+        // real exports; include any .ts/.tsx under a test-project/ path.
+        (dir.includes("/test-project") && /\.(tsx?)$/.test(name))
       ) {
         results.push(toPosixPath(join(dir, name)));
       }
@@ -148,8 +513,27 @@ function resolveImport(
   return null;
 }
 
-const IMPORT_RE =
-  /(?:(?:import|export)\s+(?:type\s+)?[\s\S]*?from\s+|require\s*\(\s*|import\s*\(\s*)['"]([^'"]+)['"]/g;
+// After `import(` / `require(`, allow whitespace AND inline block comments
+// (e.g. `import(/* turbopackIgnore: true */ "…")`) before the specifier — the
+// generated route-handlers use these, and missing them makes every route.ts
+// loaded via the registry look dead.
+const COMMENTS_WS = String.raw`(?:\s|/\*[^]*?\*/)*`;
+// Five import shapes. Order matters: the bare/dynamic forms (specifier directly
+// after the keyword) MUST be tried before the `from`-based form, whose
+// `[\s\S]*?from` would otherwise swallow a bare `import "x"` line by scanning
+// forward to the next statement's `from`.
+//   import "…"                                 (side-effect / bare — NO `from`)
+//   require("…")  /  import("…")               (dynamic, may have inline comments)
+//   import X from "…"  /  export … from "…"   (named/default, has `from`)
+const IMPORT_RE = new RegExp(
+  String.raw`(?:` +
+    String.raw`import\s+(?=['"])` + // bare side-effect: `import "x"`
+    String.raw`|require\s*\(${COMMENTS_WS}` +
+    String.raw`|import\s*\(${COMMENTS_WS}` +
+    String.raw`|(?:import|export)\s+(?:type\s+)?[^;'"]*?from\s+` +
+    String.raw`)['"]([^'"]+)['"]`,
+  "g",
+);
 
 function extractImports(source: string): string[] {
   const found = new Set<string>();
@@ -168,6 +552,13 @@ function toGraphKey(absPath: string): string {
   const srcPrefix = `${toPosixPath(SRC_ROOT)}/`;
   if (absPath.startsWith(srcPrefix)) {
     return SRC_PREFIX + absPath.slice(srcPrefix.length);
+  }
+  // Project files outside src/ (root-level *.config.ts, scripts/, types/, …):
+  // key = path relative to PROJECT_ROOT (e.g. "release.config.ts"), so they
+  // participate in the graph as importers with a stable, non-absolute key.
+  const rootPrefix = `${toPosixPath(PROJECT_ROOT)}/`;
+  if (absPath.startsWith(rootPrefix)) {
+    return absPath.slice(rootPrefix.length);
   }
   return absPath;
 }
@@ -780,7 +1171,7 @@ function buildNeedsMove(
   const promote: DepsEntry[] = [];
 
   for (const key of graph.keys()) {
-    if (isSelf(key)) {
+    if (isSelf(key) || isGenerated(key)) {
       continue;
     }
     if (scope && !key.includes(scope)) {
@@ -910,12 +1301,23 @@ function buildUnusedSymbols(
   graph: Graph,
   onlyScope: string | undefined,
   includeSingleUse: boolean,
+  buildInputs: ReadonlySet<string>,
+  namespaceImported: ReadonlySet<string>,
+  testWords: ReadonlySet<string>,
 ): DepsEntry[] {
   const index = buildUsageIndex(sources);
   const entries: DepsEntry[] = [];
 
   for (const [file, src] of sources) {
-    if (isSelf(file)) {
+    if (
+      isSelf(file) ||
+      isGenerated(file) ||
+      isPlatformVariantWithBase(file) ||
+      isUiMirrorWithWebBase(file) ||
+      // Namespace-imported (`import * as X`) → every export reachable via the
+      // namespace; the per-symbol name-usage index can't see those, so skip.
+      namespaceImported.has(file)
+    ) {
       continue;
     }
     if (onlyScope && !file.includes(onlyScope)) {
@@ -923,25 +1325,87 @@ function buildUnusedSymbols(
     }
     const symbols: SymbolDef[] = extractSymbols(file, src);
     for (const sym of symbols) {
-      // Skip endpoint-boilerplate exports that the framework wires by convention
-      // (route handlers, definitions) — they look "unused" but are loaded dynamically.
-      if (sym.name === "POST" || sym.name === "GET" || sym.name === "default") {
+      // Skip framework-CONVENTION exports that always ship as a set even when
+      // only part is consumed — flagging them is noise, and removing one breaks
+      // the contract's consistency. Precise name/location patterns, not fuzzy:
+      //   • route handlers          POST / GET / PUT / PATCH / DELETE / default
+      //   • createEndpoint type quad *RequestInput/Output, *ResponseInput/Output,
+      //                              *UrlVariables*, *RequestData, *ResponseData
+      //   • i18n index contract      *TranslationKey and the `T` alias, in i18n/
+      if (isFrameworkBoilerplateSymbol(sym, file)) {
         continue;
       }
       const usage = usageFor(sym, index);
       const threshold = includeSingleUse ? 1 : 0;
       if (usage.usageCount <= threshold) {
+        // Distinguish TRULY dead (no reference anywhere) from EXPORTED-BUT-ONLY-
+        // USED-IN-ITS-OWN-FILE. The latter isn't dead — it's referenced locally,
+        // it just shouldn't carry `export`. Different fix (drop the modifier),
+        // so a different finding. Count in-file name occurrences beyond the
+        // declaration; >0 ⇒ internal-only.
+        // Match on the QUALIFIED name for static methods (`Owner.method`), never
+        // the bare method name — a bare `run`/`stop`/`execute` collides with the
+        // same word in unrelated files and would spuriously read as test-used or
+        // in-file-used. Free functions/consts/types use their plain name.
+        const refName =
+          sym.kind === "static-method" && sym.owner
+            ? `${sym.owner}.${sym.name}`
+            : sym.name;
+        // A test/fixture references it (tests are skipped from the graph). The
+        // export is REACHED — dropping it would break the test import — so this
+        // is NEVER `unexport`. It's `test-only`: the export exists to be tested
+        // (legit coverage, or dead-code-with-a-test). Checked first so it wins.
+        const testReferenced = usage.usageCount === 0 && testWords.has(refName);
+        // Subtract the declaration only when the ref-name appears AT the decl.
+        // Free fn/const/type: the decl line contains the name → subtract 1.
+        // Static method: refName is the QUALIFIED `Owner.method`, but the decl
+        // reads `static method(` (unqualified) — the qualified string never
+        // appears there, so every hit is a real in-file call → subtract 0.
+        const declHit = sym.kind === "static-method" ? 0 : 1;
+        const inFileHits = countOccurrences(src, refName) - declHit;
+        // Used only in its OWN file (and not by any test) → drop `export`.
+        const internalOnly =
+          usage.usageCount === 0 && !testReferenced && inFileHits > 0;
+        const testOnly = testReferenced;
+        // A static method can only "drop export" by becoming `private`, which
+        // compiles ONLY if every same-file reference sits inside the owning
+        // class body. If the sole caller is a sibling module-level wrapper
+        // (outside the class), `private` won't compile — the real fix is to
+        // inline that wrapper, a different action. Distinguish the two so the
+        // note is honest and actionable rather than a compile-breaking suggestion.
+        const body = sym.ownerBody;
+        const staticExtraClass =
+          internalOnly &&
+          sym.kind === "static-method" &&
+          body !== undefined &&
+          occurrenceLines(src, refName).some((l) => l < body[0] || l > body[1]);
+        const status = testOnly
+          ? "test-only"
+          : staticExtraClass
+            ? "inline-wrapper"
+            : internalOnly
+              ? "unexport"
+              : null;
         entries.push({
           path: file,
           imports: [],
           importedBy: usage.usedInFiles,
           importCount: 0,
           importedByCount: usage.usageCount,
-          isUnused: usage.usageCount === 0,
+          isUnused: usage.usageCount === 0 && !internalOnly && !testOnly,
           symbol: sym.name,
-          symbolKind: sym.kind,
+          symbolKind: status ? `${sym.kind} (${status})` : sym.kind,
           symbolOwner: sym.owner,
           offenders: usage.usedInFiles,
+          moveNote: staticExtraClass
+            ? "only caller is a same-file sibling — inline the wrapper (`private` won't compile)"
+            : internalOnly
+              ? sym.kind === "static-method"
+                ? "called only inside its own class — make `private`"
+                : "used only in its own file — drop `export`"
+              : testOnly
+                ? "used only by tests — keep-for-coverage or remove source+test"
+                : undefined,
         });
       }
     }
@@ -949,7 +1413,16 @@ function buildUnusedSymbols(
 
   // Dead files (zero importers) within scope, as their own entries.
   for (const [key, node] of graph) {
-    if (isSelf(key) || node.importedBy.size !== 0) {
+    if (
+      isSelf(key) ||
+      isGenerated(key) ||
+      isPlatformVariantWithBase(key) ||
+      isUiMirrorWithWebBase(key) ||
+      isFrameworkEntrypoint(key) ||
+      isKnownEntrypoint(key) ||
+      buildInputs.has(key) ||
+      node.importedBy.size !== 0
+    ) {
       continue;
     }
     if (onlyScope && !key.includes(onlyScope)) {
@@ -974,6 +1447,70 @@ function buildUnusedSymbols(
       : a.path.localeCompare(b.path),
   );
   return entries;
+}
+
+// ============================================================
+// Lens: report — the all-in-one prioritized TODO list
+// ============================================================
+
+/**
+ * The single default view: every actionable finding across ALL lenses, grouped
+ * into ordered TODO sections you can work top-down. Each section is a
+ * PackageGroup (title + count + entries). Sections, in priority order:
+ *
+ *   1. COLOCATE   — file used from one folder, lives elsewhere → move next to it.
+ *   2. PROMOTE    — shared across N domains → lift into a framework primitive.
+ *   3. DEAD FILE  — zero importers (whole file unused).
+ *   4. DEAD SYMBOL— exported symbol/static method nothing references.
+ *
+ * `scope` restricts which files are judged (default system/); importers are read
+ * from the full graph. `ignorePrefixes` = settled areas, never proposed to move.
+ */
+function buildReport(
+  graph: Graph,
+  sources: ReadonlyMap<string, string>,
+  scope: string,
+  ignorePrefixes: ReadonlyArray<string>,
+  perSection: number,
+): PackageGroup[] {
+  const moves = buildNeedsMove(graph, scope, ignorePrefixes, 10_000);
+  const colocate = moves.filter((e) => e.moveKind === "reorganize");
+  const promote = moves.filter((e) => e.moveKind === "relocate");
+
+  // Dead files + dead symbols (0-use only; single-use is noisier, left to the
+  // dedicated mode). Split whole-file deaths from symbol deaths.
+  const buildInputs = collectBuildInputs(sources);
+  const nsImported = collectNamespaceImported(sources, new Set(graph.keys()));
+  const testWords = collectTestWords();
+  const dead = buildUnusedSymbols(
+    sources,
+    graph,
+    scope || undefined,
+    false,
+    buildInputs,
+    nsImported,
+    testWords,
+  );
+  const deadFiles = dead.filter((e) => e.symbolKind === "file");
+  const deadSymbols = dead.filter((e) => e.symbolKind !== "file");
+
+  const sections: PackageGroup[] = [];
+  const add = (title: string, entries: DepsEntry[]): void => {
+    if (entries.length === 0) {
+      return;
+    }
+    sections.push({
+      package: `${title}  (${String(entries.length)})`,
+      violationCount: entries.length,
+      entries: entries.slice(0, perSection),
+    });
+  };
+
+  add("COLOCATE — used from one folder, move next to consumers", colocate);
+  add("PROMOTE — shared across domains, lift into vibe", promote);
+  add("DEAD FILE — zero importers", deadFiles);
+  add("DEAD SYMBOL — exported but never referenced", deadSymbols);
+  return sections;
 }
 
 function summarize(edges: BoundaryEdge[]): ViolationSummary {
@@ -1043,15 +1580,24 @@ export class VibeDepsRepository {
   ): Promise<ResponseType<VibeDepsResponseOutput>> {
     try {
       const { focus, mode, depth, limit, package: onlyPackage } = data;
+      const effectiveMode = mode ?? "report";
       const effectiveDepth = depth ?? 1;
       const effectiveLimit = limit ?? 100;
-      const view = mode ?? "files";
+      const view = effectiveMode;
 
-      // Scan all of src/. Capture sources only for symbol-level modes (reuses
-      // the single read pass instead of re-reading every file).
-      const needsSources = mode === "unused-symbols" || mode === "needs-move";
+      // Scan the WHOLE PROJECT (cwd), not just src/ — root-level config files
+      // (release.config.ts, build.config.ts, vibe-deps.config.ts, …) import
+      // types from src/ and must count as importers, or those types look dead.
+      // SKIP_DIRS blacklists the irrelevant trees. Capture sources only for
+      // symbol-level modes (reuses the single read pass instead of re-reading
+      // every file). `report` bundles the symbol-level dead-code lens, so it
+      // needs sources too.
+      const needsSources =
+        effectiveMode === "unused-symbols" ||
+        effectiveMode === "needs-move" ||
+        effectiveMode === "report";
       const sources = needsSources ? new Map<string, string>() : undefined;
-      const allFiles = scanTsFiles(SRC_ROOT);
+      const allFiles = scanTsFiles(PROJECT_ROOT);
       const graph = buildGraph(allFiles, sources);
 
       // Always write the full file-level dependencies.json
@@ -1068,19 +1614,43 @@ export class VibeDepsRepository {
         }
       }
 
-      // Relocation scope: which files the move/cross-domain lenses JUDGE.
-      // Importers are always read from the full graph, so a system file used
-      // from a domain still shows its true cross-domain spread. When a path is
-      // given (`vibe deps <path>`) we scope to it (normalized to a src-relative
-      // substring); otherwise default to system/ — the framework is the focus.
+      // Relocation scope: which files the move/dead lenses JUDGE. Importers are
+      // always read from the FULL graph (a file used from another area still
+      // shows its true cross-area spread). The scope respects ANY path given:
+      //   `vibe deps <path>`  → judge only files under that path
+      //   `vibe deps`         → whole project (empty scope = judge everything)
       const moveScope = focus
         ? toPosixPath(focus)
             .replace(/^.*?\/src\//, "src/")
             .replace(/\/+$/, "")
-        : "system/";
+        : "";
 
       const config = loadConfig(logger);
       const ignorePrefixes = (config.ignore ?? []).map((p) => toPosixPath(p));
+
+      // ── All-in-one TODO report (default) ────────────────────
+      if (effectiveMode === "report") {
+        const groups = buildReport(
+          graph,
+          sources ?? new Map(),
+          moveScope,
+          ignorePrefixes,
+          effectiveLimit,
+        );
+        const itemCount = groups.reduce((n, g) => n + g.violationCount, 0);
+        logger.info(
+          `vibe-deps: report — ${itemCount} findings across ${groups.length} sections`,
+        );
+        return success({
+          view,
+          entries: [],
+          groups,
+          violations: emptyViolations(),
+          totalFiles,
+          totalEdges,
+          unusedCount,
+        });
+      }
 
       // ── Reorg move-list ─────────────────────────────────────
       if (mode === "needs-move") {
@@ -1127,12 +1697,15 @@ export class VibeDepsRepository {
 
       // ── Unused public surface (dead exports + static methods + files) ──
       if (mode === "unused-symbols") {
-        const scope = focus ? toPosixPath(focus) : "system/";
+        const scope = focus ? toPosixPath(focus) : "";
         const entries = buildUnusedSymbols(
           sources!,
           graph,
           scope,
           /* includeSingleUse */ false,
+          collectBuildInputs(sources!),
+          collectNamespaceImported(sources!, new Set(graph.keys())),
+          collectTestWords(),
         ).slice(0, effectiveLimit);
         logger.info(
           `vibe-deps: unused-symbols — ${entries.length} dead symbols/files in ${scope}`,

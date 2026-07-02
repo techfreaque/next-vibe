@@ -15,12 +15,13 @@ import {
   useWidgetForm,
   useWidgetLocale,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { ReactElement } from "react";
+import type { z } from "zod";
+
 import type {
   CodeQualityFilesSchema,
   CodeQualityFilesWidgetConfig,
 } from "./types";
-import type { ReactElement } from "react";
-import type { z } from "zod";
 
 /**
  * Code Quality Files React Widget

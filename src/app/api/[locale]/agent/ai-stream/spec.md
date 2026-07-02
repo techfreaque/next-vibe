@@ -78,7 +78,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote direct** | Non-blocking HTTP. AI gets taskId immediately.                        |
 | **Remote queue**  | Task created. AI gets taskId immediately.                             |
 
-**Tool message**: created `pending`. On completion: backfilled with result, `TASK_COMPLETED` WS event. No revival. AI can upgrade by calling `await-task(taskId)`.
+**Tool message**: created `pending` and NEVER backfilled — the dispatch message permanently keeps `{taskId}` (detach's contract on every transport). On completion: `TASK_COMPLETED` WS event + thread-state reconcile; the result lives in task execution history. No revival. AI retrieves the result by calling `await-task(taskId)` (which upgrades the task to WAIT semantics).
 
 ---
 

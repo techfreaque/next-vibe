@@ -141,7 +141,7 @@ const config: BuildConfig = {
 
     // ── TanStack Start (SSR) ─────────────────────────────────────────────────
     // Full-stack SSR build using @tanstack/react-start + nitro.
-    // `input` = srcDirectory for tanstackStart plugin (src/app-tanstack).
+    // `input` = srcDirectory for tanstackStart plugin (src/generated/app-tanstack).
     // `output` = .dist-tanstack (Nitro outputs .dist-tanstack/server/index.mjs).
     {
       disabled: true,

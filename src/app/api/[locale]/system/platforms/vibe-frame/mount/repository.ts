@@ -29,18 +29,18 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  IntegrationRequest,
-  VibeFrameConfigRequestOutput,
-  VibeFrameConfigResponseOutput,
-  WidgetResponse,
-} from "./definition";
 import { scopedTranslation } from "next-vibe/platforms/vibe-frame/mount/i18n";
 
 import { envClient } from "@/config/env-client";
 
 import { frameExchangeTokens } from "../db";
 import { generateFrameId } from "../types";
+import type {
+  IntegrationRequest,
+  VibeFrameConfigRequestOutput,
+  VibeFrameConfigResponseOutput,
+  WidgetResponse,
+} from "./definition";
 
 // ─── Repository ──────────────────────────────────────────────────────────────
 

@@ -19,7 +19,6 @@ export const {
   CRON: "type.cron" as const,
   TASK_RUNNER: "type.task_runner" as const,
 });
-export const TaskTypeDB = [TaskType.CRON, TaskType.TASK_RUNNER] as const;
 
 /**
  * Task Priority Levels
@@ -266,38 +265,6 @@ export const PulseExecutionStatusDB = [
  */
 
 /**
- * Map priority filter to actual priorities
- */
-export function mapPriorityFilter(
-  filter: typeof CronTaskPriorityFilterValue,
-): Array<typeof CronTaskPriorityValue> {
-  switch (filter) {
-    case CronTaskPriorityFilter.ALL:
-      return Object.values(CronTaskPriority);
-    case CronTaskPriorityFilter.CRITICAL:
-      return [CronTaskPriority.CRITICAL];
-    case CronTaskPriorityFilter.HIGH:
-      return [CronTaskPriority.HIGH];
-    case CronTaskPriorityFilter.MEDIUM:
-      return [CronTaskPriority.MEDIUM];
-    case CronTaskPriorityFilter.LOW:
-      return [CronTaskPriority.LOW];
-    case CronTaskPriorityFilter.BACKGROUND:
-      return [CronTaskPriority.BACKGROUND];
-    case CronTaskPriorityFilter.HIGH_AND_ABOVE:
-      return [CronTaskPriority.CRITICAL, CronTaskPriority.HIGH];
-    case CronTaskPriorityFilter.MEDIUM_AND_ABOVE:
-      return [
-        CronTaskPriority.CRITICAL,
-        CronTaskPriority.HIGH,
-        CronTaskPriority.MEDIUM,
-      ];
-    default:
-      return Object.values(CronTaskPriority);
-  }
-}
-
-/**
  * Map status filter to actual statuses
  */
 export function mapStatusFilter(
@@ -353,36 +320,4 @@ export function getPriorityWeight(
     default:
       return 3; // Default to medium
   }
-}
-
-/**
- * Check if status indicates task is active/running
- */
-export function isActiveStatus(status: typeof CronTaskStatusValue): boolean {
-  const activeStatuses = [
-    CronTaskStatus.PENDING,
-    CronTaskStatus.RUNNING,
-    CronTaskStatus.SCHEDULED,
-  ] as const;
-  return (activeStatuses as readonly string[]).includes(status);
-}
-
-/**
- * Check if status indicates task failed
- */
-export function isFailureStatus(status: typeof CronTaskStatusValue): boolean {
-  const failureStatuses = [
-    CronTaskStatus.FAILED,
-    CronTaskStatus.TIMEOUT,
-    CronTaskStatus.ERROR,
-    CronTaskStatus.CANCELLED,
-  ] as const;
-  return (failureStatuses as readonly string[]).includes(status);
-}
-
-/**
- * Check if status indicates task completed successfully
- */
-export function isSuccessStatus(status: typeof CronTaskStatusValue): boolean {
-  return status === CronTaskStatus.COMPLETED;
 }

@@ -18,13 +18,14 @@ import {
   useWidgetLocale,
   useWidgetResponse,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { ReactElement } from "react";
+import { useMemo } from "react";
+import type { z } from "zod";
+
 import type {
   CodeQualityListSchema,
   CodeQualityListWidgetConfig,
 } from "./types";
-import type { ReactElement } from "react";
-import { useMemo } from "react";
-import type { z } from "zod";
 
 interface CodeQualityItem {
   file: string;

@@ -1,6 +1,8 @@
 "use client";
 
 import { useToast } from "next-vibe/ui/web/hooks/use-toast";
+import type { JSX } from "react";
+
 import {
   Toast,
   ToastClose,
@@ -9,7 +11,6 @@ import {
   ToastTitle,
   ToastViewport,
 } from "./toast";
-import type { JSX } from "react";
 
 export function Toaster(): JSX.Element {
   const { toasts } = useToast();

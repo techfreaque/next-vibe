@@ -13,7 +13,6 @@
  */
 
 import type { WidgetData } from "next-vibe/core/utils/json";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
 
 interface WithId {
   id: string | number;

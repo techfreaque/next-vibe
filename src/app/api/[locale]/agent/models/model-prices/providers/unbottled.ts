@@ -10,8 +10,8 @@
  *
  * NOTE: When unbottled.ai cloud is deployed, fetch live prices from:
  * GET /api/<locale>/agent/ai-stream/ws-provider/models on the cloud instance
- * (URL from UNBOTTLED_CLOUD_CREDENTIALS env, falls back to local).
- * Use the returned creditCost values instead of the computed markup.
+ * (resolve the instance via the system inference-provider connection, falling
+ * back to local). Use the returned creditCost values instead of computed markup.
  */
 
 import "server-only";

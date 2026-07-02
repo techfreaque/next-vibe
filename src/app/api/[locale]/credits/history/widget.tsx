@@ -16,7 +16,6 @@ import {
 import { PaginationWidget } from "next-vibe/unified-ui/containers/pagination/widget";
 
 import { CreditsTabHeader } from "../credits-tab-header";
-
 import type definition from "./definition";
 
 interface CustomWidgetProps {

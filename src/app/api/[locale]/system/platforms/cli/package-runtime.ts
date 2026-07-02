@@ -13,7 +13,7 @@
  */
 
 // Scoped endpoint registry - bundled at build time from the generated files
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { runCli } from "./run-cli";
 

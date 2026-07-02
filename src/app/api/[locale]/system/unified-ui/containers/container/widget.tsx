@@ -50,16 +50,17 @@ import {
   getTextSizeClassName,
   type LayoutConfig,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import type {
-  ContainerArrayWidgetConfig,
-  ContainerObjectWidgetConfig,
-  ContainerUnionWidgetConfig,
-} from "./types";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
+
+import type {
+  ContainerArrayWidgetConfig,
+  ContainerObjectWidgetConfig,
+  ContainerUnionWidgetConfig,
+} from "./types";
 
 /**
  * Container Widget - Displays container layouts with nested fields

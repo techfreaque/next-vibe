@@ -8,7 +8,7 @@ import "server-only";
 
 import type { WidgetData } from "next-vibe/core/utils/json";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 /**
  * Split flat merged args into urlPathParams + data using the endpoint's

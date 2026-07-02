@@ -24,6 +24,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { parseJsonWithComments } from "next-vibe/core/utils/parse-json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation } from "next-vibe/tooling/check/config/i18n";
+
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,

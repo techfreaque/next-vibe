@@ -20,13 +20,12 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/infra";
 import {
   type BridgeContext,
   ModalityResolver,
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
-import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { getEnvAvailability } from "../env-availability";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import {
   chatFavorites,
@@ -36,6 +35,7 @@ import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 
+import { getEnvAvailability } from "../env-availability";
 import type {
   DescribeVideoPostRequestOutput,
   DescribeVideoPostResponseOutput,

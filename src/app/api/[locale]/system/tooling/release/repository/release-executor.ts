@@ -24,6 +24,8 @@ import {
   formatWarning,
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+
 import type {
   GitInfo,
   GitOpsConfig,
@@ -36,8 +38,6 @@ import type {
   RequestType,
   Timings,
 } from "../definition";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
-
 import { assetZipper } from "./asset-zipper";
 import { changelogGenerator } from "./changelog-generator";
 import { ciDetector } from "./ci-detector";

@@ -73,6 +73,7 @@ const { POST } = createEndpoint({
         description: "fields.mode.description",
         columns: 4,
         options: [
+          { value: "report", label: "mode.report" },
           { value: "files", label: "mode.files" },
           { value: "categories", label: "mode.categories" },
           { value: "unused", label: "mode.unused" },
@@ -86,6 +87,7 @@ const { POST } = createEndpoint({
         ],
         schema: z
           .enum([
+            "report",
             "files",
             "categories",
             "unused",
@@ -97,7 +99,7 @@ const { POST } = createEndpoint({
             "unused-symbols",
             "cross-domain",
           ])
-          .default("files"),
+          .default("report"),
       }),
 
       package: requestField(scopedTranslation, {
@@ -132,6 +134,7 @@ const { POST } = createEndpoint({
       view: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.enum([
+          "report",
           "files",
           "categories",
           "unused",
@@ -276,6 +279,30 @@ const { POST } = createEndpoint({
                   offenders: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     schema: z.array(z.string()).optional(),
+                  }),
+                  moveTo: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string().optional(),
+                  }),
+                  moveNote: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string().optional(),
+                  }),
+                  moveKind: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.enum(["reorganize", "relocate"]).optional(),
+                  }),
+                  symbol: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string().optional(),
+                  }),
+                  symbolKind: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string().optional(),
+                  }),
+                  symbolOwner: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string().optional(),
                   }),
                 },
               }),

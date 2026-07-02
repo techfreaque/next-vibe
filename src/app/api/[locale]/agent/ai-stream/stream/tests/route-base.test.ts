@@ -1158,12 +1158,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     const suiteRootFolderId: DefaultFolderId =
       cfg.rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
 
-    // True when the AI loop runs ON the remote instance (direct-http relay,
-    // UNBOTTLED/reverse-ws relay, or REMOTE-folder routing). In those modes the
-    // remote user's wallet is billed — NOT the local testUser — so local-wallet
-    // deduction assertions are meaningless (the local balance may even rise from
-    // a sync/refund artifact). `assertDeductedLocal` therefore no-ops in remote
-    // mode; only the regular (local-loop) contexts assert local deductions.
+    // True when the AI loop runs ON the remote instance (UNBOTTLED/relay or
+    // REMOTE-folder routing). In those modes the remote user's wallet is billed
+    // for the loop — NOT the local testUser — so local-wallet deduction
+    // assertions are meaningless (the local balance may even rise from a
+    // sync/refund artifact). `assertDeductedLocal` therefore no-ops in remote
+    // mode. NOTE: assertSystemPromptFromLocal does NOT imply a remote loop —
+    // the tools-remote contexts (loop LOCAL, tools via execute-tool→hermes)
+    // set it and their loop bills locally, which MUST be asserted.
     const loopRunsRemote =
       cfg.assertSystemPromptFromLocal === true ||
       cfg.assertRelayRan === true ||

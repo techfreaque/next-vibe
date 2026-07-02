@@ -18,7 +18,6 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { type JSX } from "react";
 
 import { InvoiceStatus } from "../enum";
-
 import type definition from "./definition";
 import type { PaymentDashboardResponseOutput } from "./definition";
 

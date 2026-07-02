@@ -561,13 +561,6 @@ export function isVibeFrameMessage(
   );
 }
 
-/** Check if a message is parent-to-frame (no frameId in the type union sense) */
-export function isParentMessage(
-  msg: BridgeMessage,
-): msg is ParentToFrameMessage {
-  return !("frameId" in msg);
-}
-
 /** Check if a message is frame-to-parent */
 export function isFrameMessage(
   msg: BridgeMessage,

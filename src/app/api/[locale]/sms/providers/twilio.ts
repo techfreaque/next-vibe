@@ -160,6 +160,7 @@ export function getTwilioProvider(): SmsProvider {
         }
 
         // Make the API request
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(baseUrl, {
           method: "POST",
           headers,

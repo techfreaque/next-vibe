@@ -75,7 +75,6 @@ import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/
 import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/skills/[id]/i18n";
 import { ModelGroup } from "@/app/api/[locale]/agent/skills/[id]/widget";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import { getBestChatModelForFavorite } from "./definition";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
@@ -128,6 +127,7 @@ import { useSkill } from "../../[id]/hooks";
 import { SkillVoteButtons } from "../../[id]/vote/vote-buttons";
 import { ModelSelectionType, SkillOwnershipType } from "../../enum";
 import definitionPatch from "./definition";
+import { getBestChatModelForFavorite } from "./definition";
 
 /**
  * Props for PATCH custom widget

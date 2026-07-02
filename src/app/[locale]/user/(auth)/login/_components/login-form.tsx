@@ -1,6 +1,6 @@
 "use client";
 
-import { getCookie } from "next-vibe/ui/web/lib/cookies";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { assignUrl } from "next-vibe/ui/web/lib/location";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
@@ -17,11 +17,8 @@ import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
 import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
-import {
-  CSRF_TOKEN_COOKIE_NAME,
-  CSRF_TOKEN_HEADER_NAME,
-} from "@/config/constants";
 import { envClient } from "@/config/env-client";
+import { useLogger } from "@/hooks/use-logger";
 
 interface LoginFormProps {
   locale: CountryLanguage;
@@ -39,6 +36,7 @@ function DevQuickLogin({
   callbackUrl,
   devSeedPassword,
   devSeedUsers,
+  user,
 }: {
   locale: CountryLanguage;
   callbackUrl?: string;

@@ -13,21 +13,17 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import {
-  ErrorResponseTypes,
-  fail,
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 
-import type { RemoteConnectionByIdT } from "./[instanceId]/i18n";
 import type {
   ConnectionHealth,
   RemoteToolCapability,

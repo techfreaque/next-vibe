@@ -12,8 +12,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { pathToAliasMap } from "@/generated/alias-map";
-import { getEndpoint } from "@/generated/endpoint";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 export interface SerializableToolMetadata {
   name: string;
@@ -115,10 +115,6 @@ async function getEndpointWithRetry(
     return null;
   }
 }
-
-export type GetAllDefinitionsFn = (
-  logger: EndpointLogger,
-) => Promise<CreateApiEndpointAny[]>;
 
 export class DefinitionsRegistry implements IDefinitionsRegistry {
   private toolsCache = new Map<string, ToolsCacheEntry>();

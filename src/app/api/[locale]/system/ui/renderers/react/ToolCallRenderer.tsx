@@ -63,7 +63,7 @@ import { useForm } from "react-hook-form";
 
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import { pathToAliasMap } from "@/generated/alias-map";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 import { EndpointRenderer } from "./EndpointRenderer";
 import { EndpointsPage } from "./EndpointsPage";

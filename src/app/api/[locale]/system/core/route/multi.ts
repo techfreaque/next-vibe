@@ -3,7 +3,6 @@ import "server-only";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
 import type { NextHandlerReturnType } from "next-vibe/platforms/next-api/handler";
 import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bridge/registry";
 /**
@@ -12,6 +11,7 @@ import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bri
  */
 import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
 
+import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
 import type { ResponseType } from "./response.schema";
 import { endpointHandler } from "./single";
 

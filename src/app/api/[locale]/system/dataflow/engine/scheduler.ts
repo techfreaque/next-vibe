@@ -12,8 +12,8 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
-import { getLatestRun } from "next-vibe/dataflow/store/runs";
 import { db } from "next-vibe/database";
+import { getLatestRun } from "next-vibe/dataflow/store/runs";
 import { maybeColorize, semantic } from "next-vibe/logger/colors";
 import { formatDuration, formatSense } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";

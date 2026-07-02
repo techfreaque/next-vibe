@@ -18,10 +18,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CronBulkRequestOutput,
-  CronBulkResponseOutput,
-} from "./definition";
 import type { CronBulkT } from "next-vibe/tasks/cron/bulk/i18n";
 import { scopedTranslation as executeTranslation } from "next-vibe/tasks/execute/i18n";
 import { TaskExecuteRepository } from "next-vibe/tasks/execute/repository";
@@ -29,6 +25,10 @@ import { TaskExecuteRepository } from "next-vibe/tasks/execute/repository";
 import type { TaskOwner } from "../db";
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { createTaskEmitters } from "../emitter";
+import type {
+  CronBulkRequestOutput,
+  CronBulkResponseOutput,
+} from "./definition";
 
 export class CronBulkRepository {
   static async executeBulkAction(

@@ -1,10 +1,11 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 import { Text, useFocus, useInput, useStdin } from "ink";
-import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type { SwitchRootProps } from "next-vibe/ui/web/ui/switch";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useRef } from "react";
+
+import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type { SwitchRootProps } from "next-vibe/ui/web/ui/switch";
 

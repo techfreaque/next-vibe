@@ -15,15 +15,15 @@
  */
 
 import type { WidgetData } from "next-vibe/core/utils/json";
+import type z from "zod";
+
+import type { UnifiedField } from "./configs";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
-import type z from "zod";
-
-import type { UnifiedField } from "./configs";
 
 // ============================================================================
 // WIDGET CONFIG TYPE GUARDS
@@ -126,26 +126,4 @@ export function hasChild<T extends { schemaType: SchemaTypes }>(
   value: WidgetData[];
 } {
   return field.schemaType === "array" || field.schemaType === "array-optional";
-}
-
-// ============================================================================
-// RUNTIME VALUE HELPERS
-// ============================================================================
-
-/**
- * Check if value is an array.
- */
-export function isArrayValue<T extends WidgetData>(
-  value: WidgetData,
-): value is T[] {
-  return Array.isArray(value);
-}
-
-/**
- * Check if value is a plain object (excludes arrays, primitives, null, undefined).
- */
-export function isObject(
-  value: WidgetData,
-): value is { [key: string]: WidgetData } {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

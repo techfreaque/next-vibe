@@ -39,8 +39,8 @@ import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/wid
 import React, { useCallback, useState } from "react";
 
 import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
-import { PayoutAction } from "../enum";
 
+import { PayoutAction } from "../enum";
 import type definition from "./definition";
 import type { ReferralsGetResponseOutput } from "./definition";
 

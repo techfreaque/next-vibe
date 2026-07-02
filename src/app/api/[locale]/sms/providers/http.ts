@@ -243,6 +243,7 @@ export function getHttpProvider(): SmsProvider {
           requestInit.body = body;
         }
 
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(parsedUrl, requestInit);
 
         // Handle HTTP errors

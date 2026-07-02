@@ -10,11 +10,11 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
 import type { SqlT } from "next-vibe/database/sql/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { db } from "..";
+import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
 
 /**
  * Execute SQL query Repository

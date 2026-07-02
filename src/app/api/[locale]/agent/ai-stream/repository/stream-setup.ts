@@ -19,7 +19,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import type { NextRequest } from "next-vibe/ui/web/lib/request";
 
-import { type ChatModelOption } from "../models";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getBestImageGenModel,
@@ -44,15 +43,16 @@ import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { ThreadStreamingState } from "../../chat/enum";
 import { chatSettings } from "../../chat/settings/db";
-import { isUuid, parseSkillId } from "../../chat/slugify";
+import { isUuid } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { DEFAULT_SKILLS } from "../../skills/config";
-import { customSkills } from "../../skills/db";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
   type FavoriteConfig,
 } from "../../skills/favorites/db";
+import { resolveSkillFavoriteContext } from "../../skills/resolver";
+import { type ChatModelOption } from "../models";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
@@ -724,7 +724,7 @@ export async function setupAiStream(params: {
       return Math.min(resolvedFavoriteConfig.compactTrigger, cap);
     }
 
-    // 2. Check skill compactTrigger (default skills first, then custom skills by UUID or slug)
+    // 2. Check skill compactTrigger (default skills first, then the prefetched custom skill)
     if (data.skill) {
       const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
       if (
@@ -919,7 +919,8 @@ export async function setupAiStream(params: {
     const bridgeFavorite: BridgeContext["favorite"] =
       resolvedFavoriteConfig ?? null;
 
-    // Resolve skill: default skills come from config (variant-aware), custom skills from DB
+    // Resolve skill: default skills come from config (variant-aware), custom
+    // skills from the prefetched row.
     if (data.skill) {
       const defaultSkillForBridge = DEFAULT_SKILLS.find(
         (c) => c.id === data.skill,

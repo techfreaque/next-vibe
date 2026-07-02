@@ -2,6 +2,8 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { assignUrl, getCurrentOrigin } from "next-vibe/ui/web/lib/location";
 import { Badge } from "next-vibe/ui/web/ui/badge";
 import { Button } from "next-vibe/ui/web/ui/button";
@@ -23,7 +25,7 @@ import { scopedTranslation as appScopedTranslation } from "@/app/[locale]/i18n";
 import { scopedTranslation as pageSubscriptionScopedTranslation } from "@/app/[locale]/subscription/i18n";
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
 import { scopedTranslation as paymentScopedTranslation } from "@/app/api/[locale]/payment/i18n";
-import portalEndpoints from "@/app/api/[locale]/payment/portal/definition";
+import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
@@ -36,6 +38,8 @@ interface SubscriptionStatusCardProps {
 export function SubscriptionStatusCard({
   locale,
   initialSubscription,
+  user,
+  logger,
 }: SubscriptionStatusCardProps): JSX.Element {
   const { t } = pageSubscriptionScopedTranslation.scopedT(locale);
   const { t: appT } = appScopedTranslation.scopedT(locale);

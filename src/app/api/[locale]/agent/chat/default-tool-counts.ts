@@ -14,7 +14,7 @@ import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 
-import { endpointsMeta } from "@/generated/endpoints-meta/en";
+import { endpointsMeta } from "@/generated/endpoints/meta/en";
 
 import { getDefaultToolIds } from "./constants";
 

@@ -11,11 +11,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { GuardStopT } from "next-vibe/tooling/guard/stop/i18n";
+
 import type {
   GuardStopRequestOutput,
   GuardStopResponseOutput,
 } from "./definition";
-import type { GuardStopT } from "next-vibe/tooling/guard/stop/i18n";
 
 /**
  * Guard Stop Repository

@@ -32,7 +32,9 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestDataArrayOptionalField,
+  requestField,
   responseArrayOptionalField,
+  responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 

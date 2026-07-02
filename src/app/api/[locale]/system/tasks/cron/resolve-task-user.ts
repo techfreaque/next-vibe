@@ -26,7 +26,7 @@ import { env } from "@/config/env";
 
 import type { TaskOwner } from "./db";
 
-export interface TaskUserContext {
+interface TaskUserContext {
   user: JwtPrivatePayloadType;
   locale: CountryLanguage;
 }

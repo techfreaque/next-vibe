@@ -12,9 +12,9 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import { isLineHighlighted, splitCodeIntoLines } from "./shared";
 import type { JSX } from "react";
 
+import { isLineHighlighted, splitCodeIntoLines } from "./shared";
 import type { CodeOutputWidgetConfig } from "./types";
 
 /**

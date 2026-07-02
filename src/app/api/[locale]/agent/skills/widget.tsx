@@ -66,13 +66,13 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { useProviderAvailability } from "../env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
+import { useProviderAvailability } from "../env-availability-context";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";

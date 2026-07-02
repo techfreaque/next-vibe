@@ -17,6 +17,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     "content-type": "application/json",
   };
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const response = await fetch(apiContactsPath, {
     method: "post",
     headers,

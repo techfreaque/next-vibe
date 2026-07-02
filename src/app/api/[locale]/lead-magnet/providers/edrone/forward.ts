@@ -21,6 +21,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   edroneData.append("action_type", "subscribe");
   edroneData.append("sender_type", "server");
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const response = await fetch(apiContactsUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

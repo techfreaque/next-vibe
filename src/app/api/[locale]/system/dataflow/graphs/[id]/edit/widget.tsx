@@ -41,6 +41,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { FieldDataType } from "next-vibe/core/definition/enums";
+import { cn } from "next-vibe/core/utils/utils";
 import { GraphResolution } from "next-vibe/dataflow/enum";
 import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
 import type {
@@ -53,7 +54,6 @@ import parentDefinitions from "next-vibe/dataflow/graphs/[id]/data/definition";
 import versionsDefinitions from "next-vibe/dataflow/graphs/[id]/versions/definition";
 import type { Resolution } from "next-vibe/dataflow/shared/fields";
 import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
-import { cn } from "next-vibe/core/utils/utils";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
 import { addWindowListener } from "next-vibe/ui/web/lib/dom";
@@ -118,9 +118,9 @@ import React, {
   useState,
 } from "react";
 
-import { pathToAliasMap } from "@/generated/alias-map";
-import { getEndpoint } from "@/generated/endpoint";
-import { endpointsMeta } from "@/generated/endpoints-meta/en";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+import { endpointsMeta } from "@/generated/endpoints/meta/en";
 
 import type definition from "./definition";
 

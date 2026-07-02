@@ -24,7 +24,6 @@ import type {
   FileToCompileWithPlugins,
   NpmPackageConfig,
 } from "../definition";
-
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
@@ -33,7 +32,7 @@ import { outputFormatter } from "./output-formatter";
 // ============================================================================
 
 /** Inline configuration input matching request type */
-export interface InlineConfigInput {
+interface InlineConfigInput {
   foldersToClean?: string[];
   filesToCompile?: FileToCompile[];
   filesOrFoldersToCopy?: CopyConfig[];
@@ -49,7 +48,7 @@ interface BuildConfigModule {
 // Interface
 // ============================================================================
 
-export interface IConfigLoader {
+interface IConfigLoader {
   /**
    * Load build configuration from file or inline data
    */

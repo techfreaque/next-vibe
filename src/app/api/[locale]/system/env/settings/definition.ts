@@ -13,9 +13,9 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { type EnvKeyMeta } from "next-vibe/env/generator";
 import { scopedTranslation } from "next-vibe/env/settings/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { type EnvKeyMeta } from "next-vibe/env/generator";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
@@ -25,8 +25,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ENV_KEYS, type EnvKeyName } from "@/generated/env-keys";
-import { type EnvFieldType } from "@/generated/env-keys";
+import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
+import { type EnvFieldType } from "@/generated/env/keys";
 
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
 
@@ -381,8 +381,9 @@ export const { PATCH } = createEndpoint({
 });
 
 /**
- * POST - Proxy unbottled.ai login server-side (avoids CORS)
- * Browser sends email/password/remoteUrl → server pings remote, logs in, returns credential.
+ * POST - Connect to a remote unbottled.ai instance as the system inference
+ * provider. Thin wrapper over the remote-connection connect flow; creates a
+ * real connection (isInferenceProvider) rather than persisting a credential.
  */
 export const { POST } = createEndpoint({
   scopedTranslation,
@@ -432,10 +433,10 @@ export const { POST } = createEndpoint({
           .url()
           .transform((v) => v.replace(/\/+$/, "")),
       }),
-      credential: responseField(scopedTranslation, {
+      connected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.string(),
+        schema: z.boolean(),
       }),
     },
   }),
@@ -493,7 +494,7 @@ export const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        credential: "leadid123:token456:https://unbottled.ai",
+        connected: true,
       },
     },
   },

@@ -20,6 +20,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   } = credentials;
   const { firstName, email } = lead;
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const authResponse = await fetch(oAuthUrl, {
     method: "POST",
     headers: {
@@ -40,6 +41,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
 
   const authData = JSON.parse(authDataRaw) as { access_token: string };
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const response = await fetch(
     `${apiContactsUrl.replace("{list_id}", mailupListId)}?ConfirmEmail=false`,
     {

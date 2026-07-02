@@ -10,10 +10,6 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  ClusterInitRequestOutput,
-  ClusterInitResponseOutput,
-} from "./definition";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
 import { buildInfraConfig } from "next-vibe/tooling/infra/shared/pulumi/config";
 import { provisionAll } from "next-vibe/tooling/infra/shared/pulumi/index";
@@ -21,6 +17,11 @@ import { ensureGitignore } from "next-vibe/tooling/infra/shared/pulumi/state";
 
 import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+
+import type {
+  ClusterInitRequestOutput,
+  ClusterInitResponseOutput,
+} from "./definition";
 
 export class ClusterInitRepository {
   static async init(

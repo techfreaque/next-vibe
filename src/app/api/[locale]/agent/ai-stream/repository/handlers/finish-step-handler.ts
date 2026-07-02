@@ -9,7 +9,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import { AbortReason, StreamAbortError } from "../core/constants";
-import type { StreamContext } from "../core/stream-context";
+import type { StreamContext } from "../core/stream";
 import { FinalizationHandler } from "./finalization-handler";
 
 export class FinishStepHandler {

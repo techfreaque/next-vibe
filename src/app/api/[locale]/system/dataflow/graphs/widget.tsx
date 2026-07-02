@@ -5,7 +5,6 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { GraphOwnerType, GraphResolution } from "../enum";
 import { cn } from "next-vibe/core/utils/utils";
 import { Badge } from "next-vibe/ui/web/ui/badge";
 import { Button } from "next-vibe/ui/web/ui/button";
@@ -19,6 +18,7 @@ import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
 import { Search } from "next-vibe/ui/web/ui/icons/Search";
 import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
+import { Trash } from "next-vibe/ui/web/ui/icons/Trash";
 import { User } from "next-vibe/ui/web/ui/icons/User";
 import { X } from "next-vibe/ui/web/ui/icons/X";
 import { Input } from "next-vibe/ui/web/ui/input";
@@ -34,6 +34,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback, useMemo } from "react";
 
+import { GraphOwnerType, GraphResolution } from "../enum";
 import type definition from "./definition";
 
 type GraphListResponseOutput = typeof definition.GET.types.ResponseOutput;
@@ -80,12 +81,14 @@ function GraphCard({
   t,
   onClick,
   onArchive,
+  onDelete,
 }: {
   graph: GraphSummary;
   locale: ReturnType<typeof useWidgetLocale>;
   t: ReturnType<typeof useWidgetTranslation<(typeof definition)["GET"]>>;
   onClick: () => void;
   onArchive: () => void;
+  onDelete: () => void;
 }): React.JSX.Element {
   const isSystem = graph.ownerType === GraphOwnerType.SYSTEM;
   const isAdmin = graph.ownerType === GraphOwnerType.ADMIN;
@@ -189,6 +192,20 @@ function GraphCard({
                       }}
                     >
                       <Archive className="h-3 w-3" />
+                    </Button>
+                  )}
+                  {!isSystem && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                      title={t("widget.delete")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                      }}
+                    >
+                      <Trash className="h-3 w-3" />
                     </Button>
                   )}
                   <Span className="text-[11px] text-muted-foreground">
@@ -329,6 +346,21 @@ export function GraphListContainer(): React.JSX.Element {
         const archiveDef =
           await import("next-vibe/dataflow/graphs/[id]/archive/definition");
         navigation.push(archiveDef.default.POST, {
+          urlPathParams: { id: graph.id },
+          renderInModal: true,
+          onSuccessCallback: () => endpointMutations?.read?.refetch?.(),
+        });
+      })();
+    },
+    [navigation, endpointMutations],
+  );
+
+  const handleDelete = useCallback(
+    (graph: GraphSummary): void => {
+      void (async (): Promise<void> => {
+        const deleteDef =
+          await import("next-vibe/dataflow/graphs/[id]/delete/definition");
+        navigation.push(deleteDef.default.DELETE, {
           urlPathParams: { id: graph.id },
           renderInModal: true,
           onSuccessCallback: () => endpointMutations?.read?.refetch?.(),
@@ -500,6 +532,7 @@ export function GraphListContainer(): React.JSX.Element {
                 t={t}
                 onClick={() => handleView(graph)}
                 onArchive={() => handleArchive(graph)}
+                onDelete={() => handleDelete(graph)}
               />
             ))}
           </Div>

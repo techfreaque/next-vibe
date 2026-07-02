@@ -20,7 +20,7 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import type { pathToAliasMap } from "@/generated/alias-map";
+import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
 import { useLogger } from "@/hooks/use-logger";
 
 import { scopedTranslation } from "./i18n";

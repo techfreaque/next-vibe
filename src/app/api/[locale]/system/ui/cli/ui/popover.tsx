@@ -27,12 +27,6 @@ export type {
   PopoverTriggerProps,
 } from "next-vibe/ui/web/ui/popover";
 
-import {
-  FocusScopeProvider,
-  useFocusScopeRegister,
-  useOverlayLock,
-  useShouldFocus,
-} from "./dialog";
 import type {
   PopoverAnchorProps,
   PopoverCloseProps,
@@ -42,6 +36,13 @@ import type {
   PopoverTriggerProps,
 } from "next-vibe/ui/web/ui/popover";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+
+import {
+  FocusScopeProvider,
+  useFocusScopeRegister,
+  useOverlayLock,
+  useShouldFocus,
+} from "./dialog";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 

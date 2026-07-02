@@ -11,14 +11,15 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
-import type {
-  ScaleReplicasRequestOutput,
-  ScaleReplicasResponseOutput,
-} from "./definition";
 import { scaleDeploymentInCluster } from "next-vibe/tooling/infra/shared/pulumi/app/index";
 
 import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+
+import type {
+  ScaleReplicasRequestOutput,
+  ScaleReplicasResponseOutput,
+} from "./definition";
 
 export class ScaleReplicasRepository {
   static async scale(

@@ -6,16 +6,16 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
-import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
+import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
 import type {
   DataPoint,
   Resolution,
   SignalEvent,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { db } from "next-vibe/database";
 
+import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
 import { BacktestActionMode } from "../enum";
 
 // ─── Create Run ───────────────────────────────────────────────────────────────
@@ -106,105 +106,4 @@ export async function writeBacktestSignalResult(
       .values(rows.slice(i, i + batchSize))
       .onConflictDoNothing();
   }
-}
-
-// ─── Read Results ─────────────────────────────────────────────────────────────
-
-export async function readBacktestRun(runId: string): Promise<{
-  runId: string;
-  graphId: string;
-  range: TimeRange;
-  resolution: Resolution;
-  eligible: boolean | null;
-} | null> {
-  const rows = await db
-    .select()
-    .from(pipelineBacktestRuns)
-    .where(eq(pipelineBacktestRuns.id, runId))
-    .limit(1);
-
-  const row = rows[0];
-  if (!row) {
-    return null;
-  }
-
-  return {
-    runId: row.id,
-    graphId: row.graphId,
-    range: { from: row.rangeFrom, to: row.rangeTo },
-    resolution: row.resolution,
-    eligible: row.eligible,
-  };
-}
-
-export async function readBacktestSeriesResults(
-  runId: string,
-  nodeId: string,
-): Promise<DataPoint[]> {
-  const rows = await db
-    .select()
-    .from(pipelineBacktestResults)
-    .where(
-      and(
-        eq(pipelineBacktestResults.runId, runId),
-        eq(pipelineBacktestResults.nodeId, nodeId),
-      ),
-    )
-    .orderBy(pipelineBacktestResults.timestamp);
-
-  return rows.map((row) => ({
-    timestamp: row.timestamp,
-    value: parseFloat(row.value),
-    meta: row.meta ?? undefined,
-  }));
-}
-
-export async function readBacktestSignalResults(
-  runId: string,
-  evaluatorId: string,
-): Promise<SignalEvent[]> {
-  const rows = await db
-    .select()
-    .from(pipelineBacktestResults)
-    .where(
-      and(
-        eq(pipelineBacktestResults.runId, runId),
-        eq(pipelineBacktestResults.nodeId, evaluatorId),
-      ),
-    )
-    .orderBy(pipelineBacktestResults.timestamp);
-
-  return rows
-    .filter((r) => r.fired !== null)
-    .map((row) => ({
-      timestamp: row.timestamp,
-      fired: row.fired!,
-      meta: row.meta ?? undefined,
-    }));
-}
-
-export async function listBacktestRunsForGraph(graphId: string): Promise<
-  Array<{
-    id: string;
-    rangeFrom: Date;
-    rangeTo: Date;
-    resolution: Resolution;
-    eligible: boolean | null;
-    createdAt: Date;
-  }>
-> {
-  const rows = await db
-    .select()
-    .from(pipelineBacktestRuns)
-    .where(eq(pipelineBacktestRuns.graphId, graphId))
-    .orderBy(pipelineBacktestRuns.createdAt);
-
-  return rows.map((row) => ({
-    id: row.id,
-    rangeFrom: row.rangeFrom,
-    rangeTo: row.rangeTo,
-    resolution: row.resolution,
-    eligible: row.eligible,
-    createdAt: row.createdAt,
-  }));
 }

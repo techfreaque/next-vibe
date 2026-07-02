@@ -22,8 +22,6 @@ import {
 import { lazy } from "react";
 import { z } from "zod";
 
-import { ImageGenModelId, ImageGenModelIdOptions } from "./models";
-
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   ImageQuality,
@@ -32,6 +30,7 @@ import {
   ImageSizeOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { ImageGenModelId, ImageGenModelIdOptions } from "./models";
 
 const ImageGenerationContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.ImageGenerationContainer })),

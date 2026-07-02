@@ -17,6 +17,19 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { scopedTranslation } from "next-vibe/tooling/builder/i18n";
+import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";
+import {
+  objectField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
+
+import { BUILDER_ALIAS } from "./constants";
 import {
   BuildProfileEnum,
   BuildProfileOptions,
@@ -34,19 +47,6 @@ import {
   ViteLibFormatOptions,
   ViteMinifyOptions,
 } from "./enum";
-import { scopedTranslation } from "next-vibe/tooling/builder/i18n";
-import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";
-import {
-  objectField,
-  objectOptionalField,
-  requestDataArrayOptionalField,
-  requestField,
-  responseArrayOptionalField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
-import { z } from "zod";
-
-import { BUILDER_ALIAS } from "./constants";
 
 /**
  * Package.json exports field schema
@@ -1456,34 +1456,20 @@ export default builderDefinition;
 export type BuildProfile = `${BuildProfileEnum}`;
 
 /** Vite build types (derived from enum) */
-export type ViteBuildType = `${ViteBuildTypeEnum}`;
+type ViteBuildType = `${ViteBuildTypeEnum}`;
 
 /** Bun build types (derived from enum) */
-export type BunBuildType = `${BunBuildTypeEnum}`;
+type BunBuildType = `${BunBuildTypeEnum}`;
 
 /** All build types */
-export type BuildType = ViteBuildType | BunBuildType;
-
-/** Bun target runtime (derived from enum) */
-export type BunTarget = `${BunTargetEnum}`;
+type BuildType = ViteBuildType | BunBuildType;
 
 /** Sourcemap mode (derived from enum) */
 export type SourcemapMode = `${SourcemapModeEnum}`;
 
-/** Output format (derived from enum) */
-export type OutputFormat = `${OutputFormatEnum}`;
-
-/** Step status (derived from enum) */
-export type StepStatus = `${StepStatusEnum}`;
-
 // ============================================================================
 // Type Guards
 // ============================================================================
-
-/** Type guard for Vite builds */
-export function isViteBuildType(type: BuildType): type is ViteBuildType {
-  return Object.values(ViteBuildTypeEnum).includes(type as ViteBuildTypeEnum);
-}
 
 /** Type guard for Bun builds */
 export function isBunBuildType(type: BuildType): type is BunBuildType {
@@ -1501,7 +1487,7 @@ export type BuilderRequest = typeof POST.types.RequestOutput;
 export type BuilderResponse = typeof POST.types.ResponseOutput;
 
 /** API config object type inferred from POST definition fields */
-export type ApiConfigObject = NonNullable<BuilderRequest["configObject"]>;
+type ApiConfigObject = NonNullable<BuilderRequest["configObject"]>;
 
 /** File to compile type inferred from API definition */
 export type FileToCompile = NonNullable<
@@ -1517,19 +1503,10 @@ export type CopyConfig = NonNullable<
 export type NpmPackageConfig = NonNullable<ApiConfigObject["npmPackage"]>;
 
 /** Bun build options type inferred from API definition, extended with runtime-only fields */
-export type BunBuildOptions = NonNullable<FileToCompile["bunOptions"]> & {
+type BunBuildOptions = NonNullable<FileToCompile["bunOptions"]> & {
   /** Bun build plugins - programmatic only, not serializable via API */
   plugins?: BunPlugin[];
 };
-
-/** Vite options type inferred from API definition */
-export type ViteOptions = NonNullable<FileToCompile["viteOptions"]>;
-
-/** Package config type inferred from API definition */
-export type PackageConfig = NonNullable<FileToCompile["packageConfig"]>;
-
-/** Step timing type inferred from response */
-export type StepTiming = NonNullable<BuilderResponse["stepTimings"]>[number];
 
 /** Build step result - internal type for tracking build steps */
 export interface BuildStepResult {
@@ -1562,7 +1539,7 @@ export interface BuildReport {
 }
 
 /** Build hook context */
-export interface BuildHookContext {
+interface BuildHookContext {
   config: BuildConfig;
   profile: BuildProfile;
   outputDir: string;
@@ -1577,7 +1554,7 @@ export interface BuildHookContext {
 }
 
 /** Build hook function */
-export type BuildHook = (context: BuildHookContext) => Promise<void> | void;
+type BuildHook = (context: BuildHookContext) => Promise<void> | void;
 
 /** FileToCompile with runtime-only fields (plugins) */
 export type FileToCompileWithPlugins = Omit<FileToCompile, "bunOptions"> & {

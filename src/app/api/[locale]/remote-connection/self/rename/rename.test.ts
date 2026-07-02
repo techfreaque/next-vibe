@@ -37,7 +37,6 @@ import {
   instanceIdentities,
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
-import selfRenameDefinitions from "./definition";
 import { env } from "@/config/env";
 
 import {
@@ -59,6 +58,7 @@ import {
   restoreHermesIdentity,
   unregisterDevFromHermes,
 } from "../../../agent/ai-stream/testing/remote-setup";
+import selfRenameDefinitions from "./definition";
 
 installFetchCache();
 

@@ -11,13 +11,13 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { maybeColorize, semantic } from "next-vibe/logger/colors";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { allGraphSeeds } from "@/generated/graph-seeds-index";
+import { allGraphSeeds } from "@/generated/dataflow/graph-seeds-index";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
 import { pipelineGraphs } from "./db";
 import { GraphOwnerType } from "./enum";
 

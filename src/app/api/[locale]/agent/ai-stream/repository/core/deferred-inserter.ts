@@ -23,6 +23,7 @@ import {
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 
 import { walkToLeafMessage } from "./branch-utils";
+import { buildSseMessageRow } from "./db-writer/sse-row";
 import type { WakeUpPayload } from "./wake-up-channel";
 
 export async function insertDeferredWakeUpMessage(

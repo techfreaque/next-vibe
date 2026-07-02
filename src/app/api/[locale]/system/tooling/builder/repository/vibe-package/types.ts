@@ -12,10 +12,10 @@
  */
 
 /** Platforms a package can expose */
-export type PackagePlatform = "cli" | "mcp";
+type PackagePlatform = "cli" | "mcp";
 
 /** Library export map: subpath → source file (relative to project root) */
-export type PackageExports = Record<string, string>;
+type PackageExports = Record<string, string>;
 
 /**
  * PackageManifest - the typed config format for distributable packages.

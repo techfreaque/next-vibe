@@ -12,7 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { reloadPage } from "next-vibe/ui/web/lib/location";
 
 import { scopedTranslation } from "@/app/[locale]/shared/i18n";
-import { getEndpoint as globalGetEndpoint } from "@/generated/endpoint";
+import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { CreateApiEndpointAny } from "./endpoint-base";
 import type { Platform } from "./platform";

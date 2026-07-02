@@ -27,7 +27,7 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
+import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/infra";
 
 import { DefaultFolderId } from "../../../config";
 import {

@@ -26,10 +26,6 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { useProviderAvailability } from "../env-availability-context";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
-import type { ImageGenModelSelection } from "./models";
-import { getBestImageGenModel, getImageGenModelById } from "./models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -37,9 +33,13 @@ import {
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
+import { useProviderAvailability } from "../env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { ImageSize } from "./enum";
 import { scopedTranslation } from "./i18n";
+import type { ImageGenModelSelection } from "./models";
+import { getBestImageGenModel, getImageGenModelById } from "./models";
 import { ImageGenModelId } from "./models";
 
 interface CustomWidgetProps {

@@ -298,14 +298,6 @@ export interface EslintParserOptions {
   [key: string]: LintConfigValue | undefined;
 }
 
-/** ESLint parse result */
-export interface EslintParseResult {
-  ast?: LintConfigElement;
-  services?: LintConfigElement;
-  scopeManager?: LintConfigElement;
-  visitorKeys?: LintConfigElement;
-}
-
 /** ESLint plugin interface - matches ESLint's Plugin type */
 export interface EslintPlugin {
   rules?: Record<string, EslintRule>;
@@ -558,29 +550,6 @@ interface VSCodeConfigEnabled extends VSCodeConfigOptions {
 }
 
 export type VSCodeConfig = VSCodeConfigDisabled | VSCodeConfigEnabled;
-
-// ============================================================
-// Feature Switches
-// ============================================================
-
-export interface FeatureSwitches {
-  /** Enable i18n literal string checking */
-  i18n?: boolean;
-  /** Enable React-specific rules */
-  react?: boolean;
-  /** Enable accessibility rules (jsx-a11y) */
-  accessibility?: boolean;
-  /** Enable import rules */
-  import?: boolean;
-  /** Enable promise rules */
-  promise?: boolean;
-  /** Enable Node.js rules */
-  node?: boolean;
-  /** Enable pedantic rules (stricter checks) */
-  pedantic?: boolean;
-  /** Use tsgo instead of tsc for type checking */
-  tsgo?: boolean;
-}
 
 // ============================================================
 // Vibe Check Configuration

@@ -34,7 +34,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";

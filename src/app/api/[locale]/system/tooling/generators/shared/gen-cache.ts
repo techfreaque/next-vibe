@@ -78,15 +78,31 @@ export function writeGenState(state: GenState): void {
 export function fingerprint(files: readonly string[]): string {
   const sorted = [...files].toSorted();
   const parts: string[] = [];
+  let existing = 0;
 
   for (const file of sorted) {
     try {
       const st = statSync(file);
       parts.push(`${file}:${st.mtimeMs}:${st.size}`);
+      existing++;
     } catch {
       // File deleted since scan — treat as absent (contributes empty string)
       parts.push(`${file}:deleted`);
     }
+  }
+
+  // A generator that DECLARES inputs but resolves NONE on disk is a broken
+  // input mapping (a stale hardcoded path in find-generator-inputs.ts) — NOT
+  // an empty-inputs generator, which returns [] and never reaches here. Left
+  // silent, such a mapping produces a stable "all-:deleted" fingerprint that
+  // equals itself forever, so the generator is skipped on every run and only
+  // regenerates under --force. Fail loudly instead of wedging the cache.
+  if (sorted.length > 0 && existing === 0) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator integrity check: a fully-missing input set means a broken path mapping; fail fast rather than silently wedge the gen-cache.
+    throw new Error(
+      `gen-cache: generator declared ${sorted.length} input file(s) but NONE exist on disk — ` +
+        `this is a stale/incorrect path in find-generator-inputs.ts. Missing:\n  ${sorted.join("\n  ")}`,
+    );
   }
 
   const combined = parts.join("|");

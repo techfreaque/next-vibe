@@ -26,9 +26,9 @@ export { createFrameBridge, createParentBridge } from "./bridge";
  * For <script> tag usage with declarative config, use the IIFE bundle instead:
  *   <script src="/vibe-frame/vibe-frame.js"></script>
  */
-export { setupTrigger } from "./triggers";
 export type { FrameBridge, ParentBridge } from "./bridge";
 export { getConfig, subscribeConfig, VibeFrame } from "./embed";
+export { setupTrigger } from "./triggers";
 export type {
   BridgeAction,
   BridgeActionMap,

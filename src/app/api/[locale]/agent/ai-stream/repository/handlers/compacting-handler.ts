@@ -5,20 +5,23 @@
 
 import "server-only";
 
-import { streamText } from "ai";
+import type { ModelMessage, streamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
 
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import { type ChatModelId, getChatModelById } from "../../models";
+import type { ChatModelId } from "../../models";
 import type { StreamContext } from "../core/stream-context";
+import {
+  buildCompactingInstructions,
+  runCompactingLLM,
+} from "./compacting-shared";
 import { MessageConverter } from "./message-converter";
 
 /**

@@ -12,11 +12,6 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  ELECTRON_ALIAS,
-  ELECTRON_START_ALIAS,
-  ELECTRON_START_DEV_ALIAS,
-} from "./constants";
 import { scopedTranslation } from "next-vibe/server/server/electron/start/i18n";
 import {
   objectField,
@@ -24,6 +19,12 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
+
+import {
+  ELECTRON_ALIAS,
+  ELECTRON_START_ALIAS,
+  ELECTRON_START_DEV_ALIAS,
+} from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,

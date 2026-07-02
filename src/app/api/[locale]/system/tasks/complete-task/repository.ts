@@ -19,13 +19,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/task-completion-handler";
+import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CompleteTaskRequestOutput,
-  CompleteTaskResponseOutput,
-} from "./definition";
 import type { NewCronTask } from "next-vibe/tasks/cron/db";
 import {
   cronTaskExecutions,
@@ -38,6 +34,10 @@ import type { TasksT } from "next-vibe/tasks/i18n";
 import { env } from "@/config/env";
 
 import { CronTaskStatus } from "../enum";
+import type {
+  CompleteTaskRequestOutput,
+  CompleteTaskResponseOutput,
+} from "./definition";
 
 export class CompleteTaskRepository {
   static async completeTask<TRequest, TResponse>(

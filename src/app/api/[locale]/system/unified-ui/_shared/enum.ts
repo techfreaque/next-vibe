@@ -52,24 +52,6 @@ export function createEnumOptions<
 }
 
 /**
- * Extract enum values as array
- */
-export function getEnumValues<T extends Record<string, string | number>>(
-  enumObject: T,
-): Array<T[keyof T]> {
-  return Object.values(enumObject) as Array<T[keyof T]>;
-}
-
-/**
- * Extract enum keys as array
- */
-export function getEnumKeys<T extends Record<string, string | number>>(
-  enumObject: T,
-): Array<keyof T> {
-  return Object.keys(enumObject) as Array<keyof T>;
-}
-
-/**
  * Check if a value is a valid enum value
  */
 export function isValidEnumValue<T extends Record<string, string | number>>(
@@ -78,27 +60,4 @@ export function isValidEnumValue<T extends Record<string, string | number>>(
 ): value is T[keyof T] {
   const enumValues = Object.values(enumObject);
   return enumValues.includes(value as T[keyof T]);
-}
-
-/**
- * Get enum value by key with type safety
- */
-export function getEnumValue<T extends Record<string, string | number>>(
-  enumObject: T,
-  key: keyof T,
-): T[keyof T] {
-  return enumObject[key];
-}
-
-/**
- * Convert enum to select options for UI components
- */
-export function enumToSelectOptions<T extends Record<string, string>>(
-  enumObject: T,
-  labelPrefix?: string,
-): Array<{ value: T[keyof T]; label: string }> {
-  return Object.entries(enumObject).map(([key, value]) => ({
-    value: value as T[keyof T],
-    label: labelPrefix ? `${labelPrefix}.${key}` : key,
-  }));
 }

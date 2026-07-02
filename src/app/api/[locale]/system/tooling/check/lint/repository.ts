@@ -15,15 +15,16 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
 import { sortIssuesByLocation } from "next-vibe/tooling/check/config/shared";
 import type { CheckConfig } from "next-vibe/tooling/check/config/types";
+import {
+  calculateFilteredSummary,
+  filterIssues,
+} from "next-vibe/tooling/check/shared/filter-utils";
+
 import type {
   LintIssue,
   LintRequestOutput,
   LintResponseOutput,
 } from "./definition";
-import {
-  calculateFilteredSummary,
-  filterIssues,
-} from "next-vibe/tooling/check/shared/filter-utils";
 
 /**
  * Run ESLint Repository

@@ -31,7 +31,6 @@ import {
   StandardSyncCursorSchema,
   ThreadsSyncCursorSchema,
 } from "../db";
-
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 

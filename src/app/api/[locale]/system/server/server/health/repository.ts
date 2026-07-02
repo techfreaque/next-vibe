@@ -16,13 +16,13 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ServerHealthT } from "next-vibe/server/server/health/i18n";
+
+import { getCurrentEnvironmentInfo } from "../environment";
 import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
 } from "./definition";
-import type { ServerHealthT } from "next-vibe/server/server/health/i18n";
-
-import { getCurrentEnvironmentInfo } from "../environment";
 
 /**
  * Health Check Repository

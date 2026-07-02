@@ -8,19 +8,23 @@ import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
+
+const UnsubscribeWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UnsubscribeWidget })),
+);
 
 /**
  * POST endpoint for newsletter unsubscribe
@@ -48,13 +52,9 @@ const { POST } = createEndpoint({
   cli: {
     firstCliArgKey: "email",
   },
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.form.title",
-    description: "post.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: UnsubscribeWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       email: requestField(scopedTranslation, {

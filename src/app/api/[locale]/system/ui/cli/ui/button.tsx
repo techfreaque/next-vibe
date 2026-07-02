@@ -7,12 +7,12 @@
  */
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
-import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import type { ButtonProps } from "next-vibe/ui/web/ui/button";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 import { Children, isValidElement, useEffect, useRef } from "react";
 
+import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import { useDropdownTrigger } from "./dropdown-menu";
 import { usePopoverTrigger } from "./popover";
 

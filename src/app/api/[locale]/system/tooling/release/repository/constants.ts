@@ -8,10 +8,6 @@
 // ============================================================================
 
 export const DEFAULT_CONFIG_PATH = "release.config.ts";
-export const DEFAULT_TAG_PREFIX = "v";
-export const DEFAULT_PACKAGE_MANAGER = "npm";
-export const DEFAULT_MAIN_BRANCH = "main";
-export const DEFAULT_REMOTE = "origin";
 
 // ============================================================================
 // Timeouts (in milliseconds)
@@ -54,14 +50,6 @@ export const RETRY_DEFAULTS = {
 // ============================================================================
 // Registry URLs
 // ============================================================================
-
-export const REGISTRIES = {
-  NPM: "https://registry.npmjs.org",
-  NPM_PACKAGE_URL: "https://www.npmjs.com/package",
-  JSR: "https://jsr.io",
-  GITHUB_NPM: "https://npm.pkg.github.com",
-  GITHUB_PACKAGES: "https://ghcr.io",
-} as const;
 
 // ============================================================================
 // Message Constants
@@ -400,8 +388,3 @@ export const MESSAGES = {
 // ============================================================================
 // Type Exports
 // ============================================================================
-
-export type MessageKey = keyof typeof MESSAGES;
-export type TimeoutKey = keyof typeof TIMEOUTS;
-export type RetryDefaultKey = keyof typeof RETRY_DEFAULTS;
-export type RegistryKey = keyof typeof REGISTRIES;

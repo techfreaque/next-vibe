@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:f5ca2b28 | Posted:Jul 1, 23:16]\n\nUser: [TEST] Create a new skill AND a favorite for it. Both steps are required.\n\nSkill parameters:\nname: Test Chef Bot\ntagline: Cooks up anything you crave\ndescription: A friendly sous-chef for everyday cooking questions\ncategory: enums.category.assistant\nicon: chef\nsystemPrompt: You are Chef Bot, a friendly cooking assistant. Answer cooking questions concisely and confidently.\nmodelSelection: filter-based, smart to brilliant intelligence, mainstream content only\nisPublic: false\n\nSteps: 1) Call skill-create with the above params. 2) Call favorite-create with the returned skill ID.\nWhen BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on failure.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:22323c96 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jul 1, 23:16]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"skill-create\"},\"callbackMode\":\"wait\"} [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"favorite-create\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"skill-create\",\"title\":\"Create Skill\",\"description\":\"Create a new custom skill\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"minLength\":2,\"maxLength\":100,\"description\":\"Give your s [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"favorite-create\",\"title\":\"Create Favorite\",\"description\":\"Create a new favorite character configuration\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"skillId\":{\"type\":\"string\",\"description\":\"Skill ID in",
+    "encoding_format": "float"
+  }
+}

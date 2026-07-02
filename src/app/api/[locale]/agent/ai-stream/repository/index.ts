@@ -6,14 +6,12 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import { desc, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
@@ -23,7 +21,6 @@ import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availabili
 
 import type { DefaultFolderId } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";
-import { chatMessages } from "../../chat/db";
 import { ThreadStatus, ThreadStreamingState } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
 import {
@@ -42,32 +39,34 @@ import type {
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { runAutoQueueBranch } from "./branches/auto-queue-branch";
-import {
-  emitSetupError,
-  emitStreamCreationError,
-} from "./branches/setup-error-emitter";
+import { CompactingHandler } from "./compacting";
+import { findLatestThreadMessage } from "./core/infra";
 import {
   clearStreamingState,
   QueueRegistry,
   setStreamingStateWaiting,
-} from "./core/stream-registry";
+} from "./core/stream";
 import {
-  subscribeWakeUpSignal,
-  type WakeUpPayload,
-} from "./core/wake-up-channel";
-import { emitStreamFinished } from "./finalize/stream-finalizer";
-import { handleWakeUpRevivalBatch } from "./finalize/wakeup-revival";
-import { CompactingHandler } from "./handlers/compacting-handler";
+  emitSetupError,
+  emitStreamCreationError,
+  StreamErrorCatchHandler,
+} from "./errors";
 import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
-import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
-import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
 import type { HeadlessAiStreamResult } from "./headless";
-import { runRelayBranch } from "./relay-branch";
-import { setupAiStream } from "./stream-setup";
+import { StreamLoop } from "./loop";
+import { runAutoQueueBranch } from "./queue";
+import { runRelayBranch } from "./relay";
+import {
+  emitStreamFinished,
+  handleWakeUpRevivalBatch,
+  subscribeWakeUpSignal,
+  type WakeUpPayload,
+} from "./revival";
+import type { HeadlessIntake } from "./setup";
+import { runHeadlessIntakePhase, setupAiStream } from "./setup";
 import { buildSystemPrompt } from "./system-prompt/builder";
 
 export class AiStreamRepository {
@@ -191,8 +190,10 @@ export class AiStreamRepository {
       AiStreamRepository.extractUserIdentifiers(user, request, headless);
 
     // ================================================================
-    // Remote host: if rootFolderId === REMOTE, delegate to the configured
-    // remote provider via the ws-provider/stream protocol. No local AI runs.
+    // Headless intake (adapter calls only): inject preCalls as thread
+    // messages and derive operation/parent/userMessageId from thread
+    // state. Must run BEFORE the relay branch so relayed headless turns
+    // forward the DERIVED operation + parent to the remote instance.
     // ================================================================
     if (!headless && !isRevival) {
       const { isRemoteHostRequest, delegateToRemoteHost } =
@@ -203,12 +204,11 @@ export class AiStreamRepository {
     }
 
     // ================================================================
-    // Auto-queue: if the thread is already streaming, save the user
-    // message with isQueued metadata and return immediately - no AI
-    // stream, no credits, no tools. The queue processor will pick
-    // this up after the current stream ends.
-    // The client sends a normal "send" operation - queue detection is
-    // entirely server-side via StreamRegistry.
+    // WS-provider branch: request came from a remote relay caller.
+    //   - inference-provider: runs INCOGNITO (no DB thread) with caller identity
+    //     for tool callbacks + WS events (UNBOTTLED / pure inference).
+    //   - relay: PERSISTS the thread at the mirrored BACKGROUND/<originator>/
+    //     <folderPath> location (remote-chat-root REMOTE-folder routing).
     // ================================================================
     if (
       data.operation === "send" &&
@@ -675,8 +675,13 @@ export class AiStreamRepository {
         // when endLoop / approve / wakeUp flags are set. The Agent SDK doesn't emit
         // finish-step between turns, so this callback replaces the finish-step abort.
 
-        // Subscribe to wake-up signal so resume-stream can signal this live stream
-        // to yield after the current step finishes (wakeUp callback mode).
+        // Subscribe to wake-up signal so resume-stream can hand a completed
+        // wakeUp result to this LIVE stream. prepareStep drains the pending
+        // injections: the deferred message is written at the live chain tip
+        // and the result is injected into the in-flight context as the next
+        // step (spec: "stream still running → result injected into current
+        // turn"). Payloads that arrive after the final step stay undrained
+        // and fall through to the post-stream revival batch below.
         const unsubscribeWakeUp = subscribeWakeUpSignal(
           threadResultThreadId,
           (payload) => {

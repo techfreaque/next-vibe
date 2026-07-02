@@ -5,7 +5,6 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { Check, ChevronDown, Search, X } from "next-vibe/ui/native/ui/icons";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
 import type {
   AutocompleteFieldProps,
@@ -17,6 +16,7 @@ import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { Badge } from "./badge";
 import { Input } from "./input";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Re-export enum for type parity with web

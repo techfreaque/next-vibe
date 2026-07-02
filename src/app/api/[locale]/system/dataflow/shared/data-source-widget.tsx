@@ -16,10 +16,9 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
+import { cn } from "next-vibe/core/utils/utils";
 import graphsDefinitions from "next-vibe/dataflow/graphs/definition";
 import { scopedTranslation as vibeSenseT } from "next-vibe/dataflow/i18n";
-import { type Resolution, RESOLUTION_MS } from "./fields";
-import { cn } from "next-vibe/core/utils/utils";
 import { getRootCssVar } from "next-vibe/ui/web/lib/css-vars";
 import { observeRootMutations } from "next-vibe/ui/web/lib/dom";
 import { Badge } from "next-vibe/ui/web/ui/badge";
@@ -47,6 +46,7 @@ import React, {
 } from "react";
 
 import { GraphResolution } from "../enum";
+import { type Resolution, RESOLUTION_MS } from "./fields";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

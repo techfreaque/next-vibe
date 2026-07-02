@@ -5,7 +5,6 @@
  * Deduplicates shared indicator nodes across multiple graphs.
  */
 
-import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
 import type { GraphConfig } from "next-vibe/dataflow/graph/types";
 
 // ─── Topological Sort ─────────────────────────────────────────────────────────
@@ -76,71 +75,6 @@ export function resolveExecutionOrder(config: GraphConfig): ExecutionOrder {
 }
 
 // ─── Input Resolution ─────────────────────────────────────────────────────────
-
-/**
- * For a given node, returns the IDs of all nodes that feed into it.
- */
-export function getNodeInputIds(nodeId: string, config: GraphConfig): string[] {
-  return config.edges.filter((e) => e.to === nodeId).map((e) => e.from);
-}
-
-/**
- * For a given node, returns the IDs of all nodes that it feeds into.
- */
-export function getNodeOutputIds(
-  nodeId: string,
-  config: GraphConfig,
-): string[] {
-  return config.edges.filter((e) => e.from === nodeId).map((e) => e.to);
-}
-
-// ─── Deduplication Across Graphs ──────────────────────────────────────────────
-
-export interface SharedNodeKey {
-  endpointPath: string;
-  graphId: string;
-}
-
-/**
- * Given multiple graph configs, returns a deduplicated set of endpoint node paths.
- * Nodes with the same endpointPath can share computed results across graphs.
- */
-export function collectSharedEndpointPaths(
-  graphs: Array<{ graphId: string; config: GraphConfig }>,
-): Map<string, SharedNodeKey[]> {
-  const shared = new Map<string, SharedNodeKey[]>();
-
-  for (const { graphId, config } of graphs) {
-    for (const node of Object.values(config.nodes)) {
-      const endpointPath = node.endpointPath;
-      if (!endpointPath) {
-        continue;
-      }
-      const existing = shared.get(endpointPath) ?? [];
-      existing.push({ endpointPath, graphId });
-      shared.set(endpointPath, existing);
-    }
-  }
-
-  return shared;
-}
-
-// ─── Node Type Helpers ────────────────────────────────────────────────────────
-
-export function isLeafNode(nodeId: string, config: GraphConfig): boolean {
-  return !config.edges.some((e) => e.from === nodeId);
-}
-
-export function isRootNode(nodeId: string, config: GraphConfig): boolean {
-  return !config.edges.some((e) => e.to === nodeId);
-}
-
-export function getNodeConfig(
-  nodeId: string,
-  config: GraphConfig,
-): GraphNodeConfig | undefined {
-  return config.nodes[nodeId];
-}
 
 // ─── Cron Pruning ─────────────────────────────────────────────────────────────
 

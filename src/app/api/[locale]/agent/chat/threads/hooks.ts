@@ -11,7 +11,6 @@ import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-ty
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 
 import type { DefaultFolderId } from "../config";
-
 import definitions from "./definition";
 
 /**

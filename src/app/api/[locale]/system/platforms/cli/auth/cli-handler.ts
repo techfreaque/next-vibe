@@ -5,13 +5,14 @@ import {
   BaseAuthHandler,
 } from "next-vibe/identity/auth/base-auth-handler";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+
 import {
   deleteSessionFile,
   readSessionFile,
   writeSessionFile,
 } from "./session-file";
-
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 
 /**
  * CLI/MCP Authentication Handler

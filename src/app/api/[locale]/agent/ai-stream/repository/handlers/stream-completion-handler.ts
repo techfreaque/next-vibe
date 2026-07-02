@@ -13,8 +13,8 @@ import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 
 import { StreamErrorType } from "../core/constants";
-import type { StreamContext } from "../core/stream-context";
-import { clearStreamingState } from "../core/stream-registry";
+import type { StreamContext } from "../core/stream";
+import { clearStreamingState } from "../core/stream";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinalizationHandler } from "./finalization-handler";
 

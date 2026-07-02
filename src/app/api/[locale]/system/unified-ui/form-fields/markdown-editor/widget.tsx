@@ -20,14 +20,14 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "next-vibe/unified-ui/_shared/widget-helpers";
-import type {
-  MarkdownEditorWidgetConfig,
-  MarkdownEditorWidgetSchema,
-} from "./types";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { extractEditableTextData } from "./shared";
+import type {
+  MarkdownEditorWidgetConfig,
+  MarkdownEditorWidgetSchema,
+} from "./types";
 
 /**
  * Text display with inline editing capability.

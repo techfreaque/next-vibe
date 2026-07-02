@@ -4,14 +4,8 @@
  */
 
 import type { WidgetData } from "next-vibe/core/utils/json";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  PackageJson,
-  ParsedVersion,
-  ReleaseConfig,
-  RetryConfig,
-} from "../definition";
-import { MESSAGES, RETRY_DEFAULTS } from "./constants";
+
+import type { PackageJson, ParsedVersion, ReleaseConfig } from "../definition";
 
 // ============================================================================
 // Type Definitions for Type Guards
@@ -155,35 +149,6 @@ export function hasStderr(
   );
 }
 
-/**
- * Type guard for errors with exit code
- */
-export function hasExitCode(
-  error: CatchError,
-): error is CatchError & { status: number } {
-  if (typeof error !== "object" || error === null) {
-    return false;
-  }
-  return "status" in error && typeof error.status === "number";
-}
-
-/**
- * Check if a value is a non-empty string
- */
-export function isNonEmptyString(
-  value: string | undefined | null,
-): value is string {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-/**
- * Check if a value is a valid semver string
- */
-export function isValidSemver(value: string): boolean {
-  const semverRegex = /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/;
-  return semverRegex.test(value);
-}
-
 // ============================================================================
 // Retry Logic
 // ============================================================================
@@ -194,78 +159,6 @@ export function isValidSemver(value: string): boolean {
 export type RetryResult<T> =
   | { success: true; data: T }
   | { success: false; message: string };
-
-/**
- * Handler for retrying failed operations with exponential backoff
- */
-export class RetryHandler {
-  private readonly maxAttempts: number;
-  private readonly delayMs: number;
-  private readonly backoffMultiplier: number;
-  private readonly maxDelayMs: number;
-
-  constructor(config?: RetryConfig) {
-    this.maxAttempts = config?.maxAttempts ?? RETRY_DEFAULTS.MAX_ATTEMPTS;
-    this.delayMs = config?.delayMs ?? RETRY_DEFAULTS.INITIAL_DELAY;
-    this.backoffMultiplier =
-      config?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
-    this.maxDelayMs = config?.maxDelayMs ?? RETRY_DEFAULTS.MAX_DELAY;
-  }
-
-  /**
-   * Execute an operation with retry logic
-   * Returns a result type instead of throwing
-   */
-  async withRetry<T>(
-    operation: () => Promise<T>,
-    logger: EndpointLogger,
-    operationName: string,
-  ): Promise<RetryResult<T>> {
-    let lastError: Error | undefined;
-
-    for (let attempt = 1; attempt <= this.maxAttempts; attempt++) {
-      try {
-        const data = await operation();
-        return { success: true, data };
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-
-        if (attempt < this.maxAttempts) {
-          const delay = this.calculateDelay(attempt);
-          logger.warn(MESSAGES.RETRY_ATTEMPT, {
-            operation: operationName,
-            attempt,
-            maxAttempts: this.maxAttempts,
-            nextRetryIn: formatDuration(delay),
-            error: lastError.message,
-          });
-          await sleep(delay);
-        }
-      }
-    }
-
-    logger.error(MESSAGES.RETRY_FAILED, {
-      operation: operationName,
-      attempts: this.maxAttempts,
-      lastError: lastError?.message,
-    });
-
-    return {
-      success: false,
-      message:
-        lastError?.message ??
-        `${operationName} failed after ${this.maxAttempts} attempts`,
-    };
-  }
-
-  /**
-   * Calculate delay for a given attempt using exponential backoff
-   */
-  private calculateDelay(attempt: number): number {
-    const delay = this.delayMs * Math.pow(this.backoffMultiplier, attempt - 1);
-    return Math.min(delay, this.maxDelayMs);
-  }
-}
 
 // ============================================================================
 // Time and Duration Helpers
@@ -311,37 +204,9 @@ export function formatDuration(ms: number): string {
   return `${hours}h ${remainingMinutes}m`;
 }
 
-/**
- * Create a stopwatch for measuring operation duration
- */
-export function createStopwatch(): {
-  stop: () => number;
-  elapsed: () => number;
-} {
-  const start = Date.now();
-  return {
-    stop: () => Date.now() - start,
-    elapsed: () => Date.now() - start,
-  };
-}
-
 // ============================================================================
 // String Helpers
 // ============================================================================
-
-/**
- * Escape shell special characters in a string
- */
-export function sanitizeForShell(value: string): string {
-  return value.replaceAll(/[`$\\!"']/g, "\\$&");
-}
-
-/**
- * Escape double quotes in a string for shell commands
- */
-export function escapeDoubleQuotes(value: string): string {
-  return value.replaceAll('"', '\\"');
-}
 
 /**
  * Truncate a string to a maximum length with ellipsis
@@ -351,27 +216,6 @@ export function truncate(str: string, maxLength: number): string {
     return str;
   }
   return `${str.slice(0, maxLength - 3)}...`;
-}
-
-/**
- * Convert a string to kebab-case
- */
-export function toKebabCase(str: string): string {
-  return str
-    .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
-    .replaceAll(/[\s_]+/g, "-")
-    .toLowerCase();
-}
-
-/**
- * Pluralize a word based on count
- */
-export function pluralize(
-  count: number,
-  singular: string,
-  plural?: string,
-): string {
-  return count === 1 ? singular : (plural ?? `${singular}s`);
 }
 
 // ============================================================================
@@ -474,42 +318,9 @@ export function unique<T>(array: T[]): T[] {
   return [...new Set(array)];
 }
 
-/**
- * Execute async operations with a concurrency limit
- * Uses Promise.allSettled for cleaner implementation without type casts
- */
-export async function asyncPool<T, R>(
-  items: T[],
-  concurrency: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = [];
-
-  // Process items in batches of concurrency size
-  for (let i = 0; i < items.length; i += concurrency) {
-    const batch = items.slice(i, i + concurrency);
-    const batchResults = await Promise.allSettled(batch.map(fn));
-
-    for (const result of batchResults) {
-      if (result.status === "fulfilled") {
-        results.push(result.value);
-      }
-    }
-  }
-
-  return results;
-}
-
 // ============================================================================
 // Object Helpers
 // ============================================================================
-
-/**
- * Deep clone an object
- */
-export function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
-}
 
 /**
  * Pick specific keys from an object
@@ -553,28 +364,6 @@ export type EnvResult =
   | { success: false; message: string };
 
 /**
- * Get an environment variable with a default value
- */
-export function getEnv(key: string, defaultValue?: string): string | undefined {
-  return process.env[key] ?? defaultValue;
-}
-
-/**
- * Get a required environment variable
- * Returns a result type instead of throwing
- */
-export function requireEnv(key: string): EnvResult {
-  const value = process.env[key];
-  if (value === undefined || value === "") {
-    return {
-      success: false,
-      message: `Required environment variable ${key} is not set`,
-    };
-  }
-  return { success: true, value };
-}
-
-/**
  * Check if running in production
  */
 export function isProduction(): boolean {
@@ -597,17 +386,6 @@ export function isDevelopment(): boolean {
  */
 export function normalizePath(path: string): string {
   return path.replaceAll("\\", "/");
-}
-
-/**
- * Get file extension from path (without dot)
- */
-export function getExtension(path: string): string {
-  const lastDot = path.lastIndexOf(".");
-  if (lastDot === -1 || lastDot === 0) {
-    return "";
-  }
-  return path.slice(lastDot + 1).toLowerCase();
 }
 
 // ============================================================================

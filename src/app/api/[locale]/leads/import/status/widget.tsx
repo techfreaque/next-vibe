@@ -28,7 +28,6 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import React from "react";
 
 import { CsvImportJobStatus, type CsvImportJobStatusValue } from "../enum";
-
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";
 

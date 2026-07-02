@@ -38,18 +38,6 @@ export const CRON_SCHEDULES = {
 } as const;
 
 /**
- * Task Priority Weights for Sorting
- * Higher numbers indicate higher priority
- */
-export const TASK_PRIORITY_WEIGHTS = {
-  CRITICAL: 5,
-  HIGH: 4,
-  MEDIUM: 3,
-  LOW: 2,
-  BACKGROUND: 1,
-} as const;
-
-/**
  * Default Task Timeouts (in milliseconds)
  */
 export const TASK_TIMEOUTS = {
@@ -58,17 +46,6 @@ export const TASK_TIMEOUTS = {
   LONG: 600000, // 10 minutes
   EXTENDED: 1800000, // 30 minutes
   MAXIMUM: 3600000, // 1 hour
-} as const;
-
-/**
- * Default Retry Configuration
- */
-export const TASK_RETRY_CONFIG = {
-  DEFAULT_RETRIES: 3,
-  DEFAULT_RETRY_DELAY: 5000, // 5 seconds
-  MAX_RETRIES: 5,
-  MIN_RETRY_DELAY: 1000, // 1 second
-  MAX_RETRY_DELAY: 30000, // 30 seconds
 } as const;
 
 /**
@@ -82,15 +59,4 @@ export const HISTORY_INTERVALS = {
   EVERY_15_MINUTES: 900000,
   EVERY_30_MINUTES: 1800000,
   EVERY_HOUR: 3600000,
-} as const;
-
-/**
- * Task Batch Sizes
- */
-export const TASK_BATCH_SIZES = {
-  SMALL: 10,
-  MEDIUM: 50,
-  LARGE: 100,
-  EXTRA_LARGE: 500,
-  MAXIMUM: 1000,
 } as const;

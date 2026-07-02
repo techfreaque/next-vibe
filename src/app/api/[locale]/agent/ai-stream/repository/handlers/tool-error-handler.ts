@@ -19,7 +19,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { type ToolCall } from "../../../chat/db";

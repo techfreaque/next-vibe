@@ -65,9 +65,9 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/platform-products";
+
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import { useSubscription } from "../hooks";
-
 import type definition from "./definition";
 
 const MIN_QTY = 1;

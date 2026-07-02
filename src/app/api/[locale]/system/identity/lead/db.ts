@@ -17,6 +17,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
+import type { z } from "zod";
+
+import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
+import { CampaignTypeDB } from "@/app/api/[locale]/messenger/accounts/enum";
+import { MessageStatus as EmailStatus } from "@/app/api/[locale]/messenger/messages/enum";
+import { MessageStatusDB as EmailStatusDB } from "@/app/api/[locale]/messenger/messages/enum";
+import { users } from "@/app/api/[locale]/user/db";
+
 import {
   DeviceTypeDB,
   EmailCampaignStage,
@@ -29,13 +37,6 @@ import {
   LeadStatus,
   LeadStatusDB,
 } from "./enum";
-import type { z } from "zod";
-
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
-import { CampaignTypeDB } from "@/app/api/[locale]/messenger/accounts/enum";
-import { MessageStatus as EmailStatus } from "@/app/api/[locale]/messenger/messages/enum";
-import { MessageStatusDB as EmailStatusDB } from "@/app/api/[locale]/messenger/messages/enum";
-import { users } from "@/app/api/[locale]/user/db";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys

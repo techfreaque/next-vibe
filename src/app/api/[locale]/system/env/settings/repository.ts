@@ -16,6 +16,11 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import type { SystemSettingsT } from "next-vibe/env/settings/i18n";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ZodTypeAny } from "zod";
+
+import type { EnvExample } from "../define-env";
 import {
   encryptEnvValue,
   isEncryptedValue,
@@ -28,11 +33,6 @@ import type {
   SystemSettingsPostRequestOutput,
   SystemSettingsPostResponseOutput,
 } from "./definition";
-import type { SystemSettingsT } from "next-vibe/env/settings/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ZodTypeAny } from "zod";
-
-import type { EnvExample } from "../define-env";
 
 export class SystemSettingsRepository {
   /** Sentinel password that triggers onboarding */
@@ -121,7 +121,7 @@ export class SystemSettingsRepository {
       logger.debug("Reading system settings from env modules");
 
       // Dynamic import to avoid server-only issues at definition parse time
-      const { envModules } = await import("@/generated/env");
+      const { envModules } = await import("@/generated/env/index");
 
       const onboardingIssues: string[] = [];
       // Hide modules where all fields are auto-detected (not user-configurable)
@@ -217,7 +217,8 @@ export class SystemSettingsRepository {
           (s) => s.key === "VIBE_ADMIN_USER_PASSWORD",
         );
         // Check raw env value (not masked) for sentinel
-        const { envModules: rawModules } = await import("@/generated/env");
+        const { envModules: rawModules } =
+          await import("@/generated/env/index");
         const rawEnv = rawModules["env"]?.env as
           | Record<string, string | number | boolean | null | undefined>
           | undefined;
@@ -302,7 +303,7 @@ export class SystemSettingsRepository {
       logger.debug(`Writing settings to ${envPath}`);
 
       // Load env modules to get metadata (comments, defaults, commented flag)
-      const { envModules } = await import("@/generated/env");
+      const { envModules } = await import("@/generated/env/index");
 
       // Build lookup maps: key → example metadata, key → schema field
       const exampleMap = new Map<string, EnvExample>();

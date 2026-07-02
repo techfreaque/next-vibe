@@ -28,10 +28,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
-import {
-  instanceIdentities,
-  remoteConnections,
-} from "../db";
 import { env } from "@/config/env";
 
 import {
@@ -46,6 +42,10 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import {
+  instanceIdentities,
+  remoteConnections,
+} from "../db";
 
 // ── Skip guard ────────────────────────────────────────────────────────────────
 
@@ -161,10 +161,10 @@ if (_remoteUrl) {
       }
 
       // Routing for threads in REMOTE/<instanceId> is purely deterministic —
-      // transport.ts step 2 traverses folder ancestors back to the REMOTE root
-      // and matches the top-level name to a connection's instanceId.
-      const { RemoteTransport } =
-        await import("../transport");
+      // execute-tool/routing step 2 traverses folder ancestors back to the
+      // REMOTE root and matches the top-level name to a connection's instanceId.
+      const { resolveTarget } =
+        await import("next-vibe/execute-tool/routing");
       const { createEndpointLogger } =
         await import("next-vibe/logger/server");
       const target = await RemoteTransport.resolveTarget({

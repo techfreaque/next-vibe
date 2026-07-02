@@ -87,6 +87,7 @@ export const translations: typeof enTranslations = {
     empty: "Brak grafow. Utworz pierwszy graf potoku.",
     error: "Nie udalo sie zaladowac grafow. Sprobuj ponownie.",
     archive: "Archiwizuj",
+    delete: "Usu\u0144",
     searchPlaceholder: "Szukaj po nazwie, slugu lub opisie\u2026",
     noMatchTitle: "Brak pasujacych grafow",
     noMatchHint: "Sprobuj innego hasla wyszukiwania",

@@ -11,8 +11,9 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 import type { JSX } from "react";
+
+import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 
 /**
  * Metadata Widget - Displays very small, muted supplementary text

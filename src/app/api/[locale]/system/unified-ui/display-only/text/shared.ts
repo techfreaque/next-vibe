@@ -7,8 +7,9 @@
 import type { FieldDataType } from "next-vibe/core/definition/enums";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import type { TextFormat, TextWidgetSchema } from "./types";
 import type z from "zod";
+
+import type { TextFormat, TextWidgetSchema } from "./types";
 
 /**
  * Processed text data structure

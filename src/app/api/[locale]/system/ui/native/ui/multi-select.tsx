@@ -3,16 +3,7 @@
  * Imports types from web and provides native implementation
  */
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./command";
 import { Check, ChevronDown, X } from "next-vibe/ui/native/ui/icons";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
 // Import ALL types from web (source of truth)
 import type {
@@ -24,6 +15,15 @@ import { Pressable, View } from "react-native";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./command";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export function MultiSelect({
   options,

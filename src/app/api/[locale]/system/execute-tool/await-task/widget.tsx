@@ -16,7 +16,7 @@ import {
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { getEndpoint } from "@/generated/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type definition from "./definition";
 

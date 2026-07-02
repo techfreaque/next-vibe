@@ -9,6 +9,11 @@ import { ChevronDown, Phone } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
 import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+import type { StyleType } from "next-vibe/ui/web/utils/style-type";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
+
+import { Button } from "./button";
 import {
   Command,
   CommandEmpty,
@@ -17,13 +22,8 @@ import {
   CommandItem,
   CommandList,
 } from "./command";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-
-import { Button } from "./button";
 import { Input } from "./input";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 // Cross-platform country data
 export interface CountryData {

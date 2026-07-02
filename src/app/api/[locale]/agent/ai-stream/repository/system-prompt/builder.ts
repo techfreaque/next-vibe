@@ -20,7 +20,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { loadAllPromptFragments } from "@/generated/prompt-fragments-server";
+import { loadAllPromptFragments } from "@/generated/prompt-fragments/server";
 
 import { buildTrailingSystemMessage, generateSystemPrompt } from "./assembler";
 import type {

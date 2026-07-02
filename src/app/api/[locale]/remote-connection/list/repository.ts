@@ -94,6 +94,7 @@ export class RemoteConnectionListRepository {
         remoteUrl: r.remoteUrl,
         localUrl: r.localUrl ?? null,
         isActive: r.isActive,
+        isInferenceProvider: r.isInferenceProvider,
         lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
         hasToken: !!r.token,
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),

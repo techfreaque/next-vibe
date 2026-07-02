@@ -7,9 +7,7 @@
  */
 
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { leads } from "next-vibe/identity/lead/db";
-import type { z } from "zod";
 
 export const frameExchangeTokens = pgTable("frame_exchange_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
