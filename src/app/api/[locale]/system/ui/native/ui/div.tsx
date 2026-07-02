@@ -1,21 +1,22 @@
 "use client";
 
+import type { JSX } from "react";
+import * as React from "react";
+import { Pressable, Text as RNText, View } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   DivGenericTarget,
   DivMouseEvent,
   DivProps as DivBaseProps,
   DivRefObject,
-} from "next-vibe/ui/web/ui/div";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import type { JSX } from "react";
-import * as React from "react";
-import { Pressable, Text as RNText, View } from "react-native";
+} from "../../web/ui/div";
+import type { StyleType } from "../../web/utils/style-type";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styledNativeRef(View);
 const StyledPressable = styledNative(Pressable);

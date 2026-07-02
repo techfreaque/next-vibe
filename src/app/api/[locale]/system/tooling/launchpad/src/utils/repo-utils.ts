@@ -40,7 +40,7 @@ function isLaunchpadPackage(
 }
 
 // Recursively process the config to extract all repository entries
-export function extractRepos(
+function extractRepos(
   obj: LaunchpadPackage | LaunchpadFolder,
   currentPath: string[] = [],
 ): { path: string[]; config: LaunchpadPackage }[] {

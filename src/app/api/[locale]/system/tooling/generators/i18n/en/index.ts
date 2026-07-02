@@ -34,10 +34,6 @@ export const translations = {
         label: "Skip Task Index",
         description: "Skip task index generation",
       },
-      enableTrpc: {
-        label: "Enable tRPC",
-        description: "Generate the tRPC router (opt-in)",
-      },
       skipTanstack: {
         label: "Skip TanStack",
         description: "Skip TanStack route generation",

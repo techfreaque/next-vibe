@@ -115,7 +115,7 @@ function computeNodeRanges(
   return result;
 }
 
-export interface GraphRunResult {
+interface GraphRunResult {
   series: Map<string, DataPoint[]>;
   signals: Map<string, SignalEvent[]>;
   errors: Array<{ nodeId: string; error: string }>;

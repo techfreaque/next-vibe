@@ -1,17 +1,18 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-} from "next-vibe/ui/web/ui/collapsible";
-import type { JSX } from "react";
+} from "../../web/ui/collapsible";
 
 export type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-} from "next-vibe/ui/web/ui/collapsible";
+} from "../../web/ui/collapsible";
 
 // CLI: always expanded - no interactivity in terminal
 

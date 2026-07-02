@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a14c2d722dbdd38a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 08:11:05 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782979864-kYOJWX7qMk2E7VL7PuTh"
+  },
+  "body": {
+    "id": "gen-1782979864-kYOJWX7qMk2E7VL7PuTh",
+    "object": "chat.completion",
+    "created": 1782979864,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio features a short, looped instrumental track with a steady, dance-like rhythm.\n\n**Music:**\n*   **Genre:** Lounge, Chill House\n*   **Tempo:** Approximately 110 BPM\n*   **Instrumentation:**\n    *   **Drums:** A simple, precise drum machine beat comprising a prominent, dry kick drum on quarter notes, a distinct snare hit on beats 2 and 4, and high-hats providing a steady eighth-note pulse. The high-hats have a slightly open, shimmering quality on the off-beats.\n    *   **Bass:** A soft, sustained synthetic bassline plays a simple, melodic figure, providing harmonic foundation and groove. It has a smooth, rounded tone.\n    *   **Keyboard/Synth (Pad):** A warm, ethereal synth pad provides sustained chords, adding to the relaxed atmosphere.\n    *   **Keyboard/Synth (Melody):** A bright, Rhodes-like electric piano or synth plays a repeating, catchy melodic phrase. The phrase is slightly syncopated, giving it a playful feel.\n*   **Production Style:** Crisp and clear, likely studio-produced with a polished feel. There's a subtle reverb on some of the synth elements, contributing to the airy feel.\n*   **Mood:** Relaxed, groovy, and slightly upbeat. It evokes images of a lounge setting or a chill-out space.\n*   **Structure:** The audio appears to be a continuous loop of a short musical phrase, without any distinct verse, chorus, or bridge indicated by the provided segment.\n\n**Overall:**\n*   **Duration Impression:** Short clip, likely an excerpt from a longer track or a looping background track.\n*   **Sound Quality:** High quality, clean recording.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 370,
+      "total_tokens": 1442,
+      "cost": 0.0017716,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017716,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000925
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

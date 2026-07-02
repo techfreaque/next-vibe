@@ -9,6 +9,7 @@
  * instanceId or a REMOTE folder — so the loop genuinely stays local.)
  *
  * Setup is E2E: connectToHermes logs into remote (3002), registers atlas, syncs caps.
+ * transportMode='direct-http' is the default after connectToHermes (same machine).
  */
 
 import "server-only";
@@ -16,84 +17,33 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-
 import {
   failSuitePrerequisites,
   HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveRemoteUrlSync,
 } from "../../testing/remote-setup";
+import { makeDirectSetup } from "./helpers/remote";
 import { describeStreamSuite } from "./route-base.test";
-
-let _prodUserId: string | null = null;
-
-async function setupDirectConnection(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const {
-    connectToHermes,
-    disconnectFromHermes,
-    ensureRemoteUserCredits,
-    resolveProdAdminToken,
-    resolveProdUserId,
-  } = await import("../../testing/remote-setup");
-
-  // Idempotent: clean up any leftover connection from a previous failed run
-  await disconnectFromHermes(testUser.id);
-
-  // E2E: log into remote, register atlas, sync capabilities
-  // _resolvedRemoteUrl is guaranteed non-null when the suite runs
-  await connectToHermes(
-    testUser,
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-  );
-
-  _prodUserId = await resolveProdUserId();
-
-  // Top up credits on the remote via real endpoint — no direct DB writes
-  const remoteAdminToken = await resolveProdAdminToken(
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-  );
-  await ensureRemoteUserCredits(
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-    remoteAdminToken,
-    _prodUserId,
-    20000,
-  );
-
-  // transportMode='direct-http' is the default after connectToHermes (same machine)
-}
-
-async function teardownDirectConnection(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const { disconnectFromHermes, unregisterDevFromHermes } =
-    await import("../../testing/remote-setup");
-
-  const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
-  if (_prodUserId) {
-    tasks.push(unregisterDevFromHermes(_prodUserId));
-  }
-  await Promise.all(tasks);
-  _prodUserId = null;
-}
 
 const _resolvedRemoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
+// Idempotent E2E connection: disconnect leftovers → connectToHermes →
+// resolveProdUserId → top up remote credits via real endpoint (20000cr) →
+// mirrored teardown (disconnect + unregister).
+const hooks = makeDirectSetup(_resolvedRemoteUrl);
+
 if (_resolvedRemoteUrl && _isFixtureMode) {
   describeStreamSuite({
-    label: `AI Stream Integration - Direct (${_resolvedRemoteUrl}, transportMode='direct-http')`,
+    label: `AI Stream Integration - Direct tools-remote (${_resolvedRemoteUrl}, loop LOCAL, tools via execute-tool→hermes over direct-http)`,
     cachePrefix: "direct-",
-    // No remoteInstanceId: AI loop runs on hermes (loopLocation='server') via relay.
-    // Tools execute locally on hermes — no execute-tool wrapper from the test side.
-    // System prompt + tools are built on local client (atlas) and sent in relay POST.
-    // Credits are deducted on hermes (remote) — not visible in local testUser balance.
-    // assertSystemPromptFromLocal: system prompt built locally; AI must report local instance ID.
+    // Loop runs locally; every tool executes on hermes via the execute-tool
+    // meta-tool (prompt wrapping + remote-call assertions key off this).
+    remoteInstanceId: HERMES_INSTANCE_ID,
     assertSystemPromptFromLocal: true,
-    setup: setupDirectConnection,
-    teardown: teardownDirectConnection,
+    setup: hooks.setup,
+    teardown: hooks.teardown,
   });
 } else if (!_resolvedRemoteUrl) {
   failSuitePrerequisites(

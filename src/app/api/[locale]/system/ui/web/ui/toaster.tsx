@@ -1,8 +1,8 @@
 "use client";
 
-import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 import type { JSX } from "react";
 
+import { useToast } from "../../web/hooks/use-toast";
 import {
   Toast,
   ToastClose,

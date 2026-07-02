@@ -16,7 +16,7 @@
  *          - Final assistant message appears AFTER the compacting message
  *          - Stream completes successfully (not aborted)
  *
- * Tests use the real quality-tester__kimi favorite (created in beforeAll if absent).
+ * Tests use the real quality-tester__budget favorite (created in beforeAll if absent).
  * C1/C2 temporarily patch compactTrigger=5000 on the fav and restore null after.
  * This lets the user override the fav via the UI — the test only changes compactTrigger.
  *
@@ -249,7 +249,7 @@ describe("Compacting - context management", () => {
       testsParentId,
     );
 
-    // ── Resolve quality-tester__kimi favorite ──
+    // ── Resolve quality-tester__budget favorite ──
     // Use existing fav if present (respects user overrides). Create only if absent.
     const [favsDef, favoriteCreateDef] = await Promise.all([
       import("@/app/api/[locale]/agent/skills/favorites/definition").then(
@@ -282,26 +282,26 @@ describe("Compacting - context management", () => {
     } else {
       const createResult = await RouteExecuteRepository.runInProcessTyped({
         definition: favoriteCreateDef,
-        input: { skillId: "quality-tester__kimi" },
+        input: { skillId: "quality-tester__budget" },
         user: testUser,
         locale: defaultLocale,
         platform: Platform.AI,
       });
       expect(
         createResult.success,
-        `Failed to create quality-tester__kimi fav: ${!createResult.success ? createResult.message : ""}`,
+        `Failed to create quality-tester__budget fav: ${!createResult.success ? createResult.message : ""}`,
       ).toBe(true);
       if (!createResult.success) {
         // oxlint-disable-next-line restricted-syntax
         throw new Error(
-          `Failed to create quality-tester__kimi favorite: ${createResult.message}`,
+          `Failed to create quality-tester__budget favorite: ${createResult.message}`,
         );
       }
       const favId = createResult.data?.["id"];
       if (!favId) {
         // oxlint-disable-next-line restricted-syntax
         throw new Error(
-          "quality-tester__kimi favorite created but id is missing",
+          "quality-tester__budget favorite created but id is missing",
         );
       }
       mainFavoriteId = String(favId);

@@ -22,7 +22,7 @@ import type { PackageJson, ReleaseOptions, VersionInfo } from "../definition";
 import { MESSAGES } from "./constants";
 import { gitService } from "./git-service";
 
-export class ReleaseCreator {
+class ReleaseCreator {
   createGitRelease(
     cwd: string,
     releaseConfig: ReleaseOptions,

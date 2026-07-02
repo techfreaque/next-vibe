@@ -1,15 +1,10 @@
 import { Text } from "ink";
-import type {
-  CountryData,
-  PhoneFieldProps,
-} from "next-vibe/ui/web/ui/phone-field";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type {
-  CountryData,
-  PhoneFieldProps,
-} from "next-vibe/ui/web/ui/phone-field";
+import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
+
+export type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
 // COUNTRIES is a large data array only needed for web phone input UI
 export const COUNTRIES: CountryData[] = [];
 

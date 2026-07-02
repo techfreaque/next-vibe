@@ -33,7 +33,7 @@ export type ClientHandlerFunction<
 /**
  * Client handler options - simplified version of ApiHandlerOptions
  */
-export interface ClientHandlerOptions<
+interface ClientHandlerOptions<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,

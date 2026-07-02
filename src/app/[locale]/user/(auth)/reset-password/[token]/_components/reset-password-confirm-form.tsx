@@ -3,13 +3,13 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Card, CardContent } from "next-vibe/ui/web/ui/card";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { Link } from "next-vibe/ui/web/ui/link";
 import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";

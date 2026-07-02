@@ -67,6 +67,7 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
+import { createQualityTesterFavorite } from "./helpers/favorites";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -85,6 +86,9 @@ const TEST_TIMEOUT = 120_000;
 
 let testUser: JwtPrivatePayloadType;
 let _prodUserId: string | null = null;
+
+/** Deterministic quality-tester favorite (created fresh in beforeAll) */
+let mainFavoriteId: string;
 
 /** Subfolder under PRIVATE root for scenario A threads */
 let privateTestFolderId: string;
@@ -128,6 +132,9 @@ if (!_resolvedRemoteUrl) {
       await disconnectFromHermes(testUser.id);
       await connectToHermes(testUser, _resolvedRemoteUrl);
       _prodUserId = await resolveProdUserId();
+
+      // ── Deterministic model selection (same favorite as all other suites) ──
+      mainFavoriteId = await createQualityTesterFavorite(testUser);
 
       // ── Create test folders ──
       // Scenario A: PRIVATE root → tests → cortex-remote
@@ -191,6 +198,7 @@ if (!_resolvedRemoteUrl) {
               "to list the root cortex directory on hermes. " +
               "Report the result as JSON, then end with STEP_OK.",
             user: testUser,
+            favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
@@ -270,10 +278,11 @@ if (!_resolvedRemoteUrl) {
           const { result, messages } = await runTestStream({
             prompt:
               `Use execute-tool with toolName='cortex-write' and instanceId='hermes' ` +
-              `to write a file at path '/e2e-test/remote-cortex-test.md' with content '${testContent}' ` +
+              `to write a file at path '/documents/e2e-test/remote-cortex-test.md' with content '${testContent}' ` +
               `on hermes. Then use execute-tool with toolName='cortex-read' and instanceId='hermes' ` +
               `to read it back and confirm the content matches. End with STEP_OK if both succeeded.`,
             user: testUser,
+            favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
@@ -349,6 +358,7 @@ if (!_resolvedRemoteUrl) {
               "List the root cortex directory using the cortex-list tool. " +
               "Report the result as JSON. End with STEP_OK.",
             user: testUser,
+            favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.REMOTE,
             subFolderId: remoteHermesFolderId,
             threadId: sharedThreadId,

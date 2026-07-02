@@ -13,8 +13,6 @@ import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { BaseExecutionContext } from "next-vibe/core/route/executor";
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -35,7 +33,6 @@ import {
   filterPlatformMarkers,
   PlatformMarker,
   UserPermissionRole,
-  type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createCliBypassUser } from "next-vibe/platforms/cli/auth/cli-bypass-user";
@@ -45,7 +42,7 @@ import {
   CliTarget,
   type CliTargetValue,
 } from "next-vibe/platforms/cli/types/cli-target";
-import type { CliResultFormatter as CliResultFormatterType } from "next-vibe/ui/renderers/cli/response/result-formatter";
+import type { CliResultFormatter as CliResultFormatterType } from "next-vibe/unified-ui/renderers/cli/response/result-formatter";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import {
@@ -54,7 +51,7 @@ import {
 } from "@/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
-import { CliInputParser, type CliUrlParams } from "./parsing";
+import { CliInputParser } from "./parsing";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
 let _getCliUser: typeof getCliUser | null = null;
@@ -71,7 +68,7 @@ let _resultFormatter: typeof CliResultFormatterType | null = null;
 async function getResultFormatter(): Promise<typeof CliResultFormatterType> {
   if (!_resultFormatter) {
     const mod =
-      await import("next-vibe/ui/renderers/cli/response/result-formatter");
+      await import("next-vibe/unified-ui/renderers/cli/response/result-formatter");
     _resultFormatter = mod.CliResultFormatter;
   }
   return _resultFormatter;
@@ -119,40 +116,6 @@ export type CliCompatiblePlatform =
   | typeof Platform.CLI
   | typeof Platform.CLI_PACKAGE
   | typeof Platform.MCP;
-
-/**
- * Route execution context
- * Extends BaseExecutionContext with CLI-specific fields
- */
-export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext<Record<string, WidgetData>>,
-  "user"
-> {
-  /** URL path parameters */
-  urlPathParams?: CliUrlParams;
-
-  /** CLI-specific arguments */
-  cliArgs?: {
-    positionalArgs: string[];
-    namedArgs: Record<string, WidgetData>;
-    /** Raw tokens after the command, for endpoint-aware re-parsing */
-    rawTokens?: string[];
-  };
-
-  /** More specific user type for CLI */
-  user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
-
-  /** CLI-specific options */
-  options?: {
-    verbose?: boolean;
-    dryRun?: boolean;
-    interactive?: boolean;
-    output?: "json" | "table" | "pretty";
-  };
-
-  /** Timestamp of execution */
-  timestamp: number;
-}
 
 /**
  * Route execution result
@@ -206,7 +169,7 @@ export interface RouteExecutionResult {
 /**
  * CLI execution options interface
  */
-export interface CliExecutionOptions {
+interface CliExecutionOptions {
   data: Record<string, WidgetData> | undefined;
   urlPathParams:
     | Record<string, string | number | boolean | null | undefined>
@@ -351,7 +314,7 @@ export class RouteDelegationHandler {
       // Interactive mode: Use Ink terminal UI
       if (options.interactive && endpoint) {
         const { renderInkEndpointPage } =
-          await import("next-vibe/ui/renderers/cli/CliEndpointPage");
+          await import("next-vibe/unified-ui/renderers/cli/CliEndpointPage");
 
         // Collect CLI input data first (parse args, but no interactive prompts)
         const inputData = await CliInputParser.collectCliRequestData(
@@ -759,6 +722,7 @@ async function executeRemoteEndpoint(params: {
     Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${effectiveLeadId}`,
   };
 
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- auth-bootstrap: login/logout needs the raw Set-Cookie response and runs before any session/instanceId exists (see comment above)
   const response = await fetch(url, {
     method: endpoint.method,
     headers,
@@ -822,6 +786,9 @@ async function bootstrapRemoteLeadId(
   logger: EndpointLogger,
 ): Promise<string | null> {
   try {
+    // auth-bootstrap: reads the raw Set-Cookie lead_id before any session exists;
+    // must hit the wire, cannot go through the typed/in-process path.
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- lead-id bootstrap (raw Set-Cookie, pre-session)
     const response = await fetch(host, { method: "GET", redirect: "manual" });
     const setCookie = response.headers.get("set-cookie");
     if (setCookie) {
@@ -835,6 +802,7 @@ async function bootstrapRemoteLeadId(
       const redirectUrl = location.startsWith("http")
         ? location
         : `${host}${location}`;
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- lead-id bootstrap: follow redirect to read raw Set-Cookie (pre-session)
       const redirectResponse = await fetch(redirectUrl, {
         method: "GET",
         redirect: "manual",

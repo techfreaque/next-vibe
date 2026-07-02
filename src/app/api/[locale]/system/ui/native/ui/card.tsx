@@ -1,9 +1,12 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import { Text as RNText, View } from "react-native";
+
 import {
   convertCSSToTextStyle,
   convertCSSToViewStyle,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   CardContentProps,
   CardDescriptionProps,
@@ -11,11 +14,8 @@ import type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "next-vibe/ui/web/ui/card";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { Text as RNText, View } from "react-native";
-
+} from "../../web/ui/card";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

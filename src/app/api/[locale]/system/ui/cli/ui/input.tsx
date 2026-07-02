@@ -1,9 +1,10 @@
 import { Text } from "ink";
 import TextInput from "ink-text-input";
-import { useCliFieldFocus } from "next-vibe/ui/cli/lib/focus-manager";
-import type { InputProps } from "next-vibe/ui/web/ui/input";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
+
+import { useCliFieldFocus } from "../../cli/lib/focus-manager";
+import type { InputProps } from "../../web/ui/input";
 
 export type {
   InferValueType,
@@ -15,7 +16,7 @@ export type {
   InputMouseEvent,
   InputProps,
   InputRefObject,
-} from "next-vibe/ui/web/ui/input";
+} from "../../web/ui/input";
 
 const BRACKET_OPEN = "\u005B";
 const BRACKET_CLOSE = "\u005D";

@@ -46,10 +46,12 @@ describe("extractSymbols", () => {
     expect(byName.get("SomeType")).toBe("type");
   });
 
-  it("extracts static methods with their owning class", () => {
+  it("extracts PUBLIC static methods with their owning class (skips private)", () => {
     const statics = syms.filter((s) => s.kind === "static-method");
     const names = statics.map((s) => s.name).toSorted();
-    expect(names).toEqual(["execute", "helperUsed", "internalThing"]);
+    // `internalThing` is `private static` — not cross-file public surface, so
+    // it is intentionally excluded (a private static can never be "dead public").
+    expect(names).toEqual(["execute", "helperUsed"]);
     expect(statics.every((s) => s.owner === "WidgetRepository")).toBe(true);
   });
 
@@ -73,10 +75,6 @@ describe("usageFor", () => {
     expect(usageFor(find("helperUsed"), index).usageCount).toBe(1);
   });
 
-  it("reports an unused static method as zero", () => {
-    expect(usageFor(find("internalThing"), index).usageCount).toBe(0);
-  });
-
   it("counts a used top-level function, excluding its own file", () => {
     expect(usageFor(find("topLevelFn"), index).usageCount).toBe(1);
   });
@@ -84,5 +82,25 @@ describe("usageFor", () => {
   it("reports unused const/type as zero", () => {
     expect(usageFor(find("SOME_CONST"), index).usageCount).toBe(0);
     expect(usageFor(find("SomeType"), index).usageCount).toBe(0);
+  });
+
+  it("treats a static method reached via a DYNAMIC class ref as used", () => {
+    // A class pulled off a module object (`mod.WidgetRepository`) then called
+    // (`.execute()`) never writes the literal `WidgetRepository.execute`, so the
+    // member scan alone would miss it. dynamicClassRefs must keep it alive.
+    const dynSources = new Map([
+      ["src/x/repo.ts", REPO_SRC],
+      [
+        "src/y/dynamic.ts",
+        `const mod = await import("./repo");\n` +
+          `const R = mod.WidgetRepository;\n` +
+          `await R.execute();\n`,
+      ],
+    ]);
+    const dynIndex = buildUsageIndex(dynSources);
+    expect(dynIndex.dynamicClassRefs.has("WidgetRepository")).toBe(true);
+    // Even helperUsed — not called by qualified name in dynamic.ts — is treated
+    // as reachable because its owning class is dynamically referenced.
+    expect(usageFor(find("helperUsed"), dynIndex).usageCount).toBeGreaterThan(0);
   });
 });

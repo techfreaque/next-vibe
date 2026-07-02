@@ -11,7 +11,7 @@ const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: { params: Record<string, string>; search: Record<string, string> }) => data)
   .handler(async ({ data }) => {
     const { tanstackLoader } = await import("@/app/[locale]/subscription/buy/page");
-        return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });
+    return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });
   });
 
 function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }

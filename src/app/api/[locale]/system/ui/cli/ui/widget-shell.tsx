@@ -1,11 +1,12 @@
 import { Box } from "ink";
-import type { WidgetShellProps } from "next-vibe/ui/web/ui/widget-shell";
 import type { JSX } from "react";
+
+import type { WidgetShellProps } from "../../web/ui/widget-shell";
 
 export type {
   WidgetShellPadding,
   WidgetShellProps,
-} from "next-vibe/ui/web/ui/widget-shell";
+} from "../../web/ui/widget-shell";
 
 const paddingMap: Record<string, number> = {
   none: 0,

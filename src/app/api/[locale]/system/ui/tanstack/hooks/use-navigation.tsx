@@ -83,4 +83,4 @@ export function useSilentHistory(): {
   );
 }
 
-export { notFound } from "next-vibe/ui/tanstack/lib/not-found";
+export { notFound } from "../../tanstack/lib/not-found";

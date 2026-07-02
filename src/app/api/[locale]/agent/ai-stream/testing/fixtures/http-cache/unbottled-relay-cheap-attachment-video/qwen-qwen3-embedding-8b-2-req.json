@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/uploads/video/t1-thread-create-tool-call-explore-the-tool-de9e656c-afe2-4cce-aa0e-74319020640f/test-video.mp4.md\n\n---\nfilename: \"test-video.mp4\"\nembedded: true\nmimeType: \"video/mp4\"\nsize: \"1.1 MB\"\nthreadId: \"de9e656c-afe2-4cce-aa0e-74319020640f\"\nthreadTitle: \"[T1 thread-create+tool-call] Explore the tool...\"\nuploadedAt: \"2026-07-02T08:09:44.111Z\"\n---\n\n# test-video.mp4\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `video/mp4` |\n| Size | 1.1 MB |\n| Thread | [T1 thread-create+tool-call] Explore the tool... |\n| Uploaded | 2026-07-02 |\n\n## Message Context\n\n[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

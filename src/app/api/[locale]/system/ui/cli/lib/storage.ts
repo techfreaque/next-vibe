@@ -12,7 +12,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
-import type { Storage } from "next-vibe/ui/web/lib/storage";
+import type { Storage } from "../../web/lib/storage";
 
 function storageDir(): string {
   return join(process.cwd(), ".tmp", "storage");

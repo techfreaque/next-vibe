@@ -2,7 +2,6 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Badge } from "next-vibe/ui/web/ui/badge";
 import { Button } from "next-vibe/ui/web/ui/button";
 import {
@@ -28,6 +27,7 @@ import { Users } from "next-vibe/ui/web/ui/icons/Users";
 import { Link } from "next-vibe/ui/web/ui/link";
 import { Span } from "next-vibe/ui/web/ui/span";
 import { H1, H2, H3, Muted, P } from "next-vibe/ui/web/ui/typography";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import referralCodesListDefinition from "@/app/api/[locale]/referral/codes/list/definition";

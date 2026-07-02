@@ -1,6 +1,7 @@
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export interface FormElementRefObject {
   submit?: () => void;

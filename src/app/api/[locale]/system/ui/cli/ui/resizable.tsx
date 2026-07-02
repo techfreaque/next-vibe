@@ -3,10 +3,9 @@ import * as React from "react";
 export type {
   ResizableContainerProps,
   ResizableHandleProps,
-} from "next-vibe/ui/web/ui/resizable";
+} from "../../web/ui/resizable";
 
-import type { ResizableContainerProps } from "next-vibe/ui/web/ui/resizable";
-
+import type { ResizableContainerProps } from "../../web/ui/resizable";
 import { Div } from "./div";
 
 export function ResizableContainer({

@@ -86,6 +86,7 @@ export function createFreedomGPT(logger: EndpointLogger): {
     };
 
     // Make the actual request
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
     const response = await fetch(input, modifiedInit);
 
     if (!response.ok) {

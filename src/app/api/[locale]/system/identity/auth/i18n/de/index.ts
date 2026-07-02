@@ -194,11 +194,6 @@ export const translations: typeof enTranslations = {
     errorValidatingUserSession: "Fehler beim Validieren der Benutzersitzung",
     errorGettingUserRoles: "Fehler beim Abrufen der Benutzerrollen",
     errorCheckingUserAuth: "Fehler beim Prüfen der Benutzerauthentifizierung",
-    gettingCurrentUserFromTrpc: "Aktueller Benutzer wird von tRPC abgerufen",
-    errorGettingAuthUserForTrpc:
-      "Fehler beim Abrufen des Auth-Benutzers für tRPC",
-    errorGettingUserRolesForTrpc:
-      "Fehler beim Abrufen der Benutzerrollen für tRPC",
     authenticatingCliUserWithPayload:
       "CLI-Benutzer wird mit Nutzdaten authentifiziert",
     errorAuthenticatingCliUserWithPayload:
@@ -225,7 +220,5 @@ export const translations: typeof enTranslations = {
     noTokenFound: "Kein Token gefunden",
     errorExtractingToken: "Fehler beim Extrahieren des Tokens",
     errorParsingCookies: "Fehler beim Parsen der Cookies",
-    errorGettingCurrentUserFromTrpc:
-      "Fehler beim Abrufen des aktuellen Benutzers von tRPC",
   },
 };

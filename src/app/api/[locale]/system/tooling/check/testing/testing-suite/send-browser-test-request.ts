@@ -30,7 +30,7 @@ import {
 
 type FlatLeaf = string | number | boolean;
 
-export interface BrowserTestOptions {
+interface BrowserTestOptions {
   /**
    * Override the debounce wait (ms) for auto-submit / GET endpoints.
    * Defaults to 800ms (endpoint default 500ms + buffer).

@@ -21,6 +21,16 @@ import { FolderContentsRepository } from "./repository";
 export function createFolderContentsEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
+  rootFolderId: DefaultFolderId,
 ): FolderContentsGetWsEmit {
-  return createEndpointEmitter(folderContentsDefinitions.GET, logger, user);
+  return createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
+    urlPathParams: { rootFolderId },
+    // folder-contents GET keys on subFolderId/threadIds (includeInCacheKey). List
+    // events target the folder's root view — the channel the client subscribes to
+    // with subFolderId undefined and no threadIds — so we key on those exact
+    // values, matching the subscription. Type-safe: requestData is required.
+    requestData: { subFolderId: undefined, threadIds: undefined },
+    kindOverride:
+      FolderContentsRepository.emitChannelForFolder(rootFolderId).kind,
+  });
 }

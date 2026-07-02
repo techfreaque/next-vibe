@@ -254,6 +254,8 @@ export function CreditsTabHeader({
           <SubscriptionStatusCard
             locale={locale}
             initialSubscription={currentSubscription}
+            user={widgetUser}
+            logger={logger}
           />
         </Div>
       )}

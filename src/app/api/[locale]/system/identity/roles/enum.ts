@@ -25,7 +25,7 @@ export const {
  * by default; add the marker to exclude from that platform.
  *   CLI_OFF       - not available on CLI / MCP (shared opt-out for agent platforms)
  *   AI_TOOL_OFF   - not available as an AI tool
- *   WEB_OFF       - not available on web (tRPC, Next.js pages/API)
+ *   WEB_OFF       - not available on web (Next.js pages/API)
  *   MCP_OFF       - not available on MCP specifically (in addition to CLI_OFF)
  *   SKILL_OFF     - excluded from AI skill markdown files (AGENT.md, character skill files, etc.)
  *   PRODUCTION_OFF - disabled in production environment
@@ -83,7 +83,7 @@ export function isUserPermissionRole(
 /**
  * Check if a role is a platform access marker (config-only, never assigned to users)
  */
-export function isPlatformMarker(
+function isPlatformMarker(
   role: UserRoleValue,
 ): role is typeof PlatformMarkerValue {
   return (

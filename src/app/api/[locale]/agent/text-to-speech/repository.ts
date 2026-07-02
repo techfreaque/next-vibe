@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 /**
  * Text-to-Speech Repository
  * Routes TTS requests to the correct provider based on the voice model's ApiProvider.
@@ -17,12 +18,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { agentEnv } from "../env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
-import { getInstanceAvailability } from "../env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import { getBestTtsModel } from "./models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { CreditRepository } from "../../credits/repository";
@@ -30,11 +27,15 @@ import {
   TTS_COST_PER_CHARACTER,
   TTS_MINIMUM_BALANCE,
 } from "../../products/repository-client";
+import { agentEnv } from "../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
+import { getInstanceAvailability } from "../env-availability";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
 } from "./definition";
 import type { TextToSpeechT } from "./i18n";
+import { getBestTtsModel } from "./models";
 
 interface EdenAITTSResponse {
   [provider: string]: {

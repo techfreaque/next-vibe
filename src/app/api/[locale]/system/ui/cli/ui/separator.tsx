@@ -1,7 +1,8 @@
 import { Text } from "ink";
-import type { SeparatorRootProps } from "next-vibe/ui/web/ui/separator";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import * as React from "react";
+
+import type { SeparatorRootProps } from "../../web/ui/separator";
 
 export function Separator({
   orientation = "horizontal",

@@ -7,6 +7,7 @@
  * - No `throw` statements
  * - No JSX in object literals (except for common React node properties like content, icon, title, etc.)
  * - No raw `fetch()` (use typed endpoint hooks; external-API calls opt out with a disable comment)
+ * - No `EndpointsPage` in server entry files (page/layout/template without 'use client' — extract a page-client.tsx)
  *
  * Configuration is loaded from check.config.ts via the shared config loader.
  *
@@ -88,6 +89,34 @@ interface CallExpression extends OxlintASTNode {
   callee?: OxlintASTNode;
 }
 
+/** AST node for Program */
+interface Program extends OxlintASTNode {
+  type: "Program";
+  body?: OxlintASTNode[];
+}
+
+/** AST node for ExpressionStatement */
+interface ExpressionStatement extends OxlintASTNode {
+  type: "ExpressionStatement";
+  expression?: OxlintASTNode;
+}
+
+/** AST node for ImportDeclaration */
+interface ImportDeclaration extends OxlintASTNode {
+  type: "ImportDeclaration";
+  source?: { value?: string | number | boolean | null };
+  importKind?: "type" | "value";
+  specifiers?: ImportSpecifier[];
+}
+
+/** AST node for ImportSpecifier */
+interface ImportSpecifier extends OxlintASTNode {
+  type: string;
+  imported?: OxlintASTNode;
+  local?: OxlintASTNode;
+  importKind?: "type" | "value";
+}
+
 /** Default error messages (can be customized via config) */
 interface RestrictedSyntaxMessages {
   unknownType: string;
@@ -100,6 +129,7 @@ interface RestrictedSyntaxMessages {
   documentAccess: string;
   navigatorAccess: string;
   rawFetch: string;
+  endpointsPageInServerEntry: string;
 }
 
 // ============================================================
@@ -147,6 +177,8 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
     "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/web/utils/browser', or useWindowSize() from 'next-vibe/ui/web/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/web/hooks/use-touch-device'.",
   rawFetch:
     "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API'.",
+  endpointsPageInServerEntry:
+    "'EndpointsPage' cannot be used in a server entry file (page/layout/template without 'use client') — its endpoint props don't survive the server→client boundary. Extract a page-client.tsx with 'use client' that renders EndpointsPage, and render that component from this file (see src/app/[locale]/tools/page.tsx + page-client.tsx).",
 };
 
 // ============================================================
@@ -621,6 +653,75 @@ function getBrowserGlobal(node: OxlintASTNode): {
 }
 
 /**
+ * Next.js server entry filenames — always server components unless the file
+ * itself starts with a 'use client' directive.
+ */
+const NEXT_SERVER_ENTRY_RE = /\/(?:page|layout|template|default)\.[jt]sx$/;
+
+/**
+ * Check if the file is a Next.js server entry file (page/layout/template/default).
+ */
+function isNextServerEntryFile(context: RestrictedSyntaxRuleContext): boolean {
+  let filename = "";
+  if (typeof context.getFilename === "function") {
+    filename = context.getFilename();
+  } else if (typeof context.filename === "string") {
+    filename = context.filename;
+  }
+  if (!filename) {
+    return false;
+  }
+  return NEXT_SERVER_ENTRY_RE.test(filename.replaceAll("\\", "/"));
+}
+
+/**
+ * Return true if a statement is a `"use client"` directive
+ * (an ExpressionStatement whose expression is the string literal).
+ */
+function isUseClientDirective(stmt: OxlintASTNode): boolean {
+  if (stmt.type !== "ExpressionStatement") {
+    return false;
+  }
+  const expr = (stmt as ExpressionStatement).expression;
+  return expr?.type === "Literal" && (expr as Literal).value === "use client";
+}
+
+/**
+ * Return true if an ImportDeclaration imports the EndpointsPage component
+ * (as a value, not a type).
+ */
+function importsEndpointsPage(node: OxlintASTNode): boolean {
+  if (node.type !== "ImportDeclaration") {
+    return false;
+  }
+  const imp = node as ImportDeclaration;
+  if (imp.importKind === "type") {
+    return false;
+  }
+  const specifiers = imp.specifiers;
+  if (!specifiers || !Array.isArray(specifiers)) {
+    return false;
+  }
+  return specifiers.some((spec) => {
+    if (spec.importKind === "type") {
+      return false;
+    }
+    const imported = spec.imported;
+    if (
+      imported?.type === "Identifier" &&
+      (imported as Identifier).name === "EndpointsPage"
+    ) {
+      return true;
+    }
+    const local = spec.local;
+    return (
+      local?.type === "Identifier" &&
+      (local as Identifier).name === "EndpointsPage"
+    );
+  });
+}
+
+/**
  * Return true if a CallExpression is a raw global `fetch(...)` call.
  *
  * Matches bare `fetch(...)`, `window.fetch(...)`, and `globalThis.fetch(...)`.
@@ -704,7 +805,7 @@ const restrictedSyntaxRule = {
     type: "problem",
     docs: {
       description:
-        "Enforces restricted syntax patterns (no unknown, object, throw, JSX in non-React-node properties, raw fetch)",
+        "Enforces restricted syntax patterns (no unknown, object, throw, JSX in non-React-node properties, raw fetch, EndpointsPage in server entry files)",
       category: "Best Practices",
       recommended: true,
     },
@@ -731,7 +832,59 @@ const restrictedSyntaxRule = {
     // Get customizable messages
     const messages = getMessages();
 
+    // Server-entry tracking for the EndpointsPage rule. The directive prologue
+    // is visited before any ImportDeclaration, so the flag is always set in time.
+    const isServerEntry = isNextServerEntryFile(context);
+    let hasUseClientDirective = false;
+
     return {
+      // ============================================================
+      // 'use client' directive detection (directive prologue only)
+      // ============================================================
+      Program(node: OxlintASTNode): void {
+        const body = (node as Program).body;
+        if (!body || !Array.isArray(body)) {
+          return;
+        }
+        for (const stmt of body) {
+          if (stmt.type !== "ExpressionStatement") {
+            break;
+          }
+          if (isUseClientDirective(stmt)) {
+            hasUseClientDirective = true;
+            break;
+          }
+        }
+      },
+
+      // Fallback for runtimes without a Program visitor: the directive's own
+      // ExpressionStatement is visited before any later node in the file.
+      ExpressionStatement(node: OxlintASTNode): void {
+        if (isUseClientDirective(node)) {
+          hasUseClientDirective = true;
+        }
+      },
+
+      // ============================================================
+      // No EndpointsPage in server entry files — it must live in a
+      // 'use client' component (page-client.tsx pattern).
+      // ============================================================
+      ImportDeclaration(node: OxlintASTNode): void {
+        if (!isServerEntry || hasUseClientDirective) {
+          return;
+        }
+        if (!importsEndpointsPage(node)) {
+          return;
+        }
+        if (hasDisableComment(context, node)) {
+          return;
+        }
+        context.report({
+          node,
+          message: messages.endpointsPageInServerEntry,
+        });
+      },
+
       // ============================================================
       // Restricted syntax rules
       // ============================================================

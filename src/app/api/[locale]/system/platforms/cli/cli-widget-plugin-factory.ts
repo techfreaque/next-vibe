@@ -19,11 +19,41 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 
 import type { BunPlugin } from "bun";
 
 const toPosix = (p: string): string => p.replaceAll("\\", "/");
+
+/**
+ * Rewrite relative imports in CLI file contents so they resolve correctly when
+ * Bun loads them under the web file's path. Without this, `./tailwind-to-ink`
+ * in cli/ui/div.tsx would be resolved relative to web/ui/ where it doesn't exist.
+ */
+function rebaseRelativeImports(
+  contents: string,
+  cliFilePath: string,
+  webFilePath: string,
+): string {
+  const cliDir = toPosix(dirname(cliFilePath));
+  const webDir = toPosix(dirname(webFilePath));
+  return contents.replace(
+    /(from\s+|import\s*\()(["'])(\.\.?\/[^"']+)(["'])/g,
+    (
+      fullMatch,
+      keyword: string,
+      q1: string,
+      importPath: string,
+      q2: string,
+    ) => {
+      void fullMatch;
+      const absTarget = toPosix(resolve(cliDir, importPath));
+      const rebased = toPosix(relative(webDir, absTarget));
+      const rel = rebased.startsWith(".") ? rebased : `./${rebased}`;
+      return `${keyword}${q1}${rel}${q2}`;
+    },
+  );
+}
 
 /**
  * @param _rootDir - Deprecated. Previously the project root, used to build the
@@ -62,7 +92,11 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
             // Try exact extension first, then alternate (.tsx↔.ts)
             if (existsSync(cliPath)) {
               return {
-                contents: readFileSync(cliPath, "utf-8"),
+                contents: rebaseRelativeImports(
+                  readFileSync(cliPath, "utf-8"),
+                  cliPath,
+                  path,
+                ),
                 loader: "tsx",
               }; // eslint-disable-line i18next/no-literal-string
             }
@@ -70,7 +104,11 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
             const altPath = cliPath.replace(/\.tsx$/, ".ts");
             if (altPath !== cliPath && existsSync(altPath)) {
               return {
-                contents: readFileSync(altPath, "utf-8"),
+                contents: rebaseRelativeImports(
+                  readFileSync(altPath, "utf-8"),
+                  altPath,
+                  path,
+                ),
                 loader: "tsx",
               }; // eslint-disable-line i18next/no-literal-string
             }
@@ -105,13 +143,24 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
             const rel = posixPath.slice(webDir.length);
             const cliPath = resolve(`${CLI_BASE}/${dir}`, rel);
             if (existsSync(cliPath)) {
-              return { contents: readFileSync(cliPath, "utf-8"), loader: "ts" }; // eslint-disable-line i18next/no-literal-string
+              return {
+                contents: rebaseRelativeImports(
+                  readFileSync(cliPath, "utf-8"),
+                  cliPath,
+                  path,
+                ),
+                loader: "ts",
+              }; // eslint-disable-line i18next/no-literal-string
             }
             // .ts web file might have .tsx CLI counterpart
             const altPath = `${cliPath}x`;
             if (existsSync(altPath)) {
               return {
-                contents: readFileSync(altPath, "utf-8"),
+                contents: rebaseRelativeImports(
+                  readFileSync(altPath, "utf-8"),
+                  altPath,
+                  path,
+                ),
                 loader: "tsx",
               }; // eslint-disable-line i18next/no-literal-string
             }

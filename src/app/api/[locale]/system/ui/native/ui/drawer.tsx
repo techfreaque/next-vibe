@@ -3,7 +3,11 @@
  * Bottom sheet drawer implementation using Modal
  */
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import React, { createContext, useContext, useState } from "react";
+import { Modal, Pressable, Text as RNText, View } from "react-native";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 // Import ALL types from web - ZERO definitions here
 import type {
   DrawerCloseProps,
@@ -17,11 +21,8 @@ import type {
   DrawerTitleProps,
   DrawerTriggerProps,
   DrawerTriggerRefObject,
-} from "next-vibe/ui/web/ui/drawer";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import React, { createContext, useContext, useState } from "react";
-import { Modal, Pressable, Text as RNText, View } from "react-native";
-import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+} from "../../web/ui/drawer";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 

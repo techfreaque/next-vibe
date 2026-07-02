@@ -4,11 +4,12 @@
  */
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-// Import ALL types from web - ZERO definitions here
-import type { ContainerProps } from "next-vibe/ui/web/ui/container";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import { View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+// Import ALL types from web - ZERO definitions here
+import type { ContainerProps } from "../../web/ui/container";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);

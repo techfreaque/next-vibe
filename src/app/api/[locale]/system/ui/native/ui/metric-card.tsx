@@ -1,13 +1,13 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
+import { View } from "react-native";
+
 import type {
   MetricCardFormat,
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "next-vibe/ui/web/ui/metric-card";
-import { View } from "react-native";
-
+} from "../../web/ui/metric-card";
 import { Text } from "./text";
 
 export type {
@@ -15,7 +15,7 @@ export type {
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "next-vibe/ui/web/ui/metric-card";
+} from "../../web/ui/metric-card";
 
 const StyledView = styled(View, { className: "style" });
 

@@ -53,6 +53,12 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { pinBalance } from "@/app/api/[locale]/agent/ai-stream/stream/tests/helpers/balance";
+import { createQualityTesterFavorite } from "@/app/api/[locale]/agent/ai-stream/stream/tests/helpers/favorites";
+import {
+  makeDirectSetup,
+  makeReverseWsSetup,
+} from "@/app/api/[locale]/agent/ai-stream/stream/tests/helpers/remote";
 import {
   normalizeFetchCacheFixtures,
   patchFetchCacheFixtures,
@@ -66,10 +72,6 @@ import {
   waitForThreadIdle,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import {
-  connectToHermes,
-  connectToHermesLocalAi,
-  disconnectFromHermes,
-  disconnectFromHermesLocalAi,
   failSuitePrerequisites,
   HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
@@ -121,6 +123,10 @@ if (!_atlasRunning) {
 /**
  * Poll DB until a cron task reaches terminal status or we time out.
  * Returns the final status, or null on timeout.
+ *
+ * Intentionally NOT shared with stream/tests/helpers: this variant returns the
+ * terminal status (asserted by callers) and treats a deleted task row as
+ * completed — the stream suites have no helper with that contract.
  */
 async function pollTaskStatus(
   taskId: string,
@@ -170,12 +176,13 @@ function findToolCall(
   toolMsgs: Array<{ metadata: MessageMetadata | null }>,
   toolName: string,
 ): (typeof toolMsgs)[number] | undefined {
-  return toolMsgs.find(
+  // LAST match: a model may fumble its first attempt (validation error, no
+  // result) and retry — the final call is the one that actually ran.
+  return toolMsgs.findLast(
     (m) =>
       m.metadata?.toolCall?.toolName === toolName ||
       (m.metadata?.toolCall?.toolName === "execute-tool" &&
-        (m.metadata.toolCall.args as { toolName?: string } | undefined)
-          ?.toolName === toolName),
+        toolResultRecord(m.metadata.toolCall.args)?.["toolName"] === toolName),
   );
 }
 
@@ -256,76 +263,6 @@ async function assertNoOrphanCronTasks(
   ).toBe(0);
 }
 
-/** Create a quality-tester favorite and return its id. Deletes existing quality-tester favorites first. */
-async function createTestFavorite(
-  user: JwtPrivatePayloadType,
-): Promise<string> {
-  const [favsDef, favoriteCreateDef, favoriteDeleteDef] = await Promise.all([
-    import("@/app/api/[locale]/agent/skills/favorites/definition").then(
-      (m) => m.default.GET,
-    ),
-    import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
-      (m) => m.default.POST,
-    ),
-    import("@/app/api/[locale]/agent/skills/favorites/[id]/definition").then(
-      (m) => m.default.DELETE,
-    ),
-  ]);
-  const favsResult = await sendTestRequest({
-    endpoint: favsDef,
-    data: { pageSize: 500 },
-    user,
-  });
-  const favsList =
-    favsResult.success && Array.isArray(favsResult.data?.["favorites"])
-      ? (favsResult.data["favorites"] as Record<string, unknown>[])
-      : [];
-  for (const fav of favsList) {
-    if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
-      await sendTestRequest({
-        endpoint: favoriteDeleteDef,
-        urlPathParams: { id: String(fav["id"]) },
-        user,
-      });
-    }
-  }
-  const createResult = await sendTestRequest({
-    endpoint: favoriteCreateDef,
-    data: { skillId: "quality-tester__kimi" },
-    user,
-  });
-  if (!createResult.success || !createResult.data?.["id"]) {
-    throw new Error(
-      `createTestFavorite: failed — ${createResult.success ? "no id" : String((createResult as { message?: string }).message ?? "")}`,
-    );
-  }
-  return String(createResult.data["id"]);
-}
-
-/** Ensure user has at least `credits` balance. */
-async function pinBalance(
-  user: JwtPrivatePayloadType,
-  credits: number,
-): Promise<void> {
-  const creditsDef = await import("@/app/api/[locale]/credits/definition").then(
-    (m) => m.default.GET,
-  );
-  const bal = await sendTestRequest({ endpoint: creditsDef, user });
-  const current = bal.success ? Number(bal.data?.total ?? 0) : 0;
-  if (current >= credits) {
-    return;
-  }
-  const adminAddDef =
-    await import("@/app/api/[locale]/credits/admin-add/definition").then(
-      (m) => m.default.POST,
-    );
-  await sendTestRequest({
-    endpoint: adminAddDef,
-    data: { targetUserId: user.id, amount: Math.ceil(credits - current) },
-    user,
-  });
-}
-
 // ── ET-AI-LOCAL: local callback modes ────────────────────────────────────────
 
 if (_atlasRunning) {
@@ -347,7 +284,7 @@ if (_atlasRunning) {
       }
       testUser = resolved;
       await pinBalance(testUser, 500);
-      favoriteId = await createTestFavorite(testUser);
+      favoriteId = await createQualityTesterFavorite(testUser);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -747,11 +684,13 @@ if (_atlasRunning) {
           ),
         )
         .limit(1);
-      // taskId lives in remoteTaskId — the dispatch placeholder is backfilled
-      // with the final tool result; the dispatched taskId is in remoteTaskId.
-      const detachTaskId = String(
-        detachMsg?.metadata?.toolCall?.remoteTaskId ?? "",
+      // Detach never backfills: the tool message keeps the dispatch result
+      // ({ taskId, hint }) forever — the real result is only retrievable via
+      // await-task. Read the taskId straight from the stored dispatch result.
+      const detachResult = toolResultRecord(
+        detachMsg?.metadata?.toolCall?.result,
       );
+      const detachTaskId = String(detachResult?.["taskId"] ?? "");
       expect(
         detachTaskId,
         "ET-AI-LOCAL-DETACH-THEN-AWAIT step1: execute-tool must return a taskId",
@@ -810,15 +749,18 @@ if (_atlasRunning) {
             eq(chatMessages.role, ChatMessageRole.TOOL),
           ),
         );
+      // findLast: the model may fumble the first attempt (e.g. missing taskId
+      // → validation error) and retry — the LAST await-task call is the one
+      // that ran to completion.
       const awaitCall =
-        step2ToolMsgs.find(
+        step2ToolMsgs.findLast(
           (m) => m.metadata?.toolCall?.toolName === "await-task",
         ) ??
-        step2ToolMsgs.find(
+        step2ToolMsgs.findLast(
           (m) =>
             m.metadata?.toolCall?.toolName === "execute-tool" &&
-            (m.metadata.toolCall.args as Record<string, unknown> | undefined)
-              ?.toolName === "await-task",
+            toolResultRecord(m.metadata.toolCall.args)?.["toolName"] ===
+              "await-task",
         );
       expect(
         awaitCall,
@@ -989,7 +931,26 @@ if (!_atlasRunning) {
     let testUser: JwtPrivatePayloadType;
     let folderId: string;
     let favoriteId: string;
-    let prodUserId: string | null = null;
+
+    // Direct-http connection + prod-db credit top-up + mirrored teardown.
+    // afterConnect pins transportMode='direct-http' via DB (no endpoint routing
+    // needed in setup).
+    const hooks = makeDirectSetup(_remoteUrl, {
+      creditVia: "prod-db",
+      afterConnect: async (user: JwtPrivatePayloadType): Promise<void> => {
+        const { remoteConnections } =
+          await import("@/app/api/[locale]/remote-connection/db");
+        await db
+          .update(remoteConnections)
+          .set({ transportMode: "direct-http", updatedAt: new Date() })
+          .where(
+            and(
+              eq(remoteConnections.userId, user.id),
+              eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+            ),
+          );
+      },
+    });
 
     beforeAll(async () => {
       const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -1002,30 +963,9 @@ if (!_atlasRunning) {
       }
       testUser = resolved;
       await pinBalance(testUser, 500);
-      favoriteId = await createTestFavorite(testUser);
+      favoriteId = await createQualityTesterFavorite(testUser);
 
-      // Connect atlas → hermes via direct-http
-      await disconnectFromHermes(testUser.id);
-      await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
-
-      // Override transport to direct-http
-      const { remoteConnections } =
-        await import("@/app/api/[locale]/remote-connection/db");
-      await db
-        .update(remoteConnections)
-        .set({ transportMode: "direct-http", updatedAt: new Date() })
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        );
-
-      // Top up hermes credits directly via prod DB (no execute-tool routing needed)
-      const { resolveProdUserId, ensureProdUserCredits } =
-        await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-      prodUserId = await resolveProdUserId();
-      await ensureProdUserCredits(prodUserId, 20_000);
+      await hooks.setup(testUser);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -1041,17 +981,9 @@ if (!_atlasRunning) {
     }, 240_000);
 
     afterAll(async () => {
-      const {
-        disconnectFromHermes: disconnect,
-        unregisterDevFromHermes,
-        closeProdDb,
-      } = await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-
-      const tasks: Promise<void>[] = [disconnect(testUser.id)];
-      if (prodUserId) {
-        tasks.push(unregisterDevFromHermes(prodUserId));
-      }
-      await Promise.all(tasks);
+      const { closeProdDb } =
+        await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
+      await hooks.teardown(testUser);
       await closeProdDb();
     });
 
@@ -1560,7 +1492,30 @@ if (!_atlasRunning) {
     let testUser: JwtPrivatePayloadType;
     let folderId: string;
     let favoriteId: string;
-    let prodUserId: string | null = null;
+
+    // Reverse-WS connection + prod-db credit top-up + mirrored teardown.
+    // afterConnect sets atlas's hermes connection to reverse-ws via the real
+    // PATCH endpoint (end to end — no manual DB writes). The handler opens the
+    // connector so it subscribes to the peer's remote-event channel (the
+    // reverse-ws forward leg).
+    const hooks = makeReverseWsSetup(_remoteUrl, {
+      creditVia: "prod-db",
+      afterConnect: async (user: JwtPrivatePayloadType): Promise<void> => {
+        const connByIdDef = (
+          await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+        ).default;
+        const wsPatch = await sendTestRequest({
+          endpoint: connByIdDef.PATCH,
+          data: { transportMode: "reverse-ws" },
+          urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+          user,
+        });
+        expect(
+          wsPatch.success,
+          `ET-AI-REMOTE-WS: set reverse-ws PATCH failed: ${JSON.stringify(wsPatch)}`,
+        ).toBe(true);
+      },
+    });
 
     beforeAll(async () => {
       const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -1573,37 +1528,9 @@ if (!_atlasRunning) {
       }
       testUser = resolved;
       await pinBalance(testUser, 500);
-      favoriteId = await createTestFavorite(testUser);
+      favoriteId = await createQualityTesterFavorite(testUser);
 
-      // Connect via reverse-WS transport
-      await disconnectFromHermesLocalAi(testUser);
-      await connectToHermesLocalAi(
-        testUser,
-        _remoteUrl ?? "http://localhost:3002",
-      );
-
-      // Set atlas's hermes connection to reverse-ws via the real PATCH endpoint
-      // (end to end — no manual DB writes). The handler opens the connector so it
-      // subscribes to the peer's remote-event channel (the reverse-ws forward leg).
-      const connByIdDef = (
-        await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
-      ).default;
-      const wsPatch = await sendTestRequest({
-        endpoint: connByIdDef.PATCH,
-        data: { transportMode: "reverse-ws" },
-        urlPathParams: { instanceId: HERMES_INSTANCE_ID },
-        user: testUser,
-      });
-      expect(
-        wsPatch.success,
-        `ET-AI-REMOTE-WS: set reverse-ws PATCH failed: ${JSON.stringify(wsPatch)}`,
-      ).toBe(true);
-
-      // Top up hermes credits directly via prod DB (no execute-tool routing needed)
-      const { resolveProdUserId, ensureProdUserCredits } =
-        await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-      prodUserId = await resolveProdUserId();
-      await ensureProdUserCredits(prodUserId, 20_000);
+      await hooks.setup(testUser);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -1619,17 +1546,9 @@ if (!_atlasRunning) {
     }, 240_000);
 
     afterAll(async () => {
-      const {
-        disconnectFromHermesLocalAi: disconnect,
-        unregisterDevFromHermes,
-        closeProdDb,
-      } = await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
-
-      const tasks: Promise<void>[] = [disconnect(testUser)];
-      if (prodUserId) {
-        tasks.push(unregisterDevFromHermes(prodUserId));
-      }
-      await Promise.all(tasks);
+      const { closeProdDb } =
+        await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
+      await hooks.teardown(testUser);
       await closeProdDb();
     });
 

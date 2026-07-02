@@ -33,6 +33,8 @@ import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[l
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;
   initialSubscription: SubscriptionGetResponseOutput;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
 }
 
 export function SubscriptionStatusCard({
@@ -45,6 +47,7 @@ export function SubscriptionStatusCard({
   const { t: appT } = appScopedTranslation.scopedT(locale);
   const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
   const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
+  const portal = useCustomerPortal(logger, user);
 
   const isCanceled = initialSubscription.status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && initialSubscription.cancelAt;
@@ -69,30 +72,20 @@ export function SubscriptionStatusCard({
       return;
     }
 
-    try {
-      const response = await fetch(
-        `/api/${locale}/${portalEndpoints.POST.path.join("/")}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            returnUrl: `${getCurrentOrigin()}/${locale}/subscription`,
-          }),
-        },
-      );
-
-      const result = await response.json();
-
-      if (result.success && result.data?.customerPortalUrl) {
-        assignUrl(result.data.customerPortalUrl);
-      } else if (result.data?.message) {
-        alert(result.data.message);
-      } else {
-        alert("Failed to open customer portal. Please try again.");
-      }
-    } catch {
-      alert("Failed to open customer portal. Please try again.");
-    }
+    portal.create.setValue(
+      "returnUrl",
+      `${getCurrentOrigin()}/${locale}/subscription`,
+    );
+    await portal.create.submitForm({
+      onSuccess: ({ responseData }) => {
+        if (responseData.customerPortalUrl) {
+          assignUrl(responseData.customerPortalUrl);
+        }
+      },
+      onError: ({ error }) => {
+        alert(error.message ?? t("subscription.manage.portal.error"));
+      },
+    });
   };
 
   return (

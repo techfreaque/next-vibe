@@ -54,17 +54,6 @@ import {
 import type { ServerDefaultContext } from "./server-default";
 
 /**
- * Type helper to infer JWT payload type based on user roles
- * - Only PUBLIC role in roles → JWTPublicPayloadType
- * - No PUBLIC role in roles → JwtPayloadType
- * - Mixed roles (includes PUBLIC + others) → JwtPayloadType (union)
- */
-export type InferJwtPayloadType<TUserRoleValue extends UserRoleValue> =
-  TUserRoleValue extends typeof UserRole.PUBLIC
-    ? JWTPublicPayloadType
-    : JwtPayloadType;
-
-/**
  * Type helper to filter out platform markers from role arrays
  * Platform markers (CLI_OFF, WEB_OFF, etc.) don't affect JWT payload type
  *
@@ -117,7 +106,7 @@ export type InferJwtPayloadTypeFromRoles<
 /**
  * SMS handler configuration
  */
-export interface SMSHandler<TEndpoint extends CreateApiEndpointAny> {
+interface SMSHandler<TEndpoint extends CreateApiEndpointAny> {
   readonly ignoreErrors?: boolean;
   readonly render: SmsFunctionType<
     TEndpoint["types"]["RequestOutput"],
@@ -130,7 +119,7 @@ export interface SMSHandler<TEndpoint extends CreateApiEndpointAny> {
 /**
  * API handler props - handlers receive OUTPUT types (validated data)
  */
-export interface ApiHandlerProps<
+interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
@@ -181,7 +170,7 @@ export interface ApiHandlerProps<
  * - FileResponse for binary file responses (e.g., file downloads)
  * - ContentResponse for mixed content blocks (text + images)
  */
-export type ApiHandlerFunction<TEndpoint extends CreateApiEndpointAny> = (
+type ApiHandlerFunction<TEndpoint extends CreateApiEndpointAny> = (
   props: ApiHandlerProps<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["UrlVariablesOutput"],
@@ -230,7 +219,7 @@ export interface ChannelDecision {
  *   - subscribe-side, `user` = the prospective subscriber → admit iff the
  *     resolved channel equals the one they asked to join.
  */
-export type ChannelResolverFn<TEndpoint extends CreateApiEndpointAny> = {
+type ChannelResolverFn<TEndpoint extends CreateApiEndpointAny> = {
   bivarianceHack(params: {
     user: JwtPayloadType;
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
@@ -304,10 +293,6 @@ export type OnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> = {
   ) => Promise<void> | void;
 };
 
-/** Convenience alias — use this in repository files to type `onRemoteEvent` exports. */
-export type EndpointOnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> =
-  OnRemoteEventMap<TEndpoint>;
-
 type _IsAnyEvents<T> = 0 extends 1 & T ? true : false;
 
 /** True when TEndpoint has at least one remoteEvent: true event. */
@@ -325,7 +310,7 @@ type HasRemoteEvents<TEndpoint extends CreateApiEndpointAny> =
       : true;
 
 /** Requires onRemoteEvent when the endpoint declares remoteEvent: true events; forbids it otherwise. */
-export type OnRemoteEventField<TEndpoint extends CreateApiEndpointAny> =
+type OnRemoteEventField<TEndpoint extends CreateApiEndpointAny> =
   HasRemoteEvents<TEndpoint> extends true
     ? { onRemoteEvent: OnRemoteEventMap<TEndpoint> }
     : HasRemoteEvents<TEndpoint> extends boolean
@@ -442,6 +427,13 @@ export type GenericHandlerReturnType<TEndpoint extends CreateApiEndpointAny> =
     // via MethodHandlerConfig → ChannelResolverField / OnRemoteEventField.
     resolveChannel?: ChannelResolverFn<TEndpoint>;
     onRemoteEvent?: OnRemoteEventMap<TEndpoint>;
+    /** Server-side field-default resolvers, exposed so dispatchers (execute-tool
+     *  remote dispatch) can pre-resolve caller-context defaults before sending
+     *  the call to a peer that lacks the caller's skill/favorite context. The
+     *  local execution path resolves these inside createGenericHandler; remote
+     *  dispatch resolves them at the caller — same resolvers, same context,
+     *  either way ("transport is invisible"). */
+    fieldDefaults?: ApiHandlerOptions<TEndpoint>["fieldDefaults"];
   };
 
 /**

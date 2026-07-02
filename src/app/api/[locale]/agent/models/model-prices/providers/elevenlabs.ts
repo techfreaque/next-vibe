@@ -65,6 +65,7 @@ async function fetchUsdPerChar(
   }
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(SUBSCRIPTION_URL, {
       headers: { "xi-api-key": apiKey },
     });

@@ -1,5 +1,6 @@
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX, ReactNode } from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export type BodyProps = {
   children: ReactNode;

@@ -1,19 +1,20 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   AlertDescriptionProps,
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "next-vibe/ui/web/ui/alert";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/alert";
 
 export type {
   AlertDescriptionProps,
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "next-vibe/ui/web/ui/alert";
+} from "../../web/ui/alert";
 import { cva } from "class-variance-authority";
 
 export const alertVariants = cva("");

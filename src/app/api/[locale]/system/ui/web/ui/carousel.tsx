@@ -3,12 +3,12 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { ArrowLeftIcon } from "next-vibe/ui/web/ui/icons/ArrowLeftIcon";
-import { ArrowRightIcon } from "next-vibe/ui/web/ui/icons/ArrowRightIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 
+import { uiScopedTranslation } from "../../web/i18n";
+import { ArrowLeftIcon } from "../../web/ui/icons/ArrowLeftIcon";
+import { ArrowRightIcon } from "../../web/ui/icons/ArrowRightIcon";
+import type { StyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
 import type { DivKeyboardEvent } from "./div";
 

@@ -4,23 +4,23 @@
  */
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { Check, ChevronDown, Search, X } from "next-vibe/ui/native/ui/icons";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+import React, { useMemo, useState } from "react";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
+
+import { Check, ChevronDown, Search, X } from "../../native/ui/icons";
+import { uiScopedTranslation } from "../../web/i18n";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,
   AutocompleteOptionBase,
-} from "next-vibe/ui/web/ui/autocomplete-field";
-import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text as RNText, View } from "react-native";
-
+} from "../../web/ui/autocomplete-field";
 import { Badge } from "./badge";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Re-export enum for type parity with web
-export { FormFieldCategory } from "next-vibe/ui/web/ui/autocomplete-field";
+export { FormFieldCategory } from "../../web/ui/autocomplete-field";
 
 export function AutocompleteField({
   value = "",

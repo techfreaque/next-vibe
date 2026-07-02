@@ -8,11 +8,11 @@
 import { ChevronDown, Phone } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { uiScopedTranslation } from "../../web/i18n";
+import type { StyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
 import {
   Command,

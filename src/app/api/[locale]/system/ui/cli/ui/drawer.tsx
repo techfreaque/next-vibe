@@ -15,7 +15,7 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
   DrawerTriggerRefObject,
-} from "next-vibe/ui/web/ui/drawer";
+} from "../../web/ui/drawer";
 
 import type {
   DrawerCloseProps,
@@ -26,7 +26,7 @@ import type {
   DrawerRootProps,
   DrawerTitleProps,
   DrawerTriggerProps,
-} from "next-vibe/ui/web/ui/drawer";
+} from "../../web/ui/drawer";
 
 export function Drawer({
   children,

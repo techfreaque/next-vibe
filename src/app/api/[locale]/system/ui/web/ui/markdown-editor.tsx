@@ -29,13 +29,14 @@ import {
   Strikethrough,
 } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef } from "react";
 import {
   Markdown as TiptapMarkdown,
   type MarkdownStorage,
 } from "tiptap-markdown";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 /**
  * Type-safe accessor for tiptap-markdown's storage.

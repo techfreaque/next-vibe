@@ -50,7 +50,7 @@ import { type Resolution, RESOLUTION_MS } from "./fields";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface DataSourceChartWidgetProps {
+interface DataSourceChartWidgetProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   definition: { POST: any };
   label: string;

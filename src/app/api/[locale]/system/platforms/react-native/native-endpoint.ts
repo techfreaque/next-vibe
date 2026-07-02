@@ -53,7 +53,7 @@ export type InferUrlVariablesOutput<T> = T extends CreateApiEndpointAny
  * Combined parameters for endpoint calls
  * Merges request data and URL parameters into a single object
  */
-export type EndpointParams<TEndpoint> =
+type EndpointParams<TEndpoint> =
   (InferRequestOutput<TEndpoint> extends undefined
     ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       {}
@@ -190,6 +190,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     try {
       const { storage } = await import("next-vibe/ui/web/lib/storage");
       const token = await storage.getItem("@auth/token");
+      // TODO requires leadid
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -230,6 +231,10 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       hasBody: !!fetchOptions.body,
     });
 
+    // Platform transport primitive: the native client's HTTP layer to the
+    // server. A mobile device has no in-process server, so this is the wire —
+    // it's the RN equivalent of the web client's fetch, not an app-code call.
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- native platform transport primitive
     const fetchResponse = await fetch(fetchUrl, fetchOptions);
 
     // Check if response is OK

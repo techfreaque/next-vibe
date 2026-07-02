@@ -287,7 +287,7 @@ export function useMessageOperations(
           selectedModel: d.settings.selectedModel,
         },
         favoriteConfig: d.favoriteConfig,
-        executionContext,
+        executionContext: { mode: "local" as const },
       });
     },
     [logger],

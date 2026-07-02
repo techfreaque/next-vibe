@@ -5,7 +5,7 @@ import type {
   InputOTPProps,
   InputOTPSeparatorProps,
   InputOTPSlotProps,
-} from "next-vibe/ui/web/ui/input-otp";
+} from "../../web/ui/input-otp";
 
 export type {
   InputOTPGroupProps,
@@ -13,7 +13,7 @@ export type {
   InputOTPSeparatorProps,
   InputOTPSlotProps,
   OTPContextValue,
-} from "next-vibe/ui/web/ui/input-otp";
+} from "../../web/ui/input-otp";
 
 export function InputOTP(_props: InputOTPProps): null {
   void _props;

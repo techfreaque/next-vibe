@@ -1,7 +1,7 @@
-import { objectEntries } from "next-vibe/core/utils/object";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
+import { objectEntries } from "../../system/core/utils/object";
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
@@ -73,7 +73,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-alloy",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -113,7 +113,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-nova",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -153,7 +153,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-onyx",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -187,7 +187,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-echo",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -221,7 +221,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-shimmer",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -255,7 +255,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-fable",
-        creditCostPerCharacter: 0.002, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -290,7 +290,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-rachel",
-        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -325,7 +325,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-josh",
-        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -360,7 +360,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-bella",
-        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
@@ -395,7 +395,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-adam",
-        creditCostPerCharacter: 0.039, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },

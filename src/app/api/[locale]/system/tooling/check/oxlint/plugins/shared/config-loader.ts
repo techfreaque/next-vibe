@@ -27,14 +27,14 @@ import type {
 // ============================================================
 
 /** Plugin names for type-safe config loading */
-export type PluginName =
+type PluginName =
   | "oxlint-plugin-i18n/no-literal-string"
   | "oxlint-plugin-jsx-capitalization/jsx-capitalization"
   | "oxlint-plugin-restricted/restricted-syntax"
   | "oxlint-plugin-boilerplate/route-pattern";
 
 /** Map plugin names to their config types */
-export interface PluginConfigMap {
+interface PluginConfigMap {
   "oxlint-plugin-i18n/no-literal-string": I18nPluginConfig;
   "oxlint-plugin-jsx-capitalization/jsx-capitalization": JsxCapitalizationPluginConfig;
   "oxlint-plugin-restricted/restricted-syntax": RestrictedSyntaxPluginConfig;
@@ -42,7 +42,7 @@ export interface PluginConfigMap {
 }
 
 /** Result of loading config */
-export interface ConfigLoadResult<T> {
+interface ConfigLoadResult<T> {
   success: boolean;
   config: T | null;
   source: "rule-config" | "direct-export" | "default" | "error";
@@ -50,7 +50,7 @@ export interface ConfigLoadResult<T> {
 }
 
 /** Error messages for plugin rules (can be customized) */
-export interface PluginMessages {
+interface PluginMessages {
   [key: string]: string;
 }
 

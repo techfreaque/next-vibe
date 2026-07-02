@@ -1,4 +1,7 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
@@ -7,9 +10,7 @@ import type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "next-vibe/ui/web/ui/breadcrumb";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/breadcrumb";
 
 export type {
   BreadcrumbEllipsisProps,
@@ -19,7 +20,7 @@ export type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "next-vibe/ui/web/ui/breadcrumb";
+} from "../../web/ui/breadcrumb";
 
 export function Breadcrumb({ children }: BreadcrumbProps): JSX.Element {
   return <Box>{children}</Box>;

@@ -1,12 +1,11 @@
-import type { ExplicitObjectType } from "next-vibe/core/utils/type-utils";
-
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;
 }
 
 // Utility type to create dot-notation paths for nested objects
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
-
+// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+type ExplicitObjectType = object;
 export type DotNotation<T> = (
   T extends ExplicitObjectType
     ? {

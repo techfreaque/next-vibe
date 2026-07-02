@@ -3,10 +3,10 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { ComponentProps, JSX, ReactNode } from "react";
 import { DayPicker, type DayPickerProps } from "react-day-picker";
 
+import type { StyleType } from "../../web/utils/style-type";
 import { buttonVariants } from "./button";
 
 // Type for date range matching react-day-picker's DateRange

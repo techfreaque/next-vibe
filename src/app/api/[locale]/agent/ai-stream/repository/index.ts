@@ -39,7 +39,9 @@ import type {
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
+import { buildSystemPrompt } from "../system-prompt/builder";
 import { CompactingHandler } from "./compacting";
+import { MessageContextBuilder } from "./context";
 import { findLatestThreadMessage } from "./core/infra";
 import {
   clearStreamingState,
@@ -53,7 +55,6 @@ import {
 } from "./errors";
 import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
-import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
 import type { HeadlessAiStreamResult } from "./headless";
 import { StreamLoop } from "./loop";
@@ -150,6 +151,8 @@ export class AiStreamRepository {
     request,
     headless = false,
     isRevival,
+    relayReceiver,
+    suppressSelfIdentity,
     t: aiStreamT,
     extraInstructions,
     excludeMemories,
@@ -323,6 +326,8 @@ export class AiStreamRepository {
       headless,
       subAgentDepth,
       isRevival,
+      relayReceiver,
+      suppressSelfIdentity,
       extraInstructions,
       excludeMemories,
       favoriteIdOverride,
@@ -781,8 +786,7 @@ export class AiStreamRepository {
               | undefined;
             {
               try {
-                const { MessageConverter } =
-                  await import("./handlers/message-converter");
+                const { MessageConverter } = await import("./context");
                 const preConvertedHistory =
                   await MessageConverter.toAiSdkMessages(
                     compactingCheck.branchMessages,
@@ -868,7 +872,7 @@ export class AiStreamRepository {
             // that was just compacted, so embedding search reflects current topic.
             try {
               const { buildEmbeddingQuery } =
-                await import("../../cortex/system-prompt/server");
+                await import("../../cortex/system-prompt");
               const refreshedPrompt = await buildSystemPrompt({
                 ...systemPromptParams,
                 lastUserMessage: buildEmbeddingQuery(messages),

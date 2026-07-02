@@ -1,4 +1,7 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   PaginationContentProps,
   PaginationEllipsisProps,
@@ -7,9 +10,7 @@ import type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "next-vibe/ui/web/ui/pagination";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/pagination";
 
 export type {
   PaginationContentProps,
@@ -19,7 +20,7 @@ export type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "next-vibe/ui/web/ui/pagination";
+} from "../../web/ui/pagination";
 
 export function Pagination({ children }: PaginationProps): JSX.Element {
   const isMcp = useIsMcp();

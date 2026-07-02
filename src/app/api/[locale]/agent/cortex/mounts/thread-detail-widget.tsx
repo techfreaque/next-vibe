@@ -7,14 +7,17 @@
 
 "use client";
 
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo } from "react";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/agent/chat/config";
 import messagesDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 
 interface ThreadDetailWidgetProps {
@@ -47,10 +50,8 @@ function extractThreadInfo(path: string): ThreadPathInfo | null {
     return null;
   }
   // Validate rootFolder is a known DefaultFolderId
-  const rootFolderId = Object.values(DefaultFolderId).includes(
-    rootFolderSegment as DefaultFolderId,
-  )
-    ? (rootFolderSegment as DefaultFolderId)
+  const rootFolderId = isDefaultFolderId(rootFolderSegment)
+    ? rootFolderSegment
     : DefaultFolderId.PRIVATE;
 
   return { threadId, rootFolderId };

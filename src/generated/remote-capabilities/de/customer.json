@@ -251677,6 +251677,123 @@
           },
           "schemaType": "primitive"
         },
+        "callerSkillId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Aufrufer-Skill-ID",
+          "description": "Wire-intern: die aktive Skill-ID der aufrufenden Instanz — die ausführende Instanz löst Feld-Defaults (z. B. Medienmodelle) dagegen auf. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "callerFavoriteId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Aufrufer-Favoriten-ID",
+          "description": "Wire-intern: die aktive Favoriten-ID der aufrufenden Instanz — die ausführende Instanz löst Feld-Defaults (z. B. Medienmodelle) dagegen auf. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "callerPlatform": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Aufrufer-Plattform",
+          "description": "Wire-intern: die Ausführungsplattform der aufrufenden Seite — die ausführende Instanz rendert plattformspezifische Ergebnisse entsprechend. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "CLI": "cli",
+                    "CLI_PACKAGE": "cli-package",
+                    "AI": "ai",
+                    "MCP": "mcp",
+                    "REMOTE_SKILL": "remote-skill",
+                    "TRPC": "trpc",
+                    "NEXT_PAGE": "next-page",
+                    "NEXT_API": "next-api",
+                    "CRON": "cron",
+                    "ELECTRON": "electron",
+                    "FRAME": "frame"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "CLI": "cli",
+                  "CLI_PACKAGE": "cli-package",
+                  "AI": "ai",
+                  "MCP": "mcp",
+                  "REMOTE_SKILL": "remote-skill",
+                  "TRPC": "trpc",
+                  "NEXT_PAGE": "next-page",
+                  "NEXT_API": "next-api",
+                  "CRON": "cron",
+                  "ELECTRON": "electron",
+                  "FRAME": "frame"
+                },
+                "options": [
+                  "cli",
+                  "cli-package",
+                  "ai",
+                  "mcp",
+                  "remote-skill",
+                  "trpc",
+                  "next-page",
+                  "next-api",
+                  "cron",
+                  "electron",
+                  "frame"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "callbackMode": {
           "type": "form_field",
           "fieldType": "text",

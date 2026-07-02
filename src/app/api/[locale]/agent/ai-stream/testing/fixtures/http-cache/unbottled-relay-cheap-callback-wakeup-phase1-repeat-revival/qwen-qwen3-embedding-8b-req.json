@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user is asking me to handle the wakeUp-phase1 test. Looking at the context, I can see that the wakeUp task has already completed and the result was delivered. The result shows:\n\n1. First phase: I called execute-tool with callbackMode='wakeUp' and got back `{\"hint\":\"Task completed. Its result has been delivered below in this conversation — do NOT call this tool again; respond using that result.\",\"status\":\"completed\"}` - this was the immediate result with no image URL, just a taskId/status.\n\n2. Second phase (revival): The system then delivered the actual result: a generated image with `imageUrl: http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/b7f735c1-c372-4098-a5ed-160705153ed5/0449beaf-d5da-4d9d-95db-97f0b7212b11.png`\n\nWait, looking more carefully at the context, I\n\nUser: [T6c wakeUp-repeat] Call execute-tool with toolName='generate_image', input={'prompt':'wakeup-repeat-test'}, callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user wants me to call generate_image with callbackMode='wakeUp' and prompt='wakeup-repeat-test'. Based on the previous experience with wakeUp mode, it seems like it might return inline immediately (as happened before) or it might return a taskId. Let me make the call.</think>\n\nAssistant: <think> The result shows a taskId was returned with no image URL, which means the task was deferred. According to the instructions, I should end with STEP_OK in this case. Then when the task completes and I'm revived, I need to check for the image URL.</think> STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

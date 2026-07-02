@@ -1,6 +1,7 @@
 // Import all public types from web version (web is source of truth)
-import type { HtmlProps } from "next-vibe/ui/web/ui/html";
 import type React from "react";
+
+import type { HtmlProps } from "../../web/ui/html";
 
 /**
  * Platform-agnostic HTML wrapper component (Native implementation)

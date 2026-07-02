@@ -492,33 +492,6 @@ export function isStatusTransitionAllowed(
 }
 
 /**
- * Get the appropriate status for a contact form submission
- * @param currentStatus - Current lead status
- * @returns LeadStatus - Status to set for contact form
- */
-export function getContactFormStatus(
-  currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus],
-): (typeof LeadStatus)[keyof typeof LeadStatus] {
-  // If already a final status, keep it unless it's a basic status
-  const finalContactStatuses: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
-    LeadStatus.IN_CONTACT,
-    LeadStatus.SIGNED_UP,
-    LeadStatus.SUBSCRIPTION_CONFIRMED,
-    LeadStatus.UNSUBSCRIBED,
-    LeadStatus.BOUNCED,
-    LeadStatus.INVALID,
-  ];
-  const isFinalStatus = finalContactStatuses.includes(currentStatus);
-
-  if (isFinalStatus) {
-    return currentStatus;
-  }
-
-  // For basic statuses, transition to IN_CONTACT
-  return LeadStatus.IN_CONTACT;
-}
-
-/**
  * Get the appropriate status for a newsletter subscription
  * @param currentStatus - Current lead status
  * @returns LeadStatus - Status to set for newsletter subscription

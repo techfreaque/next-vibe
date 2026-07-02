@@ -3,12 +3,13 @@
  */
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
-import type { DatePickerProps } from "next-vibe/ui/web/ui/date-picker";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
-export type { DatePickerProps } from "next-vibe/ui/web/ui/date-picker";
+import type { DatePickerProps } from "../../web/ui/date-picker";
+
+export type { DatePickerProps } from "../../web/ui/date-picker";
 
 const DATE_FORMAT = "YYYY-MM-DD";
 

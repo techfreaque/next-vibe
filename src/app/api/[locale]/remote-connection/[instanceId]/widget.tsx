@@ -15,7 +15,6 @@
 import { Methods } from "next-vibe/core/definition/enums";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -64,6 +63,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";

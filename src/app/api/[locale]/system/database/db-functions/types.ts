@@ -9,7 +9,7 @@
  * PostgreSQL → TypeScript type mapping.
  * Nullable PG types (uuid, text) map to `T | null`.
  */
-export interface PgToTs {
+interface PgToTs {
   uuid: string | null;
   text: string | null;
   numeric: number;
@@ -44,7 +44,7 @@ export interface TypedQueryBuilder<TResult> {
  * Extract the result row type from a typed Drizzle query builder.
  * `db.select({...}).from(table)` has `_.result: Row[]` - we extract `Row`.
  */
-export type InferQueryResult<TBuilder> =
+type InferQueryResult<TBuilder> =
   TBuilder extends TypedQueryBuilder<infer TResult>
     ? TResult extends readonly (infer TRow)[]
       ? TRow

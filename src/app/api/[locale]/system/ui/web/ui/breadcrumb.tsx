@@ -1,11 +1,12 @@
 import { Slot } from "@radix-ui/react-slot";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { ChevronRightIcon } from "next-vibe/ui/web/ui/icons/ChevronRightIcon";
-import { DotsHorizontalIcon } from "next-vibe/ui/web/ui/icons/DotsHorizontalIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { uiScopedTranslation } from "../../web/i18n";
+import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
+import { DotsHorizontalIcon } from "../../web/ui/icons/DotsHorizontalIcon";
+import type { StyleType } from "../../web/utils/style-type";
 
 // Breadcrumb
 export type BreadcrumbProps = {
@@ -98,7 +99,7 @@ export function BreadcrumbItem({
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
 // Cross-platform click event for BreadcrumbLink
-export interface BreadcrumbLinkClickEvent {
+interface BreadcrumbLinkClickEvent {
   preventDefault: () => void;
   stopPropagation: () => void;
 }

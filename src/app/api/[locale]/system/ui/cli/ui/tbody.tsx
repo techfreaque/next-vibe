@@ -1,9 +1,10 @@
 import { Box } from "ink";
-import { parseClassesToBoxProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { TbodyProps } from "next-vibe/ui/web/ui/tbody";
 import type { JSX } from "react";
 
-export type { TbodyProps } from "next-vibe/ui/web/ui/tbody";
+import type { TbodyProps } from "../../web/ui/tbody";
+import { parseClassesToBoxProps } from "./tailwind-to-ink";
+
+export type { TbodyProps } from "../../web/ui/tbody";
 
 export function Tbody({ className, children }: TbodyProps): JSX.Element {
   const boxProps = parseClassesToBoxProps(className);

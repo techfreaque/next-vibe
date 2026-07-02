@@ -58,6 +58,11 @@ export function releaseSyncSlot(key: string): void {
   inFlightSyncs.delete(key);
 }
 
+/** True while a sync exchange for this connection is in flight (test-settle probes). */
+export function isSyncSlotBusy(key: string): boolean {
+  return inFlightSyncs.has(key);
+}
+
 /**
  * Force-clear a sync slot, e.g. when a connection is closed while a pull is in flight.
  * The abandoned in-flight pull will hit releaseSyncSlot() in its finally block — that's
@@ -74,9 +79,9 @@ export class TaskSyncRepository {
    */
   private static async getCapabilitiesVersion(): Promise<string> {
     const { CAPABILITIES_VERSION } =
-      await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
-        () => ({ CAPABILITIES_VERSION: "unknown" }),
-      );
+      await import("@/generated/remote-capabilities/version").catch(() => ({
+        CAPABILITIES_VERSION: "unknown",
+      }));
     return CAPABILITIES_VERSION;
   }
 
@@ -108,14 +113,14 @@ export class TaskSyncRepository {
   ): Promise<z.infer<typeof RemoteToolCapabilitySchema>[] | null> {
     const capFileImport =
       roleSlug === "admin"
-        ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin.json").catch(
+        ? await import("@/generated/remote-capabilities/en/admin.json").catch(
             () => null,
           )
         : roleSlug === "customer"
-          ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer.json").catch(
+          ? await import("@/generated/remote-capabilities/en/customer.json").catch(
               () => null,
             )
-          : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public.json").catch(
+          : await import("@/generated/remote-capabilities/en/public.json").catch(
               () => null,
             );
     if (!capFileImport) {

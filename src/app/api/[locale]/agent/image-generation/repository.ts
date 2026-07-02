@@ -17,8 +17,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import { getEnvAvailability } from "../env-availability";
-import { getImageGenModelById, type ImageGenModelId } from "./models";
 import {
   ApiProvider,
   isModelOptionImageBased,
@@ -32,6 +30,7 @@ import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
 import { DefaultFolderId } from "../chat/config";
+import { getEnvAvailability } from "../env-availability";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -43,6 +42,7 @@ import {
   type ImageGenerationPostResponseOutput,
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
+import { getImageGenModelById, type ImageGenModelId } from "./models";
 import { generateWithFalAi } from "./providers/fal-ai";
 import { generateImageWithModelsLab } from "./providers/modelslab";
 import { generateWithOpenAI } from "./providers/openai";
@@ -314,6 +314,7 @@ export class ImageGenerationRepository {
     if (streamContext.threadId) {
       try {
         const storage = getStorageAdapter();
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const imgRes = await fetch(imageUrl);
         if (!imgRes.ok) {
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
@@ -468,6 +469,7 @@ export class ImageGenerationRepository {
         }
         if (!imageBuffer) {
           // Fallback to HTTP fetch for external URLs
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
           const arrayBuf = await fetch(imageUrl).then((r) => r.arrayBuffer());
           imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
         }

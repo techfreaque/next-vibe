@@ -16,7 +16,6 @@ import helpDefinitions from "next-vibe/help-tool/definition";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { AutocompleteOption } from "next-vibe/ui/web/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/web/ui/autocomplete-field";
 import { Badge } from "next-vibe/ui/web/ui/badge";
@@ -59,6 +58,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/wid
 import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, {
   useCallback,

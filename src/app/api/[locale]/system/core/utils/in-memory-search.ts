@@ -10,14 +10,14 @@
  * Multi-word queries work because each term is scored independently.
  */
 
-export interface SearchField<T> {
+interface SearchField<T> {
   /** Extract the searchable string(s) from the item */
   get: (item: T) => string | string[];
   /** Higher weight = stronger signal. Suggested: name=1.0, tagline=0.5, description=0.3, tags=0.2 */
   weight: number;
 }
 
-export interface SearchOptions<T> {
+interface SearchOptions<T> {
   fields: SearchField<T>[];
   query: string;
 }

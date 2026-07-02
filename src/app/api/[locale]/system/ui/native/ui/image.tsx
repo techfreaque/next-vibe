@@ -1,9 +1,10 @@
-import { convertCSSToImageStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { ImageProps } from "next-vibe/ui/web/ui/image";
 import * as React from "react";
 import { Image as RNImage } from "react-native";
 
-export type { ImageProps } from "next-vibe/ui/web/ui/image";
+import { convertCSSToImageStyle } from "../../native/utils/style-converter";
+import type { ImageProps } from "../../web/ui/image";
+
+export type { ImageProps } from "../../web/ui/image";
 
 /**
  * Image component for React Native

@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import type { ActionCardProps } from "next-vibe/ui/web/ui/action-card";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type { ActionCardProps } from "next-vibe/ui/web/ui/action-card";
+import type { ActionCardProps } from "../../web/ui/action-card";
+
+export type { ActionCardProps } from "../../web/ui/action-card";
 
 export function ActionCard({
   title,

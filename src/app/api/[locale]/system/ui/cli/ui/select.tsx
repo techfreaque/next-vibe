@@ -3,16 +3,6 @@
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useFocus, useInput } from "ink";
-import type {
-  SelectContentProps,
-  SelectGroupProps,
-  SelectItemProps,
-  SelectLabelProps,
-  SelectRootProps,
-  SelectSeparatorProps,
-  SelectTriggerProps,
-  SelectValueProps,
-} from "next-vibe/ui/web/ui/select";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import {
@@ -25,6 +15,16 @@ import {
   useState,
 } from "react";
 
+import type {
+  SelectContentProps,
+  SelectGroupProps,
+  SelectItemProps,
+  SelectLabelProps,
+  SelectRootProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
+} from "../../web/ui/select";
 import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type {
@@ -37,7 +37,7 @@ export type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SelectValueProps,
-} from "next-vibe/ui/web/ui/select";
+} from "../../web/ui/select";
 
 interface SelectContextType {
   value: string | undefined;

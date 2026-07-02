@@ -61,6 +61,7 @@ export async function generateWithOpenAI(params: {
   });
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       "https://api.openai.com/v1/images/generations",
       {

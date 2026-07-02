@@ -138,7 +138,7 @@ interface UseUrlNavStackOptions {
  * On popstate the URL is read and the single entry reconstructed.
  * The in-memory "stack" is always 0 or 1 entries.
  */
-export type UrlNavStackReturn = UseNavigationStackReturn & {
+type UrlNavStackReturn = UseNavigationStackReturn & {
   /** Reset in-memory stack without touching browser history. For sidebar-driven base changes. */
   _clearStack: () => void;
   /** Seed an initial stack entry without touching browser history. For restoring URL params on page refresh. */

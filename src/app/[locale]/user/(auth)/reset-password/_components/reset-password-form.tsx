@@ -2,8 +2,8 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import resetRequestDefinitions from "@/app/api/[locale]/user/public/reset-password/request/definition";

@@ -1,0 +1,42 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a14a6764bad1ddd3-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Thu, 02 Jul 2026 03:01:09 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782961265-ZuzTesRnqbW10CgOU9w3"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to call `execute-tool` with specific parameters:\\n- toolName='tool-help'\\n- instanceId='hermes'\\n- callbackMode='wait'\\n- input={}\\n\\nThen I need to check the result:\\n- Must come back inline (not as\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to call `execute-tool` with specific parameters:\\n- toolName='tool-help'\\n- instanceId='hermes'\\n- callbackMode='wait'\\n- input={}\\n\\nThen I need to check the result:\\n- Must come back inline (not as\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" a taskId)\\n- Inner result must have a non-empty tools array\\n- End with STEP_OK if conditions met\\n- Or FAILED: <reason> if not\\n\\nLet me call execute-tool with these parameters.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" a taskId)\\n- Inner result must have a non-empty tools array\\n- End with STEP_OK if conditions met\\n- Or FAILED: <reason> if not\\n\\nLet me call execute-tool with these parameters.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:0\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\":\\\"tool-help\\\",\\\"instanceId\\\":\\\"hermes\\\",\\\"callbackMode\\\":\\\"wait\\\",\\\"input\\\":{}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782961265-ZuzTesRnqbW10CgOU9w3\",\"object\":\"chat.completion.chunk\",\"created\":1782961265,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":6473,\"completion_tokens\":131,\"total_tokens\":6604,\"cost\":0.002869546,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":3584,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.002869546,\"upstream_inference_prompt_cost\":0.002422836,\"upstream_inference_completions_cost\":0.00044671},\"completion_tokens_details\":{\"reasoning_tokens\":97,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

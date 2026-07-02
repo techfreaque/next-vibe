@@ -1,8 +1,9 @@
 import { Text } from "ink";
-import type { ExternalLinkProps, LinkProps } from "next-vibe/ui/web/ui/link";
 import { useCliPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import * as React from "react";
 import terminalLink from "terminal-link";
+
+import type { ExternalLinkProps, LinkProps } from "../../web/ui/link";
 
 function renderChildren(children: React.ReactNode): string {
   if (typeof children === "string") {

@@ -7,7 +7,7 @@
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
-import { authClientRepository } from "next-vibe/identity/auth/repository-client";
+import { AuthClientRepository } from "next-vibe/identity/auth/repository-client";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
@@ -54,7 +54,7 @@ export function useLogout(
       });
 
       // remove react native token - web token is already cleared by server
-      await authClientRepository.removeAuthToken(logger, authT);
+      await AuthClientRepository.removeAuthToken(logger, authT);
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
@@ -70,7 +70,7 @@ export function useLogout(
         variant: "default",
       });
       // remove react native token - web token is already cleared by server
-      await authClientRepository.removeAuthToken(logger, authT);
+      await AuthClientRepository.removeAuthToken(logger, authT);
 
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);

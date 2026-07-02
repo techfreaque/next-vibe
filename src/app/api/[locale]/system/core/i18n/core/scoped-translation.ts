@@ -18,14 +18,6 @@ import type { DotNotation, TParams } from "./static-types";
 export type TranslatedKeyType = "createScopedTranslation-key";
 
 /**
- * Translation schema type for scoped modules
- * Supports deeply nested structures with recursive type definition
- */
-export interface ScopedTranslationSchema {
-  [key: string]: string | ScopedTranslationSchema;
-}
-
-/**
  * Creates a scoped translation system for a specific module
  * EN translations are used as the source of truth for type safety
  *

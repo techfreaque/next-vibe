@@ -5,7 +5,6 @@
 "use client";
 
 import { styled } from "nativewind";
-import { safeGetRequiredFields } from "next-vibe/core/core-utils/zod-required-fields";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
@@ -14,14 +13,6 @@ import {
   type ReactT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
 } from "next-vibe/platforms/react/i18n";
-import { Info } from "next-vibe/ui/native/ui/icons/Info";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import type {
-  EndpointFormFieldProps,
-  FormFieldError,
-} from "next-vibe/ui/web/ui/form/endpoint-form-field";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Calendar } from "next-vibe/ui/web/ui/icons/Calendar";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -39,6 +30,15 @@ import type {
 } from "react-hook-form";
 import { View } from "react-native";
 
+import { Info } from "../../../native/ui/icons/Info";
+import { convertCSSToViewStyle } from "../../../native/utils/style-converter";
+import type {
+  EndpointFormFieldProps,
+  FormFieldError,
+} from "../../../web/ui/form/endpoint-form-field";
+import { AlertCircle } from "../../../web/ui/icons/AlertCircle";
+import { Calendar } from "../../../web/ui/icons/Calendar";
+import { safeGetRequiredFields } from "../../../zod-required-fields";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";

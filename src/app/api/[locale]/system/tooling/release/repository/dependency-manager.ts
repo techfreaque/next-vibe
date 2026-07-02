@@ -31,7 +31,7 @@ import { toCatchError } from "./utils";
 /**
  * Result of checking for outdated dependencies
  */
-export interface OutdatedResult {
+interface OutdatedResult {
   /** Number of outdated dependencies */
   count: number;
   /** List of outdated packages with current and latest versions */
@@ -64,7 +64,7 @@ export interface UpdateOptions {
   target?: "latest" | "newest" | "greatest" | "minor" | "patch";
 }
 
-export class DependencyManager {
+class DependencyManager {
   private ncuAvailable: boolean | null = null;
 
   isNcuAvailable(): boolean {

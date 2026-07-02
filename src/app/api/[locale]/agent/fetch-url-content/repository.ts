@@ -18,8 +18,8 @@ import TurndownService from "turndown";
 import { z } from "zod";
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import { agentEnv } from "../env";
 
+import { agentEnv } from "../env";
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";
 
@@ -264,6 +264,7 @@ class FetchUrlService {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
 
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {

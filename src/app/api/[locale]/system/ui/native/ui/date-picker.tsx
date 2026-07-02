@@ -3,14 +3,14 @@
  * Date input with calendar - placeholder implementation
  */
 import { cn } from "next-vibe/core/utils/utils";
-import { Calendar as CalendarIcon } from "next-vibe/ui/native/ui/icons/Calendar";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-// Import all types from web (web is source of truth)
-import type { DatePickerProps } from "next-vibe/ui/web/ui/date-picker";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 
+import { Calendar as CalendarIcon } from "../../native/ui/icons/Calendar";
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+// Import all types from web (web is source of truth)
+import type { DatePickerProps } from "../../web/ui/date-picker";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

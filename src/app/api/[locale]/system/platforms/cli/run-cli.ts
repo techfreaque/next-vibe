@@ -12,10 +12,6 @@ import {
   type IDefinitionLoader,
 } from "next-vibe/core/definition/loader";
 import { Platform } from "next-vibe/core/definition/platform";
-import {
-  DefinitionsRegistry,
-  type IDefinitionsRegistry,
-} from "next-vibe/core/definitions/registry";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -44,6 +40,10 @@ import {
   CliTarget,
   type CliTargetValue,
 } from "next-vibe/platforms/cli/types/cli-target";
+import {
+  DefinitionsRegistry,
+  type IDefinitionsRegistry,
+} from "next-vibe/platforms/definitions-registry";
 
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
@@ -106,8 +106,7 @@ function resolveCommandFromPath(
 }
 
 const environmentResult: EnvironmentResult = loadEnvironment();
-export const cliPlatform = environmentResult.platform;
-export const isCliPackage: boolean = environmentResult.isPackage;
+const cliPlatform = environmentResult.platform;
 export const projectRoot: string | null = environmentResult.projectRoot;
 
 interface CliOptions {
@@ -128,7 +127,7 @@ interface CliOptions {
 const CLI_VERSION = "3.3.3" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
-export interface RunCliOptions {
+interface RunCliOptions {
   /** Binary name shown in help (e.g. "vibe" or "vibe-check") */
   name: string;
   /**

@@ -96,6 +96,7 @@ export class ReplicatePriceFetcher extends PriceFetcher {
 
     if (apiToken) {
       try {
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
         const response = await fetch(
           `https://api.replicate.com/v1/models/${owner}/${model}`,
           {
@@ -140,6 +141,7 @@ export class ReplicatePriceFetcher extends PriceFetcher {
 
     // Fall back to HTML scraping
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
       const response = await fetch(`https://replicate.com/${owner}/${model}`, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; unbottled-ai/1.0)" },
       });

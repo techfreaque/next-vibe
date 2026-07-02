@@ -84,8 +84,8 @@ export const errorLogs = pgTable(
 /**
  * Zod schemas for validation
  */
-export const insertErrorLogSchema = createInsertSchema(errorLogs);
-export const selectErrorLogSchema = createSelectSchema(errorLogs);
+const insertErrorLogSchema = createInsertSchema(errorLogs);
+const selectErrorLogSchema = createSelectSchema(errorLogs);
 
 /**
  * Type exports

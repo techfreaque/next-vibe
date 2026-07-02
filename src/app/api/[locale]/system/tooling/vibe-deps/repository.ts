@@ -19,7 +19,13 @@ import type {
   VibeDepsResponseOutput,
 } from "./definition";
 import type { CheckVibeDepsT } from "./i18n";
-import { domainOf, isSelf, placementOf, usageProfile } from "./placement";
+import {
+  domainOf,
+  isGeneratedImporter,
+  isSelf,
+  placementOf,
+  usageProfile,
+} from "./placement";
 import {
   buildUsageIndex,
   extractSymbols,
@@ -90,6 +96,33 @@ function isGenerated(key: string): boolean {
 }
 
 /**
+ * Intentional PUBLIC API surface — the framework's widget / field-config /
+ * UI-primitive trees. Their exports ARE the public contract (a widget component,
+ * a *FieldConfig type, a shared schema) and are meant to be importable even when
+ * no consumer currently does — many are also reached via `lazyWidget(() =>
+ * import("./widget").then(m => m.XWidget))` or default-imported by the renderer,
+ * so the static graph under-counts their real usage. NEVER suggest `unexport`
+ * for these (dropping the export breaks the public surface, not a dead leak).
+ * Truly-dead / whole-file-dead detection still applies.
+ */
+/** Exported for consumers OUTSIDE this codebase — skip all dead-symbol checks. */
+function isVibeFrameExternalFile(key: string): boolean {
+  return (
+    key.endsWith("/system/platforms/vibe-frame/VibeFrameHost.tsx") ||
+    key.endsWith("/system/platforms/vibe-frame/types.ts") ||
+    key.endsWith("/system/platforms/vibe-frame/triggers.ts")
+  );
+}
+
+/**
+ * Public API surface: skip `unexport` classification (symbols here are
+ * intentional contract even when not yet consumed by a static importer).
+ */
+function isPublicApiSurface(key: string): boolean {
+  return key.includes("/system/unified-ui/") || isVibeFrameExternalFile(key);
+}
+
+/**
  * Framework entrypoints — loaded by CONVENTION (Next.js file-based routing or
  * the generated endpoint/route registry), not by a static import. A `route.ts`
  * / `page.tsx` at an app path is the framework's entry for that URL; "0 static
@@ -97,14 +130,30 @@ function isGenerated(key: string): boolean {
  * whole purpose is to be discovered by location.) Their exported symbols are
  * still checked for dead-symbol.
  */
+// Files discovered BY CONVENTION (filename) by a generator's
+// findFilesRecursively scan (see find-generator-inputs.ts) — the generated
+// registry imports them, so they have no static importer of their own. Same
+// "0 importers is expected" status as route.ts. Keep in sync with the
+// convention scans in find-generator-inputs.ts.
+const CONVENTION_LOADED_FILES = new Set([
+  "route.ts",
+  "route.tsx",
+  "route-client.ts",
+  "page.tsx",
+  "layout.tsx",
+  "category.ts", // → generated/categories/registry (category-index generator)
+  "seeds.ts", // → seed registry
+  "task.ts", // → task-index
+  "task-runner.ts", // → task-index
+  "skill.ts", // → skills-index
+  "email.tsx", // → email-templates
+  "prompt.ts", // → prompt-fragments
+  "graph-seeds.ts", // → dataflow graph-seeds-index
+]);
+
 function isFrameworkEntrypoint(key: string): boolean {
   const base = key.slice(key.lastIndexOf("/") + 1);
-  return (
-    base === "route.ts" ||
-    base === "route.tsx" ||
-    base === "page.tsx" ||
-    base === "layout.tsx"
-  );
+  return CONVENTION_LOADED_FILES.has(base);
 }
 
 /**
@@ -128,6 +177,11 @@ function isKnownEntrypoint(key: string): boolean {
     ) ||
     // oxlint JS plugins — loaded by oxlint via check.config.ts jsPlugins paths.
     /^tooling\/check\/oxlint\/plugins\/[^/]+\/src\/index$/.test(sysRel) ||
+    // *.stub files — swapped in for their real module by a build alias
+    // (next.config.ts / build.config.ts resolve.alias), referenced as an alias
+    // VALUE string, not a normal import. e.g. McpResultFormatter.stub,
+    // CliEndpointPage.stub. Never statically imported → 0 importers is expected.
+    sysRel.endsWith(".stub") ||
     // ANY *.config file — consumed by its tool/runtime, never imported. Covers
     // every root-level config (build/check/vite/drizzle/release/vibe-deps/next/
     // …) without needing to enumerate each; new configs are entrypoints too.
@@ -143,6 +197,11 @@ function isKnownEntrypoint(key: string): boolean {
     ) ||
     // The CLI runtime entry — invoked as the `vibe` bin, not imported.
     sysRel === "platforms/cli/vibe-runtime" ||
+    // Node/Bun --require/--preload entry for the MCP server (see .mcp.*.json):
+    // loaded by the runtime preload flag, never statically imported.
+    sysRel === "platforms/cli/runtime/env-preload" ||
+    // bun test preloads — referenced by bunfig.toml `preload`, never imported.
+    /(^|\/)setup-tests$/.test(sysRel) ||
     // Launchpad + guard standalone scripts — spawned as processes.
     /^tooling\/launchpad\/src\/(index|scripts\/)/.test(sysRel) ||
     // Test fixtures — inputs for the builder's own tests, not app code.
@@ -352,6 +411,60 @@ function occurrenceLines(src: string, name: string): number[] {
   }
   return lines;
 }
+
+/**
+ * Build the set of graph keys that test/spec files import. The main graph
+ * skips test files entirely, so a module imported ONLY by tests shows zero
+ * importers and would be misreported as a DEAD FILE. Test infrastructure
+ * (stream/tests/helpers/*, testing fixtures, bun preloads) exists exactly for
+ * that purpose — such files are `test-only`, not dead. Uses the same
+ * extract/resolve pipeline as the main graph.
+ */
+function collectTestImportedKeys(graph: Graph): Set<string> {
+  const keys = new Set<string>();
+  for (const f of scanTestFiles(SRC_ROOT)) {
+    let src: string;
+    try {
+      src = readFileSync(f, "utf8");
+    } catch {
+      continue;
+    }
+    for (const imp of extractImports(src)) {
+      const resolved = resolveImport(imp, toPosixPath(f));
+      if (!resolved) {
+        continue;
+      }
+      const candidates = [
+        resolved,
+        `${resolved}.ts`,
+        `${resolved}.tsx`,
+        `${resolved}/index.ts`,
+        `${resolved}/index.tsx`,
+      ];
+      for (const c of candidates) {
+        if (graph.has(c)) {
+          keys.add(c);
+          break;
+        }
+      }
+    }
+  }
+  return keys;
+}
+
+/**
+ * Per-domain CONVENTION files: discovered/imported by a central layer BY
+ * DESIGN (the domain owns them, the central layer aggregates them). Moving
+ * them "next to their consumer" would break the convention, so COLOCATE must
+ * never propose it:
+ *   - generator.ts          — domain codegen, aggregated by tooling/generators
+ *   - sync-provider.ts      — domain sync, aggregated by remote-connection/sync
+ *   - system-prompt/{prompt,server,client}.ts — domain prompt fragments,
+ *     aggregated via generated/prompt-fragments
+ *   - seeds/*.ts            — domain seeds, aggregated by the seed runner
+ */
+const CONVENTION_FILE_RE =
+  /(^|\/)(generator|sync-provider)\.tsx?$|(^|\/)system-prompt\/(prompt|server|client)\.tsx?$|(^|\/)seeds\/[^/]+\.tsx?$/;
 
 /** Platform-override suffixes the bundler swaps in for the base module. */
 const PLATFORM_VARIANT_RE = /\.(native|cli|web|ios|android)\.(tsx?)$/;
@@ -1180,22 +1293,45 @@ function buildNeedsMove(
     if (isIgnored(key, ignorePrefixes)) {
       continue;
     }
+    // Per-domain convention files (generator.ts, sync-provider.ts,
+    // system-prompt fragments, seeds) are imported by a central aggregator BY
+    // DESIGN — "move next to the consumer" would break the convention.
+    if (CONVENTION_FILE_RE.test(key)) {
+      continue;
+    }
     const node = graph.get(key)!;
-    const importers = [...node.importedBy].toSorted();
+    // Filter out generated re-emitters and self — same as placementOf — so the
+    // count shown matches the consumer set that drove the verdict.
+    const importers = [...node.importedBy]
+      .filter((i) => !isSelf(i) && !isGeneratedImporter(i))
+      .toSorted();
     const verdict = placementOf(key, importers);
     if (verdict.kind === "in-place" || verdict.kind === "unused") {
       continue;
     }
+    // For COLOCATE: list the actual importer files (not just the folder).
+    // For PROMOTE: list the parent domains that import it.
+    const colocateImporterNote =
+      verdict.kind === "colocate" && verdict.usableImporters.length > 0
+        ? `  ·  consumers: ${verdict.usableImporters.map((p) => p.slice(p.lastIndexOf("/") + 1).replace(/\.(ts|tsx)$/, "")).join(", ")}`
+        : "";
+    const promoteDomainNote =
+      verdict.kind === "promote"
+        ? `  ·  domains: ${verdict.importerDomainList.join(", ")}`
+        : "";
+    const noteExtra = colocateImporterNote || promoteDomainNote;
     const entry: DepsEntry = {
       path: key,
       imports: [],
       importedBy: importers,
       importCount: node.imports.size,
-      importedByCount: node.importedBy.size,
-      isUnused: node.importedBy.size === 0,
+      importedByCount: importers.length,
+      isUnused: importers.length === 0,
       moveTo: verdict.suggestedDir ?? "(undecided)",
-      moveNote: withUsage(verdict.note, importers),
+      moveNote: `${withUsage(verdict.note, importers)}${noteExtra}`,
       moveKind: verdict.kind === "colocate" ? "reorganize" : "relocate",
+      // Tag whether the file is already in system/ so PROMOTE can split sections.
+      sourcePackage: verdict.alreadyVibe ? "system" : undefined,
     };
     (verdict.kind === "colocate" ? colocate : promote).push(entry);
   }
@@ -1316,7 +1452,11 @@ function buildUnusedSymbols(
       isUiMirrorWithWebBase(file) ||
       // Namespace-imported (`import * as X`) → every export reachable via the
       // namespace; the per-symbol name-usage index can't see those, so skip.
-      namespaceImported.has(file)
+      namespaceImported.has(file) ||
+      // Test infrastructure (tests/helpers, testing fixtures): every export
+      // exists FOR tests — symbol-level "test-only" findings there are pure
+      // noise, not actions.
+      /\/(tests|testing)\//.test(file)
     ) {
       continue;
     }
@@ -1363,10 +1503,42 @@ function buildUnusedSymbols(
         // appears there, so every hit is a real in-file call → subtract 0.
         const declHit = sym.kind === "static-method" ? 0 : 1;
         const inFileHits = countOccurrences(src, refName) - declHit;
-        // Used only in its OWN file (and not by any test) → drop `export`.
+        // Public-API-surface files: a symbol with in-file usage is intentional
+        // exported contract (widget component / *FieldConfig / shared schema),
+        // often reached via lazyWidget dynamic imports the graph can't see.
+        // Skip it entirely — neither `unexport` nor dead. (A public-API symbol
+        // with ZERO in-file usage still falls through to the dead-check below,
+        // so genuinely-orphaned public files are still caught.)
+        if (usage.usageCount === 0 && isPublicApiSurface(file)) {
+          // vibe-frame extern files: skip ALL dead-symbol findings (exported for
+          // consumers outside this codebase — static graph can't see those refs).
+          // unified-ui / ui/renderers: only skip when there's an in-file use
+          // (lazyWidget / default-import pattern); truly-orphaned symbols there
+          // still surface.
+          if (isVibeFrameExternalFile(file) || inFileHits > 0) {
+            continue;
+          }
+        }
+        // In-file usage: symbol appears somewhere inside its own file beyond
+        // the declaration line. Covers types used as field types, return types,
+        // parameter types, and class bodies — all invisible to cross-file import
+        // graph but clearly active production code.
+        const hasInFileUsage = inFileHits > 0;
+        // Production-with-coverage: used in this file AND referenced by tests.
+        // This is NOT dead and NOT test-only — it's a legitimately exported type
+        // that tests happen to import. Silently skip it. Example: ConnectionConfig
+        // appears 5× inside connector.ts as a type annotation AND is imported by
+        // connector.test.ts to type-check the test fixture — neither dead nor
+        // a candidate for unexport.
+        if (usage.usageCount === 0 && hasInFileUsage && testReferenced) {
+          continue;
+        }
+        // Used only in its OWN file → drop `export` (make unexported/private).
         const internalOnly =
-          usage.usageCount === 0 && !testReferenced && inFileHits > 0;
-        const testOnly = testReferenced;
+          usage.usageCount === 0 && !testReferenced && hasInFileUsage;
+        // test-only: only when no in-file usage at all. If in-file hits exist,
+        // it's production code (handled above or as internalOnly).
+        const testOnly = testReferenced && !hasInFileUsage;
         // A static method can only "drop export" by becoming `private`, which
         // compiles ONLY if every same-file reference sits inside the owning
         // class body. If the sole caller is a sibling module-level wrapper
@@ -1412,6 +1584,10 @@ function buildUnusedSymbols(
   }
 
   // Dead files (zero importers) within scope, as their own entries.
+  // Files imported ONLY by test/spec files are NOT dead — the main graph skips
+  // test files, so without this check every test-helper module would be
+  // misreported. They get their own informational class instead.
+  const testImportedKeys = collectTestImportedKeys(graph);
   for (const [key, node] of graph) {
     if (
       isSelf(key) ||
@@ -1428,15 +1604,19 @@ function buildUnusedSymbols(
     if (onlyScope && !key.includes(onlyScope)) {
       continue;
     }
+    const testOnlyFile = testImportedKeys.has(key);
     entries.push({
       path: key,
       imports: [...node.imports].toSorted(),
       importedBy: [],
       importCount: node.imports.size,
       importedByCount: 0,
-      isUnused: true,
+      isUnused: !testOnlyFile,
       symbol: "(whole file)",
-      symbolKind: "file",
+      symbolKind: testOnlyFile ? "file (test-only)" : "file",
+      moveNote: testOnlyFile
+        ? "imported only by tests — test infrastructure, not dead"
+        : undefined,
     });
   }
 
@@ -1466,6 +1646,71 @@ function buildUnusedSymbols(
  * `scope` restricts which files are judged (default system/); importers are read
  * from the full graph. `ignorePrefixes` = settled areas, never proposed to move.
  */
+
+/**
+ * Reverse coupling: files OUTSIDE the scope that import heavily FROM it.
+ *
+ * When you run `vibe deps system/realtime`, `use-endpoint-subscription.ts` in
+ * `system/platforms` imports `cache-merger`, `channel`, `client`, `types` — 4
+ * realtime files. That's a strong signal the hook IS realtime code and belongs
+ * colocated there. The forward lens only sees "cache-merger.ts is used by one
+ * folder → move it there"; the reverse lens surfaces the full coupling: "that
+ * consumer imports N files from your domain — consider pulling it in".
+ *
+ * Only surfaces files outside the scope with ≥2 distinct in-scope imports
+ * (single-import coupling is expected and unactionable).
+ */
+function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
+  if (!scope) {
+    return [];
+  }
+  const scopePrefix = scope.endsWith("/") ? scope : `${scope}/`;
+
+  const outsiderImportCount = new Map<string, Set<string>>();
+  for (const [key, node] of graph) {
+    if (
+      key.startsWith(scopePrefix) ||
+      isSelf(key) ||
+      isGeneratedImporter(key)
+    ) {
+      continue;
+    }
+    for (const dep of node.imports) {
+      if (dep.startsWith(scopePrefix)) {
+        const set = outsiderImportCount.get(key) ?? new Set<string>();
+        set.add(dep);
+        outsiderImportCount.set(key, set);
+      }
+    }
+  }
+
+  const entries: DepsEntry[] = [];
+  for (const [outsider, scopeImports] of outsiderImportCount) {
+    if (scopeImports.size < 2) {
+      continue;
+    }
+    const importedList = [...scopeImports].toSorted();
+    const shortNames = importedList
+      .map((p) => p.slice(scopePrefix.length).replace(/\.(ts|tsx)$/, ""))
+      .join(", ");
+    entries.push({
+      path: outsider,
+      imports: importedList,
+      importedBy: [],
+      importCount: scopeImports.size,
+      importedByCount: scopeImports.size, // leading display count = how many scope files imported
+      isUnused: false,
+      moveTo: scopePrefix.slice(0, -1),
+      moveNote: `imports ${shortNames}`,
+    });
+  }
+
+  entries.sort(
+    (a, b) => b.importCount - a.importCount || a.path.localeCompare(b.path),
+  );
+  return entries;
+}
+
 function buildReport(
   graph: Graph,
   sources: ReadonlyMap<string, string>,
@@ -1492,7 +1737,10 @@ function buildReport(
     testWords,
   );
   const deadFiles = dead.filter((e) => e.symbolKind === "file");
-  const deadSymbols = dead.filter((e) => e.symbolKind !== "file");
+  const testOnlyFiles = dead.filter((e) => e.symbolKind === "file (test-only)");
+  const deadSymbols = dead.filter(
+    (e) => e.symbolKind !== "file" && e.symbolKind !== "file (test-only)",
+  );
 
   const sections: PackageGroup[] = [];
   const add = (title: string, entries: DepsEntry[]): void => {
@@ -1506,9 +1754,27 @@ function buildReport(
     });
   };
 
+  const coupling = buildConsumerCoupling(graph, scope);
+
+  // Split PROMOTE into two distinct signals:
+  //   MISPLACED: file NOT in system/, used cross-domain → actually move it into system/
+  //   WIDE COUPLING: already in system/ (framework primitive), just informational for
+  //     understanding which primitives are relied on and by which domains.
+  const misplaced = promote.filter((e) => e.sourcePackage !== "system");
+  const wideCoupling = promote.filter((e) => e.sourcePackage === "system");
+
   add("COLOCATE — used from one folder, move next to consumers", colocate);
-  add("PROMOTE — shared across domains, lift into vibe", promote);
+  add("MISPLACED — used across domains, belongs in system/", misplaced);
+  add(
+    "WIDE COUPLING — framework primitive shared across domains (already in system/, informational)",
+    wideCoupling,
+  );
+  add(
+    "CONSUMER COUPLING — outside files importing ≥2 from this domain (consider moving them here)",
+    coupling,
+  );
   add("DEAD FILE — zero importers", deadFiles);
+  add("TEST-ONLY FILE — imported only by tests (informational)", testOnlyFiles);
   add("DEAD SYMBOL — exported but never referenced", deadSymbols);
   return sections;
 }
@@ -1603,7 +1869,7 @@ export class VibeDepsRepository {
       // Always write the full file-level dependencies.json
       writeDependenciesJson(graph, logger);
 
-      // Whole-graph stats (always from the full file graph)
+      // Whole-graph stats
       const totalFiles = graph.size;
       let totalEdges = 0;
       let unusedCount = 0;
@@ -1613,6 +1879,12 @@ export class VibeDepsRepository {
           unusedCount++;
         }
       }
+
+      // Scoped stats — when a focus path is given, compute counts only for
+      // files under that path so the header reflects what you're actually looking at.
+      let scopedFiles = totalFiles;
+      let scopedEdges = totalEdges;
+      let scopedUnused = unusedCount;
 
       // Relocation scope: which files the move/dead lenses JUDGE. Importers are
       // always read from the FULL graph (a file used from another area still
@@ -1624,6 +1896,22 @@ export class VibeDepsRepository {
             .replace(/^.*?\/src\//, "src/")
             .replace(/\/+$/, "")
         : "";
+
+      if (moveScope) {
+        scopedFiles = 0;
+        scopedEdges = 0;
+        scopedUnused = 0;
+        for (const [k, node] of graph) {
+          if (!k.includes(moveScope)) {
+            continue;
+          }
+          scopedFiles++;
+          scopedEdges += node.imports.size;
+          if (node.importedBy.size === 0) {
+            scopedUnused++;
+          }
+        }
+      }
 
       const config = loadConfig(logger);
       const ignorePrefixes = (config.ignore ?? []).map((p) => toPosixPath(p));
@@ -1646,9 +1934,9 @@ export class VibeDepsRepository {
           entries: [],
           groups,
           violations: emptyViolations(),
-          totalFiles,
-          totalEdges,
-          unusedCount,
+          totalFiles: scopedFiles,
+          totalEdges: scopedEdges,
+          unusedCount: scopedUnused,
         });
       }
 

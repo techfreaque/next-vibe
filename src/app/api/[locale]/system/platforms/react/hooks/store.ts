@@ -11,7 +11,7 @@ import type {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { generateStorageKey } from "next-vibe/platforms/react/utils/storage-storage-client";
+import { generateStorageKey } from "next-vibe/platforms/react/utils/storage-client";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -52,18 +52,16 @@ interface CustomStateMap {
 }
 
 // Typed custom state utilities
-export interface TypedCustomStateKey<T extends CustomStateValue> {
+interface TypedCustomStateKey<T extends CustomStateValue> {
   readonly key: string;
   readonly _type?: T; // Phantom type for TypeScript inference
 }
 
-export type TypedCustomStateSelector<T extends CustomStateValue> = (
+type TypedCustomStateSelector<T extends CustomStateValue> = (
   state: ApiStore,
 ) => T;
 
-export type TypedCustomStateSetter<T extends CustomStateValue> = (
-  value: T,
-) => void;
+type TypedCustomStateSetter<T extends CustomStateValue> = (value: T) => void;
 
 export function createCustomStateKey<T extends CustomStateValue>(
   key: string,
@@ -72,7 +70,7 @@ export function createCustomStateKey<T extends CustomStateValue>(
 }
 
 // Helper function to create a typed selector
-export function createCustomStateSelector<T extends CustomStateValue>(
+function createCustomStateSelector<T extends CustomStateValue>(
   stateKey: TypedCustomStateKey<T>,
   defaultValue: T,
 ): TypedCustomStateSelector<T> {
@@ -83,7 +81,7 @@ export function createCustomStateSelector<T extends CustomStateValue>(
 }
 
 // Helper function to create a typed setter
-export function createCustomStateSetter<T extends CustomStateValue>(
+function createCustomStateSetter<T extends CustomStateValue>(
   stateKey: TypedCustomStateKey<T>,
 ): TypedCustomStateSetter<T> {
   return (value: T): void => {
@@ -182,7 +180,7 @@ export interface ApiStore {
   ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined;
 }
 
-export interface QueryStoreType<TResponse> {
+interface QueryStoreType<TResponse> {
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;
 
@@ -203,21 +201,6 @@ export interface QueryStoreType<TResponse> {
   /** @deprecated Use response?.message instead */
   statusMessage: TranslatedKeyType | undefined;
   lastFetchTime: number | null;
-}
-
-export interface MutationStoreType<TResponse> {
-  /** The complete response including success/error state */
-  response: ResponseType<TResponse> | undefined;
-  isSuccess: boolean;
-  data: TResponse | undefined;
-  isError: boolean;
-  isPending: boolean;
-
-  // Backward compatibility properties
-  /** @deprecated Use response?.success === false ? response : null instead */
-  error: ErrorResponseType | null;
-  /** @deprecated Use response?.message instead */
-  statusMessage: TranslatedKeyType | undefined;
 }
 
 export const useApiStore = create<ApiStore>((set, get) => ({

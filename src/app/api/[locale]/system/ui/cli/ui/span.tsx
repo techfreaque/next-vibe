@@ -1,7 +1,8 @@
 import { Text } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { SpanProps, SpanRefObject } from "next-vibe/ui/web/ui/span";
 import * as React from "react";
+
+import type { SpanProps, SpanRefObject } from "../../web/ui/span";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 // forwardRef is a no-op in CLI - terminals have no DOM refs.
 export const Span = React.forwardRef<SpanRefObject, SpanProps>(

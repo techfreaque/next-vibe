@@ -21,7 +21,7 @@ import type { PackageJson, ReleasePackage } from "../definition";
 import { MESSAGES } from "./constants";
 import { parsePackageJson, safeJsonParse } from "./utils";
 
-export class PackageService {
+class PackageService {
   getPackageJson(
     cwd: string,
     logger: EndpointLogger,

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:84866145 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jul 2, 08:47]\n\nAssistant: STEP_OK\n\nSystem: [Context: ID:3bc24dee | Posted:Jul 2, 08:47]\n\nUser: [T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'await-task-test'}, callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:1b03494d | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jul 2, 08:47]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"await-task-test\"},\"instanceId\":\"hermes\",\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"remote-ws-hermes-functions-execute-tool-5\",\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\"}",
+    "encoding_format": "float"
+  }
+}

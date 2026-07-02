@@ -12,7 +12,7 @@ import { type JSX } from "react";
 
 import { scopedTranslation as pageT } from "./i18n";
 
-export { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
+export { useThemeToggle } from "next-vibe/ui/web/ui/theme-provider";
 
 export function ThemeToggle({
   locale,

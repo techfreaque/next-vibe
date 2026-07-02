@@ -4,19 +4,16 @@
  */
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { ChevronDown, Phone } from "next-vibe/ui/native/ui/icons";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-// Import all types and constants from web (web is source of truth)
-import type {
-  CountryData,
-  PhoneFieldProps,
-} from "next-vibe/ui/web/ui/phone-field";
-import { COUNTRIES } from "next-vibe/ui/web/ui/phone-field";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
+import { ChevronDown, Phone } from "../../native/ui/icons";
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
+// Import all types and constants from web (web is source of truth)
+import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
+import { COUNTRIES } from "../../web/ui/phone-field";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

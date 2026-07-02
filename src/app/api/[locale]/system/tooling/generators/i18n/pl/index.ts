@@ -36,10 +36,6 @@ export const translations: typeof enTranslations = {
         label: "Pomiń indeks zadań",
         description: "Pomiń generowanie indeksu zadań",
       },
-      enableTrpc: {
-        label: "Włącz tRPC",
-        description: "Generuj router tRPC (opt-in)",
-      },
       skipTanstack: {
         label: "Pomiń TanStack",
         description: "Pomiń generowanie tras TanStack",

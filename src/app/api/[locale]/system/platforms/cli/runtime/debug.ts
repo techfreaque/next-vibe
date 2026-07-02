@@ -117,7 +117,7 @@ class ResourceCleanupRegistry {
 /**
  * Performance monitor for CLI operations
  */
-export class CliPerformanceMonitor {
+class CliPerformanceMonitor {
   private timings: Partial<TimingData> = {};
 
   /**
@@ -178,7 +178,7 @@ export class CliPerformanceMonitor {
 /**
  * Resource monitor for detecting hanging handles
  */
-export class ResourceMonitor {
+class ResourceMonitor {
   /**
    * Get active handles that might prevent process exit
    */
@@ -356,7 +356,7 @@ function formatExecutionSummary(
 /**
  * CLI resource manager for proper cleanup
  */
-export class CliResourceManager {
+class CliResourceManager {
   private performanceMonitor = new CliPerformanceMonitor();
   private cleanupRegistry = new ResourceCleanupRegistry();
   private resourceMonitor = new ResourceMonitor();

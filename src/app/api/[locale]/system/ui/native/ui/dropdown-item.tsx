@@ -1,6 +1,7 @@
-import type { DropdownItemProps } from "next-vibe/ui/web/ui/dropdown-item";
 import React, { useState } from "react";
 import { Pressable, Text as RNText, View } from "react-native";
+
+import type { DropdownItemProps } from "../../web/ui/dropdown-item";
 
 export function DropdownItem({
   isSelected = false,

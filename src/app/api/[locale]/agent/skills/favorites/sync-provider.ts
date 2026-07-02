@@ -8,7 +8,7 @@ import "server-only";
  * Instance-local fields (useCount, lastUsedAt) are NOT synced.
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import {
@@ -281,39 +281,57 @@ export const favoritesSyncProvider: SyncProvider = {
       .parse(JSON.parse(json));
     let synced = 0;
 
-    // Load existing favorites for all incoming skillIds up front,
-    // keyed by the (skillId, variantId) natural key
-    const remoteSkillIds = remoteFavorites.map((f) => f.skillId);
-    const existingRows =
-      remoteSkillIds.length > 0
-        ? await db
-            .select({
-              id: chatFavorites.id,
-              skillId: chatFavorites.skillId,
-              variantId: chatFavorites.variantId,
-              updatedAt: chatFavorites.updatedAt,
-            })
-            .from(chatFavorites)
-            .where(
-              and(
-                eq(chatFavorites.userId, userId),
-                inArray(chatFavorites.skillId, remoteSkillIds),
-              ),
-            )
-        : [];
+    // Load ALL of the user's favorites up front. Matching precedence:
+    //   1. id — sync preserves remote UUIDs on insert, so a previously synced
+    //      favorite matches by id even after renames.
+    //   2. slug — unique per (user, slug); prevents the LWW update from
+    //      copying a remote slug onto the WRONG sibling and violating the
+    //      unique index (a user can hold several favorites of the same
+    //      skill+variant, e.g. a numbered "my-skill-2/-3/-4" series).
+    //   3. (skillId, variantId) natural key — legacy rows that predate
+    //      id-preserving sync.
+    // Every match is CONSUMED so two remote favorites can never map onto the
+    // same local row.
+    const existingRows = await db
+      .select({
+        id: chatFavorites.id,
+        slug: chatFavorites.slug,
+        skillId: chatFavorites.skillId,
+        variantId: chatFavorites.variantId,
+        updatedAt: chatFavorites.updatedAt,
+      })
+      .from(chatFavorites)
+      .where(eq(chatFavorites.userId, userId));
+    const existingById = new Map(existingRows.map((r) => [r.id, r]));
+    const existingBySlug = new Map(existingRows.map((r) => [r.slug, r]));
     const existingByKey = new Map(
       existingRows.map((r) => [favoriteKey(r.skillId, r.variantId), r]),
     );
+    const consumeExisting = (row: (typeof existingRows)[number]): void => {
+      existingById.delete(row.id);
+      if (existingBySlug.get(row.slug)?.id === row.id) {
+        existingBySlug.delete(row.slug);
+      }
+      const key = favoriteKey(row.skillId, row.variantId);
+      if (existingByKey.get(key)?.id === row.id) {
+        existingByKey.delete(key);
+      }
+    };
 
     // New rows are collected and inserted in batches after the loop
     const insertRows: (typeof chatFavorites.$inferInsert)[] = [];
 
     for (const remoteFav of remoteFavorites) {
       try {
-        // Dedup by (skillId, variantId) — natural key, not UUID
-        const existing = existingByKey.get(
-          favoriteKey(remoteFav.skillId, remoteFav.variantId),
-        );
+        const existing =
+          existingById.get(remoteFav.id) ??
+          existingBySlug.get(remoteFav.slug) ??
+          existingByKey.get(
+            favoriteKey(remoteFav.skillId, remoteFav.variantId),
+          );
+        if (existing) {
+          consumeExisting(existing);
+        }
 
         const remoteTime = new Date(remoteFav.updatedAt).getTime();
 
@@ -384,6 +402,9 @@ export const favoritesSyncProvider: SyncProvider = {
       } catch (error) {
         logger.error("Failed to upsert synced favorite", {
           id: remoteFav.id,
+          slug: remoteFav.slug,
+          skillId: remoteFav.skillId,
+          error: String(error),
           ...parseError(error),
         });
       }

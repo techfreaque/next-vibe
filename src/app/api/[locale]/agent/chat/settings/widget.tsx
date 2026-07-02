@@ -16,7 +16,6 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
 import taskExecuteEndpoints from "next-vibe/tasks/execute/definition";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
 import { Badge } from "next-vibe/ui/web/ui/badge";
 import { Button } from "next-vibe/ui/web/ui/button";
@@ -64,6 +63,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 

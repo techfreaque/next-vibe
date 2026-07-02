@@ -13,7 +13,6 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { usePathname, useRouter } from "next-vibe/ui/web/hooks/use-navigation";
 import { useResizeObserver } from "next-vibe/ui/web/hooks/use-resize-observer";
 import { useSafeAreaInsets } from "next-vibe/ui/web/hooks/use-safe-area-insets";
@@ -35,6 +34,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 

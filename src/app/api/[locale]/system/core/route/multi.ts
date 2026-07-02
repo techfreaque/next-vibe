@@ -3,7 +3,6 @@ import "server-only";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { NextHandlerReturnType } from "next-vibe/platforms/next-api/handler";
 import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bridge/registry";
 /**
  * Endpoint Handler Implementation
@@ -12,6 +11,7 @@ import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bri
 import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
 
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
+import type { NextHandlerReturnType } from "./next-handler";
 import type { ResponseType } from "./response.schema";
 import { endpointHandler } from "./single";
 
@@ -145,6 +145,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint,
         );
       }
+      // Exposed for dispatchers (execute-tool remote dispatch) to pre-resolve
+      // caller-context defaults before shipping the call to a peer.
+      if (methodConfig.fieldDefaults) {
+        result.tools[Methods.GET].fieldDefaults = methodConfig.fieldDefaults;
+      }
     }
   }
 
@@ -178,6 +183,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint,
         );
       }
+      if (methodConfig.fieldDefaults) {
+        result.tools[Methods.POST].fieldDefaults = methodConfig.fieldDefaults;
+      }
     }
   }
 
@@ -210,6 +218,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           methodConfig.onRemoteEvent,
           endpoint,
         );
+      }
+      if (methodConfig.fieldDefaults) {
+        result.tools[Methods.PUT].fieldDefaults = methodConfig.fieldDefaults;
       }
     }
   }
@@ -245,6 +256,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           endpoint,
         );
       }
+      if (methodConfig.fieldDefaults) {
+        result.tools[Methods.PATCH].fieldDefaults = methodConfig.fieldDefaults;
+      }
     }
   }
 
@@ -278,6 +292,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           methodConfig.onRemoteEvent,
           endpoint,
         );
+      }
+      if (methodConfig.fieldDefaults) {
+        result.tools[Methods.DELETE].fieldDefaults = methodConfig.fieldDefaults;
       }
     }
   }

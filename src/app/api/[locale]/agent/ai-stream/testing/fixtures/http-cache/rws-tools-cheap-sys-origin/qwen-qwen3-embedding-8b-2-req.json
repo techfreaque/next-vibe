@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t-sys--what-is-your-instance-id--look-at-your----ad57dad4-359b-4226-aac1-2a5d3a2923b9.md\n\n# [T-SYS] What is your instance ID? Look at your...\nFolder: cron\nPreview: <think> The user is asking for my instance ID. Looking at the system prompt, under \"System Context\" it clearly states: I…",
+    "encoding_format": "float"
+  }
+}

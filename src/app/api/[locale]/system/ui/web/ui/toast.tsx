@@ -4,9 +4,10 @@ import * as ToastPrimitives from "@radix-ui/react-toast";
 import { cva } from "class-variance-authority";
 import { X } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { useTouchDevice } from "../../web/hooks/use-touch-device";
+import type { StyleType } from "../../web/utils/style-type";
 
 export interface ToastProviderProps {
   children: React.ReactNode;

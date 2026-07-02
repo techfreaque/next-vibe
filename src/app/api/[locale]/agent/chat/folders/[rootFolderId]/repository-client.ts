@@ -175,7 +175,7 @@ export class ChatFoldersRepositoryClient {
       },
       {
         urlPathParams: {
-          rootFolderId: newItem.rootFolderId as DefaultFolderId,
+          rootFolderId: newItem.rootFolderId,
         },
         requestData: { subFolderId: newItem.parentId, threadIds: null },
       },

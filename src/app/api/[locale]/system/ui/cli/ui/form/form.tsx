@@ -1,6 +1,9 @@
 import { Box, Text } from "ink";
-import { CliFocusManager } from "next-vibe/ui/cli/lib/focus-manager";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
+import type { JSX } from "react";
+import type { FieldPath, FieldValues } from "react-hook-form";
+import { Controller, FormProvider, useFormContext } from "react-hook-form";
+
+import { CliFocusManager } from "../../../cli/lib/focus-manager";
 import type {
   FormComboboxProps,
   FormControlProps,
@@ -14,10 +17,8 @@ import type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "next-vibe/ui/web/ui/form/form";
-import type { JSX } from "react";
-import type { FieldPath, FieldValues } from "react-hook-form";
-import { Controller, FormProvider, useFormContext } from "react-hook-form";
+} from "../../../web/ui/form/form";
+import { parseClassesToInkProps } from "../tailwind-to-ink";
 
 export type {
   FormComboboxProps,
@@ -32,7 +33,7 @@ export type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "next-vibe/ui/web/ui/form/form";
+} from "../../../web/ui/form/form";
 
 const COLON = "\u003A";
 const SPACE = "\u0020";

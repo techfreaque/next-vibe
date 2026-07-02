@@ -2,7 +2,6 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   DialogContent,
   DialogDescription,
@@ -12,6 +11,7 @@ import {
 import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
 import { Maximize } from "next-vibe/ui/web/ui/icons/Maximize";
 import { Link } from "next-vibe/ui/web/ui/link";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/cortex/i18n";

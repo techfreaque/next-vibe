@@ -4,10 +4,11 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { Cross2Icon } from "next-vibe/ui/web/ui/icons/Cross2Icon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { uiScopedTranslation } from "../../web/i18n";
+import { Cross2Icon } from "../../web/ui/icons/Cross2Icon";
+import type { StyleType } from "../../web/utils/style-type";
 
 // Cross-platform types
 export interface SheetRootProps {

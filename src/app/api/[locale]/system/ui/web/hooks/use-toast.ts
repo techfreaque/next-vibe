@@ -1,11 +1,9 @@
 "use client";
 
 // Inspired by react-hot-toast library
-import type {
-  ToastActionElement,
-  ToastRootProps,
-} from "next-vibe/ui/web/ui/toast";
 import * as React from "react";
+
+import type { ToastActionElement, ToastRootProps } from "../../web/ui/toast";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 5000;

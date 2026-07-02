@@ -1,5 +1,16 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type {
+  ErrorResponseType,
+  MessageResponseType,
+  ResponseType,
+} from "next-vibe/core/route/response.schema";
+import type { Prettify } from "next-vibe/core/utils/type-utils";
+import type { DeepPartial } from "next-vibe/core/utils/type-utils";
+import type { UseFormReturn } from "react-hook-form";
+import type { ZodType } from "zod";
+import type { ZodTypeDef } from "zod/v3";
+
+import type {
   DeleteRequest,
   DeleteResponse,
   DeleteUrlVariables,
@@ -12,18 +23,7 @@ import type {
   PrimaryMutationRequest,
   PrimaryMutationResponse,
   PrimaryMutationUrlVariables,
-} from "next-vibe/core/definition/endpoint-helpers";
-import type {
-  ErrorResponseType,
-  MessageResponseType,
-  ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { Prettify } from "next-vibe/core/utils/type-utils";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
-import type { UseFormReturn } from "react-hook-form";
-import type { ZodType } from "zod";
-import type { ZodTypeDef } from "zod/v3";
-
+} from "./endpoint-helpers";
 import type { CacheKeyRequestData } from "./query-key-builder";
 import type {
   ApiFormOptions,
@@ -114,27 +114,6 @@ export type OptionsOptional<T> = [ReadRequired<T>] extends [true]
       : [DeleteRequired<T>] extends [true]
         ? false
         : true;
-
-// Combined URL variables type - supports both GET and mutation endpoints
-// If GET exists, use its urlPathParams; otherwise use primary mutation's urlPathParams
-export type EndpointUrlVariables<T> =
-  GetRequest<T> extends never
-    ? PrimaryMutationRequest<T> extends never
-      ? undefined
-      : PrimaryMutationUrlVariables<T>
-    : GetUrlVariables<T>;
-
-// AutoPrefill data type - represents data from GET response that can prefill mutation request
-// When both GET and mutation endpoints exist, the GET response is used to prefill the mutation
-// This type represents the intersection: it must be assignable to mutation request
-export type AutoPrefillDataType<T> =
-  GetRequest<T> extends never
-    ? undefined
-    : PrimaryMutationRequest<T> extends never
-      ? undefined
-      : GetResponse<T> extends PrimaryMutationRequest<T>
-        ? GetResponse<T>
-        : Partial<PrimaryMutationRequest<T>>;
 
 // ── Per-section option shapes ────────────────────────────────────────────────
 
@@ -255,204 +234,6 @@ export interface FormAlertState {
   title: MessageResponseType;
   message: MessageResponseType;
 }
-
-export type UseEndpointMutationOptions<T> = ApiMutationOptions<
-  PrimaryMutationRequest<T> extends never ? never : PrimaryMutationRequest<T>,
-  PrimaryMutationRequest<T> extends never ? never : PrimaryMutationResponse<T>,
-  PrimaryMutationRequest<T> extends never
-    ? never
-    : PrimaryMutationUrlVariables<T>
->;
-
-// Create operation return type
-export type CreateOperationReturn<T> = "POST" extends keyof T
-  ? {
-      form: UseFormReturn<
-        PrimaryMutationRequest<T>,
-        ZodType<
-          PrimaryMutationRequest<T>,
-          ZodTypeDef,
-          PrimaryMutationRequest<T>
-        >
-      >;
-      /** The complete response including success/error state */
-      response: ResponseType<PrimaryMutationResponse<T>> | undefined;
-
-      // Backward compatibility properties
-      /** @deprecated Use response?.success === true instead */
-      isSuccess: boolean;
-      /** @deprecated Use response?.success === false ? response : null instead */
-      error: ErrorResponseType | null;
-
-      values: Partial<PrimaryMutationRequest<T>>;
-      setValue: <K extends keyof PrimaryMutationRequest<T>>(
-        key: K,
-        value: PrimaryMutationRequest<T>[K],
-      ) => void;
-      onSubmit: (e: FormEvent) => Promise<void>;
-      reset: () => void;
-      isSubmitting: boolean;
-      isDirty: boolean;
-      clearSavedForm: () => void;
-      /** @deprecated Use response property instead */
-      setErrorType: (error: ErrorResponseType | null) => void;
-    }
-  : "PUT" extends keyof T
-    ? {
-        form: UseFormReturn<
-          PrimaryMutationRequest<T>,
-          ZodType<
-            PrimaryMutationRequest<T>,
-            ZodTypeDef,
-            PrimaryMutationRequest<T>
-          >
-        >;
-        /** The complete response including success/error state */
-        response: ResponseType<PrimaryMutationResponse<T>> | undefined;
-
-        // Backward compatibility properties
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
-
-        values: Partial<PrimaryMutationRequest<T>>;
-        setValue: <K extends keyof PrimaryMutationRequest<T>>(
-          key: K,
-          value: PrimaryMutationRequest<T>[K],
-        ) => void;
-        onSubmit: (e: FormEvent) => Promise<void>;
-        reset: () => void;
-        isSubmitting: boolean;
-        isDirty: boolean;
-        clearSavedForm: () => void;
-        /** @deprecated Use response property instead */
-        setErrorType: (error: ErrorResponseType | null) => void;
-      }
-    : "PATCH" extends keyof T
-      ? {
-          form: UseFormReturn<
-            PrimaryMutationRequest<T>,
-            ZodType<
-              PrimaryMutationRequest<T>,
-              ZodTypeDef,
-              PrimaryMutationRequest<T>
-            >
-          >;
-          /** The complete response including success/error state */
-          response: ResponseType<PrimaryMutationResponse<T>> | undefined;
-
-          // Backward compatibility properties
-          /** @deprecated Use response?.success === true instead */
-          isSuccess: boolean;
-          /** @deprecated Use response?.success === false ? response : null instead */
-          error: ErrorResponseType | null;
-
-          values: Partial<PrimaryMutationRequest<T>>;
-          setValue: <K extends keyof PrimaryMutationRequest<T>>(
-            key: K,
-            value: PrimaryMutationRequest<T>[K],
-          ) => void;
-          onSubmit: (e: FormEvent) => Promise<void>;
-          reset: () => void;
-          isSubmitting: boolean;
-          isDirty: boolean;
-          clearSavedForm: () => void;
-          /** @deprecated Use response property instead */
-          setErrorType: (error: ErrorResponseType | null) => void;
-        }
-      : "DELETE" extends keyof T
-        ? {
-            form: UseFormReturn<
-              PrimaryMutationRequest<T>,
-              ZodType<
-                PrimaryMutationRequest<T>,
-                ZodTypeDef,
-                PrimaryMutationRequest<T>
-              >
-            >;
-            /** The complete response including success/error state */
-            response: ResponseType<PrimaryMutationResponse<T>> | undefined;
-
-            // Backward compatibility properties
-            /** @deprecated Use response?.success === true instead */
-            isSuccess: boolean;
-            /** @deprecated Use response?.success === false ? response : null instead */
-            error: ErrorResponseType | null;
-
-            values: Partial<PrimaryMutationRequest<T>>;
-            setValue: <K extends keyof PrimaryMutationRequest<T>>(
-              key: K,
-              value: PrimaryMutationRequest<T>[K],
-            ) => void;
-            onSubmit: (e: FormEvent) => Promise<void>;
-            reset: () => void;
-            isSubmitting: boolean;
-            isDirty: boolean;
-            clearSavedForm: () => void;
-            /** @deprecated Use response property instead */
-            setErrorType: (error: ErrorResponseType | null) => void;
-          }
-        : undefined;
-
-// Read operation return type
-export type ReadOperationReturn<T> = "GET" extends keyof T
-  ? {
-      form: UseFormReturn<
-        GetRequest<T>,
-        ZodType<GetRequest<T>, ZodTypeDef, GetRequest<T>>
-      >;
-      /** The complete response including success/error state */
-      response: ResponseType<GetResponse<T>> | undefined;
-
-      // Backward compatibility properties
-      /** @deprecated Use response.success and response.data instead */
-      data: GetResponse<T> | undefined;
-      /** @deprecated Use !response?.success instead */
-      isError: boolean;
-      /** @deprecated Use response?.success === false ? response : null instead */
-      error: ErrorResponseType | null;
-      /** @deprecated Use response?.success === true instead */
-      isSuccess: boolean;
-      /** @deprecated Use response?.success === true instead */
-      isSubmitSuccessful: boolean;
-      /** @deprecated Use response?.success === false ? response : undefined instead */
-      submitError: ErrorResponseType | undefined;
-
-      isLoading: boolean;
-      isLoadingFresh: boolean;
-      isCachedData: boolean;
-      refetch: () => Promise<void>;
-      submitForm: SubmitFormFunction<
-        GetRequest<T>,
-        GetResponse<T>,
-        GetUrlVariables<T>
-      >;
-      isSubmitting: boolean;
-      clearSavedForm: () => void;
-      /** @deprecated Use response property instead */
-      setErrorType: (error: ErrorResponseType | null) => void;
-      isFetching: boolean;
-      status: "loading" | "success" | "error" | "idle";
-    }
-  : undefined;
-
-// Delete operation return type
-export type DeleteOperationReturn<T> = "DELETE" extends keyof T
-  ? {
-      /** The complete response including success/error state */
-      response: ResponseType<DeleteResponse<T>> | undefined;
-
-      // Backward compatibility properties
-      /** @deprecated Use response?.success === true instead */
-      isSuccess: boolean;
-      /** @deprecated Use response?.success === false ? response : null instead */
-      error: ErrorResponseType | null;
-
-      submit: (data?: DeleteRequest<T>) => Promise<void>;
-      isSubmitting: boolean;
-    }
-  : undefined;
 
 // Main endpoint return interface
 export type EndpointReturn<T> = Prettify<{
@@ -714,51 +495,6 @@ export type EndpointReturn<T> = Prettify<{
   error: ErrorResponseType | null;
 }>;
 
-// Options for individual hooks
-export interface UseEndpointCreateOptions<T> {
-  formOptions?: ApiFormOptions<
-    PrimaryMutationRequest<T> extends never ? never : PrimaryMutationRequest<T>
-  >;
-  mutationOptions?: ApiMutationOptions<
-    PrimaryMutationRequest<T> extends never ? never : PrimaryMutationRequest<T>,
-    PrimaryMutationRequest<T> extends never
-      ? never
-      : PrimaryMutationResponse<T>,
-    PrimaryMutationRequest<T> extends never
-      ? never
-      : PrimaryMutationUrlVariables<T>
-  >;
-  urlPathParams?: PrimaryMutationUrlVariables<T> extends never
-    ? undefined
-    : PrimaryMutationUrlVariables<T>;
-  autoPrefillData?: PrimaryMutationRequest<T> extends never
-    ? undefined
-    : Partial<PrimaryMutationRequest<T>>;
-}
-
-export interface UseEndpointReadOptions<T> {
-  formOptions?: ApiQueryFormOptions<
-    GetRequest<T> extends never ? never : GetRequest<T>
-  >;
-  queryOptions?: ApiQueryOptions<
-    GetRequest<T> extends never ? never : GetRequest<T>,
-    GetRequest<T> extends never ? never : GetResponse<T>,
-    GetRequest<T> extends never ? never : GetUrlVariables<T>
-  >;
-  urlPathParams: GetRequest<T> extends never ? undefined : GetUrlVariables<T>;
-}
-
-export interface UseEndpointDeleteOptions<T> {
-  mutationOptions?: ApiMutationOptions<
-    DeleteRequest<T> extends never ? never : DeleteRequest<T>,
-    DeleteRequest<T> extends never ? never : DeleteResponse<T>,
-    DeleteRequest<T> extends never ? never : DeleteUrlVariables<T>
-  >;
-  urlPathParams?: DeleteUrlVariables<T> extends never
-    ? undefined
-    : DeleteUrlVariables<T>;
-}
-
 /**
  * Form auto-prefill types and configurations
  */
@@ -792,42 +528,4 @@ export interface FormDataPriority<T> {
   dataSource: "default" | "server" | "localStorage" | "initialState";
   /** Whether local storage data was used (indicates unsaved changes) */
   hasUnsavedChanges: boolean;
-}
-
-/**
- * Type-safe callbacks for localStorage mode
- * All callbacks must return ResponseType to maintain consistency with API mode
- */
-export interface LocalStorageCallbacks<T> {
-  /** Callback for GET/read operations */
-  read?: "GET" extends keyof T
-    ? (params: {
-        urlPathParams?: GetUrlVariables<T>;
-        requestData?: GetRequest<T>;
-      }) => Promise<ResponseType<GetResponse<T>>>
-    : undefined;
-
-  /** Callback for POST/create operations */
-  create?: "POST" extends keyof T
-    ? (params: {
-        requestData: PrimaryMutationRequest<T>;
-        urlPathParams?: PrimaryMutationUrlVariables<T>;
-      }) => Promise<ResponseType<PrimaryMutationResponse<T>>>
-    : undefined;
-
-  /** Callback for PATCH/update operations */
-  update?: "PATCH" extends keyof T
-    ? (params: {
-        requestData: PatchRequest<T>;
-        urlPathParams?: PatchUrlVariables<T>;
-      }) => Promise<ResponseType<PatchResponse<T>>>
-    : undefined;
-
-  /** Callback for DELETE operations */
-  delete?: "DELETE" extends keyof T
-    ? (params: {
-        requestData?: DeleteRequest<T>;
-        urlPathParams?: DeleteUrlVariables<T>;
-      }) => Promise<ResponseType<DeleteResponse<T>>>
-    : undefined;
 }

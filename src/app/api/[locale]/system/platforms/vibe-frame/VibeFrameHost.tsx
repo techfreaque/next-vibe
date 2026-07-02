@@ -14,7 +14,12 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { createParentBridge, type ParentBridge } from "./bridge";
-import type { FrameError, FrameTheme, FrameToParentMessage } from "./types";
+import type {
+  FrameError,
+  FrameTheme,
+  FrameToParentMessage,
+  VibeFrameInstance,
+} from "./types";
 import { DEFAULT_SANDBOX, generateFrameId } from "./types";
 
 // ─── Props ───────────────────────────────────────────────────────────────────

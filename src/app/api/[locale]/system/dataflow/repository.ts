@@ -776,7 +776,7 @@ export class VibeSenseRepository {
 
   // ─── Data (on-demand render) ──────────────────────────────────────────────────
 
-  static async getGraphData(
+  private static async getGraphData(
     id: string,
     data: GraphDataInput,
     user: JwtPayloadType,

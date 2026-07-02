@@ -2,7 +2,6 @@
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { ReactNode } from "react";
 import * as React from "react";
 import {
@@ -16,6 +15,8 @@ import {
   VictoryTheme as VictoryThemeBase,
   VictoryTooltip as VictoryTooltipBase,
 } from "victory";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: ".light", dark: ".dark" } as const;

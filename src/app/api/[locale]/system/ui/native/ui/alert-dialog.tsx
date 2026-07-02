@@ -1,6 +1,11 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import type { ViewStyle } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   AlertDialogActionProps,
   AlertDialogCancelProps,
@@ -13,13 +18,8 @@ import type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import type { ViewStyle } from "react-native";
-import { StyleSheet, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
+} from "../../web/ui/alert-dialog";
+import { applyStyleType } from "../../web/utils/style-type";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 

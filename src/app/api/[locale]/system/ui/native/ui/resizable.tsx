@@ -5,14 +5,15 @@
 import { GripVertical } from "lucide-react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import React from "react";
+import { View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   ResizableContainerProps,
   ResizableHandleProps,
-} from "next-vibe/ui/web/ui/resizable";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import React from "react";
-import { View } from "react-native";
+} from "../../web/ui/resizable";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });

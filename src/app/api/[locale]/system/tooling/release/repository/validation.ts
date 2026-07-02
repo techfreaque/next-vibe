@@ -19,7 +19,7 @@ import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import type { GitInfo, PackageManager, ReleaseConfig } from "../definition";
 import { MESSAGES } from "./constants";
 
-export class ValidationService {
+class ValidationService {
   /**
    * Validate branch configuration
    */

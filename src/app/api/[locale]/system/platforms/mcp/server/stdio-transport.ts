@@ -13,7 +13,7 @@ import type { JsonRpcRequest, JsonRpcResponse } from "../types";
 /**
  * MCP Transport Interface
  */
-export interface IMCPTransport {
+interface IMCPTransport {
   start(): Promise<void>;
   stop(): Promise<void>;
   send(message: JsonRpcResponse): Promise<void>;

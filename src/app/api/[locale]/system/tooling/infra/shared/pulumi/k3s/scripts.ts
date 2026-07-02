@@ -68,14 +68,8 @@ export function kubectl(cmd: string): string {
   return `k3s kubectl ${cmd}`;
 }
 
-/** Apply a YAML manifest from stdin */
-export const KUBECTL_APPLY_STDIN = `k3s kubectl apply -f -`;
-
 /** Get node status */
 export const GET_NODES = `k3s kubectl get nodes -o json`;
-
-/** Get pod counts per namespace */
-export const GET_POD_COUNTS = `k3s kubectl get pods --all-namespaces --no-headers | awk '{print $1}' | sort | uniq -c`;
 
 /** Scale a deployment */
 export function scaleDeployment(

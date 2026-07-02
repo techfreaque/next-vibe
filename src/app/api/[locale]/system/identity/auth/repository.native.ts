@@ -33,20 +33,6 @@ const AUTH_EXPIRES_AT_STORAGE_KEY = "@auth/expiresAt";
  * Native Auth Repository - Static class pattern
  */
 export class AuthRepository {
-  static async getPrimaryLeadId(
-    // oxlint-disable-next-line no-unused-vars
-    _userId: string,
-  ): Promise<string | null> {
-    return null;
-  }
-
-  static async getAllLeadIds(
-    // oxlint-disable-next-line no-unused-vars
-    _userId: string,
-  ): Promise<string[]> {
-    return [];
-  }
-
   static async validateSession(
     // oxlint-disable-next-line no-unused-vars
     _token: string,
@@ -68,18 +54,6 @@ export class AuthRepository {
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("authenticate is not implemented on native");
-  }
-
-  static async getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
-    // oxlint-disable-next-line no-unused-vars
-    _roles: TRoles,
-    // oxlint-disable-next-line no-unused-vars
-    _context: AuthContext,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles>> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("getTypedAuthMinimalUser is not implemented on native");
   }
 
   static async setAuthCookies(
@@ -152,16 +126,6 @@ export class AuthRepository {
     throw new Error("verifyJwt is not implemented on native");
   }
 
-  static getCurrentUser(
-    // oxlint-disable-next-line no-unused-vars
-    _context: AuthContext,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("getCurrentUser is not implemented on native");
-  }
-
   static getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     // oxlint-disable-next-line no-unused-vars
     _roles: TRoles,
@@ -172,17 +136,6 @@ export class AuthRepository {
   ): Promise<InferUserType<TRoles>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getAuthMinimalUser is not implemented on native");
-  }
-
-  static getUserRoles(
-    // oxlint-disable-next-line no-unused-vars
-    _requiredRoles: readonly UserRoleValue[],
-    // oxlint-disable-next-line no-unused-vars
-    _context: AuthContext,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<UserRoleValue[]> {
-    return Promise.resolve([]);
   }
 
   static async storeAuthTokenForPlatform(
@@ -220,17 +173,6 @@ export class AuthRepository {
   ): Promise<ResponseType<string>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("createCliToken is not implemented on native");
-  }
-
-  static validateCliToken(
-    // oxlint-disable-next-line no-unused-vars
-    _token: string,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
-  ): Promise<JwtPrivatePayloadType | null> {
-    return Promise.resolve(null);
   }
 
   static extractUserId(payload: JwtPrivatePayloadType): string | null {

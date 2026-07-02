@@ -187,11 +187,6 @@ export const translations: typeof enTranslations = {
     errorGettingUserRoles: "Błąd podczas pobierania ról użytkownika",
     errorCheckingUserAuth:
       "Błąd podczas sprawdzania uwierzytelniania użytkownika",
-    gettingCurrentUserFromTrpc: "Pobieranie bieżącego użytkownika z tRPC",
-    errorGettingAuthUserForTrpc:
-      "Błąd podczas pobierania użytkownika auth dla tRPC",
-    errorGettingUserRolesForTrpc:
-      "Błąd podczas pobierania ról użytkownika dla tRPC",
     authenticatingCliUserWithPayload:
       "Uwierzytelnianie użytkownika CLI z danymi",
     errorAuthenticatingCliUserWithPayload:
@@ -217,7 +212,5 @@ export const translations: typeof enTranslations = {
     noTokenFound: "Nie znaleziono tokenu",
     errorExtractingToken: "Błąd podczas wyodrębniania tokenu",
     errorParsingCookies: "Błąd podczas parsowania cookies",
-    errorGettingCurrentUserFromTrpc:
-      "Błąd podczas pobierania bieżącego użytkownika z tRPC",
   },
 };

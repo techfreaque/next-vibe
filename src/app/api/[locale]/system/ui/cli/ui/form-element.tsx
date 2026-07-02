@@ -1,15 +1,16 @@
 import { Box } from "ink";
+import type { JSX } from "react";
+import { forwardRef } from "react";
+
 import type {
   FormElementProps,
   FormElementRefObject,
-} from "next-vibe/ui/web/ui/form-element";
-import type { JSX } from "react";
-import { forwardRef } from "react";
+} from "../../web/ui/form-element";
 
 export type {
   FormElementProps,
   FormElementRefObject,
-} from "next-vibe/ui/web/ui/form-element";
+} from "../../web/ui/form-element";
 
 export const FormElement = forwardRef(function FormElement(
   { children, onSubmit }: FormElementProps,

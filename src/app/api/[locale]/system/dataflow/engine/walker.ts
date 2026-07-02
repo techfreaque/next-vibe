@@ -13,7 +13,7 @@ import type { GraphConfig } from "next-vibe/dataflow/graph/types";
  * Returns nodes in topological order (sources first, actions last).
  * Used by the executor to process nodes in dependency order.
  */
-export interface ExecutionOrder {
+interface ExecutionOrder {
   order: string[];
   cycleNodes: string[];
 }

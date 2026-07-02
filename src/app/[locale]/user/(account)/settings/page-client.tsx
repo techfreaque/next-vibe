@@ -2,7 +2,6 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Card, CardContent } from "next-vibe/ui/web/ui/card";
 import { Div } from "next-vibe/ui/web/ui/div";
@@ -10,6 +9,7 @@ import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
 import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
 import { Link } from "next-vibe/ui/web/ui/link";
 import { H2, P } from "next-vibe/ui/web/ui/typography";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import meDefinition from "@/app/api/[locale]/user/private/me/definition";

@@ -19,7 +19,7 @@ import { outputFormatter } from "./output-formatter";
 // Interface
 // ============================================================================
 
-export interface IFileCopier {
+interface IFileCopier {
   /**
    * Copy files and folders to destinations
    */
@@ -42,7 +42,7 @@ export interface IFileCopier {
 // Implementation
 // ============================================================================
 
-export class FileCopier implements IFileCopier {
+class FileCopier implements IFileCopier {
   async copy(
     filesToCopy: CopyConfig[],
     output: string[],

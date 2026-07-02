@@ -76,6 +76,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
 
     let rawModels: OpenRouterModel[] = [];
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch(OpenRouterTokenPriceFetcher.API_URL, {
         headers: { "Content-Type": "application/json" },
       });

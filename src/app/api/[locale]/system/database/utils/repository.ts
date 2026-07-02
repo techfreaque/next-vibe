@@ -116,7 +116,7 @@ export class DbUtilsRepository {
   /**
    * Get database statistics
    */
-  static async getStats(
+  private static async getStats(
     t: UtilsT,
     logger: EndpointLogger,
   ): Promise<

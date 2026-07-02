@@ -1,8 +1,8 @@
 import { Box, Text } from "ink";
-import {
-  parseClassesToBoxProps,
-  parseClassesToTextProps,
-} from "next-vibe/ui/cli/utils/tailwind-to-ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+import * as React from "react";
+
 import type {
   TableBodyProps,
   TableCaptionProps,
@@ -12,10 +12,11 @@ import type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "next-vibe/ui/web/ui/table";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-import * as React from "react";
+} from "../../web/ui/table";
+import {
+  parseClassesToBoxProps,
+  parseClassesToTextProps,
+} from "./tailwind-to-ink";
 
 // Re-export types from web version
 export type {
@@ -27,7 +28,7 @@ export type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "next-vibe/ui/web/ui/table";
+} from "../../web/ui/table";
 
 const SEPARATOR = "\u2500".repeat(60);
 const CELL_DIVIDER = " | ";

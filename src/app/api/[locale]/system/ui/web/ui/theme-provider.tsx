@@ -2,10 +2,11 @@
 
 import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { setCookie } from "next-vibe/ui/web/lib/cookies";
-import { storage } from "next-vibe/ui/web/lib/storage";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import React, { type JSX, useEffect, useState } from "react";
+
+import { setCookie } from "../../web/lib/cookies";
+import { storage } from "../../web/lib/storage";
+import type { StyleType } from "../../web/utils/style-type";
 
 export const THEME_COOKIE_NAME = "theme_v2";
 

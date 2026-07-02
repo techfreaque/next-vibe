@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:a5fb8d32 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jul 2, 08:39]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help','instanceId':'hermes'}```json { \",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Forbidden\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"logout\",\"title\":\"User Logout\",\"titleShort\":\"Logout\",\"description\":\"Logs out the current user and invalidates their session\",\"id\":\"logout\",\"tags\":[\"logout\"],\"method\":\"POST\",\"category\":\"account\",\"platforms\":[\"cli\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"electro\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"category\":\"ai\"},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\",\"titleShort\":\"Community Feed\",\"description\":\"Public threads shared with the community\",\"id\":\"agent_chat_public-feed_GET\",\"tags\":[\"Public Feed\"],\"method\":\"GET\",\"category\":\"ai\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill",
+    "encoding_format": "float"
+  }
+}

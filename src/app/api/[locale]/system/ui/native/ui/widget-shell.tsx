@@ -1,12 +1,13 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import type { WidgetShellProps } from "next-vibe/ui/web/ui/widget-shell";
 import { View } from "react-native";
+
+import type { WidgetShellProps } from "../../web/ui/widget-shell";
 
 export type {
   WidgetShellPadding,
   WidgetShellProps,
-} from "next-vibe/ui/web/ui/widget-shell";
+} from "../../web/ui/widget-shell";
 
 const StyledView = styled(View, { className: "style" });
 

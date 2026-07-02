@@ -13,7 +13,7 @@ import type { z } from "zod";
 /**
  * JSON-RPC 2.0 Base Types
  */
-export type JsonRpcVersion = "2.0";
+type JsonRpcVersion = "2.0";
 
 /**
  * JSON-RPC Request (generic version)
@@ -83,22 +83,6 @@ export enum MCPMethod {
   RESOURCES_READ = "resources/read",
 }
 
-/**
- * MCP Initialize Request
- */
-export interface MCPInitializeParams {
-  protocolVersion: string;
-  capabilities: {
-    tools?: { listChanged?: boolean };
-    prompts?: { listChanged?: boolean };
-    resources?: { subscribe?: boolean };
-  };
-  clientInfo: {
-    name: string;
-    version: string;
-  };
-}
-
 export interface MCPInitializeResult {
   protocolVersion: string;
   capabilities: {
@@ -134,13 +118,6 @@ export interface MCPTool {
     required?: string[];
     additionalProperties?: boolean;
   };
-}
-
-/**
- * MCP Tools List
- */
-export interface MCPToolsListParams {
-  cursor?: string;
 }
 
 export interface MCPToolsListResult {

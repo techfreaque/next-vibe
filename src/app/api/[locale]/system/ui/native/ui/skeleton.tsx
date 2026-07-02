@@ -1,5 +1,4 @@
 import { cn } from "next-vibe/core/utils/utils";
-import type { SkeletonProps } from "next-vibe/ui/web/ui/skeleton";
 import * as React from "react";
 import Animated, {
   useAnimatedStyle,
@@ -8,6 +7,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+
+import type { SkeletonProps } from "../../web/ui/skeleton";
 
 const duration = 1000;
 

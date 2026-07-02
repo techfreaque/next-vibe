@@ -123,12 +123,9 @@ export class ThreadRenameRepository {
       // event (the changed fields the user submitted + updatedAt). The client
       // onEvent merges them into the sidebar list cache; cross-instance the peer
       // re-applies the update.
-      createEndpointEmitter(
-        threadsByIdDefinitions.PATCH,
-        logger,
-        user,
-      )("thread-updated", {
+      createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
         urlPathParams: { threadId: updatedThread.id },
+      })("thread-updated", {
         requestData: {
           title: updatedThread.title,
           folderId: updatedThread.folderId,
@@ -141,15 +138,12 @@ export class ThreadRenameRepository {
       });
 
       if (updatedThread.rootFolderId) {
-        const { default: folderContentsDefinitions } =
-          await import("../../folder-contents/[rootFolderId]/definition");
-        const emitFolderContents = createEndpointEmitter(
-          folderContentsDefinitions.GET,
+        const emitFolderContents = createFolderContentsEmitter(
           logger,
           user,
+          updatedThread.rootFolderId,
         );
         emitFolderContents("thread-updated", {
-          urlPathParams: { rootFolderId: updatedThread.rootFolderId },
           responseData: {
             items: [
               {

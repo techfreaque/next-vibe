@@ -67,7 +67,7 @@ export function throwErrorResponse(
 /**
  * Options for success response
  */
-export interface SuccessResponseOptions {
+interface SuccessResponseOptions {
   /** Mark as error response (for special handling) */
   isErrorResponse?: true;
   /** Custom headers to include in the HTTP response */
@@ -102,7 +102,7 @@ export function success<TResponse>(
   };
 }
 
-export const messageResponseSchema = z.object({
+const messageResponseSchema = z.object({
   message: z.string() as z.ZodType<TranslatedKeyType>,
   messageParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
@@ -294,7 +294,7 @@ export interface SuccessResponseType<TResponseData> {
   cause?: never;
 }
 
-export type ErrorTypes =
+type ErrorTypes =
   | "VALIDATION_ERROR"
   | "AUTH_ERROR"
   | "UNAUTHORIZED"
@@ -332,7 +332,7 @@ export type ErrorTypes =
   | "PAYMENT_REQUIRED"
   | "CONFLICT";
 
-export type ErrorResponseTypesElements = {
+type ErrorResponseTypesElements = {
   [errorType in ErrorTypes]: {
     errorKey: SharedTranslationKey;
     errorCode: number;

@@ -18,7 +18,7 @@ import { MESSAGES } from "./constants";
 // Interface
 // ============================================================================
 
-export interface IAssetZipper {
+interface IAssetZipper {
   /**
    * Zip folders for release
    */
@@ -40,7 +40,7 @@ export interface IAssetZipper {
 // Implementation
 // ============================================================================
 
-export class AssetZipper implements IAssetZipper {
+class AssetZipper implements IAssetZipper {
   async zipFolders(
     newTag: string,
     packageJson: PackageJson,

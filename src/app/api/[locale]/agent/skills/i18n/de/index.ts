@@ -1721,7 +1721,6 @@ export const translations: typeof enTranslations = {
         3: "Mach ein kurzes Video von einer Katze",
       },
       variants: {
-        kimi: "Kimi",
         budget: "Budget",
         visual: "Visuell",
       },

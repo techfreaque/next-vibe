@@ -9,7 +9,7 @@ export type {
   ToastRootProps,
   ToastTitleProps,
   ToastViewportProps,
-} from "next-vibe/ui/web/ui/toast";
+} from "../../web/ui/toast";
 
 import { cva } from "class-variance-authority";
 
@@ -21,7 +21,7 @@ import type {
   ToastProviderProps,
   ToastRootProps,
   ToastTitleProps,
-} from "next-vibe/ui/web/ui/toast";
+} from "../../web/ui/toast";
 
 export function ToastProvider({
   children,

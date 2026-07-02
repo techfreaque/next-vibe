@@ -170,12 +170,9 @@ export async function pushThreadSync(
       isPublic: false,
       roles: [],
     };
-    createEndpointEmitter(
-      threadsByIdDefinitions.PATCH,
-      logger,
-      user,
-    )("thread-updated", {
+    createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
       urlPathParams: { threadId },
+    })("thread-updated", {
       requestData: {
         title: thread.title,
         folderId: thread.folderId,
@@ -245,10 +242,16 @@ export const threadsSyncProvider: SyncProvider = {
       messageCursors: typedCursor?.messageCursors ?? {},
     };
     try {
-      // Serves EVERY thread newer than the cursor, each with ALL its messages
-      // newer than that thread's message cursor. Threads are ordered ascending
-      // by updatedAt so the cursor of the last served thread is a valid
-      // watermark.
+      // Serves threads newer than the cursor (ascending updatedAt) in BOUNDED
+      // batches, each with ALL its messages newer than that thread's message
+      // cursor. The cursor of the last served thread is the watermark; a peer
+      // with a stale/zero cursor converges over several pulls instead of
+      // serializing the entire history in one payload (which OOMs on large DBs:
+      // thousands of threads × tens of thousands of messages → multi-hundred-MB
+      // JSON.stringify). THREAD_SYNC_BATCH bounds each payload; the `>=` filter
+      // re-serves the boundary thread idempotently so no thread is skipped when
+      // several share the same updatedAt at the batch edge.
+      const THREAD_SYNC_BATCH = 200;
       const threads = await db
         .select()
         .from(chatThreads)
@@ -263,7 +266,8 @@ export const threadsSyncProvider: SyncProvider = {
               )
             : eq(chatThreads.userId, userId),
         )
-        .orderBy(asc(chatThreads.updatedAt));
+        .orderBy(asc(chatThreads.updatedAt))
+        .limit(THREAD_SYNC_BATCH);
 
       const result: SyncedThread[] = [];
 
@@ -671,8 +675,54 @@ export const threadsSyncProvider: SyncProvider = {
         logger.error("Failed to upsert synced thread", parseError(error));
       }
     }
-    for (let i = 0; i < messageInsertRows.length; i += 1000) {
-      const batch = messageInsertRows.slice(i, i + 1000);
+
+    // parent_id is a self-FK (chat_messages.parent_id → chat_messages.id). The
+    // batch insert violates it (and onConflictDoNothing does NOT catch FK errors,
+    // only PK conflicts) whenever a child precedes its parent, OR the parent is
+    // absent — e.g. an empty-assistant placeholder skipped above (line ~621), or a
+    // parent that lives in a thread outside this bounded sync batch. Reconcile both:
+    //   1. Null out parentIds that reference neither an already-persisted message
+    //      nor a message in THIS insert set → attach to thread root (no orphan FK).
+    //   2. Topologically order so every parent is inserted before its children.
+    const insertById = new Map<string, typeof chatMessages.$inferInsert>();
+    for (const m of messageInsertRows) {
+      if (typeof m.id === "string") {
+        insertById.set(m.id, m);
+      }
+    }
+    const parentResolvable = (pid: string): boolean =>
+      existingMessageById.has(pid) || insertById.has(pid);
+    for (const m of messageInsertRows) {
+      if (typeof m.parentId === "string" && !parentResolvable(m.parentId)) {
+        m.parentId = null;
+      }
+    }
+    const orderedInserts: (typeof chatMessages.$inferInsert)[] = [];
+    const emitted = new Set<string>();
+    const place = (id: string): void => {
+      if (emitted.has(id)) {
+        return;
+      }
+      const m = insertById.get(id);
+      if (!m) {
+        return;
+      }
+      // Parent in THIS batch must be emitted first; parents already in the DB are
+      // fine (FK satisfied) and are not in insertById.
+      if (typeof m.parentId === "string" && insertById.has(m.parentId)) {
+        place(m.parentId);
+      }
+      emitted.add(id);
+      orderedInserts.push(m);
+    };
+    for (const m of messageInsertRows) {
+      if (typeof m.id === "string") {
+        place(m.id);
+      }
+    }
+
+    for (let i = 0; i < orderedInserts.length; i += 1000) {
+      const batch = orderedInserts.slice(i, i + 1000);
       try {
         await db.insert(chatMessages).values(batch).onConflictDoNothing();
       } catch (batchError) {
@@ -688,20 +738,20 @@ export const threadsSyncProvider: SyncProvider = {
           try {
             await db.insert(chatMessages).values([row]).onConflictDoNothing();
           } catch (singleError) {
-            logger.error("Failed to insert synced message (single)", {
-              id: row.id,
-              threadId: row.threadId,
-              role: row.role,
-              parentId: row.parentId,
-              rawError:
-                singleError instanceof Error
-                  ? `${singleError.name}: ${singleError.message}`
-                  : String(singleError),
-              stack:
-                singleError instanceof Error
-                  ? singleError.stack?.split("\n").slice(0, 5).join(" | ")
-                  : undefined,
-            });
+            // pg driver errors carry the real cause on non-enumerable fields
+            // (code/detail/constraint/table/column) that JSON.stringify drops to
+            // {}. Read them explicitly so the failing constraint is visible.
+            const pg = singleError as {
+              code?: string;
+              detail?: string;
+              constraint?: string;
+              table?: string;
+              column?: string;
+              message?: string;
+            };
+            logger.error(
+              `Failed to insert synced message (single): ${pg.code ?? "?"} ${pg.constraint ?? ""} ${pg.detail ?? pg.message ?? String(singleError)} [id=${row.id} threadId=${row.threadId} role=${row.role} parentId=${String(row.parentId)}]`,
+            );
           }
         }
       }

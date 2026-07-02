@@ -1,14 +1,14 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import type { ResultBannerProps } from "next-vibe/ui/web/ui/result-banner";
 import { View } from "react-native";
 
+import type { ResultBannerProps } from "../../web/ui/result-banner";
 import { Text } from "./text";
 
 export type {
   ResultBannerProps,
   ResultBannerVariant,
-} from "next-vibe/ui/web/ui/result-banner";
+} from "../../web/ui/result-banner";
 
 const StyledView = styled(View, { className: "style" });
 

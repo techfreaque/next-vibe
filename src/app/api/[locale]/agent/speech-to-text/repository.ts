@@ -17,17 +17,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { agentEnv } from "../env";
-import {
-  buildMissingKeyMessage,
-  getEnvAvailability,
-  getInstanceAvailability,
-  PROVIDER_SETUP_INSTRUCTIONS,
-} from "../env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
-import type { SttModelId } from "./models";
-import { getBestSttModel, type SttModelSelection } from "./models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { CreditRepository } from "../../credits/repository";
@@ -37,12 +27,22 @@ import {
   STT_COST_PER_SECOND,
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
+import { agentEnv } from "../env";
+import {
+  buildMissingKeyMessage,
+  getEnvAvailability,
+  getInstanceAvailability,
+  PROVIDER_SETUP_INSTRUCTIONS,
+} from "../env-availability";
 import { ModelSelectionType } from "../skills/enum";
+import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import {
   scopedTranslation as sttScopedTranslation,
   type SpeechToTextT,
 } from "./i18n";
+import type { SttModelId } from "./models";
+import { getBestSttModel, type SttModelSelection } from "./models";
 /**
  * Map from MIME type to file extension for Eden AI filename hints.
  * Eden AI uses the filename extension as an additional format signal on top of Content-Type.
@@ -177,7 +177,7 @@ export class SpeechToTextRepository {
       return fail({
         message: t("post.errors.transcriptionFailed", {
           error:
-            "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, DEEPGRAM_API_KEY, or UNBOTTLED_CLOUD_CREDENTIALS.",
+            "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, or DEEPGRAM_API_KEY, or connect a system inference provider.",
         }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
@@ -461,6 +461,7 @@ export class SpeechToTextRepository {
       fileSize: file.size,
     });
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       "https://api.openai.com/v1/audio/transcriptions",
       {
@@ -621,6 +622,7 @@ export class SpeechToTextRepository {
       language,
     });
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       "https://api.edenai.run/v2/audio/speech_to_text_async",
       {
@@ -711,6 +713,7 @@ export class SpeechToTextRepository {
     url.searchParams.set("model", providerModel);
     url.searchParams.set("language", language);
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
@@ -780,6 +783,7 @@ export class SpeechToTextRepository {
       });
 
       try {
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(
           `https://api.edenai.run/v2/audio/speech_to_text_async/${publicId}`,
           {

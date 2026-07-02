@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='wakeUp', input={}. Phase 1: You will get a taskId immediately — reply PHASE1_OK taskId=<value>. Phase 2: You will be automatically revived when hermes finishes executing the tool. The revival result must include tool information (non-empty tools array). When revived, end with WAKEUP_OK if tools data is present. Or WAKEUP_FAILED: <reason> if tools data is missing.",
+    "encoding_format": "float"
+  }
+}

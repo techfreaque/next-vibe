@@ -68,7 +68,7 @@ export class StreamStartHandler {
     locale: CountryLanguage;
     user: JwtPayloadType;
     logger: EndpointLogger;
-    wsEmit: WsEmitCallback;
+    wsEmit: MessagesWsEmit;
     emitTitle: EmitThreadTitleFn;
     availability: AgentEnvAvailability;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */

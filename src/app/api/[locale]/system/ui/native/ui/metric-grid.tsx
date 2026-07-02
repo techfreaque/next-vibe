@@ -1,12 +1,13 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import type { MetricGridProps } from "next-vibe/ui/web/ui/metric-grid";
 import { View } from "react-native";
+
+import type { MetricGridProps } from "../../web/ui/metric-grid";
 
 export type {
   MetricGridColumns,
   MetricGridProps,
-} from "next-vibe/ui/web/ui/metric-grid";
+} from "../../web/ui/metric-grid";
 
 const StyledView = styled(View, { className: "style" });
 

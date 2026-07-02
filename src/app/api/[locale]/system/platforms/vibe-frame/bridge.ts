@@ -581,17 +581,3 @@ export function recordDisplay(
       break;
   }
 }
-
-// ─── Utility ─────────────────────────────────────────────────────────────────
-
-/** Create a typed frame-to-parent message with frameId pre-filled */
-export function frameMessage<T extends FrameToParentMessage["type"]>(
-  frameId: string,
-  type: T,
-  payload: Omit<Extract<FrameToParentMessage, { type: T }>, "frameId" | "type">,
-): Extract<FrameToParentMessage, { type: T }> {
-  return { type, frameId, ...payload } as Extract<
-    FrameToParentMessage,
-    { type: T }
-  >;
-}

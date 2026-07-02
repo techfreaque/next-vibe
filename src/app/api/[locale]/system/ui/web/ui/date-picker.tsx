@@ -7,10 +7,10 @@
 
 import { CalendarIcon } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { StyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { Input } from "./input";

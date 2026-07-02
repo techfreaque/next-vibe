@@ -167,12 +167,13 @@ export class SkillVoteRepository {
         })
         .where(eq(customSkills.id, resolvedId));
 
-      createEndpointEmitter(
-        voteDefinitions.POST,
-        logger,
-        user,
-      )("skill-voted", {
+      createEndpointEmitter(voteDefinitions.POST, logger, user, {
         urlPathParams: { id: skill.slug ?? skill.id },
+        // Vote metrics are visible to anyone who can view the skill.
+        kindOverride: SkillsRepository.emitChannelForOwnership(
+          skill.ownershipType,
+        ).kind,
+      })("skill-voted", {
         responseData: { voteCount: newVoteCount, trustLevel: newTrustLevel },
       });
 

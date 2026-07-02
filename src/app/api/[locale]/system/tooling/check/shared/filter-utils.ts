@@ -3,7 +3,7 @@
  * Supports simple string matching, regex patterns, and multiple filters
  */
 
-export interface FilterableIssue {
+interface FilterableIssue {
   file: string;
   message: string;
   rule?: string;
@@ -226,7 +226,7 @@ export function filterIssues<T extends FilterableIssue>(
  * - currentPage/totalPages: only when multiple pages exist
  * - truncatedMessage: only when there's actual truncation
  */
-export interface FilteredSummary {
+interface FilteredSummary {
   totalIssues: number;
   totalFiles: number;
   totalErrors?: number;

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
@@ -17,6 +17,7 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -47,8 +48,7 @@ import {
   canPostInThread,
   canViewThread,
 } from "../../../permissions/permissions";
-import definitions from "./definition";
-import {
+import definitions, {
   type MessageCreateRequestOutput,
   type MessageCreateResponseOutput,
   type MessageListResponseOutput,
@@ -59,6 +59,61 @@ import { type MessagesT, scopedTranslation } from "./i18n";
  * Messages Repository Implementation
  */
 export class MessagesRepository {
+  /**
+   * resolveChannel for the message stream (`threads/[threadId]/messages`). Loads
+   * the thread and applies real per-thread visibility (canViewThread, with folder
+   * inheritance), then maps to a channel kind: owner → their own user channel;
+   * viewable PUBLIC/SHARED → the shared resource channel; else deny. Same
+   * folder-trust the messages emitter uses to pick delivery, so subscribe and
+   * emit land on the same channel.
+   */
+  static async resolveSubscriptionChannel(ctx: {
+    user: JwtPayloadType;
+    urlPathParams: { readonly threadId?: string };
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+  }): Promise<ChannelDecision> {
+    const threadId = ctx.urlPathParams.threadId;
+    if (!threadId) {
+      return { kind: "deny" };
+    }
+
+    const [thread] = await db
+      .select()
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    if (!thread) {
+      // Fresh/optimistic thread not yet persisted (client-minted id mid-stream):
+      // owner-private — deliver on the creator's own channel.
+      return { kind: !ctx.user.isPublic && !!ctx.user.id ? "user" : "deny" };
+    }
+
+    // Owner → their own channel.
+    if (!ctx.user.isPublic && ctx.user.id && thread.userId === ctx.user.id) {
+      return { kind: "user" };
+    }
+
+    const folder = thread.folderId
+      ? await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1)
+          .then(([f]) => f ?? null)
+      : null;
+
+    // Non-owner: viewable shared/public thread → shared channel; else deny.
+    const canView = await canViewThread(
+      ctx.user,
+      thread,
+      folder,
+      ctx.logger,
+      ctx.locale,
+    );
+    return { kind: canView ? "resource" : "deny" };
+  }
+
   /**
    * Fetch message history for a thread, optionally filtered by branch
    * Returns messages in chronological order for AI context
@@ -905,7 +960,7 @@ export class MessagesRepository {
     };
     userId: string | undefined;
     leadId?: string | null;
-    rootFolderId?: string;
+    rootFolderId: DefaultFolderId;
     subFolderId?: string | null;
     logger: EndpointLogger;
   }): Promise<
@@ -926,9 +981,7 @@ export class MessagesRepository {
         await db.insert(chatThreads).values({
           id: params.threadId,
           title: params.prompt.slice(0, 80) || "New Chat",
-          rootFolderId:
-            (params.rootFolderId as DefaultFolderId | undefined) ??
-            DefaultFolderId.PRIVATE,
+          rootFolderId: params.rootFolderId ?? DefaultFolderId.PRIVATE,
           folderId: params.subFolderId ?? null,
           userId: params.userId ?? null,
           leadId: params.leadId ?? null,
@@ -1018,6 +1071,45 @@ export class MessagesRepository {
   }
 }
 
+/**
+ * Upsert relayed toolCall metadata onto a message row. Relayed events arrive
+ * as independent posts with NO ordering guarantee: a tool-result can land
+ * BEFORE the tool message's message-created insert. When the thread id is
+ * known, write a stub TOOL row carrying the toolCall so the result is never
+ * lost — message-created backfills the structural fields on conflict.
+ */
+async function upsertRemoteToolCallMetadata(
+  messageId: string,
+  threadId: WidgetData,
+  toolCall: ToolCall,
+): Promise<void> {
+  const toolCallMetadata = JSON.stringify({ toolCall });
+  const mergedMetadata = sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(${toolCallMetadata}::jsonb)`;
+  if (typeof threadId !== "string" || threadId.length === 0) {
+    await db
+      .update(chatMessages)
+      .set({ metadata: mergedMetadata })
+      .where(eq(chatMessages.id, messageId))
+      .catch(() => undefined);
+    return;
+  }
+  await db
+    .insert(chatMessages)
+    .values({
+      id: messageId,
+      threadId,
+      role: ChatMessageRole.TOOL,
+      isAI: true,
+      content: "",
+      metadata: { toolCall },
+    })
+    .onConflictDoUpdate({
+      target: chatMessages.id,
+      set: { metadata: mergedMetadata },
+    })
+    .catch(() => undefined);
+}
+
 export class MessagesRemoteRepository {
   static async applyRemoteMessageCreated({
     responseData,
@@ -1031,6 +1123,12 @@ export class MessagesRemoteRepository {
     const raw = responseData.messages?.[0];
     const msgId = raw?.id;
     const msgThreadId = raw?.threadId;
+    logger.debug("[MessagesRemote] message-created received", {
+      messageId: msgId,
+      threadId: msgThreadId,
+      role: raw?.role,
+      hasParent: !!raw?.parentId,
+    });
     if (!msgId || !msgThreadId) {
       return;
     }
@@ -1038,6 +1136,30 @@ export class MessagesRemoteRepository {
     const content = raw.content ?? "";
     const metadata = raw.metadata ?? {};
     const updatedAt = raw.updatedAt ? new Date(raw.updatedAt) : new Date();
+    // Relayed events arrive as independent HTTP posts with NO ordering
+    // guarantee. parent_id carries an FK — if this child applies before its
+    // parent's own message-created, the write would fail and the chain break
+    // permanently. Materialize a minimal parent stub first (the parent's own
+    // event backfills role/content/structure on conflict).
+    if (raw.parentId) {
+      await db
+        .insert(chatMessages)
+        .values({
+          id: raw.parentId,
+          threadId: msgThreadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          metadata: {},
+        })
+        .onConflictDoNothing()
+        .catch(() => undefined);
+    }
+    // A content-done / tool-result for this message may have landed FIRST and
+    // upserted a stub row. On conflict, backfill the structural fields the
+    // stub lacks (parent chain, model, author) and merge metadata — but never
+    // clobber already-delivered final content with the (empty) creation
+    // snapshot.
     await db
       .insert(chatMessages)
       .values({
@@ -1055,20 +1177,74 @@ export class MessagesRemoteRepository {
         createdAt: raw.createdAt ? new Date(raw.createdAt) : new Date(),
         updatedAt,
       })
-      .onConflictDoNothing()
-      .catch(() => undefined);
+      .onConflictDoUpdate({
+        target: chatMessages.id,
+        // USER rows are CALLER-authoritative (the originator wrote them before
+        // the relay; the receiver's mirrored copy carries receiver-side noise
+        // like the resolved model) — merge metadata only. ASSISTANT/TOOL rows
+        // are receiver-authoritative: backfill the structural fields a
+        // content-done/tool-result stub lacks.
+        set:
+          role === ChatMessageRole.USER
+            ? {
+                metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(excluded.metadata)`,
+                updatedAt,
+              }
+            : {
+                role,
+                isAI: raw.isAI ?? false,
+                parentId: raw.parentId ?? null,
+                authorId: raw.authorId ?? null,
+                model: raw.model ?? null,
+                skill: raw.skill ?? null,
+                sequenceId: raw.sequenceId ?? null,
+                content: sql`CASE WHEN excluded.content = '' THEN ${chatMessages.content} ELSE excluded.content END`,
+                metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(excluded.metadata)`,
+                // Stub rows (parent stubs, content-done/tokens-updated
+                // arrivals) were inserted with NOW() — adopt the AUTHORITATIVE
+                // creation time so parent-chain chronology holds.
+                createdAt: raw.createdAt
+                  ? new Date(raw.createdAt)
+                  : sql`${chatMessages.createdAt}`,
+                updatedAt,
+              },
+      })
+      .catch((err: Error) => {
+        logger.warn(
+          "[MessagesRemote] message-created upsert failed — mirror row incomplete",
+          { messageId: msgId, threadId: msgThreadId, error: err.message },
+        );
+      });
     const state = responseData.streamingState;
-    if (state) {
+    if (state && state !== ThreadStreamingState.IDLE) {
+      // Relayed events are UNORDERED: a message-created carrying
+      // streamingState:"streaming" can land AFTER stream-finished marked the
+      // mirror idle — and nothing would ever reset it. Idle is ABSORBING for
+      // remote state writes: only the local relay reconcile
+      // (clearStreamingState) or the stream-finished anchor moves a thread
+      // out of/into idle.
+      await db
+        .update(chatThreads)
+        .set({ streamingState: state, updatedAt: new Date() })
+        .where(
+          and(
+            eq(chatThreads.id, msgThreadId),
+            ne(chatThreads.streamingState, ThreadStreamingState.IDLE),
+          ),
+        )
+        .catch(() => undefined);
+    } else if (state) {
       await db
         .update(chatThreads)
         .set({ streamingState: state, updatedAt: new Date() })
         .where(eq(chatThreads.id, msgThreadId))
         .catch(() => undefined);
     }
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "message-created",
-      { urlPathParams, responseData },
-    );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("message-created", { responseData });
   }
 
   static async applyRemoteError({
@@ -1086,16 +1262,17 @@ export class MessagesRemoteRepository {
       .set({
         content: msg.content ?? "",
         metadata: msg.metadata
-          ? sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify(msg.metadata)}::jsonb`
+          ? sql`COALESCE(metadata, '{}'::jsonb) || jsonb_strip_nulls(${JSON.stringify(msg.metadata)}::jsonb)`
           : sql`metadata`,
         updatedAt: new Date(),
       })
       .where(eq(chatMessages.id, msg.id))
       .catch(() => undefined);
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "error",
-      { urlPathParams, responseData },
-    );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("error", { responseData });
   }
 
   static async applyRemoteContentDone({
@@ -1108,26 +1285,50 @@ export class MessagesRemoteRepository {
     "content-done"
   >): Promise<void> {
     const msg = responseData.messages?.[0];
-    if (!msg?.id || !msg.content) {
+    const threadId = urlPathParams.threadId;
+    logger.debug("[MessagesRemote] content-done received", {
+      messageId: msg?.id,
+      hasContent: !!msg?.content,
+      promptTokens: msg?.metadata?.promptTokens ?? null,
+      creditCost: msg?.metadata?.creditCost ?? null,
+    });
+    if (!msg?.id || !msg.content || typeof threadId !== "string") {
       return;
     }
+    const tokenMetadata = JSON.stringify({
+      promptTokens: msg.metadata?.promptTokens ?? null,
+      completionTokens: msg.metadata?.completionTokens ?? null,
+      totalTokens: msg.metadata?.totalTokens ?? null,
+      creditCost: msg.metadata?.creditCost ?? null,
+      finishReason: msg.metadata?.finishReason ?? null,
+    });
+    // Upsert, not update: relayed events have no ordering guarantee, so the
+    // final content can arrive BEFORE this message's message-created insert.
+    // Write a stub row carrying the content; message-created backfills the
+    // structural fields (parent chain, model) on conflict without clobbering it.
     await db
-      .update(chatMessages)
-      .set({
+      .insert(chatMessages)
+      .values({
+        id: msg.id,
+        threadId,
+        role: ChatMessageRole.ASSISTANT,
+        isAI: true,
         content: msg.content,
-        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-          promptTokens: msg.metadata?.promptTokens ?? null,
-          completionTokens: msg.metadata?.completionTokens ?? null,
-          totalTokens: msg.metadata?.totalTokens ?? null,
-          creditCost: msg.metadata?.creditCost ?? null,
-          finishReason: msg.metadata?.finishReason ?? null,
-        })}::jsonb`,
+        metadata: msg.metadata ?? {},
       })
-      .where(eq(chatMessages.id, msg.id));
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "content-done",
-      { urlPathParams, responseData },
-    );
+      .onConflictDoUpdate({
+        target: chatMessages.id,
+        set: {
+          content: msg.content,
+          metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(${tokenMetadata}::jsonb)`,
+        },
+      })
+      .catch(() => undefined);
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("content-done", { responseData });
   }
 
   static async applyRemoteToolResult({
@@ -1170,16 +1371,16 @@ export class MessagesRemoteRepository {
     const taggedToolCall = instanceId
       ? { ...toolCall, remoteInstanceId: instanceId }
       : toolCall;
-    await db
-      .update(chatMessages)
-      .set({
-        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
-      })
-      .where(eq(chatMessages.id, msg.id));
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "tool-result",
-      { urlPathParams, responseData },
+    await upsertRemoteToolCallMetadata(
+      msg.id,
+      urlPathParams.threadId,
+      taggedToolCall,
     );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("tool-result", { responseData });
   }
 
   static async applyRemoteToolResultUpdated({
@@ -1200,16 +1401,16 @@ export class MessagesRemoteRepository {
     const taggedToolCall = instanceId
       ? { ...toolCall, remoteInstanceId: instanceId }
       : toolCall;
-    await db
-      .update(chatMessages)
-      .set({
-        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
-      })
-      .where(eq(chatMessages.id, msg.id));
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "tool-result-updated",
-      { urlPathParams, responseData },
+    await upsertRemoteToolCallMetadata(
+      msg.id,
+      urlPathParams.threadId,
+      taggedToolCall,
     );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("tool-result-updated", { responseData });
   }
 
   static async applyRemoteTokensUpdated({
@@ -1222,25 +1423,54 @@ export class MessagesRemoteRepository {
     "tokens-updated"
   >): Promise<void> {
     const msg = responseData.messages?.[0];
+    const threadId = urlPathParams.threadId;
+    logger.debug("[MessagesRemote] tokens-updated received", {
+      messageId: msg?.id,
+      promptTokens: msg?.metadata?.promptTokens ?? null,
+      creditCost: msg?.metadata?.creditCost ?? null,
+    });
     if (!msg?.id) {
       return;
     }
-    await db
-      .update(chatMessages)
-      .set({
-        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-          promptTokens: msg.metadata?.promptTokens ?? null,
-          completionTokens: msg.metadata?.completionTokens ?? null,
-          totalTokens: msg.metadata?.totalTokens ?? null,
-          creditCost: msg.metadata?.creditCost ?? null,
-          finishReason: msg.metadata?.finishReason ?? null,
-        })}::jsonb`,
-      })
-      .where(eq(chatMessages.id, msg.id));
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "tokens-updated",
-      { urlPathParams, responseData },
-    );
+    const tokenMetadata = {
+      promptTokens: msg.metadata?.promptTokens ?? null,
+      completionTokens: msg.metadata?.completionTokens ?? null,
+      totalTokens: msg.metadata?.totalTokens ?? null,
+      creditCost: msg.metadata?.creditCost ?? null,
+      finishReason: msg.metadata?.finishReason ?? null,
+    };
+    const mergedTokenMetadata = sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(${JSON.stringify(tokenMetadata)}::jsonb)`;
+    if (typeof threadId === "string" && threadId.length > 0) {
+      // Upsert, not update: relayed events are unordered — token usage can
+      // land before the message's own insert. Stub the row (assistant; the
+      // later message-created backfills structure) so the usage is never lost.
+      await db
+        .insert(chatMessages)
+        .values({
+          id: msg.id,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: "",
+          metadata: msg.metadata ?? {},
+        })
+        .onConflictDoUpdate({
+          target: chatMessages.id,
+          set: { metadata: mergedTokenMetadata },
+        })
+        .catch(() => undefined);
+    } else {
+      await db
+        .update(chatMessages)
+        .set({ metadata: mergedTokenMetadata })
+        .where(eq(chatMessages.id, msg.id))
+        .catch(() => undefined);
+    }
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("tokens-updated", { responseData });
   }
 
   static async applyRemoteStreamFinished({
@@ -1262,13 +1492,13 @@ export class MessagesRemoteRepository {
           { threadId, error: err.message },
         );
       });
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "stream-finished",
-      {
-        urlPathParams,
-        responseData: { streamingState: ThreadStreamingState.IDLE },
-      },
-    );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("stream-finished", {
+      responseData: { streamingState: ThreadStreamingState.IDLE },
+    });
   }
 
   static async applyRemoteStreamingStateChanged({
@@ -1282,17 +1512,29 @@ export class MessagesRemoteRepository {
   >): Promise<void> {
     const threadId = urlPathParams.threadId;
 
+    // Idle is ABSORBING for remote state writes (see applyRemoteMessageCreated):
+    // relayed events are unordered, so a late "streaming"/"waiting" must never
+    // re-stick a mirror that the local reconcile / stream-finished already
+    // settled to idle. Writing idle itself is always allowed.
     await db
       .update(chatThreads)
       .set({
         streamingState: responseData.streamingState,
         updatedAt: new Date(),
       })
-      .where(eq(chatThreads.id, threadId))
+      .where(
+        responseData.streamingState === ThreadStreamingState.IDLE
+          ? eq(chatThreads.id, threadId)
+          : and(
+              eq(chatThreads.id, threadId),
+              ne(chatThreads.streamingState, ThreadStreamingState.IDLE),
+            ),
+      )
       .catch(() => undefined);
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "streaming-state-changed",
-      { urlPathParams, responseData },
-    );
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams,
+      requestData: {},
+      fanOut: false,
+    })("streaming-state-changed", { responseData });
   }
 }

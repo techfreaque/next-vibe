@@ -1,21 +1,5 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
 import { cn } from "next-vibe/core/utils/utils";
-import { ChevronDown } from "next-vibe/ui/native/ui/icons/ChevronDown";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type {
-  NavigationMenuContentProps,
-  NavigationMenuIndicatorProps,
-  NavigationMenuItemProps,
-  NavigationMenuLinkProps,
-  NavigationMenuListProps,
-  NavigationMenuProps,
-  NavigationMenuTriggerProps,
-  NavigationMenuViewportProps,
-} from "next-vibe/ui/web/ui/navigation-menu";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, {
@@ -26,6 +10,22 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { ChevronDown } from "../../native/ui/icons/ChevronDown";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../native/utils/style-converter";
+import type {
+  NavigationMenuContentProps,
+  NavigationMenuIndicatorProps,
+  NavigationMenuItemProps,
+  NavigationMenuLinkProps,
+  NavigationMenuListProps,
+  NavigationMenuProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuViewportProps,
+} from "../../web/ui/navigation-menu";
+import { applyStyleType } from "../../web/utils/style-type";
 import { buttonVariants } from "./button";
 
 const StyledView = styledNative(View);

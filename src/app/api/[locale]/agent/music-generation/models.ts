@@ -60,7 +60,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "meta/musicgen",
-        creditCostPerClip: 4.4, // updated: 2026-04-07 from replicate-html-p50
+        creditCostPerClip: 10, // updated: 2026-07-02 from replicate-html-p50
         defaultDurationSeconds: 8,
         supportedDurations: ALL_DURATIONS,
       },
@@ -68,7 +68,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "musicgen-stereo",
-        creditCostPerClip: 5.72, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerClip: 13, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 8,
         supportedDurations: [
           "post.duration.short",
@@ -110,7 +110,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSIC_GEN,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "music-gen",
-        creditCostPerClip: 27.3, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerClip: 27.3, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 30,
         minDurationSeconds: 30,
         supportedDurations: ["post.duration.long"],
@@ -148,7 +148,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.ELEVENLABS_MUSIC,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-music",
-        creditCostPerClip: 27.3, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerClip: 27.3, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: [
           "post.duration.short",
@@ -189,7 +189,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.SONAUTO_SONG,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "sonauto-song",
-        creditCostPerClip: 10.4, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerClip: 10.4, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: [
           "post.duration.short",
@@ -230,7 +230,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.LYRIA_3,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "lyria-3",
-        creditCostPerClip: 6.5, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerClip: 6.5, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: ["post.duration.long"],
       },

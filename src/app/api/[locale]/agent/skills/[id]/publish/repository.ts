@@ -115,12 +115,15 @@ export class SkillPublishRepository {
 
       // Suppressed when applying a relayed publish (avoids re-relay ping-pong).
       if (!relayed) {
-        createEndpointEmitter(
-          publishDefinitions.PATCH,
-          logger,
-          user,
-        )("skill-updated", {
+        // Publishing flips ownership (PUBLISHED → PUBLIC); deliver on the channel
+        // matching the NEW visibility so viewers of a now-public skill get it.
+        const channel = await SkillsRepository.emitChannelBySkillId(
+          skill.slug ?? skill.id,
+        );
+        createEndpointEmitter(publishDefinitions.PATCH, logger, user, {
           urlPathParams: { id: skill.slug ?? skill.id },
+          kindOverride: channel.kind,
+        })("skill-updated", {
           responseData: { status_response: newStatus },
           requestData: { status: newStatus },
         });
@@ -166,10 +169,14 @@ export class SkillPublishRepository {
       });
       return;
     }
+    const channel = await SkillsRepository.emitChannelBySkillId(
+      urlPathParams.id,
+    );
     createEndpointEmitter(publishDefinitions.PATCH, logger, user, {
+      urlPathParams: { id: urlPathParams.id },
+      kindOverride: channel.kind,
       fanOut: false,
     })("skill-updated", {
-      urlPathParams: { id: urlPathParams.id },
       requestData,
       responseData: result.data,
     });

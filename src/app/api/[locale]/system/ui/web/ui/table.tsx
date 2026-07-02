@@ -1,8 +1,8 @@
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { ReactNode } from "react";
 import * as React from "react";
 
+import type { StyleType } from "../../web/utils/style-type";
 import type { DivKeyboardEvent } from "./div";
 
 // Table
@@ -113,7 +113,7 @@ export function TableRow({
 }
 TableRow.displayName = "TableRow";
 
-export interface TableHeadKeyboardEvent {
+interface TableHeadKeyboardEvent {
   key: string;
   preventDefault: () => void;
   stopPropagation: () => void;

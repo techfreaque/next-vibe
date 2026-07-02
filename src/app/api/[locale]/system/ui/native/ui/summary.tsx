@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToTextStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { SummaryProps } from "next-vibe/ui/web/ui/summary";
 import type { JSX } from "react";
 import * as React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import type { SummaryProps } from "../../web/ui/summary";
 import { DetailsContext } from "./details";
 
 export function Summary({

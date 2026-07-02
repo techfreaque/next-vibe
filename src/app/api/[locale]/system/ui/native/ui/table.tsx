@@ -1,9 +1,13 @@
 import * as TablePrimitive from "@rn-primitives/table";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import type { ViewStyle } from "react-native";
+import { Pressable, Text as RNText, View as RNView } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
   TableBodyProps,
@@ -14,12 +18,8 @@ import type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "next-vibe/ui/web/ui/table";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import type { ViewStyle } from "react-native";
-import { Pressable, Text as RNText, View as RNView } from "react-native";
-
+} from "../../web/ui/table";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 const StyledTableRoot = styledNative(TablePrimitive.Root);

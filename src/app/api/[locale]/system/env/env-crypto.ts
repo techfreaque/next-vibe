@@ -29,7 +29,7 @@ const ENC_PREFIX = "vibe:enc:";
 const KEY_DIR = join(homedir(), ".vibe", "keys");
 
 /** Returns the path to this project's key file */
-export function getKeyFilePath(cwd: string): string {
+function getKeyFilePath(cwd: string): string {
   const hash = createHash("sha256").update(cwd).digest("hex").slice(0, 16);
   return join(KEY_DIR, `${hash}.key`);
 }

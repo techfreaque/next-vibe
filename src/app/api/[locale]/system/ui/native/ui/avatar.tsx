@@ -1,13 +1,14 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
 import { cn } from "next-vibe/core/utils/utils";
-import { styledNative } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+
+import { styledNative } from "../../native/utils/style-converter";
 // Import ALL types from web version (web is source of truth)
 import type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "next-vibe/ui/web/ui/avatar";
-import * as React from "react";
+} from "../../web/ui/avatar";
 
 // Re-export types for consistency
 export type { AvatarFallbackProps, AvatarImageProps, AvatarRootProps };

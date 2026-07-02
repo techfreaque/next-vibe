@@ -9,6 +9,7 @@ import { constants, existsSync } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +18,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { SystemSettingsT } from "next-vibe/env/settings/i18n";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ZodTypeAny } from "zod";
 
@@ -258,9 +260,6 @@ export class SystemSettingsRepository {
         (a, b) => a.step - b.step,
       );
 
-      // Health check for UNBOTTLED_CLOUD_CREDENTIALS
-      await SystemSettingsRepository.checkUnbottledHealth(modules, logger);
-
       const writable = await SystemSettingsRepository.checkWritable();
       const devMode = SystemSettingsRepository.isDevMode();
 
@@ -284,7 +283,7 @@ export class SystemSettingsRepository {
   /**
    * PATCH - Update .env file with new values
    */
-  static async updateSettings(
+  private static async updateSettings(
     data: { settings: Record<string, string> },
     logger: EndpointLogger,
     t: SystemSettingsT,
@@ -573,148 +572,49 @@ export class SystemSettingsRepository {
   }
 
   /**
-   * Check unbottled cloud credential health by pinging the remote.
-   * Mutates the setting.health field in-place.
-   */
-  private static async checkUnbottledHealth(
-    modules: {
-      settings: {
-        key: string;
-        isConfigured: boolean;
-        health?: "connected" | "disconnected" | "error";
-      }[];
-    }[],
-    logger: EndpointLogger,
-  ): Promise<void> {
-    for (const mod of modules) {
-      const setting = mod.settings.find(
-        (s) => s.key === "UNBOTTLED_CLOUD_CREDENTIALS",
-      );
-      if (!setting || !setting.isConfigured) {
-        if (setting) {
-          setting.health = "disconnected";
-        }
-        continue;
-      }
-
-      try {
-        const { parseUnbottledCredentials } =
-          await import("@/app/api/[locale]/agent/env");
-        const { agentEnv } = await import("@/app/api/[locale]/agent/env");
-        const session = parseUnbottledCredentials(
-          agentEnv.UNBOTTLED_CLOUD_CREDENTIALS,
-        );
-        if (!session) {
-          setting.health = "disconnected";
-          continue;
-        }
-
-        const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
-        const healthUrl = `${session.remoteUrl}/api/en-US/agent/ai-stream/ws-provider/models`;
-        const resp = await fetch(healthUrl, {
-          method: "GET",
-          headers: {
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${session.token}`,
-            Cookie: `${LEAD_ID_COOKIE_NAME}=${session.leadId}`,
-          },
-          signal: AbortSignal.timeout(5_000),
-        });
-        setting.health = resp.ok ? "connected" : "disconnected";
-      } catch (err) {
-        logger.debug("[Settings] Unbottled health check failed", {
-          error: err instanceof Error ? err.message : String(err),
-        });
-        setting.health = "error";
-      }
-    }
-  }
-
-  /**
-   * POST - Proxy login to a remote unbottled.ai instance.
-   * Runs server-side to avoid browser CORS restrictions.
+   * POST - Connect this instance to a remote unbottled.ai instance as the
+   * system inference provider.
+   *
+   * The "unbottled cloud login" surfaced on the settings/onboarding page is a
+   * thin wrapper over the canonical remote-connection flow: it creates a real
+   * remote connection (marked isInferenceProvider) instead of persisting a
+   * standalone credential. State lives in the remoteConnections table; there is
+   * no UNBOTTLED_CLOUD_CREDENTIALS env var anymore.
    */
   static async unbottledLogin(
     data: SystemSettingsPostRequestOutput,
-    locale: string,
+    user: JwtPrivatePayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
     t: SystemSettingsT,
   ): Promise<ResponseType<SystemSettingsPostResponseOutput>> {
     const { email, password, remoteUrl } = data;
 
-    // Ping remote page to get lead_id cookie for session continuity
-    let remotePingLeadId: string | undefined;
-    try {
-      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
-      const pingResponse = await fetch(`${remoteUrl}/${locale}`, {
-        method: "GET",
-        redirect: "follow",
-        signal: AbortSignal.timeout(10_000),
+    const { RemoteConnectionConnectRepository } =
+      await import("@/app/api/[locale]/remote-connection/connect/repository");
+    const { scopedTranslation: connectScopedTranslation } =
+      await import("@/app/api/[locale]/remote-connection/connect/i18n");
+    const { t: connectT } = connectScopedTranslation.scopedT(locale);
+
+    const result = await RemoteConnectionConnectRepository.connectRemote(
+      { email, password, remoteUrl, isInferenceProvider: true },
+      user,
+      logger,
+      connectT,
+      locale,
+    );
+
+    if (!result.success) {
+      logger.error("[Settings] Unbottled connect failed", {
+        error: result.message,
       });
-      const setCookie = pingResponse.headers.get("set-cookie") ?? "";
-      const match = setCookie.match(
-        new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
-      );
-      if (match?.[1]) {
-        remotePingLeadId = match[1];
-      }
-    } catch (pingErr) {
-      // Non-fatal — continue without lead_id
-      logger.debug(
-        "[Settings] Unbottled ping failed, continuing without lead_id",
-        {
-          error: String(pingErr),
-        },
-      );
-    }
-
-    try {
-      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
-      const loginUrl = `${remoteUrl}/api/${locale}/user/public/login`;
-      const loginHeaders: Record<string, string> = {
-        // eslint-disable-next-line i18next/no-literal-string
-        "Content-Type": "application/json",
-      };
-      if (remotePingLeadId) {
-        loginHeaders.Cookie = `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`;
-      }
-
-      const loginResponse = await fetch(loginUrl, {
-        method: "POST",
-        headers: loginHeaders,
-        body: JSON.stringify({ email, password, rememberMe: true }),
-        signal: AbortSignal.timeout(15_000),
-      });
-
-      if (!loginResponse.ok) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      const body = (await loginResponse.json()) as {
-        success?: boolean;
-        data?: { token?: string; leadId?: string };
-      };
-
-      if (!body.success || !body.data?.token) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      const effectiveLeadId = body.data.leadId ?? remotePingLeadId ?? "";
-      const credential = `${effectiveLeadId}:${body.data.token}:${remoteUrl}`;
-      return success({ credential });
-    } catch (err) {
-      logger.error("[Settings] Unbottled login failed", { error: String(err) });
       return fail({
-        message: t("post.errors.network.title"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        message: t("post.errors.server.title"),
+        errorType: result.errorType,
       });
     }
+
+    return success({ connected: true });
   }
 
   /**

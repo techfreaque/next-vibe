@@ -25,7 +25,9 @@ export type {
   PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-} from "next-vibe/ui/web/ui/popover";
+} from "../../web/ui/popover";
+
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import type {
   PopoverAnchorProps,
@@ -34,9 +36,7 @@ import type {
   PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-} from "next-vibe/ui/web/ui/popover";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-
+} from "../../web/ui/popover";
 import {
   FocusScopeProvider,
   useFocusScopeRegister,

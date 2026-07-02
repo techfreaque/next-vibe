@@ -1,4 +1,4 @@
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
+import type { StyleType } from "../../web/utils/style-type";
 
 export type BrProps = {
   id?: string;

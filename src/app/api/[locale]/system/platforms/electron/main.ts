@@ -150,6 +150,7 @@ async function waitForServer(port: number): Promise<boolean> {
     try {
       // redirect:"manual" avoids chasing locale redirect loops (307 → /en-GLOBAL → ...).
       // Any response except 502/503/504 means the server is up.
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe (waits for the bundled Next server to come up)
       const res = await fetch(serverUrl, {
         method: "HEAD",
         redirect: "manual",

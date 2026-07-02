@@ -7,11 +7,11 @@
  */
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
-import type { ButtonProps } from "next-vibe/ui/web/ui/button";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 import { Children, isValidElement, useEffect, useRef } from "react";
 
+import type { ButtonProps } from "../../web/ui/button";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import { useDropdownTrigger } from "./dropdown-menu";
 import { usePopoverTrigger } from "./popover";
@@ -19,7 +19,7 @@ import { usePopoverTrigger } from "./popover";
 // Stub variants for CLI - CSS classes are unused in terminal rendering
 export const buttonVariants = cva("");
 export const buttonTextVariants = cva("");
-export type { ButtonSize, ButtonVariant } from "next-vibe/ui/web/ui/button";
+export type { ButtonSize, ButtonVariant } from "../../web/ui/button";
 
 /**
  * True if a string is a meaningful label (more than just an icon/emoji).

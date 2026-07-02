@@ -213,12 +213,9 @@ export class ThreadByIdRepository {
       // sidebar list cache; cross-instance (remoteEvent) the peer re-applies the
       // update. Suppressed when applying a relayed edit (avoids re-relay ping-pong).
       if (!relayed) {
-        createEndpointEmitter(
-          threadsByIdDefinitions.PATCH,
-          logger,
-          user,
-        )("thread-updated", {
+        createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
           urlPathParams: { threadId: updatedThread.id },
+        })("thread-updated", {
           requestData: {
             title: updatedThread.title,
             folderId: updatedThread.folderId,
@@ -231,15 +228,12 @@ export class ThreadByIdRepository {
         });
       }
       if (updatedThread.rootFolderId) {
-        const { default: folderContentsDefinitions } =
-          await import("../../folder-contents/[rootFolderId]/definition");
-        const emitFolderContents = createEndpointEmitter(
-          folderContentsDefinitions.GET,
+        const emitFolderContents = createFolderContentsEmitter(
           logger,
           user,
+          updatedThread.rootFolderId,
         );
         emitFolderContents("thread-updated", {
-          urlPathParams: { rootFolderId: updatedThread.rootFolderId },
           responseData: {
             items: [
               {
@@ -396,25 +390,19 @@ export class ThreadByIdRepository {
       // removes it from the sidebar list cache; cross-instance (remoteEvent) the
       // peer re-applies the delete. Suppressed when applying a relayed delete.
       if (!relayed && deletedThread.rootFolderId) {
-        createEndpointEmitter(
-          threadsByIdDefinitions.DELETE,
-          logger,
-          user,
-        )("thread-deleted", {
+        createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
           urlPathParams: { threadId },
+        })("thread-deleted", {
           requestData: { rootFolderId: deletedThread.rootFolderId },
         });
       }
       if (deletedThread.rootFolderId) {
-        const { default: folderContentsDefinitions } =
-          await import("../../folder-contents/[rootFolderId]/definition");
-        const emitFolderContents = createEndpointEmitter(
-          folderContentsDefinitions.GET,
+        const emitFolderContents = createFolderContentsEmitter(
           logger,
           user,
+          deletedThread.rootFolderId,
         );
         emitFolderContents("thread-deleted", {
-          urlPathParams: { rootFolderId: deletedThread.rootFolderId },
           responseData: { items: [{ id: threadId }] },
         });
       }
@@ -483,9 +471,9 @@ export class ThreadByIdRepository {
     // Re-emit on the PATCH channel (fanOut: false) so local WS subscribers on
     // this instance fire their onEvent and update the threads list cache.
     createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+      urlPathParams: { threadId: urlPathParams.threadId },
       fanOut: false,
     })("thread-updated", {
-      urlPathParams: { threadId: urlPathParams.threadId },
       requestData: props.requestData,
       responseData: result.data,
     });
@@ -520,9 +508,9 @@ export class ThreadByIdRepository {
     // Re-emit on the DELETE channel (fanOut: false) so local WS subscribers on
     // this instance fire their onEvent and remove the thread from the list cache.
     createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
+      urlPathParams: { threadId: urlPathParams.threadId },
       fanOut: false,
     })("thread-deleted", {
-      urlPathParams: { threadId: urlPathParams.threadId },
       requestData,
     });
   }

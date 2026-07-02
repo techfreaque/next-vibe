@@ -2,19 +2,16 @@ import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import {
-  type ToggleSize,
-  type ToggleVariant,
-} from "next-vibe/ui/web/ui/toggle";
-import type {
-  ToggleGroupItemProps,
-  ToggleGroupRootProps,
-} from "next-vibe/ui/web/ui/toggle-group";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { View } from "react-native";
 
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { type ToggleSize, type ToggleVariant } from "../../web/ui/toggle";
+import type {
+  ToggleGroupItemProps,
+  ToggleGroupRootProps,
+} from "../../web/ui/toggle-group";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 import { toggleTextVariants, toggleVariants } from "./toggle";
 // The styled() function has type inference issues with this primitive

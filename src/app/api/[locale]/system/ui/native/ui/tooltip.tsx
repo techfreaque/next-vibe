@@ -1,17 +1,17 @@
 import * as TooltipPrimitive from "@rn-primitives/tooltip";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { StyleSheet } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "next-vibe/ui/web/ui/tooltip";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { StyleSheet } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
+} from "../../web/ui/tooltip";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */

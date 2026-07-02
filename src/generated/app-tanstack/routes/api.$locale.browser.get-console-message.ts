@@ -3,12 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/browser/get-console-message",
-)({
-  server: {
-    handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/browser/get-console-message/route"),
-    ),
-  },
+export const Route = createFileRoute("/api/$locale/browser/get-console-message")({
+  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/browser/get-console-message/route")) },
 });

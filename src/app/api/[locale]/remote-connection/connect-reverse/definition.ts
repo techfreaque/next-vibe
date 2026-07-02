@@ -87,6 +87,16 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
+      // The connecting instance's OWN userId on its own DB. The cloud stores it
+      // as the reverse entry's remoteUserId so the cloud's connector can target
+      // the peer's concrete `user/{remoteUserId}` channel for the bridge event.
+      selfUserId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
       submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "post.title" as const,
@@ -103,6 +113,14 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
       remoteInstanceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+      // The cloud's OWN userId. The connecting instance stores it as its
+      // connection's remoteUserId so ITS connector can target the cloud's
+      // concrete `user/{remoteUserId}` channel for the bridge event.
+      remoteUserId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
@@ -165,6 +183,7 @@ const { POST } = createEndpoint({
       default: {
         registered: true,
         remoteInstanceId: "thea",
+        remoteUserId: "00000000-0000-0000-0000-000000000000",
       },
     },
   },

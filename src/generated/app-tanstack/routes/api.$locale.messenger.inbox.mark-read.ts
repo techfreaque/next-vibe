@@ -3,12 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/messenger/inbox/mark-read",
-)({
-  server: {
-    handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/messenger/inbox/mark-read/route"),
-    ),
-  },
+export const Route = createFileRoute("/api/$locale/messenger/inbox/mark-read")({
+  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/messenger/inbox/mark-read/route")) },
 });

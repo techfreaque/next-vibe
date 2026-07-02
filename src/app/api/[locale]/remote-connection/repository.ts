@@ -37,9 +37,6 @@ interface ConnectToRemoteResult {
   remoteUrl: string;
   isConnected: boolean;
 }
-interface ClearRemoteConnectionResult {
-  disconnected: boolean;
-}
 
 export class RemoteConnectionRepository {
   // ─── Token Encryption ─────────────────────────────────────────────────────────
@@ -217,57 +214,6 @@ export class RemoteConnectionRepository {
   // ─── Remote Connections ───────────────────────────────────────────────────────
 
   /**
-   * Get the current remote connection status for a user (no token in response).
-   */
-  static async getRemoteConnection(
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-    instanceId?: string,
-  ): Promise<
-    ResponseType<{
-      isConnected: boolean;
-      remoteUrl: string | null;
-      isActive: boolean | null;
-      lastSyncedAt: string | null;
-      instanceId: string | null;
-      healthStatus: ConnectionHealth | null;
-    }>
-  > {
-    const conditions = [eq(remoteConnections.userId, user.id)];
-    if (instanceId) {
-      conditions.push(eq(remoteConnections.instanceId, instanceId));
-    }
-
-    const [row] = await db
-      .select()
-      .from(remoteConnections)
-      .where(and(...conditions))
-      .orderBy(desc(remoteConnections.updatedAt))
-      .limit(1);
-
-    if (!row || !row.isActive) {
-      logger.debug("No active remote connection for user", { userId: user.id });
-      return success({
-        isConnected: false,
-        remoteUrl: null,
-        isActive: null,
-        lastSyncedAt: null,
-        instanceId: null,
-        healthStatus: null,
-      });
-    }
-
-    return success({
-      isConnected: true,
-      remoteUrl: row.remoteUrl,
-      isActive: row.isActive,
-      lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
-      instanceId: row.instanceId,
-      healthStatus: RemoteConnectionRepository.getConnectionHealth(row),
-    });
-  }
-
-  /**
    * Store or update a remote connection (upsert on userId + instanceId).
    * Also ensures a self-identity record exists.
    */
@@ -362,34 +308,42 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Clear a remote connection (by instanceId, or all if not specified).
-   * Does NOT delete instance identities - those persist across reconnects.
+   * Mark a connection as synced right now, optionally storing an updated
+   * capability snapshot in the same write.
+   *
+   * Called unconditionally at the start of every sync exchange (sync/repository)
+   * so lastSyncedAt is a reliable "a sync completed" signal that tests and the
+   * connection-health indicator can poll. Capabilities are only included when
+   * the sender's capabilitiesVersion changed (once per change, never per exchange).
    */
-  static async clearRemoteConnection(
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-    t: RemoteConnectionByIdT,
-    instanceId?: string,
-  ): Promise<ResponseType<ClearRemoteConnectionResult>> {
-    const conditions = [eq(remoteConnections.userId, user.id)];
-    if (instanceId) {
-      conditions.push(eq(remoteConnections.instanceId, instanceId));
-    }
-
-    const result = await db
-      .delete(remoteConnections)
-      .where(and(...conditions))
-      .returning();
-
-    if (result.length === 0) {
-      return fail({
-        message: t("delete.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
-    }
-
-    logger.info("Cleared remote connection", { userId: user.id, instanceId });
-    return success({ disconnected: true });
+  static async touchLastSynced(
+    userId: string,
+    instanceId: string,
+    capabilityOpts?: {
+      capabilities: RemoteToolCapability[];
+      capabilitiesVersion?: string;
+    },
+  ): Promise<void> {
+    await db
+      .update(remoteConnections)
+      .set({
+        lastSyncedAt: new Date(),
+        updatedAt: new Date(),
+        ...(capabilityOpts
+          ? {
+              capabilities: capabilityOpts.capabilities,
+              ...(capabilityOpts.capabilitiesVersion
+                ? { capabilitiesVersion: capabilityOpts.capabilitiesVersion }
+                : {}),
+            }
+          : {}),
+      })
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      );
   }
 
   /**
@@ -512,51 +466,6 @@ export class RemoteConnectionRepository {
       leadId: row.leadId,
       instanceId: row.instanceId,
     };
-  }
-
-  /**
-   * Update lastSyncedAt + capabilities snapshot for a connection.
-   */
-  static async touchLastSynced(
-    userId: string,
-    instanceId: string,
-    opts?: {
-      capabilities?: RemoteToolCapability[];
-      capabilitiesVersion?: string;
-      sentCapabilitiesVersion?: string;
-      /** Merge per-domain cursors into existing syncCursors JSONB */
-      syncCursors?: Record<string, SyncCursor>;
-      isActive?: boolean;
-    },
-  ): Promise<void> {
-    await db
-      .update(remoteConnections)
-      .set({
-        lastSyncedAt: new Date(),
-        updatedAt: new Date(),
-        ...(opts?.capabilities !== undefined
-          ? { capabilities: opts.capabilities }
-          : {}),
-        ...(opts?.capabilitiesVersion !== undefined
-          ? { capabilitiesVersion: opts.capabilitiesVersion }
-          : {}),
-        ...(opts?.sentCapabilitiesVersion !== undefined
-          ? { sentCapabilitiesVersion: opts.sentCapabilitiesVersion }
-          : {}),
-        // Merge incoming cursors into existing JSONB (don't overwrite keys not in this update)
-        ...(opts?.syncCursors !== undefined
-          ? {
-              syncCursors: sql`COALESCE(${remoteConnections.syncCursors}, '{}'::jsonb) || ${JSON.stringify(opts.syncCursors)}::jsonb`,
-            }
-          : {}),
-        ...(opts?.isActive !== undefined ? { isActive: opts.isActive } : {}),
-      })
-      .where(
-        and(
-          eq(remoteConnections.userId, userId),
-          eq(remoteConnections.instanceId, instanceId),
-        ),
-      );
   }
 
   /**
@@ -702,37 +611,4 @@ export class RemoteConnectionRepository {
         : null,
     };
   }
-
-  /**
-   * Get capabilities for a remote instance without requiring a specific userId.
-   * Used by CLI_AUTH_BYPASS / public contexts where userId is unavailable.
-   * Read-only metadata - safe for unauthenticated discovery.
-   */
-  static async getCapabilitiesAnyUser(
-    instanceId: string,
-  ): Promise<RemoteToolCapability[] | null> {
-    const [row] = await db
-      .select({
-        capabilities: remoteConnections.capabilities,
-      })
-      .from(remoteConnections)
-      .where(
-        and(
-          eq(remoteConnections.isActive, true),
-          or(
-            eq(remoteConnections.instanceId, instanceId),
-            eq(remoteConnections.remoteInstanceId, instanceId),
-          ),
-        ),
-      )
-      .limit(1);
-
-    return row?.capabilities ?? null;
-  }
 }
-
-// Type for native repository type checking
-export type RemoteConnectionRepositoryType = Pick<
-  typeof RemoteConnectionRepository,
-  keyof typeof RemoteConnectionRepository
->;

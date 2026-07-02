@@ -7,7 +7,10 @@ import "server-only";
 import { and, count as drizzleCount, desc, eq, isNull } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/agent/chat/config";
 import {
   chatFolders,
   chatMessages,
@@ -23,10 +26,6 @@ const ROOT_FOLDERS: readonly DefaultFolderId[] = [
   DefaultFolderId.PUBLIC,
   DefaultFolderId.BACKGROUND,
 ];
-
-function isRootFolder(value: string): value is DefaultFolderId {
-  return ROOT_FOLDERS.includes(value as DefaultFolderId);
-}
 
 /**
  * Slugify a thread title for use as a filename
@@ -187,7 +186,7 @@ export async function listThreadPath(
   const segments = path.split("/").filter(Boolean);
   if (segments.length === 2) {
     const rootFolderSegment = segments[1];
-    if (!isRootFolder(rootFolderSegment)) {
+    if (!isDefaultFolderId(rootFolderSegment)) {
       return [];
     }
     const rootFolderId = rootFolderSegment;
@@ -246,7 +245,7 @@ export async function listThreadPath(
 
   // /threads/<rootFolder>/<folderId> - list threads in a subfolder
   if (segments.length === 3) {
-    if (!isRootFolder(segments[1])) {
+    if (!isDefaultFolderId(segments[1])) {
       return [];
     }
     const rootFolderId = segments[1];

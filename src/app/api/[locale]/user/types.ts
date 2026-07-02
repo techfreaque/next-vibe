@@ -10,8 +10,11 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
-import { UserRoleDB, type UserRoleValue } from "next-vibe/identity/roles/enum";
-import { userRoleResponseSchema } from "next-vibe/identity/roles/types";
+import {
+  UserPermissionRole,
+  UserRoleDB,
+  type UserRoleValue,
+} from "next-vibe/identity/roles/enum";
 import { z } from "zod";
 
 import {

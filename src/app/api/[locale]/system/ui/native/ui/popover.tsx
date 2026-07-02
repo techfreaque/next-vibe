@@ -1,7 +1,11 @@
 import * as PopoverPrimitive from "@rn-primitives/popover";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   PopoverAnchorProps,
   PopoverCloseProps,
@@ -9,12 +13,8 @@ import type {
   PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-} from "next-vibe/ui/web/ui/popover";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
+} from "../../web/ui/popover";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

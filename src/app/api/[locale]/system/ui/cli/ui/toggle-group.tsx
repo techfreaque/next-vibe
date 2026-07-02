@@ -1,15 +1,16 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
-} from "next-vibe/ui/web/ui/toggle-group";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/toggle-group";
 
 export type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
-} from "next-vibe/ui/web/ui/toggle-group";
+} from "../../web/ui/toggle-group";
 
 // CLI: render group as a box of items
 export function ToggleGroup({ children }: ToggleGroupRootProps): JSX.Element {

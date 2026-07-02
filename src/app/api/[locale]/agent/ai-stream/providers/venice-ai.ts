@@ -89,6 +89,7 @@ export function createVeniceAI(logger: EndpointLogger): {
     };
 
     // Make the actual request to Venice.ai API
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
     const response = await fetch(input, modifiedInit);
 
     if (!response.ok) {

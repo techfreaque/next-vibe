@@ -1,11 +1,5 @@
 import * as SwitchPrimitives from "@rn-primitives/switch";
 import { cn } from "next-vibe/core/utils/utils";
-import { useColorScheme } from "next-vibe/ui/native/lib/useColorScheme";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type { SwitchRootProps } from "next-vibe/ui/web/ui/switch";
 import * as React from "react";
 import Animated, {
   interpolateColor,
@@ -13,6 +7,13 @@ import Animated, {
   useDerivedValue,
   withTiming,
 } from "react-native-reanimated";
+
+import { useColorScheme } from "../../native/lib/useColorScheme";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../native/utils/style-converter";
+import type { SwitchRootProps } from "../../web/ui/switch";
 
 // Re-export all types from web
 export type { SwitchRootProps };

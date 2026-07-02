@@ -1,15 +1,16 @@
 import * as RadioGroupPrimitive from "@rn-primitives/radio-group";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { Check } from "next-vibe/ui/native/ui/icons/Check";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { View } from "react-native";
+
+import { Check } from "../../native/ui/icons/Check";
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "next-vibe/ui/web/ui/radio-group";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { View } from "react-native";
+} from "../../web/ui/radio-group";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styled(View, { className: "style" });
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;

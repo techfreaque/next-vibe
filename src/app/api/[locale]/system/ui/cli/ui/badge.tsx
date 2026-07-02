@@ -1,12 +1,13 @@
 import { cva } from "class-variance-authority";
 import { Text } from "ink";
-import type { BadgeProps } from "next-vibe/ui/web/ui/badge";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import type { BadgeProps } from "../../web/ui/badge";
+
 export const badgeVariants = cva("");
 export const badgeTextVariants = cva("");
-export type { BadgeVariant } from "next-vibe/ui/web/ui/badge";
+export type { BadgeVariant } from "../../web/ui/badge";
 
 const VARIANT_COLOR: Record<NonNullable<BadgeProps["variant"]>, string> = {
   default: "cyan",

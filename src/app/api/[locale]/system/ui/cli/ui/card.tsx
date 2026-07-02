@@ -1,4 +1,7 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   CardContentProps,
   CardDescriptionProps,
@@ -6,9 +9,7 @@ import type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "next-vibe/ui/web/ui/card";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/card";
 
 export type {
   CardContentProps,
@@ -17,7 +18,7 @@ export type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "next-vibe/ui/web/ui/card";
+} from "../../web/ui/card";
 
 export function Card({ children }: CardProps): JSX.Element {
   const isMcp = useIsMcp();

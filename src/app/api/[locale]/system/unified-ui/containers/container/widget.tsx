@@ -4,7 +4,6 @@ import { LayoutType } from "next-vibe/core/definition/enums";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as reactScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { MultiWidgetRenderer } from "next-vibe/ui/renderers/react/MultiWidgetRenderer";
 import { Button } from "next-vibe/ui/web/ui/button";
 import {
   Card,
@@ -52,6 +51,7 @@ import {
 } from "next-vibe/unified-ui/_shared/widget-helpers";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { MultiWidgetRenderer } from "next-vibe/unified-ui/renderers/react/MultiWidgetRenderer";
 import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";

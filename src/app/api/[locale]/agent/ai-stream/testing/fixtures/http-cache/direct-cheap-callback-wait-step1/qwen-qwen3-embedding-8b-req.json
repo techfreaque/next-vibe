@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T2 cortex-write] Use execute-tool with toolName='cortex-write' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use execute-tool with toolName='cortex-read' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to:\n1. Call execute-tool with toolName='cortex-write', instanceId='hermes', input with path=\"/memories/t2-cheap-test\" and content=\"T2_CHEAP_OK\"\n2. Then call execute-tool with toolName='cortex-read', instanceId='hermes', input with path=\"/memories/t2-cheap-test\"\n3. Verify the content is exactly \"T2_CHEAP_OK\"\n4. End with STEP_OK or FAILED\n\nLet me do both calls. They are independent in sequence (write then read), so I need to do them sequentially.</think>\n\nAssistant: <think>Write succeeded. Now read it back.</think>\n\nAssistant: <think>The content read back is exactly \"T2_CHEAP_OK\". Write succeeded and read confirmed.</think>STEP_OK\n\nUser: [T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'await-task-test'}, callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

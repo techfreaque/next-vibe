@@ -16,7 +16,7 @@ import { installStorage } from "next-vibe/tooling/infra/shared/pulumi/storage/in
 import type { ClientT } from "@/app/api/[locale]/ssh/client";
 
 import type { InfraConfig } from "./config";
-export interface ProvisionAllResult {
+interface ProvisionAllResult {
   success: boolean;
   message: string;
   nodesProvisioned: number;

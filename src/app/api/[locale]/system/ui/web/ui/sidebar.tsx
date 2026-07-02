@@ -1,11 +1,11 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { useWindowSize } from "next-vibe/ui/web/hooks/use-window-size";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
 import { platform } from "@/config/env-client";
 
+import { useWindowSize } from "../../web/hooks/use-window-size";
 import { Div } from "./div";
 import { ResizableContainer } from "./resizable";
 import { ScrollArea } from "./scroll-area";

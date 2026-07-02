@@ -18,7 +18,6 @@ import {
   Languages,
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
-import { leadId } from "next-vibe/identity/lead/types";
 import { UserRole, UserRoleOptions } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
@@ -189,7 +188,7 @@ const { POST } = createEndpoint({
             description: "post.leadId.description" as const,
             helpText: "post.leadId.description" as const,
             columns: 6,
-            schema: leadId.nullable().optional(),
+            schema: z.uuid().nullable().optional(),
           }),
         },
       }),
@@ -260,7 +259,7 @@ const { POST } = createEndpoint({
       responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.leadId.content" as const,
-        schema: leadId.nullable(),
+        schema: z.uuid().nullable(),
       }),
       responseEmail: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

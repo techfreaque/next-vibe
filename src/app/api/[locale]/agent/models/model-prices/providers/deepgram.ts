@@ -35,6 +35,7 @@ async function scrapePricing(
 ): Promise<{ map: Map<string, number>; error?: string }> {
   const priceMap = new Map<string, number>();
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
     const response = await fetch(PRICING_URL, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; unbottled-ai/1.0)" },
     });

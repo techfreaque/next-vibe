@@ -1,4 +1,6 @@
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   CommandDialogProps,
   CommandEmptyProps,
@@ -9,8 +11,7 @@ import type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "next-vibe/ui/web/ui/command";
-import type { JSX } from "react";
+} from "../../web/ui/command";
 
 export type {
   CommandDialogProps,
@@ -22,7 +23,7 @@ export type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "next-vibe/ui/web/ui/command";
+} from "../../web/ui/command";
 
 // CLI: passthrough wrappers - command UI has no terminal equivalent
 // but child content (items, groups) should still render

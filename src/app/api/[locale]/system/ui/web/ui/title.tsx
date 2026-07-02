@@ -1,7 +1,8 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import React from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export type TitleProps = {
   children: React.ReactNode;

@@ -12,7 +12,7 @@ export type {
   SheetRootProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "next-vibe/ui/web/ui/sheet";
+} from "../../web/ui/sheet";
 
 import type {
   SheetCloseProps,
@@ -24,7 +24,7 @@ import type {
   SheetRootProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "next-vibe/ui/web/ui/sheet";
+} from "../../web/ui/sheet";
 
 export function Sheet({
   children,

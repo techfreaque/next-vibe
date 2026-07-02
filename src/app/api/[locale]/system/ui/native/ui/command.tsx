@@ -2,10 +2,19 @@
 
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import {
+  Pressable,
+  ScrollView,
+  Text as RNText,
+  TextInput,
+  View,
+} from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 // Import all cross-platform type definitions from web (source of truth)
 import type {
   CommandDialogProps,
@@ -17,18 +26,9 @@ import type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "next-vibe/ui/web/ui/command";
-import { MagnifyingGlassIcon } from "next-vibe/ui/web/ui/icons/MagnifyingGlassIcon";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import {
-  Pressable,
-  ScrollView,
-  Text as RNText,
-  TextInput,
-  View,
-} from "react-native";
-
+} from "../../web/ui/command";
+import { MagnifyingGlassIcon } from "../../web/ui/icons/MagnifyingGlassIcon";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Dialog, DialogContent } from "./dialog";
 
 const StyledView = styled(View, { className: "style" });

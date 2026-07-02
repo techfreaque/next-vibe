@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The async task has completed. The generate_image result is visible in the conversation context above, showing a rendered markdown image and an imageUrl field:\n\n```\nimageUrl: http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/15d654e7-ee0b-4b01-bea6-2be30408e98e/53cd0d45-5253-44e8-83d6-17adaac494fb.png\n```\n\nThe image URL is present and non-empty. According to the instructions from T6a:\n- Phase 1: Already completed with STEP_OK (taskId seen, no image URL yet)\n- Phase 2 (this revival): Need to confirm an image URL is present and end with WAKEUP_OK\n\nThe result clearly contains `imageUrl: http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/15d654e7-ee0b-4b01-bea6-2be30408e98e/53cd0d45-5253-44e8-83d6-17adaac494fb.png`\n\nAlso the markdown rendered image shows the URL. So \n\nUser: [T6c wakeUp-repeat] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wakeup-repeat-test'}, callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user wants me to call `generate_image` on `hermes` with `callbackMode='wakeUp'` and `prompt='wakeup-repeat-test'`.\n\nTwo valid outcomes:\n1. DEFERRED - I get a taskId and no image → end with STEP_OK\n2. INLINE - fast task returns image immediately → end with WAKEUP_OK\n\nOnly FAILED if I get neither taskId nor image.\n\nIf deferred, I will be revived later and need to confirm image URL and end with WAKEUP_OK.\n\nLet me make the call.</think>\n\nAssistant: <think> The user wants me to run T6c: wakeUp-repeat.\nI called execute-tool with callbackMode='wakeUp'.\nThe result is a JSON object with a taskId and a hint.\nThere is no imageUrl.\nSo this is outcome (a) DEFERRED.\nI should end with STEP_OK.</think> STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

@@ -27,7 +27,7 @@ import {
   READ_NODE_TOKEN,
 } from "./scripts";
 
-export interface K3sProvisionResult {
+interface K3sProvisionResult {
   nodesProvisioned: number;
   controlPlaneIp: string;
   kubeconfig: string;

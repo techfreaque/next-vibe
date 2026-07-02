@@ -38,7 +38,7 @@ function serializeDebugMeta(meta: LoggerMetadata[]): string {
     .join(" ")}`;
 }
 
-export type PersistFn = (
+type PersistFn = (
   level: ErrorLogLevel,
   message: string,
   error: LoggerMetadata | undefined,
@@ -46,7 +46,7 @@ export type PersistFn = (
   locale: CountryLanguage,
 ) => void;
 
-export type FileLogFn = (
+type FileLogFn = (
   message: string,
   data?: Record<string, LoggerMetadata>,
 ) => void;

@@ -9,7 +9,7 @@ import type { TranslatedKeyType } from "./scoped-translation";
 /**
  * Options for generating metadata with translations
  */
-export interface GenerateMetadataOptions {
+interface GenerateMetadataOptions {
   path: string;
   title: TranslatedKeyType;
   category: TranslatedKeyType;

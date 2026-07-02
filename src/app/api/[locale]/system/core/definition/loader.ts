@@ -21,7 +21,7 @@ export type GetEndpointFn = (
   path: string,
 ) => Promise<CreateApiEndpointAny | null>;
 
-export interface LoadEndpointOptions {
+interface LoadEndpointOptions {
   identifier: string;
   platform: Platform;
   user: JwtPayloadType;
@@ -31,7 +31,7 @@ export interface LoadEndpointOptions {
   skipAccessValidation?: boolean;
 }
 
-export interface LoadEndpointsOptions {
+interface LoadEndpointsOptions {
   identifiers: string[];
   platform: Platform;
   user: JwtPayloadType;

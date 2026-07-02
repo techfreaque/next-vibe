@@ -7,17 +7,14 @@ import { hydrateRoot } from "react-dom/client";
 
 hydrateStart()
   .then(async (router) => {
-    const { preloadAllWidgets } =
-      await import("next-vibe/ui/renderers/react/widget-preloader");
-    await Promise.all([
-      ...router.state.matches.flatMap((match) => {
+    await Promise.all(
+      router.state.matches.flatMap((match) => {
         const route =
           router.routesByPath[match.routeId] ??
           router.routesById[match.routeId];
         return [route?.lazyFn?.(), route?.options?.component?.preload?.()];
       }),
-      preloadAllWidgets(),
-    ]);
+    );
 
     // React 19's trackUsedThenable checks thenable.status first:
     //   "fulfilled" → returns thenable.value synchronously (no suspend)

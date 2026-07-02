@@ -535,27 +535,3 @@ export function isCronTaskDue(
     return false;
   }
 }
-
-/**
- * Parse cron expression and return parsed interval
- * Centralized cron parsing function
- */
-export function parseCronExpression(
-  logger: EndpointLogger,
-  schedule: string,
-  timezone = "UTC",
-  currentDate?: Date,
-): ReturnType<typeof cronParser.parse> | null {
-  try {
-    return cronParser.parse(schedule, {
-      tz: timezone,
-      currentDate: currentDate || new Date(),
-    });
-  } catch (error) {
-    logger.error("Failed to parse cron expression", parseError(error), {
-      schedule,
-      timezone,
-    });
-    return null;
-  }
-}

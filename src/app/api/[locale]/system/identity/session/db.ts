@@ -24,26 +24,16 @@ export const sessions = pgTable("sessions", {
 });
 
 /**
- * Session relations
- */
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, {
-    fields: [sessions.userId],
-    references: [users.id],
-  }),
-}));
-
-/**
  * Zod schemas for validation
  */
-export const insertSessionSchema = createInsertSchema(sessions);
-export const selectSessionSchema = createSelectSchema(sessions);
+const insertSessionSchema = createInsertSchema(sessions);
+const selectSessionSchema = createSelectSchema(sessions);
 
 /**
  * Types
  */
-export type InsertSession = z.infer<typeof insertSessionSchema>;
-export type SelectSession = z.infer<typeof selectSessionSchema>;
+type InsertSession = z.infer<typeof insertSessionSchema>;
+type SelectSession = z.infer<typeof selectSessionSchema>;
 
 /**
  * Legacy type aliases for backward compatibility

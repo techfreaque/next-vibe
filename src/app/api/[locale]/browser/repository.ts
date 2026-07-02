@@ -297,6 +297,7 @@ async function ensureMCP(logger: EndpointLogger): Promise<MCPProcess | null> {
 
 async function isChromeReady(): Promise<boolean> {
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const r = await fetch(
       `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/version`,
       { signal: AbortSignal.timeout(1000) },
@@ -409,6 +410,7 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
       const initialTargets = await listCDPTargets();
       for (const t of initialTargets) {
         try {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
           await fetch(
             `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/close/${t.id}`,
             { signal: AbortSignal.timeout(2000) },
@@ -439,6 +441,7 @@ interface CDPTarget {
 
 async function listCDPTargets(): Promise<CDPTarget[]> {
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const resp = await fetch(
       `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json`,
       { signal: AbortSignal.timeout(3000) },
@@ -619,6 +622,7 @@ function isSessionAlive(sessionId: string): boolean {
  */
 async function closeCDPTab(targetId: string): Promise<void> {
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     await fetch(
       `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/close/${targetId}`,
       { signal: AbortSignal.timeout(3000) },

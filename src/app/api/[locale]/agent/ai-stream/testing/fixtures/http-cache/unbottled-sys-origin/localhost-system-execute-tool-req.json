@@ -1,0 +1,37 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/system/execute-tool",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]",
+    "x-vibe-fixture-context": "unbottled-sys-origin"
+  },
+  "body": {
+    "toolName": "ai-stream",
+    "input": {
+      "operation": "send",
+      "role": "user",
+      "voiceMode": {
+        "enabled": false,
+        "voice": "openai-alloy"
+      },
+      "audioInput": {
+        "file": null
+      },
+      "content": "[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the server you are running on. Reply with ONLY the instance ID string, nothing else.",
+      "model": "kimi-k2.6",
+      "skill": "quality-tester__kimi",
+      "timezone": "UTC",
+      "threadId": "3590e3d4-4f8c-4366-a159-ad5331c3c3f9",
+      "userMessageId": "13043516-928b-4430-bfd3-662c5d58779e",
+      "rootFolderId": "remote",
+      "messageHistory": [],
+      "executionContext": {
+        "instanceId": "atlas",
+        "callerUserId": "fa8f2bae-a0ac-4c48-83d7-f33ce074085e",
+        "callerLeadId": "9dd44fbe-2959-4479-ace6-04b40d1abd0f",
+        "mode": "inference-provider"
+      }
+    }
+  }
+}

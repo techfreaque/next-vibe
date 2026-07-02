@@ -20,7 +20,9 @@ export type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "next-vibe/ui/web/ui/alert-dialog";
+} from "../../web/ui/alert-dialog";
+
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import type {
   AlertDialogActionProps,
@@ -33,8 +35,7 @@ import type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../web/ui/alert-dialog";
 
 let alertBtnIdCounter = 0;
 

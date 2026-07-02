@@ -1,9 +1,10 @@
-import type { AudioWaveformProps } from "next-vibe/ui/web/ui/audio-waveform";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Animated, StyleSheet, View } from "react-native";
+
+import type { AudioWaveformProps } from "../../web/ui/audio-waveform";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const color = "ef4444";
 /**

@@ -34,6 +34,21 @@ export const translations: typeof enTranslations = {
           description:
             'Wie das asynchrone Ergebnis behandelt werden soll. "wait": warten bis fertig, "task-done": taskId sofort zurückgeben, "inject": Ergebnis in den aktuellen Thread einfügen.',
         },
+        callerSkillId: {
+          label: "Aufrufer-Skill-ID",
+          description:
+            "Wire-intern: die aktive Skill-ID der aufrufenden Instanz — die ausführende Instanz löst Feld-Defaults (z. B. Medienmodelle) dagegen auf. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+        },
+        callerFavoriteId: {
+          label: "Aufrufer-Favoriten-ID",
+          description:
+            "Wire-intern: die aktive Favoriten-ID der aufrufenden Instanz — die ausführende Instanz löst Feld-Defaults (z. B. Medienmodelle) dagegen auf. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+        },
+        callerPlatform: {
+          label: "Aufrufer-Plattform",
+          description:
+            "Wire-intern: die Ausführungsplattform der aufrufenden Seite — die ausführende Instanz rendert plattformspezifische Ergebnisse entsprechend. Wird bei Cross-Instance-Aufrufen automatisch gesetzt.",
+        },
       },
       response: {
         result:
@@ -56,6 +71,11 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Tool nicht gefunden",
           description: "Kein registriertes Tool mit diesem Namen gefunden",
+        },
+        remoteFailed: {
+          title: "Remote-Tool fehlgeschlagen: {{message}}",
+          description:
+            "Die Remote-Instanz hat den Aufruf abgelehnt oder er ist fehlgeschlagen",
         },
         server: {
           title: "Ausführungsfehler",

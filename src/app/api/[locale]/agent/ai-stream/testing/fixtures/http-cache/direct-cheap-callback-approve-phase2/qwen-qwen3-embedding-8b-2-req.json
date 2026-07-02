@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user asked me to call execute-tool with toolName='tool-help', instanceId='hermes', input={'toolName':'generate_image'} but I see that the request I actually made didn't include the input parameter for toolName - I called it without input. But looking at the result, it returned a list of tools, not the specific tool schema. I need to call it correctly with the input containing toolName.\n\nWait, looking at the previous turn's result: The user asked for `input={'toolName':'generate_image'}` but the actual call I made was `{\"callbackMode\":\"wait\",\"input\":{},\"instanceId\":\"hermes\",\"toolName\":\"tool-help\"}` - I forgot to include the input!\n\nBut actually, looking at the system message, this is a state boundary. The user is asking me to perform T1b. Let me re-read the user's request.\n\nThe u\n\nAssistant: <think>The result contains:\n- name: \"generate_image\" (in the tools array, the tool object has \"name\":\"generate_image\")\n- description: \"Generate an image from a text prompt using AI\"\n- parameters schema: Yes, there's a \"parameters\" field with a JSON schema containing properties like aspectRatio, inputMediaUrl, model, prompt, quality, size, etc.\n\nAll three are present. So the answer is STEP_OK.</think>STEP_OK\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK\n\nAssistant: <think>The user is asking me to say exactly: \"RETRY_RESPONSE STEP_OK\". This is a clear instruction. I should follow it precisely.</think>RETRY_RESPONSE STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

@@ -6,9 +6,6 @@ export let mcpSilentMode = false;
 export function isFileLoggingEnabled(): boolean {
   return process.env["VIBE_LOG_TARGET"] === "file";
 }
-export function isDbLoggingEnabled(): boolean {
-  return process.env["VIBE_LOG_TARGET"] === "db";
-}
 
 export function enableMcpSilentMode(): void {
   mcpSilentMode = true;

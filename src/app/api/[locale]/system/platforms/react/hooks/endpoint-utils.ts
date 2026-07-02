@@ -46,20 +46,6 @@ export function usePrimaryMutationMethod(
 }
 
 /**
- * Utility to determine if forms should be cleared after success
- * In production: always clear
- * In development: controlled by debug setting
- */
-export function shouldClearFormAfterSuccess(): boolean {
-  if (envClient.NODE_ENV === Environment.PRODUCTION) {
-    return true;
-  }
-
-  // In development, use debug setting
-  return clearFormsAfterSuccessInDev;
-}
-
-/**
  * Check if value is a plain object (not array, null, date, etc.)
  * @param value - The value to check
  * @returns True if value is a plain object
@@ -133,20 +119,6 @@ export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
   }
 
   return result as T;
-}
-
-/**
- * Utility to safely merge form data with prefilled data
- * Performs deep merge for nested objects
- * Priority (lowest to highest): defaultValues < prefillData < initialState < savedData
- */
-export function mergeFormData<T>(
-  defaultValues: T | undefined,
-  prefillData: T | undefined,
-  initialState: T | undefined,
-  savedData?: T | null,
-): T {
-  return deepMerge<T>(defaultValues, prefillData, initialState, savedData);
 }
 
 /**

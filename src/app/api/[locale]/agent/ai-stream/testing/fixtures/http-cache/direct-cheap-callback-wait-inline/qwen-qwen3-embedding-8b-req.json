@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to call the local `await-task` tool directly (not via execute-tool) with the taskId from the previous step. Let me check if `await-task` is available in my tool catalog.\n\nLooking at the tool catalog, I see `await-task` is listed as a tool. I should call it directly using `execute-tool` with `toolName='await-task'`. Wait, the user said \"do NOT use execute-tool for this - call await-task directly\". But in this environment, all tools are called via `execute-tool`. Let me re-read...\n\nActually, looking at the instructions, I use `execute-tool` to call any registered endpoint. The `await-task` is in the tool catalog. So I should call `execute-tool` with `toolName='await-task'` and pass the taskId.\n\nWait, the user specifically said \"Call the local await-task tool (do NOT \n\nAssistant: <think> The result contains an imageUrl string nested in result.result.imageUrl. So the imageUrl is present.\n\nSTEP_OK</think> STEP_OK\n\nUser: [T5a endLoop] Call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='endLoop'. After receiving the result, try to call execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.\n\nAssistant: <think> The user's instruction states: \"Call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='endLoop'. After receiving the result, try to call execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array.\"\n\nThe critical point is that `callbackMode='endLoop'` is supposed to stop the AI's turn after executing the tool. This means I should only make the first call, and then the turn should end. The user is testing whether `endLoop` actually works.\n\nHowever, looking at the current state, I'm in a new turn where the user is giving me this instruction. The previous\n\nUser: [T5d wait-inline] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.",
+    "encoding_format": "float"
+  }
+}

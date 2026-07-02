@@ -1,9 +1,12 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import { CheckIcon } from "next-vibe/ui/web/ui/icons/CheckIcon";
-import { ChevronRightIcon } from "next-vibe/ui/web/ui/icons/ChevronRightIcon";
-import { DotFilledIcon } from "next-vibe/ui/web/ui/icons/DotFilledIcon";
+import * as React from "react";
+import { View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { CheckIcon } from "../../web/ui/icons/CheckIcon";
+import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
+import { DotFilledIcon } from "../../web/ui/icons/DotFilledIcon";
 import type {
   MenubarCheckboxItemProps,
   MenubarContentProps,
@@ -21,11 +24,8 @@ import type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "next-vibe/ui/web/ui/menubar";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { View } from "react-native";
-
+} from "../../web/ui/menubar";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Span } from "./span";
 
 // The styled() function from nativewind has overly complex type inference for these components

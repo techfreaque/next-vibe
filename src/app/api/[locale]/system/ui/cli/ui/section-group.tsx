@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import type { SectionGroupProps } from "next-vibe/ui/web/ui/section-group";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type { SectionGroupProps } from "next-vibe/ui/web/ui/section-group";
+import type { SectionGroupProps } from "../../web/ui/section-group";
+
+export type { SectionGroupProps } from "../../web/ui/section-group";
 
 export function SectionGroup({
   title,

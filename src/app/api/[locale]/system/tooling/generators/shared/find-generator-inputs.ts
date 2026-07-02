@@ -121,9 +121,7 @@ export function findGeneratorInputs(
       if (liveIndex) {
         return [...liveIndex.promptFragmentFiles].toSorted();
       }
-      return findFilesRecursively(apiDir, "prompt.ts").filter((f) =>
-        f.includes("/system-prompt/"),
-      );
+      return findFilesRecursively(apiDir, "system-prompt.ts").toSorted();
 
     // --- Generators not yet in LiveIndex (always scan disk) ---
 

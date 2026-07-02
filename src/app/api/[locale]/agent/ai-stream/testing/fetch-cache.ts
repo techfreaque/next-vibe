@@ -27,6 +27,7 @@
  * Cache bust: delete fixtures/http-cache/{testCase}/
  */
 
+import { AsyncLocalStorage } from "node:async_hooks";
 import {
   existsSync,
   mkdirSync,

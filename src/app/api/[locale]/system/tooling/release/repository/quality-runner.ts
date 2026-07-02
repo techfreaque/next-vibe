@@ -37,7 +37,7 @@ import {
 // Interface
 // ============================================================================
 
-export interface IQualityRunner {
+interface IQualityRunner {
   /**
    * Run linting (with optional custom command)
    */
@@ -115,7 +115,7 @@ export interface IQualityRunner {
 // Implementation
 // ============================================================================
 
-export class QualityRunner implements IQualityRunner {
+class QualityRunner implements IQualityRunner {
   runLint(
     cwd: string,
     packageManager: PackageManager,

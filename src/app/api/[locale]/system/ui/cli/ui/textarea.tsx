@@ -1,9 +1,10 @@
 import { Text } from "ink";
 import TextInput from "ink-text-input";
-import { useCliFieldFocus } from "next-vibe/ui/cli/lib/focus-manager";
-import type { TextareaProps } from "next-vibe/ui/web/ui/textarea";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
+
+import { useCliFieldFocus } from "../../cli/lib/focus-manager";
+import type { TextareaProps } from "../../web/ui/textarea";
 
 export type {
   TextareaChangeEvent,
@@ -13,7 +14,7 @@ export type {
   TextareaKeyboardEvent,
   TextareaProps,
   TextareaRefObject,
-} from "next-vibe/ui/web/ui/textarea";
+} from "../../web/ui/textarea";
 
 import { cva } from "class-variance-authority";
 

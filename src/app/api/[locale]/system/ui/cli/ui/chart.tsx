@@ -20,7 +20,7 @@ export type {
   PayloadItem,
   PieProps,
   ThemeKeys,
-} from "next-vibe/ui/web/ui/chart";
+} from "../../web/ui/chart";
 
 export function useChart(): ChartContextProps {
   // CLI stub - chart context is never used in terminal rendering
@@ -33,7 +33,7 @@ import type {
   ChartDataPoint,
   ChartLegendContentProps,
   ChartTooltipContentProps,
-} from "next-vibe/ui/web/ui/chart";
+} from "../../web/ui/chart";
 
 export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
   children,

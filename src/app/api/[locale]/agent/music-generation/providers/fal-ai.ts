@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";

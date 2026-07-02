@@ -1,15 +1,15 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { styledNative } from "next-vibe/ui/native/utils/style-converter";
-import type { EmptyBlockProps } from "next-vibe/ui/web/ui/empty-block";
 import { Pressable, View } from "react-native";
 
+import { styledNative } from "../../native/utils/style-converter";
+import type { EmptyBlockProps } from "../../web/ui/empty-block";
 import { Text } from "./text";
 
 export type {
   EmptyBlockAction,
   EmptyBlockProps,
-} from "next-vibe/ui/web/ui/empty-block";
+} from "../../web/ui/empty-block";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

@@ -34,13 +34,6 @@ export function formatWarning(message: string, icon = "⚠️"): string {
 }
 
 /**
- * Format an info message
- */
-export function formatInfo(message: string, icon = "ℹ️"): string {
-  return `${icon} ${maybeColorize(message, semantic.info)}`;
-}
-
-/**
  * Format a database message (cyan color for all DB operations)
  */
 export function formatDatabase(message: string, icon = "🗄️"): string {
@@ -184,13 +177,6 @@ export function formatCount(
 }
 
 /**
- * Format a URL
- */
-export function formatUrl(url: string): string {
-  return maybeColorize(url, semantic.accent);
-}
-
-/**
  * Format a file path
  */
 export function formatPath(path: string): string {
@@ -200,7 +186,7 @@ export function formatPath(path: string): string {
 /**
  * Format a separator line
  */
-export function formatSeparator(char = "─", length = 50): string {
+function formatSeparator(char = "─", length = 50): string {
   return maybeColorize(char.repeat(length), semantic.muted);
 }
 
@@ -209,23 +195,6 @@ export function formatSeparator(char = "─", length = 50): string {
  */
 export function formatSection(title: string): string {
   return `\n${maybeColorize(bold(title), semantic.highlight)}\n${formatSeparator()}`;
-}
-
-/**
- * Format a key-value pair
- */
-export function formatKeyValue(
-  key: string,
-  value: string | number | boolean,
-): string {
-  return `${maybeColorize(key, semantic.muted)}: ${maybeColorize(bold(String(value)), semantic.highlight)}`;
-}
-
-/**
- * Format a list item
- */
-export function formatListItem(item: string, icon = "•"): string {
-  return `  ${maybeColorize(icon, semantic.muted)} ${item}`;
 }
 
 /**

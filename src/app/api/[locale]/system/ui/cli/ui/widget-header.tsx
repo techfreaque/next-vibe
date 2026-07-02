@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import type { WidgetHeaderProps } from "next-vibe/ui/web/ui/widget-header";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type { WidgetHeaderProps } from "next-vibe/ui/web/ui/widget-header";
+import type { WidgetHeaderProps } from "../../web/ui/widget-header";
+
+export type { WidgetHeaderProps } from "../../web/ui/widget-header";
 
 export function WidgetHeader({
   title,

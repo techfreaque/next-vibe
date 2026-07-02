@@ -6,12 +6,12 @@
 
 "use client";
 
+import type { JSX } from "react";
+
 import type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "next-vibe/ui/web/ui/form/form-section";
-import type { JSX } from "react";
-
+} from "../../../web/ui/form/form-section";
 import { Div } from "../div";
 import { Span } from "../span";
 import { H2, H3, P } from "../typography";

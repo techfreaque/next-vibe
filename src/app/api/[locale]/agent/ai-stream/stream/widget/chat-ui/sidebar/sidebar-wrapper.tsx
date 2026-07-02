@@ -3,11 +3,11 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { useWindowSize } from "next-vibe/ui/web/hooks/use-window-size";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
 import { ResizableContainer } from "next-vibe/ui/web/ui/resizable";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 

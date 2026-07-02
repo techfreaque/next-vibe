@@ -16,7 +16,6 @@ import { success } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   useRouter,
   useSilentHistory,
@@ -74,6 +73,7 @@ import {
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo, useState } from "react";
 
 import {
@@ -224,7 +224,7 @@ function ThreadRow({
     }
     setNavigation({
       activeThreadId: item.id,
-      currentRootFolderId: item.rootFolderId as DefaultFolderId,
+      currentRootFolderId: item.rootFolderId,
       currentSubFolderId: item.folderId ?? null,
     });
     const url = item.folderId
@@ -361,7 +361,7 @@ function ThreadRow({
       if (isActive) {
         setNavigation({
           activeThreadId: NEW_MESSAGE_ID,
-          currentRootFolderId: item.rootFolderId as DefaultFolderId,
+          currentRootFolderId: item.rootFolderId,
           currentSubFolderId: null,
         });
         pushState(`/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`);
@@ -734,7 +734,7 @@ function ThreadRowShared({
     }
     setNavigation({
       activeThreadId: item.id,
-      currentRootFolderId: item.rootFolderId as DefaultFolderId,
+      currentRootFolderId: item.rootFolderId,
       currentSubFolderId: item.folderId ?? null,
     });
     const url = item.folderId

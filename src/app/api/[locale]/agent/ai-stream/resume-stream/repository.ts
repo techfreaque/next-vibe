@@ -110,7 +110,7 @@ export class ResumeStreamRepository {
       let thread:
         | {
             streamingState: ThreadStreamingState | null;
-            rootFolderId: string | null;
+            rootFolderId: DefaultFolderId;
             folderId: string | null;
           }
         | undefined;
@@ -197,11 +197,46 @@ export class ResumeStreamRepository {
       // Use the thread's actual rootFolderId for revival so the system prompt tone
       // matches the original conversation context (private/public/shared/cron).
       const threadRootFolderId =
-        (thread?.rootFolderId as DefaultFolderId | null) ??
-        DefaultFolderId.PRIVATE;
+        thread?.rootFolderId ?? DefaultFolderId.PRIVATE;
       // The thread's subfolder rides along so revival turns route exactly
       // like the original turn (REMOTE-folder threads relay to their instance).
       const threadSubFolderId = thread?.folderId ?? undefined;
+
+      // Shared reset: flip streamingState back to idle. Guarded on the expected
+      // current state so a concurrent claim's 'streaming' (or a fresh turn) is
+      // never clobbered. The WS emit fires even when the DB update fails so
+      // clients are never left showing a spinner on an error path; DB errors
+      // propagate to the caller which decides whether to swallow or log them.
+      const resetStreamingToIdle = async (
+        targetThreadId: string,
+        guardState:
+          | ThreadStreamingState.STREAMING
+          | ThreadStreamingState.WAITING,
+      ): Promise<void> => {
+        try {
+          await db
+            .update(chatThreads)
+            .set({
+              streamingState: ThreadStreamingState.IDLE,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(chatThreads.id, targetThreadId),
+                eq(chatThreads.streamingState, guardState),
+              ),
+            );
+        } finally {
+          createMessagesEmitter(logger, user, {
+            threadId: targetThreadId,
+            rootFolderId: threadRootFolderId,
+          })("streaming-state-changed", {
+            responseData: {
+              streamingState: ThreadStreamingState.IDLE,
+            },
+          });
+        }
+      };
 
       logger.debug("[ResumeStream] State check", {
         threadId,
@@ -379,26 +414,10 @@ export class ResumeStreamRepository {
             const clearStuckStreaming = async (): Promise<void> => {
               if (streamingState === ThreadStreamingState.STREAMING) {
                 try {
-                  await db
-                    .update(chatThreads)
-                    .set({
-                      streamingState: ThreadStreamingState.IDLE,
-                      updatedAt: new Date(),
-                    })
-                    .where(
-                      and(
-                        eq(chatThreads.id, effectiveThreadId),
-                        sql`${chatThreads.streamingState} = 'streaming'`,
-                      ),
-                    );
-                  createMessagesEmitter(logger, user, {
-                    rootFolderId: threadRootFolderId,
-                  })("streaming-state-changed", {
-                    responseData: {
-                      streamingState: ThreadStreamingState.IDLE,
-                    },
-                    urlPathParams: { threadId: effectiveThreadId },
-                  });
+                  await resetStreamingToIdle(
+                    effectiveThreadId,
+                    ThreadStreamingState.STREAMING,
+                  );
                   logger.debug(
                     "[ResumeStream] wakeUp - cleared stuck streaming state (idempotency path)",
                     { threadId: effectiveThreadId },
@@ -470,13 +489,11 @@ export class ResumeStreamRepository {
                 );
                 return success({ resumed: false, lastAiMessageId: null });
               }
-              void runHeadlessAiStream({
+              void fireWakeUpRevival({
                 favoriteId: favoriteId ?? undefined,
                 favoriteConfig: resolvedFavoriteConfig,
                 model: resolvedModel,
                 skill: resolvedSkill,
-                prompt: "",
-                wakeUpRevival: true,
                 explicitParentMessageId: existingDeferred.id,
                 sequenceIdOverride: existingDeferred.sequenceId ?? undefined,
                 threadId: effectiveThreadId,
@@ -490,14 +507,14 @@ export class ResumeStreamRepository {
                 abortSignal: revivalAbortSignal,
               })
                 .then(async (result) => {
-                  createMessagesEmitter(logger, user, {
+                  emitStreamFinished({
                     threadId,
+                    state: ThreadStreamingState.IDLE,
+                    preview: null,
+                    updatedAt: new Date(),
                     rootFolderId: threadRootFolderId,
-                  })("stream-finished", {
-                    responseData: {
-                      streamingState: ThreadStreamingState.IDLE,
-                    },
-                    urlPathParams: { threadId },
+                    logger,
+                    user,
                   });
                   logger.debug(
                     "[ResumeStream] wakeUp revival (from existing deferred) complete",
@@ -533,29 +550,6 @@ export class ResumeStreamRepository {
 
             // wakeUpResult arrives as a parsed object (deepParseJsonStrings in request-validator
             const parsedResult = wakeUpResultObj ? wakeUpResultObj : undefined;
-            const deferredStatus =
-              wakeUpStatus === "completed"
-                ? ("completed" as const)
-                : ("failed" as const);
-
-            const deferredSequenceId = crypto.randomUUID();
-            const deferredId = crypto.randomUUID();
-
-            const deferredToolCall: ToolCall = {
-              ...toolCall,
-              // Reuse original toolCallId so the AI recognizes this as the result
-              // of the tool call it made. The original is superseded (skipped) in
-              // message-converter; this deferred one takes its place.
-              toolCallId: toolCall.toolCallId,
-              result: parsedResult,
-              status: deferredStatus,
-              originalToolCallId: toolCall.toolCallId,
-              callbackMode: "wakeUp",
-              isDeferred: true,
-              // Do NOT propagate isConfirmed - this is an async background result,
-              // not a user-confirmation action. Prevents "Confirmed by you" badge.
-              isConfirmed: false,
-            };
 
             // If the thread's live stream is still running, signal it with the full
             // payload. The live stream inserts the deferred message itself in its
@@ -618,19 +612,23 @@ export class ResumeStreamRepository {
             // This guarantees linear chain: leaf → deferredA → aiResponse1 → deferredB → aiResponse2.
 
             if (!(await claimRevival(effectiveThreadId))) {
-              // Sibling claimed revival first. Back off until it finishes (isStreaming→false).
+              // Claim blocked: either a sibling revival is running, or the
+              // ORIGINAL stream is still live — possibly in ANOTHER process
+              // (test harness / multi-worker), where this process sees only the
+              // DB state. Back off until the thread becomes claimable.
               logger.debug(
                 "[ResumeStream] wakeUp - revival claimed by sibling, backing off until sibling finishes",
                 { threadId: effectiveThreadId, toolMessageId },
               );
 
-              // Poll until isStreaming=false (sibling finished) or timeout.
-              // Short timeout: revival should be fast. If sibling takes >5s, something is wrong.
+              // Poll until the thread is claimable or timeout. The window must
+              // cover a full in-flight AI turn (the blocker may be the original
+              // stream finishing its park), not just a fast sibling revival.
               const backoffStart = Date.now();
-              const backoffTimeoutMs = 5_000;
+              const backoffTimeoutMs = 180_000;
               while (Date.now() - backoffStart < backoffTimeoutMs) {
                 await new Promise<void>((resolve) => {
-                  setTimeout(resolve, 500);
+                  setTimeout(resolve, 1_000);
                 });
                 const [currentThread] = await db
                   .select({ streamingState: chatThreads.streamingState })
@@ -638,7 +636,13 @@ export class ResumeStreamRepository {
                   .where(eq(chatThreads.id, effectiveThreadId))
                   .limit(1);
                 const siblingState = currentThread?.streamingState;
-                if (siblingState === ThreadStreamingState.IDLE) {
+                // idle AND waiting are both claimable states (claimRevival
+                // accepts either) — 'waiting' is exactly the parked-wakeUp
+                // state the original stream leaves behind.
+                if (
+                  siblingState === ThreadStreamingState.IDLE ||
+                  siblingState === ThreadStreamingState.WAITING
+                ) {
                   break;
                 }
                 // If thread is aborting (user cancelled), bail out immediately.
@@ -663,79 +667,63 @@ export class ResumeStreamRepository {
               }
             }
 
-            // We have the revival claim. Walk to the current leaf.
-            const leafId = await walkToLeafMessage(
-              effectiveThreadId,
-              leafMessageId ?? resolvedToolMessageId,
-              resolvedToolMessageId,
-            );
+            // We have the revival claim.
+            // RE-CHECK idempotency AFTER the claim: the entry check ran before
+            // the backoff, and during the backoff the LIVE stream may have
+            // injected the deferred and acknowledged it in-stream (live
+            // injection). Without this re-check the dead path fires a full
+            // duplicate revival loop on an already-delivered result.
+            const [postClaimDeferred] = await db
+              .select({ id: chatMessages.id })
+              .from(chatMessages)
+              .where(
+                and(
+                  eq(chatMessages.threadId, effectiveThreadId),
+                  sql`(${chatMessages.metadata}->'toolCall'->>'originalToolCallId') = ${toolCall.toolCallId}`,
+                  sql`(${chatMessages.metadata}->'toolCall'->>'isDeferred')::boolean = true`,
+                ),
+              )
+              .limit(1);
+            if (postClaimDeferred) {
+              logger.debug(
+                "[ResumeStream] wakeUp - deferred appeared during claim backoff (live injection) — releasing claim, idempotent",
+                { threadId: effectiveThreadId, toolMessageId },
+              );
+              await resetStreamingToIdle(
+                effectiveThreadId,
+                ThreadStreamingState.STREAMING,
+              );
+              return success({ resumed: false, lastAiMessageId: null });
+            }
 
-            // wakeUp: original tool message is NEVER modified.
-            // Always insert a new deferred TOOL message as child of the current leaf.
-            // sameSequence (leaf IS the original tool msg) or diffSequence (leaf is newer) —
-            // both get a deferred child. The original stays as-is (status:pending) for UI.
-            await db.insert(chatMessages).values({
-              id: deferredId,
-              threadId: effectiveThreadId,
-              role: ChatMessageRole.TOOL,
-              content: null,
-              parentId: leafId,
-              authorId:
-                resolvedExisting?.authorId ?? existing?.authorId ?? null,
-              sequenceId: deferredSequenceId,
-              isAI: true,
-              model: resolvedModel,
-              skill: resolvedSkill,
-              metadata: { toolCall: deferredToolCall },
-            });
-
-            createMessagesEmitter(logger, user, {
-              rootFolderId: threadRootFolderId,
-            })("message-created", {
-              urlPathParams: { threadId: effectiveThreadId },
-              responseData: {
-                streamingState: ThreadStreamingState.STREAMING,
-                messages: [
-                  {
-                    id: deferredId,
-                    threadId: effectiveThreadId,
-                    role: ChatMessageRole.TOOL,
-                    parentId: leafId,
-                    content: null,
-                    model: resolvedModel,
-                    skill: resolvedSkill,
-                    sequenceId: deferredSequenceId,
-                    metadata: { toolCall: deferredToolCall },
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    isAI: true,
-                    authorId:
-                      resolvedExisting?.authorId ?? existing?.authorId ?? null,
-                    authorName: null,
-                    errorType: null,
-                    errorCode: null,
-                    errorMessage: null,
-                    upvotes: 0,
-                    downvotes: 0,
-                    searchVector: null,
-                  },
-                ],
-              },
-            });
-
-            createMessagesEmitter(logger, user, {
-              rootFolderId: threadRootFolderId,
-            })("tool-result", {
-              urlPathParams: { threadId: effectiveThreadId },
-              responseData: {
-                messages: [
-                  {
-                    id: deferredId,
-                    metadata: { toolCall: deferredToolCall },
-                  },
-                ],
-              },
-            });
+            // wakeUp: original tool message is NEVER modified. The inserter walks
+            // to the current leaf and inserts a new deferred TOOL message as its
+            // child - sameSequence (leaf IS the original tool msg) or diffSequence
+            // (leaf is newer), both get a deferred child. The original stays as-is
+            // (status:pending) for UI. message-created + tool-result WS events are
+            // emitted by the inserter.
+            const { deferredId, deferredSequenceId } =
+              await insertDeferredWakeUpMessage(
+                effectiveThreadId,
+                {
+                  toolMessageId: resolvedToolMessageId,
+                  authorId:
+                    resolvedExisting?.authorId ?? existing?.authorId ?? null,
+                  originalSequenceId:
+                    resolvedExisting?.sequenceId ??
+                    existing?.sequenceId ??
+                    null,
+                  originalToolCall: toolCall,
+                  wakeUpResult: parsedResult,
+                  wakeUpStatus,
+                  resolvedModel,
+                  resolvedSkill,
+                  leafMessageId: leafMessageId ?? undefined,
+                  favoriteId: favoriteId ?? undefined,
+                },
+                logger,
+                user,
+              );
 
             const revivalParentId = deferredId;
 
@@ -750,13 +738,11 @@ export class ResumeStreamRepository {
 
             // Fire wakeup-resume headless stream. Pass favoriteId so escalateToTask
             // works correctly if the AI calls it during revival.
-            void runHeadlessAiStream({
+            void fireWakeUpRevival({
               favoriteId: favoriteId ?? undefined,
               favoriteConfig: resolvedFavoriteConfig,
               model: resolvedModel,
               skill: resolvedSkill,
-              prompt: "",
-              wakeUpRevival: true,
               explicitParentMessageId: revivalParentId,
               sequenceIdOverride: deferredSequenceId,
               threadId: effectiveThreadId,
@@ -770,14 +756,14 @@ export class ResumeStreamRepository {
               abortSignal: revivalAbortSignal,
             })
               .then(async (result) => {
-                createMessagesEmitter(logger, user, {
+                emitStreamFinished({
                   threadId,
+                  state: ThreadStreamingState.IDLE,
+                  preview: null,
+                  updatedAt: new Date(),
                   rootFolderId: threadRootFolderId,
-                })("stream-finished", {
-                  responseData: {
-                    streamingState: ThreadStreamingState.IDLE,
-                  },
-                  urlPathParams: { threadId },
+                  logger,
+                  user,
                 });
                 logger.debug("[ResumeStream] wakeUp revival complete", {
                   threadId,
@@ -814,26 +800,10 @@ export class ResumeStreamRepository {
                 });
                 // Reset thread from streaming→idle so it doesn't get stuck
                 // (e.g. if runHeadlessAiStream throws before setting state back).
-                db.update(chatThreads)
-                  .set({
-                    streamingState: ThreadStreamingState.IDLE,
-                    updatedAt: new Date(),
-                  })
-                  .where(
-                    and(
-                      eq(chatThreads.id, effectiveThreadId),
-                      sql`${chatThreads.streamingState} = 'streaming'`,
-                    ),
-                  )
-                  .catch(() => undefined);
-                createMessagesEmitter(logger, user, {
-                  rootFolderId: threadRootFolderId,
-                })("streaming-state-changed", {
-                  responseData: {
-                    streamingState: ThreadStreamingState.IDLE,
-                  },
-                  urlPathParams: { threadId: effectiveThreadId },
-                });
+                resetStreamingToIdle(
+                  effectiveThreadId,
+                  ThreadStreamingState.STREAMING,
+                ).catch(() => undefined);
               });
 
             return success({ resumed: true, lastAiMessageId: null });
@@ -847,9 +817,9 @@ export class ResumeStreamRepository {
             // Stream still running - live loop will pick up the backfilled result.
             // Emit TOOL_RESULT WS so the UI bubble updates immediately.
             createMessagesEmitter(logger, user, {
+              threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,
             })("tool-result", {
-              urlPathParams: { threadId: effectiveThreadId },
               responseData: {
                 messages: [
                   {
@@ -902,9 +872,9 @@ export class ResumeStreamRepository {
           if (isWaitMode) {
             // Emit tool-result WS so the UI bubble shows the real result.
             createMessagesEmitter(logger, user, {
+              threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,
             })("tool-result", {
-              urlPathParams: { threadId: effectiveThreadId },
               responseData: {
                 messages: [
                   {
@@ -979,13 +949,11 @@ export class ResumeStreamRepository {
 
             let revivalResult;
             try {
-              revivalResult = await runHeadlessAiStream({
+              revivalResult = await fireWakeUpRevival({
                 favoriteId: favoriteId ?? undefined,
                 favoriteConfig: resolvedFavoriteConfig,
                 model: resolvedModel,
                 skill: resolvedSkill,
-                prompt: "",
-                wakeUpRevival: true,
                 explicitParentMessageId: waitRevivalParentId,
                 sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
                 threadId: effectiveThreadId,
@@ -997,34 +965,16 @@ export class ResumeStreamRepository {
                 logger,
                 t,
                 abortSignal: revivalAbortSignal,
-                headlessInstructions:
-                  "The async remote task has completed. All tool results from the previous step are now available in the context above. Your ONLY task is to acknowledge the completion to the user. Do NOT call any tools. Do NOT re-execute any previous tool calls. Simply confirm the result in one or two sentences and stop.",
               });
             } catch (err) {
               logger.error("[ResumeStream] WAIT headless revival threw", {
                 threadId,
                 error: parseError(err).message,
               });
-              db.update(chatThreads)
-                .set({
-                  streamingState: ThreadStreamingState.IDLE,
-                  updatedAt: new Date(),
-                })
-                .where(
-                  and(
-                    eq(chatThreads.id, effectiveThreadId),
-                    sql`${chatThreads.streamingState} = 'streaming'`,
-                  ),
-                )
-                .catch(() => undefined);
-              createMessagesEmitter(logger, user, {
-                rootFolderId: threadRootFolderId,
-              })("streaming-state-changed", {
-                responseData: {
-                  streamingState: ThreadStreamingState.IDLE,
-                },
-                urlPathParams: { threadId: effectiveThreadId },
-              });
+              resetStreamingToIdle(
+                effectiveThreadId,
+                ThreadStreamingState.STREAMING,
+              ).catch(() => undefined);
               return success({ resumed: true, lastAiMessageId: null });
             }
 
@@ -1040,35 +990,31 @@ export class ResumeStreamRepository {
             // so it doesn't stay stuck. runHeadlessAiStream handles the state internally
             // on success; only failures need explicit reset here.
             if (!revivalResult.success) {
-              db.update(chatThreads)
-                .set({
-                  streamingState: ThreadStreamingState.IDLE,
-                  updatedAt: new Date(),
-                })
-                .where(
-                  and(
-                    eq(chatThreads.id, effectiveThreadId),
-                    sql`${chatThreads.streamingState} = 'streaming'`,
-                  ),
-                )
-                .catch(() => undefined);
-              createMessagesEmitter(logger, user, {
-                rootFolderId: threadRootFolderId,
-              })("streaming-state-changed", {
-                responseData: {
-                  streamingState: ThreadStreamingState.IDLE,
-                },
-                urlPathParams: { threadId: effectiveThreadId },
-              });
+              resetStreamingToIdle(
+                effectiveThreadId,
+                ThreadStreamingState.STREAMING,
+              ).catch(() => undefined);
             } else {
-              createMessagesEmitter(logger, user, {
+              // Authoritatively reconcile the thread's streaming state. On success
+              // the inner headless revival normally clears the state, but in the
+              // relay/direct path its finalizer can run while transient pending
+              // work is still visible and settle on 'waiting', leaving the thread
+              // stuck (direct full T5b: detach goroutine + revival race on the
+              // streaming state). clearStreamingState re-evaluates RUNNING tasks +
+              // resume-stream rows + pending calls and returns idle when there is
+              // no real pending work — the same authoritative gate every other
+              // finalizer uses, so it is safe and idempotent here.
+              await clearStreamingState(effectiveThreadId, logger, user).catch(
+                () => undefined,
+              );
+              emitStreamFinished({
                 threadId,
+                state: ThreadStreamingState.IDLE,
+                preview: null,
+                updatedAt: new Date(),
                 rootFolderId: threadRootFolderId,
-              })("stream-finished", {
-                responseData: {
-                  streamingState: ThreadStreamingState.IDLE,
-                },
-                urlPathParams: { threadId },
+                logger,
+                user,
               });
               // Clean up any error messages that are children of the tool message.
               db.delete(chatMessages)
@@ -1141,27 +1087,7 @@ export class ResumeStreamRepository {
       // doesn't stay stuck in a non-interactive state indefinitely.
       if (streamingState === ThreadStreamingState.WAITING) {
         try {
-          await db
-            .update(chatThreads)
-            .set({
-              streamingState: ThreadStreamingState.IDLE,
-              updatedAt: new Date(),
-            })
-            .where(
-              and(
-                eq(chatThreads.id, threadId),
-                sql`${chatThreads.streamingState} = 'waiting'`,
-              ),
-            );
-          createMessagesEmitter(logger, user, {
-            threadId,
-            rootFolderId: threadRootFolderId,
-          })("streaming-state-changed", {
-            responseData: {
-              streamingState: ThreadStreamingState.IDLE,
-            },
-            urlPathParams: { threadId },
-          });
+          await resetStreamingToIdle(threadId, ThreadStreamingState.WAITING);
           logger.debug(
             "[ResumeStream] Cleared thread from waiting to idle (no-op path)",
             { threadId },

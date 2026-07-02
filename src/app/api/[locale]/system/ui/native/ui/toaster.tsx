@@ -2,10 +2,10 @@
  * Toaster Component for React Native
  * Renders toast notifications from useToast hook
  */
-import { useToast } from "next-vibe/ui/native/hooks/use-toast";
 import React from "react";
 import { View } from "react-native";
 
+import { useToast } from "../../native/hooks/use-toast";
 import {
   Toast,
   ToastClose,

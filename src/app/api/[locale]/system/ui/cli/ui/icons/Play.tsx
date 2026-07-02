@@ -1,6 +1,7 @@
 import { Text } from "ink";
-import type { IconComponent } from "next-vibe/ui/web/lib/helper";
 import type { JSX } from "react";
+
+import type { IconComponent } from "../../../web/lib/helper";
 
 const symbol = "▶"; // eslint-disable-line i18next/no-literal-string
 export const Play: IconComponent = (): JSX.Element => <Text>{symbol}</Text>;

@@ -30,7 +30,9 @@ import {
 } from "./enum";
 
 const ErrorLogsContainer = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.ErrorLogsContainer })),
+  import("./widget").then((m) => ({
+    default: m.ErrorLogsContainer,
+  })),
 );
 
 export const { GET } = createEndpoint({

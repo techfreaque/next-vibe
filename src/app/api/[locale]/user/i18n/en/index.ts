@@ -38,9 +38,6 @@ export const translations = {
       errorValidatingUserSession: "Error validating user session",
       errorGettingUserRoles: "Error getting user roles",
       errorCheckingUserAuth: "Error checking user authentication",
-      gettingCurrentUserFromTrpc: "Getting current user from tRPC",
-      errorGettingAuthUserForTrpc: "Error getting auth user for tRPC",
-      errorGettingUserRolesForTrpc: "Error getting user roles for tRPC",
       authenticatingCliUserWithPayload: "Authenticating CLI user with payload",
       errorAuthenticatingCliUserWithPayload:
         "Error authenticating CLI user with payload",
@@ -61,7 +58,6 @@ export const translations = {
       noTokenFound: "No token found",
       errorExtractingToken: "Error extracting token",
       errorParsingCookies: "Error parsing cookies",
-      errorGettingCurrentUserFromTrpc: "Error getting current user from tRPC",
     },
     errors: {
       token_generation_failed: "Failed to generate authentication token",

@@ -1,19 +1,20 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   TabsContentProps,
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "next-vibe/ui/web/ui/tabs";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/tabs";
 
 export type {
   TabsContentProps,
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "next-vibe/ui/web/ui/tabs";
+} from "../../web/ui/tabs";
 
 export function Tabs({ children }: TabsProps): JSX.Element {
   return <Box flexDirection="column">{children}</Box>;

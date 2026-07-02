@@ -6,8 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { TanstackPage as RootLayout } from "@/app/[locale]/layout";
-
-import globalsUrl from "../../app/api/[locale]/system/ui/globals.css?url";
+import globalsUrl from "@/app/api/[locale]/system/ui/globals.css?url";
 
 const loadLayout = createServerFn({ method: "GET" })
   .inputValidator((data: { locale: string }) => data)

@@ -69,15 +69,14 @@ import {
 } from "../../testing/headless-test-runner";
 import {
   connectToHermes,
-  disconnectFromHermes,
   failSuitePrerequisites,
   HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   LOCAL_DEV_URL,
   resolveDevUser,
   resolveRemoteUrlSync,
-  unregisterDevFromHermes,
 } from "../../testing/remote-setup";
+import { makeDirectSetup, makeReverseWsSetup } from "./helpers/remote";
 import { describeStreamSuite } from "./route-base.test";
 
 // eslint-disable-next-line i18next/no-literal-string
@@ -89,18 +88,11 @@ const HERMES_PORT = 3002;
 
 // ── Suite A: WS-Provider ──────────────────────────────────────────────────────
 
-let _wpProdUserId: string | null = null;
-
-async function setupWsProvider(testUser: JwtPrivatePayloadType): Promise<void> {
-  const {
-    ensureRemoteUserCredits: _ensureCredits,
-    resolveProdAdminToken: _resolveToken,
-    resolveProdUserId: _resolveId,
-  } = await import("../../testing/remote-setup");
-
-  await disconnectFromHermes(testUser.id);
-  await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
-
+// Shared direct-http connect/credit/teardown block; the ws-provider flags are
+// PATCHed right after the connection is established.
+const wsProviderFlagsPatch = async (
+  testUser: JwtPrivatePayloadType,
+): Promise<void> => {
   const connByIdDef =
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
   await sendTestRequest({
@@ -109,29 +101,17 @@ async function setupWsProvider(testUser: JwtPrivatePayloadType): Promise<void> {
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
     user: testUser,
   });
+};
 
-  _wpProdUserId = await _resolveId();
-  const remoteAdminToken = await _resolveToken(
-    _remoteUrl ?? "http://localhost:3002",
-  );
-  await _ensureCredits(
-    _remoteUrl ?? "http://localhost:3002",
-    remoteAdminToken,
-    _wpProdUserId,
-    20000,
-  );
-}
+const wsProviderHooks = makeDirectSetup(_remoteUrl, {
+  afterConnect: wsProviderFlagsPatch,
+});
 
-async function teardownWsProvider(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
-  if (_wpProdUserId) {
-    tasks.push(unregisterDevFromHermes(_wpProdUserId));
-  }
-  await Promise.all(tasks);
-  _wpProdUserId = null;
-}
+// Same ws-provider flags over the REVERSE-WS leg: the relay must ride the
+// standing connector socket, and T-RELAY asserts the ATTESTED transport.
+const wsProviderReverseWsHooks = makeReverseWsSetup(_remoteUrl, {
+  afterConnect: wsProviderFlagsPatch,
+});
 
 // ── Suite B: UNBOTTLED Remote Mode ────────────────────────────────────────────
 
@@ -354,11 +334,28 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
 if (_remoteUrl && _isFixtureMode) {
   // A: WS-Provider — hermes runs AI loop; tools execute locally via tool-execute-request roundtrip
   describeStreamSuite({
-    label: `AI Stream — WS-Provider (${_remoteUrl}, transportMode='ws-provider')`,
+    label: `AI Stream — WS-Provider direct-HTTP (${_remoteUrl})`,
     cachePrefix: "ws-provider-",
     assertSystemPromptFromLocal: true,
-    setup: setupWsProvider,
-    teardown: teardownWsProvider,
+    // Both-sides billing: the provider (hermes) bills its own markup for the
+    // relayed loop — T-RELAY asserts the remote wallet decreased — while the
+    // local side still bills the user, so the local deduction asserts run too.
+    assertRelayRan: true,
+    expectRelayTransport: "direct-http",
+    setup: wsProviderHooks.setup,
+    teardown: wsProviderHooks.teardown,
+  });
+
+  // A-RWS: same ws-provider semantics over the REVERSE-WS leg. The relay must
+  // ride the standing connector socket; T-RELAY asserts the ATTESTED transport.
+  describeStreamSuite({
+    label: `AI Stream — WS-Provider reverse-WS (${_remoteUrl})`,
+    cachePrefix: "ws-provider-rws-",
+    assertSystemPromptFromLocal: true,
+    assertRelayRan: true,
+    expectRelayTransport: "reverse-ws",
+    setup: wsProviderReverseWsHooks.setup,
+    teardown: wsProviderReverseWsHooks.teardown,
   });
 
   // A: WP3–WP6 — provider stateless + tool roundtrip + AI loop assertions
@@ -381,7 +378,7 @@ if (_remoteUrl && _isFixtureMode) {
       }
       testUser = resolved;
 
-      await setupWsProvider(testUser);
+      await wsProviderHooks.setup(testUser);
 
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -422,7 +419,7 @@ if (_remoteUrl && _isFixtureMode) {
     afterAll(async () => {
       const { closeProdDb } = await import("../../testing/remote-setup");
       if (testUser) {
-        await teardownWsProvider(testUser);
+        await wsProviderHooks.teardown(testUser);
       }
       await closeProdDb();
     });
@@ -490,8 +487,11 @@ if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream — UNBOTTLED Remote Mode (${_remoteUrl}, AI on hermes)`,
     cachePrefix: "unbottled-",
-    systemPromptInstanceId: HERMES_INSTANCE_ID,
+    // Tools and system prompt ALWAYS come from the client (options on the
+    // ai-stream) — the provider runs the loop but must identify the CALLER.
+    assertSystemPromptFromLocal: true,
     assertRelayRan: true,
+    expectRelayTransport: "direct-http",
     setup: setupUnbottled,
     teardown: teardownUnbottled,
   });

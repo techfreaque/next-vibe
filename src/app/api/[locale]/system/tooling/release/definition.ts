@@ -27,10 +27,6 @@ import {
   customWidgetObject,
   objectField,
   objectOptionalField,
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
-import {
   requestDataArrayOptionalField,
   requestField,
   responseArrayOptionalField,
@@ -2458,41 +2454,11 @@ export type PackageManager = z.infer<typeof PackageManagerSchema>;
 /** Version increment types - derived from schema */
 export type VersionIncrement = z.infer<typeof VersionIncrementSchema>;
 
-/** CI provider types - derived from schema */
-export type CIProvider = z.infer<typeof CIProviderSchema>;
-
-/** Package status types - derived from schema */
-export type PackageStatus = z.infer<typeof PackageStatusSchema>;
-
-/** Webhook type - derived from schema */
-export type WebhookType = z.infer<typeof WebhookTypeSchema>;
-
-/** Changelog preset - derived from schema */
-export type ChangelogPreset = z.infer<typeof ChangelogPresetSchema>;
-
-/** NPM access level - derived from schema */
-export type NpmAccess = z.infer<typeof NpmAccessSchema>;
-
 /** CI environment - derived from response schema */
 export type CIEnvironment = NonNullable<ReleaseResponseType["ciEnvironment"]>;
 
 // Infer config types from request type
 export type ReleaseConfig = NonNullable<RequestType["configObject"]>;
-
-/** File-based config (without runtime-only options like ci, dryRun, skipXxx, etc.) */
-export type ReleaseFileConfig = Partial<
-  Pick<
-    ReleaseConfig,
-    | "packageManager"
-    | "globalVersion"
-    | "branch"
-    | "continueOnError"
-    | "packages"
-    | "notifications"
-    | "hooks"
-  >
-> &
-  Required<Pick<ReleaseConfig, "packages">>;
 
 /** Package configuration */
 export type ReleasePackage = NonNullable<ReleaseConfig["packages"]>[number];
@@ -2503,45 +2469,13 @@ export type ReleaseOptions = NonNullable<ReleasePackage["release"]>;
 /** Git operations configuration */
 export type GitOpsConfig = NonNullable<ReleaseOptions["git"]>;
 
-/** NPM publish configuration */
-export type NpmPublishConfig = NonNullable<ReleaseOptions["npm"]>;
-
-/** JSR publish configuration */
-export type JsrPublishConfig = NonNullable<ReleaseOptions["jsr"]>;
-
-/** Changelog configuration */
-export type ChangelogConfig = NonNullable<ReleaseOptions["changelog"]>;
-
-/** Git release configuration */
-export type GitReleaseConfig = NonNullable<ReleaseOptions["gitRelease"]>;
-
-/** Branch configuration */
-export type BranchConfig = NonNullable<ReleaseConfig["branch"]>;
-
 /** Notification configuration */
 export type NotificationConfig = NonNullable<ReleaseConfig["notifications"]>;
-
-/** Retry configuration */
-export type RetryConfig = NonNullable<ReleaseConfig["retry"]>;
-
-/** Rollback configuration */
-export type RollbackConfig = NonNullable<ReleaseConfig["rollback"]>;
 
 /** Hook configuration - derived from hooks schema */
 export type ReleaseHook = NonNullable<
   NonNullable<ReleaseConfig["hooks"]>["preRelease"]
 >;
-
-/** Folders to zip configuration - derived from package release schema */
-export type FoldersToZip = NonNullable<ReleaseOptions["foldersToZip"]>;
-
-/** Version bumper configuration - derived from package release schema */
-export type VersionBumper = NonNullable<ReleaseOptions["versionBumper"]>;
-
-/** Git release assets configuration */
-export type GitReleaseAsset = NonNullable<
-  NonNullable<ReleaseOptions["gitRelease"]>["assets"]
->[number];
 
 // ============================================================================
 // Response-Derived Types
@@ -2587,14 +2521,8 @@ export type ParsedVersion = NonNullable<InternalTypes["parsedVersion"]>;
 /** Repository hosting information - derived from _internal.repoInfo */
 export type RepoInfo = NonNullable<InternalTypes["repoInfo"]>;
 
-/** Git commit information - derived from _internal.commitInfo */
-export type CommitInfo = NonNullable<InternalTypes["commitInfo"]>;
-
 /** Hook execution context - derived from _internal.hookContext */
 export type HookContext = NonNullable<InternalTypes["hookContext"]>;
-
-/** Hook execution result - derived from _internal.hookResult */
-export type HookResult = NonNullable<InternalTypes["hookResult"]>;
 
 /** Security scan results - derived from _internal.securityScanResult */
 export type SecurityScanResult = NonNullable<
@@ -2603,6 +2531,3 @@ export type SecurityScanResult = NonNullable<
 
 /** Notification data for webhooks - derived from _internal.notificationData */
 export type NotificationData = NonNullable<InternalTypes["notificationData"]>;
-
-/** Notification timings - derived from _internal.notificationData.timings */
-export type NotificationTimings = NonNullable<NotificationData["timings"]>;

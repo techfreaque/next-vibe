@@ -2,10 +2,11 @@
 // no copy buttons, no modals. Strip formatting and pass content through.
 
 import { Text } from "ink";
-import type { MarkdownProps } from "next-vibe/ui/web/ui/markdown";
 import type { JSX } from "react";
 
-export type { MarkdownProps } from "next-vibe/ui/web/ui/markdown";
+import type { MarkdownProps } from "../../web/ui/markdown";
+
+export type { MarkdownProps } from "../../web/ui/markdown";
 
 function stripMarkdown(content: string): string {
   return (

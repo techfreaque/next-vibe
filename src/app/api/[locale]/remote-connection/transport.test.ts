@@ -118,7 +118,7 @@ describe("resolveTarget routing priority", () => {
 describe("ToolSourceSchema", () => {
   it("accepts valid values", async () => {
     const { ToolSourceSchema } = await import(
-      "@/app/api/[locale]/remote-connection/db"
+      "./db"
     );
     expect(ToolSourceSchema.parse("local")).toBe("local");
     expect(ToolSourceSchema.parse("remote")).toBe("remote");
@@ -127,7 +127,7 @@ describe("ToolSourceSchema", () => {
 
   it("rejects unknown values", async () => {
     const { ToolSourceSchema } = await import(
-      "@/app/api/[locale]/remote-connection/db"
+      "./db"
     );
     expect(() => ToolSourceSchema.parse("cloud")).toThrow();
   });

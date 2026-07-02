@@ -212,26 +212,3 @@ export async function deleteSessionFile(
     });
   }
 }
-
-/**
- * Check if session file exists
- */
-export async function sessionFileExists(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  logger: EndpointLogger,
-): Promise<boolean> {
-  try {
-    const sessionPath = getSessionFilePath();
-    await fs.access(sessionPath);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Get session file path for display purposes
- */
-export function getSessionFilePathForDisplay(): string {
-  return getSessionFilePath();
-}

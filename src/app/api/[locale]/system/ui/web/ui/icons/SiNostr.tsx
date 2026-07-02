@@ -1,5 +1,6 @@
-import { type IconComponent } from "next-vibe/ui/web/lib/helper";
 import type { JSX } from "react";
+
+import { type IconComponent } from "../../../web/lib/helper";
 
 export const SiNostr: IconComponent = ({
   className,

@@ -32,6 +32,21 @@ export const translations = {
           description:
             '"wait": execute synchronously, return result inline (default). "detach": fire-and-forget, returns {taskId} immediately - use await-task later if needed. "wakeUp": fire-and-forget, result is automatically injected into the thread when ready - do NOT call await-task. "endLoop": execute normally and return the result, but stop the tool loop after this batch - no further tool calls this turn (parallel sibling calls in the same batch still run). "approve": require user confirmation before executing.',
         },
+        callerSkillId: {
+          label: "Caller Skill ID",
+          description:
+            "Wire-internal: the dispatching instance's active skill ID — the executing instance resolves field defaults (e.g. media models) against it. Set automatically on cross-instance calls.",
+        },
+        callerFavoriteId: {
+          label: "Caller Favorite ID",
+          description:
+            "Wire-internal: the dispatching instance's active favorite ID — the executing instance resolves field defaults (e.g. media models) against it. Set automatically on cross-instance calls.",
+        },
+        callerPlatform: {
+          label: "Caller Platform",
+          description:
+            "Wire-internal: the dispatching side's execution platform — the executing instance renders platform-shaped results (e.g. AI vs CLI help output) accordingly. Set automatically on cross-instance calls.",
+        },
       },
       response: {
         result:
@@ -54,6 +69,10 @@ export const translations = {
         notFound: {
           title: "Tool Not Found",
           description: "No registered tool matches the given toolName",
+        },
+        remoteFailed: {
+          title: "Remote tool failed: {{message}}",
+          description: "The remote instance rejected or failed the call",
         },
         server: {
           title: "Execution Error",

@@ -10,13 +10,11 @@ import type { TextareaRefObject } from "next-vibe/ui/web/ui/textarea";
 import { createRef, type RefObject } from "react";
 import { create } from "zustand";
 
-// eslint-disable-next-line no-restricted-imports -- Enum objects needed for keyof typeof derivation
 import {
   ImageQuality,
   ImageSize,
-} from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-// eslint-disable-next-line no-restricted-imports -- Enum objects needed for keyof typeof derivation
-import { MusicDuration } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
+} from "@/app/api/[locale]/agent/image-generation/enum";
+import { MusicDuration } from "@/app/api/[locale]/agent/music-generation/enum";
 
 export { ImageQuality, ImageSize, MusicDuration };
 

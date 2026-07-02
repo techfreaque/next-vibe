@@ -10,11 +10,29 @@ import threadsDefinitions, {
   type ThreadsPostWsEmit,
 } from "./definition";
 
+/**
+ * The threads list channel key. Threads GET marks rootFolderId + subFolderId as
+ * includeInCacheKey, so the client subscribes per folder view — the emitter MUST
+ * carry the same values, or it emits to a different channel than the one watched.
+ */
+export interface ThreadsChannelRouting {
+  rootFolderId: DefaultFolderId;
+  subFolderId: string | null;
+}
+
+// Threads list is `scope:"user"` (channel = owner's `user/{id}`) keyed by the
+// folder view's rootFolderId + subFolderId.
 export function createThreadsGetEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
+  routing: ThreadsChannelRouting,
 ): ThreadsGetWsEmit {
-  return createEndpointEmitter(threadsDefinitions.GET, logger, user);
+  return createEndpointEmitter(threadsDefinitions.GET, logger, user, {
+    requestData: {
+      rootFolderId: routing.rootFolderId,
+      subFolderId: routing.subFolderId,
+    },
+  });
 }
 
 export function createThreadsPostEmitter(

@@ -1,7 +1,8 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
-import type { IframeProps } from "next-vibe/ui/web/ui/iframe";
 import * as React from "react";
 import { Text, View } from "react-native";
+
+import type { IframeProps } from "../../web/ui/iframe";
 
 /**
  * Platform-agnostic Iframe component for native

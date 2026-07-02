@@ -1709,7 +1709,6 @@ export const translations: typeof enTranslations = {
         3: "Zrób krótki film z kotem",
       },
       variants: {
-        kimi: "Kimi",
         budget: "Budżetowy",
         visual: "Wizualny",
       },

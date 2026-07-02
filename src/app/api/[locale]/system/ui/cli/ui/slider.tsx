@@ -1,18 +1,19 @@
 import { Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   SliderRangeProps,
   SliderRootProps,
   SliderThumbProps,
   SliderTrackProps,
-} from "next-vibe/ui/web/ui/slider";
-import type { JSX } from "react";
+} from "../../web/ui/slider";
 
 export type {
   SliderRangeProps,
   SliderRootProps,
   SliderThumbProps,
   SliderTrackProps,
-} from "next-vibe/ui/web/ui/slider";
+} from "../../web/ui/slider";
 
 // CLI: show value range as "min..max" - no drag UI in terminal
 export function Slider({ value, min, max }: SliderRootProps): JSX.Element {

@@ -176,13 +176,12 @@ export class FolderRepository {
       logger.info("Folder updated", { folderId: data.id });
 
       // Emit WS event so all open tabs update the folder in the sidebar immediately
-      const emitFolderContents = createEndpointEmitter(
-        folderContentsDefinitions.GET,
+      const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,
+        updated.rootFolderId,
       );
       emitFolderContents("folder-updated", {
-        urlPathParams: { rootFolderId: updated.rootFolderId },
         responseData: {
           items: [
             {
@@ -264,13 +263,12 @@ export class FolderRepository {
       logger.info("Folder deleted", { folderId: data.id });
 
       // Emit WS event so all open tabs remove the folder from the sidebar immediately
-      const emitFolderContents = createEndpointEmitter(
-        folderContentsDefinitions.GET,
+      const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,
+        folder.rootFolderId,
       );
       emitFolderContents("folder-deleted", {
-        urlPathParams: { rootFolderId: folder.rootFolderId },
         responseData: { items: [{ id: folder.id }] },
       });
 

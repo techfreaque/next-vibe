@@ -7,13 +7,11 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { notFound } from "next-vibe/ui/web/lib/not-found";
 import type { JSX } from "react";
 
-import unsubscribeDefinitions from "@/app/api/[locale]/newsletter/unsubscribe/definition";
-
 import { scopedTranslation } from "../../i18n";
+import { UnsubscribePageClient } from "../page-client";
 
 interface PageProps {
   params: Promise<{
@@ -93,10 +91,10 @@ export function TanstackPage({
   authUser,
 }: NewsletterUnsubscribeWithEmailPageData): JSX.Element {
   return (
-    <UnsubscribePage
+    <UnsubscribePageClient
       locale={locale}
-      prefilledEmail={decodedEmail}
       user={authUser}
+      prefilledEmail={decodedEmail}
     />
   );
 }

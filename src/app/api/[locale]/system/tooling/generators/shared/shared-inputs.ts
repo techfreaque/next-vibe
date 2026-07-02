@@ -28,13 +28,13 @@ import { findFilesRecursively } from "next-vibe/tooling/generators/shared/utils"
  * the method sub-objects / aliases / scopedTranslation / fields they need. Null when
  * the import failed (logged, skipped downstream).
  */
-export type DefinitionDefault = ApiSection | null;
+type DefinitionDefault = ApiSection | null;
 
 /** Parsed model definitions, shared by the ai-stream enum generators. */
-export type ModelDefinitions = WidgetData;
+type ModelDefinitions = WidgetData;
 
 /** File lists, scanned once. Empty arrays when a category has no files. */
-export interface GeneratorFileLists {
+interface GeneratorFileLists {
   definition: string[];
   route: string[];
   routeClient: string[];
@@ -49,7 +49,7 @@ export interface GeneratorFileLists {
 }
 
 /** Computed-once artifacts. The heart of the shared-computation contract. */
-export interface GeneratorComputed {
+interface GeneratorComputed {
   /** Each definition.ts imported once: absolute POSIX path → parsed `.default`. */
   definitionModules: Map<string, DefinitionDefault>;
   /** Parsed model definitions (vision + media-gen enum generators). */
@@ -163,9 +163,7 @@ function scanFileLists(
         ],
     promptFragment: live?.promptFragmentFiles
       ? [...live.promptFragmentFiles]
-      : findFilesRecursively(apiDir, "prompt.ts").filter((f) =>
-          f.includes("/system-prompt/"),
-        ),
+      : findFilesRecursively(apiDir, "system-prompt.ts"),
     category: fromLive(live?.categoryFiles, apiDir, "category.ts"),
     graphSeed: fromLive(live?.graphSeedFiles, apiRoot, "graph-seeds.ts"),
   };
@@ -175,7 +173,7 @@ function scanFileLists(
 // Context builder — called ONCE by the orchestrator
 // ---------------------------------------------------------------------------
 
-export interface BuildContextOptions {
+interface BuildContextOptions {
   logger: EndpointLogger;
   force: boolean;
   /** Warm index from the dev watcher; disk scan when absent. */

@@ -1,22 +1,23 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
+import React from "react";
+import type { ScrollView as RNScrollView } from "react-native";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
-} from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+} from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
 import type {
   CarouselApi,
   CarouselButtonProps,
   CarouselContentProps,
   CarouselItemProps,
   CarouselProps,
-} from "next-vibe/ui/web/ui/carousel";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import React from "react";
-import type { ScrollView as RNScrollView } from "react-native";
-import { Pressable, ScrollView, Text as RNText, View } from "react-native";
+} from "../../web/ui/carousel";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(
   ScrollView,

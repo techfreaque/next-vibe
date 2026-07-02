@@ -21,7 +21,7 @@ import {
 import { pipelineDatapoints } from "../db";
 import { runGraph } from "./runner";
 
-export interface BacktestResult {
+interface BacktestResult {
   runId: string;
   eligible: boolean;
   ineligibleNodeIds: string[];

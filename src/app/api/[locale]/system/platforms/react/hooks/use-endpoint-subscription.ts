@@ -25,11 +25,6 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import {
-  appendDeltaToCache,
-  applyPartialToCache,
-  removeFromCache,
-} from "next-vibe/realtime/cache-merger";
 import { buildUserChannel, buildWsChannel } from "next-vibe/realtime/channel";
 import { subscribeToChannel } from "next-vibe/realtime/client";
 import type { AnyEndpointEventEnvelope } from "next-vibe/realtime/structured-events";
@@ -37,6 +32,11 @@ import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events"
 import type { WsChannelDescriptor } from "next-vibe/realtime/types";
 import { useEffect, useRef } from "react";
 
+import {
+  appendDeltaToCache,
+  applyPartialToCache,
+  removeFromCache,
+} from "./cache-merger";
 import { toCacheKeyParams } from "./query-key-builder";
 import { queryClient } from "./store";
 

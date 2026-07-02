@@ -1,9 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 // Cross-platform type exports
 export interface DrawerRootProps {

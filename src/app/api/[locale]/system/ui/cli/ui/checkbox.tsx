@@ -1,12 +1,13 @@
 import { Text } from "ink";
-import type { CheckboxRootProps } from "next-vibe/ui/web/ui/checkbox";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
+
+import type { CheckboxRootProps } from "../../web/ui/checkbox";
 
 export type {
   CheckboxIndicatorProps,
   CheckboxRootProps,
-} from "next-vibe/ui/web/ui/checkbox";
+} from "../../web/ui/checkbox";
 
 const CHECKED_CLI = "\u2713";
 const UNCHECKED_CLI = "\u25A1";

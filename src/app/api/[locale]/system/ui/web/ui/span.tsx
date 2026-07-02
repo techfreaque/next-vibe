@@ -1,8 +1,9 @@
 "use client";
 
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import * as React from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export interface SpanGenericTarget {
   addEventListener: (
@@ -51,7 +52,7 @@ export interface SpanMouseEvent {
   type: string;
 }
 
-export interface SpanDragEvent {
+interface SpanDragEvent {
   currentTarget: SpanGenericTarget;
   target: SpanGenericTarget;
   preventDefault: () => void;
@@ -74,7 +75,7 @@ export interface SpanDragEvent {
   type: string;
 }
 
-export interface SpanKeyboardEvent {
+interface SpanKeyboardEvent {
   currentTarget: SpanGenericTarget;
   target: SpanGenericTarget;
   key: string;

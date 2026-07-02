@@ -20,7 +20,7 @@ import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
 import { START_ALIASES } from "next-vibe/server/server/start/constants";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */
-export type CliPlatform = typeof Platform.CLI | typeof Platform.CLI_PACKAGE;
+type CliPlatform = typeof Platform.CLI | typeof Platform.CLI_PACKAGE;
 
 /** Result of environment loading */
 export interface EnvironmentResult {
@@ -466,14 +466,6 @@ export function loadEnvironment(): EnvironmentResult {
     isPackage,
   };
 
-  return cachedEnvironmentResult;
-}
-
-/**
- * Get the cached environment result
- * Must be called after loadEnvironment()
- */
-export function getEnvironmentResult(): EnvironmentResult | null {
   return cachedEnvironmentResult;
 }
 

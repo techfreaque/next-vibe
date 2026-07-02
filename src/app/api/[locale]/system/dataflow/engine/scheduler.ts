@@ -22,7 +22,7 @@ import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";
 import { runGraph } from "./runner";
 
-export interface SchedulerResult {
+interface SchedulerResult {
   graphsChecked: number;
   graphsExecuted: number;
   errors: Array<{ graphId: string; slug: string; error: string }>;

@@ -49,7 +49,6 @@ import {
   PulseHealthStatus,
 } from "../enum";
 import { getPriorityWeight } from "../enum";
-import { resolveTaskDisplayName } from "../i18n-utils";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -57,6 +56,7 @@ import type {
   PulseHealth,
 } from "./db";
 import { pulseExecutions, pulseHealth } from "./db";
+import { resolveTaskDisplayName } from "./i18n-utils";
 
 /**
  * Implementation of Pulse Health Repository

@@ -52,7 +52,7 @@ import { dispatchRemoteEvent } from "./registry";
  * (responseData, requestData, urlPathParams, payload) plus routing metadata
  * (endpointPath, endpointMethod, eventName). No duplication at the wire level.
  */
-export interface RemoteEventPayload {
+interface RemoteEventPayload {
   originInstanceId?: string;
   syncDomain?: string;
   envelope?: AnyEndpointEventEnvelope;
@@ -192,6 +192,9 @@ export class RemoteEventBridgeRepository {
       // direct-http leg, and POSTs to the peer's bridge. The peer dispatches it
       // to the target route's onRemoteEvent. DETACH = fire-and-forget: pure
       // transport; the relayed event handles its own result on the peer.
+      // Single-shot by design: delivery either works or it doesn't — a failure
+      // is logged, never retried (the appliers are idempotent upserts, so the
+      // mirror converges from the remaining events / the local reconcile).
       const { RouteExecuteRepository } =
         await import("next-vibe/execute-tool/repository");
       const { CallbackMode } = await import("next-vibe/execute-tool/constants");
@@ -214,8 +217,9 @@ export class RemoteEventBridgeRepository {
           payload: wire,
         },
       }).catch((err) => {
-        logger.warn("[RemoteEventBridge] pushRemoteEvent dispatch failed", {
+        logger.error("[RemoteEventBridge] pushRemoteEvent dispatch failed", {
           instanceId: conn.instanceId,
+          eventName: envelope.eventName,
           error: err instanceof Error ? err.message : String(err),
         });
       });

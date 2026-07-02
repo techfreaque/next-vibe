@@ -3,8 +3,10 @@
  * Production-ready endpoints for user profile management
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { iconSchema } from "next-vibe/core/definition/common.schema";
+import {
+  dateSchema,
+  iconSchema,
+} from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -14,9 +16,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { leadId } from "next-vibe/identity/lead/types";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
-import { userRoleResponseSchema } from "next-vibe/identity/roles/types";
 import {
   customWidgetObject,
   objectField,

@@ -24,7 +24,7 @@ interface ValidationResult {
 // Interface
 // ============================================================================
 
-export interface IConfigValidator {
+interface IConfigValidator {
   /**
    * Validate build configuration and return detailed errors/warnings
    */
@@ -35,7 +35,7 @@ export interface IConfigValidator {
 // Implementation
 // ============================================================================
 
-export class ConfigValidator implements IConfigValidator {
+class ConfigValidator implements IConfigValidator {
   validate(config: BuildConfig, t: ModuleT): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];

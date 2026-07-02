@@ -1,9 +1,9 @@
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import type { MessageResponseType } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 
+import type { StyleType } from "../../../web/utils/style-type";
 import { Alert, AlertDescription, AlertTitle } from "../alert";
 
 export interface FormAlertState {

@@ -20,7 +20,7 @@ import { formatDuration, sleep } from "./utils";
 /**
  * Extended notification config with additional options
  */
-export interface ExtendedNotificationConfig extends NotificationConfig {
+interface ExtendedNotificationConfig extends NotificationConfig {
   /** Retry configuration for failed notifications */
   retry?: {
     maxAttempts: number;
@@ -169,7 +169,7 @@ type WebhookPayload =
 // Interface
 // ============================================================================
 
-export interface INotificationService {
+interface INotificationService {
   /**
    * Send a notification via webhook
    */
@@ -443,7 +443,7 @@ const payloadBuilders: Record<
 // Implementation
 // ============================================================================
 
-export class NotificationService implements INotificationService {
+class NotificationService implements INotificationService {
   async sendNotification(
     config: NotificationConfig | ExtendedNotificationConfig,
     data: NotificationData,

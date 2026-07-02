@@ -52,7 +52,7 @@ export type CacheKeyRequestData<TEndpoint extends CreateApiEndpointAny> =
  * multi-select `threadIds`) that an `includeInCacheKey` field can hold — exactly
  * what `buildKey` JSON-stringifies into the key.
  */
-export type CacheKeyScalar = string | number | boolean;
+type CacheKeyScalar = string | number | boolean;
 export type CacheKeyParamValue =
   | CacheKeyScalar
   | null

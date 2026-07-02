@@ -13,7 +13,7 @@ import { availableCountries } from "./config";
 /**
  * Type-safe mapping of language codes to their information
  */
-export type LanguageGroupMap = {
+type LanguageGroupMap = {
   [langCode in Languages]: {
     name: string;
     countries: CountryInfo[];
@@ -139,7 +139,7 @@ class LanguageMapper {
 /**
  * Convenience function to get the singleton instance
  */
-export const getLanguageMapper = (): LanguageMapper => {
+const getLanguageMapper = (): LanguageMapper => {
   return LanguageMapper.getInstance();
 };
 
@@ -154,44 +154,10 @@ export const getUniqueLanguages = (): [
 };
 
 /**
- * Convenience function to get countries for a specific language
- */
-export const getCountriesForLanguage = (language: Languages): CountryInfo[] => {
-  return getLanguageMapper().getCountriesForLanguage(language);
-};
-
-/**
- * Convenience function to get language name
- */
-export const getLanguageName = (language: Languages): string => {
-  return getLanguageMapper().getLanguageName(language);
-};
-
-/**
- * Convenience function to check if a language has multiple countries
- */
-export const hasMultipleCountries = (language: Languages): boolean => {
-  return getLanguageMapper().hasMultipleCountries(language);
-};
-
-/**
- * Convenience function to get the primary country for a language
- */
-export const getPrimaryCountryForLanguage = (
-  language: Languages,
-): CountryInfo | null => {
-  return getLanguageMapper().getPrimaryCountryForLanguage(language);
-};
-
-/**
  * Extract country code from locale string
  */
 export function getCountryFromLocale(locale: CountryLanguage): Countries {
   const parts = locale.split("-");
-  if (parts.length !== 2 || !parts[1]) {
-    // Return a default value instead of throwing
-    return "GLOBAL" as Countries;
-  }
   return parts[1] as Countries;
 }
 
@@ -200,10 +166,6 @@ export function getCountryFromLocale(locale: CountryLanguage): Countries {
  */
 export function getLanguageFromLocale(locale: CountryLanguage): Languages {
   const parts = locale.split("-");
-  if (parts.length !== 2 || !parts[0]) {
-    // Return a default value instead of throwing
-    return "en" as Languages;
-  }
   return parts[0] as Languages;
 }
 
@@ -215,13 +177,6 @@ export function getLanguageAndCountryFromLocale(locale: CountryLanguage): {
   country: Countries;
 } {
   const parts = locale.split("-");
-  if (parts.length !== 2 || !parts[0] || !parts[1]) {
-    // Return default values instead of throwing
-    return {
-      language: "en" as Languages,
-      country: "GLOBAL" as Countries,
-    };
-  }
   return {
     language: parts[0] as Languages,
     country: parts[1] as Countries,

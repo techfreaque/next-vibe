@@ -1,7 +1,7 @@
 "use client";
 
-export { useEndpoint } from "./use-endpoint-implementation";
 export type { EndpointReturn, UseEndpointOptions } from "./endpoint-types";
+export { useEndpoint } from "./use-endpoint-implementation";
 export {
   clearEndpointInstances,
   getEndpointInstanceCount,

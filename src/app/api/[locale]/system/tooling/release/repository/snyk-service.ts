@@ -18,7 +18,7 @@ import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 
 import { MESSAGES } from "./constants";
 
-export class SnykService {
+class SnykService {
   isAvailable(): boolean {
     try {
       execSync("snyk --version", { stdio: "pipe" });

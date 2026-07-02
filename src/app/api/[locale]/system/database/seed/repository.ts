@@ -23,7 +23,7 @@ import { seedDatabase } from "./seed-manager";
  * Run database seeds Repository
  */
 export class SeedRepository {
-  static async runSeed(
+  private static async runSeed(
     environment: keyof EnvironmentSeeds,
     t: SeedT,
     logger: EndpointLogger,

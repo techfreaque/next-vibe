@@ -1,5 +1,6 @@
-import { type IconComponent } from "next-vibe/ui/web/lib/helper";
 import type { JSX } from "react";
+
+import { type IconComponent } from "../../../web/lib/helper";
 
 /** Gab social platform logo */
 export const SiGab: IconComponent = ({

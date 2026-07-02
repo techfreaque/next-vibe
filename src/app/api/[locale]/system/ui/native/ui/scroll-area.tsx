@@ -3,10 +3,13 @@
  * Cross-platform wrapper around ScrollView with full web API compatibility
  */
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import { ScrollView } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   ScrollAreaBarProps,
   ScrollAreaCornerProps,
@@ -15,10 +18,8 @@ import type {
   ScrollAreaThumbProps,
   ScrollAreaViewportProps,
   ScrollBarProps,
-} from "next-vibe/ui/web/ui/scroll-area";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { ScrollView } from "react-native";
+} from "../../web/ui/scroll-area";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Re-export all types from web for cross-platform compatibility
 export type {

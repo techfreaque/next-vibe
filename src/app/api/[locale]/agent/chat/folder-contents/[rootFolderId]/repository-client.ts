@@ -16,7 +16,6 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../../config";
 import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import {
   getFoldersForRoot,
@@ -45,7 +44,7 @@ export class FolderContentsRepositoryClient {
   ): Promise<ResponseType<FolderContentsResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const rootFolderId = urlPathParams.rootFolderId as DefaultFolderId;
+      const rootFolderId = urlPathParams.rootFolderId;
       const subFolderId = data.subFolderId ?? null;
 
       // Fetch folders at this level

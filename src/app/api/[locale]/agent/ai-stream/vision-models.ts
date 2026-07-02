@@ -98,6 +98,21 @@ const imageVisionModelOptionsIndex: Record<
   ImageVisionModelId,
   ImageVisionModelOption | undefined
 > = {
+  [ImageVisionModelId.GPT_5_5]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_5,
+  ),
+  [ImageVisionModelId.GPT_5_5_PRO]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_5_PRO,
+  ),
+  [ImageVisionModelId.GEMINI_3_5_FLASH]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_3_5_FLASH,
+  ),
+  [ImageVisionModelId.KIMI_K2_5]: makeImageVisionOption(
+    ImageVisionModelId.KIMI_K2_5,
+  ),
+  [ImageVisionModelId.GPT_5_4_IMAGE_2]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_4_IMAGE_2,
+  ),
   [ImageVisionModelId.GPT_5_4]: makeImageVisionOption(
     ImageVisionModelId.GPT_5_4,
   ),
@@ -215,6 +230,9 @@ const videoVisionModelOptionsIndex: Record<
   VideoVisionModelId,
   VideoVisionModelOption | undefined
 > = {
+  [VideoVisionModelId.GEMINI_3_5_FLASH]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_3_5_FLASH,
+  ),
   [VideoVisionModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS]:
     makeVideoVisionOption(
       VideoVisionModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
@@ -240,6 +258,9 @@ const audioVisionModelOptionsIndex: Record<
   AudioVisionModelId,
   AudioVisionModelOption | undefined
 > = {
+  [AudioVisionModelId.GEMINI_3_5_FLASH]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_3_5_FLASH,
+  ),
   [AudioVisionModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS]:
     makeAudioVisionOption(
       AudioVisionModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,

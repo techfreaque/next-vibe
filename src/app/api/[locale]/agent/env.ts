@@ -179,16 +179,6 @@ const baseFields = {
     commented: true,
     sensitive: true,
   },
-  UNBOTTLED_CLOUD_CREDENTIALS: {
-    schema: z.string().optional(),
-    example: "leadId:token:https://unbottled.ai",
-    comment:
-      "Unbottled AI cloud credentials (leadId:token:remoteUrl) - set automatically when signing in to unbottled.ai",
-    commented: true,
-    sensitive: true,
-    onboardingStep: 4,
-    onboardingGroup: "ai",
-  },
 } as const;
 
 // S3 storage specific fields
@@ -307,45 +297,3 @@ export const {
     s3: { ...baseFields, ...s3Fields },
   },
 });
-
-export interface UnbottledCloudSession {
-  leadId: string;
-  token: string;
-  remoteUrl: string;
-}
-
-/**
- * Parse UNBOTTLED_CLOUD_CREDENTIALS env var.
- * Format: "leadId:token:https://unbottled.ai"
- * leadId = UUID (no colons), token = JWT (may contain dots but no ://), remoteUrl = URL at end
- */
-export function parseUnbottledCredentials(
-  creds: string | undefined,
-): UnbottledCloudSession | null {
-  if (!creds) {
-    return null;
-  }
-
-  const firstColon = creds.indexOf(":");
-  if (firstColon === -1) {
-    return null;
-  }
-
-  const leadId = creds.slice(0, firstColon);
-  const rest = creds.slice(firstColon + 1);
-
-  // URL is at the end, starting with http:// or https://
-  const urlMatch = rest.match(/(https?:\/\/.+)$/);
-  if (!urlMatch) {
-    return null;
-  }
-
-  const remoteUrl = urlMatch[1];
-  const token = rest.slice(0, rest.length - remoteUrl.length - 1);
-
-  if (!leadId || !token || !remoteUrl) {
-    return null;
-  }
-
-  return { leadId, token, remoteUrl };
-}

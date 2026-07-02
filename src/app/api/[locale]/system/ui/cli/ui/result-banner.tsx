@@ -1,12 +1,13 @@
 import { Box, Text } from "ink";
-import type { ResultBannerProps } from "next-vibe/ui/web/ui/result-banner";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
+
+import type { ResultBannerProps } from "../../web/ui/result-banner";
 
 export type {
   ResultBannerProps,
   ResultBannerVariant,
-} from "next-vibe/ui/web/ui/result-banner";
+} from "../../web/ui/result-banner";
 
 const variantColors: Record<string, string> = {
   success: "green",

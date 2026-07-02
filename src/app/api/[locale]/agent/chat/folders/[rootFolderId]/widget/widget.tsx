@@ -8,7 +8,6 @@
 import { cn } from "next-vibe/core/utils/utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
 import { Button } from "next-vibe/ui/web/ui/button";
 import {
@@ -37,6 +36,7 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -161,7 +161,7 @@ function RootFolderBar({
       setModalOpen(true);
       return;
     }
-    onSelectFolder(folderId as DefaultFolderId);
+    onSelectFolder(folderId);
   };
 
   return (

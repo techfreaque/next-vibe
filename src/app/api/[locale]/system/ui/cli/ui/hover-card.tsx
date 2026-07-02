@@ -5,14 +5,14 @@ export type {
   HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-} from "next-vibe/ui/web/ui/hover-card";
+} from "../../web/ui/hover-card";
 
 import type {
   HoverCardContentProps,
   HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-} from "next-vibe/ui/web/ui/hover-card";
+} from "../../web/ui/hover-card";
 
 export function HoverCard({
   children,

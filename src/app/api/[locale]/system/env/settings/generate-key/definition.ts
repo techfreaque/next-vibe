@@ -18,7 +18,7 @@ import { z } from "zod";
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "runtime", "settings", "generate-key"] as const,
+  path: ["system", "env", "settings", "generate-key"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,

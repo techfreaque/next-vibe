@@ -503,12 +503,9 @@ export class SingleFavoriteRepository {
       // rebuilds the card and patches the list cache; cross-instance (remoteEvent)
       // the peer re-applies the edit. Suppressed when applying a relayed edit.
       if (!relayed) {
-        createEndpointEmitter(
-          favoriteByIdDefinitions.PATCH,
-          logger,
-          user,
-        )("favorite-updated", {
+        createEndpointEmitter(favoriteByIdDefinitions.PATCH, logger, user, {
           urlPathParams: { id: updated.slug || updated.id },
+        })("favorite-updated", {
           requestData: {
             skillId: formatSkillId(
               await SkillsRepository.resolveCanonicalSkillId(updated.skillId),
@@ -598,11 +595,9 @@ export class SingleFavoriteRepository {
       // This op owns its `favorite-deleted` event, carrying the deleted id.
       // Locally its client onEvent removes the row from the list cache;
       // cross-instance (remoteEvent) the peer's onRemoteEvent removes it by id.
-      createEndpointEmitter(
-        favoriteByIdDefinitions.DELETE,
-        logger,
-        user,
-      )("favorite-deleted", { urlPathParams: { id: deletedId } });
+      createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
+        urlPathParams: { id: deletedId },
+      })("favorite-deleted");
 
       return success({
         skillId: await SkillsRepository.resolveCanonicalSkillId(
@@ -655,9 +650,9 @@ export class SingleFavoriteRepository {
       return;
     }
     createEndpointEmitter(favoriteByIdDefinitions.PATCH, logger, user, {
+      urlPathParams: { id: urlPathParams.id },
       fanOut: false,
     })("favorite-updated", {
-      urlPathParams: { id: urlPathParams.id },
       requestData,
     });
   }
@@ -682,9 +677,8 @@ export class SingleFavoriteRepository {
       logger,
     );
     createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
-      fanOut: false,
-    })("favorite-deleted", {
       urlPathParams: { id: urlPathParams.id },
-    });
+      fanOut: false,
+    })("favorite-deleted");
   }
 }

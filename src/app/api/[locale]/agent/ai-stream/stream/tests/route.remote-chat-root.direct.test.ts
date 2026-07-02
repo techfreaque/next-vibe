@@ -22,7 +22,6 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import { sql } from "drizzle-orm";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -37,80 +36,45 @@ import {
 } from "../../testing/headless-test-runner";
 import {
   assertProdDbHasMessages,
-  assertProdDbHasThread,
   ATLAS_INSTANCE_ID,
-  connectToHermes,
-  disconnectFromHermes,
-  ensureRemoteUserCredits,
   failSuitePrerequisites,
-  getProdDb,
-  HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveDevUser,
-  resolveProdAdminToken,
-  resolveProdUserId,
   resolveRemoteUrlSync,
-  unregisterDevFromHermes,
 } from "../../testing/remote-setup";
+import {
+  assertHermesFolderChainHasThread,
+  describeLoopOnClientSuite,
+  makeDirectSetup,
+} from "./helpers/remote";
 import { describeStreamSuite } from "./route-base.test";
 
 const _remoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
-let _localFolderId: string | null = null;
-let _mainProdUserId: string | null = null;
-
-async function setup(testUser: JwtPrivatePayloadType): Promise<void> {
-  await disconnectFromHermes(testUser.id);
-  await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
-
-  _mainProdUserId = await resolveProdUserId();
-  const remoteAdminToken = await resolveProdAdminToken(
-    _remoteUrl ?? "http://localhost:3002",
-  );
-  await ensureRemoteUserCredits(
-    _remoteUrl ?? "http://localhost:3002",
-    remoteAdminToken,
-    _mainProdUserId,
-    20000,
-  );
-  await ensureRemoteUserCredits(
-    _remoteUrl ?? "http://localhost:3002",
-    remoteAdminToken,
-    testUser.id,
-    20000,
-  );
-
-  _localFolderId = await getOrCreateFolder(
-    testUser,
-    DefaultFolderId.REMOTE,
-    HERMES_INSTANCE_ID,
-    null,
-  );
-}
-
-async function teardown(testUser: JwtPrivatePayloadType): Promise<void> {
-  await disconnectFromHermes(testUser.id);
-  if (_mainProdUserId) {
-    await unregisterDevFromHermes(_mainProdUserId);
-  }
-  _localFolderId = null;
-  _mainProdUserId = null;
-}
+// Direct-http connection + REMOTE/hermes subfolder on atlas + remote credit
+// top-up for the remote admin AND the mirrored testUser (the relayed loop
+// bills the mirrored user on hermes) + mirrored teardown.
+const hooks = makeDirectSetup(_remoteUrl, {
+  createRemoteFolder: true,
+});
 
 if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream — remote chat root direct-HTTP (${_remoteUrl}, REMOTE/hermes, AI on hermes)`,
     cachePrefix: "remote-chat-root-direct-",
-    systemPromptInstanceId: HERMES_INSTANCE_ID,
+    // Tools and system prompt ALWAYS come from the client (options on the
+    // ai-stream) — the executor runs the loop but identifies the CALLER.
+    assertSystemPromptFromLocal: true,
+    expectRelayTransport: "direct-http",
     get rootFolderIdOverride() {
       return DefaultFolderId.REMOTE;
     },
     get subFolderIdOverride() {
-      return _localFolderId ?? undefined;
+      return hooks.getLocalFolderId() ?? undefined;
     },
-    setup,
-    teardown,
+    setup: hooks.setup,
+    teardown: hooks.teardown,
   });
 
   // ── Bidirectional thread location assertions ───────────────────────────────
@@ -130,14 +94,14 @@ if (_remoteUrl && _isFixtureMode) {
       }
       testUser = resolved;
 
-      await setup(testUser);
+      await hooks.setup(testUser);
 
       // Create REMOTE/hermes/tests/remote-chat-root-direct folder chain on atlas.
       _rcrTestsFolderId = await getOrCreateFolder(
         testUser,
         DefaultFolderId.REMOTE,
         "tests",
-        _localFolderId ?? undefined,
+        hooks.getLocalFolderId() ?? undefined,
       );
       _rcrSuiteFolderId = await getOrCreateFolder(
         testUser,
@@ -168,7 +132,7 @@ if (_remoteUrl && _isFixtureMode) {
     afterAll(async () => {
       const { closeProdDb } = await import("../../testing/remote-setup");
       if (testUser) {
-        await teardown(testUser);
+        await hooks.teardown(testUser);
       }
       await closeProdDb();
     });
@@ -214,60 +178,30 @@ if (_remoteUrl && _isFixtureMode) {
       ).toBeTruthy();
     }, 30_000);
 
-    it("RCR-D3: hermes thread is in BACKGROUND/atlas/tests/remote-chat-root-direct", async () => {
-      const pdb = getProdDb();
-
-      // Resolve BACKGROUND/atlas on hermes.
-      const atlasRows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_folders
-              WHERE user_id = ${_mainProdUserId}
-                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
-                AND name = ${ATLAS_INSTANCE_ID}
-                AND parent_id IS NULL
-              LIMIT 1`,
-      );
-      expect(
-        atlasRows.rows.length,
-        `BACKGROUND/${ATLAS_INSTANCE_ID} subfolder must exist on hermes`,
-      ).toBeGreaterThan(0);
-      const atlasFolderId = atlasRows.rows[0]!.id;
-
-      // Resolve BACKGROUND/atlas/tests on hermes.
-      const testsRows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_folders
-              WHERE user_id = ${_mainProdUserId}
-                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
-                AND name = 'tests'
-                AND parent_id = ${atlasFolderId}
-              LIMIT 1`,
-      );
-      expect(
-        testsRows.rows.length,
-        "BACKGROUND/atlas/tests must exist on hermes",
-      ).toBeGreaterThan(0);
-      const testsFolderId = testsRows.rows[0]!.id;
-
-      // Resolve BACKGROUND/atlas/tests/remote-chat-root-direct on hermes.
-      const suiteRows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_folders
-              WHERE user_id = ${_mainProdUserId}
-                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
-                AND name = 'remote-chat-root-direct'
-                AND parent_id = ${testsFolderId}
-              LIMIT 1`,
-      );
-      expect(
-        suiteRows.rows.length,
-        "BACKGROUND/atlas/tests/remote-chat-root-direct must exist on hermes",
-      ).toBeGreaterThan(0);
-      const hermesTargetFolderId = suiteRows.rows[0]!.id;
-
-      await assertProdDbHasThread(threadId, hermesTargetFolderId);
+    it("RCR-D3: hermes thread is in REMOTE/atlas/tests/remote-chat-root-direct", async () => {
+      // The executor SERVES the originator (atlas connected to hermes), so its
+      // copy lands under REMOTE/<clientInstanceId>/<path>.
+      await assertHermesFolderChainHasThread({
+        prodUserId: hooks.getProdUserId(),
+        rootFolderId: DefaultFolderId.REMOTE,
+        folderChain: [ATLAS_INSTANCE_ID, "tests", "remote-chat-root-direct"],
+        threadId,
+      });
     }, 30_000);
 
     it("RCR-D4: hermes has messages — AI loop ran there", async () => {
       await assertProdDbHasMessages(threadId, 2);
     }, 30_000);
+  });
+  // ── Loop on CLIENT: the cloud (hermes) originates, this side runs the loop.
+  //    Cloud copy:  REMOTE/atlas/tests/loop-on-client-direct
+  //    Client copy: BACKGROUND/remote/hermes/tests/loop-on-client-direct
+  describeLoopOnClientSuite({
+    label: `Remote Chat Root — loop on CLIENT via direct-HTTP (${_remoteUrl})`,
+    transport: "direct-http",
+    caseName: "loop-on-client-direct",
+    fetchCacheContext: "remote-chat-root-direct-loop-on-client",
+    hooks: makeDirectSetup(_remoteUrl, { createRemoteFolder: true }),
   });
 } else if (!_remoteUrl) {
   failSuitePrerequisites(

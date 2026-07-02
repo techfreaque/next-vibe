@@ -1,7 +1,5 @@
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
-
 import { ChatModelId } from "../../../ai-stream/models";
 import type { Skill } from "../../config";
 import {
@@ -60,11 +58,13 @@ If everything works, respond normally to the user. Only flag issues - don't narr
   ],
   variants: [
     {
-      id: "kimi",
-      variantName: "skills.qualityTester.variants.kimi" as const,
+      id: "budget",
+      variantName: "skills.qualityTester.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: DEFAULT_CHAT_MODEL_ID,
+        // DeepSeek V4 Flash: same tool-calling capability class as kimi at a
+        // fraction of the price — the QA suites hammer this model constantly.
+        manualModelId: ChatModelId.DEEPSEEK_V4_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.BRILLIANT,

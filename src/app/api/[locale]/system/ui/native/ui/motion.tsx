@@ -6,20 +6,6 @@ import {
   MotiView,
 } from "moti";
 import { styled } from "nativewind";
-import {
-  convertCSSToImageStyle,
-  convertCSSToTextStyle,
-  convertCSSToViewStyle,
-} from "next-vibe/ui/native/utils/style-converter";
-import type {
-  AnimatePresenceProps,
-  MotionButtonProps,
-  MotionDivProps,
-  MotionImgProps,
-  MotionSpanProps,
-  MotionTransition,
-} from "next-vibe/ui/web/ui/motion";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import type {
   ImageSourcePropType,
@@ -28,6 +14,21 @@ import type {
   ViewStyle,
 } from "react-native";
 import { Pressable, Text as RNText } from "react-native";
+
+import {
+  convertCSSToImageStyle,
+  convertCSSToTextStyle,
+  convertCSSToViewStyle,
+} from "../../native/utils/style-converter";
+import type {
+  AnimatePresenceProps,
+  MotionButtonProps,
+  MotionDivProps,
+  MotionImgProps,
+  MotionSpanProps,
+  MotionTransition,
+} from "../../web/ui/motion";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Create styled wrappers for Moti components
 const StyledMotiView = styled(MotiView, { className: "style" });

@@ -1592,6 +1592,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.8, // released: 2026-04-20 from openrouter
         outputTokenCost: 3.5, // released: 2026-04-20 from openrouter
       },
+      {
+        id: ChatModelId.KIMI_K2_6,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kimi-k2.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.04, // openrouter +30% unbottled markup
+        outputTokenCost: 4.55, // openrouter +30% unbottled markup
+      },
     ],
     utilities: [
       ModelUtility.SMART,

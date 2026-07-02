@@ -6,7 +6,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { leadId } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/web/lib/request";
 import { z } from "zod";

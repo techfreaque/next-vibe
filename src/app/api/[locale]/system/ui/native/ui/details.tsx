@@ -1,13 +1,14 @@
 "use client";
 
 import { styled } from "nativewind";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { DetailsProps } from "next-vibe/ui/web/ui/details";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import type { DetailsProps } from "../../web/ui/details";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styled(View, { className: "style" });
 

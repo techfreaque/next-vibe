@@ -19,7 +19,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { parseJsonWithComments } from "next-vibe/core/utils/parse-json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
 import type { CheckConfig } from "next-vibe/tooling/check/config/types";
@@ -30,11 +29,13 @@ import {
 import type { CheckTypecheckT } from "next-vibe/tooling/check/typecheck/i18n";
 import { z } from "zod";
 
+import { parseJsonWithComments } from "../parse-json";
 import type {
   TypecheckIssue,
   TypecheckRequestOutput,
   TypecheckResponseOutput,
 } from "./definition";
+import { TsgoDaemon } from "./lsp-daemon";
 import { type TypecheckConfig } from "./utils";
 import {
   createTypecheckConfig,

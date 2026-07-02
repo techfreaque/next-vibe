@@ -3,8 +3,9 @@ import {
   motion as fmMotion,
   type Transition,
 } from "framer-motion";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 // AnimatePresence interface
 export interface AnimatePresenceProps {

@@ -1,21 +1,22 @@
 "use client";
 
 import { styled } from "nativewind";
+import type { JSX } from "react";
+import * as React from "react";
+import { Pressable, Text as RNText } from "react-native";
+
 import {
   convertCSSToTextStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   SpanGenericTarget,
   SpanMouseEvent,
   SpanProps as SpanBaseProps,
   SpanRefObject,
-} from "next-vibe/ui/web/ui/span";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import type { JSX } from "react";
-import * as React from "react";
-import { Pressable, Text as RNText } from "react-native";
+} from "../../web/ui/span";
+import type { StyleType } from "../../web/utils/style-type";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledText = styled(RNText);
 const StyledPressable = styledNative(Pressable);

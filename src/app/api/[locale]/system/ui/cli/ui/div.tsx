@@ -1,7 +1,8 @@
 import { Box, Text } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { DivProps, DivRefObject } from "next-vibe/ui/web/ui/div";
 import * as React from "react";
+
+import type { DivProps, DivRefObject } from "../../web/ui/div";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 /**
  * Wrap bare string/number children in <Text> so Ink doesn't crash.

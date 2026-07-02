@@ -26,6 +26,171 @@ import { NO_SKILL_ID } from "./constants";
 import { isFiltersSelection, isManualSelection } from "./create/definition";
 import type { CustomSkill } from "./db";
 import { customSkills } from "./db";
+import type { FavoriteConfig } from "./favorites/db";
+import { resolveFavoriteConfig } from "./favorites/repository";
+
+/**
+ * Raw custom-skill config columns used by the ai-stream setup cascades
+ * (compact trigger, tool config, memory limit). null for default skills.
+ */
+export type CustomSkillConfig = Pick<
+  CustomSkill,
+  | "compactTrigger"
+  | "deniedTools"
+  | "availableTools"
+  | "pinnedTools"
+  | "memoryLimit"
+>;
+
+/** Full row selected ONCE per resolution: config columns + bridge-model columns + variants. */
+type CustomSkillContextRow = CustomSkillConfig &
+  Pick<
+    CustomSkill,
+    | "voiceModelSelection"
+    | "sttModelSelection"
+    | "imageVisionModelSelection"
+    | "videoVisionModelSelection"
+    | "audioVisionModelSelection"
+    | "variants"
+  >;
+
+/** ONE customSkills fetch for all cascade needs - by UUID or slug. */
+async function fetchCustomSkillContextRow(
+  skillIdOrSlug: string,
+): Promise<CustomSkillContextRow | null> {
+  const [row] = await db
+    .select({
+      compactTrigger: customSkills.compactTrigger,
+      deniedTools: customSkills.deniedTools,
+      availableTools: customSkills.availableTools,
+      pinnedTools: customSkills.pinnedTools,
+      memoryLimit: customSkills.memoryLimit,
+      voiceModelSelection: customSkills.voiceModelSelection,
+      sttModelSelection: customSkills.sttModelSelection,
+      imageVisionModelSelection: customSkills.imageVisionModelSelection,
+      videoVisionModelSelection: customSkills.videoVisionModelSelection,
+      audioVisionModelSelection: customSkills.audioVisionModelSelection,
+      variants: customSkills.variants,
+    })
+    .from(customSkills)
+    .where(
+      isUuid(skillIdOrSlug)
+        ? eq(customSkills.id, skillIdOrSlug)
+        : eq(customSkills.slug, skillIdOrSlug),
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+/**
+ * Build a BridgeSkill from a custom-skill row: resolve the active variant
+ * (explicit id → default variant → first variant) with variant fields falling
+ * back to row-level model selections.
+ */
+function buildCustomBridgeSkill(
+  row: CustomSkillContextRow,
+  activeVariantId: string | null,
+): BridgeSkill {
+  const variants = row.variants;
+  const activeVariant =
+    variants && activeVariantId
+      ? (variants.find((v) => v.id === activeVariantId) ??
+        variants.find((v) => v.isDefault) ??
+        variants[0])
+      : variants
+        ? (variants.find((v) => v.isDefault) ?? variants[0])
+        : null;
+
+  return activeVariant
+    ? {
+        modelSelection: activeVariant.modelSelection ?? undefined,
+        voiceModelSelection:
+          activeVariant.voiceModelSelection ??
+          row.voiceModelSelection ??
+          undefined,
+        sttModelSelection:
+          activeVariant.sttModelSelection ?? row.sttModelSelection ?? undefined,
+        imageVisionModelSelection:
+          activeVariant.imageVisionModelSelection ??
+          row.imageVisionModelSelection ??
+          undefined,
+        videoVisionModelSelection:
+          activeVariant.videoVisionModelSelection ??
+          row.videoVisionModelSelection ??
+          undefined,
+        audioVisionModelSelection:
+          activeVariant.audioVisionModelSelection ??
+          row.audioVisionModelSelection ??
+          undefined,
+        imageGenModelSelection:
+          activeVariant.imageGenModelSelection ?? undefined,
+        musicGenModelSelection:
+          activeVariant.musicGenModelSelection ?? undefined,
+        videoGenModelSelection:
+          activeVariant.videoGenModelSelection ?? undefined,
+      }
+    : {
+        modelSelection: undefined,
+        voiceModelSelection: row.voiceModelSelection ?? undefined,
+        sttModelSelection: row.sttModelSelection ?? undefined,
+        imageVisionModelSelection: row.imageVisionModelSelection ?? undefined,
+        videoVisionModelSelection: row.videoVisionModelSelection ?? undefined,
+        audioVisionModelSelection: row.audioVisionModelSelection ?? undefined,
+        imageGenModelSelection: undefined,
+        musicGenModelSelection: undefined,
+        videoGenModelSelection: undefined,
+      };
+}
+
+/** Build a BridgeSkill from a default (config) skill's variants. */
+function buildDefaultBridgeSkill(
+  defaultSkill: Skill,
+  activeVariantId: string | null,
+): BridgeSkill | null {
+  const activeVariant = activeVariantId
+    ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
+      defaultSkill.variants.find((v) => v.isDefault) ??
+      defaultSkill.variants[0])
+    : (defaultSkill.variants.find((v) => v.isDefault) ??
+      defaultSkill.variants[0]);
+  return activeVariant ?? null;
+}
+
+/**
+ * Shared skill resolution: default skills from config (no DB round-trip),
+ * custom skills via ONE customSkills query (UUID or slug). Returns the raw
+ * custom-skill row alongside the BridgeSkill so callers needing the config
+ * columns (compactTrigger, tool config, memoryLimit) don't re-query.
+ */
+async function resolveSkillInternal(
+  rawSkillId: string,
+  favoriteVariantId: string | null | undefined,
+): Promise<{
+  skill: BridgeSkill | null;
+  customSkillRow: CustomSkillContextRow | null;
+}> {
+  const { skillId, variantId: explicitVariantId } = parseSkillId(rawSkillId);
+  const activeVariantId = explicitVariantId ?? favoriteVariantId ?? null;
+
+  // Default skill: resolve from config
+  const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === skillId);
+  if (defaultSkill) {
+    return {
+      skill: buildDefaultBridgeSkill(defaultSkill, activeVariantId),
+      customSkillRow: null,
+    };
+  }
+
+  // Custom skill: resolve variant-aware model selections from DB (UUID or slug)
+  const row = await fetchCustomSkillContextRow(skillId);
+  if (!row) {
+    return { skill: null, customSkillRow: null };
+  }
+  return {
+    skill: buildCustomBridgeSkill(row, activeVariantId),
+    customSkillRow: row,
+  };
+}
 
 /**
  * Resolve a BridgeSkill from a raw skillId (supports "slug__variantId" format).
@@ -43,94 +208,151 @@ export async function resolveSkillVariant(
   if (!rawSkillId) {
     return null;
   }
+  return (await resolveSkillInternal(rawSkillId, favoriteVariantId)).skill;
+}
 
-  const { skillId, variantId: explicitVariantId } = parseSkillId(rawSkillId);
-  const activeVariantId = explicitVariantId ?? favoriteVariantId ?? null;
+/**
+ * Everything the favorite → skill cascade consumers need, resolved in
+ * ONE favorite query + ONE customSkills query.
+ */
+export interface SkillFavoriteContext {
+  /** Resolved favorite config (null when none / not found). */
+  favorite: FavoriteConfig | null;
+  /** Variant-aware model selections for the active skill (null when no skill / not found). */
+  skill: BridgeSkill | null;
+  /** Raw custom-skill config columns (null for default skills / no skill). */
+  customSkill: CustomSkillConfig | null;
+}
 
-  if (isUuid(skillId)) {
-    // Custom skill: resolve variant-aware model selections from DB
-    const [row] = await db
-      .select({
-        voiceModelSelection: customSkills.voiceModelSelection,
-        sttModelSelection: customSkills.sttModelSelection,
-        imageVisionModelSelection: customSkills.imageVisionModelSelection,
-        videoVisionModelSelection: customSkills.videoVisionModelSelection,
-        audioVisionModelSelection: customSkills.audioVisionModelSelection,
-        variants: customSkills.variants,
-      })
-      .from(customSkills)
-      .where(eq(customSkills.id, skillId))
-      .limit(1);
+/**
+ * Resolve the favorite + skill context shared by ai-stream setup, execute-tool
+ * and headless runs.
+ *
+ * - Favorite: resolved via resolveFavoriteConfig (UUID, "skillSlug__variantId",
+ *   or slug), unless a pre-resolved favorite is passed in.
+ * - Skill: "slug__variantId", UUID, or slug. Explicit variant in the skillId
+ *   wins; otherwise the variant merged into the favorite's skillId is used.
+ * - Custom skills: ONE DB query fetches config + bridge columns together.
+ */
+export async function resolveSkillFavoriteContext(params: {
+  favoriteId: string | null | undefined;
+  /** Skill identifier: "slug__variantId", UUID, or slug. */
+  skillId: string | null | undefined;
+  userId: string | undefined;
+  /**
+   * Pre-resolved favorite (pass null for "resolved, none"). When provided the
+   * favorite query is skipped - callers that already loaded the favorite
+   * (e.g. stream-setup's loadFavoriteOnce) resolve it exactly ONCE.
+   */
+  favorite?: FavoriteConfig | null;
+}): Promise<SkillFavoriteContext> {
+  const favorite =
+    params.favorite !== undefined
+      ? params.favorite
+      : await resolveFavoriteConfig(
+          params.favoriteId ?? undefined,
+          params.userId,
+        );
 
-    if (!row) {
-      return null;
-    }
-
-    const variants = row.variants;
-    const activeVariant =
-      variants && activeVariantId
-        ? (variants.find((v) => v.id === activeVariantId) ??
-          variants.find((v) => v.isDefault) ??
-          variants[0])
-        : variants
-          ? (variants.find((v) => v.isDefault) ?? variants[0])
-          : null;
-
-    return activeVariant
-      ? {
-          modelSelection: activeVariant.modelSelection ?? undefined,
-          voiceModelSelection:
-            activeVariant.voiceModelSelection ??
-            row.voiceModelSelection ??
-            undefined,
-          sttModelSelection:
-            activeVariant.sttModelSelection ??
-            row.sttModelSelection ??
-            undefined,
-          imageVisionModelSelection:
-            activeVariant.imageVisionModelSelection ??
-            row.imageVisionModelSelection ??
-            undefined,
-          videoVisionModelSelection:
-            activeVariant.videoVisionModelSelection ??
-            row.videoVisionModelSelection ??
-            undefined,
-          audioVisionModelSelection:
-            activeVariant.audioVisionModelSelection ??
-            row.audioVisionModelSelection ??
-            undefined,
-          imageGenModelSelection:
-            activeVariant.imageGenModelSelection ?? undefined,
-          musicGenModelSelection:
-            activeVariant.musicGenModelSelection ?? undefined,
-          videoGenModelSelection:
-            activeVariant.videoGenModelSelection ?? undefined,
-        }
-      : {
-          modelSelection: undefined,
-          voiceModelSelection: row.voiceModelSelection ?? undefined,
-          sttModelSelection: row.sttModelSelection ?? undefined,
-          imageVisionModelSelection: row.imageVisionModelSelection ?? undefined,
-          videoVisionModelSelection: row.videoVisionModelSelection ?? undefined,
-          audioVisionModelSelection: row.audioVisionModelSelection ?? undefined,
-          imageGenModelSelection: undefined,
-          musicGenModelSelection: undefined,
-          videoGenModelSelection: undefined,
-        };
+  if (!params.skillId) {
+    return { favorite, skill: null, customSkill: null };
   }
 
-  // Default skill: resolve from config
-  const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === skillId);
-  if (!defaultSkill) {
+  // Variant fallback comes from the favorite's merged skillId ("slug__variant")
+  const favoriteVariantId = favorite
+    ? parseSkillId(favorite.skillId).variantId
+    : null;
+  const { skill, customSkillRow } = await resolveSkillInternal(
+    params.skillId,
+    favoriteVariantId,
+  );
+
+  return {
+    favorite,
+    skill,
+    customSkill: customSkillRow
+      ? {
+          compactTrigger: customSkillRow.compactTrigger,
+          deniedTools: customSkillRow.deniedTools,
+          availableTools: customSkillRow.availableTools,
+          pinnedTools: customSkillRow.pinnedTools,
+          memoryLimit: customSkillRow.memoryLimit,
+        }
+      : null,
+  };
+}
+
+/**
+ * Resolve a favorite to a concrete { model, skill, favoriteConfig } trio.
+ * Model cascade: favorite manual/filters selection → skill-variant selection.
+ * Returns null when the favorite doesn't exist or no model is resolvable.
+ * Shared by the headless adapter and resume-stream's revival path.
+ */
+export async function resolveFavorite(
+  favoriteId: string,
+  userId: string,
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<{
+  model: ChatModelId;
+  skill: string;
+  favoriteConfig: FavoriteConfig;
+} | null> {
+  const favorite = await resolveFavoriteConfig(favoriteId, userId);
+
+  if (!favorite) {
+    logger.error("[Headless AI] Favorite not found", {
+      favoriteId,
+      userId,
+      locale,
+    });
     return null;
   }
 
-  const activeVariant = activeVariantId
-    ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
-      defaultSkill.variants.find((v) => v.isDefault) ??
-      defaultSkill.variants[0])
-    : (defaultSkill.variants.find((v) => v.isDefault) ??
-      defaultSkill.variants[0]);
+  const skill = favorite.skillId || NO_SKILL_ID;
+  const availability = await getInstanceAvailability();
 
-  return activeVariant ?? null;
+  const sel = favorite.modelSelection;
+
+  if (sel && isManualSelection(sel) && "manualModelId" in sel) {
+    return {
+      model: sel.manualModelId,
+      skill,
+      favoriteConfig: favorite,
+    };
+  }
+  if (sel && isFiltersSelection(sel)) {
+    const best = getBestChatModel(sel, user, availability);
+    if (best) {
+      return { model: best.id, skill, favoriteConfig: favorite };
+    }
+  }
+
+  if (skill !== NO_SKILL_ID) {
+    // Skill-variant model resolution via the shared skills-domain resolver.
+    // The favorite is already resolved - passed through, never re-queried.
+    const { skill: skillVariant } = await resolveSkillFavoriteContext({
+      favoriteId,
+      skillId: skill,
+      userId,
+      favorite,
+    });
+    const varSel = skillVariant?.modelSelection;
+    if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
+      const best = getBestChatModel(varSel, user, availability);
+      if (best) {
+        return { model: best.id, skill, favoriteConfig: favorite };
+      }
+    }
+  }
+
+  logger.warn(
+    "[Headless AI] Favorite has no resolvable model - pass model explicitly",
+    {
+      favoriteId,
+      skillId: skill,
+    },
+  );
+  return null;
 }

@@ -9,8 +9,8 @@ import "server-only";
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { EnvExample, EnvRecord } from "next-vibe/env/define-env";
+import { envValidationLogger } from "next-vibe/env/env-logger";
 import { validateEnv } from "next-vibe/env/env-util";
-import { envValidationLogger } from "next-vibe/logger/env-logger";
 import type { z } from "zod";
 
 // Import env modules

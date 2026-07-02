@@ -109,6 +109,7 @@ async function callEmbeddingApi(
   apiKey: string,
   text: string,
 ): Promise<number[] | null> {
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
     method: "POST",
     headers: {

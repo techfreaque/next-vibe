@@ -149,7 +149,7 @@ function ThreadRow({
     // Update Zustand store - single source of truth
     setNavigation({
       activeThreadId: thread.id,
-      currentRootFolderId: thread.rootFolderId as DefaultFolderId,
+      currentRootFolderId: thread.rootFolderId,
       currentSubFolderId: thread.folderId ?? null,
     });
     // Update URL without server re-render

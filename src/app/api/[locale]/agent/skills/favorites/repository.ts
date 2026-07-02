@@ -46,6 +46,7 @@ import {
   type FavoriteConfig,
 } from "./db";
 import type { FavoritesListResponseOutput } from "./definition";
+import type { FavoriteSummaryItem } from "./favorites-formatter";
 import {
   formatEmptyFavoritesGuidance,
   formatFavoritesSummary,
@@ -54,7 +55,6 @@ import type { FavoritesT } from "./i18n";
 import reorderDefinitions from "./reorder/definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 import type { SyncedFavorite } from "./sync-provider";
-import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 
 export function buildFavoriteConfig(
   overrides: Partial<FavoriteConfig> & Pick<FavoriteConfig, "id" | "skillId">,

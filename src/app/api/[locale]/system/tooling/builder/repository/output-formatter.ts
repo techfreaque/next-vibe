@@ -9,7 +9,7 @@ import { SIZE_THRESHOLDS } from "./constants";
 // Interface
 // ============================================================================
 
-export interface IOutputFormatter {
+interface IOutputFormatter {
   /** Format a header with decorative lines */
   formatHeader(text: string): string;
 
@@ -45,7 +45,7 @@ export interface IOutputFormatter {
 // Implementation
 // ============================================================================
 
-export class OutputFormatter implements IOutputFormatter {
+class OutputFormatter implements IOutputFormatter {
   formatHeader(text: string): string {
     const line = "═".repeat(60);
     return `\n${line}\n  ${text}\n${line}`;

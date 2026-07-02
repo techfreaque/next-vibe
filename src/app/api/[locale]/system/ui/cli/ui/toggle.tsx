@@ -1,17 +1,18 @@
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   ToggleRootProps,
   ToggleSize,
   ToggleVariant,
-} from "next-vibe/ui/web/ui/toggle";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/toggle";
 
 export type {
   ToggleRootProps,
   ToggleSize,
   ToggleVariant,
-} from "next-vibe/ui/web/ui/toggle";
+} from "../../web/ui/toggle";
 import { cva } from "class-variance-authority";
 
 export const toggleVariants = cva("");

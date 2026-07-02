@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user is asking me to handle a wakeUp repeat test. Looking at the context, I see there was a previous wakeUp test that completed. The current context shows:\n\n1. A previous `execute-tool` with `toolName='generate_image'`, `input={'prompt':'wakeup-repeat-test'}`, `callbackMode='wakeUp'` was called\n2. The immediate result was `{\"hint\":\"Task completed. Its result has been delivered below in this conversation — do NOT call this tool again; respond using that result.\",\"status\":\"completed\"}` - this means it completed inline, not deferred\n3. Then there was a deferred result showing the image with imageUrl: `http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/2afc4e60-8363-4703-9a43-0af8b03b3998/6898f76b-f580-4aec-9662-611e9da69a49.png`\n\nWait, looking more carefully at the conte\n\nUser: [T6d wakeUp-stress] Call execute-tool with toolName='generate_image', input={'prompt':'wakeup-stress-test'}, callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user wants me to call generate_image with callbackMode='wakeUp'. Let me do that now.</think>\n\nAssistant: <think> The first phase returned only a taskId with no image. This is a DEFERRED outcome. I must end this turn with STEP_OK and then wait for revival.</think> STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

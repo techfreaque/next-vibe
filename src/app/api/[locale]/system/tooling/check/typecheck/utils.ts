@@ -34,9 +34,7 @@ export interface TypecheckConfig {
  * Determine the path type for TypeScript checking
  * @param path - Path to check (string or array of strings)
  */
-export function determinePathType(
-  path: string | string[] | undefined,
-): PathType {
+function determinePathType(path: string | string[] | undefined): PathType {
   if (!path || (Array.isArray(path) && path.length === 0)) {
     return PathType.NO_PATH;
   }
@@ -81,7 +79,7 @@ export function determinePathType(
  * @param pathType - Type of path (file, folder, or no path)
  * @param targetPath - Target path(s) to generate key for
  */
-export function generateCacheKey(
+function generateCacheKey(
   pathType: PathType,
   targetPath?: string | string[],
 ): string {

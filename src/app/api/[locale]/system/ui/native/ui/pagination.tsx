@@ -1,18 +1,18 @@
 "use client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { ChevronLeftIcon } from "next-vibe/ui/web/ui/icons/ChevronLeftIcon";
-import { ChevronRightIcon } from "next-vibe/ui/web/ui/icons/ChevronRightIcon";
-import { DotsHorizontalIcon } from "next-vibe/ui/web/ui/icons/DotsHorizontalIcon";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
+import { ChevronLeftIcon } from "../../web/ui/icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
+import { DotsHorizontalIcon } from "../../web/ui/icons/DotsHorizontalIcon";
+import { applyStyleType } from "../../web/utils/style-type";
 import { buttonVariants } from "./button";
 
 const StyledView = styledNative(View);
@@ -28,7 +28,7 @@ import type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "next-vibe/ui/web/ui/pagination";
+} from "../../web/ui/pagination";
 
 const Pagination = ({
   className,

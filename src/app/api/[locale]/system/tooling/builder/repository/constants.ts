@@ -27,44 +27,6 @@ export const SIZE_THRESHOLDS = {
 } as const;
 
 // ============================================================================
-// Default Externals
-// ============================================================================
-
-/** Default external modules that cannot be bundled (native/binary dependencies) */
-export const DEFAULT_CLI_EXTERNALS = [
-  // Native crypto
-  "argon2",
-  // Database drivers
-  "pg-native",
-  "better-sqlite3",
-  // Graphics
-  "canvas",
-  // CSS processing
-  "lightningcss",
-  // OXC native bindings (all platforms)
-  "@oxc-project/oxc-darwin-arm64",
-  "@oxc-project/oxc-darwin-x64",
-  "@oxc-project/oxc-linux-arm64-gnu",
-  "@oxc-project/oxc-linux-arm64-musl",
-  "@oxc-project/oxc-linux-x64-gnu",
-  "@oxc-project/oxc-linux-x64-musl",
-  "@oxc-project/oxc-win32-arm64-msvc",
-  "@oxc-project/oxc-win32-x64-msvc",
-  "@oxc-parser/napi",
-  "@oxc-parser/napi-darwin-arm64",
-  "@oxc-parser/napi-darwin-x64",
-  "@oxc-parser/napi-linux-arm64-gnu",
-  "@oxc-parser/napi-linux-arm64-musl",
-  "@oxc-parser/napi-linux-x64-gnu",
-  "@oxc-parser/napi-linux-x64-musl",
-  "@oxc-parser/napi-win32-arm64-msvc",
-  "@oxc-parser/napi-win32-x64-msvc",
-  // Browser automation (native binary, dynamic import only)
-  "playwright",
-  "playwright-core",
-] as const;
-
-// ============================================================================
 // Profile Defaults
 // ============================================================================
 

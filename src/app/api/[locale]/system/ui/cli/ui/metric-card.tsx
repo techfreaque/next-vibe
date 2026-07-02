@@ -1,18 +1,19 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "next-vibe/ui/web/ui/metric-card";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/metric-card";
 
 export type {
   MetricCardFormat,
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "next-vibe/ui/web/ui/metric-card";
+} from "../../web/ui/metric-card";
 
 const VARIANT_COLOR: Record<MetricCardVariant, string | undefined> = {
   default: undefined,

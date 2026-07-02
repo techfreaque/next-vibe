@@ -66,7 +66,7 @@ export const semantic = {
 /**
  * Format a message with color
  */
-export function colorize(text: string, color: string): string {
+function colorize(text: string, color: string): string {
   return `${color}${text}${colors.reset}`;
 }
 
@@ -94,7 +94,7 @@ export function styled(text: string, ...styles: string[]): string {
 /**
  * Check if colors should be disabled (e.g., in CI or when piped)
  */
-export function shouldUseColors(): boolean {
+function shouldUseColors(): boolean {
   // Disable colors if NO_COLOR env var is set
   if (process.env.NO_COLOR) {
     return false;

@@ -1709,7 +1709,6 @@ export const translations = {
         3: "Make a short video of a cat",
       },
       variants: {
-        kimi: "Kimi",
         budget: "Budget",
         visual: "Visual",
       },

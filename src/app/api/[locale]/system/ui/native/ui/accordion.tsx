@@ -1,17 +1,5 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
 import { cn } from "next-vibe/core/utils/utils";
-import { ChevronDown } from "next-vibe/ui/native/ui/icons/ChevronDown";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type {
-  AccordionContentProps,
-  AccordionItemProps,
-  AccordionProps,
-  AccordionTriggerProps,
-} from "next-vibe/ui/web/ui/accordion";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -26,6 +14,18 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { ChevronDown } from "../../native/ui/icons/ChevronDown";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../native/utils/style-converter";
+import type {
+  AccordionContentProps,
+  AccordionItemProps,
+  AccordionProps,
+  AccordionTriggerProps,
+} from "../../web/ui/accordion";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Text, TextClassContext } from "./text";
 
 const StyledAnimatedView = styledNative(Animated.View);

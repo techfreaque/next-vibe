@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The result contains an `imageUrl` field with a non-empty value: `http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/b2341723-d6fa-40f9-975a-1b16ebe50882/5bbd25b4-c61b-469c-9044-13659df88a4c.png`. There is no `taskId` present. The credit cost is 2.9. Everything looks correct for T5d.\n\nI should end my reply with STEP_OK.</think> STEP_OK\n\nUser: [T6a wakeUp-phase1] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wakeup-test'}, callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no image yet - end your reply with STEP_OK if you see taskId and no image URL, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived you will see the generate_image result containing the image — the URL may appear either as an \"imageUrl\" field OR as a rendered markdown image link ![...](https://...). EITHER form counts. Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any fo\n\nAssistant: <think> The user wants me to run T6a: call execute-tool with generate_image on hermes, callbackMode='wakeUp', prompt='wakeup-test'. I should get a taskId with no image. Then I'll be automatically revived when the image is ready.\n\nLet me call execute-tool with the specified parameters.</think>\n\nAssistant: <think> The execute-tool call with callbackMode='wakeUp' returned a taskId (\"remote-ws-hermes-functions-execute-tool-2\") and no imageUrl. According to the test instructions, I need to end my reply with STEP_OK if I see taskId and no image URL.\n\nThe hint also says: \"Acknowledge the taskId to the user in one short sentence, then STOP this turn.\"\n\nSo I should just say something brief and end with STEP_OK.</think> Dispatched taskId `remote-ws-hermes-functions-execute-tool-2`. Waiting for async result.\n\nSTEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

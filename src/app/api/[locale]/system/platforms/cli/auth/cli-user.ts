@@ -31,7 +31,7 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
  * Get CLI user email from environment
  * Returns null if VIBE_ADMIN_USER_EMAIL is not set
  */
-export function getCliUserEmail(): string | null {
+function getCliUserEmail(): string | null {
   return env.VIBE_ADMIN_USER_EMAIL ?? null;
 }
 
@@ -45,18 +45,6 @@ export function createDefaultCliUser(): JwtPrivatePayloadType {
     id: DEFAULT_CLI_USER_ID,
     leadId: DEFAULT_CLI_USER_ID,
     roles: [],
-  };
-}
-
-/**
- * Create a public CLI user payload
- * Used when VIBE_ADMIN_USER_EMAIL is not configured
- */
-export function createPublicCliUser(): JWTPublicPayloadType {
-  return {
-    isPublic: true,
-    leadId: DEFAULT_CLI_USER_ID,
-    roles: [UserPermissionRole.PUBLIC],
   };
 }
 

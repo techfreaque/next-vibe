@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t-sys--what-is-your-instance-id--look-at-your----e16f512e-7ae4-4218-817b-54dfb2233cc1.md\n\n# [T-SYS] What is your instance ID? Look at your...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

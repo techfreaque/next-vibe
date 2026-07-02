@@ -18,7 +18,7 @@ import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
 import { MESSAGES } from "./constants";
 
-export class GitService {
+class GitService {
   getInfo(cwd: string, logger: EndpointLogger): GitInfo {
     logger.debug("Getting git info", { cwd });
     let currentBranch: string | null = null;

@@ -9,7 +9,7 @@ import { dirname } from "node:path";
  * This directory should be git-ignored.
  */
 
-export interface ClusterState {
+interface ClusterState {
   clusterName: string;
   kubeconfig: string;
   controlPlaneIp: string;
@@ -18,26 +18,10 @@ export interface ClusterState {
   updatedAt: string;
 }
 
-export function readClusterState(stateDir: string): ClusterState | null {
-  const statePath = `${stateDir}/state.json`;
-  if (!existsSync(statePath)) {
-    return null;
-  }
-  const raw = readFileSync(statePath, "utf-8");
-  return JSON.parse(raw) as ClusterState;
-}
-
 export function writeClusterState(stateDir: string, state: ClusterState): void {
   mkdirSync(stateDir, { recursive: true });
   const statePath = `${stateDir}/state.json`;
   writeFileSync(statePath, JSON.stringify(state, null, 2), "utf-8");
-}
-
-export function readKubeconfig(kubeconfigPath: string): string | null {
-  if (!existsSync(kubeconfigPath)) {
-    return null;
-  }
-  return readFileSync(kubeconfigPath, "utf-8");
 }
 
 export function writeKubeconfig(

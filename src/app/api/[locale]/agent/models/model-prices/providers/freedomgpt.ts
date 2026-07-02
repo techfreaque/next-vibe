@@ -47,6 +47,7 @@ export class FreedomGptPriceFetcher extends PriceFetcher {
     let apiModels: FreedomGptApiModel[];
 
     try {
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const response = await fetch(MODELS_API_URL, {
         headers: {
           "User-Agent":

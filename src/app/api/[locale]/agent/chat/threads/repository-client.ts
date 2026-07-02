@@ -16,7 +16,6 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 import {
   createIncognitoThread,
@@ -48,7 +47,7 @@ export class ChatThreadsRepositoryClient {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const allThreads = await getThreadsForFolder(
-        data.rootFolderId as DefaultFolderId,
+        data.rootFolderId,
         data.subFolderId ?? null,
       );
 
@@ -128,7 +127,7 @@ export class ChatThreadsRepositoryClient {
       const threadId = data.id ?? crypto.randomUUID();
       const thread = await createIncognitoThread(
         data.title ?? "New Chat",
-        data.rootFolderId as DefaultFolderId,
+        data.rootFolderId,
         data.subFolderId ?? null,
         threadId,
       );

@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
-import type { RootStackProps } from "next-vibe/ui/web/ui/root-stack";
 import type { JSX } from "react";
+
+import type { RootStackProps } from "../../web/ui/root-stack";
 
 /**
  * Platform-agnostic RootStack component (Native implementation)

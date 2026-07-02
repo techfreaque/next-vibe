@@ -35,20 +35,20 @@ export const DataPointSchema = z.object({
 
 export type DataPoint = z.infer<typeof DataPointSchema>;
 
-export const TimeSeriesSchema = z.array(DataPointSchema);
+const TimeSeriesSchema = z.array(DataPointSchema);
 export type TimeSeries = DataPoint[];
 
-export const ResolutionSchema = z.enum(GraphResolutionDB);
+const ResolutionSchema = z.enum(GraphResolutionDB);
 export type Resolution = (typeof GraphResolutionDB)[number];
 export { GraphResolutionDB as ResolutionValues };
 
-export const RangeSchema = z.object({
+const RangeSchema = z.object({
   from: dateSchema,
   to: dateSchema,
 });
 export type TimeRange = z.infer<typeof RangeSchema>;
 
-export const NodeMetaSchema = z.object({
+const NodeMetaSchema = z.object({
   actualResolution: z.enum(GraphResolutionDB),
   lookbackUsed: z.number().int().min(0),
   sparse: z.boolean().optional(),
@@ -78,7 +78,7 @@ export interface SignalEvent {
   meta?: Record<string, string | number | boolean | null>;
 }
 
-export const SignalEventSchema = z.object({
+const SignalEventSchema = z.object({
   timestamp: z.coerce.date(),
   fired: z.boolean(),
   meta: z
@@ -89,10 +89,10 @@ export const SignalEventSchema = z.object({
     .optional(),
 });
 
-export const SignalsSchema = z.array(SignalEventSchema);
+const SignalsSchema = z.array(SignalEventSchema);
 export type Signals = z.infer<typeof SignalsSchema>;
 
-export const SignalStreamsSchema = z.array(z.array(SignalEventSchema));
+const SignalStreamsSchema = z.array(z.array(SignalEventSchema));
 
 // ─── Scoped Translation Constraint ───────────────────────────────────────────
 

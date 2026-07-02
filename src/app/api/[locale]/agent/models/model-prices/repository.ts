@@ -1259,7 +1259,7 @@ export class ModelPricesRepository {
       // and the in-memory defs reflect the latest modality data.
       try {
         const { generateVisionEnumFileContent } =
-          await import("../../ai-stream/vision-enum-generator");
+          await import("../../ai-stream/model-enums-generator/vision-enum-generator");
         const { ChatModelId: ChatModelIdEnum } =
           await import("../../ai-stream/models");
         const content = generateVisionEnumFileContent(
@@ -1284,7 +1284,7 @@ export class ModelPricesRepository {
       // Re-generate LLM-derived entries inline in ImageGenModelId / VideoGenModelId / MusicGenModelId
       try {
         const { updateMediaGenInlineEnum } =
-          await import("../../ai-stream/media-gen-enum-generator");
+          await import("../../ai-stream/model-enums-generator/media-gen-enum-generator");
         const { ChatModelId: ChatModelIdEnum } =
           await import("../../ai-stream/models");
         const chatEnumEntries = Object.entries(ChatModelIdEnum) as Array<

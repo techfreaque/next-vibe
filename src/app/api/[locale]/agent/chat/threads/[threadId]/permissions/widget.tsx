@@ -3,13 +3,13 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/web/ui/dialog";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 

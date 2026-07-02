@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "You have two tasks. Task 1: Call execute-tool with toolName='self-instance-id', instanceId='hermes', callbackMode='detach', input={}. This dispatches the job on hermes in the background and returns a taskId immediately. Report the taskId as: taskId=<the exact value>. Task 2: After task 1, call await-task with taskId=<value from task 1>. The completed result should contain instanceId='hermes'. End your response with STEP_OK instanceId=<value> if both calls succeeded, or FAILED: <reason> if either failed.",
+    "encoding_format": "float"
+  }
+}

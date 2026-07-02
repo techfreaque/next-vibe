@@ -49,6 +49,7 @@ import {
   getOrCreateFolder,
   resolveUser,
   runTestStream,
+  toolResultRecord,
 } from "../../testing/headless-test-runner";
 
 const VIBE_CODER_FAVORITE_ID = "00000000-0000-4010-a000-000000000001";
@@ -146,16 +147,13 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
     _prodUserId = await resolveProdUserId();
     const remoteAdminToken = await resolveProdAdminToken();
+    // Only the hermes-side mapped user (_prodUserId) needs remote credits —
+    // hermes executes atlas's calls as that user. testUser exists only in the
+    // atlas DB; crediting it on hermes would hit the users FK and 404.
     await ensureRemoteUserCredits(
       "http://localhost:3002",
       remoteAdminToken,
       _prodUserId,
-      5000,
-    );
-    await ensureRemoteUserCredits(
-      "http://localhost:3002",
-      remoteAdminToken,
-      testUser.id,
       5000,
     );
   }, 120_000);
@@ -188,6 +186,9 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       favoriteId: VIBE_CODER_FAVORITE_ID,
       rootFolderId: DefaultFolderId.BACKGROUND,
       subFolderId: vibeCoderFolderId,
+      // Two-level agent chain (Thea → ai-run sub-agent incl. a 30s shell-exec
+      // window) legitimately takes 2-4 min on a live first recording.
+      settleTimeoutMs: 240_000,
     });
 
     expect(
@@ -207,30 +208,44 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
     );
 
     // ── Assert ai-run was called ──
+    // Thea may call ai-run directly OR route it through execute-tool
+    // (toolName="execute-tool", args.toolName="ai-run", args.input=<ai-run args>).
+    // Both are the same delegation — accept either shape.
     const toolMessages = messages.filter((m) => m.role === "tool");
     const toolNames = toolMessages
-      .map((m) => m.toolCall?.toolName ?? "")
+      .map((m) => {
+        const name = m.toolCall?.toolName ?? "";
+        const inner = toolResultRecord(m.toolCall?.args)?.["toolName"];
+        return name === "execute-tool" && typeof inner === "string"
+          ? `execute-tool→${inner}`
+          : name;
+      })
       .filter(Boolean);
 
-    const aiRunMsg = toolMessages.find(
-      (m) => m.toolCall?.toolName === "ai-run",
+    // Use the LAST matching call: a model may first attempt ai-run with bad
+    // args (validation error), then retry correctly — the final call is the
+    // delegation that actually ran.
+    const aiRunMsg = toolMessages.findLast(
+      (m) =>
+        m.toolCall?.toolName === "ai-run" ||
+        (m.toolCall?.toolName === "execute-tool" &&
+          toolResultRecord(m.toolCall.args)?.["toolName"] === "ai-run"),
     );
 
     expect(
       aiRunMsg,
-      `VC1: Expected Thea to call \`ai-run\` for coding delegation, but tool calls were: [${toolNames.join(", ")}].\n\nAI response:\n${aiContent}\n\nFix: update codingAgentSettingFragment in chat/settings/system-prompt/prompt.ts to clearly instruct Thea to use ai-run(skill="vibe-coder") when codingAgent=next-vibe-coder.`,
+      `VC1: Expected Thea to call \`ai-run\` for coding delegation, but tool calls were: [${toolNames.join(", ")}].\n\nAI response:\n${aiContent}\n\nFix: update codingAgentSettingFragment in chat/settings/system-prompt.ts to clearly instruct Thea to use ai-run(skill="vibe-coder") when codingAgent=next-vibe-coder.`,
     ).toBeDefined();
 
     // ── Assert ai-run was called with vibe-coder skill ──
     if (aiRunMsg) {
-      const toolArgs: WidgetData = aiRunMsg.toolCall?.args;
+      const outerArgs = toolResultRecord(aiRunMsg.toolCall?.args);
+      // execute-tool wraps the target tool's args under `input`
       const argsRecord =
-        toolArgs !== null &&
-        toolArgs !== undefined &&
-        typeof toolArgs === "object" &&
-        !Array.isArray(toolArgs)
-          ? (toolArgs as Record<string, WidgetData>)
-          : null;
+        aiRunMsg.toolCall?.toolName === "execute-tool"
+          ? (toolResultRecord(outerArgs?.["input"]) ?? outerArgs)
+          : outerArgs;
+      const toolArgs: WidgetData = argsRecord;
 
       const skillArg = argsRecord?.skill ?? argsRecord?.skillId;
       expect(
@@ -255,7 +270,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       aiContent.includes("STEP_OK"),
       `VC1: AI did not confirm STEP_OK.\n\nAI response:\n${aiContent}`,
     ).toBe(true);
-  }, 180_000);
+  }, 360_000);
 
   // ── VC2: vibe-coder skill has SSH awareness ───────────────────────────────
   it("VC2: vibe-coder skill has ssh-exec available and provides SSH guidance when no connections exist", async () => {

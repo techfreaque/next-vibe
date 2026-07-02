@@ -1,12 +1,12 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { styledNative } from "next-vibe/ui/native/utils/style-converter";
-import type { ListItemProps } from "next-vibe/ui/web/ui/list-item";
 import { Pressable, View } from "react-native";
 
+import { styledNative } from "../../native/utils/style-converter";
+import type { ListItemProps } from "../../web/ui/list-item";
 import { Text } from "./text";
 
-export type { ListItemProps } from "next-vibe/ui/web/ui/list-item";
+export type { ListItemProps } from "../../web/ui/list-item";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

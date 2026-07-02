@@ -5,14 +5,15 @@
  */
 
 import { styled } from "nativewind";
+import type { ForwardedRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { View } from "react-native";
+
 // Import all types from web version (web is source of truth)
 import type {
   FormElementProps,
   FormElementRefObject,
-} from "next-vibe/ui/web/ui/form-element";
-import type { ForwardedRef } from "react";
-import { forwardRef, useImperativeHandle, useRef } from "react";
-import { View } from "react-native";
+} from "../../web/ui/form-element";
 
 const StyledView = styled(View, { className: "style" });
 

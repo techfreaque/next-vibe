@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-vc2-ssh-awareness--using-the-vibe-coder-skill----906dc47a-4c64-4a9e-bd52-33521d634c3f.md\n\n# [VC2 ssh-awareness] Using the vibe-coder skill...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

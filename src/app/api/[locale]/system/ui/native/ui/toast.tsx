@@ -1,10 +1,14 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import { Pressable, View } from "react-native";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+} from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
 import type {
   ToastActionProps,
   ToastCloseProps,
@@ -13,13 +17,9 @@ import type {
   ToastRootProps,
   ToastTitleProps,
   ToastViewportProps,
-} from "next-vibe/ui/web/ui/toast";
-import { toastVariants } from "next-vibe/ui/web/ui/toast";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { Pressable, View } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-
+} from "../../web/ui/toast";
+import { toastVariants } from "../../web/ui/toast";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Span } from "./span";
 
 // Re-export types for cross-platform compatibility

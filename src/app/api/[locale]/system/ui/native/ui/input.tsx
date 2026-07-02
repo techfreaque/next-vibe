@@ -1,6 +1,10 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToTextStyle } from "next-vibe/ui/native/utils/style-converter";
+import type { JSX } from "react";
+import * as React from "react";
+import { TextInput } from "react-native";
+
+import { convertCSSToTextStyle } from "../../native/utils/style-converter";
 import type {
   InferValueType,
   InputChangeEvent,
@@ -8,12 +12,9 @@ import type {
   InputGenericTarget,
   InputProps as InputBaseProps,
   InputRefObject,
-} from "next-vibe/ui/web/ui/input";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import type { JSX } from "react";
-import * as React from "react";
-import { TextInput } from "react-native";
+} from "../../web/ui/input";
+import type { StyleType } from "../../web/utils/style-type";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledTextInput = styled(TextInput);
 

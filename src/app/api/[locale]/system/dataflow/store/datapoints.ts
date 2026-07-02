@@ -105,7 +105,7 @@ export async function readDatapoints(
  * Applies both maxRows and maxAgeDays limits, whichever triggers first.
  * Called by the scheduled cleanup task.
  */
-export async function runRetentionCleanup(
+async function runRetentionCleanup(
   nodeId: string,
   config: { maxRows?: number; maxAgeDays?: number },
 ): Promise<{ deletedRows: number }> {

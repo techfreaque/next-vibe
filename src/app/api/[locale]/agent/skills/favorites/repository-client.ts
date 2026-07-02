@@ -135,28 +135,34 @@ export class ChatFavoritesRepositoryClient {
         name: string | null;
         tagline: string | null;
         description: string | null;
-        variants: Array<{
-          id: string;
-          modelSelection: ChatModelSelection | null;
-          voiceModelSelection: VoiceModelSelection | null;
-          isDefault: boolean;
-        }>;
+        variants: SkillVariantData[];
       }
 
       const fetchedSkillMap = new Map<string, FetchedSkill>();
       if (uuidSkillIds.length > 0) {
         const results = await Promise.allSettled(
           uuidSkillIds.map(async (skillId) => {
-            const res = await fetch(`/api/${locale}/agent/skills/${skillId}`);
-            if (!res.ok) {
+            const response = await executeQuery({
+              endpoint: skillSingleDefinition.GET,
+              logger,
+              user,
+              locale,
+              availability,
+              requestData: undefined,
+              pathParams: { id: skillId },
+            });
+            if (!response.success) {
               return;
             }
-            const json = (await res.json()) as {
-              data?: FetchedSkill & { id?: string };
-            };
-            if (json.data) {
-              fetchedSkillMap.set(skillId, json.data);
-            }
+            const { icon, name, tagline, description, variants } =
+              response.data;
+            fetchedSkillMap.set(skillId, {
+              icon,
+              name,
+              tagline,
+              description,
+              variants,
+            });
           }),
         );
         // Log failures for debugging but don't crash

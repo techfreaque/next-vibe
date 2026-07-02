@@ -1,14 +1,15 @@
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "next-vibe/ui/web/ui/radio-group";
-import type { JSX } from "react";
+} from "../../web/ui/radio-group";
 
 export type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "next-vibe/ui/web/ui/radio-group";
+} from "../../web/ui/radio-group";
 
 // Radio button marker - non-translatable terminal symbol
 const RADIO_MARKER = "(\u00a0)";

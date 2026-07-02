@@ -1,8 +1,9 @@
 import { Text } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { TitleProps } from "next-vibe/ui/web/ui/title";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import * as React from "react";
+
+import type { TitleProps } from "../../web/ui/title";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Title({
   children,

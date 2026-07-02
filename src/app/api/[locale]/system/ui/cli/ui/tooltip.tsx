@@ -15,14 +15,14 @@ export type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "../../web/ui/tooltip";
 
 import type {
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "../../web/ui/tooltip";
 
 export function TooltipProvider({
   children,

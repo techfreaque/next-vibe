@@ -177,6 +177,44 @@ export class SkillsRepository {
   }
 
   /**
+   * The emit-side channel for a skill event. The emitting user owns the skill
+   * (they just mutated it), so a PUBLIC skill's events ride the shared resource
+   * channel (every viewer gets them) and any other skill rides the owner's own
+   * user channel. Mirrors resolveSubscriptionChannel's owner/public split so the
+   * emitter delivers on exactly the channel subscribers were admitted to.
+   */
+  static emitChannelForOwnership(
+    ownershipType: string | undefined,
+  ): EmitChannelDecision {
+    return {
+      kind: ownershipType === SkillOwnershipType.PUBLIC ? "resource" : "user",
+    };
+  }
+
+  /**
+   * Resolve the emit-side channel for a skill by id — for re-emit sites (the
+   * peer-relay onRemoteEvent handlers) that have only the id. SYSTEM/built-in
+   * skills are public → resource; a missing custom skill defaults to the owner's
+   * own channel (safe: never a shared channel for an unknown resource).
+   */
+  static async emitChannelBySkillId(
+    rawSkillId: string,
+  ): Promise<EmitChannelDecision> {
+    const { skillId } = parseSkillId(rawSkillId);
+    if (DEFAULT_SKILLS.some((s) => s.id === skillId)) {
+      return { kind: "resource" };
+    }
+    const [skill] = await db
+      .select({ ownershipType: customSkills.ownershipType })
+      .from(customSkills)
+      .where(eq(customSkills.slug, skillId))
+      .limit(1);
+    return skill
+      ? SkillsRepository.emitChannelForOwnership(skill.ownershipType)
+      : { kind: "user" };
+  }
+
+  /**
    * Resolve a skill identifier (UUID or slug) to its canonical slug form.
    * Default skill IDs are already friendly strings - returned as-is.
    * Custom skill UUIDs are looked up and resolved to the slug.
@@ -1498,12 +1536,12 @@ export class SkillsRepository {
       // the framework merges them into the [id] DETAIL cache AND the client onEvent
       // rebuilds the LIST card; cross-instance (remoteEvent) the peer re-applies the
       // update.
-      createEndpointEmitter(
-        skillIdDefinitions.PATCH,
-        logger,
-        user,
-      )("skill-updated", {
+      createEndpointEmitter(skillIdDefinitions.PATCH, logger, user, {
         urlPathParams: { id: existingSkill.slug ?? existingSkill.id },
+        // PUBLIC skill → shared resource channel (all viewers); else owner's own.
+        kindOverride:
+          SkillsRepository.emitChannelForOwnership(ownershipType).kind,
+      })("skill-updated", {
         requestData: {
           name: updated.name ?? null,
           icon: updated.icon ?? null,
@@ -1606,13 +1644,13 @@ export class SkillsRepository {
       // This op owns its `skill-deleted` event (side-effect; the skill id rides on
       // urlPathParams). Locally its client onEvent removes the skill from the list;
       // cross-instance (remoteEvent) the peer's onRemoteEvent removes it by id.
-      createEndpointEmitter(
-        skillIdDefinitions.DELETE,
-        logger,
-        user,
-      )("skill-deleted", {
+      createEndpointEmitter(skillIdDefinitions.DELETE, logger, user, {
         urlPathParams: { id: deleted.slug ?? deleted.id },
-      });
+        // PUBLIC skill → shared resource channel (all viewers); else owner's own.
+        kindOverride: SkillsRepository.emitChannelForOwnership(
+          deleted.ownershipType,
+        ).kind,
+      })("skill-deleted");
 
       // Fire-and-forget: remove embedding from cortex_nodes
       void (async (): Promise<void> => {
@@ -1766,6 +1804,9 @@ export class SkillsRepository {
     "skill-deleted"
   >): Promise<void> {
     const skillId = urlPathParams.id;
+    // Capture the channel kind BEFORE the row is gone (the delete removes the
+    // ownership we need to decide owner-vs-public delivery).
+    const channel = await SkillsRepository.emitChannelBySkillId(skillId);
     try {
       const { parseSkillId: parse } = await import("../chat/slugify");
       const { skillId: resolvedId } = parse(skillId);
@@ -1784,10 +1825,10 @@ export class SkillsRepository {
       return;
     }
     createEndpointEmitter(skillIdDefinitions.DELETE, logger, user, {
-      fanOut: false,
-    })("skill-deleted", {
       urlPathParams: { id: skillId },
-    });
+      kindOverride: channel.kind,
+      fanOut: false,
+    })("skill-deleted");
   }
 
   /**
@@ -1831,10 +1872,12 @@ export class SkillsRepository {
       });
       return;
     }
+    const channel = await SkillsRepository.emitChannelBySkillId(skillId);
     createEndpointEmitter(skillIdDefinitions.PATCH, logger, user, {
+      urlPathParams: { id: skillId },
+      kindOverride: channel.kind,
       fanOut: false,
     })("skill-updated", {
-      urlPathParams: { id: skillId },
       requestData,
     });
   }

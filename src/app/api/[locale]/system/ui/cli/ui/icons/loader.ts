@@ -5,7 +5,7 @@
  * can statically analyze and tree-shake per icon.
  */
 
-import type { IconComponent } from "next-vibe/ui/web/lib/helper";
+import type { IconComponent } from "../../../web/lib/helper";
 
 type IconModule = Record<string, IconComponent>;
 

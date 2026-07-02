@@ -1,8 +1,9 @@
 "use client";
 
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export type CollapsibleProps = {
   children?: React.ReactNode;

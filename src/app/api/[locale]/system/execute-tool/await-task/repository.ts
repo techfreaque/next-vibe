@@ -13,6 +13,7 @@
 import "server-only";
 
 import { desc, eq, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -89,6 +90,49 @@ export class AwaitTaskRepository {
           });
         }
 
+        // Receiver-owns-task: for a remote dispatch the durable result lives in
+        // the OWNER instance's task history. The local entry can be stale — a
+        // detach dispatch message is never backfilled, and the result event may
+        // have been consumed by ANOTHER process on this instance (its registry,
+        // not ours). Ask the owner directly before parking this thread.
+        if (pendingCall.instanceId) {
+          const { RouteExecuteRepository } =
+            await import("next-vibe/execute-tool/repository");
+          const { default: awaitTaskDefinition } = await import("./definition");
+          const remote = await RouteExecuteRepository.runInProcessTyped({
+            definition: awaitTaskDefinition.POST,
+            instanceId: pendingCall.instanceId,
+            input: { taskId },
+            user,
+            locale: defaultLocale,
+            logger,
+            callbackMode: CallbackMode.WAIT,
+          });
+          if (
+            remote.success &&
+            remote.data.waiting !== true &&
+            (remote.data.status === CronTaskStatus.COMPLETED ||
+              remote.data.status === CronTaskStatus.FAILED)
+          ) {
+            discardPendingCall(taskId);
+            logger.debug(
+              "[AwaitTask] Owner instance returned settled result — delivering inline",
+              { taskId, instanceId: pendingCall.instanceId },
+            );
+            return success<AwaitTaskResponseOutput>({
+              ...remote.data,
+              originalToolName:
+                remote.data.originalToolName ?? pendingCall.toolName,
+              originalArgs:
+                remote.data.originalArgs ?? pendingCall.input ?? undefined,
+            });
+          }
+          logger.debug(
+            "[AwaitTask] Owner instance has no settled result yet — parking locally",
+            { taskId, instanceId: pendingCall.instanceId },
+          );
+        }
+
         const pendThreadId = streamContext.threadId;
         const pendToolMessageId =
           streamContext.currentToolMessageId ?? streamContext.aiMessageId;
@@ -106,6 +150,14 @@ export class AwaitTaskRepository {
             subAgentDepth: streamContext.subAgentDepth ?? 0,
             userId: user.id ?? "",
           });
+
+          // Restart/cross-process safety (same pattern as the wakeUp park):
+          // persist the callId on the await-task tool message so ANY process
+          // that receives the result event can revive this parked thread from
+          // the DB — the in-memory revival above only helps the process that
+          // parked it.
+          const { storePendingCallId } = await import("../handlers/remote");
+          await storePendingCallId(pendToolMessageId, taskId, logger);
 
           streamContext.waitingForRemoteResult = true;
           streamContext.pendingTimeoutMs = 90_000;
@@ -245,7 +297,7 @@ export class AwaitTaskRepository {
           await db
             .delete(cronTasks)
             .where(
-              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
+              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
             );
           await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
         } catch (cleanupErr) {
@@ -363,7 +415,7 @@ export class AwaitTaskRepository {
             await db
               .delete(cronTasks)
               .where(
-                sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
+                sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
               );
             await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
           } catch (cleanupErr) {

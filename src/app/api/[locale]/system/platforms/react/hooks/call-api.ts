@@ -11,10 +11,9 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
-import { authClientRepository } from "next-vibe/identity/auth/repository-client";
+import { AuthClientRepository } from "next-vibe/identity/auth/repository-client";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { containsFile, objectToFormData } from "./api-utils-shared";
 import { scopedTranslation as hooksTranslation } from "next-vibe/platforms/react/hooks/i18n";
 import { getCookie } from "next-vibe/ui/web/lib/cookies";
 
@@ -24,8 +23,9 @@ import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
 } from "@/config/constants";
-import { platform } from "@/config/env-client";
-import { envClient } from "@/config/env-client";
+import { envClient, platform } from "@/config/env-client";
+
+import { containsFile, objectToFormData } from "./api-utils-shared";
 
 const MUTATING_METHODS = new Set([
   Methods.POST,
@@ -195,8 +195,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   if (shouldUseClientRoute) {
     const { endpointToToolName } =
       await import("next-vibe/core/core-utils/path");
-    const { getClientRouteHandler } =
-      await import("@/generated/route-handlers-client");
+    const { getClientRouteHandler } = await import("@/generated/routes/client");
     const pathKey = endpointToToolName(endpoint);
     const handlerObject = await getClientRouteHandler(pathKey);
     if (handlerObject?.handler) {
@@ -252,7 +251,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     if (platform.isReactNative) {
       const { t: authT } = authScopedTranslation.scopedT(locale);
-      const storedToken = await authClientRepository.getAuthToken(
+      const storedToken = await AuthClientRepository.getAuthToken(
         logger,
         authT,
       );
@@ -278,6 +277,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       options.body = postBody;
     }
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(url, options);
     const json = (await response.json()) as ResponseType<
       TEndpoint["types"]["ResponseOutput"]

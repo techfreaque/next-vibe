@@ -3,12 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/agent/chat/data-sources/chat-messages-total",
-)({
-  server: {
-    handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/chat/data-sources/chat-messages-total/route"),
-    ),
-  },
+export const Route = createFileRoute("/api/$locale/agent/chat/data-sources/chat-messages-total")({
+  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/chat/data-sources/chat-messages-total/route")) },
 });

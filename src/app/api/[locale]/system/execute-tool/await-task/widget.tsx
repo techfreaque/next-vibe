@@ -3,7 +3,6 @@
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { P } from "next-vibe/ui/web/ui/typography";
 import {
@@ -13,6 +12,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

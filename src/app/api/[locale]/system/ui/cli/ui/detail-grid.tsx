@@ -1,15 +1,16 @@
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   DetailFieldProps,
   DetailGridProps,
-} from "next-vibe/ui/web/ui/detail-grid";
-import type { JSX } from "react";
+} from "../../web/ui/detail-grid";
 
 export type {
   DetailFieldProps,
   DetailGridColumns,
   DetailGridProps,
-} from "next-vibe/ui/web/ui/detail-grid";
+} from "../../web/ui/detail-grid";
 
 export function DetailGrid({ children }: DetailGridProps): JSX.Element {
   return (

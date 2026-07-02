@@ -11,7 +11,6 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { type UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { endpoints as cronTaskEndpoints } from "next-vibe/tasks/cron/[id]/definition";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
@@ -31,6 +30,7 @@ import {
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

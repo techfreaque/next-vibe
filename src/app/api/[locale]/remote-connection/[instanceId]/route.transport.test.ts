@@ -34,7 +34,6 @@ import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { env } from "@/config/env";
 
-import { DEFAULT_CHAT_MODEL_ID } from "../../agent/ai-stream/constants";
 import { setFetchCacheContext } from "../../agent/ai-stream/testing/fetch-cache";
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {
@@ -335,111 +334,49 @@ if (_remoteUrl && _isFixtureMode) {
       ).toBeDefined();
     }, 180_000);
 
-    // ── TM3: Reverse stream — hermes initiates to atlas ───────────────
+    // ── TM3: atlas → hermes stream reaches idle + persists locally ────
     //
-    // hermes calls atlas's ws-provider/stream endpoint directly (using an
-    // admin JWT obtained from hermes's local DB). atlas runs the AI loop.
-    // The resulting thread should appear in hermes's local DB in the
-    // remote/atlas subfolder.
+    // Always initiate FROM atlas TO hermes (the normal direction) via the typed
+    // headless stream runner — never a raw reverse device-token POST. atlas
+    // relays to hermes, hermes runs the AI loop, and with threadMirrorMode='both'
+    // the thread is mirrored back into atlas's local remote/hermes folder.
     //
-    // This validates that the bidirectional relay works in both directions:
-    //   TM1: atlas → hermes (covered above)
-    //   TM3: hermes → atlas (reverse direction)
-    //
-    // Note: atlas's ws-provider/stream requires a valid token from atlas's DB.
-    // We use the stored connection token from the local remoteConnections row
-    // (the token hermes obtained during connect — it's atlas's device token).
+    // Complements TM1 (which checks folder placement both sides) by asserting the
+    // mirrored thread reaches a terminal (idle) streaming state on atlas.
 
-    it("TM3: reverse stream — hermes initiates to atlas, thread appears in hermes remote/atlas folder", async () => {
+    it("TM3: atlas → hermes stream mirrors thread to atlas and reaches idle", async () => {
       setFetchCacheContext("transport-mirror-tm3");
 
-      // Get the token hermes holds for atlas (stored in hermes's remote_connections).
-      // This is the token atlas issued during registration (atlas's device token).
-      const pdb = getProdDb();
-      const connRow = await pdb.execute<{
-        token: string;
-        lead_id: string;
-      }>(
-        sql`SELECT token, lead_id FROM remote_connections
-                WHERE user_id = ${prodUserId}
-                  AND instance_id = ${ATLAS_INSTANCE_ID}
-                LIMIT 1`,
-      );
-
-      const remoteConnRow = connRow.rows[0];
-      expect(
-        remoteConnRow?.token,
-        "[TM3] hermes has no token for atlas — connectToHermes() registration did not complete. " +
-          "Check that register/repository.ts stored the token on hermes's side.",
-      ).toBeTruthy();
-      if (!remoteConnRow?.token) {
-        return;
-      }
-
-      // POST to atlas's ws-provider/stream endpoint directly.
-      // Use hermes's stored token for atlas (a device token on atlas).
-      const { RemoteConnectionRepository } =
-        await import("../repository");
-      const decryptedToken = RemoteConnectionRepository.decryptToken(
-        remoteConnRow.token,
-      );
-
-      const devUrl = "http://localhost:3000";
-      const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-      const streamUrl = `${devUrl}/api/${defaultLocale}/agent/ai-stream/ws-provider/stream`;
-
-      const streamResp = await fetch(streamUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${decryptedToken}`,
-        },
-        body: JSON.stringify({
-          content: "[TM3 reverse-stream] Reply with exactly: REVERSE_OK",
-          model: DEFAULT_CHAT_MODEL_ID,
-          rootFolderId: DefaultFolderId.REMOTE,
-          // instanceId identifies the calling instance as known by the provider (atlas).
-          // Hermes is known as HERMES_INSTANCE_ID ("hermes") by atlas.
-          instanceId: HERMES_INSTANCE_ID,
-          // threadMirrorMode='both' enables provider-side persistence on atlas
-          // so the thread is written to atlas's REMOTE/hermes folder and can be
-          // queried in the assertions below.
-          threadMirrorMode: "both",
-        }),
-        signal: AbortSignal.timeout(60_000),
+      const { result } = await runTestStream({
+        user: testUser,
+        prompt: "[TM3 mirror-idle] Reply with exactly: REVERSE_OK",
+        rootFolderId: DefaultFolderId.REMOTE,
+        subFolderId: localFolderId,
+        favoriteId: tmFavoriteId,
       });
 
       expect(
-        streamResp.ok,
-        `TM3: ws-provider/stream POST to atlas failed with ${String(streamResp.status)}`,
+        result.success,
+        `TM3 stream failed: ${!result.success ? result.message : ""}`,
       ).toBe(true);
-      if (!streamResp.ok) {
+      if (!result.success) {
         return;
       }
 
-      const streamBody = (await streamResp.json()) as {
-        success?: boolean;
-        data?: { responseThreadId?: string; messageId?: string };
-      };
-
-      const responseThreadId = streamBody.data?.responseThreadId;
-      expect(
-        responseThreadId,
-        "TM3: ws-provider/stream must return responseThreadId",
-      ).toBeTruthy();
-      if (!responseThreadId) {
+      const threadId = result.data.threadId;
+      expect(threadId, "TM3: expected threadId in result").toBeDefined();
+      if (!threadId) {
         return;
       }
 
-      // Wait for the stream to complete on atlas (poll thread state).
+      // Wait for the mirrored thread to reach a terminal (idle) state on atlas.
       const deadline = Date.now() + 60_000;
       let threadIdle = false;
       while (!threadIdle && Date.now() < deadline) {
         const [threadRow] = await db
           .select({ streamingState: chatThreads.streamingState })
           .from(chatThreads)
-          .where(eq(chatThreads.id, responseThreadId))
+          .where(eq(chatThreads.id, threadId))
           .limit(1);
         if (threadRow?.streamingState === "idle") {
           threadIdle = true;
@@ -452,23 +389,27 @@ if (_remoteUrl && _isFixtureMode) {
 
       expect(
         threadIdle,
-        `TM3: atlas thread ${responseThreadId} did not reach idle state within timeout`,
+        `TM3: atlas thread ${threadId} did not reach idle state within timeout`,
       ).toBe(true);
 
-      // ── atlas side: thread must exist locally ──────────────────────
+      // ── atlas side: thread must exist locally in the REMOTE folder ──
       const [localThread] = await db
         .select({
           id: chatThreads.id,
           rootFolderId: chatThreads.rootFolderId,
         })
         .from(chatThreads)
-        .where(eq(chatThreads.id, responseThreadId))
+        .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       expect(
         localThread,
-        `TM3: thread ${responseThreadId} not found on atlas after reverse stream.`,
+        `TM3: thread ${threadId} not found on atlas after stream.`,
       ).toBeDefined();
+      expect(
+        localThread?.rootFolderId,
+        "TM3: mirrored thread must be in the REMOTE root folder",
+      ).toBe(DefaultFolderId.REMOTE);
     }, 180_000);
 
     // ── TM2: threadMirrorMode='none' — no local write on atlas ────────

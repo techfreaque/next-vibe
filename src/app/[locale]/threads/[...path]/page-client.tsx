@@ -1,7 +1,7 @@
 "use client";
 
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";

@@ -5,7 +5,6 @@
  */
 
 import type { LeadGetResponseOutput } from "next-vibe/identity/lead/[id]/definition";
-import { z } from "zod";
 
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/leads/list/definition";
 

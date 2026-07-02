@@ -83,7 +83,7 @@ abstract class CliError extends Error {
 /**
  * Route execution error
  */
-export class RouteExecutionError extends CliError {
+class RouteExecutionError extends CliError {
   readonly code = "ROUTE_EXECUTION_ERROR";
   readonly statusCode = 500;
 

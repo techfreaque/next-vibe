@@ -64,11 +64,12 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-whisper",
-        creditCostPerSecond: 0.013, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 0.013, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },
   [SttModelId.DEEPGRAM_NOVA_2]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Nova-2",
     by: "deepgram",
     description: "speechToText.models.descriptions.deepgramNova2",
@@ -97,7 +98,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepgram-nova-2",
-        creditCostPerSecond: 0.0126, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 0.0126, // updated: 2026-07-02 from unbottled.ai
       },
     ],
   },

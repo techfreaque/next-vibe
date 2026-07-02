@@ -11,7 +11,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 // Interface
 // ============================================================================
 
-export interface IErrorSuggester {
+interface IErrorSuggester {
   /**
    * Get actionable suggestions based on an error message
    */
@@ -22,7 +22,7 @@ export interface IErrorSuggester {
 // Implementation
 // ============================================================================
 
-export class ErrorSuggester implements IErrorSuggester {
+class ErrorSuggester implements IErrorSuggester {
   getSuggestions(errorMessage: string, t: ModuleT): string[] {
     const suggestions: string[] = [];
     const lowerError = errorMessage.toLowerCase();

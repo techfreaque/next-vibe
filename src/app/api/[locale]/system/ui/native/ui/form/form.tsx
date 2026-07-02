@@ -3,6 +3,11 @@
 import { Slot } from "@radix-ui/react-slot";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import type { FieldPath, FieldValues } from "react-hook-form";
+import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import { View } from "react-native";
+
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
 // ============================================================================
@@ -17,12 +22,7 @@ import type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "next-vibe/ui/web/ui/form/form";
-import * as React from "react";
-import type { FieldPath, FieldValues } from "react-hook-form";
-import { Controller, FormProvider, useFormContext } from "react-hook-form";
-import { View } from "react-native";
-
+} from "../../../web/ui/form/form";
 import { Label } from "../label";
 import { P } from "../typography";
 

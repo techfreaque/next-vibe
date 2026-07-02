@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import type { DropdownItemProps } from "next-vibe/ui/web/ui/dropdown-item";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type { DropdownItemProps } from "next-vibe/ui/web/ui/dropdown-item";
+import type { DropdownItemProps } from "../../web/ui/dropdown-item";
+
+export type { DropdownItemProps } from "../../web/ui/dropdown-item";
 
 const SELECTED_MARKER = "\u25B6 "; // ▶
 const DISABLED_MARKER = "\u2013 "; // –

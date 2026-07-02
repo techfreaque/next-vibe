@@ -13,7 +13,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { type EnvKeyMeta } from "next-vibe/env/generator";
+import { type EnvKeyMeta } from "next-vibe/env/generator/generator";
 import { scopedTranslation } from "next-vibe/env/settings/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";

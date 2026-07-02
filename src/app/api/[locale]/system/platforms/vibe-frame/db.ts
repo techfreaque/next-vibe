@@ -33,13 +33,3 @@ export const frameExchangeTokens = pgTable("frame_exchange_tokens", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export const selectFrameExchangeTokenSchema =
-  createSelectSchema(frameExchangeTokens);
-export const insertFrameExchangeTokenSchema =
-  createInsertSchema(frameExchangeTokens);
-
-export type FrameExchangeToken = z.infer<typeof selectFrameExchangeTokenSchema>;
-export type NewFrameExchangeToken = z.infer<
-  typeof insertFrameExchangeTokenSchema
->;

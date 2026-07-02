@@ -14,10 +14,7 @@ const loadData = createServerFn({ method: "GET" })
     const { tanstackLoader } = await import("@/app/[locale]/threads/[...path]/page");
     const p = toNextParams(data.params);
     return tanstackLoader({
-      params: Promise.resolve({
-        ...p,
-        path: (p["_splat"] ?? "").split("/").filter(Boolean),
-      } as { locale: CountryLanguage; path: string[] }),
+      params: Promise.resolve({ ...p, path: (p["_splat"] ?? "").split("/").filter(Boolean) } as { locale: CountryLanguage; path: string[] }),
       searchParams: Promise.resolve(data.search),
     });
   });

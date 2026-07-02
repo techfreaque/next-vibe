@@ -14,12 +14,12 @@ import { serverSystemEnv } from "./env";
 /**
  * Supported server environments
  */
-export type ServerEnvironmentType = "development" | "production" | "serverless";
+type ServerEnvironmentType = "development" | "production" | "serverless";
 
 /**
  * Environment configuration interface
  */
-export interface EnvironmentConfig {
+interface EnvironmentConfig {
   environment: ServerEnvironmentType;
   nodeEnv: string;
   supportsTaskRunners: boolean;
@@ -35,7 +35,7 @@ export interface EnvironmentConfig {
 /**
  * Platform information interface
  */
-export interface PlatformInfo {
+interface PlatformInfo {
   name: string;
   type: string;
   region?: string;
@@ -48,7 +48,7 @@ export interface PlatformInfo {
 /**
  * Current environment information interface
  */
-export interface CurrentEnvironmentInfo {
+interface CurrentEnvironmentInfo {
   environment: ServerEnvironmentType;
   config: EnvironmentConfig;
   isServerless: boolean;
@@ -61,7 +61,7 @@ export interface CurrentEnvironmentInfo {
 /**
  * Detect the current server environment
  */
-export function detectEnvironment(): ServerEnvironmentType {
+function detectEnvironment(): ServerEnvironmentType {
   // Check for serverless environments first
   if (isServerlessEnvironment()) {
     return "serverless";
@@ -80,7 +80,7 @@ export function detectEnvironment(): ServerEnvironmentType {
 /**
  * Check if running in a serverless environment
  */
-export function isServerlessEnvironment(): boolean {
+function isServerlessEnvironment(): boolean {
   return !!(
     serverSystemEnv.VERCEL ||
     serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME ||
@@ -93,7 +93,7 @@ export function isServerlessEnvironment(): boolean {
 /**
  * Get environment configuration for the detected environment
  */
-export function getEnvironmentConfig(
+function getEnvironmentConfig(
   environment?: ServerEnvironmentType,
 ): EnvironmentConfig {
   const detectedEnv = environment || detectEnvironment();

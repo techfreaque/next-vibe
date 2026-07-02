@@ -2,9 +2,10 @@
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { cn } from "next-vibe/core/utils/utils";
-import { ChevronDownIcon } from "next-vibe/ui/web/ui/icons/ChevronDownIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { ChevronDownIcon } from "../../web/ui/icons/ChevronDownIcon";
+import type { StyleType } from "../../web/utils/style-type";
 
 // Accordion
 export type AccordionProps = {

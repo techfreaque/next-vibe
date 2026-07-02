@@ -3,8 +3,9 @@
  * This is a placeholder for native implementation
  */
 
-import type { RangeSliderProps } from "next-vibe/ui/web/ui/range-slider";
 import type { JSX } from "react";
+
+import type { RangeSliderProps } from "../../web/ui/range-slider";
 
 export function RangeSlider(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -16,4 +17,4 @@ export function RangeSlider(
 export type {
   RangeSliderOption,
   RangeSliderProps,
-} from "next-vibe/ui/web/ui/range-slider";
+} from "../../web/ui/range-slider";

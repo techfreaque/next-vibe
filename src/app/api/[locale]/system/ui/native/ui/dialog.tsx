@@ -1,10 +1,14 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import { cn } from "next-vibe/core/utils/utils";
-import { X } from "next-vibe/ui/native/ui/icons/X";
+import * as React from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { X } from "../../native/ui/icons/X";
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   DialogCloseProps,
   DialogContentProps,
@@ -16,11 +20,8 @@ import type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "next-vibe/ui/web/ui/dialog";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+} from "../../web/ui/dialog";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styledNative(View);
 const StyledText = styledNative(Text);

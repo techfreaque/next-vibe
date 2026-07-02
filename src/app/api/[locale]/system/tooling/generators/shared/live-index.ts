@@ -20,7 +20,7 @@ import { findFilesRecursively, toPosixPath } from "./utils";
 /**
  * Which generator group a changed file belongs to
  */
-export interface FileClass {
+interface FileClass {
   /** definition.ts or route.ts - affects endpoint generators */
   endpoints?: boolean;
   /** route-client.ts - affects client-routes generator */
@@ -35,16 +35,18 @@ export interface FileClass {
   indicatorIndex?: boolean;
   /** graph-seeds.ts - affects graph-seeds-index generator */
   graphSeedsIndex?: boolean;
-  /** system-prompt/prompt.ts - affects prompt-fragments generator */
+  /** system-prompt.ts - affects prompt-fragments generator */
   promptFragments?: boolean;
   /** skill.ts anywhere in api/ - affects skills-index generator */
   skillsIndex?: boolean;
   /** category.ts - affects category-index generator */
   categoryIndex?: boolean;
+  /** page.tsx or layout.tsx - affects tanstack-routes, next-app, native-indexes generators */
+  platformRoutes?: boolean;
 }
 
 /** Dirty flags - which generator groups need to run */
-export interface DirtyFlags {
+interface DirtyFlags {
   endpoints: boolean;
   clientRoutes: boolean;
   taskIndex: boolean;
@@ -55,6 +57,8 @@ export interface DirtyFlags {
   promptFragments: boolean;
   skillsIndex: boolean;
   categoryIndex: boolean;
+  /** page.tsx / layout.tsx changed — tanstack-routes, next-app, native-indexes need re-run */
+  platformRoutes: boolean;
 }
 
 /**
@@ -94,6 +98,10 @@ export interface LiveIndex {
   // --- Category-index generator ---
   categoryFiles: Set<string>;
 
+  // --- Platform surface generators (tanstack-routes, next-app, native-indexes) ---
+  pageFiles: Set<string>;
+  layoutFiles: Set<string>;
+
   /**
    * Per-definition HTTP method cache.
    * key = absolute path to definition.ts
@@ -127,7 +135,7 @@ const HTTP_METHODS = [
  *   export const { GET, POST, tools } = endpointsHandler({...})
  *   or top-level keys in an object export: GET: { ... }, POST: { ... }
  */
-export function extractMethodsFromFile(absPath: string): string[] {
+function extractMethodsFromFile(absPath: string): string[] {
   if (!existsSync(absPath)) {
     return [];
   }
@@ -212,8 +220,7 @@ export function classifyFile(filename: string): FileClass | null {
   if (base === "graph-seeds.ts") {
     return { graphSeedsIndex: true };
   }
-  // system-prompt/prompt.ts - the fragment definition file
-  if (base === "prompt.ts" && normalized.includes("/system-prompt/")) {
+  if (base === "system-prompt.ts") {
     return { promptFragments: true };
   }
 
@@ -224,6 +231,10 @@ export function classifyFile(filename: string): FileClass | null {
 
   if (base === "category.ts") {
     return { categoryIndex: true };
+  }
+
+  if (base === "page.tsx" || base === "layout.tsx") {
+    return { platformRoutes: true };
   }
 
   return null;
@@ -243,6 +254,12 @@ function getApiDir(): string {
 function getApiRootDir(): string {
   // eslint-disable-next-line i18next/no-literal-string
   return join(process.cwd(), "src", "app", "api");
+}
+
+/** Base directory for UI pages/layouts (tanstack-start, next-app, native generators) */
+function getUiDir(): string {
+  // eslint-disable-next-line i18next/no-literal-string
+  return join(process.cwd(), "src", "app", "[locale]");
 }
 
 /**
@@ -279,12 +296,14 @@ export function buildLiveIndex(): LiveIndex {
     findFilesRecursively(apiDir, "graph-seeds.ts"),
   );
   const promptFragmentFiles = new Set(
-    findFilesRecursively(apiDir, "prompt.ts").filter((f) =>
-      f.includes("/system-prompt/"),
-    ),
+    findFilesRecursively(apiDir, "system-prompt.ts"),
   );
   const defaultSkillFiles = new Set(findFilesRecursively(apiDir, "skill.ts"));
   const categoryFiles = new Set(findFilesRecursively(apiDir, "category.ts"));
+
+  const uiDir = getUiDir();
+  const pageFiles = new Set(findFilesRecursively(uiDir, "page.tsx"));
+  const layoutFiles = new Set(findFilesRecursively(uiDir, "layout.tsx"));
 
   // Build method cache for all definition files
   const methodCache = new Map<string, string[]>();
@@ -303,6 +322,7 @@ export function buildLiveIndex(): LiveIndex {
     promptFragments: true,
     skillsIndex: true,
     categoryIndex: true,
+    platformRoutes: true,
   };
 
   return {
@@ -318,6 +338,8 @@ export function buildLiveIndex(): LiveIndex {
     promptFragmentFiles,
     defaultSkillFiles,
     categoryFiles,
+    pageFiles,
+    layoutFiles,
     methodCache,
     dirty,
   };
@@ -453,7 +475,7 @@ export function updateLiveIndex(
     return;
   }
 
-  if (base === "prompt.ts" && normalized.includes("/system-prompt/")) {
+  if (base === "system-prompt.ts") {
     if (fileExists) {
       index.promptFragmentFiles.add(normalized);
     } else {
@@ -480,6 +502,26 @@ export function updateLiveIndex(
       index.categoryFiles.delete(normalized);
     }
     index.dirty.categoryIndex = true;
+    return;
+  }
+
+  if (base === "page.tsx") {
+    if (fileExists) {
+      index.pageFiles.add(normalized);
+    } else {
+      index.pageFiles.delete(normalized);
+    }
+    index.dirty.platformRoutes = true;
+    return;
+  }
+
+  if (base === "layout.tsx") {
+    if (fileExists) {
+      index.layoutFiles.add(normalized);
+    } else {
+      index.layoutFiles.delete(normalized);
+    }
+    index.dirty.platformRoutes = true;
   }
 }
 
@@ -497,4 +539,5 @@ export function clearDirtyFlags(index: LiveIndex): void {
   index.dirty.promptFragments = false;
   index.dirty.skillsIndex = false;
   index.dirty.categoryIndex = false;
+  index.dirty.platformRoutes = false;
 }

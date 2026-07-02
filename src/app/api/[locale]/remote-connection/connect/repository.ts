@@ -112,6 +112,7 @@ export class RemoteConnectionConnectRepository {
     token: string;
     leadId: string;
     instanceId: string;
+    selfUserId: string;
     locale: CountryLanguage;
     reverseToken?: string;
     reverseLeadId?: string;
@@ -121,6 +122,7 @@ export class RemoteConnectionConnectRepository {
     conflict: boolean;
     forbidden?: boolean;
     remoteInstanceId: string | null;
+    remoteUserId: string | null;
   }> {
     const {
       remoteUrl,
@@ -134,82 +136,86 @@ export class RemoteConnectionConnectRepository {
       logger,
     } = params;
     const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
-    const registerUrl = `${remoteUrl}/api/${locale}/${registerEndpoints.POST.path.join("/")}`;
 
-    try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
-      };
+    // Register runs during connection bootstrap — no remoteConnections row exists
+    // yet, so this cannot use runInProcessTyped({ instanceId }). It goes through
+    // the single sanctioned raw remote primitive with an authenticated bearer.
+    const result = await RemoteTransport.callRaw({
+      remoteUrl,
+      apiPath: `${locale}/${registerEndpoints.POST.path.join("/")}`,
+      method: Methods.POST,
+      token,
+      leadId,
+      body: {
+        instanceId,
+        localUrl,
+        selfUserId,
+        ...(reverseToken ? { reverseToken } : {}),
+        ...(reverseLeadId ? { reverseLeadId } : {}),
+      },
+    });
 
-      const response = await fetch(registerUrl, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          instanceId,
-          localUrl,
-          selfUserId,
-          ...(reverseToken ? { reverseToken } : {}),
-          ...(reverseLeadId ? { reverseLeadId } : {}),
-        }),
-        signal: AbortSignal.timeout(30000),
-      });
-
-      if (response.status === 409) {
-        logger.warn("[CONNECT] Instance ID already registered on remote", {
-          instanceId,
-        });
-        return {
-          ok: false,
-          conflict: true,
-          remoteInstanceId: null,
-        };
-      }
-
-      if (response.status === 403) {
-        logger.warn(
-          "[CONNECT] Remote rejected registration (not a cloud instance or missing permissions)",
-          {
-            instanceId,
-          },
-        );
-        return {
-          ok: false,
-          conflict: false,
-          forbidden: true,
-          remoteInstanceId: null,
-        };
-      }
-
-      if (!response.ok) {
-        logger.warn("[CONNECT] Remote registration failed", {
-          status: response.status,
-          instanceId,
-        });
-        return {
-          ok: false,
-          conflict: false,
-          remoteInstanceId: null,
-        };
-      }
-
-      const body = (await response.json()) as {
-        data?: { remoteInstanceId?: string };
-      };
-      return {
-        ok: true,
-        conflict: false,
-        remoteInstanceId: body.data?.remoteInstanceId ?? null,
-      };
-    } catch (error) {
-      logger.error(`[CONNECT] Remote registration error: ${String(error)}`);
+    if (result.networkError) {
+      logger.error("[CONNECT] Remote registration error (network)");
       return {
         ok: false,
         conflict: false,
         forbidden: false,
         remoteInstanceId: null,
+        remoteUserId: null,
       };
     }
+
+    if (result.status === 409) {
+      logger.warn("[CONNECT] Instance ID already registered on remote", {
+        instanceId,
+      });
+      return {
+        ok: false,
+        conflict: true,
+        remoteInstanceId: null,
+        remoteUserId: null,
+      };
+    }
+
+    if (result.status === 403) {
+      logger.warn(
+        "[CONNECT] Remote rejected registration (not a cloud instance or missing permissions)",
+        {
+          instanceId,
+        },
+      );
+      return {
+        ok: false,
+        conflict: false,
+        forbidden: true,
+        remoteInstanceId: null,
+        remoteUserId: null,
+      };
+    }
+
+    if (!result.ok) {
+      logger.warn("[CONNECT] Remote registration failed", {
+        status: result.status,
+        instanceId,
+      });
+      return {
+        ok: false,
+        conflict: false,
+        remoteInstanceId: null,
+        remoteUserId: null,
+      };
+    }
+
+    const data = result.body?.["data"] as
+      | { remoteInstanceId?: string; remoteUserId?: string }
+      | undefined;
+    return {
+      ok: true,
+      conflict: false,
+      remoteInstanceId: data?.remoteInstanceId ?? null,
+      remoteUserId: data?.remoteUserId ?? null,
+    };
   }
 
   /**
@@ -252,95 +258,67 @@ export class RemoteConnectionConnectRepository {
     // ── Step 2: Login to remote server ─────────────────────────────────────────
     // Ping the login API endpoint first (HEAD request) to get the lead_id cookie
     // set by middleware, then send it with the actual login request.
-    let remotePingLeadId: string | undefined;
-    const loginUrl = `${remoteUrl}/api/${locale}/${loginEndpoints.POST.path.join("/")}`;
-    try {
-      const pingResponse = await fetch(`${remoteUrl}/${locale}`, {
-        method: "GET",
-        redirect: "follow",
-        signal: AbortSignal.timeout(30000),
-      });
-      const setCookie = pingResponse.headers.get("set-cookie") ?? "";
-      const match = setCookie.match(
-        new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
-      );
-      if (match?.[1]) {
-        remotePingLeadId = match[1];
-        logger.debug("[CONNECT] Got remote leadId from ping", {
-          leadId: remotePingLeadId,
-        });
-      }
-    } catch (pingErr) {
-      logger.error("[CONNECT] Remote ping failed", { error: String(pingErr) });
-      return fail({
-        message: t("post.errors.network.title"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    const remotePingLeadId = await RemoteTransport.fetchLeadId(remoteUrl);
+    if (remotePingLeadId) {
+      logger.debug("[CONNECT] Got remote leadId from ping", {
+        leadId: remotePingLeadId,
       });
     }
 
     let token: string;
     let effectiveLeadId: string;
-    try {
-      const loginHeaders: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (remotePingLeadId) {
-        loginHeaders.Cookie = `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`;
-      }
-      const loginResponse = await fetch(loginUrl, {
-        method: "POST",
-        headers: loginHeaders,
-        body: JSON.stringify({ email, password, rememberMe: true }),
-        signal: AbortSignal.timeout(30000),
-      });
+    const loginResult = await RemoteTransport.callRaw({
+      remoteUrl,
+      apiPath: `${locale}/${loginEndpoints.POST.path.join("/")}`,
+      method: Methods.POST,
+      leadId: remotePingLeadId,
+      body: { email, password, rememberMe: true },
+    });
 
-      if (!loginResponse.ok) {
-        if (loginResponse.status === 401) {
-          return fail({
-            message: t("post.errors.unauthorized.title"),
-            errorType: ErrorResponseTypes.UNAUTHORIZED,
-          });
-        }
-        if (loginResponse.status === 403) {
-          return fail({
-            message: t("post.errors.forbidden.title"),
-            errorType: ErrorResponseTypes.FORBIDDEN,
-          });
-        }
-        if (loginResponse.status === 404) {
-          return fail({
-            message: t("post.errors.notFound.title"),
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
-        }
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      const loginBody = (await loginResponse.json()) as {
-        success?: boolean;
-        data?: LoginPostResponseOutput;
-      };
-
-      if (!loginBody.data?.token) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      token = loginBody.data.token;
-      effectiveLeadId = loginBody.data.leadId ?? "";
-      logger.debug("[CONNECT] Successfully logged into remote", { remoteUrl });
-    } catch (err) {
-      logger.error("[CONNECT] Remote login error", { error: String(err) });
+    if (loginResult.networkError) {
+      logger.error("[CONNECT] Remote login error (network)");
       return fail({
         message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+    if (!loginResult.ok) {
+      if (loginResult.status === 401) {
+        return fail({
+          message: t("post.errors.unauthorized.title"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+      if (loginResult.status === 403) {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      if (loginResult.status === 404) {
+        return fail({
+          message: t("post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const loginData = loginResult.body?.["data"] as
+      | LoginPostResponseOutput
+      | undefined;
+    if (!loginData?.token) {
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    token = loginData.token;
+    effectiveLeadId = loginData.leadId ?? "";
+    logger.debug("[CONNECT] Successfully logged into remote", { remoteUrl });
 
     // ── Step 3: Local collision check ──────────────────────────────────────────
 
@@ -359,50 +337,24 @@ export class RemoteConnectionConnectRepository {
     if (localUrl) {
       try {
         // Ping ourselves to get a fresh leadId cookie.
-        let localPingLeadId: string | undefined;
-        try {
-          const localPingResp = await fetch(`${localUrl}/${locale}`, {
-            method: "GET",
-            redirect: "follow",
-            signal: AbortSignal.timeout(30000),
-          });
-          const setCookieLocal = localPingResp.headers.get("set-cookie") ?? "";
-          const localMatch = setCookieLocal.match(
-            new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
-          );
-          if (localMatch?.[1]) {
-            localPingLeadId = localMatch[1];
-          }
-        } catch {
-          // Non-fatal - continue without ping leadId
-        }
+        const localPingLeadId = await RemoteTransport.fetchLeadId(localUrl);
 
         // Login to ourselves to get a session-backed token.
-        const localLoginUrl = `${localUrl}/api/${locale}/${loginEndpoints.POST.path.join("/")}`;
-        const localLoginHeaders: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        if (localPingLeadId) {
-          localLoginHeaders.Cookie = `${LEAD_ID_COOKIE_NAME}=${localPingLeadId}`;
-        }
-        const localLoginResp = await fetch(localLoginUrl, {
-          method: "POST",
-          headers: localLoginHeaders,
-          body: JSON.stringify({
-            email,
-            password,
-            rememberMe: true,
-          }),
-          signal: AbortSignal.timeout(15000),
+        const localLoginResp = await RemoteTransport.callRaw({
+          remoteUrl: localUrl,
+          apiPath: `${locale}/${loginEndpoints.POST.path.join("/")}`,
+          method: Methods.POST,
+          leadId: localPingLeadId,
+          body: { email, password, rememberMe: true },
+          timeoutMs: 15_000,
         });
         if (localLoginResp.ok) {
-          const localLoginBody = (await localLoginResp.json()) as {
-            success?: boolean;
-            data?: LoginPostResponseOutput;
-          };
-          if (localLoginBody.data?.token) {
-            reverseToken = localLoginBody.data.token;
-            reverseLeadId = localLoginBody.data.leadId ?? undefined;
+          const localLoginData = localLoginResp.body?.["data"] as
+            | LoginPostResponseOutput
+            | undefined;
+          if (localLoginData?.token) {
+            reverseToken = localLoginData.token;
+            reverseLeadId = localLoginData.leadId ?? undefined;
             logger.debug(
               "[CONNECT] Obtained reverse session token via self-login",
             );
@@ -448,6 +400,7 @@ export class RemoteConnectionConnectRepository {
         token,
         leadId: effectiveLeadId,
         instanceId: selfInstanceId,
+        selfUserId: user.id,
         locale,
         reverseToken,
         reverseLeadId,
@@ -504,6 +457,7 @@ export class RemoteConnectionConnectRepository {
         leadId: effectiveLeadId,
         instanceId,
         remoteInstanceId: selfInstanceId,
+        remoteUserId: registerResult.remoteUserId ?? undefined,
         isInferenceProvider: data.isInferenceProvider,
         syncScope: data.syncScope
           ? SyncScopeSchema.parse(data.syncScope)
@@ -651,6 +605,7 @@ export class RemoteConnectionConnectRepository {
           .select({
             id: remoteConnections.id,
             userId: remoteConnections.userId,
+            remoteUserId: remoteConnections.remoteUserId,
             capabilitiesVersion: remoteConnections.capabilitiesVersion,
             sentCapabilitiesVersion: remoteConnections.sentCapabilitiesVersion,
             syncScope: remoteConnections.syncScope,
@@ -680,6 +635,7 @@ export class RemoteConnectionConnectRepository {
             token,
             leadId: effectiveLeadId,
             userId: stored.userId,
+            remoteUserId: stored.remoteUserId ?? null,
             capabilitiesVersion: stored.capabilitiesVersion ?? null,
             sentCapabilitiesVersion: stored.sentCapabilitiesVersion ?? null,
             syncScope: stored.syncScope ?? null,

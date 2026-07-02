@@ -1,6 +1,9 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { Text, View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   AreaProps,
   AxisProps,
@@ -21,10 +24,8 @@ import type {
   PayloadItem,
   PieProps,
   ThemeKeys,
-} from "next-vibe/ui/web/ui/chart";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { Text, View } from "react-native";
+} from "../../web/ui/chart";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
@@ -585,4 +586,4 @@ export type {
   PayloadItem,
   PieProps,
   ThemeKeys,
-} from "next-vibe/ui/web/ui/chart";
+} from "../../web/ui/chart";

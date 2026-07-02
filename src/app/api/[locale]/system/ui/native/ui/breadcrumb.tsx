@@ -7,11 +7,14 @@ import { ChevronRight } from "lucide-react-native";
 import { styled } from "nativewind";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
+import React from "react";
+import { Pressable, Text as RNText, View } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
+} from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
@@ -20,10 +23,8 @@ import type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "next-vibe/ui/web/ui/breadcrumb";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import React from "react";
-import { Pressable, Text as RNText, View } from "react-native";
+} from "../../web/ui/breadcrumb";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

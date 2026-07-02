@@ -21,80 +21,6 @@ import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availabi
  */
 
 /**
- * Extract types from an CreateApiEndpoint for ApiFormReturn
- * Uses direct property access instead of infer for better type inference
- */
-export type InferApiFormReturn<T> = T extends CreateApiEndpointAny
-  ? T extends {
-      types: {
-        RequestOutput: infer TRequestOutput extends FieldValues;
-        ResponseOutput: infer TResponseOutput;
-        UrlVariablesOutput: infer TUrlVariablesOutput;
-        FormValues: infer TFormValues;
-      };
-    }
-    ? ApiFormReturn<
-        TRequestOutput,
-        TResponseOutput,
-        TUrlVariablesOutput,
-        TFormValues
-      >
-    : never
-  : never;
-
-/**
- * Extract types from an CreateApiEndpoint for ApiQueryReturn
- * Uses direct property access instead of infer for better type inference
- */
-export type InferApiQueryReturn<T> = T extends CreateApiEndpointAny
-  ? T extends { types: { ResponseOutput: infer TResponseOutput } }
-    ? ApiQueryReturn<TResponseOutput>
-    : never
-  : never;
-
-/**
- * Extract types from an CreateApiEndpoint for ApiQueryFormReturn
- * Uses direct property access instead of infer for better type inference
- */
-export type InferApiQueryFormReturn<T> = T extends CreateApiEndpointAny
-  ? T extends {
-      types: {
-        RequestOutput: infer TRequestOutput extends FieldValues;
-        ResponseOutput: infer TResponseOutput;
-        UrlVariablesOutput: infer TUrlVariablesOutput;
-        FormValues: infer TFormValues;
-      };
-    }
-    ? ApiQueryFormReturn<
-        TRequestOutput,
-        TResponseOutput,
-        TUrlVariablesOutput,
-        TFormValues
-      >
-    : never
-  : never;
-
-/**
- * Extract types from an CreateApiEndpoint for EnhancedMutationResult
- * Uses direct property access instead of infer for better type inference
- */
-export type InferEnhancedMutationResult<T> = T extends CreateApiEndpointAny
-  ? T extends {
-      types: {
-        RequestOutput: infer TRequestOutput;
-        ResponseOutput: infer TResponseOutput;
-        UrlVariablesOutput: infer TUrlVariablesOutput;
-      };
-    }
-    ? EnhancedMutationResult<
-        TResponseOutput,
-        TRequestOutput,
-        TUrlVariablesOutput
-      >
-    : never
-  : never;
-
-/**
  * Enhanced query result with additional loading state info
  */
 export interface ApiQueryReturn<TResponse> {
@@ -189,13 +115,6 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
   }) => void | Promise<void>;
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }
-
-export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> =
-  ApiMutationOptions<
-    TEndpoint["types"]["RequestOutput"],
-    TEndpoint["types"]["ResponseOutput"],
-    TEndpoint["types"]["UrlVariablesOutput"]
-  >;
 
 /**
  * Type for the API query form options

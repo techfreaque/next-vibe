@@ -451,9 +451,6 @@ import { Route as ApiLocaleSystemTasksCronIdRouteImport } from './routes/api.$lo
 import { Route as ApiLocaleSystemServerServerRebuildRouteImport } from './routes/api.$locale.system.server.server.rebuild'
 import { Route as ApiLocaleSystemServerServerHealthRouteImport } from './routes/api.$locale.system.server.server.health'
 import { Route as ApiLocaleSystemPlatformsVibeFrameMountRouteImport } from './routes/api.$locale.system.platforms.vibe-frame.mount'
-import { Route as ApiLocaleSystemPlatformsTanstackStartGenerateRouteImport } from './routes/api.$locale.system.platforms.tanstack-start.generate'
-import { Route as ApiLocaleSystemPlatformsReactNativeGenerateRouteImport } from './routes/api.$locale.system.platforms.react-native.generate'
-import { Route as ApiLocaleSystemPlatformsNextAppGenerateRouteImport } from './routes/api.$locale.system.platforms.next-app.generate'
 import { Route as ApiLocaleSystemLoggerErrorMonitorLogsRouteImport } from './routes/api.$locale.system.logger.error-monitor.logs'
 import { Route as ApiLocaleSystemLoggerErrorMonitorClientLogRouteImport } from './routes/api.$locale.system.logger.error-monitor.client-log'
 import { Route as ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport } from './routes/api.$locale.system.logger.error-monitor.cleanup'
@@ -572,6 +569,7 @@ import { Route as ApiLocaleSystemDataflowGraphsIdVersionsRouteImport } from './r
 import { Route as ApiLocaleSystemDataflowGraphsIdTriggerRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.trigger'
 import { Route as ApiLocaleSystemDataflowGraphsIdPromoteRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.promote'
 import { Route as ApiLocaleSystemDataflowGraphsIdEditRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.edit'
+import { Route as ApiLocaleSystemDataflowGraphsIdDeleteRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.delete'
 import { Route as ApiLocaleSystemDataflowGraphsIdDataRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.data'
 import { Route as ApiLocaleSystemDataflowGraphsIdBacktestRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.backtest'
 import { Route as ApiLocaleSystemDataflowGraphsIdArchiveRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.archive'
@@ -3180,24 +3178,6 @@ const ApiLocaleSystemPlatformsVibeFrameMountRoute =
     path: '/api/$locale/system/platforms/vibe-frame/mount',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleSystemPlatformsTanstackStartGenerateRoute =
-  ApiLocaleSystemPlatformsTanstackStartGenerateRouteImport.update({
-    id: '/api/$locale/system/platforms/tanstack-start/generate',
-    path: '/api/$locale/system/platforms/tanstack-start/generate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsReactNativeGenerateRoute =
-  ApiLocaleSystemPlatformsReactNativeGenerateRouteImport.update({
-    id: '/api/$locale/system/platforms/react-native/generate',
-    path: '/api/$locale/system/platforms/react-native/generate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsNextAppGenerateRoute =
-  ApiLocaleSystemPlatformsNextAppGenerateRouteImport.update({
-    id: '/api/$locale/system/platforms/next-app/generate',
-    path: '/api/$locale/system/platforms/next-app/generate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiLocaleSystemLoggerErrorMonitorLogsRoute =
   ApiLocaleSystemLoggerErrorMonitorLogsRouteImport.update({
     id: '/api/$locale/system/logger/error-monitor/logs',
@@ -3908,6 +3888,12 @@ const ApiLocaleSystemDataflowGraphsIdEditRoute =
   ApiLocaleSystemDataflowGraphsIdEditRouteImport.update({
     id: '/$id/edit',
     path: '/$id/edit',
+    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
+  } as any)
+const ApiLocaleSystemDataflowGraphsIdDeleteRoute =
+  ApiLocaleSystemDataflowGraphsIdDeleteRouteImport.update({
+    id: '/$id/delete',
+    path: '/$id/delete',
     getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
   } as any)
 const ApiLocaleSystemDataflowGraphsIdDataRoute =
@@ -4639,9 +4625,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/next-app/generate': typeof ApiLocaleSystemPlatformsNextAppGenerateRoute
-  '/api/$locale/system/platforms/react-native/generate': typeof ApiLocaleSystemPlatformsReactNativeGenerateRoute
-  '/api/$locale/system/platforms/tanstack-start/generate': typeof ApiLocaleSystemPlatformsTanstackStartGenerateRoute
   '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
   '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
   '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
@@ -4693,6 +4676,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
   '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
   '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
+  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
   '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
   '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
   '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
@@ -5233,9 +5217,6 @@ export interface FileRoutesByTo {
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/next-app/generate': typeof ApiLocaleSystemPlatformsNextAppGenerateRoute
-  '/api/$locale/system/platforms/react-native/generate': typeof ApiLocaleSystemPlatformsReactNativeGenerateRoute
-  '/api/$locale/system/platforms/tanstack-start/generate': typeof ApiLocaleSystemPlatformsTanstackStartGenerateRoute
   '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
   '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
   '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
@@ -5287,6 +5268,7 @@ export interface FileRoutesByTo {
   '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
   '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
   '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
+  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
   '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
   '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
   '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
@@ -5834,9 +5816,6 @@ export interface FileRoutesById {
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/next-app/generate': typeof ApiLocaleSystemPlatformsNextAppGenerateRoute
-  '/api/$locale/system/platforms/react-native/generate': typeof ApiLocaleSystemPlatformsReactNativeGenerateRoute
-  '/api/$locale/system/platforms/tanstack-start/generate': typeof ApiLocaleSystemPlatformsTanstackStartGenerateRoute
   '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
   '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
   '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
@@ -5888,6 +5867,7 @@ export interface FileRoutesById {
   '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
   '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
   '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
+  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
   '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
   '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
   '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
@@ -6435,9 +6415,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/next-app/generate'
-    | '/api/$locale/system/platforms/react-native/generate'
-    | '/api/$locale/system/platforms/tanstack-start/generate'
     | '/api/$locale/system/platforms/vibe-frame/mount'
     | '/api/$locale/system/server/server/health'
     | '/api/$locale/system/server/server/rebuild'
@@ -6489,6 +6466,7 @@ export interface FileRouteTypes {
     | '/api/$locale/system/dataflow/graphs/$id/archive'
     | '/api/$locale/system/dataflow/graphs/$id/backtest'
     | '/api/$locale/system/dataflow/graphs/$id/data'
+    | '/api/$locale/system/dataflow/graphs/$id/delete'
     | '/api/$locale/system/dataflow/graphs/$id/edit'
     | '/api/$locale/system/dataflow/graphs/$id/promote'
     | '/api/$locale/system/dataflow/graphs/$id/trigger'
@@ -7029,9 +7007,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/next-app/generate'
-    | '/api/$locale/system/platforms/react-native/generate'
-    | '/api/$locale/system/platforms/tanstack-start/generate'
     | '/api/$locale/system/platforms/vibe-frame/mount'
     | '/api/$locale/system/server/server/health'
     | '/api/$locale/system/server/server/rebuild'
@@ -7083,6 +7058,7 @@ export interface FileRouteTypes {
     | '/api/$locale/system/dataflow/graphs/$id/archive'
     | '/api/$locale/system/dataflow/graphs/$id/backtest'
     | '/api/$locale/system/dataflow/graphs/$id/data'
+    | '/api/$locale/system/dataflow/graphs/$id/delete'
     | '/api/$locale/system/dataflow/graphs/$id/edit'
     | '/api/$locale/system/dataflow/graphs/$id/promote'
     | '/api/$locale/system/dataflow/graphs/$id/trigger'
@@ -7629,9 +7605,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/next-app/generate'
-    | '/api/$locale/system/platforms/react-native/generate'
-    | '/api/$locale/system/platforms/tanstack-start/generate'
     | '/api/$locale/system/platforms/vibe-frame/mount'
     | '/api/$locale/system/server/server/health'
     | '/api/$locale/system/server/server/rebuild'
@@ -7683,6 +7656,7 @@ export interface FileRouteTypes {
     | '/api/$locale/system/dataflow/graphs/$id/archive'
     | '/api/$locale/system/dataflow/graphs/$id/backtest'
     | '/api/$locale/system/dataflow/graphs/$id/data'
+    | '/api/$locale/system/dataflow/graphs/$id/delete'
     | '/api/$locale/system/dataflow/graphs/$id/edit'
     | '/api/$locale/system/dataflow/graphs/$id/promote'
     | '/api/$locale/system/dataflow/graphs/$id/trigger'
@@ -8071,9 +8045,6 @@ export interface RootRouteChildren {
   ApiLocaleSystemLoggerErrorMonitorCleanupRoute: typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   ApiLocaleSystemLoggerErrorMonitorClientLogRoute: typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   ApiLocaleSystemLoggerErrorMonitorLogsRoute: typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  ApiLocaleSystemPlatformsNextAppGenerateRoute: typeof ApiLocaleSystemPlatformsNextAppGenerateRoute
-  ApiLocaleSystemPlatformsReactNativeGenerateRoute: typeof ApiLocaleSystemPlatformsReactNativeGenerateRoute
-  ApiLocaleSystemPlatformsTanstackStartGenerateRoute: typeof ApiLocaleSystemPlatformsTanstackStartGenerateRoute
   ApiLocaleSystemPlatformsVibeFrameMountRoute: typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
   ApiLocaleSystemServerServerHealthRoute: typeof ApiLocaleSystemServerServerHealthRoute
   ApiLocaleSystemServerServerRebuildRoute: typeof ApiLocaleSystemServerServerRebuildRoute
@@ -11211,27 +11182,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleSystemPlatformsVibeFrameMountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/system/platforms/tanstack-start/generate': {
-      id: '/api/$locale/system/platforms/tanstack-start/generate'
-      path: '/api/$locale/system/platforms/tanstack-start/generate'
-      fullPath: '/api/$locale/system/platforms/tanstack-start/generate'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsTanstackStartGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/react-native/generate': {
-      id: '/api/$locale/system/platforms/react-native/generate'
-      path: '/api/$locale/system/platforms/react-native/generate'
-      fullPath: '/api/$locale/system/platforms/react-native/generate'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsReactNativeGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/next-app/generate': {
-      id: '/api/$locale/system/platforms/next-app/generate'
-      path: '/api/$locale/system/platforms/next-app/generate'
-      fullPath: '/api/$locale/system/platforms/next-app/generate'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsNextAppGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$locale/system/logger/error-monitor/logs': {
       id: '/api/$locale/system/logger/error-monitor/logs'
       path: '/api/$locale/system/logger/error-monitor/logs'
@@ -12056,6 +12006,13 @@ declare module '@tanstack/react-router' {
       path: '/$id/edit'
       fullPath: '/api/$locale/system/dataflow/graphs/$id/edit'
       preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdEditRouteImport
+      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
+    }
+    '/api/$locale/system/dataflow/graphs/$id/delete': {
+      id: '/api/$locale/system/dataflow/graphs/$id/delete'
+      path: '/$id/delete'
+      fullPath: '/api/$locale/system/dataflow/graphs/$id/delete'
+      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdDeleteRouteImport
       parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
     }
     '/api/$locale/system/dataflow/graphs/$id/data': {
@@ -13082,6 +13039,7 @@ interface ApiLocaleSystemDataflowGraphsRouteChildren {
   ApiLocaleSystemDataflowGraphsIdArchiveRoute: typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
   ApiLocaleSystemDataflowGraphsIdBacktestRoute: typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
   ApiLocaleSystemDataflowGraphsIdDataRoute: typeof ApiLocaleSystemDataflowGraphsIdDataRoute
+  ApiLocaleSystemDataflowGraphsIdDeleteRoute: typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
   ApiLocaleSystemDataflowGraphsIdEditRoute: typeof ApiLocaleSystemDataflowGraphsIdEditRoute
   ApiLocaleSystemDataflowGraphsIdPromoteRoute: typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
   ApiLocaleSystemDataflowGraphsIdTriggerRoute: typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
@@ -13096,6 +13054,8 @@ const ApiLocaleSystemDataflowGraphsRouteChildren: ApiLocaleSystemDataflowGraphsR
       ApiLocaleSystemDataflowGraphsIdBacktestRoute,
     ApiLocaleSystemDataflowGraphsIdDataRoute:
       ApiLocaleSystemDataflowGraphsIdDataRoute,
+    ApiLocaleSystemDataflowGraphsIdDeleteRoute:
+      ApiLocaleSystemDataflowGraphsIdDeleteRoute,
     ApiLocaleSystemDataflowGraphsIdEditRoute:
       ApiLocaleSystemDataflowGraphsIdEditRoute,
     ApiLocaleSystemDataflowGraphsIdPromoteRoute:
@@ -13767,12 +13727,6 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleSystemLoggerErrorMonitorClientLogRoute,
   ApiLocaleSystemLoggerErrorMonitorLogsRoute:
     ApiLocaleSystemLoggerErrorMonitorLogsRoute,
-  ApiLocaleSystemPlatformsNextAppGenerateRoute:
-    ApiLocaleSystemPlatformsNextAppGenerateRoute,
-  ApiLocaleSystemPlatformsReactNativeGenerateRoute:
-    ApiLocaleSystemPlatformsReactNativeGenerateRoute,
-  ApiLocaleSystemPlatformsTanstackStartGenerateRoute:
-    ApiLocaleSystemPlatformsTanstackStartGenerateRoute,
   ApiLocaleSystemPlatformsVibeFrameMountRoute:
     ApiLocaleSystemPlatformsVibeFrameMountRoute,
   ApiLocaleSystemServerServerHealthRoute:

@@ -1,14 +1,15 @@
 import { Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   FormAlertProps,
   FormAlertState,
-} from "next-vibe/ui/web/ui/form/form-alert";
-import type { JSX } from "react";
+} from "../../../web/ui/form/form-alert";
 
 export type {
   FormAlertProps,
   FormAlertState,
-} from "next-vibe/ui/web/ui/form/form-alert";
+} from "../../../web/ui/form/form-alert";
 
 const VARIANT_COLOR: Record<FormAlertState["variant"], string> = {
   default: "white",

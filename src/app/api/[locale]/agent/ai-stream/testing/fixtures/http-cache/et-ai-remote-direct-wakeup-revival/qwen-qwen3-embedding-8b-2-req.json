@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/call-execute-tool-with-toolname--tool-help------64ed336f-249e-4310-b257-62cb9bdbddd3.md\n\n# Call execute-tool with toolName='tool-help',...\nFolder: cron\nPreview: <think> The async task has completed. The result shows tool information from the hermes instance with 604 tools across 2…",
+    "encoding_format": "float"
+  }
+}

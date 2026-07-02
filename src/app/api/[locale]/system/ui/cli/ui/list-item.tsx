@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import type { ListItemProps } from "next-vibe/ui/web/ui/list-item";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-export type { ListItemProps } from "next-vibe/ui/web/ui/list-item";
+import type { ListItemProps } from "../../web/ui/list-item";
+
+export type { ListItemProps } from "../../web/ui/list-item";
 
 export function ListItem({
   title,

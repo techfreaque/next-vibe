@@ -76,20 +76,20 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-07 from modelslab.com
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.WAN_2_7_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "wan-2-7-t2v",
-        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 13, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 15,
         supportedDurations: ["5", "10", "15"],
         supportedResolutions: ["1080p"],
-        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-04-07 from unbottled.ai
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-07-02 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -109,7 +109,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -121,20 +121,20 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-04-07 from modelslab.com
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.WAN_2_6_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "wan-2-6-i2v",
-        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 13, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 15,
         supportedDurations: ["5", "10", "15"],
         supportedResolutions: ["1080p"],
-        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-04-07 from unbottled.ai
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-07-02 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -154,32 +154,32 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
         id: VideoGenModelId.WAN_2_6_I2V_FLASH,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.6-i2v-flash",
-        creditCostPerSecond: 5, // updated: 2026-03-31 from modelslab.com
+        creditCostPerSecond: 10, // updated: 2026-07-02 from modelslab.com
         supportedResolutions: ["1080p"], // updated: 2026-04-04 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5"], // updated: 2026-04-04 from modelslab.com
-        pricingByResolution: { "720p": 5, "1080p": 7.5 }, // updated: 2026-04-07 from modelslab.com
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.WAN_2_6_I2V_FLASH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "wan-2-6-i2v-flash",
-        creditCostPerSecond: 6.5, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 13, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 5,
         supportedDurations: ["5"],
         supportedResolutions: ["1080p"],
-        pricingByResolution: { "720p": 6.5, "1080p": 9.75 }, // updated: 2026-04-07 from unbottled.ai
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-07-02 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -206,7 +206,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 4.4, // updated: 2026-04-04 from modelslab.com
+        creditCostPerSecond: 3, // updated: 2026-07-02 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-04-04 from modelslab.com
         defaultDurationSeconds: 5,
       },
@@ -214,7 +214,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 5.72, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 3.9, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         supportedAspectRatios: ["16:9", "9:16"],
       },
@@ -250,7 +250,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.OMNIHUMAN_1_5,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "omnihuman-1-5",
-        creditCostPerSecond: 18.2, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 18.2, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -289,7 +289,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.VEO_3_1,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "veo-3-1",
-        creditCostPerSecond: 62.4, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 62.4, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 3,
         maxDurationSeconds: 8,
@@ -332,7 +332,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.VEO_3_1_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "veo-3-1-fast",
-        creditCostPerSecond: 31.2, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 31.2, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 3,
         maxDurationSeconds: 8,
@@ -357,7 +357,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -374,7 +374,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_5_TURBO_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-v2-5-turbo-i2v",
-        creditCostPerSecond: 10.92, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 10.92, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
@@ -416,7 +416,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_5_TURBO_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-v2-5-turbo-t2v",
-        creditCostPerSecond: 10.92, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 10.92, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
@@ -458,7 +458,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_1_MASTER_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-v2-1-master-t2v",
-        creditCostPerSecond: 43.68, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 43.68, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
@@ -482,7 +482,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -499,7 +499,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_1_MASTER_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-v2-1-master-i2v",
-        creditCostPerSecond: 43.68, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 43.68, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
@@ -532,20 +532,20 @@ export const videoGenModelDefinitions: Record<
         providerModel: "kling-v3-t2v",
         creditCostPerSecond: 10, // updated: 2026-03-31 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-04-04 from modelslab.com
-        minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
-        maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
-        supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
+        minDurationSeconds: 3, // updated: 2026-07-02 from modelslab.com
+        maxDurationSeconds: 15, // updated: 2026-07-02 from modelslab.com
+        supportedDurations: ["3", "5", "10", "15"], // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.KLING_3_0_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-3-0-t2v",
-        creditCostPerSecond: 13, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 13, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
-        minDurationSeconds: 5,
-        maxDurationSeconds: 10,
-        supportedDurations: ["5", "10"],
+        minDurationSeconds: 3,
+        maxDurationSeconds: 15,
+        supportedDurations: ["3", "5", "10", "15"],
         supportedAspectRatios: ["16:9", "9:16", "1:1"],
       },
     ],
@@ -574,7 +574,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "ltx-2-pro-t2v",
         creditCostPerSecond: 1.4, // updated: 2026-04-04 from modelslab.com
-        supportedResolutions: ["2K", "4K"], // updated: 2026-04-04 from modelslab.com
+        supportedResolutions: ["2K", "4K"], // updated: 2026-07-02 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "8", "10"], // updated: 2026-04-04 from modelslab.com
@@ -584,7 +584,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.LTX_2_PRO_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "ltx-2-pro-t2v",
-        creditCostPerSecond: 1.82, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 1.82, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 6,
         maxDurationSeconds: 10,
@@ -609,14 +609,14 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
         id: VideoGenModelId.LTX_2_3_PRO_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "ltx-2-3-pro-i2v",
-        creditCostPerSecond: 1.4, // updated: 2026-04-04 from modelslab.com
+        creditCostPerSecond: 1.92, // updated: 2026-07-02 from modelslab.com
         supportedResolutions: ["2K", "4K"], // updated: 2026-04-04 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
@@ -627,7 +627,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.LTX_2_3_PRO_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "ltx-2-3-pro-i2v",
-        creditCostPerSecond: 1.82, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 2.496, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 6,
         maxDurationSeconds: 10,
@@ -659,14 +659,14 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.HAILUO_2_3_T2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-t2v",
-        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        creditCostPerSecond: 6.7, // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.HAILUO_2_3_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "hailuo-2-3-t2v",
-        creditCostPerSecond: 7.15, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 8.71, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -687,14 +687,14 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
         id: VideoGenModelId.HAILUO_2_3_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-i2v",
-        creditCostPerSecond: 5.5, // updated: 2026-03-31 from modelslab.com
+        creditCostPerSecond: 6.7, // updated: 2026-07-02 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "10"], // updated: 2026-04-04 from modelslab.com
@@ -704,7 +704,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.HAILUO_2_3_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "hailuo-2-3-i2v",
-        creditCostPerSecond: 7.15, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 8.71, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 6,
         maxDurationSeconds: 10,
@@ -728,7 +728,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -745,7 +745,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.HAILUO_2_3_FAST_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "hailuo-2-3-fast-i2v",
-        creditCostPerSecond: 4.94, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 4.94, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 6,
         maxDurationSeconds: 10,
@@ -777,7 +777,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "sora-2",
         creditCostPerSecond: 12.5, // updated: 2026-03-31 from modelslab.com
-        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-04-04 from modelslab.com
+        supportedAspectRatios: ["16:9"], // updated: 2026-07-02 from modelslab.com
         minDurationSeconds: 4, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 12, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
@@ -787,12 +787,12 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SORA_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "sora-2",
-        creditCostPerSecond: 16.25, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 16.25, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 12,
         supportedDurations: ["2", "4", "8", "12"],
-        supportedAspectRatios: ["16:9", "9:16"],
+        supportedAspectRatios: ["16:9"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -820,7 +820,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "sora-2-pro-t2v",
         creditCostPerSecond: 36, // updated: 2026-03-31 from modelslab.com
-        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-04-04 from modelslab.com
+        supportedAspectRatios: ["16:9"], // updated: 2026-07-02 from modelslab.com
         minDurationSeconds: 4, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 12, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
@@ -830,12 +830,12 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SORA_2_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "sora-2-pro",
-        creditCostPerSecond: 46.8, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 46.8, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 12,
         supportedDurations: ["2", "4", "8", "12"],
-        supportedAspectRatios: ["16:9", "9:16"],
+        supportedAspectRatios: ["16:9"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -872,14 +872,14 @@ export const videoGenModelDefinitions: Record<
           "33:14",
           "53:30",
           "4:3",
-        ], // updated: 2026-04-07 from modelslab.com
+        ], // updated: 2026-07-02 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.GEN4_ALEPH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gen4-aleph",
-        creditCostPerSecond: 23.4, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 23.4, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         supportedAspectRatios: [
           "16:9",
@@ -924,7 +924,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.LIPSYNC_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "lipsync-2",
-        creditCostPerSecond: 9.1, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 9.1, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
       },
     ],
@@ -963,7 +963,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.GROK_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-t2v",
-        creditCostPerSecond: 7.8, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 7.8, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 1,
         maxDurationSeconds: 15,
@@ -988,7 +988,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"],
+    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1006,7 +1006,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.GROK_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-i2v",
-        creditCostPerSecond: 7.8, // updated: 2026-04-07 from unbottled.ai
+        creditCostPerSecond: 7.8, // updated: 2026-07-02 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 1,
         maxDurationSeconds: 15,

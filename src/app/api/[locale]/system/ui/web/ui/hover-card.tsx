@@ -2,8 +2,9 @@
 
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 export interface HoverCardRootProps {
   open?: boolean;

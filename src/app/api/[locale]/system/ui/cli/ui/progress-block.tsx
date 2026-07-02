@@ -1,15 +1,16 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "next-vibe/ui/web/ui/progress-block";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/progress-block";
 
 export type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "next-vibe/ui/web/ui/progress-block";
+} from "../../web/ui/progress-block";
 
 const VARIANT_COLOR: Record<ProgressBlockVariant, string> = {
   default: "cyan",

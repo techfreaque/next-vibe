@@ -1,7 +1,8 @@
 import { Box } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { MainProps } from "next-vibe/ui/web/ui/main";
 import * as React from "react";
+
+import type { MainProps } from "../../web/ui/main";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Main({
   className,

@@ -46,9 +46,6 @@ export class GenerateAllRepository {
     if (data.skipTaskIndex) {
       overrides["tasks"] = false;
     }
-    if (data.enableTrpc) {
-      overrides["trpc"] = true;
-    }
     return overrides;
   }
 

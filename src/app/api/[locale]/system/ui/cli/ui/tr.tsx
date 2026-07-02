@@ -1,11 +1,12 @@
 import { Box, Text } from "ink";
-import { parseClassesToBoxProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { TrProps } from "next-vibe/ui/web/ui/tr";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
-export type { TrProps } from "next-vibe/ui/web/ui/tr";
+import type { TrProps } from "../../web/ui/tr";
+import { parseClassesToBoxProps } from "./tailwind-to-ink";
+
+export type { TrProps } from "../../web/ui/tr";
 
 const SEPARATOR = "\u2500".repeat(60);
 const CELL_DIVIDER = " | ";

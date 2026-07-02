@@ -62,6 +62,7 @@ export async function generateWithFalAi(params: {
   });
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const submitResponse = await fetch(
       `https://queue.fal.run/${providerModel}`,
       {
@@ -107,6 +108,7 @@ export async function generateWithFalAi(params: {
         setTimeout(resolve, POLL_INTERVAL_MS);
       });
 
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       const statusResponse = await fetch(
         `https://queue.fal.run/${providerModel}/requests/${requestId}/status`,
         {
@@ -121,6 +123,7 @@ export async function generateWithFalAi(params: {
       const statusData = (await statusResponse.json()) as FalAiStatusResponse;
 
       if (statusData.status === "COMPLETED") {
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const resultResponse = await fetch(
           `https://queue.fal.run/${providerModel}/requests/${requestId}`,
           {

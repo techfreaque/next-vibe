@@ -12,7 +12,7 @@ import { join, relative, resolve } from "node:path";
 /**
  * Options for directory scanning
  */
-export interface DirectoryScanOptions {
+interface DirectoryScanOptions {
   /**
    * File name pattern to match (e.g., "route.ts", "seed.ts")
    * Can be exact match or regex pattern
@@ -70,21 +70,21 @@ export interface DirectoryScanOptions {
 /**
  * Result of directory scan with full path
  */
-export interface ScanResultSimple {
+interface ScanResultSimple {
   fullPath: string;
 }
 
 /**
  * Result of directory scan with relative path
  */
-export interface ScanResultWithRelative extends ScanResultSimple {
+interface ScanResultWithRelative extends ScanResultSimple {
   relativePath: string;
 }
 
 /**
  * Result of directory scan with path segments
  */
-export interface ScanResultWithSegments extends ScanResultWithRelative {
+interface ScanResultWithSegments extends ScanResultWithRelative {
   pathSegments: string[];
 }
 
@@ -103,7 +103,7 @@ const DEFAULT_EXCLUDE_DIRS = [
 /**
  * Scan directory recursively and find matching files
  */
-export function scanDirectory(
+function scanDirectory(
   baseDir: string,
   options: DirectoryScanOptions = {},
 ): ScanResultWithSegments[] {

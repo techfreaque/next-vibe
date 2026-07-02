@@ -1,8 +1,9 @@
 import { Text } from "ink";
-import type { TagOption, TagsFieldProps } from "next-vibe/ui/web/ui/tags-field";
 import type { JSX } from "react";
 
-export type { TagOption, TagsFieldProps } from "next-vibe/ui/web/ui/tags-field";
+import type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
+
+export type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
 
 // CLI: show tags as comma-separated list
 export function TagsField<TKey extends string>({

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The content read back is exactly \"T2_CHEAP_OK\". Write succeeded and read confirmed.</think>STEP_OK\n\nUser: [T5 detach-dispatch] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'await-task-test'}, callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'await-task-test'}, callbackMode='detach'. Then check that the immediate result has a taskId string and does NOT have an imageUrl. End with STEP_OK taskId=<value> or FAILED.\n\nLet me do that.</think>\n\nAssistant: <think>The result has a taskId string: \"remote-ws-hermes-functions-execute-tool-5\" and does NOT have an imageUrl. This matches what the user asked for. I should end with STEP_OK taskId=<value>.</think>STEP_OK taskId=remote-ws-hermes-functions-execute-tool-5\n\nUser: [T5b await-task] Call the local await-task tool (do NOT use execute-tool for this - call await-task directly) with taskId='remote-ws-hermes-functions-execute-tool-5'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

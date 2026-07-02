@@ -104,7 +104,6 @@ export class RebuildRepository {
               skipEndpoints: false,
               skipSeeds: false,
               skipTaskIndex: false,
-              enableTrpc: false,
               skipTanstack: data.framework !== ServerFramework.TANSTACK,
               force: false,
             },

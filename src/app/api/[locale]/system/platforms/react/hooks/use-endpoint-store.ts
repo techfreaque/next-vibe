@@ -107,7 +107,7 @@ interface RefCountStore {
 
 const CLEANUP_DELAY = 5 * 60 * 1000;
 
-export const endpointInstanceStore = create<RefCountStore>((set, get) => ({
+const endpointInstanceStore = create<RefCountStore>((set, get) => ({
   instances: new Map(),
 
   register: (key: string, asOwner: boolean): void => {

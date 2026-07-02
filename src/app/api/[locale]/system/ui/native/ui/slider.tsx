@@ -4,15 +4,16 @@
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   SliderRangeProps,
   SliderRootProps,
   SliderThumbProps,
   SliderTrackProps,
-} from "next-vibe/ui/web/ui/slider";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
+} from "../../web/ui/slider";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Re-export all types from web
 export type {

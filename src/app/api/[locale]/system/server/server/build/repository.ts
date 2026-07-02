@@ -11,19 +11,19 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SeedRepository } from "next-vibe/database/seed/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
-import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling/builder/i18n";
 import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
+import type { ServerBuildT } from "next-vibe/server/server/build/i18n";
+import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling/builder/i18n";
 import { GenerateAllRepository } from "next-vibe/tooling/generators/repository";
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
-import type { ServerBuildT } from "next-vibe/server/server/build/i18n";
 
 /**
  * Build Repository
@@ -83,7 +83,6 @@ export class BuildRepository {
               skipEndpoints: !data.generateEndpoints,
               skipSeeds: !data.generateSeeds,
               skipTaskIndex: false,
-              enableTrpc: false,
               skipTanstack: data.framework !== ServerFramework.TANSTACK,
               force: false,
             },

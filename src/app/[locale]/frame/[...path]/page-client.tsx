@@ -16,10 +16,10 @@ import type {
   ParentToFrameMessage,
 } from "next-vibe/platforms/vibe-frame/types";
 import { useFrameBridge } from "next-vibe/platforms/vibe-frame/use-bridge";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { setRootCssVar } from "next-vibe/ui/web/lib/css-vars";
 import { getDocumentScrollHeight } from "next-vibe/ui/web/lib/dom";
 import { Div } from "next-vibe/ui/web/ui/div";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

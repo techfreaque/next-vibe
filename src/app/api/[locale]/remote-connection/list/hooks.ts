@@ -22,7 +22,3 @@ export function useRemoteConnections(
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(definitions, undefined, logger, user);
 }
-
-export type RemoteConnectionsEndpointReturn = EndpointReturn<
-  typeof definitions
->;

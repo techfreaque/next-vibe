@@ -17,7 +17,7 @@ import type { CIEnvironment } from "../definition";
 /**
  * Extended CI environment info with additional metadata
  */
-export interface ExtendedCIEnvironment extends CIEnvironment {
+interface ExtendedCIEnvironment extends CIEnvironment {
   /** Job/Build ID */
   buildId?: string | null;
   /** Build number */
@@ -40,7 +40,7 @@ export interface ExtendedCIEnvironment extends CIEnvironment {
 // Interface
 // ============================================================================
 
-export interface ICIDetector {
+interface ICIDetector {
   /**
    * Detect the current CI environment
    */
@@ -101,7 +101,7 @@ export interface ICIDetector {
 // Implementation
 // ============================================================================
 
-export class CIDetector implements ICIDetector {
+class CIDetector implements ICIDetector {
   private cachedEnvironment: ExtendedCIEnvironment | null = null;
 
   detect(): ExtendedCIEnvironment {

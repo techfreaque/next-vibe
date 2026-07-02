@@ -19,13 +19,15 @@ import {
 import { z } from "zod";
 
 const ExportEnvWidget = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.ExportEnvWidget })),
+  import("./widget").then((m) => ({
+    default: m.ExportEnvWidget,
+  })),
 );
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "runtime", "settings", "export-env"] as const,
+  path: ["system", "env", "settings", "export-env"] as const,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_OFF,

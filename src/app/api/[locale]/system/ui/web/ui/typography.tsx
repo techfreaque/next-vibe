@@ -1,6 +1,7 @@
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
+
+import type { StyleType } from "../../web/utils/style-type";
 
 // Cross-platform accessibility role type
 export type AccessibilityRoleValue =
@@ -32,7 +33,7 @@ export type AccessibilityRoleValue =
   | "toolbar"
   | undefined;
 
-export type TypographyProps = {
+type TypographyProps = {
   children?: React.ReactNode;
 } & StyleType;
 

@@ -252,16 +252,18 @@ export function ToolsConfigEdit({
       }
     > = {};
     for (const tool of filteredTools) {
-      const category = tool.category;
+      // category is omitted on compact (AI/MCP) payloads; web always sets it,
+      // but fall back so the grouping is total.
+      const category: string = tool.category ?? "";
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
       }
-      grouped[category].tools.push(tool);
-      const subKey = getSubcategory(tool.id ?? tool.name);
-      if (!grouped[category].subcategories[subKey]) {
-        grouped[category].subcategories[subKey] = [];
+      grouped[category]!.tools.push(tool);
+      const subKey: string = getSubcategory(tool.id ?? tool.name);
+      if (!grouped[category]!.subcategories[subKey]) {
+        grouped[category]!.subcategories[subKey] = [];
       }
-      grouped[category].subcategories[subKey].push(tool);
+      grouped[category]!.subcategories[subKey]!.push(tool);
     }
     return grouped;
   }, [filteredTools]);

@@ -83,6 +83,7 @@ export function getWhatsAppProvider(
           text: { body: params.message },
         });
 
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const response = await fetch(url, {
           method: "POST",
           headers: {

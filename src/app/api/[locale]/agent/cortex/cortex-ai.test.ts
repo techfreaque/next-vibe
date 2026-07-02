@@ -2329,7 +2329,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
+      const { loadCortexData } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2402,8 +2402,8 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
-      const { cortexFragment } = await import("./system-prompt/prompt");
+      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2468,7 +2468,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
+      const { loadCortexData } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2500,7 +2500,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
+      const { loadCortexData } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       // Query something that should match our test-inserted skills.md
@@ -2567,8 +2567,8 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
-      const { cortexFragment } = await import("./system-prompt/prompt");
+      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2587,7 +2587,7 @@ describe("Cortex System Prompt Injection", () => {
       // A score badge renders only for NON-pinned scored files (pinned files
       // suppress the score — see renderFileEntryLines). Count those, since they
       // are exactly the entries that must produce a `[NN%]` badge.
-      const { renderCortexTree } = await import("./system-prompt/prompt");
+      const { renderCortexTree } = await import("./system-prompt");
       const renderedTree = renderCortexTree(data);
       const scoredRenderableFiles = data.tree.flatMap((e) =>
         e.kind === "dir"
@@ -2635,8 +2635,8 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt/server");
-      const { cortexFragment } = await import("./system-prompt/prompt");
+      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({

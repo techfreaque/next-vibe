@@ -1,8 +1,9 @@
 import { Text } from "ink";
-import type { LabelRootProps } from "next-vibe/ui/web/ui/label";
 import type { JSX } from "react";
 
-export type { LabelRootProps } from "next-vibe/ui/web/ui/label";
+import type { LabelRootProps } from "../../web/ui/label";
+
+export type { LabelRootProps } from "../../web/ui/label";
 
 const COLON = "\u003A";
 const SPACE = "\u0020";

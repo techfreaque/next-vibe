@@ -21,7 +21,7 @@ import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import type { CIEnvironment, PackageJson, ReleaseOptions } from "../definition";
 import { MESSAGES } from "./constants";
 
-export class Publisher {
+class Publisher {
   runCiReleaseCommand(
     releaseConfig: ReleaseOptions,
     packageName: string,

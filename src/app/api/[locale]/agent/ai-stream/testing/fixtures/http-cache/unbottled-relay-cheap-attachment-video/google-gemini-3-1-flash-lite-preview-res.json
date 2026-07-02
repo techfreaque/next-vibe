@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a14c2b948b29d38a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 08:09:57 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782979787-tVTjknhF2sDuTtaho3J0"
+  },
+  "body": {
+    "id": "gen-1782979787-tVTjknhF2sDuTtaho3J0",
+    "object": "chat.completion",
+    "created": 1782979787,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a 5-second, high-definition, professional-quality close-up shot that appears to be a promotional clip or a documentary-style segment centered on Rubik’s Cubes.\n\n### Visual Content\n*   **Setting and Environment:** The scene is set in an indoor, dimly lit environment where a surface is completely covered, wall-to-wall, with dozens of Rubik’s Cubes. Some cubes are partially solved, some are scrambled, and some show wear.\n*   **Characters/Actions:** A person’s hands are centered in the frame, holding a single, professional-grade 3x3 Rubik’s Cube. The person is rotating the top slice of the cube to the left, then the right, demonstrating the crisp, mechanical, and smooth movement of the puzzle's internal mechanisms. The hands are medium-toned with visible skin texture.\n*   **Camera Work:** The camera is positioned in a tight close-up, focusing entirely on the hands and the cube being manipulated. The depth of field is shallow, leaving the surrounding pile of cubes in the background softly out of focus.\n*   **Objects:** The central cube being held shows a distinct white logo on the center blue square, featuring a graphic of a bird-like shape within a rectangle and the character \"X\" positioned to the right of the icon.\n\n### Audio\n*   **Speech/Dialogue:** None.\n*   **Sound Effects:** The audio is dominated by the crisp, high-fidelity mechanical sounds of the Rubik’s Cube sections clicking into place as they are turned. These are sharp, rhythmic \"click-clack\" sounds that emphasize the high build quality of the puzzle.\n*   **Background Music:** There is a faint, rhythmic, pulsing electronic ambient bassline that sounds modern and cinematic, designed to create a sense of focus and technical precision.\n\n### Style and Production\n*   **Production Quality:** Extremely professional, featuring high-end lighting that highlights the glossy plastic of the cubes and a deliberate, high-quality audio mix focused on the tangible feedback of the mechanical toy.\n*   **Visual Style:** Realistic, high-contrast, and textured. The lighting suggests directional studio lighting meant to emphasize the colors and the mechanical movement.\n*   **Pacing:** Very slow and deliberate, focusing on the sensory details of the manipulation rather than speed solving.\n\n### Mood and Arc\n*   **Mood:** The emotional tone is one of focus, precision, satisfaction, and hobbyist obsession. \n*   **Narrative/Demonstration:** The video serves as a demonstration of quality—specifically focusing on the smooth, mechanical feel of the cube. It appeals to enthusiasts who appreciate the tactile experience of the puzzle. There is no start-to-finish narrative arc, but rather a \"slice of life\" demonstration of a physical object.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "AY89a18N1KV5oat5mQoVVt6b8q7scMSsyXeB2ZPyqDsDzMksVvp3aLP74ix73HglVgg=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 592,
+      "total_tokens": 1000,
+      "cost": 0.00099,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00099,
+        "upstream_inference_prompt_cost": 0.000102,
+        "upstream_inference_completions_cost": 0.000888
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

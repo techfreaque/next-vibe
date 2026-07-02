@@ -4,12 +4,13 @@
  * Currently renders plain text
  */
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-// Import all public types from web version (web is source of truth)
-import type { MarkdownProps } from "next-vibe/ui/web/ui/markdown";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import { memo } from "react";
 import { Text as RNText, View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+// Import all public types from web version (web is source of truth)
+import type { MarkdownProps } from "../../web/ui/markdown";
+import { applyStyleType } from "../../web/utils/style-type";
 
 export const CodeBlock = memo(function CodeBlock({
   code,

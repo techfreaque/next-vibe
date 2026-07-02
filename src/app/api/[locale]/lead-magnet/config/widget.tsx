@@ -1,7 +1,6 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
@@ -25,6 +24,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 

@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a14c2c8c4bf4b913-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 08:10:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782979827-XMaPyRW7XaLdhYsXpl66"
+  },
+  "body": {
+    "id": "gen-1782979827-XMaPyRW7XaLdhYsXpl66",
+    "object": "chat.completion",
+    "created": 1782979827,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "error",
+        "native_finish_reason": null,
+        "error": {
+          "code": 429,
+          "message": "JSON error injected into SSE stream",
+          "metadata": {
+            "error_type": "rate_limit_exceeded"
+          }
+        },
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short recording of a single musical track, likely an excerpt rather than a full song, lasting 27 seconds.\n\nThe music falls into the electronic/synth-pop genre, with a light and somewhat playful mood. It is instrumental; there are no vocals present.\n\n**Instrumentation and Arrangement:**\n- **Drums:** A drum machine provides a consistent, driving beat.\n    - At the 0:00 mark, a snare drum hit marks the beginning, followed by a repetitive, groovy hi-hat pattern (roughly 8th or 16th notes with some variation) that continues throughout.\n    - A kick drum provides a steady pulse, often on the downbeats.\n    - At approximately 0:03, a rimshot or a thinner snare sound is introduced, adding to the rhythm.\n    - At 0:08, a subtle cymbal crash marks a slight transition or emphasis.\n    - A consistent, almost metronomic high-pitched percussive element (possibly woodblock or very short clave sound) is layered over the main beat, contributing to the \"bubbly\" feel.\n- **Bass:** A synth bass provides a foundational, melodic line. It's not a heavy 808 but a more articulate, almost staccato synth bass sound.\n- **Melody/Harmony:** Synthesizers clearly dominate the melodic and harmonic content.\n    - A primary synth melody, with a bright, clean tone, plays a catchy, repetitive pattern that defines the track's theme. Its progression is fairly simple but effective.\n    - Underlying harmonic pads from another synthesizer occasionally swell, providing a warm background texture without overpowering the main melody.\n    - At approximately 0:08, a second, higher-pitched synth line with a slightly different timbre (perhaps more rounded or \"fluty\") is introduced, playing in counterpoint or as a melodic embellishment to the main synth line.\n\n**Tempo and Rhythm:**\n- The tempo is moderately fast, estimated around 120-130 BPM.\n- The time signature appears to be 4/4.\n- The rhythm is highly syncopated and groovy, driven by the interaction of the drum machine and the synth bass.\n\n**Production Style:**\n- The production sounds polished and clean.\n- There's a noticeable, but not overly aggressive, amount of reverb on some of the synth elements, adding depth.\n- The overall mix is clear, allowing individual elements to be heard distinctly.\n\n**Mood:**\n- The mood is upbeat, light, and perhaps a",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0,
+      "cost": 0,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0,
+        "upstream_inference_prompt_cost": 0,
+        "upstream_inference_completions_cost": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

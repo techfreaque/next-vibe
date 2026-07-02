@@ -16,14 +16,14 @@ import { clientEndpointHandler } from "./client-handler";
 /**
  * Base constraint for client endpoint definitions
  */
-export type ClientEndpointDefinitionsConstraint = {
+type ClientEndpointDefinitionsConstraint = {
   readonly [K in Methods]?: K extends Methods ? CreateApiEndpointAny : never;
 };
 
 /**
  * Client handler configuration that matches server MethodHandlerConfig structure
  */
-export interface ClientMethodHandlerConfig<
+interface ClientMethodHandlerConfig<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
@@ -39,7 +39,7 @@ export interface ClientMethodHandlerConfig<
  * Type-safe configuration for client handlers
  * Matches server EndpointHandlerConfig structure
  */
-export type ClientEndpointHandlerConfig<
+type ClientEndpointHandlerConfig<
   T extends ClientEndpointDefinitionsConstraint,
 > = {
   endpoint: T;

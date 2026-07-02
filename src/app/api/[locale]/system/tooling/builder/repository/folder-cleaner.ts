@@ -18,7 +18,7 @@ import { outputFormatter } from "./output-formatter";
 // Interface
 // ============================================================================
 
-export interface IFolderCleaner {
+interface IFolderCleaner {
   /**
    * Clean (delete) specified folders
    */
@@ -40,7 +40,7 @@ export interface IFolderCleaner {
 // Implementation
 // ============================================================================
 
-export class FolderCleaner implements IFolderCleaner {
+class FolderCleaner implements IFolderCleaner {
   async clean(
     folders: string[],
     output: string[],

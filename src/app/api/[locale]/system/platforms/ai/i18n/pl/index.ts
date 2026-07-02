@@ -34,6 +34,21 @@ export const translations: typeof enTranslations = {
           description:
             'Jak obsługiwać wynik asynchroniczny. "wait": czekaj aż gotowe, "task-done": zwróć taskId natychmiast, "inject": wstaw wynik do bieżącego wątku.',
         },
+        callerSkillId: {
+          label: "ID skilla wywołującego",
+          description:
+            "Wewnętrzne pole wire: aktywne ID skilla instancji wywołującej — instancja wykonująca rozwiązuje na jego podstawie domyślne pola (np. modele mediów). Ustawiane automatycznie przy wywołaniach między instancjami.",
+        },
+        callerFavoriteId: {
+          label: "ID ulubionego wywołującego",
+          description:
+            "Wewnętrzne pole wire: aktywne ID ulubionego instancji wywołującej — instancja wykonująca rozwiązuje na jego podstawie domyślne pola (np. modele mediów). Ustawiane automatycznie przy wywołaniach między instancjami.",
+        },
+        callerPlatform: {
+          label: "Platforma wywołującego",
+          description:
+            "Wewnętrzne pole wire: platforma wykonawcza strony wywołującej — instancja wykonująca renderuje wyniki w odpowiednim kształcie. Ustawiane automatycznie przy wywołaniach między instancjami.",
+        },
       },
       response: {
         result:
@@ -56,6 +71,11 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Narzędzie nie znalezione",
           description: "Brak zarejestrowanego narzędzia o podanej nazwie",
+        },
+        remoteFailed: {
+          title: "Zdalne narzędzie zawiodło: {{message}}",
+          description:
+            "Zdalna instancja odrzuciła wywołanie lub zakończyło się błędem",
         },
         server: {
           title: "Błąd wykonania",

@@ -16,7 +16,7 @@ import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availabi
 
 import { callApi } from "./call-api";
 
-export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
+interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
   onSuccess?: (
     context: {
       requestData: TRequest;

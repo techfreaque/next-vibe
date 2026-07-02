@@ -3,9 +3,10 @@
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/core/utils/utils";
-import { DashIcon } from "next-vibe/ui/web/ui/icons/DashIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { DashIcon } from "../../web/ui/icons/DashIcon";
+import type { StyleType } from "../../web/utils/style-type";
 
 export type InputOTPProps = {
   containerClassName?: string;

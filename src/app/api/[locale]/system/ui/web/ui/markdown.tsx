@@ -3,8 +3,6 @@
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -13,6 +11,8 @@ import { nightOwl as atomDark } from "react-syntax-highlighter/dist/esm/styles/p
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
+import { uiScopedTranslation } from "../../web/i18n";
+import type { StyleType } from "../../web/utils/style-type";
 import { ExternalLink as ExternalLinkComponent } from "./link";
 
 // Constants for non-translatable values

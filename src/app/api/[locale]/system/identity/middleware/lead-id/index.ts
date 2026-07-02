@@ -94,7 +94,7 @@ export { LeadIdCheckResult };
 
 // ─── Exchange Token Redemption ────────────────────────────────────────────────
 
-export interface ExchangeTokenPayload {
+interface ExchangeTokenPayload {
   /** Null when the host page didn't provide a leadId - middleware creates a new lead */
   leadId: string | null;
   authToken: string | null;

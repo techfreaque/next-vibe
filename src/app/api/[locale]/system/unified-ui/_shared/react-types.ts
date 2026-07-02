@@ -3,7 +3,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   CancelButtonConfig,
   SubmitButtonConfig,
-} from "next-vibe/ui/renderers/react/EndpointRenderer";
+} from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
 import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type z from "zod";

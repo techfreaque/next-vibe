@@ -22,7 +22,7 @@ import { MESSAGES } from "./constants";
 // Interface
 // ============================================================================
 
-export interface IVersionService {
+interface IVersionService {
   /**
    * Get the last version from git tags
    */
@@ -73,7 +73,7 @@ export interface IVersionService {
 // Implementation
 // ============================================================================
 
-export class VersionService implements IVersionService {
+class VersionService implements IVersionService {
   getLastVersionFromGitTag(
     tagPrefix: string,
     mainPackagePath: string,

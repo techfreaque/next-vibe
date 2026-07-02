@@ -125,37 +125,3 @@ export function ensureFullUrl(url: string, baseUrl: string): string {
 
   return url;
 }
-
-/**
- * Generate engagement tracking API URL
- * Client-safe implementation
- */
-export function generateEngagementTrackingApiUrl(
-  baseUrl: string,
-  locale: CountryLanguage,
-  params: {
-    leadId: string;
-    campaignId?: string;
-    stage?: string;
-    source?: string;
-    url: string;
-    ref?: string;
-  },
-): string {
-  const apiUrl = new URL(`/api/${locale}/leads/tracking/engagement`, baseUrl);
-
-  apiUrl.searchParams.set("leadId", params.leadId);
-  if (params.campaignId) {
-    apiUrl.searchParams.set("campaignId", params.campaignId);
-  }
-  if (params.stage) {
-    apiUrl.searchParams.set("stage", params.stage);
-  }
-  apiUrl.searchParams.set("source", params.source || "email");
-  apiUrl.searchParams.set("url", params.url);
-  if (params.ref) {
-    apiUrl.searchParams.set("ref", params.ref);
-  }
-
-  return apiUrl.toString();
-}

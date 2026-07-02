@@ -100,15 +100,6 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      enableTrpc: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.enableTrpc.label",
-        description: "post.fields.enableTrpc.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
       skipTanstack: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -214,35 +205,24 @@ const { POST } = createEndpoint({
         verbose: false,
         skipEndpoints: false,
         skipSeeds: false,
-        enableTrpc: false,
       },
       success: {
         outputDir: "src/generated",
         verbose: false,
         skipEndpoints: false,
         skipSeeds: false,
-        enableTrpc: false,
       },
       verbose: {
         outputDir: "src/generated",
         verbose: true,
         skipEndpoints: false,
         skipSeeds: false,
-        enableTrpc: false,
       },
       skipSome: {
         outputDir: "src/generated",
         verbose: false,
         skipEndpoints: true,
         skipSeeds: false,
-        enableTrpc: false,
-      },
-      withTrpc: {
-        outputDir: "src/generated",
-        verbose: false,
-        skipEndpoints: false,
-        skipSeeds: false,
-        enableTrpc: true,
       },
     },
     responses: {

@@ -1,11 +1,11 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import type { WidgetHeaderProps } from "next-vibe/ui/web/ui/widget-header";
 import { View } from "react-native";
 
+import type { WidgetHeaderProps } from "../../web/ui/widget-header";
 import { Text } from "./text";
 
-export type { WidgetHeaderProps } from "next-vibe/ui/web/ui/widget-header";
+export type { WidgetHeaderProps } from "../../web/ui/widget-header";
 
 const StyledView = styled(View, { className: "style" });
 

@@ -1,13 +1,13 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { Span } from "next-vibe/ui/web/ui/span";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 

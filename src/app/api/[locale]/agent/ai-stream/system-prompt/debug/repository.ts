@@ -11,8 +11,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { buildSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/builder";
+import { buildSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { loadRawEmbeddingScores } from "@/app/api/[locale]/agent/cortex/system-prompt";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

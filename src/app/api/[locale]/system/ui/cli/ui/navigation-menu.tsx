@@ -10,7 +10,7 @@ export type {
   NavigationMenuTriggerProps,
   NavigationMenuTriggerStyleProps,
   NavigationMenuViewportProps,
-} from "next-vibe/ui/web/ui/navigation-menu";
+} from "../../web/ui/navigation-menu";
 
 import { cva } from "class-variance-authority";
 
@@ -23,7 +23,7 @@ import type {
   NavigationMenuListProps,
   NavigationMenuProps,
   NavigationMenuTriggerProps,
-} from "next-vibe/ui/web/ui/navigation-menu";
+} from "../../web/ui/navigation-menu";
 
 export function NavigationMenu({
   children,

@@ -32,7 +32,7 @@ import {
 /**
  * Validate locale using the standard schema
  */
-export function validateLocale(
+function validateLocale(
   locale: CountryLanguage,
   logger: EndpointLogger,
   platform: Platform,
@@ -65,7 +65,7 @@ export function validateLocale(
 /**
  * CLI validation context
  */
-export interface HandlerValidationContext<TRequestData, TUrlParameters> {
+interface HandlerValidationContext<TRequestData, TUrlParameters> {
   /** HTTP method being used */
   method: Methods;
   /** Direct request data */

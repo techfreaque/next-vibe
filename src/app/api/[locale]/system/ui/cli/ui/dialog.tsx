@@ -29,7 +29,9 @@ export type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "next-vibe/ui/web/ui/dialog";
+} from "../../web/ui/dialog";
+
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import type {
   DialogCloseProps,
@@ -41,8 +43,7 @@ import type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "next-vibe/ui/web/ui/dialog";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../web/ui/dialog";
 
 // ─── Overlay Lock ────────────────────────────────────────────────────────────
 // Module-level overlay counter with subscriber notification.

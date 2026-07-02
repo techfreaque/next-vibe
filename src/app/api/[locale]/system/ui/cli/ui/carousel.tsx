@@ -8,13 +8,13 @@ export type {
   CarouselOptions,
   CarouselPlugin,
   CarouselProps,
-} from "next-vibe/ui/web/ui/carousel";
+} from "../../web/ui/carousel";
 
 import type {
   CarouselContentProps,
   CarouselItemProps,
   CarouselProps,
-} from "next-vibe/ui/web/ui/carousel";
+} from "../../web/ui/carousel";
 
 export function Carousel({
   children,

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/remote-stream-1c44e2cd-5843-4377-a0c1-9c2377ba0735.md\n\n# Remote Stream\nFolder: cron\nPreview: <think> The user wants me to describe the attached image. Looking at the image, it shows a solid red circle on a white b…",
+    "encoding_format": "float"
+  }
+}

@@ -591,7 +591,7 @@ export class ThreadsRepository {
         }
       }
 
-      // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
+      // Map DB fields to API response format (DB has rootFolderId , folderId as UUID)
       // Compute permission flags for each thread
       const threads = await Promise.all(
         visibleThreads.map(async (thread) => {
@@ -907,10 +907,14 @@ export class ThreadsRepository {
     if (!thread?.id || !thread.title) {
       return;
     }
-    await db
+    const updatedRows = await db
       .update(chatThreads)
       .set({ title: thread.title, updatedAt: new Date() })
       .where(eq(chatThreads.id, thread.id))
+      .returning({
+        rootFolderId: chatThreads.rootFolderId,
+        folderId: chatThreads.folderId,
+      })
       .catch((err: Error) => {
         logger.warn(
           "[threads/repository] thread-title-updated: DB update failed",
@@ -919,13 +923,23 @@ export class ThreadsRepository {
             error: err.message,
           },
         );
+        return [];
       });
+    const updatedRow = updatedRows[0];
+    if (!updatedRow) {
+      return;
+    }
     const { createEndpointEmitter } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "thread-title-updated",
-      { responseData: { threads: [{ id: thread.id, title: thread.title }] } },
-    );
+      await import("next-vibe/realtime/emitter");
+    createEndpointEmitter(definitions.GET, logger, user, {
+      requestData: {
+        rootFolderId: updatedRow.rootFolderId,
+        subFolderId: updatedRow.folderId ?? null,
+      },
+      fanOut: false,
+    })("thread-title-updated", {
+      responseData: { threads: [{ id: thread.id, title: thread.title }] },
+    });
   }
 
   /**

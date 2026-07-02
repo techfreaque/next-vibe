@@ -55,7 +55,7 @@ function defaultChangeLocale(): void {
 }
 
 // Create context with default values
-export const TranslationContext = createContext<TranslationContextType>({
+const TranslationContext = createContext<TranslationContextType>({
   language: defaultLocaleConfig.language,
   country: defaultLocaleConfig.country,
   locale: `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,

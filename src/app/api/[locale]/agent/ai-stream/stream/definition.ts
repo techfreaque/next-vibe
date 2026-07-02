@@ -64,6 +64,11 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "ai-stream", "stream"],
+  // No handler timeout: ai-stream runs an unbounded agent loop. A relay receiver
+  // runs it HEADLESS (full loop to completion inside the request), and a WAIT-mode
+  // media tool (image/video/music gen) can legitimately take minutes — well past
+  // the 90s default. Matches video-generation / coding-agent (also long-running).
+  timeoutMs: 0,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

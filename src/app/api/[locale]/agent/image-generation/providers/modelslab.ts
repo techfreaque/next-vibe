@@ -65,6 +65,7 @@ export async function generateImageWithModelsLab(params: {
       ? "https://modelslab.com/api/v6/images/img2img"
       : "https://modelslab.com/api/v6/images/text2img";
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const submitResponse = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -121,6 +122,7 @@ export async function generateImageWithModelsLab(params: {
           setTimeout(resolve, POLL_INTERVAL_MS);
         });
 
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const pollResponse = await fetch(fetchUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

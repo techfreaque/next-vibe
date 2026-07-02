@@ -150,17 +150,6 @@ export function hasStderr(
 }
 
 // ============================================================================
-// Retry Logic
-// ============================================================================
-
-/**
- * Result type for retry operations
- */
-export type RetryResult<T> =
-  | { success: true; data: T }
-  | { success: false; message: string };
-
-// ============================================================================
 // Time and Duration Helpers
 // ============================================================================
 
@@ -225,7 +214,7 @@ export function truncate(str: string, maxLength: number): string {
 /**
  * Parse a semantic version string into components
  */
-export function parseVersion(version: string): ParsedVersion {
+function parseVersion(version: string): ParsedVersion {
   const regex =
     /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
   const match = version.match(regex);
@@ -357,13 +346,6 @@ export function omit<T extends Record<string, WidgetData>, K extends keyof T>(
 // ============================================================================
 
 /**
- * Result type for environment variable retrieval
- */
-export type EnvResult =
-  | { success: true; value: string }
-  | { success: false; message: string };
-
-/**
  * Check if running in production
  */
 export function isProduction(): boolean {
@@ -386,27 +368,4 @@ export function isDevelopment(): boolean {
  */
 export function normalizePath(path: string): string {
   return path.replaceAll("\\", "/");
-}
-
-// ============================================================================
-// Date Helpers
-// ============================================================================
-
-/**
- * Get current date in ISO format (YYYY-MM-DD)
- */
-export function getISODate(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
-}
-
-/**
- * Get current timestamp suitable for filenames
- */
-export function getFileTimestamp(): string {
-  return new Date()
-    .toISOString()
-    .replaceAll(/[:.T]/g, "-")
-    .split("-")
-    .slice(0, 6)
-    .join("-");
 }

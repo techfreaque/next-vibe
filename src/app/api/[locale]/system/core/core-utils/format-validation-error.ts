@@ -56,7 +56,7 @@ function parseFieldErrors(
  * Structured data extracted from a validation error response.
  * Each platform uses this to build its own formatted message.
  */
-export interface ValidationErrorData {
+interface ValidationErrorData {
   /** Number of validation errors */
   count: number;
   /** Per-field errors with CLI flag name pre-computed */

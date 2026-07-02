@@ -1,7 +1,8 @@
 import { Box } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { NavProps } from "next-vibe/ui/web/ui/nav";
 import * as React from "react";
+
+import type { NavProps } from "../../web/ui/nav";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Nav({
   className,

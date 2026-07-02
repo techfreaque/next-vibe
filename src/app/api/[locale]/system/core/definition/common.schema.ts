@@ -15,7 +15,7 @@ export const dateSchema = z
 
 // Runtime: accepts any string (emoji, IconKey), Type: IconKey
 export const iconSchema = z.string() as z.ZodType<IconKey>;
-export const iconOptionalSchema = z.string().optional() as z.ZodType<
+const iconOptionalSchema = z.string().optional() as z.ZodType<
   IconKey | undefined
 >;
 export const iconNullishSchema = z

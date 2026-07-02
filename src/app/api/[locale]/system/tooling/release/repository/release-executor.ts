@@ -59,7 +59,7 @@ import { versionService } from "./version-service";
 // Interface
 // ============================================================================
 
-export interface IReleaseExecutor {
+interface IReleaseExecutor {
   /**
    * Execute the release process
    */

@@ -13,13 +13,15 @@
 
 import "server-only";
 
-import { generate as generateEndpointFramework } from "next-vibe/core/definition/generator";
+import { generate as generateEndpointFramework } from "next-vibe/core/definition/generator/generator";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { generate as generateSeeds } from "next-vibe/database/seed/generator";
 import { generate as generateDataflow } from "next-vibe/dataflow/generator";
-import { generate as generateEnv } from "next-vibe/env/generator";
+import { generate as generateEnv } from "next-vibe/env/generator/generator";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { generate as generateTrpc } from "next-vibe/platforms/trpc/generator";
+import { generate as generateNextApp } from "next-vibe/platforms/next-app/generator";
+import { generate as generateNativeIndexes } from "next-vibe/platforms/react-native/generator";
+import { generate as generateTanstackRoutes } from "next-vibe/platforms/tanstack-start/generator";
 import { generate as generateTasks } from "next-vibe/tasks/generator";
 import {
   findGeneratorInputs,
@@ -39,8 +41,8 @@ import {
   type GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
-import { generate as generateAiStreamEnums } from "@/app/api/[locale]/agent/ai-stream/generator";
-import { generate as generatePromptFragments } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/generator";
+import { generate as generateAiStreamEnums } from "@/app/api/[locale]/agent/ai-stream/model-enums-generator/generator";
+import { generate as generatePromptFragments } from "@/app/api/[locale]/agent/ai-stream/system-prompt/generator";
 import { generate as generateCortex } from "@/app/api/[locale]/agent/cortex/seeds/generator";
 import { generate as generateAgentDocs } from "@/app/api/[locale]/agent/skills/default-skills/vibe-coder/generator";
 import { generate as generateSkills } from "@/app/api/[locale]/agent/skills/generator";
@@ -65,7 +67,7 @@ interface GeneratorEntry {
   enabled: boolean;
 }
 
-export interface RunGeneratorsOptions {
+interface RunGeneratorsOptions {
   logger: EndpointLogger;
   force?: boolean;
   live?: LiveIndex;
@@ -74,7 +76,7 @@ export interface RunGeneratorsOptions {
   noCache?: boolean;
 }
 
-export interface RunGeneratorsResult {
+interface RunGeneratorsResult {
   ran: string[];
   skipped: string[];
   failed: { key: string; error: string }[];
@@ -203,13 +205,31 @@ export class GeneratorRunner {
       enabled: true,
     },
     {
-      key: "trpc",
-      run: generateTrpc,
+      key: "tanstack-routes",
+      run: generateTanstackRoutes,
       phase: "default",
       needs: {},
-      cacheKey: null,
-      output: "src/app/api/[locale]/system/platforms/trpc/[...trpc]/router.ts",
-      enabled: false, // opt-in (was enableTrpc)
+      cacheKey: "tanstack-routes",
+      output: "src/generated/app-tanstack/routes",
+      enabled: true,
+    },
+    {
+      key: "next-app",
+      run: generateNextApp,
+      phase: "default",
+      needs: {},
+      cacheKey: "next-app",
+      output: "src/generated/app",
+      enabled: true,
+    },
+    {
+      key: "native-indexes",
+      run: generateNativeIndexes,
+      phase: "default",
+      needs: {},
+      cacheKey: "native-indexes",
+      output: "src/generated/app-native",
+      enabled: true,
     },
   ] as const;
 

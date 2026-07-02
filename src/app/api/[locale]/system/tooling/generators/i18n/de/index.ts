@@ -36,10 +36,6 @@ export const translations: typeof enTranslations = {
         label: "Task-Index überspringen",
         description: "Task-Index-Generierung überspringen",
       },
-      enableTrpc: {
-        label: "tRPC aktivieren",
-        description: "tRPC-Router generieren (opt-in)",
-      },
       skipTanstack: {
         label: "TanStack überspringen",
         description: "TanStack-Routen-Generierung überspringen",

@@ -82,6 +82,7 @@ export async function generateVideoWithModelsLab(params: {
   });
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const submitResponse = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -143,6 +144,7 @@ export async function generateVideoWithModelsLab(params: {
           setTimeout(resolve, POLL_INTERVAL_MS);
         });
 
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const pollResponse = await fetch(fetchUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

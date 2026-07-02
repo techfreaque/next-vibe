@@ -2,14 +2,14 @@
 
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { styledNative } from "next-vibe/ui/native/utils/style-converter";
-import type { SectionGroupProps } from "next-vibe/ui/web/ui/section-group";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
+import { styledNative } from "../../native/utils/style-converter";
+import type { SectionGroupProps } from "../../web/ui/section-group";
 import { Text } from "./text";
 
-export type { SectionGroupProps } from "next-vibe/ui/web/ui/section-group";
+export type { SectionGroupProps } from "../../web/ui/section-group";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

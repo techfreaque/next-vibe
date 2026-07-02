@@ -31,59 +31,15 @@ import { platform } from "@/config/env-client";
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";
 
 /**
- * Auth Client Repository Interface
- * Provides all client-side authentication-related functionality in a single interface
- */
-export interface AuthClientRepository {
-  /**
-   * Stores the JWT token using platform-agnostic storage (next-vibe-ui)
-   * For web, uses localStorage
-   * For React Native, uses AsyncStorage automatically
-   * @param token - The JWT token to store
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  setAuthToken(
-    token: string,
-    logger: EndpointLogger,
-    t: AuthT,
-  ): Promise<ResponseType<void>>;
-
-  /**
-   * Retrieves the stored JWT token using platform-agnostic storage (next-vibe-ui)
-   * For web, retrieves from localStorage
-   * For React Native, retrieves from AsyncStorage automatically
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> with the token or undefined
-   */
-  getAuthToken(
-    logger: EndpointLogger,
-    t: AuthT,
-  ): Promise<ResponseType<string | undefined>>;
-
-  /**
-   * Removes the stored JWT token using platform-agnostic storage (next-vibe-ui)
-   * For web, removes from localStorage
-   * For React Native, removes from AsyncStorage automatically
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  removeAuthToken(
-    logger: EndpointLogger,
-    t: AuthT,
-  ): Promise<ResponseType<void>>;
-}
-
-/**
  * Auth Client Repository Implementation
  */
-export class AuthClientRepositoryImpl implements AuthClientRepository {
+export class AuthClientRepository {
   /**
    * Stores the JWT token using platform-agnostic storage
    * For web, uses localStorage (tokens can also be in httpOnly cookies)
    * For React Native, uses AsyncStorage automatically via next-vibe-ui
    */
-  async setAuthToken(
+  static async setAuthToken(
     token: string,
     logger: EndpointLogger,
     t: AuthT,
@@ -121,7 +77,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * For web, retrieves from localStorage
    * For React Native, retrieves from AsyncStorage automatically via next-vibe-ui
    */
-  async getAuthToken(
+  static async getAuthToken(
     logger: EndpointLogger,
     t: AuthT,
   ): Promise<ResponseType<string | undefined>> {
@@ -159,7 +115,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * For web, removes from localStorage
    * For React Native, removes from AsyncStorage automatically via next-vibe-ui
    */
-  async removeAuthToken(
+  static async removeAuthToken(
     logger: EndpointLogger,
     t: AuthT,
   ): Promise<ResponseType<void>> {
@@ -191,13 +147,3 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     }
   }
 }
-
-/**
- * Singleton Repository Instance
- *
- * We export a singleton instance of the repository to ensure that:
- * 1. Only one instance exists throughout the application
- * 2. The instance is lazily created when first imported
- * 3. All consumers use the same instance
- */
-export const authClientRepository = new AuthClientRepositoryImpl();

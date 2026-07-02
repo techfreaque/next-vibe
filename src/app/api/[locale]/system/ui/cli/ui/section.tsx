@@ -1,7 +1,8 @@
 import { Box } from "ink";
-import { parseClassesToInkProps } from "next-vibe/ui/cli/utils/tailwind-to-ink";
-import type { SectionProps } from "next-vibe/ui/web/ui/section";
 import * as React from "react";
+
+import type { SectionProps } from "../../web/ui/section";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Section({
   className,

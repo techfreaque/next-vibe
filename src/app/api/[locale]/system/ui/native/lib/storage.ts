@@ -1,7 +1,8 @@
 // Platform-specific storage for React Native using AsyncStorage
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 // Import cross-platform storage interface from web (source of truth)
-import type { Storage } from "next-vibe/ui/web/lib/storage";
+import type { Storage } from "../../web/lib/storage";
 
 // Simple logger for storage errors
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax

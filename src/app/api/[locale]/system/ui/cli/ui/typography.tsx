@@ -1,10 +1,7 @@
 import { Box, Text } from "ink";
-import {
-  type InkTextProps,
-  mergeTextProps,
-  parseClassesToInkProps,
-  parseClassesToTextProps,
-} from "next-vibe/ui/cli/utils/tailwind-to-ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   BlockQuoteProps,
   CodeProps,
@@ -17,9 +14,13 @@ import type {
   MutedProps,
   PProps,
   SmallProps,
-} from "next-vibe/ui/web/ui/typography";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/typography";
+import {
+  type InkTextProps,
+  mergeTextProps,
+  parseClassesToInkProps,
+  parseClassesToTextProps,
+} from "./tailwind-to-ink";
 
 // ─── H1 ────────────────────────────────────────────────────────────────────
 

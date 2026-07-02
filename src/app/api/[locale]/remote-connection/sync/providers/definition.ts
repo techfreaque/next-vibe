@@ -21,14 +21,6 @@ import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
 
-export const SyncProviderInfoSchema = z.object({
-  key: z.string(),
-  label: z.string(),
-  description: z.string(),
-});
-
-export type SyncProviderInfo = z.infer<typeof SyncProviderInfoSchema>;
-
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -48,7 +40,13 @@ export const { GET } = createEndpoint({
     children: {
       providers: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.array(SyncProviderInfoSchema),
+        schema: z.array(
+          z.object({
+            key: z.string(),
+            label: z.string(),
+            description: z.string(),
+          }),
+        ),
       }),
     },
   }),
@@ -134,6 +132,8 @@ export const { GET } = createEndpoint({
 });
 
 export type SyncProvidersGetResponseOutput = typeof GET.types.ResponseOutput;
+export type SyncProviderInfo =
+  SyncProvidersGetResponseOutput["providers"][number];
 
 const endpoints = { GET } as const;
 export default endpoints;

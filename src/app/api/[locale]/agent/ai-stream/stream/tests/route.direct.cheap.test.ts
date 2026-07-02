@@ -15,73 +15,34 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-
 import {
   failSuitePrerequisites,
   HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveRemoteUrlSync,
 } from "../../testing/remote-setup";
+import { makeDirectSetup } from "./helpers/remote";
 import { describeStreamSuite } from "./route-base.test";
-
-let _prodUserId: string | null = null;
-
-async function setupDirectConnection(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const {
-    connectToHermes,
-    disconnectFromHermes,
-    ensureRemoteUserCredits,
-    resolveProdAdminToken,
-    resolveProdUserId,
-  } = await import("../../testing/remote-setup");
-
-  await disconnectFromHermes(testUser.id);
-  await connectToHermes(
-    testUser,
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-  );
-
-  _prodUserId = await resolveProdUserId();
-
-  const remoteAdminToken = await resolveProdAdminToken(
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-  );
-  await ensureRemoteUserCredits(
-    _resolvedRemoteUrl ?? "http://localhost:3002",
-    remoteAdminToken,
-    _prodUserId,
-    20000,
-  );
-}
-
-async function teardownDirectConnection(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const { disconnectFromHermes, unregisterDevFromHermes } =
-    await import("../../testing/remote-setup");
-
-  const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
-  if (_prodUserId) {
-    tasks.push(unregisterDevFromHermes(_prodUserId));
-  }
-  await Promise.all(tasks);
-  _prodUserId = null;
-}
 
 const _resolvedRemoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
+// Idempotent E2E connection: disconnect leftovers → connectToHermes →
+// resolveProdUserId → top up remote credits via real endpoint (20000cr) →
+// mirrored teardown (disconnect + unregister).
+const hooks = makeDirectSetup(_resolvedRemoteUrl);
+
 if (_resolvedRemoteUrl && _isFixtureMode) {
   describeStreamSuite({
-    label: `AI Stream Integration - Direct (cheap) (${_resolvedRemoteUrl}, transportMode='direct-http')`,
+    label: `AI Stream Integration - Direct tools-remote (cheap) (${_resolvedRemoteUrl}, loop LOCAL, tools via execute-tool→hermes over direct-http)`,
     cachePrefix: "direct-cheap-",
     cheapMode: true,
+    // Loop runs locally; every tool executes on hermes via the execute-tool
+    // meta-tool (prompt wrapping + remote-call assertions key off this).
+    remoteInstanceId: HERMES_INSTANCE_ID,
     assertSystemPromptFromLocal: true,
-    setup: setupDirectConnection,
-    teardown: teardownDirectConnection,
+    setup: hooks.setup,
+    teardown: hooks.teardown,
   });
 } else if (!_resolvedRemoteUrl) {
   failSuitePrerequisites(

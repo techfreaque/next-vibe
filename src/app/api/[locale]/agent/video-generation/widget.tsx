@@ -1,5 +1,4 @@
 "use client";
-import { objectValues } from "next-vibe/core/utils/object";
 import { Badge } from "next-vibe/ui/web/ui/badge";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
@@ -39,8 +38,11 @@ import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 import type { VideoGenModelSelection } from "./models";
-import { getBestVideoGenModel, getVideoGenModelById } from "./models";
-import { VideoGenModelId } from "./models";
+import {
+  getBestVideoGenModel,
+  getVideoGenModelById,
+  VideoGenModelId,
+} from "./models";
 
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
@@ -145,7 +147,7 @@ export function VideoGenerationContainer({
     if (!m) {
       return undefined;
     }
-    const modelId = objectValues(VideoGenModelId).includes(m.id)
+    const modelId = Object.values(VideoGenModelId).includes(m.id)
       ? m.id
       : undefined;
     if (!modelId) {

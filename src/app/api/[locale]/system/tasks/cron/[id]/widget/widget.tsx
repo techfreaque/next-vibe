@@ -12,7 +12,6 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { cn } from "next-vibe/core/utils/utils";
 import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
 import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
 import { Form } from "next-vibe/ui/web/ui/form/form";
@@ -47,6 +46,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/wid
 import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";

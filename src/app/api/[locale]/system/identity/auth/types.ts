@@ -37,11 +37,6 @@ const privateJwtPayloadSchema = z.object({
   roles: z.array(z.enum(UserRoleDB)),
 });
 
-export const jwtPayloadSchema = z.discriminatedUnion("isPublic", [
-  publicJwtPayloadSchema,
-  privateJwtPayloadSchema,
-]);
-
 export type JWTPublicPayloadType = z.infer<typeof publicJwtPayloadSchema> & {
   id?: never;
 };

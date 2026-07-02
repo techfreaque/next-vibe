@@ -4,8 +4,6 @@
  */
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import type { IconPickerProps } from "next-vibe/ui/web/ui/icon-picker";
 import type { CategoryKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import {
   Icon,
@@ -23,6 +21,8 @@ import {
   View,
 } from "react-native";
 
+import { uiScopedTranslation } from "../../web/i18n";
+import type { IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";
 
 export type { CategoryKey, IconPickerProps };

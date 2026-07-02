@@ -8,12 +8,6 @@
 
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import type {
-  MarkdownEditorProps,
-  ToolbarAction,
-} from "next-vibe/ui/web/ui/markdown-editor";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import React, { useCallback, useRef, useState } from "react";
 import {
   ScrollView,
@@ -23,11 +17,18 @@ import {
   View,
 } from "react-native";
 
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import type {
+  MarkdownEditorProps,
+  ToolbarAction,
+} from "../../web/ui/markdown-editor";
+import { applyStyleType } from "../../web/utils/style-type";
+
 // Re-export types so consumers can import from the native path too
 export type {
   MarkdownEditorProps,
   ToolbarAction,
-} from "next-vibe/ui/web/ui/markdown-editor";
+} from "../../web/ui/markdown-editor";
 
 const StyledView = styled(View, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });

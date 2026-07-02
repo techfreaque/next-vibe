@@ -47,7 +47,7 @@ function trackRequest(method: string, path: string): void {
 // server's own deadline fires.
 const PROXY_REQUEST_TIMEOUT_MS = 600_000;
 
-export interface HttpProxyContext {
+interface HttpProxyContext {
   nextPort: number;
   logger: EndpointLogger;
   /** True once the server is stopping — suppresses retries and expected errors. */

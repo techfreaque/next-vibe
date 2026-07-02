@@ -5,6 +5,8 @@
  */
 
 export enum ImageVisionModelId {
+  GPT_5_5 = "gpt-55",
+  GPT_5_5_PRO = "gpt-55-pro",
   GPT_5_4 = "gpt-54",
   GPT_5_4_PRO = "gpt-54-pro",
   GPT_5_4_MINI = "gpt-5.4-mini",
@@ -23,11 +25,11 @@ export enum ImageVisionModelId {
   GPT_5_NANO = "gpt-5-nano",
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
+  GEMINI_3_5_FLASH = "gemini-3.5-flash",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
-  KIMI_K2_6 = "kimi-k2.6",
   GROK_4_FAST = "grok-4-fast",
   GROK_4 = "grok-4",
   GROK_4_3 = "grok-4.3",
@@ -39,15 +41,19 @@ export enum ImageVisionModelId {
   CLAUDE_OPUS_4_6 = "claude-opus-4.6",
   CLAUDE_OPUS_4_7 = "claude-opus-4.7",
   GLM_4_5V = "glm-4.5v",
+  KIMI_K2_5 = "kimi_k2_5",
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
+  GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
+  KIMI_K2_6 = "kimi-k2.6",
 }
 
 export enum VideoVisionModelId {
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
+  GEMINI_3_5_FLASH = "gemini-3.5-flash",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
@@ -57,6 +63,7 @@ export enum VideoVisionModelId {
 export enum AudioVisionModelId {
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
+  GEMINI_3_5_FLASH = "gemini-3.5-flash",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",

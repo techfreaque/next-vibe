@@ -6,13 +6,13 @@ export type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
   ErrorFallbackProps,
-} from "next-vibe/ui/web/ui/error-boundary";
+} from "../../web/ui/error-boundary";
 
 import type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
   ErrorFallbackProps,
-} from "next-vibe/ui/web/ui/error-boundary";
+} from "../../web/ui/error-boundary";
 
 // ─── Default Error Fallback (CLI) ─────────────────────────────────────────────
 

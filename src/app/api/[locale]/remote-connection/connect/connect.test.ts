@@ -167,7 +167,7 @@ if (_remoteUrl) {
         await import("next-vibe/execute-tool/routing");
       const { createEndpointLogger } =
         await import("next-vibe/logger/server");
-      const target = await RemoteTransport.resolveTarget({
+      const target = await resolveTarget({
         userId: testUser.id,
         folderId: folder.id,
         rootFolderId: DefaultFolderId.REMOTE,

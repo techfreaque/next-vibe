@@ -8,22 +8,22 @@
  */
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import type {
-  AutocompleteFieldProps,
-  AutocompleteOption,
-  AutocompleteOptionBase,
-} from "next-vibe/ui/web/ui/autocomplete-field";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo, useRef, useState } from "react";
 
+import type {
+  AutocompleteFieldProps,
+  AutocompleteOption,
+  AutocompleteOptionBase,
+} from "../../web/ui/autocomplete-field";
 import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type {
   AutocompleteFieldProps,
   AutocompleteOption,
   AutocompleteOptionBase,
-} from "next-vibe/ui/web/ui/autocomplete-field";
+} from "../../web/ui/autocomplete-field";
 
 export enum FormFieldCategory {
   OTHER = "other",

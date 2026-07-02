@@ -19,8 +19,6 @@ import helpEndpoints from "next-vibe/help-tool/definition";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
-import { EndpointRenderer } from "next-vibe/ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { AutocompleteOption } from "next-vibe/ui/web/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/web/ui/autocomplete-field";
 import { Button } from "next-vibe/ui/web/ui/button";
@@ -47,6 +45,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

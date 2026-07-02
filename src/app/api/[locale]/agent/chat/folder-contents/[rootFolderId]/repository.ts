@@ -51,6 +51,73 @@ import definitions from "./definition";
 import type { FolderContentsT } from "./i18n";
 
 export class FolderContentsRepository {
+  /**
+   * Map a default root folder to a WS channel kind for the SUBSCRIBER —
+   * EXHAUSTIVE over DefaultFolderId (the only type a rootFolderId can be; the
+   * endpoint's url param is a `z.enum([DefaultFolderId.*])`). PUBLIC/SHARED are
+   * shared resource channels (many identities watch one); PRIVATE / BACKGROUND /
+   * REMOTE are the owner's own channel; INCOGNITO never reaches the server.
+   * Shared by the folder-contents and messages channel resolvers so the same
+   * folder-trust drives subscribe-admission and the emitter's delivery channel.
+   */
+  static folderIdToChannelKind(
+    user: JwtPayloadType,
+    rootFolderId: DefaultFolderId,
+  ): ChannelDecision["kind"] {
+    switch (rootFolderId) {
+      case DefaultFolderId.INCOGNITO:
+        return "deny";
+      case DefaultFolderId.PUBLIC:
+      case DefaultFolderId.SHARED:
+        // Many identities watch one channel.
+        return user.isPublic ? (user.leadId ? "resource" : "deny") : "resource";
+      case DefaultFolderId.PRIVATE:
+      case DefaultFolderId.BACKGROUND:
+      case DefaultFolderId.REMOTE:
+        // Owner-private — events ride the owner's own user channel.
+        return !user.isPublic && !!user.id ? "user" : "deny";
+    }
+  }
+
+  /**
+   * The emit-side channel kind for a folder event. The emitting user owns the
+   * folder, so a PUBLIC/SHARED folder's events ride the shared resource channel
+   * (every viewer gets them) and any other folder rides the owner's own user
+   * channel. EXHAUSTIVE over DefaultFolderId. Mirrors folderIdToChannelKind's
+   * public/owner split so emit-delivery lands on the subscribers' channel.
+   */
+  static emitChannelForFolder(
+    rootFolderId: DefaultFolderId,
+  ): EmitChannelDecision {
+    switch (rootFolderId) {
+      case DefaultFolderId.PUBLIC:
+      case DefaultFolderId.SHARED:
+        return { kind: "resource" };
+      case DefaultFolderId.PRIVATE:
+      case DefaultFolderId.BACKGROUND:
+      case DefaultFolderId.REMOTE:
+      case DefaultFolderId.INCOGNITO:
+        return { kind: "user" };
+    }
+  }
+
+  /**
+   * resolveChannel for `folder-contents/[rootFolderId]`. The rootFolderId (a
+   * typed DefaultFolderId) names the folder whose contents stream; its trust
+   * class decides the channel.
+   */
+  static resolveSubscriptionChannel(ctx: {
+    user: JwtPayloadType;
+    urlPathParams: { readonly rootFolderId: DefaultFolderId };
+  }): ChannelDecision {
+    return {
+      kind: FolderContentsRepository.folderIdToChannelKind(
+        ctx.user,
+        ctx.urlPathParams.rootFolderId,
+      ),
+    };
+  }
+
   static async getFolderContents(
     urlPathParams: FolderContentsUrlVariablesOutput,
     data: FolderContentsRequestOutput,
@@ -686,13 +753,16 @@ export class FolderContentsRepository {
         );
       });
     const { createEndpointEmitter } =
-      await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-    createEndpointEmitter(definitions.GET, logger, user, { fanOut: false })(
-      "thread-title-updated",
-      {
-        urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
-        responseData: { items: [{ id: item.id, title: item.title }] },
-      },
-    );
+      await import("next-vibe/realtime/emitter");
+    createEndpointEmitter(definitions.GET, logger, user, {
+      urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
+      requestData: { subFolderId: undefined, threadIds: undefined },
+      kindOverride: FolderContentsRepository.emitChannelForFolder(
+        urlPathParams.rootFolderId,
+      ).kind,
+      fanOut: false,
+    })("thread-title-updated", {
+      responseData: { items: [{ id: item.id, title: item.title }] },
+    });
   }
 }

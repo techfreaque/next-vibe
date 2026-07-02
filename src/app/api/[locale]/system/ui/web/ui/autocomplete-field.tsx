@@ -9,10 +9,10 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
+import { uiScopedTranslation } from "../../web/i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {

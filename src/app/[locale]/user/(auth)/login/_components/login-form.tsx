@@ -12,7 +12,7 @@ const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 
 import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
 import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
@@ -42,45 +42,35 @@ function DevQuickLogin({
   callbackUrl?: string;
   devSeedPassword: string | null;
   devSeedUsers: typeof DEV_SEED_USERS | null;
+  user: JwtPayloadType;
 }): React.JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
   const [loadingEmail, setLoadingEmail] = useState<string | null>(null);
+  const logger = useLogger();
+  // Typed login mutation — the client route handler attaches CSRF + cookies.
+  const loginMutation = useApiMutation(loginEndpoints.POST, logger, user);
 
   const handleQuickLogin = useCallback(
     async (email: string) => {
       setLoadingEmail(email);
-      try {
-        const csrfCookie = await getCookie(CSRF_TOKEN_COOKIE_NAME);
-        const response = await fetch(
-          `/api/${locale}/${loginEndpoints.POST.path.join("/")}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(csrfCookie ? { [CSRF_TOKEN_HEADER_NAME]: csrfCookie } : {}),
-            },
-            body: JSON.stringify({
-              email,
-              password: devSeedPassword,
-              rememberMe: true,
-            }),
-          },
-        );
-
-        if (response.ok) {
-          const target =
-            devSeedPassword === DEFAULT_PASSWORD_SENTINEL
-              ? `/${locale}/admin/settings`
-              : (callbackUrl ?? `/${locale}`);
-          assignUrl(target);
-        } else {
-          setLoadingEmail(null);
-        }
-      } catch {
+      const result = await loginMutation.mutateAsync({
+        requestData: {
+          email,
+          password: devSeedPassword ?? "",
+          rememberMe: true,
+        },
+      });
+      if (result.success) {
+        const target =
+          devSeedPassword === DEFAULT_PASSWORD_SENTINEL
+            ? `/${locale}/admin/settings`
+            : (callbackUrl ?? `/${locale}`);
+        assignUrl(target);
+      } else {
         setLoadingEmail(null);
       }
     },
-    [locale, callbackUrl, devSeedPassword],
+    [locale, callbackUrl, devSeedPassword, loginMutation],
   );
 
   return (
@@ -149,6 +139,7 @@ export function LoginForm({
           callbackUrl={callbackUrl}
           devSeedPassword={devSeedPassword}
           devSeedUsers={devSeedUsers}
+          user={user}
         />
       )}
     </>

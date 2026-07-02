@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t-sys--what-is-your-instance-id--look-at-your----44e3cb39-43a1-4cdd-937b-ec702fc2b4d6.md\n\n# [T-SYS] What is your instance ID? Look at your...\nFolder: remote\nPreview: <think>The user is asking for my instance ID. Looking at the system context, I can see: Instance ID: atlas This is clear…",
+    "encoding_format": "float"
+  }
+}

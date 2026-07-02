@@ -5,14 +5,20 @@ import { Div } from "next-vibe/ui/web/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
 import { Markdown } from "next-vibe/ui/web/ui/markdown";
 import type { JSX } from "react";
-import React, { useCallback, useMemo } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   chatAnimations,
   chatShadows,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
+import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
 import debugDefinition from "@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
@@ -68,10 +74,26 @@ export const DebugLinearMessageView = React.memo(
     const { t } = scopedTranslation.scopedT(locale);
 
     const chatInput = useChatInputStore((s) => s.input);
-    const userMessage = useMemo(
+    const rawUserMessage = useMemo(
       () => buildEmbeddingQuery(messages, chatInput),
       [messages, chatInput],
     );
+
+    const [userMessage, setUserMessage] = useState(rawUserMessage);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect((): (() => void) => {
+      if (debounceRef.current !== null) {
+        clearTimeout(debounceRef.current);
+      }
+      debounceRef.current = setTimeout(() => {
+        setUserMessage(rawUserMessage);
+      }, 800);
+      return (): void => {
+        if (debounceRef.current !== null) {
+          clearTimeout(debounceRef.current);
+        }
+      };
+    }, [rawUserMessage]);
 
     const debugOptions = useMemo(
       () => ({

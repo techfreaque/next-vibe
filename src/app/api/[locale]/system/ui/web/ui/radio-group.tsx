@@ -2,9 +2,10 @@
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { cn } from "next-vibe/core/utils/utils";
-import { CheckIcon } from "next-vibe/ui/web/ui/icons/CheckIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { CheckIcon } from "../../web/ui/icons/CheckIcon";
+import type { StyleType } from "../../web/utils/style-type";
 
 export type RadioGroupRootProps = {
   value?: string;

@@ -285,7 +285,7 @@ export interface EslintParser {
 }
 
 /** ESLint parser options */
-export interface EslintParserOptions {
+interface EslintParserOptions {
   ecmaVersion?: number | "latest";
   sourceType?: "module" | "script" | "commonjs";
   ecmaFeatures?: {
@@ -299,7 +299,7 @@ export interface EslintParserOptions {
 }
 
 /** ESLint plugin interface - matches ESLint's Plugin type */
-export interface EslintPlugin {
+interface EslintPlugin {
   rules?: Record<string, EslintRule>;
   configs?: Record<string, EslintPluginConfig>;
   processors?: Record<string, EslintProcessor>;
@@ -307,13 +307,13 @@ export interface EslintPlugin {
 }
 
 /** ESLint plugin metadata */
-export interface EslintPluginMeta {
+interface EslintPluginMeta {
   name?: string;
   version?: string;
 }
 
 /** ESLint plugin config (shareable config) */
-export interface EslintPluginConfig {
+interface EslintPluginConfig {
   plugins?: Record<string, EslintPlugin>;
   rules?: LintConfigElement;
   languageOptions?: LintConfigElement;
@@ -321,7 +321,7 @@ export interface EslintPluginConfig {
 }
 
 /** ESLint processor interface */
-export interface EslintProcessor {
+interface EslintProcessor {
   preprocess?: (
     text: string,
     filename: string,
@@ -334,21 +334,19 @@ export interface EslintProcessor {
 }
 
 /** ESLint rule interface - matches ESLint's LooseRuleDefinition */
-export type EslintRule = EslintRuleFunction | EslintRuleModule;
+type EslintRule = EslintRuleFunction | EslintRuleModule;
 
 /** ESLint rule as a function */
-export type EslintRuleFunction = (
-  context: EslintRuleContext,
-) => EslintRuleListener;
+type EslintRuleFunction = (context: EslintRuleContext) => EslintRuleListener;
 
 /** ESLint rule as a module with create function */
-export interface EslintRuleModule {
+interface EslintRuleModule {
   create: EslintRuleFunction;
   meta?: EslintRuleMeta;
 }
 
 /** ESLint rule context (simplified) */
-export interface EslintRuleContext {
+interface EslintRuleContext {
   report: (descriptor: EslintReportDescriptor) => void;
   options: LintConfigValue[];
   getSourceCode: () => EslintSourceCode;
@@ -357,7 +355,7 @@ export interface EslintRuleContext {
 }
 
 /** ESLint report descriptor */
-export interface EslintReportDescriptor {
+interface EslintReportDescriptor {
   node?: LintConfigElement;
   message?: string;
   messageId?: string;
@@ -368,7 +366,7 @@ export interface EslintReportDescriptor {
 }
 
 /** ESLint fixer */
-export interface EslintFixer {
+interface EslintFixer {
   insertTextAfter: (node: LintConfigElement, text: string) => EslintFix;
   insertTextBefore: (node: LintConfigElement, text: string) => EslintFix;
   remove: (node: LintConfigElement) => EslintFix;
@@ -377,13 +375,13 @@ export interface EslintFixer {
 }
 
 /** ESLint fix */
-export interface EslintFix {
+interface EslintFix {
   range: [number, number];
   text: string;
 }
 
 /** ESLint suggestion */
-export interface EslintSuggestion {
+interface EslintSuggestion {
   desc?: string;
   messageId?: string;
   data?: Record<string, string | number>;
@@ -391,19 +389,19 @@ export interface EslintSuggestion {
 }
 
 /** ESLint source code */
-export interface EslintSourceCode {
+interface EslintSourceCode {
   getText: (node?: LintConfigElement) => string;
   getLines: () => string[];
   getAllComments: () => LintConfigElement[];
 }
 
 /** ESLint rule listener */
-export interface EslintRuleListener {
+interface EslintRuleListener {
   [selector: string]: ((node: LintConfigElement) => void) | undefined;
 }
 
 /** ESLint rule meta */
-export interface EslintRuleMeta {
+interface EslintRuleMeta {
   type?: "problem" | "suggestion" | "layout";
   docs?: {
     description?: string;
@@ -451,7 +449,7 @@ interface EslintConfigEnabled extends EslintConfigOptions {
   ) => EslintFlatConfigItem[];
 }
 
-export type EslintConfig = EslintConfigDisabled | EslintConfigEnabled;
+type EslintConfig = EslintConfigDisabled | EslintConfigEnabled;
 
 // ============================================================
 // Testing Configuration
@@ -490,7 +488,7 @@ interface TestingConfigEnabled extends TestingConfigOptions {
   enabled: true;
 }
 
-export type TestingConfig = TestingConfigDisabled | TestingConfigEnabled;
+type TestingConfig = TestingConfigDisabled | TestingConfigEnabled;
 
 // ============================================================
 // VSCode Integration Configuration
@@ -549,14 +547,14 @@ interface VSCodeConfigEnabled extends VSCodeConfigOptions {
   enabled: true;
 }
 
-export type VSCodeConfig = VSCodeConfigDisabled | VSCodeConfigEnabled;
+type VSCodeConfig = VSCodeConfigDisabled | VSCodeConfigEnabled;
 
 // ============================================================
 // Vibe Check Configuration
 // ============================================================
 
 /** Vibe Check defaults */
-export interface VibeCheckConfig {
+interface VibeCheckConfig {
   /** Auto-fix issues (default: false) */
   fix?: boolean;
   /** Skip ESLint checks (default: false) */
@@ -616,13 +614,13 @@ export interface CheckConfig {
 // Config Repository Result Types
 // ============================================================
 
-export interface ConfigReadyResult {
+interface ConfigReadyResult {
   ready: true;
   config: CheckConfig;
   regenerated: boolean;
 }
 
-export interface ConfigErrorResult {
+interface ConfigErrorResult {
   ready: false;
   error: "missing" | "exists" | "creation_failed" | "load_failed";
   message: string;

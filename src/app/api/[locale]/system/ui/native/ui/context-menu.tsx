@@ -1,11 +1,14 @@
 import * as ContextMenuPrimitive from "@rn-primitives/context-menu";
 import { cn } from "next-vibe/core/utils/utils";
-import { Check } from "next-vibe/ui/native/ui/icons/Check";
-import { ChevronRight } from "next-vibe/ui/native/ui/icons/ChevronRight";
+import * as React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { Check } from "../../native/ui/icons/Check";
+import { ChevronRight } from "../../native/ui/icons/ChevronRight";
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
+} from "../../native/utils/style-converter";
 import type {
   ContextMenuCheckboxItemProps,
   ContextMenuContentProps,
@@ -22,11 +25,8 @@ import type {
   ContextMenuSubProps,
   ContextMenuSubTriggerProps,
   ContextMenuTriggerProps,
-} from "next-vibe/ui/web/ui/context-menu";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-
+} from "../../web/ui/context-menu";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 

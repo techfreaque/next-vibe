@@ -5,7 +5,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds/index";
 
-export type SeedFn = (
+type SeedFn = (
   logger: EndpointLogger,
   locale: CountryLanguage,
 ) => Promise<void> | void;
@@ -50,7 +50,7 @@ async function loadSeedModules(logger: EndpointLogger): Promise<void> {
 /**
  * Run all registered seed functions for the specified environment
  */
-export async function runSeeds(
+async function runSeeds(
   environment: keyof EnvironmentSeeds,
   logger: EndpointLogger,
   locale: CountryLanguage,

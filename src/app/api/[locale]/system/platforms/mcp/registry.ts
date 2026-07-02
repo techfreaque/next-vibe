@@ -12,10 +12,6 @@ import {
   type IDefinitionLoader,
 } from "next-vibe/core/definition/loader";
 import { Platform } from "next-vibe/core/definition/platform";
-import {
-  definitionsRegistry,
-  type IDefinitionsRegistry,
-} from "next-vibe/core/definitions/registry";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -25,9 +21,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import {
+  definitionsRegistry,
+  type IDefinitionsRegistry,
+} from "next-vibe/platforms/definitions-registry";
 import { scopedTranslation as mcpScopedTranslation } from "next-vibe/platforms/mcp/i18n";
 import { VIBE_CHECK_TOOL_NAMES } from "next-vibe/tooling/check/vibe-check/constants";
-import { McpResultFormatter } from "next-vibe/ui/renderers/mcp/McpResultFormatter";
+import { McpResultFormatter } from "next-vibe/unified-ui/renderers/mcp/McpResultFormatter";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
@@ -246,9 +246,9 @@ export class MCPRegistry {
         ? context.user.id
         : undefined;
     if (userId) {
-      const { RemoteTransport } =
-        await import("@/app/api/[locale]/remote-connection/transport");
-      const target = await RemoteTransport.resolveTarget({
+      const { resolveTarget } =
+        await import("@/app/api/[locale]/system/execute-tool/routing");
+      const target = await resolveTarget({
         userId,
         locale: context.locale,
         logger,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/call-execute-tool-with----c6bb2d40-07f0-459f-ba34-649a360794cd.md\n\n# Call execute-tool with...\nFolder: cron",
+    "input": "/threads/cron/call-execute-tool-with----dbf211db-d897-4d47-88c5-ffd54537776d.md\n\n# Call execute-tool with...\nFolder: cron",
     "encoding_format": "float"
   }
 }

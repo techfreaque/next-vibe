@@ -20,7 +20,6 @@ import {
   ApiProvider,
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
-import { getMusicGenModelById } from "./models";
 
 import {
   checkMediaBalance,
@@ -32,6 +31,7 @@ import {
 } from "./definition";
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
+import { getMusicGenModelById } from "./models";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
 import { generateMusicWithReplicate } from "./providers/replicate";
 import { generateMusicWithUnbottled } from "./providers/unbottled";
@@ -185,6 +185,7 @@ export class MusicGenerationRepository {
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         const arrayBuf = await fetch(audioUrl).then((r) => r.arrayBuffer());
         const audioBuffer = Buffer.from(new Uint8Array(arrayBuf));
         const uploadResult = await storage.uploadFile(audioBuffer, {

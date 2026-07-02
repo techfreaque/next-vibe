@@ -1,12 +1,13 @@
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+import { type AccessibilityRole, Pressable, View } from "react-native";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type { LiMouseEvent, LiProps } from "next-vibe/ui/web/ui/li";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { type AccessibilityRole, Pressable, View } from "react-native";
+} from "../../native/utils/style-converter";
+import type { LiMouseEvent, LiProps } from "../../web/ui/li";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledPressable = styledNative(Pressable);
 const StyledView = styledNative(View);

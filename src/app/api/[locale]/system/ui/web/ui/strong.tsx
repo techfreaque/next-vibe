@@ -1,8 +1,9 @@
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 
-export interface StrongMouseEvent {
+import type { StyleType } from "../../web/utils/style-type";
+
+interface StrongMouseEvent {
   preventDefault?: () => void;
   stopPropagation?: () => void;
 }

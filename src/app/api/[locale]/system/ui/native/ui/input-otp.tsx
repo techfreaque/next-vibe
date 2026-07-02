@@ -5,7 +5,10 @@
 import { Minus } from "lucide-react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import React, { createContext, useContext, useState } from "react";
+import { Text as RNText, TextInput, View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 // Import all public types from web version (web is source of truth)
 import type {
   InputOTPGroupProps,
@@ -13,10 +16,8 @@ import type {
   InputOTPSeparatorProps,
   InputOTPSlotProps,
   OTPContextValue,
-} from "next-vibe/ui/web/ui/input-otp";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import React, { createContext, useContext, useState } from "react";
-import { Text as RNText, TextInput, View } from "react-native";
+} from "../../web/ui/input-otp";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styled(View, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });

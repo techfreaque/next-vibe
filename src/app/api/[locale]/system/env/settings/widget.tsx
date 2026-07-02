@@ -7,7 +7,6 @@
 import { cn } from "next-vibe/core/utils/utils";
 import exportEnvEndpoints from "next-vibe/env/settings/export-env/definition";
 import { ServerFramework } from "next-vibe/server/server/enum";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { storage } from "next-vibe/ui/web/lib/storage";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { Div } from "next-vibe/ui/web/ui/div";
@@ -41,6 +40,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -49,7 +49,9 @@ import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availabili
 import type endpoints from "./definition";
 
 const SettingsWizard = React.lazy(() =>
-  import("./widget-wizard").then((m) => ({ default: m.SettingsWizard })),
+  import("./widget-wizard").then((m) => ({
+    default: m.SettingsWizard,
+  })),
 );
 
 type Module = (typeof endpoints.GET.types.ResponseOutput)["modules"][number];

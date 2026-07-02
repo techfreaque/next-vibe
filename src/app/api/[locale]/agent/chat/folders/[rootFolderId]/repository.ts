@@ -362,13 +362,12 @@ export class ChatFoldersRepository {
       }
 
       // Emit WS event so all open tabs see the new folder in the sidebar immediately
-      const emitFolderContents = createEndpointEmitter(
-        folderContentsDefinitions.GET,
+      const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,
+        newFolder.rootFolderId,
       );
       emitFolderContents("folder-created", {
-        urlPathParams: { rootFolderId: newFolder.rootFolderId },
         responseData: {
           items: [
             {

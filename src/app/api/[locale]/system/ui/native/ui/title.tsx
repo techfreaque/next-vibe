@@ -3,11 +3,12 @@
  * Provides semantic heading levels with responsive sizing
  */
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToTextStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { TitleProps } from "next-vibe/ui/web/ui/title";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import type { TextStyle } from "react-native";
 import { Text as RNText } from "react-native";
+
+import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import type { TitleProps } from "../../web/ui/title";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Re-export types from web
 export type { TitleProps };

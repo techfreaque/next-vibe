@@ -142,7 +142,7 @@ export interface EndpointReadOptions<TRequest, TResponse, TUrlVariables> {
  * Options for create/update (POST/PUT/PATCH) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointCreateOptions<TRequest, TResponse, TUrlVariables> {
+interface EndpointCreateOptions<TRequest, TResponse, TUrlVariables> {
   /** Form options for mutation forms */
   formOptions?: ApiFormOptions<TRequest>;
   /** Mutation options for create/update operations */
@@ -159,7 +159,7 @@ export interface EndpointCreateOptions<TRequest, TResponse, TUrlVariables> {
  * Options for delete (DELETE) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
+interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
   /** Form options - can be used if delete needs confirmation form */
   formOptions?: ApiFormOptions<TRequest>;
   /** Mutation options for delete operations */
@@ -448,7 +448,7 @@ export interface ApiEndpoint<
 // Ergonomic system that prevents requestData + requestUrlPathParams conflicts
 
 // Extract core properties from UnifiedField - handle all the extra properties
-export type ExtractFieldCore<F> = F extends {
+type ExtractFieldCore<F> = F extends {
   type: "primitive";
   schema: infer Schema;
   usage: infer Usage;
@@ -712,7 +712,7 @@ export interface CreateApiEndpoint<
 /**
  * Return type for createEndpoint with full type inference from fields
  */
-export type CreateEndpointReturnInMethod<
+type CreateEndpointReturnInMethod<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,

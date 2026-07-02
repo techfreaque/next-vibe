@@ -17,7 +17,7 @@ export type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "next-vibe/ui/web/ui/menubar";
+} from "../../web/ui/menubar";
 
 import type {
   MenubarCheckboxItemProps,
@@ -33,7 +33,7 @@ import type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "next-vibe/ui/web/ui/menubar";
+} from "../../web/ui/menubar";
 
 export function Menubar({
   children,

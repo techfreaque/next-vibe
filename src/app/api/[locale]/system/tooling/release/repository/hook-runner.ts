@@ -20,7 +20,7 @@ import { scopedTranslation } from "next-vibe/tooling/release/i18n";
 import type { HookContext, ReleaseHook } from "../definition";
 import { MESSAGES } from "./constants";
 
-export class HookRunner {
+class HookRunner {
   runHook(
     hook: ReleaseHook,
     cwd: string,

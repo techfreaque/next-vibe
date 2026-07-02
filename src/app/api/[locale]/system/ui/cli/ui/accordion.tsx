@@ -1,18 +1,19 @@
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   AccordionContentProps,
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "next-vibe/ui/web/ui/accordion";
-import type { JSX } from "react";
+} from "../../web/ui/accordion";
 
 export type {
   AccordionContentProps,
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "next-vibe/ui/web/ui/accordion";
+} from "../../web/ui/accordion";
 
 // CLI: always expanded - no interactivity in terminal
 

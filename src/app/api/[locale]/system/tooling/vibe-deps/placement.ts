@@ -34,17 +34,36 @@ export function isSelf(key: string): boolean {
   return key.startsWith(SELF_ROOT);
 }
 
+/**
+ * A `src/generated/` file is DERIVED OUTPUT — the framework re-emits the imports
+ * of convention-scanned files (route.ts / definition.ts / task.ts / seed.ts …)
+ * into registries there. Those edges aren't AUTHORED dependencies: a route.ts is
+ * not "used by src/generated", it is *discovered by location* and its handler
+ * copied into the generated registry. So a generated importer must NOT decide
+ * where a file "belongs" — otherwise every route.ts looks like it should
+ * "colocate into src/generated" (nonsense: you can't move source into generated,
+ * and the generator scans it in place). Filtered out of the consumer set below,
+ * exactly like the tool's own files. Not a whitelist — a structural fact about
+ * generated output.
+ */
+export function isGeneratedImporter(key: string): boolean {
+  return key.includes("/generated/") || key.startsWith("src/generated/");
+}
+
 /** Is this key inside the system/ (framework) scope? */
 export function isInSystem(key: string): boolean {
   return key.startsWith(SYSTEM_ROOT);
 }
 
 /**
- * Domain of a file = its owning top-level segment.
- *   - locale files: the first segment after [locale]/ (e.g. "agent", "system").
- *     Inside system/, the domain is "system/<area>" so framework areas don't all
- *     collapse into one bucket.
- *   - non-locale files: the first two path segments (e.g. "src/config").
+ * Domain of a file = its owning root segment.
+ *
+ * `system/` is treated as a ROOT, so each sub-area is its own domain:
+ *   system/realtime  ≠  system/database  ≠  system/platforms  etc.
+ *
+ *   - system/ files:      `system/<area>`  (first segment inside system/)
+ *   - other locale files: `<domain>`       (first segment after [locale]/)
+ *   - non-locale files:   first two path segments (e.g. `src/config`)
  */
 export function domainOf(key: string): string {
   if (key.startsWith(SYSTEM_ROOT)) {
@@ -57,6 +76,21 @@ export function domainOf(key: string): string {
   }
   const parts = key.split("/");
   return parts.slice(0, 2).join("/");
+}
+
+/**
+ * Parent domain for promote decisions — same as domainOf().
+ *
+ * Now that system/ is treated as a root (each sub-area is its own domain),
+ * there is no coarser bucket needed: `system/realtime` and `system/database`
+ * are distinct domains, just like `agent` and `leads` are distinct.
+ *
+ * A file is a promote/misplaced candidate iff its importers span ≥2 distinct
+ * domains from this function, which now fires correctly for intra-system
+ * cross-area coupling too.
+ */
+export function parentDomainOf(key: string): string {
+  return domainOf(key);
 }
 
 /** Directory of a file key (posix), no trailing slash. */
@@ -197,6 +231,12 @@ export interface PlacementVerdict {
   note: string;
   /** How many distinct domains import this file (breadth of sharing). */
   domainSpread: number;
+  /** True when the file is already in system/ (a framework primitive in place). */
+  alreadyVibe: boolean;
+  /** Sorted list of parent domains that import this file. */
+  importerDomainList: string[];
+  /** The actual importer files (filtered — no generated, no self). */
+  usableImporters: string[];
 }
 
 /**
@@ -209,7 +249,10 @@ export function placementOf(
   key: string,
   importers: ReadonlyArray<string>,
 ): PlacementVerdict {
-  const usable = importers.filter((i) => !isSelf(i));
+  // Drop the tool's own files AND generated re-emitters (see isGeneratedImporter)
+  // — neither is an authored consumer that should pull the file toward it.
+  const usable = importers.filter((i) => !isSelf(i) && !isGeneratedImporter(i));
+  const sortedUsable = [...usable].toSorted();
 
   if (usable.length === 0) {
     return {
@@ -217,12 +260,17 @@ export function placementOf(
       suggestedDir: null,
       note: "no importers — dead file or entrypoint",
       domainSpread: 0,
+      alreadyVibe: isInSystem(key),
+      importerDomainList: [],
+      usableImporters: [],
     };
   }
 
   const importerDomains = new Set(usable.map(domainOf));
   const domainSpread = importerDomains.size;
   const fileDir = dirOf(key);
+  const importerParentDomains = new Set(usable.map(parentDomainOf));
+  const importerDomainList = [...importerParentDomains].toSorted();
 
   // Signal 1: single-folder ownership. All importers under one dir → the file
   // belongs under that dir. If it already lives there, it's in place.
@@ -242,29 +290,44 @@ export function placementOf(
           suggestedDir: fileDir,
           note: "colocated with its only consumer folder",
           domainSpread,
+          alreadyVibe: isInSystem(key),
+          importerDomainList,
+          usableImporters: sortedUsable,
         };
       }
     } else if (!wouldLeaveSystem) {
       return {
         kind: "colocate",
         suggestedDir: shared,
-        note: `used only under ${shared} — move next to consumers`,
+        note: `used only under ${shared}`,
         domainSpread,
+        alreadyVibe: isInSystem(key),
+        importerDomainList,
+        usableImporters: sortedUsable,
       };
     }
   }
 
-  // Signal 2: cross-domain sharing. Reached from >1 domain → promote candidate.
-  if (domainSpread > 1) {
-    const fileDomain = domainOf(key);
+  // Signal 2: cross-domain sharing. Reached from multiple PARENT domains → promote
+  // candidate. We use parentDomainOf() here — not domainOf() — so that:
+  //   • all system/<area> sub-areas collapse to "system" (siblings, not separate domains)
+  //   • a definition used only within remote-connection/* stays in-place
+  // Only when importers span 2+ distinct parent domains is promote warranted.
+  const fileParentDomain = parentDomainOf(key);
+  const parentDomainSpread = importerParentDomains.size;
+
+  if (parentDomainSpread > 1) {
     const alreadyVibe = isInSystem(key);
     return {
       kind: "promote",
       suggestedDir: alreadyVibe ? fileDir : "src/app/api/[locale]/system",
       note: alreadyVibe
-        ? `shared across ${String(domainSpread)} domains (framework primitive)`
-        : `shared across ${String(domainSpread)} domains from ${fileDomain} — promote into vibe`,
+        ? `wide coupling across ${String(parentDomainSpread)} domains`
+        : `used by ${String(parentDomainSpread)} domains from ${fileParentDomain} — promote into system`,
       domainSpread,
+      alreadyVibe,
+      importerDomainList,
+      usableImporters: sortedUsable,
     };
   }
 
@@ -273,5 +336,8 @@ export function placementOf(
     suggestedDir: fileDir,
     note: "single-domain, colocated",
     domainSpread,
+    alreadyVibe: isInSystem(key),
+    importerDomainList,
+    usableImporters: sortedUsable,
   };
 }

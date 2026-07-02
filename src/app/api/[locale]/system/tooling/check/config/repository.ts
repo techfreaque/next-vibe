@@ -21,10 +21,10 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { parseJsonWithComments } from "next-vibe/core/utils/parse-json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation } from "next-vibe/tooling/check/config/i18n";
 
+import { parseJsonWithComments } from "../parse-json";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
@@ -510,7 +510,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return { ready: true, config, regenerated };
   }
 
-  static async generateAllConfigs(
+  private static async generateAllConfigs(
     logger: EndpointLogger,
     config: CheckConfig,
     locale: CountryLanguage,

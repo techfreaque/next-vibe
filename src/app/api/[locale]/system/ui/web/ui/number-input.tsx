@@ -7,10 +7,10 @@
 
 import { Minus, Plus } from "lucide-react";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
+import type { StyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
 import { Div } from "./div";
 import { Input, type InputChangeEvent } from "./input";

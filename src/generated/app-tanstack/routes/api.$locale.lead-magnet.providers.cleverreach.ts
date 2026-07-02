@@ -3,12 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute(
-  "/api/$locale/lead-magnet/providers/cleverreach",
-)({
-  server: {
-    handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/lead-magnet/providers/cleverreach/route"),
-    ),
-  },
+export const Route = createFileRoute("/api/$locale/lead-magnet/providers/cleverreach")({
+  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/lead-magnet/providers/cleverreach/route")) },
 });

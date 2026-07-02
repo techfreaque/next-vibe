@@ -14,16 +14,17 @@
 import { cva } from "class-variance-authority";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { TextInput, View } from "react-native";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 // Import ALL types from web - ZERO definitions here
 import type {
   TextareaChangeEvent,
   TextareaProps,
   TextareaRefObject,
-} from "next-vibe/ui/web/ui/textarea";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
-import { TextInput, View } from "react-native";
+} from "../../web/ui/textarea";
+import { applyStyleType } from "../../web/utils/style-type";
 const noop = (): void => {
   return undefined;
 };

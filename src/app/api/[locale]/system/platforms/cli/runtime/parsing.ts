@@ -8,8 +8,8 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { SchemaUIHandler } from "next-vibe/ui/renderers/cli/response/schema-handler";
 import { hasChildren } from "next-vibe/unified-ui/_shared/type-guards";
+import { SchemaUIHandler } from "next-vibe/unified-ui/renderers/cli/response/schema-handler";
 import type { z } from "zod";
 
 /**
@@ -784,6 +784,6 @@ interface CollectedCliRequestData {
 /**
  * CLI URL path parameters
  */
-export interface CliUrlParams {
+interface CliUrlParams {
   [key: string]: string | number | boolean | null | undefined;
 }

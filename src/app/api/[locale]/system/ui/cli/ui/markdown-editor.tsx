@@ -1,15 +1,16 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import type {
   MarkdownEditorProps,
   ToolbarAction,
-} from "next-vibe/ui/web/ui/markdown-editor";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+} from "../../web/ui/markdown-editor";
 
 export type {
   MarkdownEditorProps,
   ToolbarAction,
-} from "next-vibe/ui/web/ui/markdown-editor";
+} from "../../web/ui/markdown-editor";
 
 // MarkdownEditor in CLI: show the current markdown value as plain text.
 // No WYSIWYG editing - the terminal can't render a rich text editor.

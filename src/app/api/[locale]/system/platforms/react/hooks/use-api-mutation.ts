@@ -41,7 +41,7 @@ export type MutationVariables<TRequest, TUrlVariables> =
 /**
  * Mutation context type for tracking additional mutation state
  */
-export interface MutationContext<TRequest, TUrlVariables> {
+interface MutationContext<TRequest, TUrlVariables> {
   /**
    * The variables that were passed to the mutation
    */

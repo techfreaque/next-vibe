@@ -1,12 +1,12 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { styledNative } from "next-vibe/ui/native/utils/style-converter";
-import type { ActionCardProps } from "next-vibe/ui/web/ui/action-card";
 import { Pressable, View } from "react-native";
 
+import { styledNative } from "../../native/utils/style-converter";
+import type { ActionCardProps } from "../../web/ui/action-card";
 import { Text } from "./text";
 
-export type { ActionCardProps } from "next-vibe/ui/web/ui/action-card";
+export type { ActionCardProps } from "../../web/ui/action-card";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

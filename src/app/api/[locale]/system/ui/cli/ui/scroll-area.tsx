@@ -8,9 +8,9 @@ export type {
   ScrollAreaThumbProps,
   ScrollAreaViewportProps,
   ScrollBarProps,
-} from "next-vibe/ui/web/ui/scroll-area";
+} from "../../web/ui/scroll-area";
 
-import type { ScrollAreaRootProps } from "next-vibe/ui/web/ui/scroll-area";
+import type { ScrollAreaRootProps } from "../../web/ui/scroll-area";
 
 export function ScrollArea({
   children,

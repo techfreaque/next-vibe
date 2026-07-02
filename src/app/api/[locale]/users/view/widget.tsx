@@ -7,7 +7,6 @@
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
 import { Button } from "next-vibe/ui/web/ui/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/web/ui/detail-grid";
@@ -53,6 +52,7 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useCallback, useMemo, useState } from "react";
 
 import type definition from "./definition";

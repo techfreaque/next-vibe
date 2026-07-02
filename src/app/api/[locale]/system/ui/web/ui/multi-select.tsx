@@ -2,13 +2,13 @@
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 
+import { uiScopedTranslation } from "../../web/i18n";
+import { Check } from "../../web/ui/icons/Check";
+import { ChevronDown } from "../../web/ui/icons/ChevronDown";
+import { X } from "../../web/ui/icons/X";
+import type { StyleType } from "../../web/utils/style-type";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {

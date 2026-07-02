@@ -5,19 +5,19 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
-import { useIsMobile } from "next-vibe/ui/native/hooks/use-mobile";
-import { PanelLeft } from "next-vibe/ui/native/ui/icons/PanelLeft";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-  styledNativeRef,
-} from "next-vibe/ui/native/utils/style-converter";
-import { uiScopedTranslation } from "next-vibe/ui/web/i18n";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import type { PressableProps, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
+import { useIsMobile } from "../../native/hooks/use-mobile";
+import { PanelLeft } from "../../native/ui/icons/PanelLeft";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../../native/utils/style-converter";
+import { uiScopedTranslation } from "../../web/i18n";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";

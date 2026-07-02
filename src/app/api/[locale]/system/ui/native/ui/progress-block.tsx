@@ -1,17 +1,17 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
+import { View } from "react-native";
+
 import type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "next-vibe/ui/web/ui/progress-block";
-import { View } from "react-native";
-
+} from "../../web/ui/progress-block";
 import { Text } from "./text";
 
 export type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "next-vibe/ui/web/ui/progress-block";
+} from "../../web/ui/progress-block";
 
 const StyledView = styled(View, { className: "style" });
 

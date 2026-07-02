@@ -1,12 +1,13 @@
 import * as AspectRatioPrimitive from "@rn-primitives/aspect-ratio";
 import { cn } from "next-vibe/core/utils/utils";
+import * as React from "react";
+
 import {
   convertCSSToViewStyle,
   styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type { AspectRatioRootProps } from "next-vibe/ui/web/ui/aspect-ratio";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
-import * as React from "react";
+} from "../../native/utils/style-converter";
+import type { AspectRatioRootProps } from "../../web/ui/aspect-ratio";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledAspectRatioRoot = styledNative(AspectRatioPrimitive.Root);
 

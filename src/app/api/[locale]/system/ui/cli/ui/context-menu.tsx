@@ -16,7 +16,7 @@ export type {
   ContextMenuSubProps,
   ContextMenuSubTriggerProps,
   ContextMenuTriggerProps,
-} from "next-vibe/ui/web/ui/context-menu";
+} from "../../web/ui/context-menu";
 
 import type {
   ContextMenuCheckboxItemProps,
@@ -31,7 +31,7 @@ import type {
   ContextMenuSubProps,
   ContextMenuSubTriggerProps,
   ContextMenuTriggerProps,
-} from "next-vibe/ui/web/ui/context-menu";
+} from "../../web/ui/context-menu";
 
 export function ContextMenu({
   children,

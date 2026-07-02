@@ -2,11 +2,11 @@
 
 import { motion } from "framer-motion";
 import { cn } from "next-vibe/core/utils/utils";
-import { DragHandleDots2Icon } from "next-vibe/ui/web/ui/icons/DragHandleDots2Icon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { DragHandleDots2Icon } from "../../web/ui/icons/DragHandleDots2Icon";
+import type { StyleType } from "../../web/utils/style-type";
 import type { DivMouseEvent } from "./div";
 
 export interface ResizableContainerProps {

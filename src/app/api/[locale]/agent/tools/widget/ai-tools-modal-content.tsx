@@ -3,7 +3,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import {
   DialogContent,
   DialogDescription,
@@ -13,6 +12,7 @@ import {
 import { Maximize } from "next-vibe/ui/web/ui/icons/Maximize";
 import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
 import { Link } from "next-vibe/ui/web/ui/link";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/tools/i18n";

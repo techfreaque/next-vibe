@@ -16,7 +16,6 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "../../config";
 import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import {
   deleteThread,
@@ -74,8 +73,7 @@ export class ChatThreadByIdRepositoryClient {
         createdAt: new Date(thread.createdAt),
         updatedAt: new Date(thread.updatedAt),
         leadId: null as string | null,
-        rootFolderId:
-          (thread.rootFolderId as DefaultFolderId) ?? DefaultFolderId.INCOGNITO,
+        rootFolderId: thread.rootFolderId,
         rolesView: null,
         rolesEdit: null,
         rolesPost: null,
@@ -179,8 +177,7 @@ export class ChatThreadByIdRepositoryClient {
       return success({
         userId: null,
         title: thread.title,
-        rootFolderId:
-          (thread.rootFolderId as DefaultFolderId) ?? DefaultFolderId.INCOGNITO,
+        rootFolderId: thread.rootFolderId,
         folderId: thread.folderId ?? null,
         status: thread.status ?? ThreadStatus.ACTIVE,
         preview: thread.preview ?? null,

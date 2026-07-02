@@ -32,7 +32,9 @@ export type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "next-vibe/ui/web/ui/dropdown-menu";
+} from "../../web/ui/dropdown-menu";
+
+import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import type {
   DropdownMenuCheckboxItemProps,
@@ -49,9 +51,7 @@ import type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "next-vibe/ui/web/ui/dropdown-menu";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
-
+} from "../../web/ui/dropdown-menu";
 import { useShouldFocus } from "./dialog";
 
 /**

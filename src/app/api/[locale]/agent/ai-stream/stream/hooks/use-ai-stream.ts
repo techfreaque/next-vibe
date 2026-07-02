@@ -89,6 +89,13 @@ export function useAIStream(): UseAIStreamReturn {
             logger,
           ),
           locale,
+          logger,
+          {
+            endpointPath: messagesDefinitions.GET.path,
+            method: messagesDefinitions.GET.method,
+            urlPathParams: { threadId },
+            requestData: { rootFolderId: data.rootFolderId },
+          },
         );
       }
 

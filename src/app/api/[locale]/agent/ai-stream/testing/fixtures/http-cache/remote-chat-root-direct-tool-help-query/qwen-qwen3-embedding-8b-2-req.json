@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:be57bc2c | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 2, 15:40]\n\nAssistant: Result from `tool-help(category='ai')`:\n\n- **matchedCount:** 69 — non-empty tools array\n- All 69 tools have both a `name` and a `description` field (checked entries like `ai-run`, `tool-help`, `agent_chat_threads_POST`, `favorite-create`, `generate_image`, `coding-agent`, `models`, `web-search`, etc.)\n- No missing fields, no empty array, no errors\n\nSTEP_OK\n\nSystem: [Context: ID:36b70ad5 | Posted:Jul 2, 17:40]\n\nUser: [T1a-query tool-help-query] Call the tool-help tool with query='search' to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:9dbd0314 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 2, 17:40]\n\nAssistant: [tool:tool-help] {\"query\":\"search\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"users-list\",\"title\":\"User List\",\"description\":\"Search and filter users\",\"category\":\"account\"},{\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\",\"description\":\"Search messages within a specific thread using full-text search\",\"category\":\"ai\"},{\"name",
+    "encoding_format": "float"
+  }
+}

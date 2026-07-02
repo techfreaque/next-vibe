@@ -2,9 +2,9 @@
 
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "next-vibe/core/utils/utils";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 
+import type { StyleType } from "../../web/utils/style-type";
 import { buttonVariants } from "./button";
 
 // Cross-platform type exports

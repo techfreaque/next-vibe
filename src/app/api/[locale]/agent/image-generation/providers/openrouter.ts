@@ -47,6 +47,7 @@ export async function generateWithOpenRouter(params: {
   });
 
   try {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {

@@ -43,9 +43,10 @@ const FILE_COUNTS: Record<string, { errors: number; warnings: number }> = {
   "nextjs-issues.tsx": { errors: 37, warnings: 1 },
   "promise-issues.ts": { errors: 12, warnings: 0 },
   "react-issues.tsx": { errors: 42, warnings: 2 },
-  "restricted-syntax-issues.tsx": { errors: 35, warnings: 0 },
+  "restricted-syntax-issues.tsx": { errors: 37, warnings: 0 },
   "typescript-issues.ts": { errors: 20, warnings: 0 },
   "calculate.ts": { errors: 1, warnings: 0 },
+  "page.tsx": { errors: 1, warnings: 0 },
 };
 
 // Rules expected per file — every rule listed here MUST appear in that file's output
@@ -146,6 +147,9 @@ const FILE_RULES: Record<string, string[]> = {
     "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
     "oxlint-plugin-i18n(no-literal-string)",
   ],
+  "page.tsx": [
+    "oxlint-plugin-restricted(restricted-syntax)",
+  ],
   "typescript-issues.ts": [
     "typescript-eslint(no-explicit-any)",
     "eslint(no-unused-vars)",
@@ -164,8 +168,8 @@ const FILE_RULES: Record<string, string[]> = {
 
 // Summary totals per scope
 const SCOPE_TOTALS = {
-  dir: { files: 11, issues: 329, errors: 322, warnings: 7 },
-  subfolder: { files: 10, issues: 328, errors: 321, warnings: 7 },
+  dir: { files: 12, issues: 332, errors: 325, warnings: 7 },
+  subfolder: { files: 11, issues: 331, errors: 324, warnings: 7 },
   singleFile: { files: 1, issues: 64, errors: 62, warnings: 2 },
 };
 
@@ -430,7 +434,7 @@ describe("Full Directory Check (./)", () => {
 });
 
 // ============================================================
-// SUBFOLDER SCOPE (src/test-issues — 10 files, no calculate.ts)
+// SUBFOLDER SCOPE (src/test-issues — 11 files, no calculate.ts)
 // ============================================================
 describe("Subfolder Check (src/test-issues)", () => {
   beforeAll(() => {

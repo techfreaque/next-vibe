@@ -10,11 +10,6 @@ import "server-only";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { Environment } from "next-vibe/env/env-util";
-import {
-  formatCount,
-  formatDuration,
-  formatGenerator,
-} from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
 import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
@@ -125,9 +120,17 @@ const startSmartFileWatcher = async (
     if (dirty.seeds) {
       dirtyNames.push("seeds");
     }
-    const runTanstack = !skipTanstack && dirty.endpoints;
-    if (runTanstack) {
-      dirtyNames.push("tanstack-routes");
+    if (dirty.promptFragments) {
+      dirtyNames.push("promptFragments");
+    }
+    if (dirty.skillsIndex) {
+      dirtyNames.push("skillsIndex");
+    }
+    if (dirty.graphSeedsIndex) {
+      dirtyNames.push("graphSeedsIndex");
+    }
+    if (dirty.platformRoutes || (!skipTanstack && dirty.endpoints)) {
+      dirtyNames.push("platformRoutes");
     }
 
     if (dirtyNames.length === 0) {
@@ -159,59 +162,31 @@ const startSmartFileWatcher = async (
     if (dirtySnapshot.seeds) {
       dirtyKeys.add("seeds");
     }
+    if (dirtySnapshot.promptFragments) {
+      dirtyKeys.add("prompt-fragments");
+    }
+    if (dirtySnapshot.skillsIndex) {
+      dirtyKeys.add("skills");
+    }
+    if (dirtySnapshot.graphSeedsIndex) {
+      dirtyKeys.add("dataflow");
+    }
+    if (
+      dirtySnapshot.platformRoutes ||
+      (!skipTanstack && dirtySnapshot.endpoints)
+    ) {
+      dirtyKeys.add("tanstack-routes");
+      dirtyKeys.add("next-app");
+      dirtyKeys.add("native-indexes");
+    }
 
-    const generatorPromises: Promise<void>[] = [
-      GeneratorRunner.runGenerators({
+    try {
+      await GeneratorRunner.runGenerators({
         logger,
         live: liveIndex,
         only: dirtyKeys,
         noCache: true,
-      })
-        .then(() => undefined)
-        .catch((error) => {
-          logger.error(
-            "Generator execution failed",
-            new Error(parseError(error).message),
-          );
-        }),
-    ];
-
-    if (runTanstack) {
-      generatorPromises.push(
-        (async (): Promise<void> => {
-          const start = Date.now();
-          try {
-            const { GenerateTanstackRoutesRepository } = await import(
-              /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/tanstack-start/generate/repository"
-            );
-            const result =
-              await GenerateTanstackRoutesRepository.generateInternal();
-            const ms = Date.now() - start;
-            if (result.success) {
-              const { created, skipped } = result.data;
-              logger.vibe(
-                formatGenerator(
-                  `Generated TanStack routes: ${formatCount(created.length, "created", "created")} ${formatCount(skipped.length, "skipped", "skipped")} in ${formatDuration(ms)}`,
-                  "🗺️ ",
-                ),
-              );
-            } else {
-              logger.error(
-                `TanStack routes generation failed: ${result.message ?? "Unknown error"}`,
-              );
-            }
-          } catch (error) {
-            logger.error(
-              "TanStack routes generation failed",
-              new Error(parseError(error).message),
-            );
-          }
-        })(),
-      );
-    }
-
-    try {
-      await Promise.allSettled(generatorPromises);
+      });
       logger.debug(`✅ Generators completed for change #${changeCount}`);
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -235,16 +210,18 @@ const startSmartFileWatcher = async (
   const cwd = process.env["PWD"] ?? process.cwd();
   // Use template string + split bracket to prevent Turbopack from statically tracing paths
   // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
-  const watchRoot = `${cwd}/src/app/api/[` + `locale]`;
+  const apiWatchRoot = `${cwd}/src/app/api/[` + `locale]`;
+  // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
+  const uiWatchRoot = `${cwd}/src/app/[` + `locale]`;
 
-  const watchPaths = [watchRoot];
+  const watchRoots = [apiWatchRoot, uiWatchRoot];
   const watchers: ReturnType<typeof fs.watch>[] = [];
 
-  for (const watchPath of watchPaths) {
+  for (const watchRoot of watchRoots) {
     try {
-      if (fs.existsSync(watchPath)) {
+      if (fs.existsSync(watchRoot)) {
         const watcher = fs.watch(
-          watchPath,
+          watchRoot,
           { recursive: true },
           (eventType, filename) => {
             if (!filename) {
@@ -259,7 +236,7 @@ const startSmartFileWatcher = async (
 
             // Resolve to absolute path.
             // Use string concat instead of join() - Turbopack's static analysis
-            // treats join(watchRoot, ...) as a broad glob over src/app/api/[locale]/.
+            // treats join(watchRoot, ...) as a broad glob over src/app/[locale]/.
             const sep = watchRoot.endsWith("/") ? "" : "/";
             const absPath = watchRoot + sep + filename;
 
@@ -278,13 +255,13 @@ const startSmartFileWatcher = async (
         );
 
         watchers.push(watcher);
-        logger.debug(`👀 Watching ${watchPath} for changes...`);
+        logger.debug(`👀 Watching ${watchRoot} for changes...`);
       } else {
-        logger.warn(`Watch path does not exist: ${watchPath}`);
+        logger.warn(`Watch path does not exist: ${watchRoot}`);
       }
     } catch (error) {
       const errorMsg = parseError(error).message;
-      logger.error(`Failed to watch ${watchPath}`, new Error(errorMsg));
+      logger.error(`Failed to watch ${watchRoot}`, new Error(errorMsg));
     }
   }
 
@@ -338,6 +315,10 @@ const startSmartFileWatcher = async (
           liveIndex.dirty.taskIndex = true;
           liveIndex.dirty.emailTemplates = true;
           liveIndex.dirty.seeds = false;
+          liveIndex.dirty.promptFragments = true;
+          liveIndex.dirty.skillsIndex = true;
+          liveIndex.dirty.graphSeedsIndex = true;
+          liveIndex.dirty.platformRoutes = true;
           void runDirtyGenerators();
         }
       };

@@ -1,11 +1,12 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToTextStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { KbdMouseEvent, KbdProps } from "next-vibe/ui/web/ui/kbd";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import type { TextStyle } from "react-native";
 import { Text } from "react-native";
+
+import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import type { KbdMouseEvent, KbdProps } from "../../web/ui/kbd";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledText = styled(Text, { className: "style" });
 

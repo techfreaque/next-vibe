@@ -7,7 +7,6 @@
 "use client";
 
 import { AlertCircle, Calendar } from "lucide-react";
-import { safeGetRequiredFields } from "next-vibe/core/core-utils/zod-required-fields";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
@@ -17,7 +16,6 @@ import {
   type ReactT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
 } from "next-vibe/platforms/react/i18n";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -39,6 +37,8 @@ import type {
   FieldValues,
 } from "react-hook-form";
 
+import { Info } from "../../../web/ui/icons/Info";
+import { safeGetRequiredFields } from "../../../zod-required-fields";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";

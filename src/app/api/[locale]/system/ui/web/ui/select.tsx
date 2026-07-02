@@ -2,11 +2,12 @@
 
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "next-vibe/core/utils/utils";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe/ui/web/ui/icons/ChevronUp";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
+
+import { Check } from "../../web/ui/icons/Check";
+import { ChevronDown } from "../../web/ui/icons/ChevronDown";
+import { ChevronUp } from "../../web/ui/icons/ChevronUp";
+import type { StyleType } from "../../web/utils/style-type";
 
 export interface SelectOption {
   value: string;

@@ -1,14 +1,4 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "next-vibe/ui/native/utils/style-converter";
-import type {
-  CollapsibleContentProps,
-  CollapsibleProps,
-  CollapsibleTriggerProps,
-} from "next-vibe/ui/web/ui/collapsible";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 import Animated, {
   FadeIn,
@@ -16,6 +6,17 @@ import Animated, {
   LayoutAnimationConfig,
   LinearTransition,
 } from "react-native-reanimated";
+
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../native/utils/style-converter";
+import type {
+  CollapsibleContentProps,
+  CollapsibleProps,
+  CollapsibleTriggerProps,
+} from "../../web/ui/collapsible";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledAnimatedView = styledNative(Animated.View);
 

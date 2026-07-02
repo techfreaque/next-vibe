@@ -26,7 +26,7 @@ import type { StandardSyncCursor, SyncCursor, ThreadsSyncCursor } from "../db";
  * the provider's current high-water mark. The peer stores this cursor and
  * resumes after the served batch on the next exchange.
  */
-export interface SyncSerializeResult {
+interface SyncSerializeResult {
   /** JSON array string of the served records (wire format per provider). */
   json: string;
   /** High-water mark of the served items. */
@@ -97,21 +97,6 @@ export function getSyncProviders(): ReadonlyMap<string, SyncProvider> {
   return providers;
 }
 
-/** Returns all unique domain keys from registered providers. Used by UI to build syncScope toggles. */
-export function getRegisteredDomains(): string[] {
-  const domains = new Set<string>();
-  for (const provider of providers.values()) {
-    if (provider.domain) {
-      domains.add(provider.domain);
-    }
-  }
-  return [...domains];
-}
-
-export function getSyncProvider(key: string): SyncProvider | undefined {
-  return providers.get(key);
-}
-
 // ─── Cursor Narrowing ────────────────────────────────────────────────────────
 
 /**
@@ -153,18 +138,6 @@ export async function collectCursors(
     }
   }
   return cursors;
-}
-
-/**
- * Compute current cursors for all registered providers.
- * Returns perProvider: a map from provider key to its current SyncCursor.
- * Used in tests to verify that re-sending current cursors yields no sync payloads.
- */
-export async function computeSyncHashes(
-  userId: string,
-): Promise<{ perProvider: Record<string, SyncCursor> }> {
-  const perProvider = await collectCursors(userId);
-  return { perProvider };
 }
 
 /**
@@ -247,41 +220,6 @@ export async function applySyncPayloads(
   }
 
   return results;
-}
-
-/**
- * Serialize specific providers by key, unconditionally (no cursor diff).
- * Used for WS-push sync: when a mutation happens, serialize just the
- * changed providers and broadcast them inline over the WS sync channel.
- *
- * Returns a map of providerKey → serialized JSON string (only for keys that exist).
- */
-export async function serializeProviders(
-  providerKeys: string[],
-  userId: string,
-  logger: EndpointLogger,
-): Promise<Record<string, string>> {
-  await ensureProvidersRegistered();
-  const result: Record<string, string> = {};
-  for (const key of providerKeys) {
-    const provider = providers.get(key);
-    if (!provider) {
-      continue;
-    }
-    try {
-      const serialized = await provider.serializeFromCursor(
-        userId,
-        null,
-        logger,
-      );
-      result[key] = serialized.json;
-    } catch (error) {
-      logger.error(`Sync provider "${key}" serialize failed`, {
-        error: String(error),
-      });
-    }
-  }
-  return result;
 }
 
 /**

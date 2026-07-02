@@ -1,11 +1,11 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { BadgeProps } from "next-vibe/ui/web/ui/badge";
-import { badgeTextVariants, badgeVariants } from "next-vibe/ui/web/ui/badge";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import { View } from "react-native";
 
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import type { BadgeProps } from "../../web/ui/badge";
+import { badgeTextVariants, badgeVariants } from "../../web/ui/badge";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Text, TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

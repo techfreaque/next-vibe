@@ -7,14 +7,13 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { EndpointsPage } from "next-vibe/ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import unsubscribeDefinitions from "@/app/api/[locale]/newsletter/unsubscribe/definition";
 import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 
 import { scopedTranslation } from "../i18n";
+import { UnsubscribePageClient } from "./page-client";
 
 interface PageProps {
   params: Promise<{
@@ -66,14 +65,14 @@ export async function tanstackLoader({
   let prefilledEmail: string | undefined;
   if (!authUser.isPublic) {
     const { t } = meScopedTranslation.scopedT(locale);
-    const userProfileResponse = await UserProfileRepository.getProfile(
+    const profile = await UserProfileRepository.getProfile(
       authUser,
       locale,
       logger,
       t,
     );
-    if (userProfileResponse.success && !userProfileResponse.data.isPublic) {
-      prefilledEmail = userProfileResponse.data.email;
+    if (profile.success && !profile.data.isPublic) {
+      prefilledEmail = profile.data.email;
     }
   }
 
@@ -86,10 +85,10 @@ export function TanstackPage({
   prefilledEmail,
 }: NewsletterUnsubscribePageData): JSX.Element {
   return (
-    <UnsubscribePage
+    <UnsubscribePageClient
       locale={locale}
-      prefilledEmail={prefilledEmail}
       user={authUser}
+      prefilledEmail={prefilledEmail}
     />
   );
 }

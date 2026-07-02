@@ -31,7 +31,9 @@ export interface AnswerAsAIDeps {
   };
   /** Active favorite config for model/tool resolution */
   favoriteConfig: FavoriteConfig | null;
-  executionContext;
+  /** How this stream executes — the ai-stream POST executionContext union
+   * (normal client chat uses `{ mode: "local" }`). */
+  executionContext: AiStreamPostRequestOutput["executionContext"];
 }
 
 export async function answerAsAI(

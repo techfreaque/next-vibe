@@ -42,29 +42,29 @@ import { envClient } from "@/config/env-client";
 /**
  * Next.js 15 async component props format
  */
-export interface AsyncPageRouterProps {
+interface AsyncPageRouterProps {
   params: Promise<PageRouterParams>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
-export interface AsyncLayoutRouterProps extends AsyncPageRouterProps {
+interface AsyncLayoutRouterProps extends AsyncPageRouterProps {
   children: React.ReactNode;
 }
 
 /**
  * Next.js 15 sync component props format
  */
-export interface SyncPageRouterProps {
+interface SyncPageRouterProps {
   params: PageRouterParams;
   searchParams?: Record<string, string | string[] | undefined>;
 }
-export interface SyncLayoutRouterProps extends SyncPageRouterProps {
+interface SyncLayoutRouterProps extends SyncPageRouterProps {
   children: React.ReactNode;
 }
 
 /**
  * Expo Router params with locale
  */
-export interface PageRouterParams extends Record<string, string | string[]> {
+interface PageRouterParams extends Record<string, string | string[]> {
   locale: CountryLanguage;
 }
 
@@ -72,14 +72,12 @@ export interface PageRouterParams extends Record<string, string | string[]> {
  * Type for any Next.js page component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-export type AnyNextComponent =
-  | AnyNextSyncPageComponent
-  | AnyNextAsyncPageComponent;
-export type AnyNextSyncPageComponent = (
+type AnyNextComponent = AnyNextSyncPageComponent | AnyNextAsyncPageComponent;
+type AnyNextSyncPageComponent = (
   props: SyncLayoutRouterProps,
 ) => JSX.Element | never;
 
-export type AnyNextAsyncPageComponent = (
+type AnyNextAsyncPageComponent = (
   props: AsyncLayoutRouterProps,
 ) => Promise<JSX.Element>;
 
@@ -209,194 +207,6 @@ export function createPageWrapperWithImport(
       );
     }
     return content;
-  };
-}
-
-/**
- * Creates a wrapper for Next.js page components to work in Expo Router
- * (Legacy version with static import - kept for backwards compatibility)
- *
- * Features:
- * - Full loading and error UI
- * - ActivityIndicator during load
- * - Error display with message
- * - Async component resolution
- * - Handles various Next.js component signatures
- *
- * @param PageComponent - The Next.js page component to wrap
- * @returns A synchronous Expo Router compatible component
- */
-export function createPageWrapper(
-  PageComponent: AnyNextComponent,
-): () => React.ReactElement {
-  return function PageWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<PageRouterParams>();
-    const [content, setContent] = useState<JSX.Element | null>(null);
-    const [error, setError] = useState<Error | null>(null);
-    const logger = useMemo(
-      () => createEndpointLogger(false, params.locale),
-      [params.locale],
-    );
-    useEffect(() => {
-      let cancelled = false;
-
-      // Use queueMicrotask to defer promise creation outside of React's render phase
-      // This prevents React 19's Suspense from detecting an uncached promise
-      queueMicrotask(() => {
-        void (async (): Promise<void> => {
-          try {
-            const result = await renderedComponent(PageComponent, params, null);
-
-            if (!cancelled) {
-              setContent(result);
-            }
-          } catch (err) {
-            if (!cancelled) {
-              const parsedError = parseError(err);
-              const errorMessage = parsedError.message;
-
-              // Check if this is a Node.js module import error (admin routes with server code)
-              const isNodeModuleError =
-                errorMessage.includes("Node standard library") ||
-                errorMessage.includes("node:") ||
-                errorMessage.includes("Module not found");
-
-              if (isNodeModuleError) {
-                logger.warn(
-                  "Page uses server-only features not available in React Native. " +
-                    "A .native override is needed for this route.",
-                  { error: parsedError, route: params },
-                );
-              } else {
-                logger.error("Failed to load page", { error: parsedError });
-              }
-
-              setError(
-                err instanceof Error
-                  ? err
-                  : new Error(
-                      reactNativeScopedTranslation
-                        .scopedT(params.locale)
-                        .t("errors.failedToLoadPage"),
-                    ),
-              );
-            }
-          }
-        })();
-      });
-
-      return (): void => {
-        cancelled = true;
-      };
-    }, [logger, params]);
-
-    // Error state
-    if (error) {
-      return (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 20,
-          }}
-        >
-          <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {reactNativeScopedTranslation
-              .scopedT(params.locale)
-              .t("errors.failedToLoadPage")}
-          </Span>
-          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
-            {error.message}
-          </Span>
-        </View>
-      );
-    }
-
-    // Loading state
-    if (!content) {
-      return (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator size="large" />
-        </View>
-      );
-    }
-
-    // Render the loaded page content
-    return content;
-  };
-}
-
-/**
- * Creates a wrapper for Next.js layout components to work in Expo Router
- *
- * Features:
- * - Uses Slot for children rendering
- * - No custom loading/error UI (layout route constraint)
- * - Falls back to Slot on error
- * - Async component resolution
- * - Handles various Next.js component signatures
- *
- * Note: Layout routes in Expo Router can only contain Screen children,
- * so we cannot show custom loading or error UI. Instead, we render
- * a Slot while loading or on error.
- *
- * @param LayoutComponent - The Next.js layout component to wrap
- * @returns A synchronous Expo Router compatible component
- */
-export function createLayoutWrapper(
-  LayoutComponent: AnyNextComponent,
-): () => React.ReactElement {
-  return function LayoutWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<PageRouterParams>();
-    const [content, setContent] = useState<React.ReactElement | null>(null);
-    const logger = useMemo(
-      () => createEndpointLogger(false, params.locale),
-      [params.locale],
-    );
-
-    useEffect(() => {
-      let cancelled = false;
-
-      const slotElement = <Slot />;
-
-      // Use queueMicrotask to defer promise creation outside of React's render phase
-      // This prevents React 19's Suspense from detecting an uncached promise
-      queueMicrotask(() => {
-        void (async (): Promise<void> => {
-          try {
-            const result = await renderedComponent(
-              LayoutComponent,
-              params,
-              slotElement,
-            );
-            if (!cancelled) {
-              setContent(result);
-            }
-          } catch (err) {
-            if (!cancelled) {
-              logger.error("Failed to load layout", { error: parseError(err) });
-              // On error, just render Slot directly
-              setContent(slotElement);
-            }
-          }
-        })();
-      });
-
-      return (): void => {
-        cancelled = true;
-      };
-    }, [logger, params]);
-
-    // Render the loaded layout content or Slot while loading
-    // Layout routes must only contain Screen children, so we can't show custom loading/error UI
-    return content ?? <Slot />;
   };
 }
 

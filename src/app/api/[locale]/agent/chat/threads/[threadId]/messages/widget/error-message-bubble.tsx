@@ -30,9 +30,9 @@ import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";
 
 const EndpointsPage = lazy(() =>
-  import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage").then(
-    (m) => ({ default: m.EndpointsPage }),
-  ),
+  import("next-vibe/unified-ui/renderers/react/EndpointsPage").then((m) => ({
+    default: m.EndpointsPage,
+  })),
 );
 
 interface ErrorMessageBubbleProps {

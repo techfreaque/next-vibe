@@ -1,14 +1,15 @@
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "next-vibe/ui/web/ui/form/form-section";
-import type { JSX } from "react";
+} from "../../../web/ui/form/form-section";
 
 export type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "next-vibe/ui/web/ui/form/form-section";
+} from "../../../web/ui/form/form-section";
 
 const SPACE = "\u0020";
 const SLASH = "\u002F";

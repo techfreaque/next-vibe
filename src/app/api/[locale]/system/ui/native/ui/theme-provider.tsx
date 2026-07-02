@@ -6,12 +6,12 @@ import { Appearance, useColorScheme, View } from "react-native";
 /** Mirrors the web constant - no cookie in React Native but exported for interface parity */
 export const THEME_COOKIE_NAME = "theme_v2";
 
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,
-} from "next-vibe/ui/web/ui/theme-provider";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
+} from "../../web/ui/theme-provider";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledView = styled(View, { className: "style" });
 

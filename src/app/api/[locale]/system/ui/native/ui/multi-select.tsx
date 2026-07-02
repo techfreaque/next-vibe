@@ -3,16 +3,16 @@
  * Imports types from web and provides native implementation
  */
 import { cn } from "next-vibe/core/utils/utils";
-import { Check, ChevronDown, X } from "next-vibe/ui/native/ui/icons";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
+import * as React from "react";
+import { Pressable, View } from "react-native";
+
+import { Check, ChevronDown, X } from "../../native/ui/icons";
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
 // Import ALL types from web (source of truth)
 import type {
   MultiSelectOption,
   MultiSelectProps,
-} from "next-vibe/ui/web/ui/multi-select";
-import * as React from "react";
-import { Pressable, View } from "react-native";
-
+} from "../../web/ui/multi-select";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {

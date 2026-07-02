@@ -1,10 +1,11 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/core/utils/utils";
-import { convertCSSToViewStyle } from "next-vibe/ui/native/utils/style-converter";
-import type { BodyProps } from "next-vibe/ui/web/ui/body";
-import { applyStyleType } from "next-vibe/ui/web/utils/style-type";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import type { BodyProps } from "../../web/ui/body";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledSafeAreaView = styled(SafeAreaView, { className: "style" });
 

@@ -25,7 +25,7 @@ import { gitService } from "./git-service";
 // Interface
 // ============================================================================
 
-export interface IChangelogGenerator {
+interface IChangelogGenerator {
   /**
    * Generate changelog from commits
    */
@@ -43,7 +43,7 @@ export interface IChangelogGenerator {
 // Implementation
 // ============================================================================
 
-export class ChangelogGenerator implements IChangelogGenerator {
+class ChangelogGenerator implements IChangelogGenerator {
   generateChangelog(
     cwd: string,
     releaseConfig: ReleaseOptions,

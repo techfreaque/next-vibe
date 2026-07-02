@@ -7,15 +7,14 @@ export type {
   MotionImgProps,
   MotionSpanProps,
   MotionTransition,
-} from "next-vibe/ui/web/ui/motion";
+} from "../../web/ui/motion";
 
 import type {
   AnimatePresenceProps,
   MotionButtonProps,
   MotionDivProps,
   MotionSpanProps,
-} from "next-vibe/ui/web/ui/motion";
-
+} from "../../web/ui/motion";
 import { Div } from "./div";
 import { Span } from "./span";
 

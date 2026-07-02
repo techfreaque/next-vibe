@@ -210,6 +210,8 @@ const { POST } = createEndpoint({
                 remoteUrl: data.requestData.remoteUrl,
                 localUrl: null,
                 isActive: true,
+                isInferenceProvider:
+                  data.requestData.isInferenceProvider ?? false,
                 lastSyncedAt: new Date().toISOString(),
                 hasToken: true,
                 healthStatus: "healthy",

@@ -4,12 +4,13 @@
  */
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { NumberInputProps } from "next-vibe/ui/web/ui/number-input";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
-export type { NumberInputProps } from "next-vibe/ui/web/ui/number-input";
+import type { NumberInputProps } from "../../web/ui/number-input";
+
+export type { NumberInputProps } from "../../web/ui/number-input";
 
 export function NumberInput({
   value = 0,

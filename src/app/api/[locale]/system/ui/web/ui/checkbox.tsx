@@ -2,10 +2,10 @@
 
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { cn } from "next-vibe/core/utils/utils";
-import { CheckIcon } from "next-vibe/ui/web/ui/icons/CheckIcon";
-import type { StyleType } from "next-vibe/ui/web/utils/style-type";
 import * as React from "react";
 
+import { CheckIcon } from "../../web/ui/icons/CheckIcon";
+import type { StyleType } from "../../web/utils/style-type";
 import type { DivMouseEvent } from "./div";
 
 export type CheckboxRootProps = {

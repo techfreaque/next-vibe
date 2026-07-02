@@ -4,12 +4,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Box, Text } from "ink";
-import type { DataTableProps } from "next-vibe/ui/web/ui/data-table";
 import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
-export type { DataTableProps } from "next-vibe/ui/web/ui/data-table";
+import type { DataTableProps } from "../../web/ui/data-table";
+
+export type { DataTableProps } from "../../web/ui/data-table";
 
 const SEPARATOR = "\u2500".repeat(60);
 const CELL_DIVIDER = " | ";

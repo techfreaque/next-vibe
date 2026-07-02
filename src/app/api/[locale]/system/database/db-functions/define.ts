@@ -63,7 +63,7 @@ type PlaceholderProxy<TParams extends Record<string, PgType>> = {
 /**
  * Definition input for defineDbFunction().
  */
-export interface DbFunctionDef<
+interface DbFunctionDef<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Drizzle's PgTableWithColumns requires TableConfig which uses any internally
   // oxlint-disable-next-line no-explicit-any
   TTables extends PgTableWithColumns<any>[],

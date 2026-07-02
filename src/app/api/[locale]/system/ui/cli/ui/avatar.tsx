@@ -1,16 +1,17 @@
 import { Text } from "ink";
+import type { JSX } from "react";
+
 import type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "next-vibe/ui/web/ui/avatar";
-import type { JSX } from "react";
+} from "../../web/ui/avatar";
 
 export type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "next-vibe/ui/web/ui/avatar";
+} from "../../web/ui/avatar";
 
 function getInitials(text: string): string {
   return text

@@ -45,7 +45,7 @@ type NestedEventPayload<TResponseOutput, TSpec> = {
  * `keyof TResponseOutput`; each value is a readonly array of that key's item's
  * own keys. Fully inferred — the concrete literal spec drives NestedEventPayload.
  */
-export type NestedFieldSpec<TResponseOutput> = {
+type NestedFieldSpec<TResponseOutput> = {
   readonly [K in keyof TResponseOutput]?: readonly PropertyKey[];
 };
 
@@ -58,7 +58,7 @@ export type NestedFieldSpec<TResponseOutput> = {
  * client (append → add, merge → patch, remove → delete) plus non-cache signals
  * (listen/status/check/retry/send/tunnel).
  */
-export type EventOperation =
+type EventOperation =
   | "append"
   | "merge"
   | "remove"
@@ -80,7 +80,7 @@ export type EventOperation =
  * with no widening. Framework members (user/logger/locale/envAvailability) are
  * the same as any route handler's context.
  */
-export interface EndpointEventHandlerContext<
+interface EndpointEventHandlerContext<
   TResponseData,
   TRequestData,
   TUrlPathParams,
@@ -93,7 +93,7 @@ export interface EndpointEventHandlerContext<
   readonly user: JwtPayloadType;
   readonly logger: EndpointLogger;
   readonly locale: CountryLanguage;
-  readonly envAvailability: AgentEnvAvailability;
+  readonly agentEnvAvailability: AgentEnvAvailability;
 }
 
 // ============================================================================
@@ -233,7 +233,7 @@ export interface EndpointEventsMap<
  *   "resource" — shared channel key without user id; route supplies resolveChannel.
  *   "resolved" — decided per resource row at runtime; route MUST resolveChannel.
  */
-export type ChannelScope = "user" | "resource" | "resolved";
+type ChannelScope = "user" | "resource" | "resolved";
 
 /**
  * The `channel` declaration on a definition. `scope` is the whole declaration —
@@ -464,15 +464,6 @@ export type EventTypes<TEvents> = [TEvents] extends [never]
 // payload) — each required only when it doesn't resolve to never/Record<never,never>.
 // ============================================================================
 
-type _IsNever<T> = [T] extends [never] ? true : false;
-type _IsEmptyRecord<T> = [keyof T] extends [never] ? true : false;
-type _RequiredIf<T> =
-  _IsNever<T> extends true
-    ? Record<never, never>
-    : _IsEmptyRecord<T> extends true
-      ? Record<never, never>
-      : { readonly [_ in keyof T]: T[_] };
-
 /**
  * The typed single-object arg for one emit. Each of the four event fields carries
  * its exact per-event projected type; a field that resolves to never/empty is
@@ -492,8 +483,13 @@ type _EmitField<K extends string, T> = [T] extends [never]
 export type EmitData<TResponseData, TRequestData, TUrlPathParams, TPayload> =
   _EmitField<"responseData", TResponseData> &
     _EmitField<"requestData", TRequestData> &
-    _EmitField<"urlPathParams", TUrlPathParams> &
-    _EmitField<"payload", TPayload>;
+    // urlPathParams is derived from channel routing at emit time, so it is never
+    // a REQUIRED emit arg — always optional (present type when the event scopes
+    // to specific path fields, still omittable by the caller).
+    { readonly urlPathParams?: TUrlPathParams } & _EmitField<
+      "payload",
+      TPayload
+    >;
 
 /**
  * Union → intersection. Turns the union of per-event emit call signatures into an

@@ -9,7 +9,7 @@ import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
 import { Platform } from "next-vibe/core/definition/platform";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -21,6 +21,7 @@ import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
+import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
 
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import endpoints from "./definition";
@@ -505,94 +506,47 @@ function buildSettingsMap(modules: Module[]): Map<string, Setting> {
 // ── Unbottled CLI Login ─────────────────────────────────────────────────
 
 function UnbottledCliLoginField({
-  currentField,
-  locale,
   t,
-  onCredential,
 }: {
-  currentField: Setting;
-  locale: CountryLanguage;
   t: (k: string) => string;
-  onCredential: (credential: string) => void;
 }): JSX.Element {
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  // Connection state is the source of truth — a system inference provider is a
+  // remote connection flagged isInferenceProvider, not an env credential.
+  const connections = useRemoteConnections(logger, user);
+  const provider = connections.read?.data?.connections.find(
+    (c) => c.isInferenceProvider,
+  );
+
   const [phase, setPhase] = useState<
     "email" | "password" | "url" | "signing-in" | "done" | "error"
-  >(currentField.isConfigured ? "done" : "email");
+  >(provider ? "done" : "email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // eslint-disable-next-line i18next/no-literal-string
   const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
   const [errorMsg, setErrorMsg] = useState("");
+  // Same typed hook the web widget uses — the settings POST creates an
+  // inference-provider remote connection server-side (no env credential).
+  const connectMutation = useApiMutation(endpoints.POST, logger, user);
 
   const doLogin = useCallback(async (): Promise<void> => {
     setPhase("signing-in");
-    try {
-      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
-      const normalizedUrl = remoteUrl.replace(/\/+$/, "");
+    const normalizedUrl = remoteUrl.replace(/\/+$/, "");
+    const result = await connectMutation.mutateAsync({
+      requestData: { email, password, remoteUrl: normalizedUrl },
+    });
 
-      // Ping for lead_id
-      let remotePingLeadId: string | undefined;
-      try {
-        const pingResponse = await fetch(`${normalizedUrl}/${locale}`, {
-          method: "GET",
-          redirect: "follow",
-          signal: AbortSignal.timeout(10_000),
-        });
-        const setCookie = pingResponse.headers.get("set-cookie") ?? "";
-        const match = setCookie.match(
-          new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
-        );
-        remotePingLeadId = match?.[1];
-      } catch {
-        setErrorMsg(t("wizard.ai.unbottledConnectionError"));
-        setPhase("error");
-        return;
-      }
-
-      // Login
-      // eslint-disable-next-line i18next/no-literal-string
-      const loginUrl = `${normalizedUrl}/api/${locale}/user/public/login`;
-      const loginResponse = await fetch(loginUrl, {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          "Content-Type": "application/json",
-          ...(remotePingLeadId && {
-            Cookie: `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`,
-          }),
-        },
-        body: JSON.stringify({ email, password, rememberMe: true }),
-        signal: AbortSignal.timeout(15_000),
-      });
-
-      if (!loginResponse.ok) {
-        setErrorMsg(t("wizard.ai.unbottledLoginFailed"));
-        setPhase("error");
-        return;
-      }
-
-      const loginBody = (await loginResponse.json()) as {
-        success?: boolean;
-        data?: { token?: string; leadId?: string };
-      };
-
-      if (!loginBody.success || !loginBody.data?.token) {
-        setErrorMsg(t("wizard.ai.unbottledLoginFailed"));
-        setPhase("error");
-        return;
-      }
-
-      const token = loginBody.data.token;
-      const effectiveLeadId = loginBody.data.leadId ?? remotePingLeadId ?? "";
-
-      // eslint-disable-next-line i18next/no-literal-string
-      onCredential(`${effectiveLeadId}:${token}:${normalizedUrl}`);
-      setPhase("done");
-    } catch {
-      setErrorMsg(t("wizard.ai.unbottledConnectionError"));
+    if (!result.success || !result.data?.connected) {
+      setErrorMsg(t("wizard.ai.unbottledLoginFailed"));
       setPhase("error");
+      return;
     }
-  }, [email, password, remoteUrl, locale, t, onCredential]);
+
+    await connections.read?.refetch();
+    setPhase("done");
+  }, [email, password, remoteUrl, t, connectMutation, connections]);
 
   return (
     <Box flexDirection="column" gap={1}>
@@ -847,19 +801,6 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
               )}
               <Text dimColor>{`[${t("wizard.next")}] continue`}</Text>
             </Box>
-          ) : currentField.key === "UNBOTTLED_CLOUD_CREDENTIALS" ? (
-            /* Special unbottled login - prompt email, password, url then sign in */
-            <UnbottledCliLoginField
-              currentField={currentField}
-              locale={locale}
-              t={t}
-              onCredential={(credential): void => {
-                setEdits((prev) => ({
-                  ...prev,
-                  [currentField.key]: credential,
-                }));
-              }}
-            />
           ) : currentField.key === "OPENROUTER_API_KEY" ? (
             /* OpenRouter with extra hints */
             <Box flexDirection="column" gap={1}>
@@ -939,6 +880,10 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           )}
         </Box>
       )}
+
+      {/* System inference provider — a remote connection, not an env var.
+          Shown in the AI step so users can connect a system provider. */}
+      {step?.group === "ai" && <UnbottledCliLoginField t={t} />}
 
       {/* Field list for this step */}
       <Box marginBottom={1}>
