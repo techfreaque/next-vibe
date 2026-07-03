@@ -5,22 +5,22 @@
   "headers": {
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "X-Generation-Id,cf-ray",
-    "cf-ray": "a11ce8d4b85c1c60-FRA",
+    "cf-ray": "a15561a9b96cd29c-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Fri, 26 Jun 2026 14:30:24 GMT",
+    "date": "Fri, 03 Jul 2026 10:59:36 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1782484222-x249KfdAgtkA9ZJQChCa"
+    "x-generation-id": "gen-1783076374-yEkOjhyW3IZcisuotJGK"
   },
   "body": {
-    "id": "gen-1782484222-x249KfdAgtkA9ZJQChCa",
+    "id": "gen-1783076374-yEkOjhyW3IZcisuotJGK",
     "object": "chat.completion",
-    "created": 1782484222,
+    "created": 1783076374,
     "model": "google/gemini-2.5-flash",
     "provider": "Google",
     "system_fingerprint": null,
@@ -33,7 +33,7 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "This is a 24-second audio clip of a piece of smooth jazz music.\nThe tempo is approximately 110-120 BPM, in 4/4 time.\n\nInstruments:\n- Electric piano (likely a Fender Rhodes or similar) playing a repeating chord progression with a slightly funky, syncopated rhythm. It carries the main melodic and harmonic content.\n- Bass guitar: Provides a walking bass line, establishing the root notes of the chords and adding a groovy foundation.\n- Drums: A standard drum kit with a laid-back, shuffling beat, featuring a soft but consistent hi-hat pattern, subtle snare hits on the off-beats, and a kick drum emphasizing the downbeats. The drumming is understated, serving to provide rhythmic support without being overly prominent.\n\nProduction style:\nThe production is polished and clean, with a clear mix that allows each instrument to be heard distinctly. There's a subtle reverb on the electric piano, giving it a warm, spacious feel.\n\nMood:\nThe mood is relaxed, chilled, and sophisticated, suggestive of a lounge or cafe setting. It's pleasant background music.\n\nSong structure:\nThe clip appears to be a continuous loop of a short musical phrase, potentially part of an intro or a repeating verse/chorus section of a longer track. There are no distinct changes in structure or mood within this short excerpt.\n\nSound quality: Excellent. Studio-recorded quality.",
+          "content": "The audio segment is a short (17-second) musical clip, likely an instrumental snippet for a podcast or a short advertisement.\n\n**Music:**\n*   **Genre:** Funk/Disco\n*   **Tempo:** Approximately 110-120 BPM (moderately fast)\n*   **Time Signature:** 4/4\n*   **Instruments:**\n    *   **Electric Guitar (clean/rhythm):** Plays a main, upbeat, and syncopated melody. It has a very clean, slightly compressed tone with some subtle reverb, typical of 70s funk. It's the most prominent instrument.\n    *   **Electric Bass (slap/pop):** Provides a driving, groovy, and percussive foundation with slap and pop techniques, characteristic of funk. It interacts tightly with the drums and guitar.\n    *   **Drums (acoustic kit):** Plays a standard funk beat with prominent kick and snare on the 2 and 4, tight hi-hats, and occasional fills. The hi-hats are particularly crisp and driving.\n    *   **Keyboard (light synth pad or electric piano):** Plays sustained, harmonically supportive chords in the background, adding a layer of warmth and fullness to the sound. It's subtle but present.\n*   **Interactions:** The guitar, bass, and drums create a very tight, interlocking groove. The keyboard pads fill out the harmonic space.\n*   **Production Style:** Polished and clean, with a clear mix that emphasizes the percussive and rhythmic elements. There's a retro feel achieved through the instrumentation and playing style, but with modern production clarity.\n*   **Mood:** Upbeat, danceable, cheerful, energetic.\n\n**Non-musical audio events:** None.\n\n**Sound Quality:** High fidelity, likely recorded in a studio environment.\n\n**Duration impression:** Short clip.",
           "refusal": null,
           "reasoning": null
         }
@@ -41,9 +41,9 @@
     ],
     "usage": {
       "prompt_tokens": 1072,
-      "completion_tokens": 298,
-      "total_tokens": 1370,
-      "cost": 0.0015916,
+      "completion_tokens": 399,
+      "total_tokens": 1471,
+      "cost": 0.0018441,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
@@ -52,9 +52,9 @@
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.0015916,
+        "upstream_inference_cost": 0.0018441,
         "upstream_inference_prompt_cost": 0.0008466,
-        "upstream_inference_completions_cost": 0.000745
+        "upstream_inference_completions_cost": 0.0009975
       },
       "completion_tokens_details": {
         "reasoning_tokens": 0,

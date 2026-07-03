@@ -9,7 +9,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
+import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 

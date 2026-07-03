@@ -8,7 +8,7 @@ import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bri
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
  */
-import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
 import type { NextHandlerReturnType } from "./next-handler";

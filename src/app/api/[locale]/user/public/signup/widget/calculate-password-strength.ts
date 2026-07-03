@@ -4,7 +4,7 @@
  * Used by both React and CLI implementations
  */
 
-export interface PasswordStrengthResult {
+interface PasswordStrengthResult {
   /** Strength score from 0-5 */
   strength: number;
   /** Strength level: "weak" | "fair" | "good" | "strong" */

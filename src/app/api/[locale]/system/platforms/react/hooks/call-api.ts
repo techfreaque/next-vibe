@@ -15,7 +15,7 @@ import { AuthClientRepository } from "next-vibe/identity/auth/repository-client"
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as hooksTranslation } from "next-vibe/platforms/react/hooks/i18n";
-import { getCookie } from "next-vibe/ui/web/lib/cookies";
+import { getCookie } from "next-vibe/ui/lib/cookies";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {

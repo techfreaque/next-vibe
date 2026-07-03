@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----8c395d81-26b0-4d56-ad44-aaa5668a5090.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The result is: imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/2aff13f2-1e4f-4d37-aa5f-4…",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----0b3565ae-8753-4a1c-b76d-24446c726607.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: Here is the stylized cartoon version of your image: ![Stylized Cartoon Portrait](http://localhost:3000/api/en-GLOBAL/age…",
     "encoding_format": "float"
   }
 }

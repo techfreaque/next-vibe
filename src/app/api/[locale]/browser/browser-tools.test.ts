@@ -29,6 +29,9 @@ import { db } from "next-vibe/database";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserRoleDB } from "next-vibe/identity/roles/enum";
+import { userRoles } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -48,9 +51,6 @@ import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definiti
 import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
 import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 
 // ---------------------------------------------------------------------------

@@ -4,16 +4,16 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { Film } from "next-vibe/ui/web/ui/icons/Film";
-import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { Film } from "next-vibe/ui/ui/icons/Film";
+import { Mic } from "next-vibe/ui/ui/icons/Mic";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
+import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,

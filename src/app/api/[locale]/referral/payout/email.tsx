@@ -13,6 +13,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -23,7 +24,6 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { users } from "@/app/api/[locale]/user/db";
 import { configScopedTranslation } from "@/config/i18n";
 
 import { REFERRAL_CONFIG } from "../config";

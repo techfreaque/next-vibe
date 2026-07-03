@@ -57,6 +57,7 @@ export const translations: typeof enTranslations = {
       charCount: { text: "Zeichen" },
       tokenEstimate: { text: "~Tokens" },
       cortexDiagnostics: { text: "Cortex Embedding-Diagnose" },
+      messageContextLines: { text: "Nachrichten-Kontextzeilen" },
     },
     errors: {
       validation: {

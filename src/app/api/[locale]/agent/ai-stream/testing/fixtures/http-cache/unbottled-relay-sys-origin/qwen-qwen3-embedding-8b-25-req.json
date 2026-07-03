@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t-sys--call-the-self-instance-id-tool-to-read----634a16fa-6cbb-4c5f-9e84-5f6c889a92f3.md\n\n# [T-SYS] Call the self-instance-id tool to read...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

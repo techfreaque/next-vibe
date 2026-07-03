@@ -5,11 +5,11 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,

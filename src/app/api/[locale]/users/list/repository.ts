@@ -27,6 +27,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
@@ -43,7 +44,6 @@ import {
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import type { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { users } from "@/app/api/[locale]/user/db";
 
 import {
   CreditActivityFilter,

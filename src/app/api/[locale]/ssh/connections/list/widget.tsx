@@ -7,20 +7,20 @@
 
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Server } from "next-vibe/ui/web/ui/icons/Server";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { ListItem } from "next-vibe/ui/web/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Server } from "next-vibe/ui/ui/icons/Server";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { ListItem } from "next-vibe/ui/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { MetricCard } from "next-vibe/ui/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,

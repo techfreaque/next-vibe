@@ -1,20 +1,20 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
-import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "next-vibe/ui/web/ui/dropdown-menu";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { MoreHorizontal } from "next-vibe/ui/web/ui/icons/MoreHorizontal";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/dropdown-menu";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { MoreHorizontal } from "next-vibe/ui/ui/icons/MoreHorizontal";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   type JSX,
   useCallback,

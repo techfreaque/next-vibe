@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1558f7eb8ded2ce-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 11:30:55 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783078251-HcxmxyfO7Ed0vAVeUD4z"
+  },
+  "body": {
+    "id": "gen-1783078251-HcxmxyfO7Ed0vAVeUD4z",
+    "object": "chat.completion",
+    "created": 1783078251,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic composition features a solid, saturated red circle perfectly centered against a plain, pure white background. The edges of the circle are crisp and defined, contrasting sharply with the surrounding white space. The overall impression is clean, balanced, and geometric, resembling the flag of Japan.",
+          "refusal": null,
+          "reasoning": "**Deconstructing the Design**\n\nI'm currently breaking down the visual elements. It appears to be a red circle centered on a white square. I'm noting the basic geometry and color composition of the image, attempting a more detailed breakdown.\n\n\n**Defining the Subject**\n\nI've detailed the individual components. The subject is a red circle, the background a white square. I've noted the color of the circle as a saturated red. I've described how the circle is perfectly centered in the square. This seems to be a minimalist illustration. It's similar to the flag of Japan.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Deconstructing the Design**\n\nI'm currently breaking down the visual elements. It appears to be a red circle centered on a white square. I'm noting the basic geometry and color composition of the image, attempting a more detailed breakdown.\n\n\n**Defining the Subject**\n\nI've detailed the individual components. The subject is a red circle, the background a white square. I've noted the color of the circle as a saturated red. I've described how the circle is perfectly centered in the square. This seems to be a minimalist illustration. It's similar to the flag of Japan.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EukFCuYFAQw51scYXM7KWD/nhFkf1FOz8Ajf/smxREFrGdfV4PJXa2sByyVaCAyCxaIr/WHL9qqFxKOCx8rG4fFj0y2AMJn73apg4j9fc7i8C1dPupI+5rCj/GJ0+vUgub+dHnX3ZexFKARTNoxUJy8PpkvRsVbvIA3HeCDSpizTQauE697N58jPGLjAPyunI2t6l9PyEEG0f6mXInDvldEp9XD3MC35J44VAT8gzukjhT6x8nXJLrUpgChSa7N7UWdv1m/Xnj9XaPdeSNNYlkhZjHv07oCwYM3jTQpBi79uyTk2sXTTxyKXpE3xPSIOZuIsWVk0313r/7r7bzTQSR6NDhsGFOCOnS95KCz75ADy+GRI3HZ3y/U+Um/q3Jmx33ryPWz9IbKdxs04T81dUEBUuxDrFXM6xbMCCDBOiaUIbslJUm13iVy60SotidOc2ASchsxW7dZQIwmvDOJJuhwcBf+zVVBxMSxbOKHujcH7M4mGY4lGZbLlyhv/JkuH1F5anXWmYixPy4lb2W22/WNK95APToKFnMepi4VuOjnVI6U0t40WuQhXJkUenEOTa1/8hNLfqKZPSCZQP779NSPkRsRzn4wXUaeK6L9YBwyt5W8C+2ppoZajQ/4y82G5wMVKlLzVWtps5hbZ/gf6Zvft246HpX9VfkGqu1D7vh4sSUCG/Pw6XgAruJwbjHakLBksqmk4DyWv/nDMjjvDZcwDPwm/7I6ixWLQCTuCi6AHWX0vyl2JSxb0KoWWNIInSvGe1rh7SXX4rF4V64f+KpHx3CBjc8Rs6TuZ6LuIR6vUEy4CIubicMB8tEhNSHmx7W8Yrf8sTr2caVyUDo8SQ2Xlpc9FYsXkqHYBTwPimkRWy7rmbAMUQFc0xuEvWA9Vyox36kl7eXnaQ75KFVrIgLkFhZR/1PSFnv+96Qdm1Lq7sEojuti6XbSZ+oDR/fudKdHWdAy8q8a5jX2eIzcrsuHJz77p6Q0vRBDTJQ=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 206,
+      "total_tokens": 742,
+      "cost": 0.003544,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003544,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.002472
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 150,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

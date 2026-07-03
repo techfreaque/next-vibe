@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----7a86d476-8af2-4e20-a362-29423236915b.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote\nPreview: <think>The generate_image tool worked. The result contains: imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/th…",
+    "encoding_format": "float"
+  }
+}

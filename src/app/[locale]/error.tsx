@@ -2,12 +2,12 @@
 // error page has to stay a client component
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Environment } from "next-vibe/env/env-util";
-import { useParams } from "next-vibe/ui/web/hooks/use-navigation";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H2, P } from "next-vibe/ui/web/ui/typography";
+import { useParams } from "next-vibe/ui/hooks/use-navigation";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H2, P } from "next-vibe/ui/ui/typography";
 import type { ReactElement } from "react";
 
 import { envClient } from "@/config/env-client";

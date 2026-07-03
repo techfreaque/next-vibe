@@ -1,14 +1,11 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
-import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
-import { setCookie } from "next-vibe/ui/web/lib/cookies";
-import {
-  getDocumentLang,
-  setDocumentLang,
-} from "next-vibe/ui/web/lib/css-vars";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
+import { setCookie } from "next-vibe/ui/lib/cookies";
+import { getDocumentLang, setDocumentLang } from "next-vibe/ui/lib/css-vars";
+import { storage } from "next-vibe/ui/lib/storage";
 import {
   createContext,
   type JSX,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----a0877f0c-b064-482a-ad6d-daffc1a70869.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user attached a video file. The system message already contains a detailed description of the video content…",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----8d2f79f4-3504-47c1-89a5-e2514eba06b3.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: <think>The video attachment was successfully processed. The injected description provides a detailed account of the visu…",
     "encoding_format": "float"
   }
 }

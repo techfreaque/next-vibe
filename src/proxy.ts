@@ -4,8 +4,8 @@
  * This file implements the middleware for the application.
  */
 
-import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import type { languageDefaults } from "./app/api/[locale]/system/core/i18n";
 import type { CountryLanguage } from "./app/api/[locale]/system/core/i18n/core/config";

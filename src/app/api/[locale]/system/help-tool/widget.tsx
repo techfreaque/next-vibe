@@ -23,23 +23,23 @@ import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
 import {
   useSearchParams,
   useSilentHistory,
-} from "next-vibe/ui/web/hooks/use-navigation";
-import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
-import { useWindowSize } from "next-vibe/ui/web/hooks/use-window-size";
-import { addWindowListener } from "next-vibe/ui/web/lib/dom";
+} from "next-vibe/ui/hooks/use-navigation";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
+import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
+import { addWindowListener } from "next-vibe/ui/lib/dom";
 import {
   getCurrentOrigin,
   getCurrentPathname,
   getCurrentSearch,
   historyBack,
-} from "next-vibe/ui/web/lib/location";
-import { getScreenWidth } from "next-vibe/ui/web/lib/screen";
-import { storage } from "next-vibe/ui/web/lib/storage";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import type { ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Dialog, DialogContent } from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/lib/location";
+import { getScreenWidth } from "next-vibe/ui/lib/screen";
+import { storage } from "next-vibe/ui/lib/storage";
+import { Badge } from "next-vibe/ui/ui/badge";
+import type { ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/ui/button";
+import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,46 +48,46 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe/ui/web/ui/dropdown-menu";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { Bot } from "next-vibe/ui/web/ui/icons/Bot";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { EyeOff } from "next-vibe/ui/web/ui/icons/EyeOff";
-import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
-import { Monitor } from "next-vibe/ui/web/ui/icons/Monitor";
-import { PanelLeft } from "next-vibe/ui/web/ui/icons/PanelLeft";
-import { Pin } from "next-vibe/ui/web/ui/icons/Pin";
-import { PinOff } from "next-vibe/ui/web/ui/icons/PinOff";
-import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
-import { Pre } from "next-vibe/ui/web/ui/pre";
-import { ResizableContainer } from "next-vibe/ui/web/ui/resizable";
+} from "next-vibe/ui/ui/dropdown-menu";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { Bot } from "next-vibe/ui/ui/icons/Bot";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
+import { Globe } from "next-vibe/ui/ui/icons/Globe";
+import { Monitor } from "next-vibe/ui/ui/icons/Monitor";
+import { PanelLeft } from "next-vibe/ui/ui/icons/PanelLeft";
+import { Pin } from "next-vibe/ui/ui/icons/Pin";
+import { PinOff } from "next-vibe/ui/ui/icons/PinOff";
+import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Input } from "next-vibe/ui/ui/input";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/ui/motion";
+import { Pre } from "next-vibe/ui/ui/pre";
+import { ResizableContainer } from "next-vibe/ui/ui/resizable";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Switch } from "next-vibe/ui/web/ui/switch";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
+import { Switch } from "next-vibe/ui/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/tooltip";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetEndpointMutations,

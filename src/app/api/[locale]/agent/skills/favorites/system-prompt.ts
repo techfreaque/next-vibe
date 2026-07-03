@@ -6,7 +6,6 @@ import type {
   SystemPromptServerParams,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
-import { SKILL_CREATE_ALIAS, SKILLS_LIST_ALIAS } from "../constants";
 import {
   FAVORITE_CREATE_ALIAS,
   FAVORITE_DELETE_ALIAS,
@@ -142,8 +141,6 @@ You have no saved favorites. Favorites let you save character + model + tool com
     return parts.join("\n");
   },
 };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
 
 export async function loadFavoritesData(
   params: SystemPromptServerParams,

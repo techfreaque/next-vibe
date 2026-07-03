@@ -7,28 +7,28 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { storage } from "next-vibe/ui/web/lib/storage";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Cloud } from "next-vibe/ui/web/ui/icons/Cloud";
-import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { ShieldPlus } from "next-vibe/ui/web/ui/icons/ShieldPlus";
-import type { InputChangeEvent } from "next-vibe/ui/web/ui/input";
-import { Input } from "next-vibe/ui/web/ui/input";
+import { storage } from "next-vibe/ui/lib/storage";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Cloud } from "next-vibe/ui/ui/icons/Cloud";
+import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { ShieldPlus } from "next-vibe/ui/ui/icons/ShieldPlus";
+import type { InputChangeEvent } from "next-vibe/ui/ui/input";
+import { Input } from "next-vibe/ui/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Switch } from "next-vibe/ui/web/ui/switch";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
+import { Switch } from "next-vibe/ui/ui/switch";
 import {
   useWidgetContext,
   useWidgetLocale,

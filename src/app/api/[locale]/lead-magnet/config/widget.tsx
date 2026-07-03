@@ -1,21 +1,21 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetContext,
   useWidgetLocale,

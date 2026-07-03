@@ -6,20 +6,20 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { CreditCard } from "next-vibe/ui/web/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { History } from "next-vibe/ui/web/ui/icons/History";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { UserCheck } from "next-vibe/ui/web/ui/icons/UserCheck";
-import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
+import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
+import { History } from "next-vibe/ui/ui/icons/History";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { UserCheck } from "next-vibe/ui/ui/icons/UserCheck";
+import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,

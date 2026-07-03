@@ -196,6 +196,19 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
               !preStreamMessageIds.has(m.id) &&
               !childIds.has(m.id),
           );
+          // WAIT-mode tool results mirror as separate events — a snapshot
+          // taken between the final assistant and a still-in-flight
+          // tool-result reads a resultless tool row. Wait for every new tool
+          // message to carry its result.
+          const unresolvedWaitTools = snapshot.filter(
+            (m) =>
+              m.role === "tool" &&
+              !preStreamMessageIds.has(m.id) &&
+              m.toolCall?.callbackMode !== "detach" &&
+              m.toolCall?.callbackMode !== "wakeUp" &&
+              (m.toolCall?.status === "pending" ||
+                resolveToolResult(m) === null),
+          );
           // This turn's assistant reply must have mirrored back: at least one
           // new (post-pre-stream) assistant message with non-empty content.
           const hasNewAssistantReply = snapshot.some(
@@ -207,6 +220,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           if (
             (pendingAsync.length === 0 &&
               danglingCompacting.length === 0 &&
+              unresolvedWaitTools.length === 0 &&
               hasNewAssistantReply) ||
             Date.now() - mirrorStart > MIRROR_WAIT_MS
           ) {

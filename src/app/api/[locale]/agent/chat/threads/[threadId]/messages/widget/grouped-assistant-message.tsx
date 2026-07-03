@@ -7,19 +7,19 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   copyImageToClipboard,
   copyToClipboard,
-} from "next-vibe/ui/web/lib/clipboard";
-import { downloadFromUrl } from "next-vibe/ui/web/lib/download";
-import { Audio } from "next-vibe/ui/web/ui/audio";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { Image } from "next-vibe/ui/web/ui/image";
-import { Markdown } from "next-vibe/ui/web/ui/markdown";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
-import { Video } from "next-vibe/ui/web/ui/video";
+} from "next-vibe/ui/lib/clipboard";
+import { downloadFromUrl } from "next-vibe/ui/lib/download";
+import { Audio } from "next-vibe/ui/ui/audio";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { Image } from "next-vibe/ui/ui/image";
+import { Markdown } from "next-vibe/ui/ui/markdown";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
+import { Video } from "next-vibe/ui/ui/video";
 import {
   type JSX,
   memo,

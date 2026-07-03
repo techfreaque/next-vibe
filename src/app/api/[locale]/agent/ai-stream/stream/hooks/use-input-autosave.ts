@@ -5,7 +5,7 @@
  */
 
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { storage } from "next-vibe/ui/lib/storage";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";

@@ -2,7 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { Dialog } from "next-vibe/ui/web/ui/dialog";
+import { Dialog } from "next-vibe/ui/ui/dialog";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
 

@@ -4,22 +4,22 @@
 
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { MessageCircle } from "next-vibe/ui/web/ui/icons/MessageCircle";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Send } from "next-vibe/ui/web/ui/icons/Send";
-import { ListItem } from "next-vibe/ui/web/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { MessageCircle } from "next-vibe/ui/ui/icons/MessageCircle";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Send } from "next-vibe/ui/ui/icons/Send";
+import { ListItem } from "next-vibe/ui/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { Span } from "next-vibe/ui/ui/span";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,

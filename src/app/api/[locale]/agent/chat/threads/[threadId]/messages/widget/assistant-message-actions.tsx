@@ -3,24 +3,26 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowBigDown } from "next-vibe/ui/web/ui/icons/ArrowBigDown";
-import { ArrowBigUp } from "next-vibe/ui/web/ui/icons/ArrowBigUp";
-import { Bot } from "next-vibe/ui/web/ui/icons/Bot";
-import { Square } from "next-vibe/ui/web/ui/icons/Square";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Volume2 } from "next-vibe/ui/web/ui/icons/Volume2";
-import { X } from "next-vibe/ui/web/ui/icons/X";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowBigDown } from "next-vibe/ui/ui/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe/ui/ui/icons/ArrowBigUp";
+import { Bot } from "next-vibe/ui/ui/icons/Bot";
+import { Square } from "next-vibe/ui/ui/icons/Square";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
+import { X } from "next-vibe/ui/ui/icons/X";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useWidgetItem } from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "next-vibe/ui/ui/popover";
+import { Span } from "next-vibe/ui/ui/span";
+import {
+  useWidgetItem,
+  useWidgetNavigation,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useState } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

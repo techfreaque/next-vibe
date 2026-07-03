@@ -2,17 +2,17 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { CodeBlock } from "next-vibe/ui/web/ui/markdown";
-import { Separator } from "next-vibe/ui/web/ui/separator";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Link } from "next-vibe/ui/ui/link";
+import { CodeBlock } from "next-vibe/ui/ui/markdown";
+import { Separator } from "next-vibe/ui/ui/separator";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/config/constants";

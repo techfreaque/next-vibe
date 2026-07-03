@@ -20,7 +20,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { NextResponse } from "next-vibe/ui/web/lib/request";
+import { NextResponse } from "next-vibe/ui/lib/request";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 

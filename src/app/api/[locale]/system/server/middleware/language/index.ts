@@ -5,7 +5,7 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 

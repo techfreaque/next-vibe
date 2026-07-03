@@ -18,11 +18,10 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { userNotes } from "next-vibe/identity/user/db";
+import { UserNoteType } from "next-vibe/identity/user/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
-
-import { userNotes } from "@/app/api/[locale]/user/db";
-import { UserNoteType } from "@/app/api/[locale]/user/enum";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";

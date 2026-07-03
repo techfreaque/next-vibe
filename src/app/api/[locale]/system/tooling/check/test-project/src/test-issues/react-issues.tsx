@@ -47,13 +47,12 @@ export class StateMutation extends React.Component<object, { count: number }> {
   }
 }
 
-// react/self-closing-comp - Should be self-closing
+// react/self-closing-comp - Should be self-closing (no children)
 export function NotSelfClosing(): React.ReactElement {
   return (
     <div>
       <br></br>
       <img src="test.png" alt="test"></img>
-
       <input type="text"></input>
       <hr></hr>
       <input type="radio"></input>

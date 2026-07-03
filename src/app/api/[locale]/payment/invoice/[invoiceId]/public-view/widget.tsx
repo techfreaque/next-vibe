@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetTranslation,

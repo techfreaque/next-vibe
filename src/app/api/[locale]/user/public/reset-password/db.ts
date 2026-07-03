@@ -3,12 +3,11 @@
  * Defines the structure of password reset-related tables
  */
 
-import { relations } from "drizzle-orm";
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { users } from "../../db";
+import { users } from "next-vibe/identity/user/db";
 
 /**
  * Password resets table schema

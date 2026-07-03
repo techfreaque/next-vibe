@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,20 +12,18 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
-import type { JwtPayloadType, JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { NewUser } from "../../db";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import { UserDetailLevel } from "../../enum";
-import { SessionRepository } from "next-vibe/identity/session/repository";
-import { UserRepository } from "../../repository";
-import type { StandardUserType } from "../../types";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import {
   UserPermissionRole,
   UserRole,
@@ -34,6 +31,12 @@ import {
   isUserPermissionRole,
 } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { SessionRepository } from "next-vibe/identity/session/repository";
+import type { NewUser } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import type { StandardUserType } from "next-vibe/identity/user/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,

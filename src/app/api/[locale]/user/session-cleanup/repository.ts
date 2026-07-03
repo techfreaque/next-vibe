@@ -18,11 +18,6 @@ import { db } from "next-vibe/database";
 import { sessions } from "next-vibe/identity/session/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
-  RESET_TOKEN_EXPIRY,
-} from "@/config/constants";
-
 import { passwordResets } from "../public/reset-password/db";
 import type {
   SessionCleanupPostRequestOutput,
@@ -165,76 +160,6 @@ export class SessionCleanupRepository {
         message: t("errors.execution_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
-      });
-    }
-  }
-
-  /**
-   * Get default configuration for session cleanup
-   */
-  static getDefaultConfig(): SessionCleanupPostRequestOutput {
-    return {
-      sessionRetentionDays: AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
-      tokenRetentionDays: RESET_TOKEN_EXPIRY,
-      batchSize: 200,
-      dryRun: false,
-    };
-  }
-
-  /**
-   * Validate task configuration
-   */
-  static async validateConfig(
-    config: SessionCleanupPostRequestOutput,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<boolean>> {
-    try {
-      // Validate database connection
-      await db.execute(sql`SELECT 1`);
-
-      // Validate configuration values
-      const { t } = scopedTranslation.scopedT(locale);
-
-      if (
-        config.sessionRetentionDays < 1 ||
-        config.sessionRetentionDays > 365
-      ) {
-        return fail({
-          message: t("errors.invalid_session_retention.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { sessionRetentionDays: config.sessionRetentionDays },
-        });
-      }
-
-      if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
-        return fail({
-          message: t("errors.invalid_token_retention.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { tokenRetentionDays: config.tokenRetentionDays },
-        });
-      }
-
-      if (config.batchSize < 1 || config.batchSize > 1000) {
-        return fail({
-          message: t("errors.invalid_batch_size.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { batchSize: config.batchSize },
-        });
-      }
-
-      logger.debug("Session cleanup configuration validation passed");
-      return success(true);
-    } catch (error) {
-      logger.error(
-        "Session cleanup configuration validation failed",
-        parseError(error),
-      );
-      const { t } = scopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.validation_failed.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

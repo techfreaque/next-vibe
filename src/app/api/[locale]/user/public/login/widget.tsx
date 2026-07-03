@@ -10,7 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
+} from "next-vibe/ui/ui/card";
 
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -18,11 +18,11 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import AlertWidget from "next-vibe/unified-ui/display-only/alert/widget";
+import { LinkWidget } from "next-vibe/unified-ui/display-only/link/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { LinkWidget } from "next-vibe/unified-ui/display-only/link/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
 import type definition from "./definition";

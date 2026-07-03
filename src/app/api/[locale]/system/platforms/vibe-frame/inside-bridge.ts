@@ -16,7 +16,7 @@
  *   </script>
  */
 
-import { addWindowListener, onDOMReady } from "next-vibe/ui/web/lib/dom";
+import { addWindowListener, onDOMReady } from "next-vibe/ui/lib/dom";
 
 import type {
   BridgeAction,

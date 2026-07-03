@@ -6,15 +6,15 @@
 import { cn } from "next-vibe/core/utils/utils";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Tag } from "next-vibe/ui/web/ui/icons/Tag";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Globe } from "next-vibe/ui/ui/icons/Globe";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Tag } from "next-vibe/ui/ui/icons/Tag";
+import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLocale,
@@ -67,7 +67,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [navigate, createdLeadId]);
@@ -77,7 +77,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.PATCH, {
         urlPathParams: { id: createdLeadId },
         prefillFromGet: true,
@@ -106,7 +106,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [createdLeadId, navigate]);

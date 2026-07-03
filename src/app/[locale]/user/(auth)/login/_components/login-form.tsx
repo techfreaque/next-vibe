@@ -1,11 +1,11 @@
 "use client";
 
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import { useCallback, useRef, useState } from "react";
 
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";

@@ -14,8 +14,8 @@ import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { frameExchangeTokens } from "next-vibe/platforms/vibe-frame/db";
 import { shouldSkipPath } from "next-vibe/server/middleware/utils";
-import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";

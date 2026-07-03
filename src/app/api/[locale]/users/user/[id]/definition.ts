@@ -873,26 +873,14 @@ const { DELETE } = createEndpoint({
 
 // Extract types using the new enhanced system
 
-export type UserGetRequestInput = typeof GET.types.RequestInput;
-export type UserGetRequestOutput = typeof GET.types.RequestOutput;
-export type UserGetResponseInput = typeof GET.types.ResponseInput;
 export type UserGetResponseOutput = typeof GET.types.ResponseOutput;
-export type UserGetUrlParamsTypeInput = typeof GET.types.UrlVariablesInput;
 export type UserGetUrlParamsTypeOutput = typeof GET.types.UrlVariablesOutput;
 
-export type UserPutRequestInput = typeof PUT.types.RequestInput;
 export type UserPutRequestOutput = typeof PUT.types.RequestOutput;
-export type UserPutResponseInput = typeof PUT.types.ResponseInput;
 export type UserPutResponseOutput = typeof PUT.types.ResponseOutput;
-export type UserPutUrlParamsTypeInput = typeof PUT.types.UrlVariablesInput;
 export type UserPutUrlParamsTypeOutput = typeof PUT.types.UrlVariablesOutput;
 
-export type UserDeleteRequestInput = typeof DELETE.types.RequestInput;
-export type UserDeleteRequestOutput = typeof DELETE.types.UrlVariablesOutput;
-export type UserDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type UserDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type UserDeleteUrlParamsTypeInput =
-  typeof DELETE.types.UrlVariablesInput;
 export type UserDeleteUrlParamsTypeOutput =
   typeof DELETE.types.UrlVariablesOutput;
 

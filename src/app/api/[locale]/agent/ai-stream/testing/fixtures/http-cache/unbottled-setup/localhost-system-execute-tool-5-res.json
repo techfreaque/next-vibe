@@ -1,0 +1,20 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/system/execute-tool",
+  "status": 200,
+  "headers": {
+    "content-length": "51",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 05:04:40 GMT, Fri, 03 Jul 2026 05:04:39 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "csrf_token_3002=9e64c5f02c76479e9010bec4e55fc9f7; Path=/; Max-Age=86400; SameSite=strict"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "result": {
+        "updated": true
+      }
+    }
+  }
+}

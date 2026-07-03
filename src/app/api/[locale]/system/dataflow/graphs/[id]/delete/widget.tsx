@@ -5,15 +5,15 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Card, CardContent } from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Trash } from "next-vibe/ui/web/ui/icons/Trash";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Trash } from "next-vibe/ui/ui/icons/Trash";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

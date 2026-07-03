@@ -1,0 +1,62 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/images/text2img",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a152b4be8d7edcdf-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 03:12:02 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=0ztbA%2BujO8M8D2XEg6xyANbQJSMD2gWjXVIrYNrUrs2nvXlUBpopRMiWVRJ%2BcEArMgHcq1jSVhLdqD9ejtJ5boBzImby4wD3p6H9XPEqTwEu47%2FWBbvJp5ZDH7q0DBY%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "4072b439eac72a70082ef1287ec1227b",
+    "x-request-time": "2.674",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 80,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/images/fetch/181411170",
+    "id": 181411170,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/fb755eb6-48c6-444e-9805-d2fdcc6f83e3-0.jpg"
+    ],
+    "meta": {
+      "id": 181411170,
+      "model_id": "z-image-base",
+      "prompt": " red circle hyperrealistic, full body, detailed clothing, highly detailed, cinematic lighting, stunningly beautiful, intricate, sharp focus, f/1. 8, 85mm, (centered image composition), (professionally color graded), ((bright soft diffused light)), volumetric fog, trending on instagram, trending on tumblr, HDR 4K, 8K",
+      "negative_prompt": " (child:1.5), ((((underage)))), ((((child)))), (((kid))), (((preteen))), (teen:1.5) ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy",
+      "width": 512,
+      "guidance_scale": 5,
+      "height": 512,
+      "samples": 1,
+      "safety_checker": "no",
+      "safety_checker_type": "black",
+      "num_inference_steps": 30,
+      "seed": 1873,
+      "webhook": null,
+      "track_id": null,
+      "base64": "no",
+      "highres_fix": null,
+      "watermark": "no",
+      "temp": "no",
+      "file_prefix": "fb755eb6-48c6-444e-9805-d2fdcc6f83e3",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/fb755eb6-48c6-444e-9805-d2fdcc6f83e3-0.jpg"
+      ]
+    }
+  }
+}

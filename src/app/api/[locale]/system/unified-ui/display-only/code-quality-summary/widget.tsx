@@ -6,9 +6,9 @@
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H3 } from "next-vibe/ui/web/ui/typography";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
+import { H3 } from "next-vibe/ui/ui/typography";
 import type { ReactRequestResponseWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import {

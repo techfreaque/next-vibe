@@ -18,6 +18,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
@@ -26,7 +27,6 @@ import {
 } from "@/app/api/[locale]/products/repository-client";
 import { env } from "@/config/env";
 
-import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
 import {
   CheckoutMode,

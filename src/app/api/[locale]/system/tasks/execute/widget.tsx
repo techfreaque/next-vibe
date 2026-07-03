@@ -11,13 +11,13 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { type UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { endpoints as cronTaskEndpoints } from "next-vibe/tasks/cron/[id]/definition";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

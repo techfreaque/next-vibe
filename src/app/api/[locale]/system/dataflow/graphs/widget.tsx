@@ -6,24 +6,24 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Card, CardContent } from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Archive } from "next-vibe/ui/web/ui/icons/Archive";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Trash } from "next-vibe/ui/web/ui/icons/Trash";
-import { User } from "next-vibe/ui/web/ui/icons/User";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { Activity } from "next-vibe/ui/ui/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { Archive } from "next-vibe/ui/ui/icons/Archive";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Trash } from "next-vibe/ui/ui/icons/Trash";
+import { User } from "next-vibe/ui/ui/icons/User";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,

@@ -11,8 +11,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { downloadBinaryFile } from "next-vibe/ui/web/lib/download";
-import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/web/lib/media";
+import { downloadBinaryFile } from "next-vibe/ui/lib/download";
+import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/lib/media";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import {

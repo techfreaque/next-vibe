@@ -16,7 +16,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { useToast } from "next-vibe/ui/web/hooks/use-toast";
+import { useToast } from "next-vibe/ui/hooks/use-toast";
 import { useCallback } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

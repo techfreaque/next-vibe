@@ -16,9 +16,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 import { DefaultFolderId } from "../config";
 import { chatFolders, chatMessages, chatThreads } from "../db";

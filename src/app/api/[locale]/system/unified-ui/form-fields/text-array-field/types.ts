@@ -4,7 +4,7 @@
  */
 
 import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { TagOption } from "next-vibe/ui/web/ui/tags-field";
+import type { TagOption } from "next-vibe/ui/ui/tags-field";
 import type { ArrayWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/form-fields/_shared/types";

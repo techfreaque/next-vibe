@@ -90,9 +90,44 @@ const sharedState: FetchCacheSharedState = ((): FetchCacheSharedState => {
   return g.__vibeFetchCacheState;
 })();
 
+/**
+ * Async-scoped context OVERRIDE. The global context is process-wide and gets
+ * re-applied by every incoming request's x-vibe-fixture-context header — a
+ * background flow (e.g. a wakeUp revival stream) that needs its own fixture
+ * namespace would lose that race. runWithFetchCacheContext scopes the override
+ * to the async execution tree, immune to concurrent requests. Shared across
+ * BOTH module graph copies (same reason as sharedState) — the SSR graph sets
+ * the scope, the CLI graph's fetch patch must resolve it.
+ */
+const contextScope: AsyncLocalStorage<string> =
+  ((): AsyncLocalStorage<string> => {
+    const g = globalThis as {
+      __vibeFetchCacheScope?: AsyncLocalStorage<string>;
+    };
+    g.__vibeFetchCacheScope ??= new AsyncLocalStorage<string>();
+    return g.__vibeFetchCacheScope;
+  })();
+
+/** The effective fixture context: async-scoped override, else the global. */
+function resolveContext(): string {
+  return contextScope.getStore() ?? sharedState.currentTestCase;
+}
+
 /** Current fixture context — relay calls forward it to fixture-mode servers. */
 export function getFetchCacheContext(): string {
-  return sharedState.currentTestCase;
+  return resolveContext();
+}
+
+/**
+ * Run `fn` with an async-scoped fixture context. All external fetches inside
+ * the async tree record/replay under `testCase`, regardless of what concurrent
+ * requests set as the process-global context.
+ */
+export function runWithFetchCacheContext<T>(
+  testCase: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  return contextScope.run(slugify(testCase), fn);
 }
 
 /**
@@ -579,9 +614,12 @@ export function clearLocalhostPorts(): void {
   localhostPorts.clear();
 }
 
-function nextCallIndex(modelName: string): number {
-  const n = (sharedState.callCounters.get(modelName) ?? 0) + 1;
-  sharedState.callCounters.set(modelName, n);
+function nextCallIndex(testCase: string, modelName: string): number {
+  // Keyed per context so an async-scoped override (revival namespace) keeps
+  // its own call ordering without consuming the base context's counter.
+  const key = `${testCase}:${modelName}`;
+  const n = (sharedState.callCounters.get(key) ?? 0) + 1;
+  sharedState.callCounters.set(key, n);
   return n;
 }
 
@@ -854,12 +892,23 @@ function buildResFile(
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
+// PER-MODULE-INSTANCE install guard. The dev server loads two module graphs (CLI
+// + Vite SSR) — each has its OWN `global.fetch`. The fetch PATCH must be applied
+// in EVERY graph (especially the SSR graph, where route handlers AND the relayed
+// AI loop run), or that graph's model/media calls go out unpatched → live, never
+// recorded → relayed remote loops run non-deterministically. The shared
+// `installed` flag (on globalThis) is NOT usable for this: it would let the second
+// graph skip patching its own fetch. So gate patching on this module-local flag.
+// Context + counters stay on the GLOBAL sharedState so both graphs agree on them.
+let installedInThisGraph = false;
+
 export function installFetchCache(
   logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
 ): void {
-  if (sharedState.installed) {
+  if (installedInThisGraph) {
     return;
   }
+  installedInThisGraph = true;
   sharedState.installed = true;
   mkdirSync(HTTP_CACHE_DIR, { recursive: true });
 
@@ -885,8 +934,13 @@ export function installFetchCache(
     // always reach the live server:
     //   ai-stream/stream (with tools+instanceId) — starts a remote AI loop, returns a fresh responseThreadId
     //   ws/broadcast                              — delivers tool results to the remote AI loop
-    // Caching either would break the relay: stale responseThreadId → dead WS channel;
-    // cached broadcast → tool result never delivered → tool timeout on remote.
+    //   system/execute-tool                       — the EVENT-protocol transport: every
+    //                                               tool-execute-request/result rides a
+    //                                               bridge POST to the peer's execute-tool
+    //                                               endpoint; replaying one from fixtures
+    //                                               means the relay never reaches the peer.
+    // Caching any would break the relay: stale responseThreadId → dead WS channel;
+    // cached broadcast/bridge POST → dispatch or result never delivered → remote hang.
     if (
       url.includes("/agent/ai-stream/stream") ||
       url.includes("/ws/broadcast")
@@ -907,8 +961,9 @@ export function installFetchCache(
       }
 
       const modelName = deriveModelName(url, bodyStr);
-      const testCaseDir = cacheDir(sharedState.currentTestCase);
-      const callIndex = nextCallIndex(modelName);
+      const effectiveTestCase = resolveContext();
+      const testCaseDir = cacheDir(effectiveTestCase);
+      const callIndex = nextCallIndex(effectiveTestCase, modelName);
       const stem = fileStem(modelName, callIndex);
       const rp = join(testCaseDir, `${stem}-res.json`);
 
@@ -941,7 +996,7 @@ export function installFetchCache(
         // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
         throw new Error(
           // eslint-disable-next-line i18next/no-literal-string
-          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${sharedState.currentTestCase})`,
+          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${effectiveTestCase})`,
         );
       }
 

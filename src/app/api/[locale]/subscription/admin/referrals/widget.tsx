@@ -16,15 +16,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/alert-dialog";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

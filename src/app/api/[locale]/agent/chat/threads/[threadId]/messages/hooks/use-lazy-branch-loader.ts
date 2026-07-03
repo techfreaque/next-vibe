@@ -18,10 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import {
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
+import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";

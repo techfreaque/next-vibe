@@ -44,7 +44,6 @@ import {
 } from "../../testing/remote-setup";
 import {
   assertHermesFolderChainHasThread,
-  describeLoopOnClientSuite,
   makeDirectSetup,
 } from "./helpers/remote";
 import { describeStreamSuite } from "./route-base.test";

@@ -10,21 +10,21 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
-import { Div } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/ui/card";
+import { Checkbox } from "next-vibe/ui/ui/checkbox";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/web/ui/form/form";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Gift } from "next-vibe/ui/web/ui/icons/Gift";
-import { Heart } from "next-vibe/ui/web/ui/icons/Heart";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/form/form";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { Gift } from "next-vibe/ui/ui/icons/Gift";
+import { Heart } from "next-vibe/ui/ui/icons/Heart";
+import { Label } from "next-vibe/ui/ui/label";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
@@ -35,7 +35,6 @@ import leadCurrentReferralDefinition, {
 } from "@/app/api/[locale]/referral/lead/current/definition";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { PasswordStrengthIndicator } from "./password-strength-indicator";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -53,6 +52,7 @@ import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-f
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 import type definition from "../definition";
 

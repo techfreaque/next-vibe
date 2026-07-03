@@ -3,6 +3,7 @@
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { cn } from "next-vibe/core/utils/utils";
+import { ExternalLink as ExternalLinkComponent } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -13,7 +14,6 @@ import remarkGfm from "remark-gfm";
 
 import { uiScopedTranslation } from "../../web/i18n";
 import type { StyleType } from "../../web/utils/style-type";
-import { ExternalLink as ExternalLinkComponent } from "./link";
 
 // Constants for non-translatable values
 const DECORATIVE_QUOTE = String.fromCodePoint(0x201c); // Left double quotation mark

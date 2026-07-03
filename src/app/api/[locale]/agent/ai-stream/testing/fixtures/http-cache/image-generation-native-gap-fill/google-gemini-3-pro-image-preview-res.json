@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1559062bd18d2ce-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 11:31:33 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783078288-NrkrTqJK5WOWpeTXwdcX"
+  },
+  "body": {
+    "id": "gen-1783078288-NrkrTqJK5WOWpeTXwdcX",
+    "object": "chat.completion",
+    "created": 1783078288,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This image is a minimalist digital graphic illustration featuring a single geometric shape against a plain background. The central subject is a solid, uniformly filled isosceles triangle with its base positioned horizontally. The triangle is rendered in a medium, saturated blue color. It is centered within the frame and occupies a significant portion of the composition, contrasting sharply with the clean, featureless white background. The edges of the triangle are crisp and precise. The overall style is simple, clean, and graphic, with no textures, gradients, shadows, or other elements present.",
+          "refusal": null,
+          "reasoning": "**Analyzing Geometric Forms**\n\nMy focus has been on dissecting the visual data. I'm currently engaged in a detailed examination of the primary geometric elements present. The immediate observation is a singular, two-dimensional triangle, presented as a solid, filled shape.\n\n**Describing Visual Elements**\n\nI am currently detailing the constituent parts of the visual input. My analysis has moved to describing the specific attributes of the observed geometric forms and their context within the overall composition.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Geometric Forms**\n\nMy focus has been on dissecting the visual data. I'm currently engaged in a detailed examination of the primary geometric elements present. The immediate observation is a singular, two-dimensional triangle, presented as a solid, filled shape.\n\n**Describing Visual Elements**\n\nI am currently detailing the constituent parts of the visual input. My analysis has moved to describing the specific attributes of the observed geometric forms and their context within the overall composition.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CscGAY89a1+r33gjOnSGf+yHddPME1tl11wndu0IasV+04xdbUfjIay7mlms/k6MkcwAOEM/8RzmjA3D15ds9qw1lvwqZLGS0V0oUENsdk9NGP1kAijiEi152WB9cBmNuftnK0OY4uyGKDNYYtHQHrrLOlo8jIb/vfZF0os6c2y+u+GmVhol2TS7ei9Lo0eoqoi64x21ZEpLkk8PLPJ6NSirBrq3UbzSCDLKH5FiKyr9dgRbzYdwOxSCy7GoSxp7ro+fBp1KJcavLkjLkGYZ2lToX5Igba7rfilHIXgpcEIMdxCKXpSeIpQWk7eGP+7mTOHZImFFDdEjlb/SUu8KdV5ASYomP2f2aTxfFk1OtD1mSfAnjcNx2NxwTOpTby2JgfamattunKudeQs8bkeGHETiZSr+lpO5FeIbM+BNwP3b/53A8lXGzu2ImhAG0TKKQUe3O3wd8VtRPaRcpKVUWmsFYYi1e6HfVAizZ9k3AJPV56mADPFuKKT7CdsbYRm7sXIm28kqe/Oad+ZyimCCJFdz4mNu27JnAGz9NngKPP8k+lXwr/FLrsqcejVcno2b5/sCYRRjMtoKHm71mx18vhmwsc1nLcAeyFju0xHSlTiu0y8IGLKPPRhEhbWtMwdS5p1wYErls92L9ubhLiSLKkMTWd5EDZoOfvYx9EopqLzN+IWhC6+WKEAumQ6Hd9B51y3wz5t7XX7Q/ql13Exi1f1H8JSDSVRkjh+vkTnCr1K2bLwue2rLvBBhF+uCqXPru85RDHvAL5D2bXTDaPtU/vtmx1ZIvKmzTwnbGwrKamFVnoK07XxO+7AlyjYiuzGl1TzN4duUp1YIEpc3VEgOIhsFRl+cAOZk88moTf/A0ZDC6GOQjeh2OZAP8wIEhOqzYackGvVk9LSeDIUaOUayJhI2iMiJTQtMVPCQv7F9zPIut5RXvRsprxxki3B03ptq+1zLmvrVj6Jh1D+9H6ARIQBlntNLr8VYTGKstePz8rXBk1qFD7WjsK8lqRtW6RHTn7T0qrAleitVTcGG1bgjAsXdGp77Hjatq12q7ELZAlhsgNOB1udDdO0z4uD4pL4XG0unB6YuG36b4NSgl28X8d8YHDvBP8uDy/o="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 271,
+      "total_tokens": 1108,
+      "cost": 0.004926,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004926,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.003252
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 163,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

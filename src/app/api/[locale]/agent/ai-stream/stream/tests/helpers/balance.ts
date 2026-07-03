@@ -324,3 +324,67 @@ async function queryRemoteDeductionsAfter(
       r.created_at instanceof Date ? r.created_at.toISOString() : r.created_at,
   }));
 }
+
+/**
+ * LOCAL-side twins of the remote ledger helpers: marker + poll for a new
+ * usage deduction (amount < 0) on the LOCAL admin's wallets. Used by the
+ * loop-on-client scenarios to prove the loop ran (and billed) on THIS side.
+ */
+export async function readLocalDeductionMarker(
+  userId: string,
+): Promise<string | null> {
+  const rows = await queryLocalDeductionsAfter(userId, null, 1);
+  return rows[0]?.createdAt ?? null;
+}
+
+export async function waitForLocalDeductionAfter(
+  userId: string,
+  marker: string | null,
+  timeoutMs = 60_000,
+  pollMs = 500,
+): Promise<RemoteDeductionRow[]> {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const rows = await queryLocalDeductionsAfter(userId, marker, 10);
+    if (rows.length > 0) {
+      return rows;
+    }
+    if (Date.now() >= deadline) {
+      return [];
+    }
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, pollMs);
+    });
+  }
+}
+
+async function queryLocalDeductionsAfter(
+  userId: string,
+  marker: string | null,
+  limit: number,
+): Promise<RemoteDeductionRow[]> {
+  const rows = await db.execute<{
+    amount: string | number;
+    model_id: string | null;
+    created_at: string | Date;
+  }>(
+    sql`SELECT ct.amount, ct.model_id, ct.created_at
+        FROM credit_transactions ct
+        JOIN credit_wallets cw ON cw.id = ct.wallet_id
+        WHERE ct.amount < 0
+          AND (cw.user_id = ${userId}
+            OR cw.lead_id IN (
+              SELECT ull.lead_id FROM user_lead_links ull
+              WHERE ull.user_id = ${userId}
+            ))
+          AND (${marker}::timestamp IS NULL OR ct.created_at > ${marker}::timestamp)
+        ORDER BY ct.created_at DESC
+        LIMIT ${limit}`,
+  );
+  return rows.rows.map((r) => ({
+    amount: typeof r.amount === "number" ? r.amount : parseFloat(r.amount),
+    modelId: r.model_id,
+    createdAt:
+      r.created_at instanceof Date ? r.created_at.toISOString() : r.created_at,
+  }));
+}

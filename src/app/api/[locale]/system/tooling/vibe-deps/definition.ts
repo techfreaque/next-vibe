@@ -84,6 +84,7 @@ const { POST } = createEndpoint({
           { value: "needs-move", label: "mode.needsMove" },
           { value: "unused-symbols", label: "mode.unusedSymbols" },
           { value: "cross-domain", label: "mode.crossDomain" },
+          { value: "page-violations", label: "mode.pageViolations" },
         ],
         schema: z
           .enum([
@@ -98,6 +99,7 @@ const { POST } = createEndpoint({
             "needs-move",
             "unused-symbols",
             "cross-domain",
+            "page-violations",
           ])
           .default("report"),
       }),
@@ -145,6 +147,7 @@ const { POST } = createEndpoint({
           "needs-move",
           "unused-symbols",
           "cross-domain",
+          "page-violations",
         ]),
       }),
 

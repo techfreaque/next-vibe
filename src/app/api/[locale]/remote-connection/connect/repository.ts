@@ -29,10 +29,6 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  DEFAULT_REMOTE_TOOL_IDS,
-  getDefaultToolIdsForUser,
-} from "@/app/api/[locale]/agent/chat/constants";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/app/api/[locale]/user/public/login/definition";

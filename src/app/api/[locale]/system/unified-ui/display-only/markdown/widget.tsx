@@ -3,8 +3,8 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Div } from "next-vibe/ui/ui/div";
+import { Markdown } from "next-vibe/ui/ui/markdown";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

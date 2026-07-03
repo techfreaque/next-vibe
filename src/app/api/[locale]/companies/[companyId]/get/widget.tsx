@@ -1,19 +1,19 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { BookOpen } from "next-vibe/ui/web/ui/icons/BookOpen";
-import { Box } from "next-vibe/ui/web/ui/icons/Box";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
-import { Inbox } from "next-vibe/ui/web/ui/icons/Inbox";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
-import { ShoppingBag } from "next-vibe/ui/web/ui/icons/ShoppingBag";
-import { ShoppingCart } from "next-vibe/ui/web/ui/icons/ShoppingCart";
-import { Users } from "next-vibe/ui/web/ui/icons/Users";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
+import { Box } from "next-vibe/ui/ui/icons/Box";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { FileText } from "next-vibe/ui/ui/icons/FileText";
+import { Inbox } from "next-vibe/ui/ui/icons/Inbox";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { ShoppingBag } from "next-vibe/ui/ui/icons/ShoppingBag";
+import { ShoppingCart } from "next-vibe/ui/ui/icons/ShoppingCart";
+import { Users } from "next-vibe/ui/ui/icons/Users";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,

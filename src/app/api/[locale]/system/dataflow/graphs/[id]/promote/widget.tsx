@@ -6,14 +6,14 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Card, CardContent } from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

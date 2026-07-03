@@ -10,9 +10,9 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { Environment } from "next-vibe/env/env-util";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { headers } from "next-vibe/ui/web/lib/headers";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
-import { NextResponse } from "next-vibe/ui/web/lib/request";
+import { headers } from "next-vibe/ui/lib/headers";
+import type { NextRequest } from "next-vibe/ui/lib/request";
+import { NextResponse } from "next-vibe/ui/lib/request";
 
 import { env } from "@/config/env";
 

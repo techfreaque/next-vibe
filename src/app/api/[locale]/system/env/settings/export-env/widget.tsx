@@ -5,14 +5,14 @@
 
 "use client";
 
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { downloadFile } from "next-vibe/ui/web/lib/download";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { Pre } from "next-vibe/ui/web/ui/pre";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { downloadFile } from "next-vibe/ui/lib/download";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { Pre } from "next-vibe/ui/ui/pre";
 import {
   useWidgetTranslation,
   useWidgetValue,

@@ -7,12 +7,11 @@ export const dynamic = "force-dynamic";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { redirect } from "next-vibe/ui/web/lib/redirect";
+import { redirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
-
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 interface ThreadsRootPageProps {
   params: Promise<{

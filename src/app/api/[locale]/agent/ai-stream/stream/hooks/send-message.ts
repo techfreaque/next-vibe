@@ -9,10 +9,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import {
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
+import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

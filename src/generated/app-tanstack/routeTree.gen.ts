@@ -86,6 +86,7 @@ import { Route as ApiLocaleNewsletterUnsubscribeRouteImport } from './routes/api
 import { Route as ApiLocaleNewsletterSubscribeRouteImport } from './routes/api.$locale.newsletter.subscribe'
 import { Route as ApiLocaleNewsletterStatusRouteImport } from './routes/api.$locale.newsletter.status'
 import { Route as ApiLocaleMessengerSendRouteImport } from './routes/api.$locale.messenger.send'
+import { Route as ApiLocaleLeadsTrackingRouteImport } from './routes/api.$locale.leads.tracking'
 import { Route as ApiLocaleLeadsStatsRouteImport } from './routes/api.$locale.leads.stats'
 import { Route as ApiLocaleLeadsSkillRouteImport } from './routes/api.$locale.leads.skill'
 import { Route as ApiLocaleLeadsSearchRouteImport } from './routes/api.$locale.leads.search'
@@ -95,6 +96,8 @@ import { Route as ApiLocaleLeadsExportRouteImport } from './routes/api.$locale.l
 import { Route as ApiLocaleLeadsDashboardRouteImport } from './routes/api.$locale.leads.dashboard'
 import { Route as ApiLocaleLeadsCreateRouteImport } from './routes/api.$locale.leads.create'
 import { Route as ApiLocaleLeadsBatchRouteImport } from './routes/api.$locale.leads.batch'
+import { Route as ApiLocaleLeadsAttributionRouteImport } from './routes/api.$locale.leads.attribution'
+import { Route as ApiLocaleLeadsIdRouteImport } from './routes/api.$locale.leads.$id'
 import { Route as ApiLocaleLeadMagnetConfigRouteImport } from './routes/api.$locale.lead-magnet.config'
 import { Route as ApiLocaleLeadMagnetCapturesRouteImport } from './routes/api.$locale.lead-magnet.captures'
 import { Route as ApiLocaleLeadMagnetCaptureRouteImport } from './routes/api.$locale.lead-magnet.capture'
@@ -198,7 +201,6 @@ import { Route as ApiLocaleSystemTasksUnifiedRunnerRouteImport } from './routes/
 import { Route as ApiLocaleSystemTasksExecuteRouteImport } from './routes/api.$locale.system.tasks.execute'
 import { Route as ApiLocaleSystemTasksCompleteTaskRouteImport } from './routes/api.$locale.system.tasks.complete-task'
 import { Route as ApiLocaleSystemRealtimeRemoteEventBridgeRouteImport } from './routes/api.$locale.system.realtime.remote-event-bridge'
-import { Route as ApiLocaleSystemIdentityAttributionRouteImport } from './routes/api.$locale.system.identity.attribution'
 import { Route as ApiLocaleSystemExecuteToolDismissTaskRouteImport } from './routes/api.$locale.system.execute-tool.dismiss-task'
 import { Route as ApiLocaleSystemExecuteToolCompleteRouteImport } from './routes/api.$locale.system.execute-tool.complete'
 import { Route as ApiLocaleSystemExecuteToolAwaitTaskRouteImport } from './routes/api.$locale.system.execute-tool.await-task'
@@ -287,6 +289,7 @@ import { Route as ApiLocaleMessengerDataSourcesMessengerClickedRouteImport } fro
 import { Route as ApiLocaleMessengerDataSourcesMessengerBouncedRouteImport } from './routes/api.$locale.messenger.data-sources.messenger-bounced'
 import { Route as ApiLocaleMessengerAccountsListRouteImport } from './routes/api.$locale.messenger.accounts.list'
 import { Route as ApiLocaleMessengerAccountsCreateRouteImport } from './routes/api.$locale.messenger.accounts.create'
+import { Route as ApiLocaleLeadsTrackingPixelRouteImport } from './routes/api.$locale.leads.tracking.pixel'
 import { Route as ApiLocaleLeadsImportStatusRouteImport } from './routes/api.$locale.leads.import.status'
 import { Route as ApiLocaleLeadsImportProcessRouteImport } from './routes/api.$locale.leads.import.process'
 import { Route as ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRouteImport } from './routes/api.$locale.leads.data-sources.leads-website-visits'
@@ -454,9 +457,6 @@ import { Route as ApiLocaleSystemPlatformsVibeFrameMountRouteImport } from './ro
 import { Route as ApiLocaleSystemLoggerErrorMonitorLogsRouteImport } from './routes/api.$locale.system.logger.error-monitor.logs'
 import { Route as ApiLocaleSystemLoggerErrorMonitorClientLogRouteImport } from './routes/api.$locale.system.logger.error-monitor.client-log'
 import { Route as ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport } from './routes/api.$locale.system.logger.error-monitor.cleanup'
-import { Route as ApiLocaleSystemIdentityTrackingPixelRouteImport } from './routes/api.$locale.system.identity.tracking.pixel'
-import { Route as ApiLocaleSystemIdentityTrackingEngagementRouteImport } from './routes/api.$locale.system.identity.tracking.engagement'
-import { Route as ApiLocaleSystemIdentityLeadIdRouteImport } from './routes/api.$locale.system.identity.lead.$id'
 import { Route as ApiLocaleSystemEnvSettingsGenerateKeyRouteImport } from './routes/api.$locale.system.env.settings.generate-key'
 import { Route as ApiLocaleSystemEnvSettingsExportEnvRouteImport } from './routes/api.$locale.system.env.settings.export-env'
 import { Route as ApiLocaleSubscriptionCompanyCompanyIdListRouteImport } from './routes/api.$locale.subscription.company.$companyId.list'
@@ -1020,6 +1020,11 @@ const ApiLocaleMessengerSendRoute = ApiLocaleMessengerSendRouteImport.update({
   path: '/api/$locale/messenger/send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleLeadsTrackingRoute = ApiLocaleLeadsTrackingRouteImport.update({
+  id: '/api/$locale/leads/tracking',
+  path: '/api/$locale/leads/tracking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleLeadsStatsRoute = ApiLocaleLeadsStatsRouteImport.update({
   id: '/api/$locale/leads/stats',
   path: '/api/$locale/leads/stats',
@@ -1063,6 +1068,17 @@ const ApiLocaleLeadsCreateRoute = ApiLocaleLeadsCreateRouteImport.update({
 const ApiLocaleLeadsBatchRoute = ApiLocaleLeadsBatchRouteImport.update({
   id: '/api/$locale/leads/batch',
   path: '/api/$locale/leads/batch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleLeadsAttributionRoute =
+  ApiLocaleLeadsAttributionRouteImport.update({
+    id: '/api/$locale/leads/attribution',
+    path: '/api/$locale/leads/attribution',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsIdRoute = ApiLocaleLeadsIdRouteImport.update({
+  id: '/api/$locale/leads/$id',
+  path: '/api/$locale/leads/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLocaleLeadMagnetConfigRoute =
@@ -1664,12 +1680,6 @@ const ApiLocaleSystemRealtimeRemoteEventBridgeRoute =
     path: '/api/$locale/system/realtime/remote-event-bridge',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleSystemIdentityAttributionRoute =
-  ApiLocaleSystemIdentityAttributionRouteImport.update({
-    id: '/api/$locale/system/identity/attribution',
-    path: '/api/$locale/system/identity/attribution',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiLocaleSystemExecuteToolDismissTaskRoute =
   ApiLocaleSystemExecuteToolDismissTaskRouteImport.update({
     id: '/dismiss-task',
@@ -2194,6 +2204,12 @@ const ApiLocaleMessengerAccountsCreateRoute =
     id: '/api/$locale/messenger/accounts/create',
     path: '/api/$locale/messenger/accounts/create',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsTrackingPixelRoute =
+  ApiLocaleLeadsTrackingPixelRouteImport.update({
+    id: '/pixel',
+    path: '/pixel',
+    getParentRoute: () => ApiLocaleLeadsTrackingRoute,
   } as any)
 const ApiLocaleLeadsImportStatusRoute =
   ApiLocaleLeadsImportStatusRouteImport.update({
@@ -3196,24 +3212,6 @@ const ApiLocaleSystemLoggerErrorMonitorCleanupRoute =
     path: '/api/$locale/system/logger/error-monitor/cleanup',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleSystemIdentityTrackingPixelRoute =
-  ApiLocaleSystemIdentityTrackingPixelRouteImport.update({
-    id: '/api/$locale/system/identity/tracking/pixel',
-    path: '/api/$locale/system/identity/tracking/pixel',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemIdentityTrackingEngagementRoute =
-  ApiLocaleSystemIdentityTrackingEngagementRouteImport.update({
-    id: '/api/$locale/system/identity/tracking/engagement',
-    path: '/api/$locale/system/identity/tracking/engagement',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemIdentityLeadIdRoute =
-  ApiLocaleSystemIdentityLeadIdRouteImport.update({
-    id: '/api/$locale/system/identity/lead/$id',
-    path: '/api/$locale/system/identity/lead/$id',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiLocaleSystemEnvSettingsGenerateKeyRoute =
   ApiLocaleSystemEnvSettingsGenerateKeyRouteImport.update({
     id: '/generate-key',
@@ -4199,6 +4197,8 @@ export interface FileRoutesByFullPath {
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
   '/api/$locale/lead-magnet/config': typeof ApiLocaleLeadMagnetConfigRoute
+  '/api/$locale/leads/$id': typeof ApiLocaleLeadsIdRoute
+  '/api/$locale/leads/attribution': typeof ApiLocaleLeadsAttributionRoute
   '/api/$locale/leads/batch': typeof ApiLocaleLeadsBatchRoute
   '/api/$locale/leads/create': typeof ApiLocaleLeadsCreateRoute
   '/api/$locale/leads/dashboard': typeof ApiLocaleLeadsDashboardRoute
@@ -4208,6 +4208,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/search': typeof ApiLocaleLeadsSearchRoute
   '/api/$locale/leads/skill': typeof ApiLocaleLeadsSkillRoute
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
+  '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
@@ -4391,6 +4392,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
   '/api/$locale/messenger/data-sources/messenger-bounced': typeof ApiLocaleMessengerDataSourcesMessengerBouncedRoute
@@ -4479,7 +4481,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
   '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
   '/api/$locale/system/execute-tool/dismiss-task': typeof ApiLocaleSystemExecuteToolDismissTaskRoute
-  '/api/$locale/system/identity/attribution': typeof ApiLocaleSystemIdentityAttributionRoute
   '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
   '/api/$locale/system/tasks/complete-task': typeof ApiLocaleSystemTasksCompleteTaskRoute
   '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
@@ -4619,9 +4620,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
   '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
   '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/identity/lead/$id': typeof ApiLocaleSystemIdentityLeadIdRoute
-  '/api/$locale/system/identity/tracking/engagement': typeof ApiLocaleSystemIdentityTrackingEngagementRoute
-  '/api/$locale/system/identity/tracking/pixel': typeof ApiLocaleSystemIdentityTrackingPixelRoute
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
@@ -4791,6 +4789,8 @@ export interface FileRoutesByTo {
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
   '/api/$locale/lead-magnet/config': typeof ApiLocaleLeadMagnetConfigRoute
+  '/api/$locale/leads/$id': typeof ApiLocaleLeadsIdRoute
+  '/api/$locale/leads/attribution': typeof ApiLocaleLeadsAttributionRoute
   '/api/$locale/leads/batch': typeof ApiLocaleLeadsBatchRoute
   '/api/$locale/leads/create': typeof ApiLocaleLeadsCreateRoute
   '/api/$locale/leads/dashboard': typeof ApiLocaleLeadsDashboardRoute
@@ -4800,6 +4800,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/search': typeof ApiLocaleLeadsSearchRoute
   '/api/$locale/leads/skill': typeof ApiLocaleLeadsSkillRoute
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
+  '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
@@ -4983,6 +4984,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
   '/api/$locale/messenger/data-sources/messenger-bounced': typeof ApiLocaleMessengerDataSourcesMessengerBouncedRoute
@@ -5071,7 +5073,6 @@ export interface FileRoutesByTo {
   '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
   '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
   '/api/$locale/system/execute-tool/dismiss-task': typeof ApiLocaleSystemExecuteToolDismissTaskRoute
-  '/api/$locale/system/identity/attribution': typeof ApiLocaleSystemIdentityAttributionRoute
   '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
   '/api/$locale/system/tasks/complete-task': typeof ApiLocaleSystemTasksCompleteTaskRoute
   '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
@@ -5211,9 +5212,6 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
   '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
   '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/identity/lead/$id': typeof ApiLocaleSystemIdentityLeadIdRoute
-  '/api/$locale/system/identity/tracking/engagement': typeof ApiLocaleSystemIdentityTrackingEngagementRoute
-  '/api/$locale/system/identity/tracking/pixel': typeof ApiLocaleSystemIdentityTrackingPixelRoute
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
@@ -5390,6 +5388,8 @@ export interface FileRoutesById {
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
   '/api/$locale/lead-magnet/config': typeof ApiLocaleLeadMagnetConfigRoute
+  '/api/$locale/leads/$id': typeof ApiLocaleLeadsIdRoute
+  '/api/$locale/leads/attribution': typeof ApiLocaleLeadsAttributionRoute
   '/api/$locale/leads/batch': typeof ApiLocaleLeadsBatchRoute
   '/api/$locale/leads/create': typeof ApiLocaleLeadsCreateRoute
   '/api/$locale/leads/dashboard': typeof ApiLocaleLeadsDashboardRoute
@@ -5399,6 +5399,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/search': typeof ApiLocaleLeadsSearchRoute
   '/api/$locale/leads/skill': typeof ApiLocaleLeadsSkillRoute
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
+  '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
@@ -5582,6 +5583,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
   '/api/$locale/messenger/data-sources/messenger-bounced': typeof ApiLocaleMessengerDataSourcesMessengerBouncedRoute
@@ -5670,7 +5672,6 @@ export interface FileRoutesById {
   '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
   '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
   '/api/$locale/system/execute-tool/dismiss-task': typeof ApiLocaleSystemExecuteToolDismissTaskRoute
-  '/api/$locale/system/identity/attribution': typeof ApiLocaleSystemIdentityAttributionRoute
   '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
   '/api/$locale/system/tasks/complete-task': typeof ApiLocaleSystemTasksCompleteTaskRoute
   '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
@@ -5810,9 +5811,6 @@ export interface FileRoutesById {
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
   '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
   '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/identity/lead/$id': typeof ApiLocaleSystemIdentityLeadIdRoute
-  '/api/$locale/system/identity/tracking/engagement': typeof ApiLocaleSystemIdentityTrackingEngagementRoute
-  '/api/$locale/system/identity/tracking/pixel': typeof ApiLocaleSystemIdentityTrackingPixelRoute
   '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
@@ -5989,6 +5987,8 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
     | '/api/$locale/lead-magnet/config'
+    | '/api/$locale/leads/$id'
+    | '/api/$locale/leads/attribution'
     | '/api/$locale/leads/batch'
     | '/api/$locale/leads/create'
     | '/api/$locale/leads/dashboard'
@@ -5998,6 +5998,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/search'
     | '/api/$locale/leads/skill'
     | '/api/$locale/leads/stats'
+    | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
@@ -6181,6 +6182,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-website-visits'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
     | '/api/$locale/messenger/data-sources/messenger-bounced'
@@ -6269,7 +6271,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/execute-tool/await-task'
     | '/api/$locale/system/execute-tool/complete'
     | '/api/$locale/system/execute-tool/dismiss-task'
-    | '/api/$locale/system/identity/attribution'
     | '/api/$locale/system/realtime/remote-event-bridge'
     | '/api/$locale/system/tasks/complete-task'
     | '/api/$locale/system/tasks/execute'
@@ -6409,9 +6410,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/company/$companyId/list'
     | '/api/$locale/system/env/settings/export-env'
     | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/identity/lead/$id'
-    | '/api/$locale/system/identity/tracking/engagement'
-    | '/api/$locale/system/identity/tracking/pixel'
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
@@ -6581,6 +6579,8 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
     | '/api/$locale/lead-magnet/config'
+    | '/api/$locale/leads/$id'
+    | '/api/$locale/leads/attribution'
     | '/api/$locale/leads/batch'
     | '/api/$locale/leads/create'
     | '/api/$locale/leads/dashboard'
@@ -6590,6 +6590,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/search'
     | '/api/$locale/leads/skill'
     | '/api/$locale/leads/stats'
+    | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
@@ -6773,6 +6774,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-website-visits'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
     | '/api/$locale/messenger/data-sources/messenger-bounced'
@@ -6861,7 +6863,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/execute-tool/await-task'
     | '/api/$locale/system/execute-tool/complete'
     | '/api/$locale/system/execute-tool/dismiss-task'
-    | '/api/$locale/system/identity/attribution'
     | '/api/$locale/system/realtime/remote-event-bridge'
     | '/api/$locale/system/tasks/complete-task'
     | '/api/$locale/system/tasks/execute'
@@ -7001,9 +7002,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/company/$companyId/list'
     | '/api/$locale/system/env/settings/export-env'
     | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/identity/lead/$id'
-    | '/api/$locale/system/identity/tracking/engagement'
-    | '/api/$locale/system/identity/tracking/pixel'
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
@@ -7179,6 +7177,8 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
     | '/api/$locale/lead-magnet/config'
+    | '/api/$locale/leads/$id'
+    | '/api/$locale/leads/attribution'
     | '/api/$locale/leads/batch'
     | '/api/$locale/leads/create'
     | '/api/$locale/leads/dashboard'
@@ -7188,6 +7188,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/search'
     | '/api/$locale/leads/skill'
     | '/api/$locale/leads/stats'
+    | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
@@ -7371,6 +7372,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-website-visits'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
     | '/api/$locale/messenger/data-sources/messenger-bounced'
@@ -7459,7 +7461,6 @@ export interface FileRouteTypes {
     | '/api/$locale/system/execute-tool/await-task'
     | '/api/$locale/system/execute-tool/complete'
     | '/api/$locale/system/execute-tool/dismiss-task'
-    | '/api/$locale/system/identity/attribution'
     | '/api/$locale/system/realtime/remote-event-bridge'
     | '/api/$locale/system/tasks/complete-task'
     | '/api/$locale/system/tasks/execute'
@@ -7599,9 +7600,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/company/$companyId/list'
     | '/api/$locale/system/env/settings/export-env'
     | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/identity/lead/$id'
-    | '/api/$locale/system/identity/tracking/engagement'
-    | '/api/$locale/system/identity/tracking/pixel'
     | '/api/$locale/system/logger/error-monitor/cleanup'
     | '/api/$locale/system/logger/error-monitor/client-log'
     | '/api/$locale/system/logger/error-monitor/logs'
@@ -7767,6 +7765,8 @@ export interface RootRouteChildren {
   ApiLocaleLeadMagnetCaptureRoute: typeof ApiLocaleLeadMagnetCaptureRoute
   ApiLocaleLeadMagnetCapturesRoute: typeof ApiLocaleLeadMagnetCapturesRoute
   ApiLocaleLeadMagnetConfigRoute: typeof ApiLocaleLeadMagnetConfigRoute
+  ApiLocaleLeadsIdRoute: typeof ApiLocaleLeadsIdRoute
+  ApiLocaleLeadsAttributionRoute: typeof ApiLocaleLeadsAttributionRoute
   ApiLocaleLeadsBatchRoute: typeof ApiLocaleLeadsBatchRoute
   ApiLocaleLeadsCreateRoute: typeof ApiLocaleLeadsCreateRoute
   ApiLocaleLeadsDashboardRoute: typeof ApiLocaleLeadsDashboardRoute
@@ -7776,6 +7776,7 @@ export interface RootRouteChildren {
   ApiLocaleLeadsSearchRoute: typeof ApiLocaleLeadsSearchRoute
   ApiLocaleLeadsSkillRoute: typeof ApiLocaleLeadsSkillRoute
   ApiLocaleLeadsStatsRoute: typeof ApiLocaleLeadsStatsRoute
+  ApiLocaleLeadsTrackingRoute: typeof ApiLocaleLeadsTrackingRouteWithChildren
   ApiLocaleMessengerSendRoute: typeof ApiLocaleMessengerSendRoute
   ApiLocaleNewsletterStatusRoute: typeof ApiLocaleNewsletterStatusRoute
   ApiLocaleNewsletterSubscribeRoute: typeof ApiLocaleNewsletterSubscribeRoute
@@ -7955,7 +7956,6 @@ export interface RootRouteChildren {
   ApiLocaleSystemDataflowGraphsRoute: typeof ApiLocaleSystemDataflowGraphsRouteWithChildren
   ApiLocaleSystemDataflowRunConfigRoute: typeof ApiLocaleSystemDataflowRunConfigRoute
   ApiLocaleSystemEnvSettingsRoute: typeof ApiLocaleSystemEnvSettingsRouteWithChildren
-  ApiLocaleSystemIdentityAttributionRoute: typeof ApiLocaleSystemIdentityAttributionRoute
   ApiLocaleSystemRealtimeRemoteEventBridgeRoute: typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
   ApiLocaleSystemTasksCompleteTaskRoute: typeof ApiLocaleSystemTasksCompleteTaskRoute
   ApiLocaleSystemTasksExecuteRoute: typeof ApiLocaleSystemTasksExecuteRoute
@@ -8039,9 +8039,6 @@ export interface RootRouteChildren {
   ApiLocaleSshLinuxUsersUsernameRoute: typeof ApiLocaleSshLinuxUsersUsernameRoute
   ApiLocaleSshLinuxUsersCreateRoute: typeof ApiLocaleSshLinuxUsersCreateRoute
   ApiLocaleSshLinuxUsersListRoute: typeof ApiLocaleSshLinuxUsersListRoute
-  ApiLocaleSystemIdentityLeadIdRoute: typeof ApiLocaleSystemIdentityLeadIdRoute
-  ApiLocaleSystemIdentityTrackingEngagementRoute: typeof ApiLocaleSystemIdentityTrackingEngagementRoute
-  ApiLocaleSystemIdentityTrackingPixelRoute: typeof ApiLocaleSystemIdentityTrackingPixelRoute
   ApiLocaleSystemLoggerErrorMonitorCleanupRoute: typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
   ApiLocaleSystemLoggerErrorMonitorClientLogRoute: typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
   ApiLocaleSystemLoggerErrorMonitorLogsRoute: typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
@@ -8627,6 +8624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleMessengerSendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/leads/tracking': {
+      id: '/api/$locale/leads/tracking'
+      path: '/api/$locale/leads/tracking'
+      fullPath: '/api/$locale/leads/tracking'
+      preLoaderRoute: typeof ApiLocaleLeadsTrackingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/leads/stats': {
       id: '/api/$locale/leads/stats'
       path: '/api/$locale/leads/stats'
@@ -8688,6 +8692,20 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/leads/batch'
       fullPath: '/api/$locale/leads/batch'
       preLoaderRoute: typeof ApiLocaleLeadsBatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/attribution': {
+      id: '/api/$locale/leads/attribution'
+      path: '/api/$locale/leads/attribution'
+      fullPath: '/api/$locale/leads/attribution'
+      preLoaderRoute: typeof ApiLocaleLeadsAttributionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/$id': {
+      id: '/api/$locale/leads/$id'
+      path: '/api/$locale/leads/$id'
+      fullPath: '/api/$locale/leads/$id'
+      preLoaderRoute: typeof ApiLocaleLeadsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/lead-magnet/config': {
@@ -9411,13 +9429,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleSystemRealtimeRemoteEventBridgeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/system/identity/attribution': {
-      id: '/api/$locale/system/identity/attribution'
-      path: '/api/$locale/system/identity/attribution'
-      fullPath: '/api/$locale/system/identity/attribution'
-      preLoaderRoute: typeof ApiLocaleSystemIdentityAttributionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$locale/system/execute-tool/dismiss-task': {
       id: '/api/$locale/system/execute-tool/dismiss-task'
       path: '/dismiss-task'
@@ -10033,6 +10044,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/messenger/accounts/create'
       preLoaderRoute: typeof ApiLocaleMessengerAccountsCreateRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/tracking/pixel': {
+      id: '/api/$locale/leads/tracking/pixel'
+      path: '/pixel'
+      fullPath: '/api/$locale/leads/tracking/pixel'
+      preLoaderRoute: typeof ApiLocaleLeadsTrackingPixelRouteImport
+      parentRoute: typeof ApiLocaleLeadsTrackingRoute
     }
     '/api/$locale/leads/import/status': {
       id: '/api/$locale/leads/import/status'
@@ -11201,27 +11219,6 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/system/logger/error-monitor/cleanup'
       fullPath: '/api/$locale/system/logger/error-monitor/cleanup'
       preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/identity/tracking/pixel': {
-      id: '/api/$locale/system/identity/tracking/pixel'
-      path: '/api/$locale/system/identity/tracking/pixel'
-      fullPath: '/api/$locale/system/identity/tracking/pixel'
-      preLoaderRoute: typeof ApiLocaleSystemIdentityTrackingPixelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/identity/tracking/engagement': {
-      id: '/api/$locale/system/identity/tracking/engagement'
-      path: '/api/$locale/system/identity/tracking/engagement'
-      fullPath: '/api/$locale/system/identity/tracking/engagement'
-      preLoaderRoute: typeof ApiLocaleSystemIdentityTrackingEngagementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/identity/lead/$id': {
-      id: '/api/$locale/system/identity/lead/$id'
-      path: '/api/$locale/system/identity/lead/$id'
-      fullPath: '/api/$locale/system/identity/lead/$id'
-      preLoaderRoute: typeof ApiLocaleSystemIdentityLeadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/system/env/settings/generate-key': {
@@ -12844,6 +12841,20 @@ const ApiLocaleLeadsImportRouteChildren: ApiLocaleLeadsImportRouteChildren = {
 const ApiLocaleLeadsImportRouteWithChildren =
   ApiLocaleLeadsImportRoute._addFileChildren(ApiLocaleLeadsImportRouteChildren)
 
+interface ApiLocaleLeadsTrackingRouteChildren {
+  ApiLocaleLeadsTrackingPixelRoute: typeof ApiLocaleLeadsTrackingPixelRoute
+}
+
+const ApiLocaleLeadsTrackingRouteChildren: ApiLocaleLeadsTrackingRouteChildren =
+  {
+    ApiLocaleLeadsTrackingPixelRoute: ApiLocaleLeadsTrackingPixelRoute,
+  }
+
+const ApiLocaleLeadsTrackingRouteWithChildren =
+  ApiLocaleLeadsTrackingRoute._addFileChildren(
+    ApiLocaleLeadsTrackingRouteChildren,
+  )
+
 interface ApiLocaleNewsletterUnsubscribeRouteChildren {
   ApiLocaleNewsletterUnsubscribeSyncRoute: typeof ApiLocaleNewsletterUnsubscribeSyncRoute
 }
@@ -13296,6 +13307,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadMagnetCaptureRoute: ApiLocaleLeadMagnetCaptureRoute,
   ApiLocaleLeadMagnetCapturesRoute: ApiLocaleLeadMagnetCapturesRoute,
   ApiLocaleLeadMagnetConfigRoute: ApiLocaleLeadMagnetConfigRoute,
+  ApiLocaleLeadsIdRoute: ApiLocaleLeadsIdRoute,
+  ApiLocaleLeadsAttributionRoute: ApiLocaleLeadsAttributionRoute,
   ApiLocaleLeadsBatchRoute: ApiLocaleLeadsBatchRoute,
   ApiLocaleLeadsCreateRoute: ApiLocaleLeadsCreateRoute,
   ApiLocaleLeadsDashboardRoute: ApiLocaleLeadsDashboardRoute,
@@ -13305,6 +13318,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadsSearchRoute: ApiLocaleLeadsSearchRoute,
   ApiLocaleLeadsSkillRoute: ApiLocaleLeadsSkillRoute,
   ApiLocaleLeadsStatsRoute: ApiLocaleLeadsStatsRoute,
+  ApiLocaleLeadsTrackingRoute: ApiLocaleLeadsTrackingRouteWithChildren,
   ApiLocaleMessengerSendRoute: ApiLocaleMessengerSendRoute,
   ApiLocaleNewsletterStatusRoute: ApiLocaleNewsletterStatusRoute,
   ApiLocaleNewsletterSubscribeRoute: ApiLocaleNewsletterSubscribeRoute,
@@ -13571,8 +13585,6 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleSystemDataflowGraphsRouteWithChildren,
   ApiLocaleSystemDataflowRunConfigRoute: ApiLocaleSystemDataflowRunConfigRoute,
   ApiLocaleSystemEnvSettingsRoute: ApiLocaleSystemEnvSettingsRouteWithChildren,
-  ApiLocaleSystemIdentityAttributionRoute:
-    ApiLocaleSystemIdentityAttributionRoute,
   ApiLocaleSystemRealtimeRemoteEventBridgeRoute:
     ApiLocaleSystemRealtimeRemoteEventBridgeRoute,
   ApiLocaleSystemTasksCompleteTaskRoute: ApiLocaleSystemTasksCompleteTaskRoute,
@@ -13716,11 +13728,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleSshLinuxUsersUsernameRoute: ApiLocaleSshLinuxUsersUsernameRoute,
   ApiLocaleSshLinuxUsersCreateRoute: ApiLocaleSshLinuxUsersCreateRoute,
   ApiLocaleSshLinuxUsersListRoute: ApiLocaleSshLinuxUsersListRoute,
-  ApiLocaleSystemIdentityLeadIdRoute: ApiLocaleSystemIdentityLeadIdRoute,
-  ApiLocaleSystemIdentityTrackingEngagementRoute:
-    ApiLocaleSystemIdentityTrackingEngagementRoute,
-  ApiLocaleSystemIdentityTrackingPixelRoute:
-    ApiLocaleSystemIdentityTrackingPixelRoute,
   ApiLocaleSystemLoggerErrorMonitorCleanupRoute:
     ApiLocaleSystemLoggerErrorMonitorCleanupRoute,
   ApiLocaleSystemLoggerErrorMonitorClientLogRoute:
@@ -13797,3 +13804,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -19,9 +19,9 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { users as usersTable } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 
 import type { TaskOwner } from "./db";

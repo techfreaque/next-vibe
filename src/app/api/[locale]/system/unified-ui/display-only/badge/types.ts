@@ -5,7 +5,7 @@
 
 import type { WidgetType } from "next-vibe/core/definition/enums";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import type { BadgeVariant } from "next-vibe/ui/web/ui/badge";
+import type { BadgeVariant } from "next-vibe/ui/ui/badge";
 import type {
   EnumWidgetSchema,
   NumberWidgetSchema,

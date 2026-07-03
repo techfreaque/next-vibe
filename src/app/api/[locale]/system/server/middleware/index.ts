@@ -17,8 +17,8 @@ import {
 } from "next-vibe/identity/middleware/lead-id/index";
 import type { LanguageMiddlewareOptions } from "next-vibe/server/middleware/language/index";
 import { detectLocale } from "next-vibe/server/middleware/language/index";
-import type { NextRequest, NextResponse } from "next-vibe/ui/web/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe/ui/web/lib/request";
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import {
   AUTH_TOKEN_COOKIE_NAME,

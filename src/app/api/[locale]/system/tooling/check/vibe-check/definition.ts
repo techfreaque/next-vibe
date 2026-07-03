@@ -73,15 +73,6 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
 
-      fix: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "fields.fix.label",
-        description: "fields.fix.description",
-        columns: 4,
-        schema: z.boolean().optional(),
-      }),
-
       timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -150,6 +141,15 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.extensive.label",
         description: "fields.extensive.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
+
+      restartLsp: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.restartLsp.label",
+        description: "fields.restartLsp.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
@@ -317,9 +317,10 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {},
+      default: { restartLsp: false },
       specificPaths: {
         paths: ["src/components", "src/utils"],
+        restartLsp: false,
       },
     },
     responses: {

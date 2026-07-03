@@ -3,40 +3,40 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
+} from "next-vibe/ui/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/web/ui/icons/Bitcoin";
-import { Calendar } from "next-vibe/ui/web/ui/icons/Calendar";
-import { Coins } from "next-vibe/ui/web/ui/icons/Coins";
-import { CreditCard } from "next-vibe/ui/web/ui/icons/CreditCard";
-import { Database } from "next-vibe/ui/web/ui/icons/Database";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Minus } from "next-vibe/ui/web/ui/icons/Minus";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { ExternalLink, Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H3 } from "next-vibe/ui/web/ui/typography";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+} from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
+import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
+import { Coins } from "next-vibe/ui/ui/icons/Coins";
+import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
+import { Database } from "next-vibe/ui/ui/icons/Database";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { Minus } from "next-vibe/ui/ui/icons/Minus";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { ExternalLink, Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H3 } from "next-vibe/ui/ui/typography";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -59,8 +59,10 @@ import publicCapDefinitions from "@/app/api/[locale]/credits/public-cap/definiti
 import { scopedTranslation as publicCapScopedTranslation } from "@/app/api/[locale]/credits/public-cap/i18n";
 import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/app/api/[locale]/credits/purchase/i18n";
-import { type PaymentProviderValue } from "@/app/api/[locale]/payment/enum";
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import {
+  PaymentProvider,
+  type PaymentProviderValue,
+} from "@/app/api/[locale]/payment/enum";
 import {
   ProductIds,
   productsRepository,

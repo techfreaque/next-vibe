@@ -4,32 +4,32 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
 
+import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
+import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 
-import type definition from "../definition";
 import AlertWidget from "next-vibe/unified-ui/display-only/alert/widget";
+import type definition from "../definition";
 
 /**
  * Props for custom widget

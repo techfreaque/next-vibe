@@ -11,19 +11,19 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
-import { Edit2 } from "next-vibe/ui/web/ui/icons/Edit2";
-import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
-import { FolderInput } from "next-vibe/ui/web/ui/icons/FolderInput";
-import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { Save } from "next-vibe/ui/web/ui/icons/Save";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { Edit2 } from "next-vibe/ui/ui/icons/Edit2";
+import { FileText } from "next-vibe/ui/ui/icons/FileText";
+import { FolderInput } from "next-vibe/ui/ui/icons/FolderInput";
+import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Save } from "next-vibe/ui/ui/icons/Save";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,

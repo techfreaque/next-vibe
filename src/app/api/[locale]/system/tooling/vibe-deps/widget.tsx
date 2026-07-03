@@ -2,9 +2,9 @@
 
 import { GitBranch, Loader2, PackageSearch } from "lucide-react";
 import { Platform } from "next-vibe/core/definition/platform";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetEndpointMutations,
   useWidgetPlatform,
@@ -530,6 +530,38 @@ function buildCrossDomainLines(
   return lines;
 }
 
+function buildPageViolationLines(
+  entries: Entry[],
+  isMcp: boolean,
+  t: TFn,
+): string[] {
+  if (entries.length === 0) {
+    return [t("response.pageViolations.emptyState")];
+  }
+  const lines: string[] = [];
+  if (!isMcp) {
+    lines.push(
+      `${pad(t("response.pageViolations.colCount"), 6)}  ${t("response.pageViolations.colPath")}`,
+    );
+    lines.push(`${"─".repeat(6)}  ${"─".repeat(60)}`);
+  }
+  for (const e of entries) {
+    const pagePath = shortPath(e.path);
+    if (isMcp) {
+      lines.push(`${String(e.importCount)} violations in ${pagePath}`);
+      for (const imp of e.imports) {
+        lines.push(`  ✗ ${shortPath(imp)}`);
+      }
+    } else {
+      lines.push(`${String(e.importCount).padStart(6)}  ${pagePath}`);
+      for (const imp of e.imports) {
+        lines.push(`         ✗ ${shortPath(imp)}`);
+      }
+    }
+  }
+  return lines;
+}
+
 function buildUnusedSymbolLines(
   entries: Entry[],
   isMcp: boolean,
@@ -590,6 +622,7 @@ export function VibeDepsWidget(): React.JSX.Element {
   const isNeedsMove = view === "needs-move";
   const isUnusedSymbols = view === "unused-symbols";
   const isCrossDomain = view === "cross-domain";
+  const isPageViolations = view === "page-violations";
 
   // ── CLI / MCP ─────────────────────────────────────────────
   if (platform === Platform.CLI || platform === Platform.MCP) {
@@ -642,6 +675,8 @@ export function VibeDepsWidget(): React.JSX.Element {
       lines.push(...buildUnusedSymbolLines(entries, isMcp, t));
     } else if (isCrossDomain) {
       lines.push(...buildCrossDomainLines(entries, isMcp, t));
+    } else if (isPageViolations) {
+      lines.push(...buildPageViolationLines(entries, isMcp, t));
     } else if (entries.length === 0) {
       lines.push(t("response.entries.emptyState.description"));
     } else {
@@ -688,7 +723,9 @@ export function VibeDepsWidget(): React.JSX.Element {
               ? t("response.unusedSymbols.title")
               : isCrossDomain
                 ? t("response.crossDomain.title")
-                : t("title");
+                : isPageViolations
+                  ? t("response.pageViolations.title")
+                  : t("title");
 
   return (
     <Div className="flex flex-col gap-6">

@@ -3,10 +3,10 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { LogOut } from "next-vibe/ui/web/ui/icons/LogOut";
-import { User } from "next-vibe/ui/web/ui/icons/User";
-import { Link } from "next-vibe/ui/web/ui/link";
+import { Button } from "next-vibe/ui/ui/button";
+import { LogOut } from "next-vibe/ui/ui/icons/LogOut";
+import { User } from "next-vibe/ui/ui/icons/User";
+import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";

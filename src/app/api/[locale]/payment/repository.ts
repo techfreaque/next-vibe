@@ -58,10 +58,10 @@ const PAYMENT_METHOD_TO_STRIPE: Record<
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 
 import { subscriptions } from "../subscription/db";

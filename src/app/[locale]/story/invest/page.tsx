@@ -4,8 +4,8 @@ import path from "node:path";
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Container } from "next-vibe/ui/web/ui/container";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Container } from "next-vibe/ui/ui/container";
+import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";

@@ -6,21 +6,21 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { PulseExecutionStatus } from "next-vibe/tasks/enum";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
-import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe/ui/web/ui/icons/ChevronUp";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Activity } from "next-vibe/ui/ui/icons/Activity";
+import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { ChevronUp } from "next-vibe/ui/ui/icons/ChevronUp";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

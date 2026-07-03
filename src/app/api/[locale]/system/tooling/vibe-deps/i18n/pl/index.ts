@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
     needsMove: "Do przeniesienia",
     unusedSymbols: "Nieużywane symbole",
     crossDomain: "Międzydomenowe",
+    pageViolations: "Naruszenia Stron",
   },
 
   container: {
@@ -124,6 +125,14 @@ export const translations: typeof enTranslations = {
       colPath: "plik",
       emptyState: "Brak nieużywanej powierzchni publicznej w zakresie.",
       wholeFile: "(cały plik — brak importerów)",
+    },
+    pageViolations: {
+      title: "Naruszenia Architektury Strony",
+      description:
+        "Pliki page.tsx importujące więcej niż repository/definition/i18n/page-client. Strony muszą być cienkimi powłokami SSR — logika biznesowa, UI, enumy i dostęp do bazy danych należą do repository.ts lub page-client.tsx.",
+      colCount: "naruszenia",
+      colPath: "strona",
+      emptyState: "Wszystkie pliki page.tsx respektują granicę architektury.",
     },
     crossDomain: {
       title: "Kandydaci Międzydomenowi",

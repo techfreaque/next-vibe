@@ -24,28 +24,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+} from "next-vibe/ui/ui/alert-dialog";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { DetailField, DetailGrid } from "next-vibe/ui/web/ui/detail-grid";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
-import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import { Switch } from "next-vibe/ui/web/ui/switch";
-import { Code, P } from "next-vibe/ui/web/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+} from "next-vibe/ui/ui/card";
+import { DetailField, DetailGrid } from "next-vibe/ui/ui/detail-grid";
+import { Div } from "next-vibe/ui/ui/div";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
+import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
+import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { Switch } from "next-vibe/ui/ui/switch";
+import { Code, P } from "next-vibe/ui/ui/typography";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,

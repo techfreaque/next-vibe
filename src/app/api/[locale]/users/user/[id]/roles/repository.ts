@@ -16,9 +16,8 @@ import {
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 import type {
   UserRoleDeleteRequestOutput,

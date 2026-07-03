@@ -4,7 +4,7 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { useWidgetForm } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";

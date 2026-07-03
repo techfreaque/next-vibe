@@ -1,14 +1,14 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Edit2 } from "next-vibe/ui/web/ui/icons/Edit2";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import type { InputKeyboardEvent } from "next-vibe/ui/web/ui/input";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Edit2 } from "next-vibe/ui/ui/icons/Edit2";
+import { X } from "next-vibe/ui/ui/icons/X";
+import type { InputKeyboardEvent } from "next-vibe/ui/ui/input";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
 import type { ReactRequestResponseWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import {

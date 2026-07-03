@@ -6,15 +6,15 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { List } from "next-vibe/ui/web/ui/icons/List";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { List } from "next-vibe/ui/ui/icons/List";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -83,7 +83,8 @@ export function LeadsBatchUpdateContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+        const leadDef =
+          await import("@/app/api/[locale]/leads/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },
@@ -409,7 +410,8 @@ export function LeadsBatchDeleteContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+        const leadDef =
+          await import("@/app/api/[locale]/leads/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },

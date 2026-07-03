@@ -10,32 +10,32 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { ArrowDown } from "next-vibe/ui/web/ui/icons/ArrowDown";
-import { ArrowUp } from "next-vibe/ui/web/ui/icons/ArrowUp";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Filter } from "next-vibe/ui/web/ui/icons/Filter";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Input } from "next-vibe/ui/web/ui/input";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { ArrowDown } from "next-vibe/ui/ui/icons/ArrowDown";
+import { ArrowUp } from "next-vibe/ui/ui/icons/ArrowUp";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Filter } from "next-vibe/ui/ui/icons/Filter";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Input } from "next-vibe/ui/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { RangeSlider } from "next-vibe/ui/web/ui/range-slider";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/popover";
+import { RangeSlider } from "next-vibe/ui/ui/range-slider";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/tooltip";
+import { P } from "next-vibe/ui/ui/typography";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -103,12 +103,12 @@ import { type AnyModelOptionWithVision } from "../all-models";
 import type { Modality, ModelRole } from "../enum";
 import { ModelUtility } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { getModelPrice } from "../models";
 import {
   type AnyModelId,
   type AnyModelOption,
   ApiProvider,
   apiProviderDisplayNames,
+  getModelPrice,
   isModelProviderAvailable,
   modelProviders,
   type ModelType,

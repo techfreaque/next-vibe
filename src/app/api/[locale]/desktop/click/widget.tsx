@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Camera } from "next-vibe/ui/web/ui/icons/Camera";
-import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Camera } from "next-vibe/ui/ui/icons/Camera";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

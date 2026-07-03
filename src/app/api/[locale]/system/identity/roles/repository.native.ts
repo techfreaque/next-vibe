@@ -5,9 +5,8 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { NewUserRole, UserRole } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { NewUserRole, UserRole } from "@/app/api/[locale]/user/db";
 
 import type { UserRole as UserRoleEnum } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";

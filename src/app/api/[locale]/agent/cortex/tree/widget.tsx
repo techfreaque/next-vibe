@@ -5,16 +5,16 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
-import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
-import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
-import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
-import { SquareCheck } from "next-vibe/ui/web/ui/icons/SquareCheck";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Pre } from "next-vibe/ui/web/ui/pre";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Div } from "next-vibe/ui/ui/div";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { FileText } from "next-vibe/ui/ui/icons/FileText";
+import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
+import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
+import { SquareCheck } from "next-vibe/ui/ui/icons/SquareCheck";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Pre } from "next-vibe/ui/ui/pre";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetDisabled,
   useWidgetTranslation,

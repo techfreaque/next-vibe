@@ -1,7 +1,7 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import {

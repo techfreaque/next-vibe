@@ -9,8 +9,8 @@ import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { useSearchParams } from "next-vibe/ui/web/hooks/use-navigation";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { Div } from "next-vibe/ui/ui/div";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 

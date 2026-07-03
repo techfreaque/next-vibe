@@ -3,8 +3,8 @@
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { Div } from "next-vibe/ui/ui/div";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetLocale,

@@ -14,9 +14,12 @@ export const dynamic = "force-dynamic";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { redirect } from "next-vibe/ui/web/lib/redirect";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { redirect } from "next-vibe/ui/lib/redirect";
+import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
@@ -53,9 +56,6 @@ import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 
 import { ThreadsPageClient } from "./page-client";

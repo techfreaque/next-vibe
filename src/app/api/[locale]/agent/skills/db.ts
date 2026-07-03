@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { users } from "next-vibe/identity/user/db";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
 
@@ -42,7 +43,6 @@ import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speec
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { users } from "@/app/api/[locale]/user/db";
 
 import type { ToolConfigItem } from "../chat/settings/definition";
 import type { VideoGenModelId } from "../video-generation/models";

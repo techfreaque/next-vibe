@@ -17,11 +17,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { hashPassword, verifyPassword } from "next-vibe/identity/auth/password";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { users } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { users } from "../../../db";
-import { UserDetailLevel } from "../../../enum";
-import { UserRepository } from "../../../repository";
 import type {
   PasswordPostRequestOutput,
   PasswordPostResponseOutput,

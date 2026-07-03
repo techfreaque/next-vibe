@@ -7,6 +7,7 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
@@ -17,7 +18,6 @@ import {
 } from "@/app/api/[locale]/messenger/accounts/enum";
 import { MessengerProvider } from "@/app/api/[locale]/messenger/accounts/enum";
 import { EmailSecurityType } from "@/app/api/[locale]/messenger/providers/email/enum";
-import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 
 import { leadMagnetConfigs } from "./db";

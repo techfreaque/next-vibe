@@ -17,16 +17,14 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { hashPassword } from "next-vibe/identity/auth/password";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { type NewUser, userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { type NewUser, userRoles, users } from "@/app/api/[locale]/user/db";
 
 import type {
   UserCreateRequestOutput,
   UserCreateResponseOutput,
 } from "./definition";
 import type { UsersCreateT } from "./i18n";
-import { sendWelcomeSms } from "./sms";
 
 export class UserCreateRepository {
   static async createUser(
@@ -119,29 +117,6 @@ export class UserCreateRepository {
         responseCreatedAt: createdUser.createdAt,
         responseUpdatedAt: createdUser.updatedAt,
       };
-
-      // Send SMS notifications (fire and forget - don't fail user creation if SMS fails)
-      void sendWelcomeSms(responseData, logger)
-        .then((result) => {
-          if (result.success) {
-            logger.debug("Welcome SMS sent successfully", {
-              userId: responseData.responseId,
-            });
-          } else {
-            logger.error("Welcome SMS failed to send", {
-              userId: responseData.responseId,
-              error: result.message,
-            });
-          }
-          return;
-        })
-        .catch((error) => {
-          logger.error("Welcome SMS sending encountered an error", {
-            userId: responseData.responseId,
-            error: error instanceof Error ? error.message : String(error),
-          });
-          return;
-        });
 
       return success(responseData);
     } catch (error) {

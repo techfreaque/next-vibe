@@ -1,22 +1,18 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/web/ui/alert";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "next-vibe/ui/web/ui/avatar";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Progress } from "next-vibe/ui/web/ui/progress";
-import { Section } from "next-vibe/ui/web/ui/section";
-import { Skeleton } from "next-vibe/ui/web/ui/skeleton";
-import { H2, H3 } from "next-vibe/ui/web/ui/typography";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { Progress } from "next-vibe/ui/ui/progress";
+import { Section } from "next-vibe/ui/ui/section";
+import { Skeleton } from "next-vibe/ui/ui/skeleton";
+import { H2, H3 } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { toast } from "sonner";
 

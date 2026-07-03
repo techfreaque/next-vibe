@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----a21475ec-b1d0-43d6-9d4d-556570e0e952.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The user wants me to say exactly: \"BRANCH_RESPONSE STEP_OK\" This is a test instruction from the quality-tester sk…",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----d9cee1a8-145a-4cec-a274-1f1ec57e0942.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: <think>The user wants me to say exactly \"BRANCH_RESPONSE STEP_OK\"</think>BRANCH_RESPONSE STEP_OK",
     "encoding_format": "float"
   }
 }

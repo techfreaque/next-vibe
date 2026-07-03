@@ -16,7 +16,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
-import { getLocalItem, storage } from "next-vibe/ui/web/lib/storage";
+import { getLocalItem, storage } from "next-vibe/ui/lib/storage";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import skillSingleDefinition from "@/app/api/[locale]/agent/skills/[id]/definition";
@@ -33,8 +33,10 @@ import {
 import type { AgentEnvAvailability } from "../../env-availability";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
-import type { VoiceModelSelection } from "../../text-to-speech/models";
-import type { TtsModelId } from "../../text-to-speech/models";
+import type {
+  TtsModelId,
+  VoiceModelSelection,
+} from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
 import type { SkillVariantData } from "../db";
 import { ModelSelectionType } from "../enum";

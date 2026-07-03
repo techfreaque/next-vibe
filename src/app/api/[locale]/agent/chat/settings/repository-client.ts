@@ -8,7 +8,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { storage } from "next-vibe/ui/lib/storage";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 

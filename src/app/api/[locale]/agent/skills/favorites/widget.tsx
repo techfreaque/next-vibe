@@ -30,26 +30,26 @@ import {
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { Compass } from "next-vibe/ui/web/ui/icons/Compass";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { Star } from "next-vibe/ui/web/ui/icons/Star";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Compass } from "next-vibe/ui/ui/icons/Compass";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { Star } from "next-vibe/ui/ui/icons/Star";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/popover";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   arrayFieldPath,
   withValue,

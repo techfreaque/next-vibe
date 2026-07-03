@@ -7,15 +7,15 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Card, CardContent } from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Star } from "next-vibe/ui/web/ui/icons/Star";
-import { ExternalLink } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Star } from "next-vibe/ui/ui/icons/Star";
+import { ExternalLink } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLogger,
   useWidgetTranslation,

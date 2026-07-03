@@ -6,23 +6,23 @@
 "use client";
 
 import { MimeType } from "next-vibe/identity/lead/enum";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { downloadBinaryFile } from "next-vibe/ui/web/lib/download";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
-import { List } from "next-vibe/ui/web/ui/icons/List";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Upload } from "next-vibe/ui/web/ui/icons/Upload";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { downloadBinaryFile } from "next-vibe/ui/lib/download";
+import { Button } from "next-vibe/ui/ui/button";
+import { Checkbox } from "next-vibe/ui/ui/checkbox";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { FileText } from "next-vibe/ui/ui/icons/FileText";
+import { List } from "next-vibe/ui/ui/icons/List";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Upload } from "next-vibe/ui/ui/icons/Upload";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

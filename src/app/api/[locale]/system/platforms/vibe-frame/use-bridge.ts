@@ -7,7 +7,7 @@
 
 "use client";
 
-import { addWindowListener } from "next-vibe/ui/web/lib/dom";
+import { addWindowListener } from "next-vibe/ui/lib/dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type {

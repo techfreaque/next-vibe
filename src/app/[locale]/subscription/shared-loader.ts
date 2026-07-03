@@ -1,14 +1,14 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { notFound } from "next-vibe/ui/web/lib/not-found";
-import { redirect } from "next-vibe/ui/web/lib/redirect";
+import { notFound } from "next-vibe/ui/lib/not-found";
+import { redirect } from "next-vibe/ui/lib/redirect";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 
 export interface SubscriptionPageData {

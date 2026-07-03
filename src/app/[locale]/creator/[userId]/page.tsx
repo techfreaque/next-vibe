@@ -32,7 +32,7 @@ async function resolveUserName(param: string): Promise<string | null> {
   if (!uuidPattern.test(param)) {
     const { eq, or, sql } = await import("drizzle-orm");
     const { db } = await import("next-vibe/database");
-    const { users } = await import("@/app/api/[locale]/user/db");
+    const { users } = await import("next-vibe/identity/user/db");
     const result = await db
       .select({ publicName: users.publicName })
       .from(users)
@@ -47,7 +47,7 @@ async function resolveUserName(param: string): Promise<string | null> {
   }
   const { eq } = await import("drizzle-orm");
   const { db } = await import("next-vibe/database");
-  const { users } = await import("@/app/api/[locale]/user/db");
+  const { users } = await import("next-vibe/identity/user/db");
   const result = await db
     .select({ publicName: users.publicName })
     .from(users)

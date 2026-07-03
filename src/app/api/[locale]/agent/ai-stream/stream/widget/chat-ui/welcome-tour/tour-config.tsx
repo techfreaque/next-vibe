@@ -1,13 +1,13 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
-import { getRootCssVar } from "next-vibe/ui/web/lib/css-vars";
-import { Div } from "next-vibe/ui/web/ui/div";
-import type { Step } from "next-vibe/ui/web/ui/joyride";
-import { Li } from "next-vibe/ui/web/ui/li";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Strong } from "next-vibe/ui/web/ui/strong";
-import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
-import { Ul } from "next-vibe/ui/web/ui/ul";
+import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
+import { Div } from "next-vibe/ui/ui/div";
+import type { Step } from "next-vibe/ui/ui/joyride";
+import { Li } from "next-vibe/ui/ui/li";
+import { Span } from "next-vibe/ui/ui/span";
+import { Strong } from "next-vibe/ui/ui/strong";
+import { H2, H3, P } from "next-vibe/ui/ui/typography";
+import { Ul } from "next-vibe/ui/ui/ul";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
@@ -28,6 +28,9 @@ export {
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;
   hideBeforeAuth?: boolean;
+  /** Custom props consumed by our tour driver (not part of react-joyride Step). */
+  skipBeacon?: boolean;
+  blockTargetInteraction?: boolean;
 }
 
 // Tour route constants

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The wakeUp result has arrived. The deferred result contains `imageUrl` with a non-empty URL. This is correct - the image was generated asynchronously and the result was delivered back. Let me verify: the imageUrl is `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/f06d3a07-ac95-4780-8150-56de7f7aea4f/e3d49c82-3032-4268-90ef-b0efd0d7e6c7.png` - non-empty, starts with http. This is phase 2.</think>Phase 2 — deferred result contains `imageUrl`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/f06d3a07-ac95-4780-8150-56de7f7aea4f/e3d49c82-3032-4268-90ef-b0efd0d7e6c7.png` — non-empty, valid URL.\n\n**WAKEUP_OK**\n\nUser: [T6c wakeUp-repeat] Call the generate_image tool with prompt='wakeup-repeat-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think>The user is asking me to call generate_image with callbackMode='wakeUp'. Let me check the result and respond accordingly.</think>\n\nAssistant: <think>I got a taskId and no image — this is the deferred (outcome a) case. I should end with STEP_OK as instructed.</think>Got a `taskId` (`remote-ws-atlas-call-11144b94f5914bb185df6002`) and no image — deferred outcome.\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

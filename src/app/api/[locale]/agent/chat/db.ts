@@ -45,13 +45,13 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
 import { leads } from "next-vibe/identity/lead/db";
 import { type UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
+import { users } from "next-vibe/identity/user/db";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import { users } from "@/app/api/[locale]/user/db";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
 import type { TtsModelId } from "../text-to-speech/models";
@@ -119,9 +119,11 @@ export interface ToolCall {
    */
   remoteInstanceId?: string;
   /**
-   * pending-calls registry key for reverse-WS inline wait calls that auto-upgraded
-   * to wakeUp. Set when WAIT→wakeUp auto-upgrade fires so dismiss-task can
-   * cancel the revival without waiting for the tool to complete.
+   * pending-calls registry key for remote dispatches: written up front by an
+   * inline WAIT (restart/cross-process anchor), by the WAIT→wakeUp
+   * auto-upgrade, by wakeUp dispatches and by await-task parks — so
+   * dismiss-task can cancel the revival and a result event landing in any
+   * process can find the waiter.
    */
   pendingCallId?: string;
 }

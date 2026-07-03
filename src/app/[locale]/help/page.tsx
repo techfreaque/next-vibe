@@ -9,10 +9,11 @@ import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { Link } from "next-vibe/ui/web/ui/link";
+import { Div } from "next-vibe/ui/ui/div";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
@@ -21,7 +22,6 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/platform-products";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation as pageT } from "./i18n";

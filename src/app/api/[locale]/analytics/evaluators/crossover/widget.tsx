@@ -5,7 +5,7 @@
 
 "use client";
 
-import { P } from "next-vibe/ui/web/ui/typography";
+import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 interface Props {

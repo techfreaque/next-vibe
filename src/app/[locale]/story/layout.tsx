@@ -6,10 +6,13 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import type { StandardUserType } from "next-vibe/identity/user/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { getPathname } from "next-vibe/ui/web/lib/headers";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { PageLayout } from "next-vibe/ui/web/ui/page-layout";
+import { getPathname } from "next-vibe/ui/lib/headers";
+import { Div } from "next-vibe/ui/ui/div";
+import { PageLayout } from "next-vibe/ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
@@ -18,9 +21,6 @@ import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import type { StandardUserType } from "@/app/api/[locale]/user/types";
 
 import { navItems } from "../story/_components/nav/nav-constants";
 import { SITE_FOOTER_ID } from "./constants";

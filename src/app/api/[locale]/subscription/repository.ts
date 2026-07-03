@@ -861,7 +861,8 @@ export class SubscriptionRepository {
       // Look up user's locale from DB for credit/product translations
       let userLocale: CountryLanguage = locale;
       if (userId) {
-        const { users: usersTable } = await import("../user/db");
+        const { users: usersTable } =
+          await import("next-vibe/identity/user/db");
 
         const [userRow] = await db
           .select({ locale: usersTable.locale })
@@ -941,7 +942,8 @@ export class SubscriptionRepository {
 
       // Send confirmation emails (user + admin)
       try {
-        const { users: usersTable } = await import("../user/db");
+        const { users: usersTable } =
+          await import("next-vibe/identity/user/db");
         const { userLeadLinks } = await import("next-vibe/identity/lead/db");
         const [fullUser] = await db
           .select({
@@ -1165,7 +1167,8 @@ export class SubscriptionRepository {
       // Look up user's locale for translations
       let userLocale: CountryLanguage = locale;
       {
-        const { users: usersTable } = await import("../user/db");
+        const { users: usersTable } =
+          await import("next-vibe/identity/user/db");
 
         const [userRow] = await db
           .select({ locale: usersTable.locale })
@@ -1365,7 +1368,8 @@ export class SubscriptionRepository {
         // Look up user's locale from DB for credit/product translations
         let userLocaleForInvoice: CountryLanguage = locale;
         {
-          const { users: usersTable } = await import("../user/db");
+          const { users: usersTable } =
+            await import("next-vibe/identity/user/db");
 
           const [userRow] = await db
             .select({ locale: usersTable.locale })
@@ -1738,7 +1742,8 @@ export class SubscriptionRepository {
         // Look up user's locale from DB for credit/product translations
         let userLocaleForUpdate: CountryLanguage = locale;
         {
-          const { users: usersTable } = await import("../user/db");
+          const { users: usersTable } =
+            await import("next-vibe/identity/user/db");
 
           const [userRow] = await db
             .select({ locale: usersTable.locale })

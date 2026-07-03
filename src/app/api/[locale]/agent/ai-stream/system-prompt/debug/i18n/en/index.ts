@@ -56,6 +56,7 @@ export const translations = {
       charCount: { text: "Characters" },
       tokenEstimate: { text: "~Tokens" },
       cortexDiagnostics: { text: "Cortex Embedding Diagnostics" },
+      messageContextLines: { text: "Message Context Lines" },
     },
     errors: {
       validation: { title: "Bad Input", description: "Check your params" },

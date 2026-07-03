@@ -426,9 +426,5 @@ export type UserListRequestOutput = typeof GET.types.RequestOutput;
 export type UserListResponseInput = typeof GET.types.ResponseInput;
 export type UserListResponseOutput = typeof GET.types.ResponseOutput;
 
-// Aliases for repository compatibility
-export type UsersQueryType = UserListRequestOutput;
-export type UserListResponseType = UserListResponseOutput;
-
 const definitions = { GET } as const;
 export default definitions;

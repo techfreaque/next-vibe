@@ -19,10 +19,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import {
-  getCurrentHost,
-  getCurrentProtocol,
-} from "next-vibe/ui/web/lib/location";
+import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 
 import type {
   EventHandler,

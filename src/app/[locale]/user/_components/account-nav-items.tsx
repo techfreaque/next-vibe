@@ -1,8 +1,8 @@
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { ShoppingCart } from "next-vibe/ui/web/ui/icons/ShoppingCart";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { ShoppingCart } from "next-vibe/ui/ui/icons/ShoppingCart";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 
 import type { NavItemType } from "@/app/[locale]/story/_components/nav/nav-constants";
 

@@ -10,8 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { Button } from "next-vibe/ui/web/ui/button";
+} from "next-vibe/ui/ui/alert-dialog";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Command,
   CommandDialog,
@@ -22,7 +22,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "next-vibe/ui/web/ui/command";
+} from "next-vibe/ui/ui/command";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -34,7 +34,7 @@ import {
   ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuTrigger,
-} from "next-vibe/ui/web/ui/context-menu";
+} from "next-vibe/ui/ui/context-menu";
 import {
   Dialog,
   DialogContent,
@@ -43,8 +43,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   Drawer,
   DrawerClose,
@@ -54,7 +54,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "next-vibe/ui/web/ui/drawer";
+} from "next-vibe/ui/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -69,20 +69,20 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe/ui/web/ui/dropdown-menu";
+} from "next-vibe/ui/ui/dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "next-vibe/ui/web/ui/hover-card";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
+} from "next-vibe/ui/ui/hover-card";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { Section } from "next-vibe/ui/web/ui/section";
+} from "next-vibe/ui/ui/popover";
+import { Section } from "next-vibe/ui/ui/section";
 import {
   Sheet,
   SheetContent,
@@ -90,14 +90,14 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "next-vibe/ui/web/ui/sheet";
+} from "next-vibe/ui/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
-import { H2, H3, H4, P, Small } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/tooltip";
+import { H2, H3, H4, P, Small } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

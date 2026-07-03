@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----be4c7bd1-5170-4c7c-8c7e-875a3f57e017.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote\nPreview: <think>The user wants me to just output \"RETRY_RESPONSE STEP_OK\" exactly as stated.</think>RETRY_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

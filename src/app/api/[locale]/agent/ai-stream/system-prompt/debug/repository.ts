@@ -1,5 +1,6 @@
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -8,11 +9,16 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { buildSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
+import {
+  buildSystemPrompt,
+  createMetadataSystemMessage,
+} from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { loadRawEmbeddingScores } from "@/app/api/[locale]/agent/cortex/system-prompt";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
@@ -39,16 +45,14 @@ export async function buildDebugSystemPrompt({
 }): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
   const { t } = scopedTranslation.scopedT(locale);
   try {
-    const userId = user.isPublic ? undefined : user.id;
-
-    const [{ systemPrompt, trailingSystemMessage }, rawScores] =
+    const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
           skillId: skillId ?? null,
           user,
           logger,
           locale,
-          rootFolderId: rootFolderId as DefaultFolderId,
+          rootFolderId,
           subFolderId: subFolderId ?? null,
           callMode: false,
           headless: false,
@@ -56,18 +60,9 @@ export async function buildDebugSystemPrompt({
           lastUserMessage: userMessage,
           threadId: threadId ?? null,
         }),
-        userMessage && userId
-          ? import("@/app/api/[locale]/agent/cortex/system-prompt/server")
-              .then(({ loadRawEmbeddingScores }) =>
-                loadRawEmbeddingScores(userId, userMessage),
-              )
-              .catch((err) => {
-                logger.warn("loadRawEmbeddingScores failed", {
-                  error: err instanceof Error ? err.message : String(err),
-                });
-                return null;
-              })
-          : Promise.resolve(null),
+        userMessage && user.id
+          ? loadRawEmbeddingScores(user.id, userMessage)
+          : Promise.resolve(undefined),
       ]);
 
     const totalChars = systemPrompt.length + trailingSystemMessage.length;

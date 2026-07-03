@@ -23,8 +23,8 @@ import {
   LeadStatus,
   LeadStatusDB,
 } from "next-vibe/identity/lead/enum";
+import { users } from "next-vibe/identity/user/db";
 
-import { users } from "../../user/db";
 import { CsvImportJobStatus, CsvImportJobStatusDB } from "./enum";
 
 /**

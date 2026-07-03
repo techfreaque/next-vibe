@@ -6,7 +6,7 @@
 
 "use client";
 
-import type { TextareaRefObject } from "next-vibe/ui/web/ui/textarea";
+import type { TextareaRefObject } from "next-vibe/ui/ui/textarea";
 import { createRef, type RefObject } from "react";
 import { create } from "zustand";
 

@@ -3,8 +3,8 @@
  *
  * Returns a BunPlugin that redirects UI imports to their CLI counterparts:
  *
- * Rule 1: next-vibe/ui/web/{ui,hooks,utils}/* → cli/{ui,hooks,utils}/*
- *   Bun resolves tsconfig paths before plugins, so "next-vibe/ui/web/ui/foo"
+ * Rule 1: next-vibe/ui/{ui,hooks,utils}/* → cli/{ui,hooks,utils}/*
+ *   Bun resolves tsconfig paths before plugins, so "next-vibe/ui/ui/foo"
  *   arrives as an absolute path to web/ui/foo.tsx in onLoad. We intercept
  *   there and serve the cli/ui counterpart's contents instead.
  *   Same for hooks/ and utils/ directories.

@@ -1,37 +1,32 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
-import { Bell } from "next-vibe/ui/web/ui/icons/Bell";
-import { Bot } from "next-vibe/ui/web/ui/icons/Bot";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Code } from "next-vibe/ui/web/ui/icons/Code";
-import { FileText } from "next-vibe/ui/web/ui/icons/FileText";
-import { Folder } from "next-vibe/ui/web/ui/icons/Folder";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { Layers } from "next-vibe/ui/web/ui/icons/Layers";
-import { Lightbulb } from "next-vibe/ui/web/ui/icons/Lightbulb";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { CodeBlock } from "next-vibe/ui/web/ui/markdown";
-import { Separator } from "next-vibe/ui/web/ui/separator";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
+import { Bell } from "next-vibe/ui/ui/icons/Bell";
+import { Bot } from "next-vibe/ui/ui/icons/Bot";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Code } from "next-vibe/ui/ui/icons/Code";
+import { FileText } from "next-vibe/ui/ui/icons/FileText";
+import { Folder } from "next-vibe/ui/ui/icons/Folder";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Layers } from "next-vibe/ui/ui/icons/Layers";
+import { Lightbulb } from "next-vibe/ui/ui/icons/Lightbulb";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Link } from "next-vibe/ui/ui/link";
+import { CodeBlock } from "next-vibe/ui/ui/markdown";
+import { Separator } from "next-vibe/ui/ui/separator";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/config/constants";

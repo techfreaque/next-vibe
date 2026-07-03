@@ -1,9 +1,9 @@
 "use client";
 
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

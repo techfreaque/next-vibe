@@ -11,10 +11,10 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { ThumbsDown } from "next-vibe/ui/web/ui/icons/ThumbsDown";
-import { ThumbsUp } from "next-vibe/ui/web/ui/icons/ThumbsUp";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { ThumbsDown } from "next-vibe/ui/ui/icons/ThumbsDown";
+import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetLogger,

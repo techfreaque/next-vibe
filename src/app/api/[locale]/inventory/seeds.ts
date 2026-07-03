@@ -6,6 +6,7 @@
 import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
@@ -14,7 +15,6 @@ import {
   CompanyType,
 } from "@/app/api/[locale]/companies/enum";
 import { catalogProducts } from "@/app/api/[locale]/products/db";
-import { users } from "@/app/api/[locale]/user/db";
 
 import { stockLevels, warehouses } from "./db";
 

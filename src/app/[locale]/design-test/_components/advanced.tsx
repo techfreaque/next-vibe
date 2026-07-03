@@ -1,12 +1,12 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Details } from "next-vibe/ui/web/ui/details";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AnimatePresence, MotionDiv } from "next-vibe/ui/web/ui/motion";
-import { Section } from "next-vibe/ui/web/ui/section";
-import { Summary } from "next-vibe/ui/web/ui/summary";
-import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { Button } from "next-vibe/ui/ui/button";
+import { Details } from "next-vibe/ui/ui/details";
+import { Div } from "next-vibe/ui/ui/div";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/ui/motion";
+import { Section } from "next-vibe/ui/ui/section";
+import { Summary } from "next-vibe/ui/ui/summary";
+import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

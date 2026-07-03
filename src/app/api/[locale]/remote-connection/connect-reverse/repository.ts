@@ -128,8 +128,12 @@ export class RemoteConnectionRegisterRepository {
     }
 
     // Upsert cloud-side record with optional reverse token for bidirectional auth.
-    // remoteInstanceId = instanceId: the connecting client's own identity, used by
-    // execute-tool to set targetInstance correctly when routing tasks back to this client.
+    // remoteInstanceId = selfInstanceId: "MY name as the PEER knows me" — the client
+    // names this connection by the cloud's self-identity. Every consumer relies on
+    // that semantic: the relay sends it as executionContext.instanceId (the receiver's
+    // callerInstanceId → landing folders BACKGROUND/remote/<caller>, tool prefixes)
+    // and task-sync resolves it against the RECEIVER's connection rows. Storing the
+    // client's own id here made a client-side executor land threads under its OWN id.
     // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
     // this instance to call /report on the connector (push task completion status back).
     // Reconnect is allowed - update localUrl/isActive if the record already exists.

@@ -24,7 +24,7 @@ import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CacheKeyRequestInput } from "next-vibe/platforms/react/hooks/query-key-builder";
 import type { HasClientDeliveredEventsOf } from "next-vibe/realtime/structured-events";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,

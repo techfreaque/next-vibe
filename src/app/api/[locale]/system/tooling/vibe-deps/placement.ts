@@ -50,6 +50,23 @@ export function isGeneratedImporter(key: string): boolean {
   return key.includes("/generated/") || key.startsWith("src/generated/");
 }
 
+/**
+ * `src/app` files (Next.js page.tsx / layout.tsx / loading.tsx) are the UI
+ * *presentation* layer — they naturally consume API domains but are NOT a peer
+ * API domain themselves. Counting them as a separate domain inflates promote
+ * signals: e.g. `user/repository.ts` imported by `agent/` + `src/app/[locale]/`
+ * would appear to span 3 domains and get flagged "promote into system/" even
+ * though the page is just rendering the response. Filtered from domain-spread
+ * calculations, same reasoning as isGeneratedImporter.
+ */
+export function isUiPageImporter(key: string): boolean {
+  return (
+    key.startsWith("src/app/") &&
+    !key.startsWith("src/app/api/") &&
+    !key.startsWith("src/app/packages/")
+  );
+}
+
 /** Is this key inside the system/ (framework) scope? */
 export function isInSystem(key: string): boolean {
   return key.startsWith(SYSTEM_ROOT);
@@ -249,9 +266,12 @@ export function placementOf(
   key: string,
   importers: ReadonlyArray<string>,
 ): PlacementVerdict {
-  // Drop the tool's own files AND generated re-emitters (see isGeneratedImporter)
-  // — neither is an authored consumer that should pull the file toward it.
-  const usable = importers.filter((i) => !isSelf(i) && !isGeneratedImporter(i));
+  // Drop the tool's own files, generated re-emitters, and Next.js UI page/layout
+  // files (see isGeneratedImporter, isUiPageImporter) — none of these are
+  // authored API consumers that should pull the file toward them.
+  const usable = importers.filter(
+    (i) => !isSelf(i) && !isGeneratedImporter(i) && !isUiPageImporter(i),
+  );
   const sortedUsable = [...usable].toSorted();
 
   if (usable.length === 0) {

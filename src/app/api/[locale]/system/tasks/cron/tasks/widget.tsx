@@ -27,7 +27,7 @@ import {
   TaskCategoryOptions,
 } from "next-vibe/tasks/enum";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,35 +38,35 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Circle } from "next-vibe/ui/web/ui/icons/Circle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { History } from "next-vibe/ui/web/ui/icons/History";
-import { Layers } from "next-vibe/ui/web/ui/icons/Layers";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
-import { Play } from "next-vibe/ui/web/ui/icons/Play";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Input } from "next-vibe/ui/web/ui/input";
+} from "next-vibe/ui/ui/alert-dialog";
+import { Button } from "next-vibe/ui/ui/button";
+import { Checkbox } from "next-vibe/ui/ui/checkbox";
+import { Div } from "next-vibe/ui/ui/div";
+import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Circle } from "next-vibe/ui/ui/icons/Circle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { History } from "next-vibe/ui/ui/icons/History";
+import { Layers } from "next-vibe/ui/ui/icons/Layers";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { Play } from "next-vibe/ui/ui/icons/Play";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Input } from "next-vibe/ui/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

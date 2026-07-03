@@ -8,17 +8,17 @@ export const dynamic = "force-dynamic";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { redirect } from "next-vibe/ui/web/lib/redirect";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { redirect } from "next-vibe/ui/lib/redirect";
+import { Div } from "next-vibe/ui/ui/div";
+import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/shared/i18n";
 import { scopedTranslation as shareLinksScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/i18n";
 import { ShareLinksRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/repository";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 interface SharedTokenPageProps {
   params: Promise<{

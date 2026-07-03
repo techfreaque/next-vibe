@@ -21,8 +21,10 @@ import type {
 import type { CheckVibeDepsT } from "./i18n";
 import {
   domainOf,
+  isCategoryImporter,
   isGeneratedImporter,
   isSelf,
+  isUiPageImporter,
   placementOf,
   usageProfile,
 } from "./placement";
@@ -213,7 +215,7 @@ function isKnownEntrypoint(key: string): boolean {
 /**
  * Platform UI mirror: files under system/ui/{cli,native,tanstack} are the
  * per-platform mirrors of system/ui/web/**, swapped in by the cli-widget-plugin
- * / bundler resolution (`next-vibe/ui/web/... → ui/cli/...`). They are never
+ * / bundler resolution (`next-vibe/ui/... → ui/cli/...`). They are never
  * imported directly, so they always show 0 importers — but a mirror is alive
  * iff its `ui/web/**` counterpart (same relative path) exists (the base the
  * plugin swaps). A mirror with NO web base is genuinely dead / native-only and
@@ -351,6 +353,12 @@ function isFrameworkBoilerplateSymbol(sym: SymbolDef, file: string): boolean {
       return true;
     }
   }
+  // Routing alias constants — used as string literals injected into category.ts
+  // `allowedRoles` and nav config at runtime; the static import graph can't see
+  // those call-sites. Convention: export names ending in `_ALIAS`.
+  if (n.endsWith("_ALIAS")) {
+    return true;
+  }
   return false;
 }
 
@@ -461,7 +469,8 @@ function collectTestImportedKeys(graph: Graph): Set<string> {
  *   - sync-provider.ts      — domain sync, aggregated by remote-connection/sync
  *   - system-prompt/{prompt,server,client}.ts — domain prompt fragments,
  *     aggregated via generated/prompt-fragments
- *   - seeds/*.ts            — domain seeds, aggregated by the seed runner
+ *   - seeds.ts              — top-level domain seed file, aggregated by seed runner
+ *   - seeds/*.ts            — sub-domain seed files, aggregated by seed runner
  */
 const CONVENTION_FILE_RE =
   /(^|\/)(generator|sync-provider)\.tsx?$|(^|\/)system-prompt\/(prompt|server|client)\.tsx?$|(^|\/)seeds\/[^/]+\.tsx?$/;
@@ -1671,7 +1680,8 @@ function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
     if (
       key.startsWith(scopePrefix) ||
       isSelf(key) ||
-      isGeneratedImporter(key)
+      isGeneratedImporter(key) ||
+      isUiPageImporter(key)
     ) {
       continue;
     }
@@ -1702,6 +1712,105 @@ function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
       isUnused: false,
       moveTo: scopePrefix.slice(0, -1),
       moveNote: `imports ${shortNames}`,
+    });
+  }
+
+  entries.sort(
+    (a, b) => b.importCount - a.importCount || a.path.localeCompare(b.path),
+  );
+  return entries;
+}
+
+// Allowed import patterns for page.tsx files.
+// A page is a thin shell: it calls a repository, gets a locale/user, passes to a client component.
+// Anything beyond these is a violation — UI components, enums, db, utils, etc. belong in
+// the repository, widget, or page-client.
+// Graph keys are relative paths like:
+//   "src/app/api/[locale]/user/repository.ts"
+//   "src/app/[locale]/creator/[userId]/page-client.tsx"
+//   "src/config/env.ts"
+// The patterns below match against these resolved keys.
+// Graph keys are relative paths like:
+//   "src/app/api/[locale]/user/repository.ts"
+//   "src/app/[locale]/creator/[userId]/page-client.tsx"
+//   "src/config/env.ts"
+// The patterns below match against these resolved keys.
+const PAGE_ALLOWED_PATTERNS: ReadonlyArray<RegExp> = [
+  // Generated shell pages are re-exports — not real pages to lint
+  /src\/generated\//,
+  // Sibling page-client / i18n (any depth)
+  /\/page-client(\.(ts|tsx))?$/,
+  /\/i18n(\/|\/index(\.(ts|tsx))?$|$)/,
+  // Sibling _components/ — UI fragments co-located with the page
+  /\/_components\//,
+  // Framework auth + logger + platform boilerplate (graph key format: system/...)
+  /system\/identity\/auth\/(repository|types)/,
+  /system\/identity\/roles\/enum/,
+  /system\/logger\/server/,
+  /system\/core\/definition\/platform/,
+  /system\/core\/i18n/,
+  // Endpoint repository + definition (the only api imports a page may make directly)
+  /src\/app\/api\/\[locale\]\/.*\/(repository|definition)(\.(ts|tsx))?$/,
+  // Project-level config
+  /src\/config\//,
+];
+
+function isPageAllowed(importKey: string): boolean {
+  for (const pattern of PAGE_ALLOWED_PATTERNS) {
+    if (pattern.test(importKey)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * page-violations mode: find page.tsx files that import something other than
+ * repository.ts / definition.ts / i18n / page-client.tsx.
+ *
+ * A page must be a thin SSR shell. Business logic, UI, enums, db, and utils
+ * belong in repository.ts or page-client.tsx — not in page.tsx.
+ */
+function buildPageViolations(graph: Graph, scope: string): DepsEntry[] {
+  const PAGE_SUFFIX = "/page.tsx";
+  const entries: DepsEntry[] = [];
+
+  for (const [key, node] of graph) {
+    if (!key.endsWith(PAGE_SUFFIX)) {
+      continue;
+    }
+    // Generated shell pages are auto-exports — not real pages to lint
+    if (key.includes("src/generated/")) {
+      continue;
+    }
+    // Apply scope filter when given
+    if (scope && !key.includes(scope)) {
+      continue;
+    }
+
+    const violations: string[] = [];
+    for (const imp of node.imports) {
+      if (!isPageAllowed(imp)) {
+        violations.push(imp);
+      }
+    }
+
+    if (violations.length === 0) {
+      continue;
+    }
+
+    entries.push({
+      path: key,
+      imports: violations,
+      importedBy: [],
+      importCount: violations.length,
+      importedByCount: 0,
+      isUnused: false,
+      moveNote: violations
+        .map((v) =>
+          v.replace(/^src\/app\/api\/\[locale\]\//, "").replace(/^src\//, ""),
+        )
+        .join(", "),
     });
   }
 
@@ -1975,6 +2084,23 @@ export class VibeDepsRepository {
         return success({
           view,
           entries: sliced,
+          groups: [],
+          violations: emptyViolations(),
+          totalFiles,
+          totalEdges,
+          unusedCount,
+        });
+      }
+
+      // ── Page architecture rule: page.tsx must only import repository/definition/i18n ──
+      if (mode === "page-violations") {
+        const entries = buildPageViolations(graph, moveScope);
+        logger.info(
+          `vibe-deps: page-violations — ${entries.length} page.tsx files with disallowed imports`,
+        );
+        return success({
+          view,
+          entries,
           groups: [],
           violations: emptyViolations(),
           totalFiles,

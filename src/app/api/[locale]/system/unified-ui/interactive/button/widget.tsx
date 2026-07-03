@@ -1,7 +1,7 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { Button } from "next-vibe/ui/ui/button";
 import type { ReactDisplayWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import { useWidgetContext } from "next-vibe/unified-ui/_shared/use-widget-context";

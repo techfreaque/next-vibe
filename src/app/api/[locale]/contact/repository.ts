@@ -15,9 +15,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 import { contacts, type NewContact } from "./db";
 import type { ContactRequest, ContactResponse } from "./definition";

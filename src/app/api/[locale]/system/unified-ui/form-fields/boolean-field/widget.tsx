@@ -9,25 +9,25 @@ import { AlertCircle } from "lucide-react";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Checkbox } from "next-vibe/ui/web/ui/checkbox";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Button } from "next-vibe/ui/ui/button";
+import { Checkbox } from "next-vibe/ui/ui/checkbox";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/web/ui/form/form";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Switch } from "next-vibe/ui/web/ui/switch";
+} from "next-vibe/ui/ui/form/form";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { Label } from "next-vibe/ui/ui/label";
+import { Span } from "next-vibe/ui/ui/span";
+import { Switch } from "next-vibe/ui/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "next-vibe/ui/ui/tooltip";
 import type { ReactFormFieldProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { BooleanWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";

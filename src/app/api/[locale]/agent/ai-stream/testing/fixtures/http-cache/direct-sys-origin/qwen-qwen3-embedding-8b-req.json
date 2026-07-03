@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "[T-SYS] Call execute-tool with toolName='self-instance-id' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.",
+    "encoding_format": "float"
+  }
+}

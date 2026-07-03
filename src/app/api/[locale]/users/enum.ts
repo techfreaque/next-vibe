@@ -16,13 +16,6 @@ export const {
   PRIVATE_NAME: "list.enums.userSortField.privateName",
   PUBLIC_NAME: "list.enums.userSortField.publicName",
 });
-export const UserSortFieldDB = [
-  UserSortField.CREATED_AT,
-  UserSortField.UPDATED_AT,
-  UserSortField.EMAIL,
-  UserSortField.PRIVATE_NAME,
-  UserSortField.PUBLIC_NAME,
-] as const;
 
 /**
  * Sort Order Enum
@@ -35,7 +28,6 @@ export const {
   ASC: "list.enums.sortOrder.asc",
   DESC: "list.enums.sortOrder.desc",
 });
-export const SortOrderDB = [SortOrder.ASC, SortOrder.DESC] as const;
 
 /**
  * User Status Filter Enum
@@ -53,15 +45,6 @@ export const {
   EMAIL_VERIFIED: "list.enums.userStatusFilter.emailVerified",
   EMAIL_UNVERIFIED: "list.enums.userStatusFilter.emailUnverified",
 });
-export const UserStatusFilterDB = [
-  UserStatusFilter.ALL,
-  UserStatusFilter.ACTIVE,
-  UserStatusFilter.INACTIVE,
-  UserStatusFilter.PENDING,
-  UserStatusFilter.SUSPENDED,
-  UserStatusFilter.EMAIL_VERIFIED,
-  UserStatusFilter.EMAIL_UNVERIFIED,
-] as const;
 
 /**
  * User Status Enum
@@ -76,12 +59,6 @@ export const {
   PENDING: "list.enums.userStatus.pending",
   SUSPENDED: "list.enums.userStatus.suspended",
 });
-export const UserStatusDB = [
-  UserStatus.ACTIVE,
-  UserStatus.INACTIVE,
-  UserStatus.PENDING,
-  UserStatus.SUSPENDED,
-] as const;
 
 /**
  * User Role Filter Enum
@@ -101,17 +78,6 @@ export const {
   ADMIN: "list.enums.userRoleFilter.admin",
   SUPER_ADMIN: "list.enums.userRoleFilter.superAdmin",
 });
-export const UserRoleFilterDB = [
-  UserRoleFilter.ALL,
-  UserRoleFilter.USER,
-  UserRoleFilter.PUBLIC,
-  UserRoleFilter.CUSTOMER,
-  UserRoleFilter.MODERATOR,
-  UserRoleFilter.PARTNER_ADMIN,
-  UserRoleFilter.PARTNER_EMPLOYEE,
-  UserRoleFilter.ADMIN,
-  UserRoleFilter.SUPER_ADMIN,
-] as const;
 
 /**
  * Subscription Status Filter Enum (for filtering users by subscription)
@@ -130,16 +96,6 @@ export const {
   PAUSED: "stats.enums.subscriptionStatusFilter.paused",
   NO_SUBSCRIPTION: "stats.enums.subscriptionStatusFilter.noSubscription",
 });
-export const SubscriptionStatusFilterDB = [
-  SubscriptionStatusFilter.ALL,
-  SubscriptionStatusFilter.ACTIVE,
-  SubscriptionStatusFilter.TRIALING,
-  SubscriptionStatusFilter.PAST_DUE,
-  SubscriptionStatusFilter.CANCELED,
-  SubscriptionStatusFilter.UNPAID,
-  SubscriptionStatusFilter.PAUSED,
-  SubscriptionStatusFilter.NO_SUBSCRIPTION,
-] as const;
 
 /**
  * Payment Method Filter Enum (for filtering users by payment method)
@@ -159,17 +115,6 @@ export const {
   CRYPTO: "stats.enums.paymentMethodFilter.crypto",
   NO_PAYMENT_METHOD: "stats.enums.paymentMethodFilter.noPaymentMethod",
 });
-export const PaymentMethodFilterDB = [
-  PaymentMethodFilter.ALL,
-  PaymentMethodFilter.CARD,
-  PaymentMethodFilter.BANK_TRANSFER,
-  PaymentMethodFilter.PAYPAL,
-  PaymentMethodFilter.APPLE_PAY,
-  PaymentMethodFilter.GOOGLE_PAY,
-  PaymentMethodFilter.SEPA_DEBIT,
-  PaymentMethodFilter.CRYPTO,
-  PaymentMethodFilter.NO_PAYMENT_METHOD,
-] as const;
 
 /**
  * Subscription Presence Filter - does the user have / had a subscription?
@@ -184,12 +129,6 @@ export const {
   HAD_ANY: "list.enums.subscriptionPresenceFilter.hadAny",
   NEVER: "list.enums.subscriptionPresenceFilter.never",
 });
-export const SubscriptionPresenceFilterDB = [
-  SubscriptionPresenceFilter.ANY,
-  SubscriptionPresenceFilter.HAS_ACTIVE,
-  SubscriptionPresenceFilter.HAD_ANY,
-  SubscriptionPresenceFilter.NEVER,
-] as const;
 
 /**
  * Credit Activity Filter - purchased packs / spent credits
@@ -204,12 +143,6 @@ export const {
   SPENT_CREDITS: "list.enums.creditActivityFilter.spentCredits",
   NEVER_SPENT: "list.enums.creditActivityFilter.neverSpent",
 });
-export const CreditActivityFilterDB = [
-  CreditActivityFilter.ANY,
-  CreditActivityFilter.BOUGHT_PACK,
-  CreditActivityFilter.SPENT_CREDITS,
-  CreditActivityFilter.NEVER_SPENT,
-] as const;
 
 /**
  * Threads Filter - has any threads
@@ -223,11 +156,6 @@ export const {
   HAS_THREADS: "list.enums.threadsFilter.hasThreads",
   NO_THREADS: "list.enums.threadsFilter.noThreads",
 });
-export const ThreadsFilterDB = [
-  ThreadsFilter.ANY,
-  ThreadsFilter.HAS_THREADS,
-  ThreadsFilter.NO_THREADS,
-] as const;
 
 /**
  * Referral Activity Filter - referral link, clicks, signups, paying subscribers
@@ -243,10 +171,3 @@ export const {
   HAS_SIGNUPS: "list.enums.referralActivityFilter.hasSignups",
   HAS_SUBSCRIBERS: "list.enums.referralActivityFilter.hasSubscribers",
 });
-export const ReferralActivityFilterDB = [
-  ReferralActivityFilter.ANY,
-  ReferralActivityFilter.HAS_CODE,
-  ReferralActivityFilter.HAS_CLICKS,
-  ReferralActivityFilter.HAS_SIGNUPS,
-  ReferralActivityFilter.HAS_SUBSCRIBERS,
-] as const;

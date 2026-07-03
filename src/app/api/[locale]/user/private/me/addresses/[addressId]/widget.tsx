@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { Button } from "next-vibe/ui/ui/button";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

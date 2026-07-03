@@ -7,7 +7,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import { and, eq, gt, lt, or } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -26,8 +26,8 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { scopedTranslation } from "./i18n";
 import type { ResetPasswordT } from "./i18n";
 
-import { UserDetailLevel } from "../../enum";
-import { UserRepository } from "../../repository";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { PasswordUpdateRepository } from "../../private/me/password/repository";
 import { scopedTranslation as passwordScopedTranslation } from "../../private/me/password/i18n";
 import type { NewPasswordReset, PasswordReset } from "./db";
@@ -48,10 +48,7 @@ interface PasswordResetTokenPayload {
  * Password Repository - Static class pattern
  */
 export class PasswordRepository {
-  /**
-   * Find a valid password reset by token
-   */
-  static async findValidByToken(
+  private static async findValidByToken(
     token: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -79,10 +76,7 @@ export class PasswordRepository {
     }
   }
 
-  /**
-   * Find a password reset by user ID
-   */
-  static async findByUserId(
+  private static async findByUserId(
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -104,10 +98,7 @@ export class PasswordRepository {
     }
   }
 
-  /**
-   * Delete a password reset by token
-   */
-  static async deleteByToken(
+  private static async deleteByToken(
     token: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -125,10 +116,7 @@ export class PasswordRepository {
     }
   }
 
-  /**
-   * Delete a password reset by user ID
-   */
-  static async deleteByUserId(
+  private static async deleteByUserId(
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -141,34 +129,6 @@ export class PasswordRepository {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.userDeletionFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Delete expired password resets
-   */
-  static async deleteExpired(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<null>> {
-    try {
-      const now = new Date();
-      await db
-        .delete(passwordResets)
-        .where(
-          or(
-            eq(passwordResets.expiresAt, new Date(0)),
-            lt(passwordResets.expiresAt, now),
-          ),
-        );
-      return success(null);
-    } catch (error) {
-      logger.error("Error deleting expired reset tokens", parseError(error));
-      const { t } = scopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.resetFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -479,31 +439,6 @@ export class PasswordRepository {
       logger.error("Error resetting password with token", parseError(error));
       return fail({
         message: t("errors.passwordResetFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Request a password reset
-   */
-  static async requestPasswordReset(
-    email: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ResetPasswordT,
-  ): Promise<ResponseType<string>> {
-    try {
-      logger.debug("Password reset request received", { email });
-
-      await this.createResetToken(email, locale, logger, t);
-
-      // We don't want to reveal if the email exists or not for security reasons
-      return success(t("request.response.success.message"));
-    } catch (error) {
-      logger.error("Error requesting password reset", parseError(error));
-      return fail({
-        message: t("errors.requestFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useSafeAreaInsets } from "next-vibe/ui/web/hooks/use-safe-area-insets";
-import type { DivRefObject } from "next-vibe/ui/web/ui/div";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
+import type { DivRefObject } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { platform } from "@/config/env-client";

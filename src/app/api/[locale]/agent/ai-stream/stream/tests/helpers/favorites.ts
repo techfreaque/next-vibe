@@ -50,7 +50,7 @@ export async function createQualityTesterFavorite(
   }
   const createResult = await sendTestRequest({
     endpoint: favoriteCreateDef,
-    data: { skillId: "quality-tester__kimi" },
+    data: { skillId: "quality-tester__budget" },
     user,
   });
   if (!createResult.success || !createResult.data?.["id"]) {

@@ -4,19 +4,19 @@
 
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe/ui/web/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Server } from "next-vibe/ui/web/ui/icons/Server";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Server } from "next-vibe/ui/ui/icons/Server";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
@@ -33,11 +33,11 @@ import messengerAccountCreateDefinition from "../create/definition";
 import messengerAccountEditDefinition from "../edit/[id]/definition";
 import type { MessengerChannelFilterValue } from "../enum";
 import {
+  MessageChannel,
   MessengerAccountStatus,
   MessengerChannelFilter,
   MessengerChannelFilterOptions,
 } from "../enum";
-import { MessageChannel } from "../enum";
 import { scopedTranslation as accountsScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { MessengerAccountsListGETResponseOutput } from "./definition";

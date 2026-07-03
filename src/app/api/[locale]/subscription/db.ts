@@ -6,11 +6,11 @@
 import { relations } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { catalogProducts } from "../products/db";
-import { users } from "../user/db";
 import {
   BillingInterval,
   BillingIntervalDB,

@@ -1,8 +1,8 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";

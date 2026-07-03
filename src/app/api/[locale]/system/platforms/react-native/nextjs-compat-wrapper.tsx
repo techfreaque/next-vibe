@@ -31,7 +31,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation as reactNativeScopedTranslation } from "next-vibe/platforms/react-native/i18n";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Span } from "next-vibe/ui/ui/span";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";

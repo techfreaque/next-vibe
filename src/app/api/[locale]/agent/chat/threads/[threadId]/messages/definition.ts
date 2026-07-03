@@ -13,10 +13,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
+import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import {
   customWidgetObject,
   objectField,

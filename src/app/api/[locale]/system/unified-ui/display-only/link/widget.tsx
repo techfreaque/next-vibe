@@ -1,10 +1,10 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { ExternalLink } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
+import { ExternalLink } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

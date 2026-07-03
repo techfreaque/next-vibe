@@ -2,14 +2,14 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Form } from "next-vibe/ui/web/ui/form/form";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Send } from "next-vibe/ui/web/ui/icons/Send";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { H3, P } from "next-vibe/ui/web/ui/typography";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Form } from "next-vibe/ui/ui/form/form";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Send } from "next-vibe/ui/ui/icons/Send";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Input } from "next-vibe/ui/ui/input";
+import { H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";

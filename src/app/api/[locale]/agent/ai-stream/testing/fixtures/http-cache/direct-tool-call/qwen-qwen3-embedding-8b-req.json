@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "[T1 thread-create+tool-call] Explore the tool catalog gradually with execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it). First call it with input={} (empty tool-help arguments — but ALWAYS keep toolName and instanceId set) — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) again with input={category:'<that category name>'} to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the categories list and the narrowed tools list both looked right, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

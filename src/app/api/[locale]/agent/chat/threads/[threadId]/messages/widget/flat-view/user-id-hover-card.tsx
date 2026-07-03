@@ -5,11 +5,11 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
-import { useWindowSize } from "next-vibe/ui/web/hooks/use-window-size";
-import { Button } from "next-vibe/ui/web/ui/button";
-import type { DivRefObject } from "next-vibe/ui/web/ui/div";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
+import { Button } from "next-vibe/ui/ui/button";
+import type { DivRefObject } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";
 

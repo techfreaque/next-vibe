@@ -1,18 +1,18 @@
 "use client";
 
-import { downloadFile } from "next-vibe/ui/web/lib/download";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { Users } from "next-vibe/ui/web/ui/icons/Users";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { downloadFile } from "next-vibe/ui/lib/download";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { Users } from "next-vibe/ui/ui/icons/Users";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 import type endpoints from "./definition";
 import type { CapturesListResponseOutput } from "./definition";

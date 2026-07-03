@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1 thread-create+tool-call] Explore the tool catalog gradually with execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it). First call it with input={} (empty tool-help arguments — but ALWAYS keep toolName and instanceId set) — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) again with input={category:'<that category name>'} to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply w\n\nAssistant: <think>Let me start by exploring the tool catalog on the 'hermes' instance. I'll call tool-help with empty input to get the categories list first.</think>\n\nAssistant: <think>The first call returned a list of 22 categories with counts and subcategories. This looks correct - the hint says \"528 tools across 22 categories.\"\n\nNow I need to pick one category and call tool-help again with that category. Let me pick a reasonably-sized category. \"desktop\" has 12 tools (no further subcategories), which is a good size to explore. Let me try that.</think>Got the categories — 22 categories with 528 tools total. Now let me pick one and drill down. I'll go with **desktop** (12 tools, fairly compact).\n\nAssistant: <think>The second call returned 12 tools in the \"desktop\" category, and every single tool has:\n- `name` — e.g. \"desktop-accessibility\", \"desktop-click\", etc.\n- `description` — e.g. \"Get the accessibility tree of the focused window or a specific application\", etc.\n\nThis looks correct. Both calls worked as expected. Let me end with STEP_OK.</think>Everything checks out:\n\n- **First call** (empty input) → returned 22 categories with names, counts, and subcategories. Correct.\n- **Second call** (category: \"desktop\") → returned 12 tools in a non-empty `tools` array. Every tool has both a `name` and a `description`.\n\nAll 12 desktop tool names are clean and descriptions are human-readable — no raw IDs, no internal blobs, no JSON leakage.\n\n**STEP_OK**\n\nUser: [T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

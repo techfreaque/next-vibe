@@ -11,7 +11,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import type { ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import type { ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { useCallback, useState } from "react";
 

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t-relay--reply-with-exactly-----9ce5cb21-2e3f-4e20-97b6-c4a46ef350fd.md\n\n# [T-RELAY] Reply with exactly:...\nFolder: remote\nPreview: <think>I've been calling generate_image repeatedly and it keeps working. Each call returns: imageUrl: a non-empty string…",
+    "encoding_format": "float"
+  }
+}

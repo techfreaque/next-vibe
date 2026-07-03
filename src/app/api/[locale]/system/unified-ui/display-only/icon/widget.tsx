@@ -12,7 +12,7 @@ import type {
 } from "next-vibe/core/definition/common.schema";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

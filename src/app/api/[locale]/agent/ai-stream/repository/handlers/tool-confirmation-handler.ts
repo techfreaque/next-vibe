@@ -126,8 +126,9 @@ export class ToolConfirmationHandler {
         : toolCall.args;
 
       // Detect original callbackMode BEFORE overriding (needed for wakeUp fire-and-forget path).
+      const isExecuteToolWrapper = toolCall.toolName === EXECUTE_TOOL_ALIAS;
       const originalCallbackMode =
-        toolCall.toolName === EXECUTE_TOOL_ALIAS &&
+        isExecuteToolWrapper &&
         typeof baseArgs === "object" &&
         baseArgs !== null &&
         !Array.isArray(baseArgs) &&
@@ -137,19 +138,24 @@ export class ToolConfirmationHandler {
           : null;
       const isWakeUpConfirm = originalCallbackMode === CallbackMode.WAKE_UP;
 
-      const finalArgs =
-        toolCall.toolName === EXECUTE_TOOL_ALIAS &&
-        typeof baseArgs === "object" &&
-        baseArgs !== null &&
-        !Array.isArray(baseArgs) &&
-        "callbackMode" in baseArgs
-          ? {
-              ...(baseArgs as Record<string, string | number | boolean | null>),
-              // wakeUp: keep wakeUp semantics - execute-tool will fire-and-forget.
-              // wait/other: override to wait so the inner tool executes inline.
-              callbackMode: isWakeUpConfirm ? CallbackMode.WAKE_UP : "wait",
-            }
-          : baseArgs;
+      // When execute-tool wraps the target tool, unwrap and call the inner tool directly.
+      // Keeping execute-tool as the wrapper double-nests the result ({ result: { result: ... } })
+      // and in the APPROVE case re-triggers the APPROVE gate inside execute-tool.
+      // Exception: wakeUp — execute-tool's local-async handler owns task creation, so the
+      // wrapper must stay for the wakeUp path.
+      const shouldUnwrapExecuteTool = isExecuteToolWrapper && !isWakeUpConfirm;
+      const execToolName = shouldUnwrapExecuteTool
+        ? String(
+            (baseArgs as Record<string, string | number | boolean | null>)
+              .toolName ?? toolCall.toolName,
+          )
+        : toolCall.toolName;
+      const execInput = shouldUnwrapExecuteTool
+        ? (((baseArgs as Record<string, WidgetData>).input as Record<
+            string,
+            WidgetData
+          > | null) ?? {})
+        : (baseArgs as Record<string, WidgetData>);
 
       // Set currentToolMessageId so RouteExecuteRepository (wakeUp path) can call
       // handleTaskCompletion with the correct toolMessageId for revival backfill.
@@ -158,102 +164,66 @@ export class ToolConfirmationHandler {
       // gate is bypassed — the user already confirmed, we must not halt again.
       params.streamContext.isConfirmedReExecution = true;
 
-      // Load and execute tool
-      // Note: Tool confirmation already happened - this is executing the confirmed tool
-      // Pass toolConfirmationConfig with requiresConfirmation=false to prevent re-checking
-      // This signals to the tool that confirmation already happened and it should execute immediately
-      const confirmationConfig = new Map<string, boolean>();
-      confirmationConfig.set(toolCall.toolName, false); // false = no confirmation needed (already confirmed)
-
-      const toolsResult = await loadTools({
-        requestedTools: [toolCall.toolName],
-        user,
-        locale,
-        logger,
-        systemPrompt: "",
-        toolConfirmationConfig: confirmationConfig,
-        streamContext: params.streamContext,
+      logger.debug("[Tool Confirmation] Executing tool", {
+        toolName: execToolName,
+        baseArgs,
       });
 
-      const toolEntry = Object.entries(toolsResult.tools ?? {}).find(
-        ([name]) =>
-          name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
-      );
-
-      if (!toolEntry) {
-        logger.error("[Tool Confirmation] Tool not found", {
-          toolName: toolCall.toolName,
-        });
-        return fail({
-          message: t("post.toolConfirmation.errors.toolNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      interface ToolExecuteOptions {
-        toolCallId: string;
-        messages: Array<{ role: ChatMessageRole; content: string }>;
-        abortSignal: AbortSignal;
-      }
-      const [, tool] = toolEntry as [
-        string,
-        {
-          execute?: (
-            args: WidgetData,
-            options: ToolExecuteOptions,
-          ) => Promise<WidgetData>;
-        },
-      ];
       let toolResult: WidgetData | undefined;
       let toolError: ErrorResponseType | undefined;
 
-      logger.debug("[Tool Confirmation] Executing tool", {
-        toolName: toolCall.toolName,
-        hasExecuteMethod: !!tool?.execute,
-        finalArgs,
+      // Route through RouteExecuteRepository so all callbackMode logic (WAKE_UP,
+      // WAIT, requiresConfirmation gate) is handled in one place.
+      const execResult = await RouteExecuteRepository.runInProcess({
+        toolName: execToolName,
+        input: execInput,
+        callbackMode: isWakeUpConfirm
+          ? CallbackMode.WAKE_UP
+          : CallbackMode.WAIT,
+        user,
+        locale,
+        logger,
+        streamContext: params.streamContext,
+        platform: Platform.AI,
       });
 
-      try {
-        if (tool?.execute) {
-          toolResult = await tool.execute(finalArgs, {
-            toolCallId: toolConfirmation.messageId,
-            messages: [],
-            abortSignal: AbortSignal.timeout(60000),
-          });
-          // Inject a hint so the AI understands why the tool ran despite callbackMode="approve"
-          if (
-            toolResult !== null &&
-            typeof toolResult === "object" &&
-            !Array.isArray(toolResult)
-          ) {
-            toolResult = {
-              ...(toolResult as Record<string, WidgetData>),
-              _hint:
-                "This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.",
-            };
-          }
-          logger.debug("[Tool Confirmation] Tool execution completed", {
-            toolName: toolCall.toolName,
-            hasResult: !!toolResult,
-          });
-        } else {
-          logger.error("[Tool Confirmation] Tool missing execute method", {
-            toolName: toolCall.toolName,
-          });
-          toolError = fail({
-            message: t("errors.toolExecutionError"),
-            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          });
+      if (execResult.success) {
+        // runInProcess wraps tool results in { result: ... } for AI/MCP display.
+        // For direct tool calls (not execute-tool wrapper), unwrap to match what
+        // the old loadTools()+tool.execute() path returned — the raw tool output.
+        // For execute-tool wrappers (already unwrapped to the inner tool),
+        // keep the { result: ... } layer since resolveToolResult will strip it.
+        const rawData = execResult.data;
+        toolResult =
+          !isExecuteToolWrapper &&
+          rawData !== null &&
+          typeof rawData === "object" &&
+          !Array.isArray(rawData) &&
+          "result" in (rawData as Record<string, WidgetData>)
+            ? ((rawData as Record<string, WidgetData>)["result"] as WidgetData)
+            : rawData;
+        // Inject a hint so the AI understands why the tool ran despite callbackMode="approve"
+        if (
+          toolResult !== null &&
+          typeof toolResult === "object" &&
+          !Array.isArray(toolResult)
+        ) {
+          toolResult = {
+            ...(toolResult as Record<string, WidgetData>),
+            _hint:
+              "This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.",
+          };
         }
-      } catch (error) {
+        logger.debug("[Tool Confirmation] Tool execution completed", {
+          toolName: toolCall.toolName,
+          hasResult: !!toolResult,
+        });
+      } else {
         logger.error("[Tool Confirmation] Tool execution failed", {
           toolName: toolCall.toolName,
-          error: error instanceof Error ? error.message : String(error),
+          message: execResult.message,
         });
-        toolError = fail({
-          message: t("errors.toolExecutionError"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
+        toolError = execResult;
       }
 
       // wakeUp confirm race: execute-tool returned {taskId, status:'pending'} immediately.
@@ -265,123 +235,30 @@ export class ToolConfirmationHandler {
         typeof toolResult === "object" &&
         toolResult !== null &&
         "status" in toolResult &&
-        toolResult.status === CronTaskStatus.PENDING
+        toolResult.status === CronTaskStatus.PENDING &&
+        !isIncognito
       ) {
         const pendingTaskId =
           typeof toolResult.taskId === "string" ? toolResult.taskId : undefined;
 
-        if (!isIncognito) {
-          // Check whether the wakeUp result already landed (newer sequence present).
-          // Exclude error messages - they belong to prior sequences and should not
-          // be counted as evidence that a new sequence has started.
-          const newerSequenceMessage = toolMessage.sequenceId
-            ? await db
-                .select({ id: chatMessages.id })
-                .from(chatMessages)
-                .where(
-                  and(
-                    eq(chatMessages.threadId, toolMessage.threadId),
-                    gt(chatMessages.createdAt, toolMessage.createdAt),
-                    ne(chatMessages.sequenceId, toolMessage.sequenceId),
-                    ne(chatMessages.role, ChatMessageRole.ERROR),
-                  ),
-                )
-                .limit(1)
-            : [];
+        const raceResult = await detectWakeUpConfirmRace({
+          toolMessage,
+          toolCall,
+          toolMessageId: toolConfirmation.messageId,
+          pendingTaskId,
+          user,
+          logger,
+        });
 
-          if (newerSequenceMessage.length === 0) {
-            // Case B: goroutine still running.
-            // Clear waitingForConfirmation so the UI shows the wakeUp state ("Running - result
-            // will wake up AI") instead of the stale "Pending Confirmation" badge.
-            // Do NOT set isDeferred or result - resume-stream owns that when the task completes.
-            const clearedToolCall: ToolCall = {
-              ...toolCall,
-              waitingForConfirmation: false,
-              isConfirmed: true,
-            };
-            await db
-              .update(chatMessages)
-              .set({ metadata: { toolCall: clearedToolCall } })
-              .where(eq(chatMessages.id, toolConfirmation.messageId));
-            // Re-emit message-created so the client updates the existing bubble's badge
-            // (waitingForConfirmation=false → shows "Running - result will wake up AI").
-            // Do NOT emit tool-result - there is no result yet; resume-stream delivers it later.
-            createMessagesEmitter(
-              toolMessage.threadId,
-              null,
-              logger,
-              user,
-            )("message-created", {
-              messages: [
-                {
-                  id: toolConfirmation.messageId,
-                  threadId: toolMessage.threadId,
-                  role: ChatMessageRole.TOOL,
-                  parentId: toolMessage.parentId ?? null,
-                  content: null,
-                  model: toolMessage.model,
-                  skill: toolMessage.skill,
-                  sequenceId: toolMessage.sequenceId ?? null,
-                  metadata: { toolCall: clearedToolCall },
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  isAI: true,
-                  authorId: null,
-                  authorName: null,
-                  errorType: null,
-                  errorCode: null,
-                  errorMessage: null,
-                  upvotes: 0,
-                  downvotes: 0,
-                  searchVector: null,
-                },
-              ],
-              streamingState: "streaming",
-            });
-
-            if (pendingTaskId) {
-              try {
-                await db
-                  .update(cronTasks)
-                  .set({
-                    wakeUpToolMessageId: toolConfirmation.messageId,
-                    updatedAt: new Date(),
-                  })
-                  .where(eq(cronTasks.id, pendingTaskId));
-              } catch (updateErr) {
-                logger.warn(
-                  "[Tool Confirmation] Failed to update wakeUp task toolMessageId (non-fatal)",
-                  {
-                    pendingTaskId,
-                    toolMessageId: toolConfirmation.messageId,
-                    error:
-                      updateErr instanceof Error
-                        ? updateErr.message
-                        : String(updateErr),
-                  },
-                );
-              }
-            }
-
-            logger.debug(
-              "[Tool Confirmation] wakeUp confirm (Case B) - goroutine running, resume-stream handles revival",
-              { toolMessageId: toolConfirmation.messageId, pendingTaskId },
-            );
-
-            return {
-              success: true,
-              data: {
-                threadId: toolMessage.threadId,
-                toolMessageId: toolConfirmation.messageId,
-                wakeUpPending: true,
-              },
-            };
-          }
-          // Case A: wakeUp already completed - fall through to the deferred insertion path below.
-          logger.debug(
-            "[Tool Confirmation] wakeUp confirm (Case A) - wakeUp already landed, inserting confirm deferred after revival",
-            { toolMessageId: toolConfirmation.messageId },
-          );
+        if (raceResult.kind === "case-b") {
+          return {
+            success: true,
+            data: {
+              threadId: toolMessage.threadId,
+              toolMessageId: toolConfirmation.messageId,
+              wakeUpPending: true,
+            },
+          };
         }
         // Case A: fall through to the deferred insertion path below.
       }
@@ -462,7 +339,10 @@ export class ToolConfirmationHandler {
           // Preserve sibling metadata keys - only replace the toolCall object.
           await db
             .update(chatMessages)
-            .set({ metadata: { toolCall: inPlaceToolCall } })
+            .set({
+              metadata: { ...toolMessage.metadata, toolCall: inPlaceToolCall },
+              updatedAt: new Date(),
+            })
             .where(eq(chatMessages.id, toolConfirmation.messageId));
           logger.debug("[Tool Confirmation] Tool executed - updated in-place", {
             messageId: toolConfirmation.messageId,
@@ -485,67 +365,14 @@ export class ToolConfirmationHandler {
           ...confirmedToolCallBase,
           isDeferred: true, // deferred: supersedes original waiting_for_confirmation placeholder
         };
-        const confirmedDeferredParentId = await walkToLeafMessage(
-          toolMessage.threadId,
-          toolMessage.parentId ?? null,
-          toolMessage.parentId ?? toolMessage.id,
-        );
-        const deferredId = crypto.randomUUID();
-        const confirmedSeqId = toolMessage.sequenceId ?? crypto.randomUUID();
-        await db.insert(chatMessages).values({
-          id: deferredId,
-          threadId: toolMessage.threadId,
-          role: "tool" as ChatMessageRole,
-          content: null,
-          parentId: confirmedDeferredParentId,
-          authorId: toolMessage.authorId,
-          sequenceId: confirmedSeqId,
-          isAI: true,
-          model: toolMessage.model,
-          skill: toolMessage.skill,
-          metadata: { toolCall: deferredToolCall },
-        });
-        // Emit WS so the client has this message in cache before any revival stream events.
-        const confirmedEmitter = createMessagesEmitter(
-          toolMessage.threadId,
-          logger,
-          user,
-        );
-        confirmedEmitter("message-created", {
-          messages: [
-            {
-              id: deferredId,
-              threadId: toolMessage.threadId,
-              role: ChatMessageRole.TOOL,
-              parentId: confirmedDeferredParentId,
-              content: null,
-              model: toolMessage.model,
-              skill: toolMessage.skill,
-              sequenceId: confirmedSeqId,
-              metadata: { toolCall: deferredToolCall },
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              isAI: true,
-              authorId: null,
-              authorName: null,
-              errorType: null,
-              errorCode: null,
-              errorMessage: null,
-              upvotes: 0,
-              downvotes: 0,
-              searchVector: null,
-            },
-          ],
-          streamingState: "streaming",
-        });
-        confirmedEmitter("tool-result", {
-          messages: [
-            {
-              id: deferredId,
-              metadata: { toolCall: deferredToolCall },
-            },
-          ],
-        });
+        const deferredId =
+          await ToolConfirmationHandler.insertDeferredConfirmationMessage({
+            toolMessage,
+            toolCall: deferredToolCall,
+            threadId: toolMessage.threadId,
+            user,
+            logger,
+          });
         logger.debug(
           "[Tool Confirmation] Tool executed - deferred confirm message inserted",
           {
@@ -630,7 +457,10 @@ export class ToolConfirmationHandler {
           // Preserve sibling metadata keys - only replace the toolCall object.
           await db
             .update(chatMessages)
-            .set({ metadata: { toolCall: inPlaceRejected } })
+            .set({
+              metadata: { ...toolMessage.metadata, toolCall: inPlaceRejected },
+              updatedAt: new Date(),
+            })
             .where(eq(chatMessages.id, toolConfirmation.messageId));
           logger.debug("[Tool Confirmation] Tool rejected - updated in-place", {
             messageId: toolConfirmation.messageId,
@@ -653,67 +483,14 @@ export class ToolConfirmationHandler {
           ...rejectedToolCallBase,
           isDeferred: true,
         };
-        const rejectedDeferredParentId = await walkToLeafMessage(
-          toolMessage.threadId,
-          toolMessage.parentId ?? null,
-          toolMessage.parentId ?? toolMessage.id,
-        );
-        const deferredId = crypto.randomUUID();
-        const rejectedSeqId = toolMessage.sequenceId ?? crypto.randomUUID();
-        await db.insert(chatMessages).values({
-          id: deferredId,
-          threadId: toolMessage.threadId,
-          role: ChatMessageRole.TOOL,
-          content: null,
-          parentId: rejectedDeferredParentId,
-          authorId: toolMessage.authorId,
-          sequenceId: rejectedSeqId,
-          isAI: true,
-          model: toolMessage.model,
-          skill: toolMessage.skill,
-          metadata: { toolCall: deferredRejected },
-        });
-        // Emit WS so the client has this message in cache before any revival stream events.
-        const rejectedEmitter = createMessagesEmitter(
-          toolMessage.threadId,
-          logger,
-          user,
-        );
-        rejectedEmitter("message-created", {
-          messages: [
-            {
-              id: deferredId,
-              threadId: toolMessage.threadId,
-              role: ChatMessageRole.TOOL,
-              parentId: rejectedDeferredParentId,
-              content: null,
-              model: toolMessage.model,
-              skill: toolMessage.skill,
-              sequenceId: rejectedSeqId,
-              metadata: { toolCall: deferredRejected },
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              isAI: true,
-              authorId: null,
-              authorName: null,
-              errorType: null,
-              errorCode: null,
-              errorMessage: null,
-              upvotes: 0,
-              downvotes: 0,
-              searchVector: null,
-            },
-          ],
-          streamingState: "streaming",
-        });
-        rejectedEmitter("tool-result", {
-          messages: [
-            {
-              id: deferredId,
-              metadata: { toolCall: deferredRejected },
-            },
-          ],
-        });
+        const deferredId =
+          await ToolConfirmationHandler.insertDeferredConfirmationMessage({
+            toolMessage,
+            toolCall: deferredRejected,
+            threadId: toolMessage.threadId,
+            user,
+            logger,
+          });
         logger.debug("[Tool Confirmation] Tool rejected - deferred inserted", {
           originalMessageId: toolConfirmation.messageId,
           deferredId,
@@ -737,5 +514,98 @@ export class ToolConfirmationHandler {
         toolMessageId: toolConfirmation.messageId,
       },
     };
+  }
+
+  /**
+   * Insert a deferred tool-result message at the current thread leaf and emit
+   * WS events so the client has it in cache before any revival stream events.
+   *
+   * Used by both the confirmed and rejected deferred paths — they build
+   * different ToolCall objects but share the exact same insert + emit sequence.
+   *
+   * Returns the new message's id (deferredId).
+   */
+  private static async insertDeferredConfirmationMessage(params: {
+    toolMessage: ChatMessage;
+    toolCall: ToolCall;
+    threadId: string;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+  }): Promise<string> {
+    const { toolMessage, toolCall, threadId, user, logger } = params;
+
+    const [threadRow] = await db
+      .select({ rootFolderId: chatThreads.rootFolderId })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    const rootFolderId = threadRow?.rootFolderId;
+
+    const deferredParentId = await walkToLeafMessage(
+      threadId,
+      toolMessage.parentId ?? null,
+      toolMessage.parentId ?? toolMessage.id,
+    );
+    const deferredId = crypto.randomUUID();
+    const seqId = toolMessage.sequenceId ?? crypto.randomUUID();
+
+    await db.insert(chatMessages).values({
+      id: deferredId,
+      threadId,
+      role: ChatMessageRole.TOOL,
+      content: null,
+      parentId: deferredParentId,
+      authorId: toolMessage.authorId,
+      sequenceId: seqId,
+      isAI: true,
+      model: toolMessage.model,
+      skill: toolMessage.skill,
+      metadata: { toolCall },
+    });
+
+    // Emit WS so the client has this message in cache before any revival stream events.
+    if (!rootFolderId) {
+      return deferredId;
+    }
+    const emitter = createMessagesEmitter(logger, user, {
+      threadId,
+      rootFolderId,
+    });
+    emitter("message-created", {
+      responseData: {
+        messages: [
+          buildSseMessageRow({
+            id: deferredId,
+            threadId,
+            role: ChatMessageRole.TOOL,
+            parentId: deferredParentId,
+            model: toolMessage.model,
+            skill: toolMessage.skill,
+            sequenceId: seqId,
+            metadata: { toolCall },
+            isAI: true,
+          }),
+        ],
+        streamingState: ThreadStreamingState.STREAMING,
+      },
+    });
+    emitter("tool-result", {
+      responseData: {
+        messages: [
+          {
+            id: deferredId,
+            metadata: { toolCall },
+          },
+        ],
+      },
+    });
+
+    logger.debug("[Tool Confirmation] Deferred confirmation message inserted", {
+      deferredId,
+      threadId,
+      deferredParentId,
+    });
+
+    return deferredId;
   }
 }

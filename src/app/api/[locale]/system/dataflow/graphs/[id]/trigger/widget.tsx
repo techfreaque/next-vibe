@@ -5,10 +5,10 @@
 
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetForm,
   useWidgetTranslation,

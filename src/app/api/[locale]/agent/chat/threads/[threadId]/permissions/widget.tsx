@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
+} from "next-vibe/ui/ui/dialog";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";

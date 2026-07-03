@@ -16,11 +16,10 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { scopedTranslation } from "next-vibe/identity/roles/i18n";
+import type { NewUserRole, UserRole } from "next-vibe/identity/user/db";
+import { insertUserRoleSchema, userRoles } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createDefaultCliUser } from "next-vibe/platforms/cli/auth/cli-user";
-
-import type { NewUserRole, UserRole } from "@/app/api/[locale]/user/db";
-import { insertUserRoleSchema, userRoles } from "@/app/api/[locale]/user/db";
 
 import type { UserRole as UserRoleEnum, UserRoleDB } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";

@@ -4,20 +4,20 @@ import { LayoutType } from "next-vibe/core/definition/enums";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as reactScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   FormAlert,
   type FormAlertState,
-} from "next-vibe/ui/web/ui/form/form-alert";
-import { H1, P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/form/form-alert";
+import { H1, P } from "next-vibe/ui/ui/typography";
 import type { ReactWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import {
   hasChild,

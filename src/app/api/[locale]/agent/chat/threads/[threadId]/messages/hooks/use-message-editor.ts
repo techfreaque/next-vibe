@@ -6,11 +6,11 @@
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { DivRefObject } from "next-vibe/ui/web/ui/div";
+import type { DivRefObject } from "next-vibe/ui/ui/div";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
-} from "next-vibe/ui/web/ui/textarea";
+} from "next-vibe/ui/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {

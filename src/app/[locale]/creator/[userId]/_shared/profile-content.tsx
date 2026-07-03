@@ -6,29 +6,25 @@
  * and the settings widget (me/widget.tsx) - exact same layout, same pixels.
  */
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "next-vibe/ui/web/ui/avatar";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Facebook } from "next-vibe/ui/web/ui/icons/Facebook";
-import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
-import { Instagram } from "next-vibe/ui/web/ui/icons/Instagram";
-import { SiDiscord } from "next-vibe/ui/web/ui/icons/SiDiscord";
-import { SiGab } from "next-vibe/ui/web/ui/icons/SiGab";
-import { SiGithub } from "next-vibe/ui/web/ui/icons/SiGithub";
-import { SiNostr } from "next-vibe/ui/web/ui/icons/SiNostr";
-import { SiOdysee } from "next-vibe/ui/web/ui/icons/SiOdysee";
-import { SiRumble } from "next-vibe/ui/web/ui/icons/SiRumble";
-import { SiTiktok } from "next-vibe/ui/web/ui/icons/SiTiktok";
-import { SiTribe } from "next-vibe/ui/web/ui/icons/SiTribe";
-import { Twitter } from "next-vibe/ui/web/ui/icons/Twitter";
-import { Youtube } from "next-vibe/ui/web/ui/icons/Youtube";
-import { Image } from "next-vibe/ui/web/ui/image";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1 } from "next-vibe/ui/web/ui/typography";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
+import { Div } from "next-vibe/ui/ui/div";
+import { Facebook } from "next-vibe/ui/ui/icons/Facebook";
+import { Globe } from "next-vibe/ui/ui/icons/Globe";
+import { Instagram } from "next-vibe/ui/ui/icons/Instagram";
+import { SiDiscord } from "next-vibe/ui/ui/icons/SiDiscord";
+import { SiGab } from "next-vibe/ui/ui/icons/SiGab";
+import { SiGithub } from "next-vibe/ui/ui/icons/SiGithub";
+import { SiNostr } from "next-vibe/ui/ui/icons/SiNostr";
+import { SiOdysee } from "next-vibe/ui/ui/icons/SiOdysee";
+import { SiRumble } from "next-vibe/ui/ui/icons/SiRumble";
+import { SiTiktok } from "next-vibe/ui/ui/icons/SiTiktok";
+import { SiTribe } from "next-vibe/ui/ui/icons/SiTribe";
+import { Twitter } from "next-vibe/ui/ui/icons/Twitter";
+import { Youtube } from "next-vibe/ui/ui/icons/Youtube";
+import { Image } from "next-vibe/ui/ui/image";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1 } from "next-vibe/ui/ui/typography";
 import type { JSX, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";

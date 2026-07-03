@@ -1,17 +1,17 @@
 "use client";
 
-import { Audio } from "next-vibe/ui/web/ui/audio";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Music } from "next-vibe/ui/web/ui/icons/Music";
-import { ExternalLink } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Textarea } from "next-vibe/ui/web/ui/textarea";
-import { H3 } from "next-vibe/ui/web/ui/typography";
+import { Audio } from "next-vibe/ui/ui/audio";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Music } from "next-vibe/ui/ui/icons/Music";
+import { ExternalLink } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { Textarea } from "next-vibe/ui/ui/textarea";
+import { H3 } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -39,8 +39,11 @@ import type definition from "./definition";
 import { MusicDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
 import type { MusicGenModelSelection } from "./models";
-import { getBestMusicGenModel } from "./models";
-import { getMusicGenModelById, MusicGenModelId } from "./models";
+import {
+  getBestMusicGenModel,
+  getMusicGenModelById,
+  MusicGenModelId,
+} from "./models";
 
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];

@@ -1,7 +1,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Link } from "next-vibe/ui/web/ui/link";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";

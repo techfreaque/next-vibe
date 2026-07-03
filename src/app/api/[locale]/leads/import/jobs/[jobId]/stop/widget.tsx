@@ -3,10 +3,10 @@
  */
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetTranslation,
   useWidgetValue,

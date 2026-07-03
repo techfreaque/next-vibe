@@ -26,8 +26,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { ActivityType, UserAssociation } from "next-vibe/identity/lead/enum";
-import { EngagementLevel } from "next-vibe/identity/tracking/engagement/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { EngagementLevel } from "@/app/api/[locale]/leads/tracking/enum";
 
 import { emails } from "../db";
 import {

@@ -18,6 +18,7 @@ export const translations = {
     needsMove: "Needs Move",
     unusedSymbols: "Unused Symbols",
     crossDomain: "Cross-Domain",
+    pageViolations: "Page Violations",
   },
 
   container: {
@@ -121,6 +122,14 @@ export const translations = {
       colPath: "file",
       emptyState: "No unused public surface found in scope.",
       wholeFile: "(whole file — no importers)",
+    },
+    pageViolations: {
+      title: "Page Architecture Violations",
+      description:
+        "page.tsx files importing more than repository/definition/i18n/page-client. Pages must be thin SSR shells — business logic, UI, enums, and db access belong in repository.ts or page-client.tsx.",
+      colCount: "violations",
+      colPath: "page",
+      emptyState: "All page.tsx files respect the architecture boundary.",
     },
     crossDomain: {
       title: "Cross-Domain Candidates",

@@ -16,6 +16,8 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { envClient } from "@/config/env-client";
@@ -23,8 +25,6 @@ import { envClient } from "@/config/env-client";
 import { getPaymentProvider } from "../../payment/providers";
 import { ProductIds } from "../../products/repository-client";
 import { SubscriptionStatus } from "../../subscription/enum";
-import { UserDetailLevel } from "../../user/enum";
-import { UserRepository } from "../../user/repository";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,

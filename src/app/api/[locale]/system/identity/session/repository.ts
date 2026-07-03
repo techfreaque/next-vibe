@@ -15,7 +15,9 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { cookies } from "next-vibe/ui/web/lib/headers";
+import type { SessionT } from "next-vibe/identity/session/i18n";
+import { scopedTranslation } from "next-vibe/identity/session/i18n";
+import { cookies } from "next-vibe/ui/lib/headers";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 
@@ -27,8 +29,6 @@ interface CurrentSessionResult {
   expiresAt: Date;
   token: string;
 }
-import type { SessionT } from "next-vibe/identity/session/i18n";
-import { scopedTranslation } from "next-vibe/identity/session/i18n";
 
 import { SessionErrorReason } from "./enum";
 
@@ -72,37 +72,6 @@ export class SessionRepository {
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           token,
-          error: parseError(error).message,
-        },
-      });
-    }
-  }
-
-  /**
-   * Delete expired sessions
-   * @returns Success or error response
-   */
-  static async deleteExpired(t: SessionT): Promise<ResponseType<void>> {
-    try {
-      // Note: Logger not available for internal cleanup methods
-
-      const now = new Date();
-      await db.delete(sessions).where(
-        or(
-          eq(sessions.expiresAt, new Date(0)),
-          // Use lt (less than) function instead of < operator
-          lt(sessions.expiresAt, now),
-        ),
-      );
-
-      return success();
-    } catch (error) {
-      // Note: Logger not available for internal cleanup methods
-
-      return fail({
-        message: t("errors.expired_sessions_delete_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
           error: parseError(error).message,
         },
       });
@@ -211,35 +180,6 @@ export class SessionRepository {
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           userId: sessionId,
-          error: parseError(error).message,
-        },
-      });
-    }
-  }
-
-  /**
-   * Delete sessions by user ID
-   * @param userId - The user ID
-   * @returns Success or error response
-   */
-  static async deleteByUserId(
-    userId: string,
-    t: SessionT,
-  ): Promise<ResponseType<void>> {
-    try {
-      // Note: Logger not available for internal session methods
-
-      await db.delete(sessions).where(eq(sessions.userId, userId));
-
-      return success();
-    } catch (error) {
-      // Note: Logger not available for internal session methods
-
-      return fail({
-        message: t("errors.user_sessions_delete_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
-          userId,
           error: parseError(error).message,
         },
       });

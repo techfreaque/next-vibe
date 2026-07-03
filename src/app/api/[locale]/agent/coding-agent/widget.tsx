@@ -7,24 +7,24 @@
 
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Mic } from "next-vibe/ui/ui/icons/Mic";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { Markdown } from "next-vibe/ui/ui/markdown";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/popover";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "next-vibe/ui/ui/tooltip";
 import {
   useWidgetContext,
   useWidgetDisabled,

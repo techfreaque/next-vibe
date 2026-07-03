@@ -97,6 +97,11 @@ export const translations: typeof enTranslations = {
       description:
         "Wenn aktiviert, werden auch Testdateien (*.test.ts, *.test.tsx) und automatisch generierte Dateien (system/generated/**) geprüft. Standardmäßig deaktiviert - für Release-Validierung oder explizite Prüfung von generiertem/Test-Code aktivieren.",
     },
+    restartLsp: {
+      label: "LSP neu starten",
+      description:
+        "Beendet den LSP-Daemon vor dem Start. Nutzen, wenn der Daemon hängt oder veraltete Ergebnisse liefert.",
+    },
   },
 
   response: {

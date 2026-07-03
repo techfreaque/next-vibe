@@ -2,9 +2,9 @@
 
 import { Platform } from "next-vibe/core/definition/platform";
 import type { ContentBlock } from "next-vibe/core/route/response.schema";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Image } from "next-vibe/ui/web/ui/image";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { Image } from "next-vibe/ui/ui/image";
+import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 
 /**

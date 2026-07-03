@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----2aff13f2-1e4f-4d37-aa5f-4cdafb177749.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result has: videoUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8795f4fe-67b7-4192-8f1c-7…",
+    "input": "Generate an image: A stylized cartoon illustration based on the photo. The hiker with the backpack is rendered with bold outlines and flat, vibrant colors, walking on a simplified mountain trail under a cheerful sun. The mountains in the background are simplified shapes with textured brushstrokes, and the sky has fluffy, stylized clouds. Use this image as reference: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
     "encoding_format": "float"
   }
 }

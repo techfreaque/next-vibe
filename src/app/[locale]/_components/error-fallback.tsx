@@ -1,10 +1,10 @@
 "use client";
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { reloadPage } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { H2, P } from "next-vibe/ui/web/ui/typography";
+import { reloadPage } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { H2, P } from "next-vibe/ui/ui/typography";
 import type React from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

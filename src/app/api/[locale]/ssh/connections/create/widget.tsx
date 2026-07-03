@@ -5,7 +5,7 @@
 "use client";
 
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   useWidgetForm,
   useWidgetUser,

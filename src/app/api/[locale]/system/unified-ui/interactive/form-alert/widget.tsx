@@ -4,7 +4,7 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import {
   FormAlert,
   type FormAlertState,
-} from "next-vibe/ui/web/ui/form/form-alert";
+} from "next-vibe/ui/ui/form/form-alert";
 import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import { useWidgetResponse } from "next-vibe/unified-ui/_shared/use-widget-context";

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:tool-help] {\"toolName\":\"generate_image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_image\",\"description\":\"Generate an image from a text prompt using AI\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"prompt\":{\"type\":\"string\",\"minLength\":1,\"maxLength\":2000,\"description\":\"Describe the image\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"red circle\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Remote tool failed: Image generation failed\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"red circle\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Remote tool failed: Image generation failed\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"model\":\"flux-2-flex\",\"prompt\":\"red circle\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"imageUrl\":\"https://cdn2.stablediffusionapi.com/generations/fb755eb6-48c6-444e-9805-d2fdcc6f83e3-0.jpg\",\"creditCost\":0.6}}",
+    "encoding_format": "float"
+  }
+}

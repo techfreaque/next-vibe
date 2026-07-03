@@ -13,16 +13,16 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/web/ui/popover";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Strong } from "next-vibe/ui/web/ui/strong";
+} from "next-vibe/ui/ui/popover";
+import { Span } from "next-vibe/ui/ui/span";
+import { Strong } from "next-vibe/ui/ui/strong";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
@@ -43,10 +43,10 @@ import {
 } from "../../ai-stream/repository/core/constants";
 import { getCreditCostFromModel } from "../all-models";
 import { scopedTranslation } from "../i18n";
-import { getModelPrice } from "../models";
 import {
   type AnyModelId,
   type AnyModelOption,
+  getModelPrice,
   PRICE_REFERENCE_STT_SECONDS,
   PRICE_REFERENCE_TTS_CHARS,
 } from "../models";

@@ -5,7 +5,7 @@
  * API routes use wrapNextApiRoute - bridges $param → param and method dispatch.
  */
 
-import { NextRequest } from "next-vibe/ui/web/lib/request";
+import { NextRequest } from "next-vibe/ui/lib/request";
 import type { ReactNode } from "react";
 
 // ---------------------------------------------------------------------------

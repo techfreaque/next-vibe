@@ -19,16 +19,16 @@ import type {
 import { cn } from "next-vibe/core/utils/utils";
 import graphsDefinitions from "next-vibe/dataflow/graphs/definition";
 import { scopedTranslation as vibeSenseT } from "next-vibe/dataflow/i18n";
-import { getRootCssVar } from "next-vibe/ui/web/lib/css-vars";
-import { observeRootMutations } from "next-vibe/ui/web/lib/dom";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { BarChart2 } from "next-vibe/ui/web/ui/icons/BarChart2";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
+import { observeRootMutations } from "next-vibe/ui/lib/dom";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { BarChart2 } from "next-vibe/ui/ui/icons/BarChart2";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetContext,
   useWidgetEndpointMutations,

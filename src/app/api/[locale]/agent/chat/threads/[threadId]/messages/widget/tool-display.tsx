@@ -4,7 +4,7 @@ import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { ToolCallRenderer } from "next-vibe/unified-ui/renderers/react/ToolCallRenderer";
 import type { JSX } from "react";
 import { memo } from "react";

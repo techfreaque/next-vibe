@@ -175,7 +175,7 @@ export class SessionManagementRepository {
     request: Request | undefined,
     t: PrivateSessionsT,
   ): Promise<ResponseType<SessionsGetResponseOutput>> {
-    const { cookies } = await import("next-vibe/ui/web/lib/headers");
+    const { cookies } = await import("next-vibe/ui/lib/headers");
     let currentToken: string | undefined;
     if (request) {
       const authHeader = request.headers.get("authorization");

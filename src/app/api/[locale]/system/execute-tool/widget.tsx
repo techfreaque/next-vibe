@@ -19,19 +19,19 @@ import helpEndpoints from "next-vibe/help-tool/definition";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
-import type { AutocompleteOption } from "next-vibe/ui/web/ui/autocomplete-field";
-import { AutocompleteField } from "next-vibe/ui/web/ui/autocomplete-field";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
+import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
+import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   Form,
   FormField,
   FormItem,
   FormLabel,
-} from "next-vibe/ui/web/ui/form/form";
-import { Pre } from "next-vibe/ui/web/ui/pre";
-import { useThemeToggle } from "next-vibe/ui/web/ui/theme-provider";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/form/form";
+import { Pre } from "next-vibe/ui/ui/pre";
+import { useThemeToggle } from "next-vibe/ui/ui/theme-provider";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,

@@ -1,7 +1,7 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Span } from "next-vibe/ui/ui/span";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

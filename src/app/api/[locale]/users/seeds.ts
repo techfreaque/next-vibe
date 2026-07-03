@@ -7,12 +7,12 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { env } from "@/config/env";
 
-import { UserDetailLevel } from "../user/enum";
-import { UserRepository } from "../user/repository";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";
 import { UserCreateRepository } from "./create/repository";

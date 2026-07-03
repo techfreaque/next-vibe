@@ -19,8 +19,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-
-import { users } from "../../db";
+import { users } from "next-vibe/identity/user/db";
 
 export class QueryUsersWithStripeRepository {
   static async queryUsersWithStripe(data: {

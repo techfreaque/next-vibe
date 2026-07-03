@@ -15,16 +15,15 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { AuthT } from "next-vibe/identity/auth/i18n";
 import { scopedTranslation } from "next-vibe/identity/auth/i18n";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import type { CompleteUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { storage } from "next-vibe/ui/lib/storage";
 
-import type { CompleteUserType } from "@/app/api/[locale]/user/types";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 
 import type { AuthContext } from "./base-auth-handler";
 import type { AuthRepositoryType } from "./repository";
-import type { JwtPrivatePayloadType } from "./types";
-import type { InferUserType } from "./types";
+import type { InferUserType, JwtPrivatePayloadType } from "./types";
 
 const AUTH_TOKEN_STORAGE_KEY = "@auth/token";
 const AUTH_EXPIRES_AT_STORAGE_KEY = "@auth/expiresAt";

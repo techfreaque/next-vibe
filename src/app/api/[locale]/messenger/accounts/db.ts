@@ -28,8 +28,8 @@ import type {
   EmailCampaignStage,
   EmailJourneyVariant,
 } from "next-vibe/identity/lead/enum";
+import { users } from "next-vibe/identity/user/db";
 
-import { users } from "../../user/db";
 import {
   EmailImapAuthMethodDB,
   EmailSecurityTypeDB,

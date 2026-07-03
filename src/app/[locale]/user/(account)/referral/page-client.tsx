@@ -2,31 +2,31 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { DollarSign } from "next-vibe/ui/web/ui/icons/DollarSign";
-import { Gift } from "next-vibe/ui/web/ui/icons/Gift";
-import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
-import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
-import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
-import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
-import { Users } from "next-vibe/ui/web/ui/icons/Users";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1, H2, H3, Muted, P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
+import { Gift } from "next-vibe/ui/ui/icons/Gift";
+import { Link2 } from "next-vibe/ui/ui/icons/Link2";
+import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
+import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
+import { Users } from "next-vibe/ui/ui/icons/Users";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 

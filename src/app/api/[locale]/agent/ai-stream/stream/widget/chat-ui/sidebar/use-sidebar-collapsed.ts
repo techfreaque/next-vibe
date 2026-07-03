@@ -9,8 +9,8 @@
 "use client";
 
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { getScreenWidth } from "next-vibe/ui/web/lib/screen";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { getScreenWidth } from "next-vibe/ui/lib/screen";
+import { storage } from "next-vibe/ui/lib/storage";
 import { create } from "zustand";
 
 import { useLogger } from "@/hooks/use-logger";
@@ -25,7 +25,7 @@ interface SidebarState {
   /** Toggle or set collapsed state. Persists to storage. */
   setCollapsed: (collapsed: boolean) => void;
   /** Load initial state from storage or screen size. Called once on mount. */
-  initialize: () => void;
+  initialize: (logger: EndpointLogger) => void;
 }
 
 const useSidebarStore = create<SidebarState>((set, get) => ({
@@ -37,7 +37,7 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
     void storage.setItem(STORAGE_KEY, JSON.stringify(collapsed));
   },
 
-  initialize: (): void => {
+  initialize: (logger): void => {
     if (get().initialized) {
       return;
     }
@@ -49,10 +49,10 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
         if (stored !== null) {
           set({ collapsed: JSON.parse(stored) as boolean });
         } else {
-          set({ collapsed: getScreenWidth() < MOBILE_BREAKPOINT });
+          set({ collapsed: getScreenWidth(logger) < MOBILE_BREAKPOINT });
         }
       } catch {
-        set({ collapsed: getScreenWidth() < MOBILE_BREAKPOINT });
+        set({ collapsed: getScreenWidth(logger) < MOBILE_BREAKPOINT });
       }
     })();
   },
@@ -67,9 +67,10 @@ export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   const collapsed = useSidebarStore((s) => s.collapsed);
   const setCollapsed = useSidebarStore((s) => s.setCollapsed);
   const initialize = useSidebarStore((s) => s.initialize);
+  const logger = useLogger();
 
   // Initialize on first render (idempotent)
-  initialize();
+  initialize(logger);
 
   return [collapsed, setCollapsed];
 }

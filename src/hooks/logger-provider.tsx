@@ -3,7 +3,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { createClientLogger } from "next-vibe/logger/client";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { getSessionItem, setSessionItem } from "next-vibe/ui/web/lib/storage";
+import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 import { createContext, type JSX, type ReactNode, useMemo } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";

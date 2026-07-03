@@ -5,10 +5,10 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { UserDetailLevel } from "../user/enum";
-import { UserRepository } from "../user/repository";
 import { DEV_SEED_DEMO_USER_EMAIL } from "../users/seeds";
 import type { NewNewsletterSubscription } from "./db";
 import { NewsletterSubscriptionStatus } from "./enum";

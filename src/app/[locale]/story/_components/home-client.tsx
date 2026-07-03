@@ -1,13 +1,10 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { useSearchParams } from "next-vibe/ui/web/hooks/use-navigation";
-import { getElementById } from "next-vibe/ui/web/lib/dom";
-import {
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { getElementById } from "next-vibe/ui/lib/dom";
+import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
+import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

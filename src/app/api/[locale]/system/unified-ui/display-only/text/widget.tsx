@@ -1,9 +1,9 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Div } from "next-vibe/ui/ui/div";
+import { Label } from "next-vibe/ui/ui/label";
+import { Span } from "next-vibe/ui/ui/span";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
@@ -24,8 +24,12 @@ import {
 import type { JSX } from "react";
 
 import { extractTextData, formatIfDate, formatText } from "./shared";
-import type { TextEmphasis, TextVariant, TextWidgetSchema } from "./types";
-import type { TextWidgetConfig } from "./types";
+import type {
+  TextEmphasis,
+  TextVariant,
+  TextWidgetConfig,
+  TextWidgetSchema,
+} from "./types";
 
 /**
  * Get CSS class for text variant styling

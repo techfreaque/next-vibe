@@ -1,10 +1,10 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Pre } from "next-vibe/ui/web/ui/pre";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Code } from "next-vibe/ui/web/ui/typography";
+import { Div } from "next-vibe/ui/ui/div";
+import { Pre } from "next-vibe/ui/ui/pre";
+import { Span } from "next-vibe/ui/ui/span";
+import { Code } from "next-vibe/ui/ui/typography";
 import type { ReactDisplayWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";

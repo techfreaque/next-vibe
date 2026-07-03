@@ -5,10 +5,10 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -71,7 +71,7 @@ export function EmailDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: email.leadId! } });
     })();
   };

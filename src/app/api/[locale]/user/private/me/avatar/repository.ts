@@ -11,10 +11,10 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { UserDetailLevel } from "../../../enum";
-import { UserRepository } from "../../../repository";
 import type {
   AvatarDeleteResponseOutput,
   AvatarPostResponseOutput,
@@ -106,7 +106,7 @@ export class AvatarRepository {
       // Update user avatar in database
       const { eq } = await import("drizzle-orm");
       const { db } = await import("next-vibe/database");
-      const { users } = await import("../../../db");
+      const { users } = await import("next-vibe/identity/user/db");
 
       await db
         .update(users)
@@ -178,7 +178,7 @@ export class AvatarRepository {
       // Delete avatar from database
       const { eq } = await import("drizzle-orm");
       const { db } = await import("next-vibe/database");
-      const { users } = await import("../../../db");
+      const { users } = await import("next-vibe/identity/user/db");
 
       await db
         .update(users)

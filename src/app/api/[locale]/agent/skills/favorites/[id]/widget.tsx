@@ -6,27 +6,27 @@
 
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { Film } from "next-vibe/ui/web/ui/icons/Film";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
-import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
-import { Skeleton } from "next-vibe/ui/web/ui/skeleton";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Textarea } from "next-vibe/ui/web/ui/textarea";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { Film } from "next-vibe/ui/ui/icons/Film";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
+import { Mic } from "next-vibe/ui/ui/icons/Mic";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
+import { Skeleton } from "next-vibe/ui/ui/skeleton";
+import { Span } from "next-vibe/ui/ui/span";
+import { Textarea } from "next-vibe/ui/ui/textarea";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -126,8 +126,7 @@ import {
 import { useSkill } from "../../[id]/hooks";
 import { SkillVoteButtons } from "../../[id]/vote/vote-buttons";
 import { ModelSelectionType, SkillOwnershipType } from "../../enum";
-import definitionPatch from "./definition";
-import { getBestChatModelForFavorite } from "./definition";
+import definitionPatch, { getBestChatModelForFavorite } from "./definition";
 
 /**
  * Props for PATCH custom widget

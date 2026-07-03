@@ -4,13 +4,13 @@
  */
 
 import { Link } from "@react-email/components";
+import type { CSSProperties, JSX, ReactNode } from "react";
+
 import {
   ensureFullUrl,
   generateTrackingLinkUrl,
   isTrackingUrl,
-} from "next-vibe/identity/tracking/utils";
-import type { CSSProperties, JSX, ReactNode } from "react";
-
+} from "@/app/api/[locale]/leads/tracking/utils";
 import { envClient } from "@/config/env-client";
 
 import { type TrackingContext } from "./tracking_context.email";

@@ -2,13 +2,13 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { openUrl } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { SiDiscord } from "next-vibe/ui/web/ui/icons/SiDiscord";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { H2, H3, P } from "next-vibe/ui/web/ui/typography";
+import { openUrl } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { SiDiscord } from "next-vibe/ui/ui/icons/SiDiscord";
+import { Link } from "next-vibe/ui/ui/link";
+import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 

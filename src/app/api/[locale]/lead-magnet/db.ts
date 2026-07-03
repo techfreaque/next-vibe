@@ -14,9 +14,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { users } from "next-vibe/identity/user/db";
 
 import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import { users } from "@/app/api/[locale]/user/db";
 
 import { LeadMagnetCaptureStatus, LeadMagnetCaptureStatusDB } from "./enum";
 

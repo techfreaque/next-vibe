@@ -1,6 +1,6 @@
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";

@@ -18,29 +18,29 @@ import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { EyeOff } from "next-vibe/ui/web/ui/icons/EyeOff";
-import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Switch } from "next-vibe/ui/web/ui/switch";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
+import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
+import { Switch } from "next-vibe/ui/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/tooltip";
+import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

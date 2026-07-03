@@ -15,7 +15,7 @@ import {
 } from "next-vibe/identity/auth/base-auth-handler";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import { cookies } from "next-vibe/ui/web/lib/headers";
+import { cookies } from "next-vibe/ui/lib/headers";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,

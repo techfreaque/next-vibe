@@ -1,6 +1,6 @@
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/form-fields/multiselect-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";

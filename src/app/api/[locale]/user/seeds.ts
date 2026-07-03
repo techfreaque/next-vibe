@@ -15,18 +15,18 @@ import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { SessionRepository } from "next-vibe/identity/session/repository";
+import type { NewUser } from "next-vibe/identity/user/db";
+import { users } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import type { StandardUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { env } from "@/config/env";
 import { translations } from "@/config/i18n/en";
 
 import { contactClientRepository } from "../contact/repository-client";
-import type { NewUser } from "./db";
-import { users } from "./db";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "./dev-seed-users";
-import { UserDetailLevel } from "./enum";
-import { UserRepository } from "./repository";
-import type { StandardUserType } from "./types";
 
 /**
  * Helper function to create user seed data

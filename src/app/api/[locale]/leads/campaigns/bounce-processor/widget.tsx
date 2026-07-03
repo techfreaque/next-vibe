@@ -6,20 +6,15 @@
 "use client";
 
 import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

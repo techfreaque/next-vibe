@@ -22,9 +22,11 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { Methods } from "next-vibe/core/definition/enums";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
@@ -32,7 +34,7 @@ import { describe, expect, it } from "vitest";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import * as userSchema from "@/app/api/[locale]/user/db";
+import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -89,7 +91,11 @@ export async function isServerRunning(
     return false;
   }
   try {
-    const resp = await fetch(`${url}/api/en-US/system/server/health`, {
+    // Liveness probe: waits for a not-yet-started server process to come up. This
+    // is the one sanctioned raw fetch — it must hit the wire before any session
+    // or connection exists, so it cannot go through the typed remote path.
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe
+    const resp = await fetch(`${url}/api/en-US/system/runtime/server/health`, {
       signal: AbortSignal.timeout(3000),
     });
     // Accept any response that isn't a network error — 401/403 still means server is up.
@@ -224,9 +230,9 @@ export async function closeProdDb(): Promise<void> {
 export async function resolveDevUser(
   email: string,
 ): Promise<JwtPrivatePayloadType | null> {
-  const { UserRepository } = await import("@/app/api/[locale]/user/repository");
-  const { UserDetailLevel } = await import("@/app/api/[locale]/user/enum");
-  const { userRoles } = await import("@/app/api/[locale]/user/db");
+  const { UserRepository } = await import("next-vibe/identity/user/repository");
+  const { UserDetailLevel } = await import("next-vibe/identity/user/enum");
+  const { userRoles } = await import("next-vibe/identity/user/db");
   const { userLeadLinks } = await import("next-vibe/identity/lead/db");
   const { eq: eqUser } = await import("drizzle-orm");
   const { UserRoleDB } = await import("next-vibe/identity/roles/enum");
@@ -418,7 +424,7 @@ export async function connectToHermes(
   // Restore atlas identity first — a prior headless run may have left
   // 'headless-client' as the default, causing register to store the wrong instanceId.
   await disconnectFromHermes(user.id);
-  await restoreHermesIdentity();
+  await restoreHermesIdentity(remoteUrl);
   await restoreAtlasIdentity();
   await unregisterDevFromHermes(await resolveProdUserId(), remoteUrl);
 
@@ -493,7 +499,7 @@ export async function connectToHermes(
   // Capture hermes's current atlas-row lastSyncedAt BEFORE triggering — phase 2
   // must wait for it to ADVANCE past this value, not just be non-null.
   const hermesBeforeTs = await resolveHermesAtlasLastSyncedAt();
-  await triggerHermesReconnect(remoteUrl);
+  await triggerHermesReconnect();
   await assertSyncCompleted(user.id, remoteUrl, hermesBeforeTs);
 
   // Ensure capabilities are populated on the atlas hermes row.
@@ -523,7 +529,7 @@ export async function connectToHermes(
     );
     // Trigger another sync so hermes resends capabilities
     const beforeTs2 = await resolveHermesAtlasLastSyncedAt();
-    await triggerHermesReconnect(remoteUrl);
+    await triggerHermesReconnect();
     // Wait for lastSyncedAt to advance past the first sync's timestamp
     const deadline2 = Date.now() + 60_000;
     while (Date.now() < deadline2) {
@@ -764,36 +770,33 @@ export async function unregisterDevFromHermes(
  * RN5 tests rename hermes's identity — if they fail mid-test the identity stays
  * as the renamed value (e.g. 'hermes-rn5-*'). Call this before connecting so
  * connectRemote gets the correct remoteInstanceId back from hermes.
+ *
+ * DIRECT HTTP by design: this runs BEFORE any atlas→hermes connection exists
+ * (connectToHermes pre-cleans the rows first), so a connection-routed remote
+ * dispatch (`sendTestRequest({instanceId})`) can never resolve here — on a
+ * clean DB it fails NOT_FOUND. Log into hermes as admin and PATCH its
+ * self-rename endpoint over raw HTTP instead. propagate=false: no live
+ * connections yet.
  */
 export async function restoreHermesIdentity(
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
-  // Hermes renames its OWN identity via its self-rename endpoint. This runs
-  // before the connection exists, so call hermes's real HTTP endpoint directly
-  // with an admin token (the same way a remote operator would).
-  // propagate=false: no live connections to notify yet.
-  const adminToken = await resolveProdAdminToken(remoteUrl);
-  const resp = await fetch(
-    `${remoteUrl}/api/en-US/remote-connection/self/rename`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        newInstanceId: HERMES_INSTANCE_ID,
-        propagate: false,
-      }),
-      signal: AbortSignal.timeout(10_000),
-    },
-  );
-  if (!resp.ok) {
-    const body = await resp.text().catch(() => "unknown");
+  const token = await resolveProdAdminToken(remoteUrl);
+  const selfRenameDef = (
+    await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+  ).default;
+  const resp = await RemoteTransport.callRaw({
+    remoteUrl,
+    apiPath: `en-US/${selfRenameDef.PATCH.path.join("/")}`,
+    method: Methods.PATCH,
+    body: { newInstanceId: HERMES_INSTANCE_ID, propagate: false },
+    token,
+    timeoutMs: 15_000,
+  });
+  if (!resp.ok || resp.body?.["success"] !== true) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `restoreHermesIdentity: self-rename failed status=${String(resp.status)} body=${body.slice(0, 200)}`,
+      `restoreHermesIdentity: self-rename failed ${String(resp.status)} ${JSON.stringify(resp.body)}`,
     );
   }
 }
@@ -834,27 +837,32 @@ export async function restoreAtlasIdentity(): Promise<void> {
  * Uses direct HTTP because this runs before the connection is fully established
  * (capability snapshot doesn't exist yet — sendTestRequest would be rejected).
  */
-async function triggerHermesReconnect(
-  remoteUrl: string = LOCAL_DEV_URL,
-): Promise<void> {
-  const adminToken = await resolveProdAdminToken(remoteUrl);
-  const resp = await fetch(
-    `${remoteUrl}/api/en-US/remote-connection/${ATLAS_INSTANCE_ID}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({ reconnectNow: true }),
-    },
-  );
-  if (!resp.ok) {
-    const body = await resp.text().catch(() => "unknown");
+async function triggerHermesReconnect(): Promise<void> {
+  // PATCH hermes's atlas connection with reconnectNow — routed to hermes via
+  // instanceId through the typed test path.
+  const { sendTestRequest } =
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+  const connByIdDef = (
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+  ).default;
+  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+  if (!adminUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `[connectToHermes] hermes reconnect failed: status=${String(resp.status)} body=${body.slice(0, 300)}`,
+      `triggerHermesReconnect: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found`,
+    );
+  }
+  const resp = await sendTestRequest({
+    endpoint: connByIdDef.PATCH,
+    data: { reconnectNow: true },
+    urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
+    user: adminUser,
+    instanceId: HERMES_INSTANCE_ID,
+  });
+  if (!resp.success) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      `[connectToHermes] hermes reconnect failed: ${resp.message}`,
     );
   }
 }
@@ -969,31 +977,44 @@ async function assertSyncCompleted(
 export async function resolveProdAdminToken(
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<string> {
-  const response = await fetch(`${remoteUrl}/api/en-US/user/public/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: env.VIBE_ADMIN_USER_EMAIL,
-      password: env.VIBE_ADMIN_USER_PASSWORD,
-    }),
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!response.ok) {
-    const err = await response.text().catch(() => "unknown");
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(
-      `resolveProdAdminToken: login failed ${String(response.status)} ${err}`,
-    );
+  // The dev HTTP layer (vite/nitro) intermittently answers with its
+  // pre-handler {"unhandled":true} 500 before the login handler even runs —
+  // side-effect-free, so a short bounded retry rides over the flake instead
+  // of failing the whole suite in beforeAll.
+  let lastFailure = "";
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    if (attempt > 1) {
+      await sleep(750 * attempt);
+    }
+    const response = await RemoteTransport.callRaw({
+      remoteUrl,
+      apiPath: "en-US/user/public/login",
+      method: Methods.POST,
+      body: {
+        email: env.VIBE_ADMIN_USER_EMAIL,
+        password: env.VIBE_ADMIN_USER_PASSWORD,
+      },
+      timeoutMs: 10_000,
+    });
+    if (!response.ok) {
+      lastFailure = `login failed ${String(response.status)} ${JSON.stringify(response.body)}`;
+      const unhandled =
+        (response.body as { unhandled?: boolean } | undefined)?.unhandled ===
+        true;
+      if (response.status >= 500 && (unhandled || attempt < 4)) {
+        continue;
+      }
+      break;
+    }
+    const data = response.body?.["data"] as { token?: string } | undefined;
+    if (!response.body?.["success"] || !data?.token) {
+      lastFailure = "no token in login response";
+      break;
+    }
+    return data.token;
   }
-  const json = (await response.json()) as {
-    success: boolean;
-    data?: { token?: string };
-  };
-  if (!json.success || !json.data?.token) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(`resolveProdAdminToken: no token in login response`);
-  }
-  return json.data.token;
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+  throw new Error(`resolveProdAdminToken: ${lastFailure}`);
 }
 
 // ── Hermes pull trigger ───────────────────────────────────────────────────────
@@ -1004,12 +1025,15 @@ export async function resolveProdAdminToken(
  * Gives tests a synchronisation point so polling the hermes DB doesn't race.
  */
 export async function triggerHermesPull(
+  // Kept for call-site compatibility — reconnect is now (user, instance)-routed
+  // via sendTestRequest, so neither the token nor the URL is needed here.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _adminToken: string,
-  remoteUrl: string = LOCAL_DEV_URL,
+  _adminToken?: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _remoteUrl?: string,
 ): Promise<void> {
   const beforeTs = await resolveHermesAtlasLastSyncedAt();
-  await triggerHermesReconnect(remoteUrl);
+  await triggerHermesReconnect();
   // Wait for hermes to complete the pull (lastSyncedAt advances past beforeTs).
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {

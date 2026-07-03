@@ -7,7 +7,7 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { notFound } from "next-vibe/ui/web/lib/not-found";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
 import { NewsletterPage } from "../_components/newsletter-page";

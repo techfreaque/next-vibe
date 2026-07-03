@@ -9,8 +9,9 @@ import type {
   EmailJourneyVariant,
 } from "next-vibe/identity/lead/enum";
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
-import { LeadTrackingRepository } from "next-vibe/identity/tracking/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { LeadTrackingRepository } from "@/app/api/[locale]/leads/tracking/repository";
 
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";

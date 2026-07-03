@@ -3,7 +3,7 @@
 import type { InferResponseOutput } from "next-vibe/core/definition/create";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { withValueNonStrict } from "next-vibe/unified-ui/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,

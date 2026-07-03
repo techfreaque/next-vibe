@@ -23,8 +23,8 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
-import { NextResponse } from "next-vibe/ui/web/lib/request";
+import type { NextRequest } from "next-vibe/ui/lib/request";
+import { NextResponse } from "next-vibe/ui/lib/request";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

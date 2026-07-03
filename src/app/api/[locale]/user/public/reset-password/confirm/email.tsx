@@ -23,8 +23,8 @@ import {
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
-import { UserDetailLevel } from "../../../enum";
-import { UserRepository } from "../../../repository";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,

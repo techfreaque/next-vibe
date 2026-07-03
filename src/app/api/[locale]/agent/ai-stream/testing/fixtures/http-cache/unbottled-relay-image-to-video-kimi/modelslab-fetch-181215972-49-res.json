@@ -1,0 +1,34 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/video/fetch/181215972",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a13cdf2d3bbdd2e4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:36:11 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=ew7gsTOv42NxOp5ARV7%2Fh0j1iRRb0lbqRgFxxV%2BcIBsWnPTkYAYE%2FBxB3iqy3gNfblwz8sg95kla8s6WrFPqTxM3BTWb%2F8miEw0dK5g8YfxZN0HrbHmP9N6QQCP87gk%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "db9a5e358113d5a7158fc7a0883af691",
+    "x-request-time": "0.253",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "success",
+    "id": 181215972,
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/7943db26-d8cb-40de-a210-e26087275314-0.mp4"
+    ],
+    "proxy_links": {}
+  }
+}

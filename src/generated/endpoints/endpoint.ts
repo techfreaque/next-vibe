@@ -904,9 +904,8 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/agent/coding-agent/definition"))
         .default.POST;
     case "click-tracking":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.GET;
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.GET;
     case "cluster-init":
       return (
         await import("@/app/api/[locale]/system/tooling/infra/cluster/init/definition")
@@ -1830,9 +1829,8 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/inventory/warehouse/[warehouseId]/update/definition")
       ).default.PATCH;
     case "ip-match-linking":
-      return (
-        await import("@/app/api/[locale]/system/identity/attribution/definition")
-      ).default.POST;
+      return (await import("@/app/api/[locale]/leads/attribution/definition"))
+        .default.POST;
     case "kagi-search":
       return (await import("@/app/api/[locale]/agent/search/kagi/definition"))
         .default.GET;
@@ -2015,6 +2013,9 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/leads/data-sources/leads-website-visits/definition")
       ).default.POST;
+    case "leads_attribution_POST":
+      return (await import("@/app/api/[locale]/leads/attribution/definition"))
+        .default.POST;
     case "leads_batch_DELETE":
       return (await import("@/app/api/[locale]/leads/batch/definition")).default
         .DELETE;
@@ -2142,6 +2143,15 @@ export async function getEndpoint(
     case "leads_export_GET":
       return (await import("@/app/api/[locale]/leads/export/definition"))
         .default.GET;
+    case "leads_id_DELETE":
+      return (await import("@/app/api/[locale]/leads/[id]/definition")).default
+        .DELETE;
+    case "leads_id_GET":
+      return (await import("@/app/api/[locale]/leads/[id]/definition")).default
+        .GET;
+    case "leads_id_PATCH":
+      return (await import("@/app/api/[locale]/leads/[id]/definition")).default
+        .PATCH;
     case "leads_import_POST":
       return (await import("@/app/api/[locale]/leads/import/definition"))
         .default.POST;
@@ -2184,6 +2194,12 @@ export async function getEndpoint(
     case "leads_stats_GET":
       return (await import("@/app/api/[locale]/leads/stats/definition")).default
         .GET;
+    case "leads_tracking_GET":
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.GET;
+    case "leads_tracking_POST":
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.POST;
     case "lint":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/tooling/check/oxlint/definition")
@@ -2899,9 +2915,8 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/server/server/rebuild/definition")
       ).default.POST;
     case "record-engagement":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.POST;
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.POST;
     case "referral-stats":
       return (await import("@/app/api/[locale]/referral/stats/definition"))
         .default.GET;
@@ -3499,30 +3514,6 @@ export async function getEndpoint(
     case "system_help-tool_GET":
       return (await import("@/app/api/[locale]/system/help-tool/definition"))
         .default.GET;
-    case "system_identity_attribution_POST":
-      return (
-        await import("@/app/api/[locale]/system/identity/attribution/definition")
-      ).default.POST;
-    case "system_identity_lead_id_DELETE":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/definition")
-      ).default.DELETE;
-    case "system_identity_lead_id_GET":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/definition")
-      ).default.GET;
-    case "system_identity_lead_id_PATCH":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/definition")
-      ).default.PATCH;
-    case "system_identity_tracking_engagement_GET":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.GET;
-    case "system_identity_tracking_engagement_POST":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.POST;
     case "system_logger_error-monitor_cleanup_POST":
       return (
         await import("@/app/api/[locale]/system/logger/error-monitor/cleanup/definition")
@@ -3842,13 +3833,11 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/system/help-tool/definition"))
         .default.GET;
     case "track-click":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.GET;
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.GET;
     case "track-engagement":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/definition")
-      ).default.POST;
+      return (await import("@/app/api/[locale]/leads/tracking/definition"))
+        .default.POST;
     case "transcribe_audio":
       return (
         await import("@/app/api/[locale]/agent/speech-to-text/definition")

@@ -29,6 +29,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -40,7 +41,6 @@ import {
 } from "@/app/api/[locale]/referral/db";
 import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
 import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
-import { users } from "@/app/api/[locale]/user/db";
 
 import {
   PayoutAction,

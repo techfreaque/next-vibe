@@ -16,9 +16,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { userAddresses } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { userAddresses } from "@/app/api/[locale]/user/db";
 
 import type {
   UserAddressDeleteResponseOutput,

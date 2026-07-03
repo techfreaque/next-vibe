@@ -223,6 +223,13 @@ interface TypecheckConfigEnabled {
   useTsgo?: boolean;
   /** Extra ignore patterns applied only in non-extensive mode (glob patterns for tsconfig exclude) */
   nonExtensiveIgnorePatterns?: string[];
+  /**
+   * Keep a warm tsgo LSP daemon and query it via workspace/diagnostic instead of
+   * spawning a fresh tsgo process each run.  First call pays the cold-start cost;
+   * every subsequent call returns in 1–3 s because the type graph stays in memory.
+   * Requires useTsgo: true.  The daemon socket lives at .tmp/tsgo-lsp.sock.
+   */
+  useLspDaemon?: boolean;
 }
 
 export type TypecheckConfig = TypecheckConfigDisabled | TypecheckConfigEnabled;

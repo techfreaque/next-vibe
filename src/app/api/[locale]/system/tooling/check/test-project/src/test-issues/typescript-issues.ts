@@ -19,7 +19,7 @@ const inferrableBoolean: boolean = true;
 // typescript/no-empty-function - Empty function
 export function emptyFunction(): void {}
 
-// typescript/consistent-type-imports - Should use type import
+// typescript/consistent-type-imports - violation: uses value import for type-only usage
 import { GreetOptions } from "../greet";
 
 // Function using the imported type to avoid unused import error

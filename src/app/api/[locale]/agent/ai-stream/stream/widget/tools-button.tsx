@@ -3,10 +3,10 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLogger,
   useWidgetUser,

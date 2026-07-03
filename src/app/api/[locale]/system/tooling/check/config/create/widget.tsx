@@ -1,6 +1,6 @@
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";

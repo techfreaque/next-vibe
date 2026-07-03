@@ -21,6 +21,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { leads } from "next-vibe/identity/lead/db";
+import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
 import type { ChatModelId } from "../agent/ai-stream/models";
@@ -29,7 +30,6 @@ import type {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../agent/ai-stream/vision-models";
-import { users } from "../user/db";
 import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
 
 /**

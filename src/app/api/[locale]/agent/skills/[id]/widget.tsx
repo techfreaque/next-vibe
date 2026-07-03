@@ -5,70 +5,70 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
-import { usePathname } from "next-vibe/ui/web/hooks/use-pathname";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { getDocumentBody } from "next-vibe/ui/web/lib/dom";
-import { getCurrentOrigin, openUrl } from "next-vibe/ui/web/lib/location";
-import { getScreenWidth } from "next-vibe/ui/web/lib/screen";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { getDocumentBody } from "next-vibe/ui/lib/dom";
+import { getCurrentOrigin, openUrl } from "next-vibe/ui/lib/location";
+import { getScreenWidth } from "next-vibe/ui/lib/screen";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe/ui/web/ui/collapsible";
+} from "next-vibe/ui/ui/collapsible";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
+} from "next-vibe/ui/ui/dialog";
+import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/web/ui/form/form";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { Brain } from "next-vibe/ui/web/ui/icons/Brain";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { DollarSign } from "next-vibe/ui/web/ui/icons/DollarSign";
-import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { Eye } from "next-vibe/ui/web/ui/icons/Eye";
-import { Film } from "next-vibe/ui/web/ui/icons/Film";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { LogIn } from "next-vibe/ui/web/ui/icons/LogIn";
-import { Maximize } from "next-vibe/ui/web/ui/icons/Maximize";
-import { Mic } from "next-vibe/ui/web/ui/icons/Mic";
-import { Pencil } from "next-vibe/ui/web/ui/icons/Pencil";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Share2 } from "next-vibe/ui/web/ui/icons/Share2";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { Star } from "next-vibe/ui/web/ui/icons/Star";
-import { ThumbsUp } from "next-vibe/ui/web/ui/icons/ThumbsUp";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { User } from "next-vibe/ui/web/ui/icons/User";
-import { UserPlus } from "next-vibe/ui/web/ui/icons/UserPlus";
-import { Users } from "next-vibe/ui/web/ui/icons/Users";
-import { Volume2 } from "next-vibe/ui/web/ui/icons/Volume2";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Image } from "next-vibe/ui/web/ui/image";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Skeleton } from "next-vibe/ui/web/ui/skeleton";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/form/form";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
+import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { Film } from "next-vibe/ui/ui/icons/Film";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
+import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
+import { Mic } from "next-vibe/ui/ui/icons/Mic";
+import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Share2 } from "next-vibe/ui/ui/icons/Share2";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { Star } from "next-vibe/ui/ui/icons/Star";
+import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { User } from "next-vibe/ui/ui/icons/User";
+import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
+import { Users } from "next-vibe/ui/ui/icons/Users";
+import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Image } from "next-vibe/ui/ui/image";
+import { Input } from "next-vibe/ui/ui/input";
+import { Link } from "next-vibe/ui/ui/link";
+import { Skeleton } from "next-vibe/ui/ui/skeleton";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "next-vibe/ui/ui/tooltip";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,

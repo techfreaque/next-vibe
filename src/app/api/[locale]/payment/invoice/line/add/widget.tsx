@@ -1,10 +1,10 @@
 "use client";
 
 import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,

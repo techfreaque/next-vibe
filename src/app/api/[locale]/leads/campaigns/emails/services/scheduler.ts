@@ -29,6 +29,7 @@ import {
   LeadSource,
   LeadStatus,
 } from "next-vibe/identity/lead/enum";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
@@ -36,7 +37,6 @@ import {
   type CampaignTypeValue,
 } from "../../../../messenger/accounts/enum";
 import { MessageStatus } from "../../../../messenger/messages/enum";
-import { users } from "../../../../user/db";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 

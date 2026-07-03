@@ -1,7 +1,7 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Alert, AlertDescription } from "next-vibe/ui/web/ui/alert";
+import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

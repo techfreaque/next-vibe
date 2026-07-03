@@ -9,7 +9,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
+import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useCallback } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

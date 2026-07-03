@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
     needsMove: "Zu verschieben",
     unusedSymbols: "Ungenutzte Symbole",
     crossDomain: "Domänenübergreifend",
+    pageViolations: "Seitenverstöße",
   },
 
   container: {
@@ -123,6 +124,14 @@ export const translations: typeof enTranslations = {
       colPath: "Datei",
       emptyState: "Keine ungenutzte öffentliche Oberfläche im Umfang.",
       wholeFile: "(ganze Datei — keine Importeure)",
+    },
+    pageViolations: {
+      title: "Seitenarchitektur-Verstöße",
+      description:
+        "page.tsx-Dateien, die mehr als Repository/Definition/i18n/page-client importieren. Seiten müssen dünne SSR-Hüllen sein — Geschäftslogik, UI, Enums und DB-Zugriff gehören in repository.ts oder page-client.tsx.",
+      colCount: "Verstöße",
+      colPath: "Seite",
+      emptyState: "Alle page.tsx-Dateien respektieren die Architekturgrenze.",
     },
     crossDomain: {
       title: "Domänenübergreifende Kandidaten",

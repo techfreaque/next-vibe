@@ -19,13 +19,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
-import { Link2 } from "next-vibe/ui/web/ui/icons/Link2";
-import { Lock } from "next-vibe/ui/web/ui/icons/Lock";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { Link2 } from "next-vibe/ui/ui/icons/Link2";
+import { Lock } from "next-vibe/ui/ui/icons/Lock";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetLocale,
   useWidgetUser,

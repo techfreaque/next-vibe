@@ -79,7 +79,6 @@ import { contacts } from "@/app/api/[locale]/contact/db";
 import { ContactSubject } from "@/app/api/[locale]/contact/enum";
 import { env } from "@/config/env";
 
-import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { ChatModelId } from "../../models";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
 import {
@@ -109,7 +108,10 @@ import {
 } from "./helpers/chain";
 import type { ModeConfig } from "./helpers/config";
 import { deriveLoopRunsRemote } from "./helpers/config";
-import { createQualityTesterFavorite } from "./helpers/favorites";
+import {
+  createQualityTesterFavorite,
+  ensureVisualFavorite,
+} from "./helpers/favorites";
 import {
   assertNoMetaToolPrefix,
   assertToolMessageComplete,
@@ -260,9 +262,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
   // For queue tests (cfg.pulse set), individual tests need more time for cron cycles
   const effectiveTestTimeout = cfg.pulse ? QUEUE_TEST_TIMEOUT : TEST_TIMEOUT;
   describe(cfg.label, () => {
-    // Suite root: BACKGROUND for all suites (test threads stay out of the
-    // user's regular chats); REMOTE-folder suites override with their
-    // instance folder root.
+    // Suite root: PRIVATE for all same-instance suites — every test thread
+    // lands at PRIVATE/tests/<case>/ and NOTHING is stored anywhere else.
+    // REMOTE-folder suites override with their instance folder root
+    // (REMOTE/<instance>/tests/<case> on the caller; the executor mirrors to
+    // BACKGROUND/remote/<caller>/tests/<case>).
     const suiteRootFolderId: DefaultFolderId =
       cfg.rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
 
@@ -574,24 +578,38 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `This means the stream ran locally (or unbilled), not on the remote relay.`,
           ).toBeGreaterThan(0);
 
-          // Transport attestation: the caller-side mirror carries the
-          // receiver-echoed transport, stamped by the transport PRIMITIVE that
-          // actually carried the relay (never by configuration).
-          if (cfg.expectRelayTransport && result.data.threadId) {
+          // Transport attestation lives on the REMOTE CONNECTION row: the
+          // transport PRIMITIVE that actually carried the dispatch stamps
+          // lastTransportUsed there (never configuration code).
+          if (cfg.expectRelayTransport) {
             const { db: localDb } = await import("next-vibe/database");
-            const { chatThreads: threadsTable } =
-              await import("@/app/api/[locale]/agent/chat/db");
-            const { eq: eqOp } = await import("drizzle-orm");
-            const [threadRow] = await localDb
-              .select({ metadata: threadsTable.metadata })
-              .from(threadsTable)
-              .where(eqOp(threadsTable.id, result.data.threadId))
+            const { remoteConnections: connTable } =
+              await import("@/app/api/[locale]/remote-connection/db");
+            const { and: andOp, eq: eqOp } = await import("drizzle-orm");
+            const { HERMES_INSTANCE_ID: hermesId } =
+              await import("../../testing/remote-setup");
+            const [connRow] = await localDb
+              .select({
+                lastTransportUsed: connTable.lastTransportUsed,
+                lastTransportUsedAt: connTable.lastTransportUsedAt,
+              })
+              .from(connTable)
+              .where(
+                andOp(
+                  eqOp(connTable.userId, testUser.id),
+                  eqOp(connTable.instanceId, hermesId),
+                ),
+              )
               .limit(1);
-            const attested = threadRow?.metadata?.["relayTransport"];
             expect(
-              attested,
-              `T-RELAY: relay must have ACTUALLY used transport '${cfg.expectRelayTransport}' — attested value on the caller thread metadata was '${String(attested)}'`,
+              connRow?.lastTransportUsed,
+              `T-RELAY: relay must have ACTUALLY used transport '${cfg.expectRelayTransport}' — connection attested '${String(connRow?.lastTransportUsed)}'`,
             ).toBe(cfg.expectRelayTransport);
+            expect(
+              (connRow?.lastTransportUsedAt?.getTime() ?? 0) >
+                Date.now() - 10 * 60 * 1000,
+              "T-RELAY: transport attestation must be recent",
+            ).toBe(true);
           }
 
           // When a specific hermes-side folder is expected, verify the thread landed there.
@@ -5895,7 +5913,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             );
           };
 
-          // ── Part A: Initial resolution → DEFAULT_CHAT_MODEL_ID + quality-tester skill ──
+          // ── Part A: Initial resolution → budget variant's manual model + quality-tester skill ──
+          // The favorite carries no own modelSelection, so the cascade falls to
+          // the skill's default (budget) variant: DEEPSEEK_V4_FLASH.
           const resolved = await resolveModelAndSkill(favoriteId);
           expect(resolved.model).toBe(DEFAULT_CHAT_MODEL_ID);
           expect(resolved.skill).toBe(QUALITY_TESTER_SKILL_ID);

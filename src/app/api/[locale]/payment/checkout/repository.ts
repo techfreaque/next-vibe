@@ -14,14 +14,14 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { envClient } from "@/config/env-client";
 
 import { ProductIds } from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";
-import { UserDetailLevel } from "../../user/enum";
-import { UserRepository } from "../../user/repository";
 import { PaymentProvider } from "../enum";
 import { getPaymentProvider } from "../providers";
 import type {

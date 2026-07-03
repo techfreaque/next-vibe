@@ -299,19 +299,12 @@ const { DELETE } = createEndpoint({
   },
 });
 
-export type UserRolePostRequestInput = typeof POST.types.RequestInput;
 export type UserRolePostRequestOutput = typeof POST.types.RequestOutput;
-export type UserRolePostResponseInput = typeof POST.types.ResponseInput;
 export type UserRolePostResponseOutput = typeof POST.types.ResponseOutput;
-export type UserRolePostUrlParamsInput = typeof POST.types.UrlVariablesInput;
 export type UserRolePostUrlParamsOutput = typeof POST.types.UrlVariablesOutput;
 
-export type UserRoleDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type UserRoleDeleteRequestOutput = typeof DELETE.types.RequestOutput;
-export type UserRoleDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type UserRoleDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type UserRoleDeleteUrlParamsInput =
-  typeof DELETE.types.UrlVariablesInput;
 export type UserRoleDeleteUrlParamsOutput =
   typeof DELETE.types.UrlVariablesOutput;
 

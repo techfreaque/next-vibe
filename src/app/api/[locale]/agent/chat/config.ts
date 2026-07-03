@@ -226,6 +226,14 @@ export interface ToolExecutionContext {
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
   /**
+   * True when this stream is a ws-provider RECEIVER loop (relay /
+   * inference-provider): it runs headless HERE but mirrors a LIVE interactive
+   * session on the originator. Confirmation gates (requiresConfirmation) must
+   * apply as if interactive — the originator has the confirmation UI; plain
+   * headless callers (MCP/CLI/cron) do not.
+   */
+  relayReceiver?: boolean;
+  /**
    * Sub-agent nesting depth. 0 = top-level (user-facing or cron).
    * Incremented each time ai-run spawns a child stream.
    * Revival / wakeUp streams inherit the parent's depth (they continue, not nest).
@@ -356,6 +364,26 @@ export interface ToolExecutionContext {
    * Only available in streaming contexts - undefined for cron/headless invocations.
    */
   emitPartialToolResult?: (partialResult: WidgetData) => Promise<void>;
+  /**
+   * Set by execute-tool's handleIncomingToolRequest (the RECEIVER of a remote
+   * detach/wakeUp dispatch). local-async uses it as the task-row ID so the
+   * SAME identity (the requester's callId) names the work on both instances —
+   * await-task targeted at either side finds it, and the receiver's task
+   * history is the durable result store (parity with local detach).
+   */
+  remoteDispatchCallId?: string;
+  /**
+   * Completion hook for receiver-side async execution: local-async invokes it
+   * after the goroutine settles (post claim/completion handling) so the
+   * receiver can emit the tool-execute-result wire event back to the
+   * requester. Undefined outside remote-dispatch reception.
+   */
+  onAsyncTaskSettled?: (outcome: {
+    taskId: string;
+    status: "completed" | "failed";
+    output: Record<string, WidgetData> | null;
+    errorMessage: string | null;
+  }) => Promise<void>;
 }
 
 /**
@@ -526,7 +554,7 @@ export const DEFAULT_FOLDER_CONFIGS = {
 export function isDefaultFolderId(
   folderId: string,
 ): folderId is DefaultFolderId {
-  return Object.values(DefaultFolderId).includes(folderId as DefaultFolderId);
+  return (Object.values(DefaultFolderId) as string[]).includes(folderId);
 }
 
 /**

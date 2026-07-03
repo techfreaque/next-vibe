@@ -5,8 +5,8 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { Div } from "next-vibe/ui/ui/div";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,

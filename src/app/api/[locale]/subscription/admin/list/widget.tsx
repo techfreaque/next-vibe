@@ -7,14 +7,14 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { BarChart3 } from "next-vibe/ui/web/ui/icons/BarChart3";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Span } from "next-vibe/ui/ui/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,

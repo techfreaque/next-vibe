@@ -6,24 +6,24 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { BarChart2 } from "next-vibe/ui/web/ui/icons/BarChart2";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { CreditCard } from "next-vibe/ui/web/ui/icons/CreditCard";
-import { Edit } from "next-vibe/ui/web/ui/icons/Edit";
-import { Link } from "next-vibe/ui/web/ui/icons/Link";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { Package } from "next-vibe/ui/web/ui/icons/Package";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { User } from "next-vibe/ui/web/ui/icons/User";
-import { XCircle } from "next-vibe/ui/web/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { BarChart2 } from "next-vibe/ui/ui/icons/BarChart2";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
+import { Edit } from "next-vibe/ui/ui/icons/Edit";
+import { Link } from "next-vibe/ui/ui/icons/Link";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { Package } from "next-vibe/ui/ui/icons/Package";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { User } from "next-vibe/ui/ui/icons/User";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -130,7 +130,7 @@ export function UserDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);
@@ -489,7 +489,7 @@ export function UserEditContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("next-vibe/identity/lead/[id]/definition");
+      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);

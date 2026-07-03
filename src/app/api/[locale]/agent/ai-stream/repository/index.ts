@@ -15,11 +15,11 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 
-import type { DefaultFolderId } from "../../chat/config";
+import type { DefaultFolderId, ToolExecutionContext } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";
 import { ThreadStatus, ThreadStreamingState } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
@@ -161,6 +161,7 @@ export class AiStreamRepository {
     subAgentDepth,
     mediaModelOverrides,
     toolsOverride,
+    toolsContext,
     parentAbortSignal,
     confirmationOverridesOverride,
   }: {

@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "next-vibe/ui/web/ui/button";
-import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
-import { Pin } from "next-vibe/ui/web/ui/icons/Pin";
-import { ListItem } from "next-vibe/ui/web/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { Button } from "next-vibe/ui/ui/button";
+import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
+import { Pin } from "next-vibe/ui/ui/icons/Pin";
+import { ListItem } from "next-vibe/ui/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

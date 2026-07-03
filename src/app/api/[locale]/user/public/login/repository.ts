@@ -5,7 +5,6 @@
 import "server-only";
 
 import { and, count, eq, gt, isNull, or } from "drizzle-orm";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,27 +13,28 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { verifyPassword } from "next-vibe/identity/auth/password";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
-import type { LeadsT } from "next-vibe/identity/lead/i18n";
-import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import type { Platform } from "next-vibe/core/definition/platform";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type {
   JWTPublicPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
-import { loginAttempts, users } from "../../db";
-import { UserDetailLevel } from "../../enum";
-import { SessionRepository } from "next-vibe/identity/session/repository";
-import { UserRepository } from "../../repository";
+import type { LeadsT } from "next-vibe/identity/lead/i18n";
+import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { SessionRepository } from "next-vibe/identity/session/repository";
+import { loginAttempts, users } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
@@ -78,8 +78,7 @@ export class LoginRepository {
   private static dummyHash: string | null = null;
   private static async getDummyHash(): Promise<string> {
     if (!LoginRepository.dummyHash) {
-      const { hashPassword } =
-        await import("next-vibe/identity/auth/password");
+      const { hashPassword } = await import("next-vibe/identity/auth/password");
       LoginRepository.dummyHash = await hashPassword(
         "__dummy_constant_time_placeholder__",
       );

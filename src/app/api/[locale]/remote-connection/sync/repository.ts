@@ -92,7 +92,7 @@ export class TaskSyncRepository {
     userId: string,
   ): Promise<"admin" | "customer" | "public"> {
     const { userRoles: userRolesTable } =
-      await import("@/app/api/[locale]/user/db");
+      await import("next-vibe/identity/user/db");
     const userRoleRows = await db
       .select({ role: userRolesTable.role })
       .from(userRolesTable)

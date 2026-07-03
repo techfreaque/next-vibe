@@ -24,8 +24,8 @@ import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import { env } from "@/config/env";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { UserDetailLevel } from "../../../enum";
-import { UserRepository } from "../../../repository";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { scopedTranslation as resetPasswordScopedTranslation } from "../i18n";
 import { PasswordRepository } from "../repository";
 import type {

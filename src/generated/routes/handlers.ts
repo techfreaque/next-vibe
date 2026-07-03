@@ -867,9 +867,8 @@ export async function getRouteHandler(
       return (await import("@/app/api/[locale]/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "click-tracking":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .GET as GenericHandlerBase;
     case "cluster-init":
       return (
         await import("@/app/api/[locale]/system/tooling/infra/cluster/init/route")
@@ -1742,9 +1741,8 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/inventory/warehouse/[warehouseId]/update/route")
       ).tools.PATCH as GenericHandlerBase;
     case "ip-match-linking":
-      return (
-        await import("@/app/api/[locale]/system/identity/attribution/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/leads/attribution/route")).tools
+        .POST as GenericHandlerBase;
     case "kagi-search":
       return (await import("@/app/api/[locale]/agent/search/kagi/route")).tools
         .GET as GenericHandlerBase;
@@ -1926,6 +1924,9 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/leads/data-sources/leads-website-visits/route")
       ).tools.POST as GenericHandlerBase;
+    case "leads_attribution_POST":
+      return (await import("@/app/api/[locale]/leads/attribution/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_batch_DELETE":
       return (await import("@/app/api/[locale]/leads/batch/route")).tools
         .DELETE as GenericHandlerBase;
@@ -2050,6 +2051,15 @@ export async function getRouteHandler(
     case "leads_export_GET":
       return (await import("@/app/api/[locale]/leads/export/route")).tools
         .GET as GenericHandlerBase;
+    case "leads_id_DELETE":
+      return (await import("@/app/api/[locale]/leads/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "leads_id_GET":
+      return (await import("@/app/api/[locale]/leads/[id]/route")).tools
+        .GET as GenericHandlerBase;
+    case "leads_id_PATCH":
+      return (await import("@/app/api/[locale]/leads/[id]/route")).tools
+        .PATCH as GenericHandlerBase;
     case "leads_import_POST":
       return (await import("@/app/api/[locale]/leads/import/route")).tools
         .POST as GenericHandlerBase;
@@ -2091,6 +2101,12 @@ export async function getRouteHandler(
     case "leads_stats_GET":
       return (await import("@/app/api/[locale]/leads/stats/route")).tools
         .GET as GenericHandlerBase;
+    case "leads_tracking_GET":
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .GET as GenericHandlerBase;
+    case "leads_tracking_POST":
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .POST as GenericHandlerBase;
     case "lint":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/tooling/check/oxlint/route")
@@ -2761,9 +2777,8 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/server/server/rebuild/route")
       ).tools.POST as GenericHandlerBase;
     case "record-engagement":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .POST as GenericHandlerBase;
     case "referral-stats":
       return (await import("@/app/api/[locale]/referral/stats/route")).tools
         .GET as GenericHandlerBase;
@@ -3321,30 +3336,6 @@ export async function getRouteHandler(
     case "system_help-tool_GET":
       return (await import("@/app/api/[locale]/system/help-tool/route")).tools
         .GET as GenericHandlerBase;
-    case "system_identity_attribution_POST":
-      return (
-        await import("@/app/api/[locale]/system/identity/attribution/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_identity_lead_id_DELETE":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "system_identity_lead_id_GET":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_identity_lead_id_PATCH":
-      return (
-        await import("@/app/api/[locale]/system/identity/lead/[id]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "system_identity_tracking_engagement_GET":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_identity_tracking_engagement_POST":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.POST as GenericHandlerBase;
     case "system_logger_error-monitor_cleanup_POST":
       return (
         await import("@/app/api/[locale]/system/logger/error-monitor/cleanup/route")
@@ -3645,13 +3636,11 @@ export async function getRouteHandler(
       return (await import("@/app/api/[locale]/system/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "track-click":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .GET as GenericHandlerBase;
     case "track-engagement":
-      return (
-        await import("@/app/api/[locale]/system/identity/tracking/engagement/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/leads/tracking/route")).tools
+        .POST as GenericHandlerBase;
     case "transcribe_audio":
       return (await import("@/app/api/[locale]/agent/speech-to-text/route"))
         .tools.POST as GenericHandlerBase;

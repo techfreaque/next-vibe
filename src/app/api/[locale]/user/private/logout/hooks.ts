@@ -11,8 +11,8 @@ import { AuthClientRepository } from "next-vibe/identity/auth/repository-client"
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useToast } from "next-vibe/ui/web/hooks/use-toast";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
+import { useToast } from "next-vibe/ui/hooks/use-toast";
+import { assignUrl } from "next-vibe/ui/lib/location";
 import { useCallback } from "react";
 
 import definitions from "@/app/api/[locale]/credits/definition";

@@ -7,16 +7,11 @@ import type {
   Languages,
 } from "next-vibe/core/i18n/core/config";
 import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Span } from "next-vibe/ui/web/ui/span";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe/ui/web/ui/tabs";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Span } from "next-vibe/ui/ui/span";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 

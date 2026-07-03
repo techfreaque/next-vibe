@@ -6,17 +6,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Bot } from "next-vibe/ui/web/ui/icons/Bot";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Code } from "next-vibe/ui/web/ui/icons/Code";
-import { Layers } from "next-vibe/ui/web/ui/icons/Layers";
-import { MessageSquare } from "next-vibe/ui/web/ui/icons/MessageSquare";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { MotionDiv } from "next-vibe/ui/web/ui/motion";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { Bot } from "next-vibe/ui/ui/icons/Bot";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Code } from "next-vibe/ui/ui/icons/Code";
+import { Layers } from "next-vibe/ui/ui/icons/Layers";
+import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { MotionDiv } from "next-vibe/ui/ui/motion";
 import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";

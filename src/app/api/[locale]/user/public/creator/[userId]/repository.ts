@@ -30,7 +30,7 @@ import { referralCodes } from "@/app/api/[locale]/referral/db";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { users } from "@/app/api/[locale]/user/db";
+import { users } from "next-vibe/identity/user/db";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 

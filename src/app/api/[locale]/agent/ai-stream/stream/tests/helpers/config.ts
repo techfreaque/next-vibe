@@ -103,6 +103,13 @@ export interface ModeConfig {
    * in this folder on the hermes prod DB. Get this from beforeAll after connecting.
    */
   hermesThreadFolderId?: string;
+  /**
+   * The transport leg the relay MUST have actually used. Asserted in T-RELAY
+   * against the REMOTE CONNECTION row's attested `lastTransportUsed` —
+   * written by the transport primitive that actually carried the dispatch
+   * (pushRemoteEvent legs / callToolDirect), never by configuration.
+   */
+  expectRelayTransport?: "direct-http" | "reverse-ws";
 }
 
 /**

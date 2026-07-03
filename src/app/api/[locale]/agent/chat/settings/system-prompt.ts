@@ -26,8 +26,10 @@ export const codingAgentSettingFragment: SystemPromptFragment<CodingAgentSetting
     id: "coding-agent-setting",
     placement: "leading",
     priority: 610,
-    condition: (data) => data.codingAgent !== null,
     build: (data) => {
+      if (data.codingAgent === null) {
+        return null;
+      }
       if (data.codingAgent === "next-vibe-coder") {
         return `## Coding Agent
 

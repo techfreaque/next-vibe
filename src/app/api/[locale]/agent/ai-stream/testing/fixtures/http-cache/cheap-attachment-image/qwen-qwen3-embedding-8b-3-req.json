@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----a0877f0c-b064-482a-ad6d-daffc1a70869.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user asked me to call the contact-form tool with specific parameters. I already did that in the previous tur…",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----8d2f79f4-3504-47c1-89a5-e2514eba06b3.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: <think>The contact form was submitted successfully. The tool required user confirmation (approve), and the user confirme…",
     "encoding_format": "float"
   }
 }

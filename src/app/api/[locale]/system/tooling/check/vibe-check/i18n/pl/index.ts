@@ -98,6 +98,11 @@ export const translations: typeof enTranslations = {
       description:
         "Po włączeniu sprawdza również pliki testowe (*.test.ts, *.test.tsx) i automatycznie generowane pliki (system/generated/**). Domyślnie wyłączone - włącz do walidacji wydania lub gdy chcesz jawnie sprawdzić wygenerowany/testowy kod.",
     },
+    restartLsp: {
+      label: "Restartuj LSP",
+      description:
+        "Zabija demona LSP przed uruchomieniem. Użyj, gdy demon się zawiesi lub zwraca nieaktualne wyniki.",
+    },
   },
 
   response: {

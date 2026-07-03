@@ -3,15 +3,10 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe/ui/web/ui/chart";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
+import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe/ui/ui/chart";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

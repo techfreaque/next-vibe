@@ -14,7 +14,7 @@ import {
   useCustomState,
 } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import type { InputChangeEvent } from "next-vibe/ui/web/ui/input";
+import type { InputChangeEvent } from "next-vibe/ui/ui/input";
 import { useCallback, useMemo } from "react";
 
 import { useLogger } from "@/hooks/use-logger";

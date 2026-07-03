@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { useWidgetForm } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";

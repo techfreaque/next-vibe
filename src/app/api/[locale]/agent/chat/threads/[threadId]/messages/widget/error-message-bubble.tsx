@@ -5,10 +5,10 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Trash2 } from "next-vibe/ui/web/ui/icons/Trash2";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
+import { Div } from "next-vibe/ui/ui/div";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLogger,
   useWidgetNavigation,

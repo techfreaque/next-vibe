@@ -3,15 +3,15 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { LeadSource } from "next-vibe/identity/lead/enum";
-import trackingEndpoints from "next-vibe/identity/tracking/engagement/definition";
 import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
-import { useSearchParams } from "next-vibe/ui/web/hooks/use-navigation";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { P } from "next-vibe/ui/web/ui/typography";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { Div } from "next-vibe/ui/ui/div";
+import { P } from "next-vibe/ui/ui/typography";
 import type React from "react";
 
 import { scopedTranslation } from "@/app/[locale]/track/i18n";
+import trackingEndpoints from "@/app/api/[locale]/leads/tracking/definition";
 import { useLogger } from "@/hooks/use-logger";
 
 /**

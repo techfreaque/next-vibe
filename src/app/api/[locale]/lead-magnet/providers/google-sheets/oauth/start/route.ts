@@ -5,7 +5,7 @@ import { Platform } from "next-vibe/core/definition/platform";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import type { NextRequest } from "next-vibe/ui/web/lib/request";
+import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { buildGoogleAuthUrl } from "../../oauth-helpers";
 

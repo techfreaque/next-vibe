@@ -16,7 +16,7 @@ import type {
   EslintFlatConfigItem,
   EslintParser,
   EslintPluginLike,
-} from "@next-vibe/checker/system/tooling/check/config/types";
+} from "@next-vibe/checker/tooling/check/config/types";
 
 // --------------------------------------------------------
 // Vibe Check Defaults
@@ -676,7 +676,7 @@ const oxlint: CheckConfig["oxlint"] = {
   },
   overrides: [
     {
-      // next-vibe-ui platform wrappers legitimately use native HTML elements
+      // vibe ui platform wrappers legitimately use native HTML elements
       // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
       files: ["**/next-vibe/ui/web/**"],
       rules: {

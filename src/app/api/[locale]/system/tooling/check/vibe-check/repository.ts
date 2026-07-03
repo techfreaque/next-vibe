@@ -34,6 +34,7 @@ import type {
   CheckVibeCheckTranslationKey,
 } from "next-vibe/tooling/check/vibe-check/i18n";
 
+import { TsgoDaemon } from "@/app/api/[locale]/system/tooling/check/typecheck/lsp-daemon";
 import { env } from "@/config/env";
 
 import type {
@@ -170,9 +171,16 @@ export class VibeCheckRepository {
     locale: CountryLanguage,
     extensive: boolean,
     signal: AbortSignal,
+    forceLspDaemon = false,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
+    const effectiveConfig: CheckConfig = forceLspDaemon
+      ? {
+          ...config,
+          typecheck: { ...config.typecheck, useLspDaemon: true },
+        }
+      : config;
     const result = await TypecheckRepository.execute(
       {
         path,
@@ -188,7 +196,7 @@ export class VibeCheckRepository {
       platform,
       typecheckT,
       locale,
-      config,
+      effectiveConfig,
       signal,
     );
 
@@ -293,6 +301,13 @@ export class VibeCheckRepository {
         );
       }
 
+      // Kill and restart LSP daemon if requested
+      if (data.restartLsp) {
+        const pidPath = `${process.cwd()}/.tmp/tsgo-lsp.pid`;
+        TsgoDaemon.kill(pidPath);
+        logger.info("LSP daemon restarted");
+      }
+
       // Apply defaults from check.config.ts
       const defaults = configResult.config.vibeCheck || {};
 
@@ -303,7 +318,7 @@ export class VibeCheckRepository {
 
       const effectiveData = {
         ...data,
-        fix: data.fix ?? defaults.fix ?? false,
+        fix: defaults.fix ?? false,
         skipEslint: defaults.skipEslint ?? false,
         skipOxlint: defaults.skipOxlint ?? false,
         skipTypecheck: defaults.skipTypecheck ?? false,

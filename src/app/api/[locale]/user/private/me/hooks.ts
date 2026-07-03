@@ -5,33 +5,20 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useToast } from "next-vibe/ui/web/hooks/use-toast";
 import { useEffect, useRef } from "react";
 
 import {
   createCustomStateKey,
   useCustomState,
 } from "../../../system/platforms/react/hooks/store";
-import {
-  type EnhancedMutationResult,
-  useApiMutation,
-} from "../../../system/platforms/react/hooks/use-api-mutation";
 import { useApiQuery } from "../../../system/platforms/react/hooks/use-api-query";
-import meEndpoints, {
-  type MeDeleteRequestOutput,
-  type MeDeleteResponseOutput,
-  type MeGetResponseOutput,
-  type MePostRequestOutput,
-  type MePostResponseOutput,
-} from "./definition";
-import { scopedTranslation } from "./i18n";
+import meEndpoints, { type MeGetResponseOutput } from "./definition";
 
 /****************************
  * STATE KEYS

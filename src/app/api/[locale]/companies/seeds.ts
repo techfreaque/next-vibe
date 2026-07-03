@@ -6,9 +6,9 @@
 import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { users } from "../user/db";
 import { companies, companyMembers } from "./db";
 import { CompanyMemberRole, CompanyType } from "./enum";
 

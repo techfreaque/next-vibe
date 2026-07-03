@@ -7,12 +7,12 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as leadsI18n } from "next-vibe/identity/lead/i18n";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { List } from "next-vibe/ui/web/ui/icons/List";
-import { Mail } from "next-vibe/ui/web/ui/icons/Mail";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { List } from "next-vibe/ui/ui/icons/List";
+import { Mail } from "next-vibe/ui/ui/icons/Mail";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetLocale,

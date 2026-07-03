@@ -55,51 +55,51 @@ import versionsDefinitions from "next-vibe/dataflow/graphs/[id]/versions/definit
 import type { Resolution } from "next-vibe/dataflow/shared/fields";
 import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { copyToClipboard } from "next-vibe/ui/web/lib/clipboard";
-import { addWindowListener } from "next-vibe/ui/web/lib/dom";
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Card } from "next-vibe/ui/web/ui/card";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { addWindowListener } from "next-vibe/ui/lib/dom";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card } from "next-vibe/ui/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div, type DivDragEvent } from "next-vibe/ui/web/ui/div";
-import { Activity } from "next-vibe/ui/web/ui/icons/Activity";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { Copy } from "next-vibe/ui/web/ui/icons/Copy";
-import { Database } from "next-vibe/ui/web/ui/icons/Database";
-import { EyeOff } from "next-vibe/ui/web/ui/icons/EyeOff";
-import { Globe } from "next-vibe/ui/web/ui/icons/Globe";
-import { History } from "next-vibe/ui/web/ui/icons/History";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { PanelLeftClose } from "next-vibe/ui/web/ui/icons/PanelLeftClose";
-import { PanelLeftOpen } from "next-vibe/ui/web/ui/icons/PanelLeftOpen";
-import { Save } from "next-vibe/ui/web/ui/icons/Save";
-import { Settings } from "next-vibe/ui/web/ui/icons/Settings";
-import { Trash } from "next-vibe/ui/web/ui/icons/Trash";
-import { Wrench } from "next-vibe/ui/web/ui/icons/Wrench";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
+} from "next-vibe/ui/ui/dialog";
+import { Div, type DivDragEvent } from "next-vibe/ui/ui/div";
+import { Activity } from "next-vibe/ui/ui/icons/Activity";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { Database } from "next-vibe/ui/ui/icons/Database";
+import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
+import { Globe } from "next-vibe/ui/ui/icons/Globe";
+import { History } from "next-vibe/ui/ui/icons/History";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { PanelLeftClose } from "next-vibe/ui/ui/icons/PanelLeftClose";
+import { PanelLeftOpen } from "next-vibe/ui/ui/icons/PanelLeftOpen";
+import { Save } from "next-vibe/ui/ui/icons/Save";
+import { Settings } from "next-vibe/ui/ui/icons/Settings";
+import { Trash } from "next-vibe/ui/ui/icons/Trash";
+import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
+import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,

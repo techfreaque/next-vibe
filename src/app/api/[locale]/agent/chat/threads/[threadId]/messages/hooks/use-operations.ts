@@ -7,7 +7,7 @@
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { toast } from "next-vibe/ui/web/hooks/use-toast";
+import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,

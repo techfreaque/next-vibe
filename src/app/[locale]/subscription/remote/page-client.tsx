@@ -4,8 +4,8 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
-import { useRouter } from "next-vibe/ui/web/hooks/use-navigation";
-import { Container } from "next-vibe/ui/web/ui/container";
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { Container } from "next-vibe/ui/ui/container";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";

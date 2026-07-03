@@ -4,23 +4,23 @@ import {
   assignUrl,
   getCurrentUrl,
   silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { CheckCircle2 } from "next-vibe/ui/web/ui/icons/CheckCircle2";
-import { ExternalLink } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { RefreshCw } from "next-vibe/ui/web/ui/icons/RefreshCw";
-import { Table } from "next-vibe/ui/web/ui/icons/Table";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Label } from "next-vibe/ui/web/ui/label";
+} from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+import { Table } from "next-vibe/ui/ui/icons/Table";
+import { Input } from "next-vibe/ui/ui/input";
+import { Label } from "next-vibe/ui/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/select";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -29,7 +29,7 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 

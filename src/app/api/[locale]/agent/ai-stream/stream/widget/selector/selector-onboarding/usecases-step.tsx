@@ -6,22 +6,22 @@ import { cn } from "next-vibe/core/utils/utils";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { BookOpen } from "next-vibe/ui/web/ui/icons/BookOpen";
-import { Briefcase } from "next-vibe/ui/web/ui/icons/Briefcase";
-import { Check } from "next-vibe/ui/web/ui/icons/Check";
-import { Code } from "next-vibe/ui/web/ui/icons/Code";
-import { Flame } from "next-vibe/ui/web/ui/icons/Flame";
-import { Heart } from "next-vibe/ui/web/ui/icons/Heart";
-import { PenTool } from "next-vibe/ui/web/ui/icons/PenTool";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { Users } from "next-vibe/ui/web/ui/icons/Users";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H3, P } from "next-vibe/ui/web/ui/typography";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
+import { Briefcase } from "next-vibe/ui/ui/icons/Briefcase";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { Code } from "next-vibe/ui/ui/icons/Code";
+import { Flame } from "next-vibe/ui/ui/icons/Flame";
+import { Heart } from "next-vibe/ui/ui/icons/Heart";
+import { PenTool } from "next-vibe/ui/ui/icons/PenTool";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { Users } from "next-vibe/ui/ui/icons/Users";
+import { Span } from "next-vibe/ui/ui/span";
+import { H3, P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetLogger,
   useWidgetUser,

@@ -373,7 +373,7 @@ class ViteCompiler {
 
       // Explicit alias fallbacks for multi-path tsconfig aliases that
       // vite-tsconfig-paths resolves only to the first match.
-      // next-vibe/ui/web/* → tanstack/ first (TanStack-specific overrides),
+      // next-vibe/ui/* → tanstack/ first (TanStack-specific overrides),
       // then falls back to web/ (shared UI components).
       const tanstackUiDir = resolve(
         ROOT_DIR,
@@ -1458,7 +1458,7 @@ class ViteCompiler {
             },
           } as Plugin,
           // Polyfill CommonJS `require()` for the i18n lazy-loader pattern:
-          // `() => require("next-vibe/ui/cli/ui/icons/src/app/api/[locale]/system/generated/endpoints-meta/de").translations` - SSR gets node:module createRequire,
+          // `() => require("next-vibe/ui/ui/icons/...").translations` - SSR gets node:module createRequire,
           // client gets require() calls rewritten to static import references.
           // apply:"serve" prevents this from running during esbuild dep pre-bundling.
           {
@@ -1786,12 +1786,9 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           tsconfigPaths: true,
           alias: [
             { find: /^@\//, replacement: `${srcDir}/` },
-            // `next-vibe/*` → system/*, EXCEPT `next-vibe/ui/web/*`: those are
-            // resolved by the next-vibe-ui-ssr-resolver plugin (tanstack variant
-            // first, web fallback) so TanStack never loads the Next.js-only web
-            // components (e.g. ui/font, which imports the CJS `next/font/google`
-            // that breaks the Vite SSR module runner). The negative lookahead lets
-            // the plugin win for ui/web/ while the alias still fast-paths the rest.
+            // next-vibe/ui/* is handled by the next-vibe-ui-ssr-resolver plugin
+            // (tanstack-first, web fallback). The negative lookahead excludes it
+            // from the general alias so the plugin wins.
             {
               find: /^next-vibe\/(?!ui\/web\/)/,
               replacement: `${nextVibeDir}/`,

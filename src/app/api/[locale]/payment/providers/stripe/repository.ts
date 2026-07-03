@@ -14,12 +14,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import Stripe from "stripe";
 
 import { productsRepository } from "@/app/api/[locale]/products/repository-client";
 
-import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
 import {
   CheckoutMode,

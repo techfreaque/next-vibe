@@ -5,9 +5,8 @@
 
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 /**
  * Sessions table schema

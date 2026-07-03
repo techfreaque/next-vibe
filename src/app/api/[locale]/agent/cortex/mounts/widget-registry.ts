@@ -28,7 +28,7 @@ export interface MountWidgetConfig {
   }>;
   /** i18n translation key for this mount type (under cortex/i18n) */
   translationKey: CortexTranslationKey;
-  /** Icon component name from next-vibe/ui/web/ui/icons */
+  /** Icon component name from next-vibe/ui/ui/icons */
   icon: string;
   /** Tailwind color class prefix (e.g. "purple" → text-purple-500) */
   color: string;

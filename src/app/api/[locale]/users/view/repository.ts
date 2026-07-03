@@ -21,6 +21,7 @@ import {
   leads,
   userLeadLinks,
 } from "next-vibe/identity/lead/db";
+import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
@@ -50,7 +51,6 @@ import {
 } from "@/app/api/[locale]/referral/db";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
-import { userRoles, users } from "@/app/api/[locale]/user/db";
 
 import type { UserViewResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -754,11 +754,7 @@ export class UserViewRepository {
     }));
   }
 
-  /**
-   * Get connected leads and users for a given user
-   * Traverses: user -> userLeadLinks -> leads -> leadLeadLinks -> more leads -> userLeadLinks -> users
-   */
-  static async getConnections(userId: string): Promise<{
+  private static async getConnections(userId: string): Promise<{
     connectedLeads: Array<{
       id: string;
       email: string | null;

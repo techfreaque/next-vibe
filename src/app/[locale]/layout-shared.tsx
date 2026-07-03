@@ -6,9 +6,9 @@
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
-import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
-import { ThemeProvider } from "next-vibe/ui/web/ui/theme-provider";
-import { Toaster } from "next-vibe/ui/web/ui/toaster";
+import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
+import { ThemeProvider } from "next-vibe/ui/ui/theme-provider";
+import { Toaster } from "next-vibe/ui/ui/toaster";
 import type { JSX, ReactNode } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";

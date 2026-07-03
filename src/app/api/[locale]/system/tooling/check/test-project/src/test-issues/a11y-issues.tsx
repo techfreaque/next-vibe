@@ -34,9 +34,6 @@ export function EmptyHeading(): React.ReactElement {
   );
 }
 
-// jsx-a11y/html-has-lang - Missing lang attribute (would need full HTML)
-// This is hard to test in a component, skip
-
 // jsx-a11y/iframe-has-title - Missing iframe title
 export function IframeWithoutTitle(): React.ReactElement {
   return <iframe src="https://example.com" />;
@@ -66,7 +63,7 @@ export function DistractingElements(): React.ReactElement {
   );
 }
 
-// jsx-a11y/no-redundant-roles - Redundant role
+// jsx-a11y/no-redundant-roles - Redundant role (explicit role matches implicit semantic)
 export function RedundantRole(): React.ReactElement {
   return (
     <div>

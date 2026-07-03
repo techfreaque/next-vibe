@@ -37,9 +37,9 @@ import {
   createElement,
   onDOMReady,
   querySelector,
-} from "next-vibe/ui/web/lib/dom";
-import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
-import { getLanguage } from "next-vibe/ui/web/lib/media";
+} from "next-vibe/ui/lib/dom";
+import { getCurrentOrigin } from "next-vibe/ui/lib/location";
+import { getLanguage } from "next-vibe/ui/lib/media";
 
 import type { ParentBridge } from "./bridge";
 import {

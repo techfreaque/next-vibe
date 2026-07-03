@@ -271,10 +271,12 @@ export class RemoteConnectionInstanceRepository {
       })();
     }
 
-    // Connector lifecycle: a side runs an outbound connector (subscribing to the
-    // peer's remote-event hub) exactly when the PEER reaches it via reverse-ws —
-    // i.e. remoteTransportMode === "reverse-ws". Our own transportMode is our
-    // SEND leg and never opens a socket. Recompute from the post-patch row.
+    // Connector lifecycle: the outbound connector (the ONE socket we open to
+    // the peer) carries BOTH reverse-ws legs — the peer's sends come DOWN it
+    // (remoteTransportMode === "reverse-ws") and our own reverse-ws sends go
+    // UP it (transportMode === "reverse-ws"; the NAT'd side can't be reached,
+    // so its send leg rides the socket it holds). Keep it open when EITHER
+    // post-patch leg is reverse-ws; only a fully direct-http pair closes it.
     // (cloud instances never open outbound sockets; openConnection no-ops there.)
     const effectiveRemoteMode =
       (await RemoteConnectionRepository.getRemoteTransportMode(

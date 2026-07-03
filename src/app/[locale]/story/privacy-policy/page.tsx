@@ -1,13 +1,13 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Lock } from "next-vibe/ui/web/ui/icons/Lock";
-import { Shield } from "next-vibe/ui/web/ui/icons/Shield";
-import { Li } from "next-vibe/ui/web/ui/li";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1, H2, H3, P } from "next-vibe/ui/web/ui/typography";
-import { Ul } from "next-vibe/ui/web/ui/ul";
+import { Div } from "next-vibe/ui/ui/div";
+import { Lock } from "next-vibe/ui/ui/icons/Lock";
+import { Shield } from "next-vibe/ui/ui/icons/Shield";
+import { Li } from "next-vibe/ui/ui/li";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
+import { Ul } from "next-vibe/ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";

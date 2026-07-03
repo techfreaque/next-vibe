@@ -1,24 +1,32 @@
 /**
- * Vibe Check Route Tests
+ * Vibe Check Integration Tests — End to End
  *
- * Tests the complete check system by running vibe check on test-project
- * and validating ALL expected issues are detected.
+ * Runs the full check pipeline on the test-project in two modes:
+ *   A) useLspDaemon: false  — TypeScript via tsgo cold path
+ *   B) useLspDaemon: true   — TypeScript via warm LSP daemon (finds more TS errors)
  *
- * Architecture:
- * - fix=false is ALWAYS passed — auto-fix must never run during tests
- * - One beforeAll per scope, cached output reused across all assertions
- * - Three scopes: full dir (./ = 11 files), subfolder (src/test-issues = 10 files),
- *   single file (src/test-issues/a11y-issues.tsx = 1 file)
- * - Rules verified per-scope with one it() per rule (no giant omnibus tests)
- * - Per-file error/warning counts asserted for the full dir scope
- * - Per-file rule presence asserted for the full dir scope
+ * Both modes run the same five invocation patterns:
+ *   1. Full project (./)
+ *   2. Subfolder (src/test-issues)
+ *   3. Two files: general-issues.ts + node-issues.ts
+ *   4. Two files: type-errors.ts + a11y-issues.tsx
+ *   5. Folder + outside file: src/test-issues + src/utils/calculate.ts
+ *
+ * The LSP daemon is then exercised directly (cold/warm, folder scan, filtering).
+ *
+ * Rules:
+ * - fix=false forced — corpus files must never be mutated by tests
+ * - Config is created fresh, then patched to useLspDaemon: true before Mode B
  */
 
 import { execSync } from "node:child_process";
-import { existsSync, unlinkSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 import { beforeAll, describe, expect, it } from "bun:test";
+
+import type { LspIssue } from "../typecheck/lsp-daemon";
+import { TsgoDaemon } from "../typecheck/lsp-daemon";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-project");
 const ROOT_PATH = resolve(__dirname, "../../../../../../..");
@@ -29,8 +37,7 @@ const VIBE_RUNTIME = resolve(
 );
 
 // ============================================================
-// GROUND TRUTH — verified from actual vibe check output
-// Update whenever test files are intentionally changed.
+// GROUND TRUTH
 // ============================================================
 
 // Per-file error/warning counts (full dir scope)
@@ -222,10 +229,6 @@ function extractSummary(output: string): {
   return { files, issues, errors, warnings: issues - errors };
 }
 
-/**
- * Extract the block of output lines that belong to a specific file.
- * The vibe check output groups errors under "● src/path/file.ext (N items)".
- */
 function extractFileBlock(output: string, filename: string): string {
   const lines = output.split("\n");
   const startIdx = lines.findIndex(
@@ -234,7 +237,6 @@ function extractFileBlock(output: string, filename: string): string {
   if (startIdx === -1) {
     return "";
   }
-  // Collect lines until the next file header or end
   const block: string[] = [lines[startIdx]];
   for (let i = startIdx + 1; i < lines.length; i++) {
     if (lines[i].startsWith("●") && !lines[i].includes(filename)) {
@@ -328,7 +330,8 @@ describe("Config Creation Flow", () => {
 });
 
 // ============================================================
-// FULL DIRECTORY SCOPE (./)
+// Shared invocation suite (called for both modes)
+// fileCounts and totals differ between no-lsp and lsp modes.
 // ============================================================
 describe("Full Directory Check (./)", () => {
   beforeAll(() => {
@@ -574,7 +577,7 @@ describe("Compiled Runtime", () => {
 });
 
 // ============================================================
-// ROOT INVOCATION (verifies ignore patterns)
+// LSP DAEMON API — direct TsgoDaemon tests
 // ============================================================
 describe("Running From Project Root", () => {
   let fromRootOutput: string;

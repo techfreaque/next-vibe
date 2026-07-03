@@ -6,7 +6,7 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Badge } from "next-vibe/ui/web/ui/badge";
+import { Badge } from "next-vibe/ui/ui/badge";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

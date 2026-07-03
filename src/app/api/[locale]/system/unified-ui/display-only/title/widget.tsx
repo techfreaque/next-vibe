@@ -6,9 +6,9 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { Title } from "next-vibe/ui/web/ui/title";
+import { Div } from "next-vibe/ui/ui/div";
+import { Span } from "next-vibe/ui/ui/span";
+import { Title } from "next-vibe/ui/ui/title";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

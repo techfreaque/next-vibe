@@ -1,10 +1,10 @@
 "use client";
 
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ScrollArea } from "next-vibe/ui/web/ui/scroll-area";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ScrollArea } from "next-vibe/ui/ui/scroll-area";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetContext,
   useWidgetForm,

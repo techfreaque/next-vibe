@@ -1,0 +1,25 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/system/execute-tool",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]",
+    "x-vibe-fixture-context": "unbottled-setup"
+  },
+  "body": {
+    "toolName": "remote-connection_connect-reverse_update_PATCH",
+    "input": {
+      "instanceId": "atlas",
+      "syncScope": {
+        "memories": true,
+        "documents": true,
+        "skills": true,
+        "favorites": true,
+        "threads": true,
+        "chat": true
+      },
+      "remoteTransportMode": "direct-http"
+    },
+    "callerPlatform": "next-api"
+  }
+}

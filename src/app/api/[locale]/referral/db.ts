@@ -14,9 +14,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { leads } from "next-vibe/identity/lead/db";
+import { users } from "next-vibe/identity/user/db";
 
 import { paymentTransactions } from "../payment/db";
-import { users } from "../user/db";
 import {
   PayoutCurrencyDB,
   PayoutStatus,

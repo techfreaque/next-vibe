@@ -23,7 +23,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { AuthT } from "next-vibe/identity/auth/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { storage } from "next-vibe/ui/web/lib/storage";
+import { storage } from "next-vibe/ui/lib/storage";
 
 import { platform } from "@/config/env-client";
 

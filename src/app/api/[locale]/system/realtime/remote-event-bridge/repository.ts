@@ -153,10 +153,10 @@ export class RemoteEventBridgeRepository {
     // mode (the local side's choice). One direction only; the back channel is a
     // separate pushRemoteEvent on the peer, decided by the peer's own mode.
     //
-    //  • reverse-ws: the peer's connector is subscribed to ITS OWN user channel
-    //    on us. We emit the bridge transport event — a regular scope:"user"
-    //    event — onto that peer's user/{remoteUserId} channel. One emit per
-    //    qualifying peer; each connector sees only events on its own channel.
+    //  • reverse-ws: the peer's connector is subscribed to THIS account's user
+    //    channel on us (it authenticates here as our local userId). We emit the
+    //    bridge transport event — a regular scope:"user" event — onto
+    //    user/{userId}. One emit per qualifying peer.
     //
     //  • direct-http: POST to the peer's bridge via the canonical remote-call.
     for (const conn of connections) {
@@ -182,6 +182,11 @@ export class RemoteEventBridgeRepository {
           conn.tokenLeadId,
           wire,
           logger,
+        );
+        void RemoteConnectionRepository.recordTransportUse(
+          userId,
+          conn.instanceId,
+          "reverse-ws",
         );
         continue;
       }
@@ -223,17 +228,24 @@ export class RemoteEventBridgeRepository {
           error: err instanceof Error ? err.message : String(err),
         });
       });
+      void RemoteConnectionRepository.recordTransportUse(
+        userId,
+        conn.instanceId,
+        "direct-http",
+      );
     }
   }
 
   /**
-   * Emit the bridge transport event onto a reverse-ws peer's OWN user channel.
+   * Emit the bridge transport event onto OUR account's user channel — the
+   * channel the reverse-ws peer's connector subscribed to on THIS hub.
    *
-   * The transport is a regular scope:"user" event on the bridge endpoint. We emit
-   * it AS the peer user (id = remoteUserId, the peer's id on its own DB) so the
-   * emitter delivers on `user/{remoteUserId}` — exactly the channel the peer's
-   * connector subscribed to. The relay payload rides the event's responseData.
-   * The connector receives a normal __event__ envelope and dispatches it.
+   * The transport is a regular scope:"user" event on the bridge endpoint. The
+   * peer's connector authenticates on this hub with this account's token (our
+   * LOCAL userId), and WS channel auth only admits `user/{auth userId}` — so we
+   * emit AS that user and the emitter delivers on exactly that channel. The
+   * relay payload rides the event's responseData; the connector receives a
+   * normal __event__ envelope and dispatches it.
    */
   private static async emitBridgeEventToPeer(
     remoteUserId: string,

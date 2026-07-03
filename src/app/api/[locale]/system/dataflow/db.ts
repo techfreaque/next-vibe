@@ -23,9 +23,8 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { GraphConfig } from "next-vibe/dataflow/graph/types";
 import type { DataPoint } from "next-vibe/dataflow/shared/fields";
 import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
+import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 import {
   BacktestActionMode,

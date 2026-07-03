@@ -1,26 +1,21 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/web/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { Bot } from "next-vibe/ui/web/ui/icons/Bot";
-import { CheckCircle } from "next-vibe/ui/web/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Code } from "next-vibe/ui/web/ui/icons/Code";
-import { Layers } from "next-vibe/ui/web/ui/icons/Layers";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { Zap } from "next-vibe/ui/web/ui/icons/Zap";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { CodeBlock } from "next-vibe/ui/web/ui/markdown";
-import { Separator } from "next-vibe/ui/web/ui/separator";
+import { Button } from "next-vibe/ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { Bot } from "next-vibe/ui/ui/icons/Bot";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Code } from "next-vibe/ui/ui/icons/Code";
+import { Layers } from "next-vibe/ui/ui/icons/Layers";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Link } from "next-vibe/ui/ui/link";
+import { CodeBlock } from "next-vibe/ui/ui/markdown";
+import { Separator } from "next-vibe/ui/ui/separator";
 import {
   BlockQuote,
   H1,
@@ -29,7 +24,7 @@ import {
   Lead,
   Muted,
   P,
-} from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

@@ -3469,7 +3469,8 @@ export class CreditRepository {
 
         // Send confirmation emails (user + admin)
         try {
-          const { users: usersTable } = await import("../user/db");
+          const { users: usersTable } =
+            await import("next-vibe/identity/user/db");
           const [fullUser] = await db
             .select({
               email: usersTable.email,

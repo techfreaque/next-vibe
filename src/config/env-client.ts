@@ -4,7 +4,7 @@
 
 import { defineEnvClient } from "next-vibe/env/define-env-client";
 import { Environment } from "next-vibe/env/env-util";
-import { getCurrentOrigin } from "next-vibe/ui/web/lib/location";
+import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { z } from "zod";
 
 import { DEFAULT_PROJECT_URL } from "./constants";

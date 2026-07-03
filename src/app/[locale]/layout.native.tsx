@@ -10,7 +10,7 @@
 import { PortalHost } from "@rn-primitives/portal";
 import { Slot, useLocalSearchParams } from "expo-router";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Body } from "next-vibe/ui/native/ui/body";
+import { Body } from "next-vibe/ui/ui/body";
 import type { JSX } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";

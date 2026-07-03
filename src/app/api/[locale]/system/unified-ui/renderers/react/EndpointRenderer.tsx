@@ -28,8 +28,8 @@ import {
   useNavigationStack,
   type UseNavigationStackReturn,
 } from "next-vibe/platforms/react/hooks/use-navigation-stack";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Form } from "next-vibe/ui/web/ui/form/form";
+import { Div } from "next-vibe/ui/ui/div";
+import { Form } from "next-vibe/ui/ui/form/form";
 import {
   extractAllFields,
   scanForInlineButtons,

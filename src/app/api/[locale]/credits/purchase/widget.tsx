@@ -6,34 +6,34 @@
 "use client";
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { assignUrl } from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
+} from "next-vibe/ui/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertCircle } from "next-vibe/ui/web/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/web/ui/icons/Bitcoin";
-import { CreditCard } from "next-vibe/ui/web/ui/icons/CreditCard";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/web/ui/icons/ExternalLink";
-import { Info } from "next-vibe/ui/web/ui/icons/Info";
-import { Minus } from "next-vibe/ui/web/ui/icons/Minus";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { Sparkles } from "next-vibe/ui/web/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/web/ui/icons/TrendingUp";
-import { ExternalLink } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
+import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { Minus } from "next-vibe/ui/ui/icons/Minus";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { ExternalLink } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetForm,
   useWidgetLogger,
@@ -47,8 +47,10 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { type PaymentProviderValue } from "@/app/api/[locale]/payment/enum";
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import {
+  PaymentProvider,
+  type PaymentProviderValue,
+} from "@/app/api/[locale]/payment/enum";
 import {
   ProductIds,
   productsRepository,

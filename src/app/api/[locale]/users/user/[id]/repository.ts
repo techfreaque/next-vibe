@@ -18,6 +18,7 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
@@ -25,7 +26,6 @@ import {
   referralEarnings,
   userReferrals,
 } from "@/app/api/[locale]/referral/db";
-import { users } from "@/app/api/[locale]/user/db";
 
 import type {
   UserDeleteResponseOutput,

@@ -8,7 +8,7 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   useWidgetLocale,
   useWidgetLogger,

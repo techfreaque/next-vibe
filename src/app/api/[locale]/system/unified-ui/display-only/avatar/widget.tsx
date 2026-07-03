@@ -1,11 +1,7 @@
 "use client";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { cn } from "next-vibe/core/utils/utils";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "next-vibe/ui/web/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

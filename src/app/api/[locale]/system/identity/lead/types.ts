@@ -4,14 +4,10 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
-import type { LeadGetResponseOutput } from "next-vibe/identity/lead/[id]/definition";
-
+import type { LeadGetResponseOutput } from "@/app/api/[locale]/leads/[id]/definition";
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/leads/list/definition";
 
 import type { EmailCampaignStage, LeadSource, LeadStatus } from "./enum";
-
-// Define leadId here so it can be used by both server and client code
-export const leadId = z.uuid();
 
 // Export the full list response type
 export type LeadListResponseType = LeadListGetResponseTypeOutput;
@@ -49,9 +45,4 @@ export interface LeadUpdateType {
 
 export interface LeadWithEmailType extends LeadResponseType {
   email: string; // Non-nullable email
-}
-
-export interface UnsubscribeType {
-  leadId?: string;
-  email?: string;
 }

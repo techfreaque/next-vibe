@@ -4,11 +4,22 @@
  */
 
 import { Button, Column, Row, Section, Text } from "@react-email/components";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import {
+  filterUserPermissionRoles,
+  UserPermissionRole,
+} from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
@@ -22,21 +33,8 @@ import type {
   EmailTemplateDefinition,
 } from "@/app/api/[locale]/messenger/registry/template";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
-} from "next-vibe/core/route/response.schema";
-
-import { scopedTranslation as userScopedTranslation } from "../../i18n";
-import {
-  scopedTranslation as signupScopedTranslation,
-  type SignupT,
-} from "./i18n";
-
-import type { EndpointLogger } from "next-vibe/logger/types";
-
 import { configScopedTranslation } from "@/config/i18n";
+
 import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
@@ -45,21 +43,23 @@ import {
   type TrackingContext,
 } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { getPricingParams } from "../../../products/platform-products";
-import userCreateDefinition, {
+import type userCreateDefinition from "../../../users/create/definition";
+import {
   type UserCreateRequestOutput,
   type UserCreateResponseOutput,
 } from "../../../users/create/definition";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { UserDetailLevel } from "../../enum";
-import { UserRepository } from "../../repository";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import type signupDefinition from "./definition";
 import {
-  UserPermissionRole,
-  filterUserPermissionRoles,
-} from "next-vibe/identity/roles/enum";
-import signupDefinition, {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
+import {
+  scopedTranslation as signupScopedTranslation,
+  type SignupT,
+} from "./i18n";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -423,7 +423,7 @@ export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
     totalModelCount: 42,
   },
   render: ({ requestData, locale, logger }) =>
-    renderWelcomeEmailByEmail(requestData.email, locale, undefined, logger),
+    renderWelcomeEmailByEmail(requestData.email, locale, logger),
 };
 
 // ============================================================================
@@ -437,7 +437,6 @@ export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
 async function renderWelcomeEmailByEmail(
   email: string,
   locale: CountryLanguage,
-  _t: unknown,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t: tUser } = userScopedTranslation.scopedT(locale);
@@ -917,7 +916,6 @@ export const adminSignupNotificationEmailTemplate: EmailTemplateDefinition<
       requestData.email,
       requestData.subscribeToNewsletter,
       locale,
-      undefined,
       logger,
     ),
 };
@@ -926,7 +924,6 @@ async function renderAdminNotificationByEmail(
   email: string,
   subscribeToNewsletter: boolean | null | undefined,
   locale: CountryLanguage,
-  _t: unknown,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t: tUser } = userScopedTranslation.scopedT(locale);
@@ -1011,12 +1008,7 @@ export const userCreateWelcomeEmailTemplate: EmailTemplateDefinition<
     id: "user-create-welcome",
   },
   render: ({ requestData, locale, logger }) =>
-    renderWelcomeEmailByEmail(
-      requestData.basicInfo.email,
-      locale,
-      undefined,
-      logger,
-    ),
+    renderWelcomeEmailByEmail(requestData.basicInfo.email, locale, logger),
 };
 
 export const userCreateAdminNotificationEmailTemplate: EmailTemplateDefinition<
@@ -1037,7 +1029,6 @@ export const userCreateAdminNotificationEmailTemplate: EmailTemplateDefinition<
       requestData.basicInfo.email,
       null,
       locale,
-      undefined,
       logger,
     ),
 };

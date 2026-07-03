@@ -14,9 +14,8 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 import { scopedTranslation } from "../i18n";
 import { CreditRepository } from "../repository";

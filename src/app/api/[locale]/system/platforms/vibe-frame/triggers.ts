@@ -11,7 +11,7 @@ import {
   addWindowListener,
   getDocumentScrollHeight,
   getScrollY,
-} from "next-vibe/ui/web/lib/dom";
+} from "next-vibe/ui/lib/dom";
 
 import type { FrameTriggerConfig } from "./types";
 

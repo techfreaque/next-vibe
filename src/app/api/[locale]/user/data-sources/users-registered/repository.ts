@@ -19,8 +19,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-
-import { users } from "../../db";
+import { users } from "next-vibe/identity/user/db";
 
 export class QueryUsersRegisteredRepository {
   static async queryUsersRegistered(data: {

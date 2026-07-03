@@ -5,25 +5,22 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { cn } from "next-vibe/core/utils/utils";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { getElementById, querySelector } from "next-vibe/ui/web/lib/dom";
-import {
-  getCurrentUrl,
-  silentReplaceState,
-} from "next-vibe/ui/web/lib/location";
-import { Button } from "next-vibe/ui/web/ui/button";
-import type { DivRefObject } from "next-vibe/ui/web/ui/div";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { Span } from "next-vibe/ui/web/ui/span";
+import { getElementById, querySelector } from "next-vibe/ui/lib/dom";
+import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
+import { Button } from "next-vibe/ui/ui/button";
+import type { DivRefObject } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetSelector,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useWidgetSelector } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import {
   useCallback,

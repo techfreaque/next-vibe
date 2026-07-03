@@ -11,9 +11,10 @@ import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 import type {
   SystemPromptFragment,
   SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
+} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/favorites-formatter";
 
+import { parseError } from "../../system/core/utils/parse-error";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
   CORTEX_EXEC_ALIAS,
@@ -1617,7 +1618,7 @@ function skillExcerpt(systemPrompt: string): string {
   return cleaned.slice(0, 100);
 }
 
-// ─── Debug: Raw Embedding Scores ─────────────────────────────────────────────
+// ─── Raw Embedding Scores (for debug endpoint) ────────────────────────────────
 
 export interface RawEmbeddingScore {
   path: string;
@@ -1631,53 +1632,61 @@ export interface RawEmbeddingScore {
 export async function loadRawEmbeddingScores(
   userId: string,
   userMessage: string,
-): Promise<{ scores: RawEmbeddingScore[]; embeddingGenerated: boolean }> {
-  const { generateEmbedding } = await import("./embeddings/service");
-  const queryEmbedding = await generateEmbedding(userMessage);
-  if (!queryEmbedding) {
-    return { scores: [], embeddingGenerated: false };
+  logger: EndpointLogger,
+): Promise<
+  { scores: RawEmbeddingScore[]; embeddingGenerated: boolean } | undefined
+> {
+  try {
+    const { generateEmbedding } = await import("./embeddings/service");
+    const queryEmbedding = await generateEmbedding(userMessage);
+    if (!queryEmbedding) {
+      return { scores: [], embeddingGenerated: false };
+    }
+
+    const { db } = await import("next-vibe/database");
+    const { cortexNodes } = await import("./db");
+    const { CortexNodeType } = await import("./enum");
+    const { eq, and, isNotNull, sql } = await import("drizzle-orm");
+
+    const embeddingStr = `[${queryEmbedding.join(",")}]`;
+
+    const rows = await db
+      .select({
+        path: cortexNodes.path,
+        updatedAt: cortexNodes.updatedAt,
+        similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
+      })
+      .from(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, userId),
+          eq(cortexNodes.nodeType, CortexNodeType.FILE),
+          isNotNull(cortexNodes.embedding),
+        ),
+      )
+      .orderBy(
+        sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
+      )
+      .limit(20);
+
+    const scores: RawEmbeddingScore[] = rows.map((r) => {
+      const baseSimilarity = r.similarity;
+      const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
+      const pathWeight = getPathTypeWeight(r.path);
+      const adjustedScore = (baseSimilarity + recencyBoost) * pathWeight;
+      return {
+        path: r.path,
+        baseSimilarity: Math.round(baseSimilarity * 1000) / 1000,
+        recencyBoost: Math.round(recencyBoost * 1000) / 1000,
+        pathWeight,
+        adjustedScore: Math.round(adjustedScore * 1000) / 1000,
+        passesThreshold: adjustedScore > 0.4,
+      };
+    });
+
+    return { scores, embeddingGenerated: true };
+  } catch (error) {
+    logger.error("Failed to loadRawEmbeddingScores", parseError(error));
+    return undefined;
   }
-
-  const { db } = await import("next-vibe/database");
-  const { cortexNodes } = await import("./db");
-  const { CortexNodeType } = await import("./enum");
-  const { eq, and, isNotNull, sql } = await import("drizzle-orm");
-
-  const embeddingStr = `[${queryEmbedding.join(",")}]`;
-
-  const rows = await db
-    .select({
-      path: cortexNodes.path,
-      updatedAt: cortexNodes.updatedAt,
-      similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
-    })
-    .from(cortexNodes)
-    .where(
-      and(
-        eq(cortexNodes.userId, userId),
-        eq(cortexNodes.nodeType, CortexNodeType.FILE),
-        isNotNull(cortexNodes.embedding),
-      ),
-    )
-    .orderBy(
-      sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
-    )
-    .limit(20);
-
-  const scores: RawEmbeddingScore[] = rows.map((r) => {
-    const baseSimilarity = r.similarity;
-    const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
-    const pathWeight = getPathTypeWeight(r.path);
-    const adjustedScore = (baseSimilarity + recencyBoost) * pathWeight;
-    return {
-      path: r.path,
-      baseSimilarity: Math.round(baseSimilarity * 1000) / 1000,
-      recencyBoost: Math.round(recencyBoost * 1000) / 1000,
-      pathWeight,
-      adjustedScore: Math.round(adjustedScore * 1000) / 1000,
-      passesThreshold: adjustedScore > 0.4,
-    };
-  });
-
-  return { scores, embeddingGenerated: true };
 }

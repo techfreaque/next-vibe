@@ -544,14 +544,6 @@ export function addProviderEntry(
     return { content, changed: false };
   }
 
-  // Check if UNBOTTLED entry already exists
-  const existingCheck = new RegExp(
-    `\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{[\\s\\S]*?apiProvider:\\s*ApiProvider\\.UNBOTTLED`,
-  );
-  if (existingCheck.test(content)) {
-    return { content, changed: false };
-  }
-
   const entry = buildUnbottledEntrySource(enumPrefix, op.enumKey, op);
 
   // Find providers array close ] to insert before it
@@ -584,6 +576,13 @@ export function addProviderEntry(
     }
   }
   if (closeIdx === -1) {
+    return { content, changed: false };
+  }
+
+  // Existence check bounded to THIS model's providers array — an unbounded
+  // lookahead would match any LATER model's UNBOTTLED entry in the file and
+  // silently skip every add.
+  if (content.slice(openIdx, closeIdx).includes("ApiProvider.UNBOTTLED")) {
     return { content, changed: false };
   }
 

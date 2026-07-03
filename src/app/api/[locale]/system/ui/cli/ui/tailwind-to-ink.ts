@@ -3,7 +3,7 @@
  *
  * Parses a Tailwind className string and returns Ink-compatible props
  * for <Text> and <Box> components. This is the foundation of the CLI
- * rendering surface - all next-vibe/ui/web/cli components use this to
+ * rendering surface - all next-vibe/ui/cli components use this to
  * translate web className strings into terminal output.
  *
  * Design notes:

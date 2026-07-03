@@ -13,9 +13,9 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { usePathname, useRouter } from "next-vibe/ui/web/hooks/use-navigation";
-import { useResizeObserver } from "next-vibe/ui/web/hooks/use-resize-observer";
-import { useSafeAreaInsets } from "next-vibe/ui/web/hooks/use-safe-area-insets";
+import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { useResizeObserver } from "next-vibe/ui/hooks/use-resize-observer";
+import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,10 +25,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/web/ui/alert-dialog";
-import { Div, type DivRefObject } from "next-vibe/ui/web/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
-import { KeyboardAvoidingView } from "next-vibe/ui/web/ui/keyboard-avoiding-view";
+} from "next-vibe/ui/ui/alert-dialog";
+import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
+import { KeyboardAvoidingView } from "next-vibe/ui/ui/keyboard-avoiding-view";
 import {
   useWidgetLocale,
   useWidgetLogger,

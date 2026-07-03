@@ -5,10 +5,10 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe/ui/web/ui/accordion";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/web/ui/alert";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { Pre } from "next-vibe/ui/web/ui/pre";
+} from "next-vibe/ui/ui/accordion";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { Pre } from "next-vibe/ui/ui/pre";
 import { type WidgetErrorBoundaryProps } from "next-vibe/unified-ui/_shared/react-types";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 /**

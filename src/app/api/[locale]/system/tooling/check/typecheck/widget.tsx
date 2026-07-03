@@ -9,7 +9,7 @@ import {
   CodeQualityIssueList,
   CodeQualitySummary,
 } from "next-vibe/tooling/check/_shared/widget-components";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 import type definition from "./definition";

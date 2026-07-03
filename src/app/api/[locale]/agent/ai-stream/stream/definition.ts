@@ -37,7 +37,7 @@ import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-gen
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
-import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
+import type { ChatMessage, MessageMetadata } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import {
   ChatModelId,
@@ -350,7 +350,6 @@ const { POST } = createEndpoint({
                     : JSON.stringify(v),
                 )
                 .optional(),
-              // DB-populated fields absent in incognito client-side messages
               authorId: z.string().nullish(),
               authorName: z.string().nullish(),
               errorType: z.string().nullish(),

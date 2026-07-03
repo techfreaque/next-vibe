@@ -1,9 +1,9 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/web/ui/error-boundary";
-import { Markdown } from "next-vibe/ui/web/ui/markdown";
+import { Div } from "next-vibe/ui/ui/div";
+import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
+import { Markdown } from "next-vibe/ui/ui/markdown";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -18,7 +18,6 @@ import {
   chatShadows,
 } from "@/app/[locale]/chat/lib/design-tokens";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
 import debugDefinition from "@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
@@ -70,6 +69,7 @@ export const DebugLinearMessageView = React.memo(
       editingMessageId,
       retryingMessageId,
       messages,
+      threadId,
     } = props;
     const { t } = scopedTranslation.scopedT(locale);
 

@@ -10,7 +10,7 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/native/ui/button";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
   CardContent,
@@ -18,12 +18,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/web/ui/card";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H1, H2 } from "next-vibe/ui/web/ui/typography";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/card";
+import { Div } from "next-vibe/ui/ui/div";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H1, H2 } from "next-vibe/ui/ui/typography";
+import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";

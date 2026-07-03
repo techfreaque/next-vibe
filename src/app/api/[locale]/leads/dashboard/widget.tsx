@@ -2,23 +2,23 @@
 
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { ActionCard } from "next-vibe/ui/web/ui/action-card";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { BarChart } from "next-vibe/ui/web/ui/icons/BarChart";
-import { Download } from "next-vibe/ui/web/ui/icons/Download";
-import { Plus } from "next-vibe/ui/web/ui/icons/Plus";
-import { UserSearch } from "next-vibe/ui/web/ui/icons/UserSearch";
-import { ListItem } from "next-vibe/ui/web/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/web/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/web/ui/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/web/ui/progress-block";
-import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+import { ActionCard } from "next-vibe/ui/ui/action-card";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { BarChart } from "next-vibe/ui/ui/icons/BarChart";
+import { Download } from "next-vibe/ui/ui/icons/Download";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { UserSearch } from "next-vibe/ui/ui/icons/UserSearch";
+import { ListItem } from "next-vibe/ui/ui/list-item";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { MetricCard } from "next-vibe/ui/ui/metric-card";
+import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/ui/progress-block";
+import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -100,7 +100,7 @@ export function LeadsDashboardWidget(_props: {
 
   const handleNavLeadDetail = (leadId: string) => (): void => {
     void (async (): Promise<void> => {
-      const def = await import("next-vibe/identity/lead/[id]/definition");
+      const def = await import("@/app/api/[locale]/leads/[id]/definition");
       navigate(def.default.GET, { urlPathParams: { id: leadId } });
     })();
   };

@@ -669,7 +669,7 @@ const i18nPatternRule = {
       // i18n/index.ts: scoped translation factory
       // Allowed imports:
       //   import { createScopedTranslation } from 'next-vibe/core/i18n/core/scoped-translation'
-      //   import { translations as enTranslations } from 'next-vibe/ui/cli/ui/icons/src/app/api/[locale]/system/generated/endpoints-meta/en'
+      //   import { translations as enTranslations } from 'next-vibe/ui/ui/icons/src/app/api/[locale]/system/generated/endpoints-meta/en'
       // Allowed exports:
       //   export const scopedTranslation = createScopedTranslation({...})
       //   export type [Name]TranslationKey = ...
@@ -788,7 +788,7 @@ const i18nPatternRule = {
           return;
         }
 
-        // de/pl: only allowed import is `import type { translations as enTranslations } from 'next-vibe/ui/cli/ui/src/app/api/[locale]/system/generated/endpoints-meta/en'`
+        // de/pl: only allowed import is `import type { translations as enTranslations } from 'next-vibe/ui/ui/src/app/api/[locale]/system/generated/endpoints-meta/en'`
         if (isLang) {
           const imp = node as ImportDeclaration;
           const source = imp.source.value;

@@ -29,16 +29,16 @@ import {
   useNavigationStack,
 } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { scopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Dialog, DialogContent } from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
-import { P } from "next-vibe/ui/web/ui/typography";
+} from "next-vibe/ui/ui/select";
+import { P } from "next-vibe/ui/ui/typography";
 import { PickerProvider } from "next-vibe/unified-ui/_shared/picker-context";
 import { useMemo, useState } from "react";
 

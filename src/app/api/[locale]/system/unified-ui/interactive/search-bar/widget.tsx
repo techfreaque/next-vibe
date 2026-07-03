@@ -9,17 +9,17 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { FieldDataType } from "next-vibe/core/definition/enums";
 import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/web/ui/form/form";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/form/form";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { Input } from "next-vibe/ui/ui/input";
+import { Span } from "next-vibe/ui/ui/span";
 import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
 import {

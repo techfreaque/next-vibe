@@ -18,9 +18,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { users } from "next-vibe/identity/user/db";
 import { z } from "zod";
-
-import { users } from "@/app/api/[locale]/user/db";
 
 /**
  * Zod schema for a serialized tool manifest entry - one per tool on the remote instance.

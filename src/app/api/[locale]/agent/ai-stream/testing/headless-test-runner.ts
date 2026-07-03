@@ -211,6 +211,15 @@ export interface TestStreamParams {
   favoriteConfig?: FavoriteConfig | null;
   /** Abort signal to cancel the stream. Defaults to a never-aborting signal. */
   abortSignal?: AbortSignal;
+  /**
+   * How long to wait for the thread to settle (idle|waiting) before failing.
+   * Defaults to 120_000ms. Heavy media turns (image-to-video/image-to-image)
+   * send multi-megabyte requests whose post-tool model turn legitimately runs
+   * longer than the default — and on first recording the live media polling plus
+   * that turn must all complete within this window for the fixtures to persist.
+   * Raise it for those cases so both recording and replay finish cleanly.
+   */
+  settleTimeoutMs?: number;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -779,7 +788,7 @@ export async function runTestStream(
   const messages = await waitForThreadSettled(
     responseThreadId,
     user,
-    120_000,
+    settleTimeoutMs ?? 120_000,
     rootFolderId,
   );
 

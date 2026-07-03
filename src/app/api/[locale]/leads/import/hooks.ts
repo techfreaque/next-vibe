@@ -7,9 +7,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { downloadFile } from "next-vibe/ui/web/lib/download";
-import type { DivDragEvent } from "next-vibe/ui/web/ui/div";
-import type { InputChangeEvent } from "next-vibe/ui/web/ui/input";
+import { downloadFile } from "next-vibe/ui/lib/download";
+import type { DivDragEvent } from "next-vibe/ui/ui/div";
+import type { InputChangeEvent } from "next-vibe/ui/ui/input";
 import React from "react";
 
 import definitions from "./definition";

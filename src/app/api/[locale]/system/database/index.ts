@@ -9,6 +9,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import * as vibeSenseSchema from "next-vibe/dataflow/db";
 import * as leadsSchema from "next-vibe/identity/lead/db";
+import * as userSchema from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import * as cronTasksSchema from "next-vibe/tasks/cron/db";
 import { Pool } from "pg";
@@ -26,7 +27,6 @@ import * as referralSchema from "@/app/api/[locale]/referral/db";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import * as sshSchema from "@/app/api/[locale]/ssh/db";
 import * as taxSchema from "@/app/api/[locale]/tax/db";
-import * as userSchema from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 
 /**

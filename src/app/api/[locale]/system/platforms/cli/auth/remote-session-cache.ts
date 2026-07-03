@@ -6,7 +6,7 @@
  * The active db singleton is always correct when this is called.
  */
 
-export interface RemoteSession {
+interface RemoteSession {
   token: string;
   leadId: string;
   remoteUrl: string;

@@ -12,32 +12,32 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import {
   useSearchParams,
   useSilentHistory,
-} from "next-vibe/ui/web/hooks/use-navigation";
-import { getCurrentUrl } from "next-vibe/ui/web/lib/location";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { EmptyBlock } from "next-vibe/ui/web/ui/empty-block";
-import { ChevronDown } from "next-vibe/ui/web/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/web/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/web/ui/icons/ChevronRight";
-import { FolderOpen } from "next-vibe/ui/web/ui/icons/FolderOpen";
-import { Home } from "next-vibe/ui/web/ui/icons/Home";
-import { Laptop } from "next-vibe/ui/web/ui/icons/Laptop";
-import { Play } from "next-vibe/ui/web/ui/icons/Play";
-import { RotateCcw } from "next-vibe/ui/web/ui/icons/RotateCcw";
-import { Server } from "next-vibe/ui/web/ui/icons/Server";
-import { Terminal } from "next-vibe/ui/web/ui/icons/Terminal";
-import { Wifi } from "next-vibe/ui/web/ui/icons/Wifi";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { LoadingBlock } from "next-vibe/ui/web/ui/loading-block";
-import { Pre } from "next-vibe/ui/web/ui/pre";
-import { SectionGroup } from "next-vibe/ui/web/ui/section-group";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { StatusPill } from "next-vibe/ui/web/ui/status-pill";
-import type { TextareaKeyboardEvent } from "next-vibe/ui/web/ui/textarea";
-import { Textarea } from "next-vibe/ui/web/ui/textarea";
-import { WidgetHeader } from "next-vibe/ui/web/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/web/ui/widget-shell";
+} from "next-vibe/ui/hooks/use-navigation";
+import { getCurrentUrl } from "next-vibe/ui/lib/location";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
+import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
+import { Home } from "next-vibe/ui/ui/icons/Home";
+import { Laptop } from "next-vibe/ui/ui/icons/Laptop";
+import { Play } from "next-vibe/ui/ui/icons/Play";
+import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
+import { Server } from "next-vibe/ui/ui/icons/Server";
+import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { Wifi } from "next-vibe/ui/ui/icons/Wifi";
+import { Input } from "next-vibe/ui/ui/input";
+import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
+import { Pre } from "next-vibe/ui/ui/pre";
+import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { Span } from "next-vibe/ui/ui/span";
+import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import type { TextareaKeyboardEvent } from "next-vibe/ui/ui/textarea";
+import { Textarea } from "next-vibe/ui/ui/textarea";
+import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetContext,
   useWidgetForm,

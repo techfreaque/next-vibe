@@ -8,29 +8,29 @@
 import { cn } from "next-vibe/core/utils/utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { useSilentHistory } from "next-vibe/ui/web/hooks/use-navigation";
-import { Button } from "next-vibe/ui/web/ui/button";
+import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
+import { Button } from "next-vibe/ui/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/web/ui/dialog";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { FolderPlus } from "next-vibe/ui/web/ui/icons/FolderPlus";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { MessageSquarePlus } from "next-vibe/ui/web/ui/icons/MessageSquarePlus";
-import { Search } from "next-vibe/ui/web/ui/icons/Search";
-import { X } from "next-vibe/ui/web/ui/icons/X";
-import { Input, type InputRefObject } from "next-vibe/ui/web/ui/input";
-import { ScrollArea } from "next-vibe/ui/web/ui/scroll-area";
-import { Span } from "next-vibe/ui/web/ui/span";
+} from "next-vibe/ui/ui/dialog";
+import { Div } from "next-vibe/ui/ui/div";
+import { FolderPlus } from "next-vibe/ui/ui/icons/FolderPlus";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { MessageSquarePlus } from "next-vibe/ui/ui/icons/MessageSquarePlus";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { Input, type InputRefObject } from "next-vibe/ui/ui/input";
+import { ScrollArea } from "next-vibe/ui/ui/scroll-area";
+import { Span } from "next-vibe/ui/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/web/ui/tooltip";
+} from "next-vibe/ui/ui/tooltip";
 import {
   useWidgetContext,
   useWidgetValue,

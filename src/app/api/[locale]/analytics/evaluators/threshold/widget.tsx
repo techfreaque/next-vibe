@@ -5,15 +5,15 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Input } from "next-vibe/ui/web/ui/input";
+import { Div } from "next-vibe/ui/ui/div";
+import { Input } from "next-vibe/ui/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/web/ui/select";
+} from "next-vibe/ui/ui/select";
 
 import type { ThresholdParams } from "./definition";
 

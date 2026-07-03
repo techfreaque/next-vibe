@@ -1,21 +1,28 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/web/ui/avatar";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { Input } from "next-vibe/ui/web/ui/input";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Nav } from "next-vibe/ui/web/ui/nav";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H2, P } from "next-vibe/ui/web/ui/typography";
-import { type JSX, useCallback, useMemo, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Input } from "next-vibe/ui/ui/input";
+import { Link } from "next-vibe/ui/ui/link";
+import { Nav } from "next-vibe/ui/ui/nav";
+import { Span } from "next-vibe/ui/ui/span";
+import { H2, P } from "next-vibe/ui/ui/typography";
+import { useCallback, useMemo, useState, type JSX } from "react";
 
-import { useTouchDevice } from "next-vibe/ui/web/hooks/use-touch-device";
-import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/skills/widget";
-import skillsDef from "@/app/api/[locale]/agent/skills/definition";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
-import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
+import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
+import {
+  DEFAULT_ACCENT,
+  ProfileBio,
+  ProfileHero,
+  ProfileSocialPills,
+} from "@/app/[locale]/creator/[userId]/_shared/profile-content";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import skillsDef from "@/app/api/[locale]/agent/skills/definition";
+import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
+import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/skills/widget";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -23,17 +30,10 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
-import {
-  DEFAULT_ACCENT,
-  ProfileBio,
-  ProfileHero,
-  ProfileSocialPills,
-} from "@/app/[locale]/creator/[userId]/_shared/profile-content";
-import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
-import { GET, type CreatorGetResponseOutput } from "./definition";
+import { GET } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 type CaptureState = "idle" | "submitting" | "done" | "error";

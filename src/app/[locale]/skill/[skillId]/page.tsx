@@ -11,8 +11,10 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { Div } from "next-vibe/ui/web/ui/div";
+import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
@@ -26,8 +28,6 @@ import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/skills/[id
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";

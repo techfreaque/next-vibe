@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { ArrowLeft } from "next-vibe/ui/web/ui/icons/ArrowLeft";
-import { Clock } from "next-vibe/ui/web/ui/icons/Clock";
-import { Link } from "next-vibe/ui/web/ui/link";
-import { Separator } from "next-vibe/ui/web/ui/separator";
-import { H1, H2, Muted, P } from "next-vibe/ui/web/ui/typography";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
+import { Clock } from "next-vibe/ui/ui/icons/Clock";
+import { Link } from "next-vibe/ui/ui/link";
+import { Separator } from "next-vibe/ui/ui/separator";
+import { H1, H2, Muted, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";

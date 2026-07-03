@@ -1,14 +1,14 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/web/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/web/ui/button";
-import { Div } from "next-vibe/ui/web/ui/div";
-import { AlertTriangle } from "next-vibe/ui/web/ui/icons/AlertTriangle";
-import { ArrowRight } from "next-vibe/ui/web/ui/icons/ArrowRight";
-import { FilePlus } from "next-vibe/ui/web/ui/icons/FilePlus";
-import { Loader2 } from "next-vibe/ui/web/ui/icons/Loader2";
-import { Span } from "next-vibe/ui/web/ui/span";
-import { H3, P } from "next-vibe/ui/web/ui/typography";
+import { Badge } from "next-vibe/ui/ui/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
+import { FilePlus } from "next-vibe/ui/ui/icons/FilePlus";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Span } from "next-vibe/ui/ui/span";
+import { H3, P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
