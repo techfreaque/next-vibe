@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc22d0d16dbeb-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:23:39 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164213-4XMxJVlB2HgdGwtcls3N"
+  },
+  "body": {
+    "id": "gen-1783164213-4XMxJVlB2HgdGwtcls3N",
+    "object": "chat.completion",
+    "created": 1783164213,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A simple graphic design features a large, solid red circle centered perfectly against a plain, uniform white background. The circle is filled completely with a vivid red color and has sharp, clean edges. The surrounding white space is unbroken and occupies the remainder of the square field.",
+          "refusal": null,
+          "reasoning": "**Describing the Circle**\n\nI'm focusing on meticulously detailing the prominent red circle and the clean white background. My analysis identifies the circle as a solid, uniformly shaded, perfect geometric form.\n\n**Defining the Elements**\n\nI am concentrating on the stark contrast between the bold red circle and the unblemished white backdrop. My assessment confirms the circle's precise geometry and consistent coloration, presented against a pure, uninterrupted expanse.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Describing the Circle**\n\nI'm focusing on meticulously detailing the prominent red circle and the clean white background. My analysis identifies the circle as a solid, uniformly shaded, perfect geometric form.\n\n**Defining the Elements**\n\nI am concentrating on the stark contrast between the bold red circle and the unblemished white backdrop. My assessment confirms the circle's precise geometry and consistent coloration, presented against a pure, uninterrupted expanse.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CqkHAY89a185qTxztFFJSZJ4wRknFuQKwMS/ycHmE0dP6jWHAnVNTs6eosWAm1JQi3/YgG2nE71gRzqyiuNGNSok2hp27jG5o76LWtrMPwD9figAaAAXoeqbZC5I6CsV9SG8BMgX1g4p5dZqnmG+TVBL1VGOlA0G7oK43/jKS7Yi/2hDsQDl2if07nm6hhdv9BtoDF2Vt95EnbrEaauJ10zzxyT5kOL7K8XlAAWVIMCx1oAk0TkCc5enDRYXLIlCbreY4aDu8+tMe/yHYAwO1he03JHKj2NgOyfcaUmLL4kzHJGW3Y82u75BrItPz8y4INFsb/zYRdRMYOvOwJ7GhaVyltTqW/DiGEgNAmJWQ4c033VU0FjgqHMOiWGST9aCIUQtszLPYhADpFZUl1m1SeMkSpftXmSkj8oa9SndNLiSbOnrXMx48sOE0gGQEaaDCm1O9fCq6mk5xTb5QFhD12Choo0W66rcwgFFysPkyjo+x/DZVPhhjCk+/HeJ5X5u0JsPktGnKoeH8H3aAqrlhdga+knyezlj7A0dO6ag/OkudY9zQ1saQvH1KYFN8VhFDgM3e+weope2HqsSgeoBjzRJZEvLRwh6eR+XrB9YrNmvOP0NmpyFEUNvPo7zUzPaOSAiCu9QWmbHPbHtn/qsvGOLv2dZnloLfNCjbVg1gGpjvXVg81vOYz3v46x4oTncx6cai3DLMULXdMaDOjYXAj4tEU9/9k3Ge27+sKn4da5iUhWagcGGcpq17GFVK1WDboia4SDVoFsECFUhz/OVPyPWntr+RFJVjPeBDM8o8D/dJtNO+GL8OblR93G4vOxUBblo2A9cBNk/R3HNMeNlkBlfjihy/Qazue4pPkbKDd4X30lsHLeBWR8+00UCl0P/acRMuwV1E1QrXFs9ZG5ol1A/7DzR//xCn6eEN7fH/b0eFNWkHvocnoyph51bFreC3byIdlwZ92+UmDI9FdkRXYaHp9w5b5LWL++kiwH5yYeIApl1FS07zYirO3rUBxGo5xlkfRNPzLjU+aG6kayobsSzjRTChjrH/60IRRz8S55nCkW1AKm2RfH6jfpv/M2nhC0WL3WzCs2lO/kVsqZINV4DcSkHjL0QdMXMUMvhpdrSG2w7lTzErlD0mHO6Ih8yati2l1P1j7UYebZNUhDGUJSVs1pJtDthuVL+1+ON5uoYAHM8H0kJJpNpNjmvUszotEwZiwWJm2DrxQMGDbXSLN8KQKl264z5nI3yzw=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 243,
+      "total_tokens": 1080,
+      "cost": 0.00459,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00459,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.002916
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 190,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

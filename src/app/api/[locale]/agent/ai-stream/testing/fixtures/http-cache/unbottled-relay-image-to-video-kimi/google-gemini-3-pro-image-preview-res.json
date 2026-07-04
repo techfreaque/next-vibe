@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15775d3ab64d26d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 17:02:54 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783098171-DbvLqdr6Y04Fd0kNr2R3"
+  },
+  "body": {
+    "id": "gen-1783098171-DbvLqdr6Y04Fd0kNr2R3",
+    "object": "chat.completion",
+    "created": 1783098171,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A simple graphic image shows a large, solid blue triangle centered against a plain white background. The triangle is equilateral, with its base positioned near the bottom of the frame and its apex pointing directly upwards toward the top edge. The blue color is a uniform, deep shade. The edges of the triangle are clean and sharp. There are no other elements, text, or textures present in the image.",
+          "refusal": null,
+          "reasoning": "**Analyzing the Shape**\n\nI'm currently focused on dissecting the image's core subject: a prominent blue triangle. I'm noting its central placement and how it occupies the frame.\n\n\n**Defining the Composition**\n\nI am now describing the image, noting the solid blue triangle and white background. The focus is on the object and elements, colors, layout, style, mood, and fine details. I've observed that the image is a simple digital illustration with clean edges.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing the Shape**\n\nI'm currently focused on dissecting the image's core subject: a prominent blue triangle. I'm noting its central placement and how it occupies the frame.\n\n\n**Defining the Composition**\n\nI am now describing the image, noting the solid blue triangle and white background. The focus is on the object and elements, colors, layout, style, mood, and fine details. I've observed that the image is a simple digital illustration with clean edges.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EvYHCvMHAQw51sdMg56EKbIDJIbS28ybWagY5VgdSCK6t+227daEByV09GlxH2WDNQyvAAg1p/u4HCUVBsAO67b3eY/fpelxziUm/StD5tfgzO27Rm/KO92JKtalJICFECgUUPQgw0k/ilgpH833UHNthLMMq+zTFWsPS2D8lWXrbXIg3xLFbWeVYGmNyx61Zw8IHTJto0GEDJom8j0biMJsebVcu+wY6eNOAOhL9TYiRGMz0bvudKFL2smmUrAmSZtidySe2dCXHP+R+yCcDyTCbdHjnnLWq//v/DP7qC/Bzv+SRQb1yy6PX0Mpf57tck0hwYe8Eu8r78GszAmL/OF1dGWu1y9Nibx4fTPUeMH8ArEKwNQMUwQrhLpkKeraEHJ59Znp7zbCDbrBIXiIeeSLe2nGuqQTaLr4Oj85dd/NZDfuma/xcCRvtjLtBxZMZnUK9JN4CImSgXAuxdSFxD7h1TI9JJHNCGc3sKCDa+OoOz6J2z6mWwia7NI/va9ZzUARu/vXXgfNZh+RElKrkAfhrHweJKj8TOFM6Tov5ttew99ClKvX95un8xcQL3VThThN/fVUmB4gHVlTAG3a0UhEjYSQseBmPpaNVnOMixd0LNmg+lLNJo6uvW5g5oxDdkx7uBCwUvn5rEYnUCZfau+AKRhSmg6zc3xG7K89rsri2yYvdRC8NPU41gsgBeq443el3pjw8Be6vtgqOXkxo8cJoqsGHbYlMNBW9wddGooOMSH4fuj1jCCHQzcntdFVkJ0itVlE2DoWG0HGyZaHaBd7nO8T2X1psJ1eOtT7TmccAMps+DkyTmsa+D4fd/aLTpTRMuFBytpm2aPIGhg+7ET3laEsb9KkInM190udq9dP4y+5tnN32sNYJLX1+FavoWLyF61bXCMee93BGICm+kAkB9qBFvWTqHSBaz2xVox2OpuT1hiL07xkpitLPmJ4Df/Kwjn1ekcd8lUPgy2lYDmTWwGa2dmd8klfEyHVwU/iBwOggFPcStZtuUrngDnZGPMcnJYYB/7oWZ3FLjzt+qMt7CCHLeMxo9W8uba5OoQLbj88avzdxVkODBpiianpE5OMxTKJb+LUmGs4itvh/XADtSK38TMugbIrCJ25rP27FLQ0wrN4BmeFviFRzxZi54bk63eYixqwJ1OwipqbxuDNDiVd83Wuo2XVpcE9zlrihRxowXZ6uyLkN3Nh40jNwU1PgyqEommM9cU1wCs3U23vSjks9LpBODBykhXWVTw05r6C34u7UydfwX+KB2IaO0ZE3F/RYbPgA5OHl7uFGF94Cn2NbT18x8EFocDVVawTiN39XznhhGINeWnqNALYbOk4OsYREnuE"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 278,
+      "total_tokens": 814,
+      "cost": 0.004408,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004408,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.003336
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 199,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

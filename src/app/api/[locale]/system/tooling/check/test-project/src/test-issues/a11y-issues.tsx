@@ -102,3 +102,18 @@ export function InvalidAriaProp(): React.ReactElement {
 export function InvalidRole(): React.ReactElement {
   return <div role="invalid-role">Content</div>;
 }
+
+// jsx-a11y/label-has-associated-control - Label not linked to input
+export function UnlinkedLabel(): React.ReactElement {
+  return (
+    <div>
+      <label>Email address</label>
+      <input type="email" />
+    </div>
+  );
+}
+
+// jsx-a11y/anchor-is-valid - Anchor used as button (no href)
+export function FakeButton(): React.ReactElement {
+  return <a onClick={() => alert("action")}>Do something</a>;
+}

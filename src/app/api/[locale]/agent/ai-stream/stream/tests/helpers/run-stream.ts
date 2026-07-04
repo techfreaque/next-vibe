@@ -16,6 +16,7 @@ import { expect } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
+import type { HeadlessAiStreamResult } from "../../../repository/headless";
 import type { SlimMessage } from "../../../testing/headless-test-runner";
 import {
   runTestStream,
@@ -71,6 +72,8 @@ export interface RunStreamDeps {
   getTestSubFolderId: () => string | undefined;
   /** REMOTE-folder modes: per-suite folder nested inside the instance folder. */
   getOverrideSubFolderId: () => string | undefined;
+  /** Loop-local topology: the hermes-side REMOTE/<client>/tests/<case> folder. */
+  getHermesCaseFolderId?: () => string | undefined;
 }
 
 export type RunStreamParams = Parameters<typeof runTestStream>[0] & {
@@ -122,6 +125,13 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           : effectiveRootFolderId === suiteRootFolderId
             ? deps.getTestSubFolderId()
             : undefined;
+    // Loop-local origination applies only to the SHARED-thread relay cases.
+    // Cases with an explicit rootFolderId (C2 incognito) are locality-pinned
+    // by definition — incognito never rides the REMOTE-folder relay; run them
+    // as a normal local stream.
+    if (cfg.originateOnRemote && params.rootFolderId === undefined) {
+      return runLoopLocalStream(deps, params, preStreamMessageIds);
+    }
     const firstResult = await runTestStream({
       ...params,
       rootFolderId: effectiveRootFolderId,
@@ -582,6 +592,12 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           }
         : firstResult.result;
       assertParentTimeOrder(finalMessages);
+      await assertCasePlacement(
+        cfg,
+        effectiveRootFolderId,
+        suiteRootFolderId,
+        finalResult.success ? finalResult.data.threadId : undefined,
+      );
       return {
         result: finalResult,
         messages: finalMessages,
@@ -590,6 +606,239 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
     }
 
     assertParentTimeOrder(firstResult.messages);
+    await assertCasePlacement(
+      cfg,
+      effectiveRootFolderId,
+      suiteRootFolderId,
+      firstResult.result.success ? firstResult.result.data.threadId : undefined,
+    );
     return firstResult;
   };
+}
+
+/**
+ * Loop-LOCAL stream: originate on hermes (REMOTE/<client>/tests/<case> there),
+ * the relay executes the loop HERE. Wait for the LOCAL executor copy
+ * (BACKGROUND/remote/<hermes>/tests/<case>) to converge, then return the
+ * standard runStream shape read from the LOCAL thread.
+ */
+async function runLoopLocalStream(
+  deps: RunStreamDeps,
+  params: RunStreamParams,
+  preStreamMessageIds: Set<string>,
+): Promise<ReturnType<typeof runTestStream>> {
+  const { cfg, getMessages } = deps;
+  const { originateStreamOnHermes } = await import("./remote");
+  const hermesFolder = deps.getHermesCaseFolderId?.();
+  if (!hermesFolder) {
+    // oxlint-disable-next-line restricted-syntax -- test wiring error
+    throw new Error("loop-local: hermesCaseFolderId not prepared in beforeAll");
+  }
+  if (params.user.isPublic) {
+    // oxlint-disable-next-line restricted-syntax -- test wiring error
+    throw new Error("loop-local: requires an authenticated test user");
+  }
+  const threadId = params.threadId ?? crypto.randomUUID();
+  const origin = await originateStreamOnHermes({
+    testUser: params.user,
+    prompt: params.prompt,
+    threadId,
+    hermesCaseFolderId: hermesFolder,
+    parentMessageId: params.explicitParentMessageId ?? null,
+    toolConfirmations: params.toolConfirmations ?? null,
+    attachments: params.attachments,
+    favoriteId: params.favoriteId,
+    // Reverse-ws fans the relayed stream to every local connector holder —
+    // this process must pre-claim to win. Direct-http is a single POST to the
+    // dev server; pre-claiming would starve its only recipient.
+    preClaim: cfg.expectRelayTransport !== "direct-http",
+  });
+  if (!origin.success) {
+    // Return the REAL failure response — cases like C3 (insufficient credits)
+    // assert on result.errorType, exactly like a locally-failed stream.
+    return {
+      result: origin.failure,
+      messages: [],
+      pinnedToolCount: 0,
+    };
+  }
+  // Local executor convergence: the loop runs HERE — the local thread row
+  // carries its real streaming state. Wait until the stream has finished
+  // (state back to idle/null) AND a new assistant message exists; a
+  // fingerprint heuristic converges too early during model-latency gaps
+  // (stable throttled writes mid-turn look "settled").
+  const WAIT_MS = 180_000;
+  const start = Date.now();
+  let messages: SlimMessage[] = [];
+  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const { eq: eqOp } = await import("drizzle-orm");
+  for (;;) {
+    const [threadRow] = await db
+      .select({ streamingState: chatThreads.streamingState })
+      .from(chatThreads)
+      .where(eqOp(chatThreads.id, threadId))
+      .limit(1);
+    const idle =
+      threadRow !== undefined &&
+      (threadRow.streamingState === null ||
+        threadRow.streamingState === "idle");
+    if (idle) {
+      messages = await getMessages(threadId);
+      const hasNewAssistant = messages.some(
+        (m) =>
+          m.role === "assistant" &&
+          !preStreamMessageIds.has(m.id) &&
+          (m.content ?? "").trim() !== "",
+      );
+      if (hasNewAssistant) {
+        break;
+      }
+    }
+    if (Date.now() - start > WAIT_MS) {
+      messages = await getMessages(threadId);
+      break;
+    }
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 500);
+    });
+  }
+  const newestAi = messages.findLast((m) => m.role === "assistant");
+  assertParentTimeOrder(messages);
+  await assertLoopLocalPlacement(cfg, threadId);
+  const { success: successResponse } =
+    await import("next-vibe/core/route/response.schema");
+  // The loop ran HERE as the relay executor — its assistant messages carry the
+  // per-turn creditCost in metadata. Sum the NEW ones so callers can assert
+  // real billing (the deduction happened on this instance).
+  const newAssistantIds = messages
+    .filter((m) => m.role === "assistant" && !preStreamMessageIds.has(m.id))
+    .map((m) => m.id);
+  let totalCreditsDeducted = 0;
+  if (newAssistantIds.length > 0) {
+    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+    const { inArray } = await import("drizzle-orm");
+    const rows = await db
+      .select({ metadata: chatMessages.metadata })
+      .from(chatMessages)
+      .where(inArray(chatMessages.id, newAssistantIds));
+    for (const row of rows) {
+      const cost = row.metadata?.creditCost;
+      if (typeof cost === "number") {
+        totalCreditsDeducted += cost;
+      }
+    }
+  }
+  // Native media file parts surface as a synthetic tool message
+  // (FilePartHandler: toolName=generate_image/... with the media URL in the
+  // result) — mirror what the in-process stream reports as
+  // lastGeneratedMediaUrl.
+  let lastGeneratedMediaUrl: string | null = null;
+  for (const m of messages) {
+    if (m.role !== "tool" || preStreamMessageIds.has(m.id)) {
+      continue;
+    }
+    const toolResult = resolveToolResult(m);
+    const mediaUrl =
+      toolResult?.["imageUrl"] ??
+      toolResult?.["videoUrl"] ??
+      toolResult?.["audioUrl"] ??
+      toolResult?.["musicUrl"] ??
+      // Native file parts: FilePartHandler's synthetic tool message stores
+      // the stored-media URL under `file`.
+      toolResult?.["file"];
+    if (typeof mediaUrl === "string" && mediaUrl.length > 0) {
+      lastGeneratedMediaUrl = mediaUrl;
+    }
+  }
+  const data: HeadlessAiStreamResult = {
+    threadId,
+    lastAiMessageId: newestAi?.id ?? "",
+    lastAiMessageContent: newestAi?.content ?? null,
+    totalCreditsDeducted,
+    lastGeneratedMediaUrl,
+    // The loop ran via the hermes-originated relay; the local observer never
+    // sees the receiver's tool-schema count.
+    pinnedToolCount: 0,
+  };
+  return {
+    result: successResponse(data),
+    messages,
+    pinnedToolCount: 0,
+  };
+}
+
+/** Loop-local placement: local=BACKGROUND/remote/<hermes>/tests/<case>, hermes=REMOTE/<client>/tests/<case>. */
+async function assertLoopLocalPlacement(
+  cfg: ModeConfig,
+  threadId: string,
+): Promise<void> {
+  const testCaseName =
+    cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") || "regular";
+  const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
+    await import("../../../testing/remote-setup");
+  await assertThreadPlacement({
+    db: "local",
+    threadId,
+    rootFolderId: DefaultFolderId.BACKGROUND,
+    nameChain: ["remote", HERMES_INSTANCE_ID, "tests", testCaseName],
+  });
+  await assertThreadPlacement({
+    db: "hermes",
+    threadId,
+    rootFolderId: DefaultFolderId.REMOTE,
+    nameChain: [SELF_INSTANCE_ID, "tests", testCaseName],
+  });
+}
+
+/**
+ * Placement discipline — asserted after EVERY successful stream (100% or fail):
+ *   same-instance suites → local PRIVATE/tests/<case>, nothing anywhere else;
+ *   REMOTE-folder suites → caller REMOTE/<remoteId>/tests/<case> AND executor
+ *   BACKGROUND/remote/<callerId>/tests/<case> on the hermes DB.
+ * Streams explicitly targeting another root (e.g. INCOGNITO cases) are exempt —
+ * the effectiveRootFolderId reflects the caller's explicit override.
+ */
+async function assertCasePlacement(
+  cfg: ModeConfig,
+  effectiveRootFolderId: DefaultFolderId,
+  suiteRootFolderId: DefaultFolderId,
+  threadId: string | undefined,
+): Promise<void> {
+  if (!threadId) {
+    return;
+  }
+  const testCaseName =
+    cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") || "regular";
+  const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
+    await import("../../../testing/remote-setup");
+  if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
+    if (effectiveRootFolderId !== DefaultFolderId.REMOTE) {
+      return; // explicit non-default root (e.g. incognito case) — exempt
+    }
+    await assertThreadPlacement({
+      db: "local",
+      threadId,
+      rootFolderId: DefaultFolderId.REMOTE,
+      nameChain: [HERMES_INSTANCE_ID, "tests", testCaseName],
+    });
+    await assertThreadPlacement({
+      db: "hermes",
+      threadId,
+      rootFolderId: DefaultFolderId.BACKGROUND,
+      nameChain: ["remote", SELF_INSTANCE_ID, "tests", testCaseName],
+    });
+    return;
+  }
+  if (cfg.rootFolderIdOverride) {
+    return; // other explicit suite roots manage their own placement
+  }
+  if (effectiveRootFolderId !== suiteRootFolderId) {
+    return; // per-call override (incognito etc.) — exempt
+  }
+  await assertThreadPlacement({
+    db: "local",
+    threadId,
+    rootFolderId: suiteRootFolderId,
+    nameChain: ["tests", testCaseName],
+  });
 }

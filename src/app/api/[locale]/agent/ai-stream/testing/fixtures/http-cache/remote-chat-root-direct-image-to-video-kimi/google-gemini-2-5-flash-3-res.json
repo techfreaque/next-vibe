@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15df58bd8be5d91-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:58:39 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783166318-jVpT2pWxmvT8CE9NIGEy"
+  },
+  "body": {
+    "id": "gen-1783166318-jVpT2pWxmvT8CE9NIGEy",
+    "object": "chat.completion",
+    "created": 1783166318,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio consists solely of a male voice speaking in English with a slight German accent for 18 seconds. The speaker has a calm, articulate tone and speaks at a measured pace. The sound quality is clear, suggesting a good microphone and a quiet recording environment, possibly a studio or a well-isolated room. There are no other background sounds, music, or additional voices present.\n\nHere is the verbatim transcript:\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be...\"",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 126,
+      "total_tokens": 948,
+      "cost": 0.0009116,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009116,
+        "upstream_inference_prompt_cost": 0.0005966,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

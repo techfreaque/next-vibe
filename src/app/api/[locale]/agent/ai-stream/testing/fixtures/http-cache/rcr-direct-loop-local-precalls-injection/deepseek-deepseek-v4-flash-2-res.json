@@ -1,0 +1,39 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a15dc1a7baa2dbeb-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Sat, 04 Jul 2026 11:23:13 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164191-5XfignrcA7dO7wOEV1ck"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" image was\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" image was\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" generated successfully\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" generated successfully\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\". The\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\". The\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" result\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" result\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" contains\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" contains\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" an image\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" an image\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"Url.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Url.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"**\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"**\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1783164191-5XfignrcA7dO7wOEV1ck\",\"object\":\"chat.completion.chunk\",\"created\":1783164191,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":27860,\"completion_tokens\":19,\"total_tokens\":27879,\"cost\":0.003738332,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.003738332,\"upstream_inference_prompt_cost\":0.00373324,\"upstream_inference_completions_cost\":0.000005092},\"completion_tokens_details\":{\"reasoning_tokens\":13,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

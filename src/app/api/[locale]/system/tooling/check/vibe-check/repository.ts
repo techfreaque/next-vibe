@@ -175,12 +175,13 @@ export class VibeCheckRepository {
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
-    const effectiveConfig: CheckConfig = forceLspDaemon
-      ? {
-          ...config,
-          typecheck: { ...config.typecheck, useLspDaemon: true },
-        }
-      : config;
+    const effectiveConfig: CheckConfig =
+      forceLspDaemon && config.typecheck.enabled
+        ? {
+            ...config,
+            typecheck: { ...config.typecheck, useLspDaemon: true },
+          }
+        : config;
     const result = await TypecheckRepository.execute(
       {
         path,
@@ -435,6 +436,7 @@ export class VibeCheckRepository {
             locale,
             isExtensive,
             signal,
+            data.restartLsp === true,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();

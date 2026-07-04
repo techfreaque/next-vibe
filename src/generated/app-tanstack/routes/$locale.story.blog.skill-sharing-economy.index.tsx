@@ -1,11 +1,9 @@
 // AUTO-GENERATED from src/app/[locale]/story/blog/skill-sharing-economy/page.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { JSX } from "react";
-
-import { TanstackPage as Page } from "@/app/[locale]/story/blog/skill-sharing-economy/page";
-
 import { toNextParams } from "../nextjs-compat-wrapper";
+import { TanstackPage as Page } from "@/app/[locale]/story/blog/skill-sharing-economy/page";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)

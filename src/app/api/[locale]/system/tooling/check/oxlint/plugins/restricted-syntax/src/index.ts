@@ -166,15 +166,15 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
   jsxInObjectLiteral:
     "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
   windowAccess:
-    "Direct 'window' access is not allowed. Use next-vibe-ui utils/hooks: getCurrentUrl(), openUrl(), openInNewTab(), getScreenWidth(), silentPushState(), silentReplaceState(), useWindowSize() — all from 'next-vibe/ui/web/utils/browser' or 'next-vibe/ui/web/hooks/use-window-size'.",
+    "Direct 'window' access is not allowed. Use next-vibe-ui utils/hooks: getCurrentUrl(), openUrl(), openInNewTab(), getScreenWidth(), silentPushState(), silentReplaceState(), useWindowSize() — all from 'next-vibe/ui/utils/browser' or 'next-vibe/ui/hooks/use-window-size'.",
   localStorageAccess:
-    "Direct 'localStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe/ui/web/lib/storage' and call storage.getItem/setItem/removeItem.",
+    "Direct 'localStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe/ui/lib/storage' and call storage.getItem/setItem/removeItem.",
   sessionStorageAccess:
-    "Direct 'sessionStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe/ui/web/lib/storage' and call storage.getItem/setItem/removeItem.",
+    "Direct 'sessionStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe/ui/lib/storage' and call storage.getItem/setItem/removeItem.",
   documentAccess:
-    "Direct 'document' access is not allowed. Use next-vibe-ui abstractions: getCookie/setCookie/deleteCookie from 'next-vibe/ui/web/lib/cookies', or getReferrer() from 'next-vibe/ui/web/utils/browser'.",
+    "Direct 'document' access is not allowed. Use next-vibe-ui abstractions: getCookie/setCookie/deleteCookie from 'next-vibe/ui/lib/cookies', or getReferrer() from 'next-vibe/ui/utils/browser'.",
   navigatorAccess:
-    "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/web/utils/browser', or useWindowSize() from 'next-vibe/ui/web/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/web/hooks/use-touch-device'.",
+    "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/utils/browser', or useWindowSize() from 'next-vibe/ui/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/hooks/use-touch-device'.",
   rawFetch:
     "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API'.",
   endpointsPageInServerEntry:
@@ -435,7 +435,7 @@ const BROWSER_GLOBALS = new Set([
  * These implement the very APIs that app code should use instead.
  */
 const BROWSER_IMPL_PATH_FRAGMENTS = [
-  "next-vibe/ui/web/",
+  "next-vibe/ui/",
   "next-vibe/ui/tanstack/",
   // The vibe-frame embed bundle is a standalone, zero-dependency script that
   // runs on third-party pages / inside the iframe. It talks to the browser
@@ -494,47 +494,47 @@ const WINDOW_UNIVERSAL_PROPS = new Set([
 /** Per-property messages for window.* access */
 const WINDOW_PROPERTY_MESSAGES: Record<string, string> = {
   location:
-    "Use getCurrentUrl(), assignUrl(url), reloadPage(), getCurrentOrigin(), getCurrentHostname(), getCurrentPathname(), or getCurrentSearch() from 'next-vibe/ui/web/utils/browser' instead of window.location.*.",
-  open: "Use openInNewTab(url) from 'next-vibe/ui/web/utils/browser' instead of window.open().",
+    "Use getCurrentUrl(), assignUrl(url), reloadPage(), getCurrentOrigin(), getCurrentHostname(), getCurrentPathname(), or getCurrentSearch() from 'next-vibe/ui/utils/browser' instead of window.location.*.",
+  open: "Use openInNewTab(url) from 'next-vibe/ui/utils/browser' instead of window.open().",
   history:
-    "Use silentPushState(url) or silentReplaceState(url) from 'next-vibe/ui/web/utils/browser' instead of window.history.",
+    "Use silentPushState(url) or silentReplaceState(url) from 'next-vibe/ui/utils/browser' instead of window.history.",
   innerWidth:
-    "Use getScreenWidth() or useWindowSize() from 'next-vibe/ui/web/hooks/use-window-size' instead of window.innerWidth.",
+    "Use getScreenWidth() or useWindowSize() from 'next-vibe/ui/hooks/use-window-size' instead of window.innerWidth.",
   innerHeight:
-    "Use useWindowSize() from 'next-vibe/ui/web/hooks/use-window-size' instead of window.innerHeight.",
+    "Use useWindowSize() from 'next-vibe/ui/hooks/use-window-size' instead of window.innerHeight.",
   scrollTo:
-    "Use scrollToTop() from 'next-vibe/ui/web/utils/browser' instead of window.scrollTo().",
+    "Use scrollToTop() from 'next-vibe/ui/utils/browser' instead of window.scrollTo().",
   print:
-    "Use triggerPrint() from 'next-vibe/ui/web/utils/browser' instead of window.print().",
+    "Use triggerPrint() from 'next-vibe/ui/utils/browser' instead of window.print().",
   ontouchstart:
-    "Use useTouchDevice() from 'next-vibe/ui/web/hooks/use-touch-device' instead of window.ontouchstart.",
+    "Use useTouchDevice() from 'next-vibe/ui/hooks/use-touch-device' instead of window.ontouchstart.",
   addEventListener:
-    "Use addWindowListener(event, handler) from 'next-vibe/ui/web/utils/browser' instead of window.addEventListener().",
+    "Use addWindowListener(event, handler) from 'next-vibe/ui/utils/browser' instead of window.addEventListener().",
   removeEventListener:
-    "Use the cleanup function returned by addWindowListener() from 'next-vibe/ui/web/utils/browser' instead of window.removeEventListener().",
+    "Use the cleanup function returned by addWindowListener() from 'next-vibe/ui/utils/browser' instead of window.removeEventListener().",
 };
 
 /** Per-property messages for document.* access */
 const DOCUMENT_PROPERTY_MESSAGES: Record<string, string> = {
   cookie:
-    "Use getCookie/setCookie/deleteCookie/getAllCookies from 'next-vibe/ui/web/lib/cookies' instead of document.cookie.",
+    "Use getCookie/setCookie/deleteCookie/getAllCookies from 'next-vibe/ui/lib/cookies' instead of document.cookie.",
   referrer:
-    "Use getReferrer() from 'next-vibe/ui/web/utils/browser' instead of document.referrer.",
+    "Use getReferrer() from 'next-vibe/ui/utils/browser' instead of document.referrer.",
   documentElement:
-    "Use getRootCssVar/setRootCssVar/rootHasClass/addRootClass/removeRootClass/observeRootMutations/getDocumentScrollHeight from 'next-vibe/ui/web/utils/browser' instead of document.documentElement.",
+    "Use getRootCssVar/setRootCssVar/rootHasClass/addRootClass/removeRootClass/observeRootMutations/getDocumentScrollHeight from 'next-vibe/ui/utils/browser' instead of document.documentElement.",
   getElementById:
-    "Use getElementById(id) from 'next-vibe/ui/web/utils/browser' instead of document.getElementById().",
+    "Use getElementById(id) from 'next-vibe/ui/utils/browser' instead of document.getElementById().",
   querySelector:
-    "Use querySelector(selector) from 'next-vibe/ui/web/utils/browser' instead of document.querySelector().",
+    "Use querySelector(selector) from 'next-vibe/ui/utils/browser' instead of document.querySelector().",
   querySelectorAll:
-    "Use querySelector(selector) from 'next-vibe/ui/web/utils/browser' instead of document.querySelectorAll().",
+    "Use querySelector(selector) from 'next-vibe/ui/utils/browser' instead of document.querySelectorAll().",
   createElement:
-    "Use downloadFile(filename, content) from 'next-vibe/ui/web/utils/browser' for download links, or add a specific helper if needed.",
+    "Use downloadFile(filename, content) from 'next-vibe/ui/utils/browser' for download links, or add a specific helper if needed.",
   addEventListener:
-    "Use addDocumentListener(event, handler) from 'next-vibe/ui/web/utils/browser' instead of document.addEventListener().",
+    "Use addDocumentListener(event, handler) from 'next-vibe/ui/utils/browser' instead of document.addEventListener().",
   removeEventListener:
-    "Use the cleanup function returned by addDocumentListener() from 'next-vibe/ui/web/utils/browser' instead of document.removeEventListener().",
-  body: "Use getDocumentBody() from 'next-vibe/ui/web/utils/browser' instead of document.body.",
+    "Use the cleanup function returned by addDocumentListener() from 'next-vibe/ui/utils/browser' instead of document.removeEventListener().",
+  body: "Use getDocumentBody() from 'next-vibe/ui/utils/browser' instead of document.body.",
   title:
     "Set document.title via a <title> tag or metadata API instead of direct document.title access.",
 };
@@ -542,19 +542,19 @@ const DOCUMENT_PROPERTY_MESSAGES: Record<string, string> = {
 /** Per-property messages for navigator.* access */
 const NAVIGATOR_PROPERTY_MESSAGES: Record<string, string> = {
   userAgent:
-    "Use getUserAgent() from 'next-vibe/ui/web/utils/browser' instead of navigator.userAgent.",
+    "Use getUserAgent() from 'next-vibe/ui/utils/browser' instead of navigator.userAgent.",
   maxTouchPoints:
-    "Use useTouchDevice() from 'next-vibe/ui/web/hooks/use-touch-device' instead of navigator.maxTouchPoints.",
+    "Use useTouchDevice() from 'next-vibe/ui/hooks/use-touch-device' instead of navigator.maxTouchPoints.",
   clipboard:
-    "Use copyToClipboard(text) from 'next-vibe/ui/web/utils/browser' instead of navigator.clipboard.",
+    "Use copyToClipboard(text) from 'next-vibe/ui/utils/browser' instead of navigator.clipboard.",
   geolocation:
-    "Use getGeolocation() from 'next-vibe/ui/web/utils/browser' instead of navigator.geolocation.",
+    "Use getGeolocation() from 'next-vibe/ui/utils/browser' instead of navigator.geolocation.",
   mediaDevices:
-    "Use navigator.mediaDevices directly — no abstraction exists yet. Add one to 'next-vibe/ui/web/utils/browser' if needed.",
+    "Use navigator.mediaDevices directly — no abstraction exists yet. Add one to 'next-vibe/ui/utils/browser' if needed.",
   language:
-    "Use navigator.language directly — no abstraction exists yet. Add one to 'next-vibe/ui/web/utils/browser' if needed.",
+    "Use navigator.language directly — no abstraction exists yet. Add one to 'next-vibe/ui/utils/browser' if needed.",
   onLine:
-    "Use navigator.onLine directly — no abstraction exists yet. Add one to 'next-vibe/ui/web/utils/browser' if needed.",
+    "Use navigator.onLine directly — no abstraction exists yet. Add one to 'next-vibe/ui/utils/browser' if needed.",
 };
 
 /**

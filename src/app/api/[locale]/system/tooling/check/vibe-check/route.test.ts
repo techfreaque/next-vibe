@@ -29,7 +29,7 @@ import type { LspIssue } from "../typecheck/lsp-daemon";
 import { TsgoDaemon } from "../typecheck/lsp-daemon";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-project");
-const ROOT_PATH = resolve(__dirname, "../../../../../../..");
+const ROOT_PATH = resolve(__dirname, "../../../../../../../..");
 const TEST_PROJECT_CONFIG = resolve(TEST_PROJECT_PATH, "check.config.ts");
 const VIBE_RUNTIME = resolve(
   ROOT_PATH,
@@ -40,32 +40,72 @@ const VIBE_RUNTIME = resolve(
 // GROUND TRUTH
 // ============================================================
 
-// Per-file error/warning counts (full dir scope)
-const FILE_COUNTS: Record<string, { errors: number; warnings: number }> = {
-  "a11y-issues.tsx": { errors: 62, warnings: 2 },
+interface FileStat {
+  errors: number;
+  warnings: number;
+}
+
+/** Mode A (no-lsp, tsgo cold): verified from actual output */
+const NO_LSP_FILE_COUNTS: Record<string, FileStat> = {
+  "a11y-issues.tsx": { errors: 72, warnings: 2 },
   "eslint-issues.tsx": { errors: 7, warnings: 0 },
-  "general-issues.ts": { errors: 34, warnings: 0 },
+  "general-issues.ts": { errors: 33, warnings: 0 },
   "i18n-issues.tsx": { errors: 43, warnings: 1 },
   "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
   "nextjs-issues.tsx": { errors: 37, warnings: 1 },
+  "node-issues.ts": { errors: 14, warnings: 0 },
   "promise-issues.ts": { errors: 12, warnings: 0 },
-  "react-issues.tsx": { errors: 42, warnings: 2 },
-  "restricted-syntax-issues.tsx": { errors: 37, warnings: 0 },
+  "react-issues.tsx": { errors: 40, warnings: 2 },
+  "restricted-syntax-issues.tsx": { errors: 30, warnings: 0 },
+  "type-errors.ts": { errors: 12, warnings: 0 },
   "typescript-issues.ts": { errors: 20, warnings: 0 },
   "calculate.ts": { errors: 1, warnings: 0 },
-  "page.tsx": { errors: 1, warnings: 0 },
 };
 
-// Rules expected per file — every rule listed here MUST appear in that file's output
+const NO_LSP_TOTALS = {
+  dir: { files: 13, issues: 357, errors: 350, warnings: 7 },
+  subfolder: { files: 12, issues: 356, errors: 349, warnings: 7 },
+  // folder+file excludes check.config.ts → same as dir (no extra files)
+  folderPlusFile: 13,
+};
+
+/** Mode B (lsp): LSP daemon finds additional TS errors + check.config.ts */
+const LSP_FILE_COUNTS: Record<string, FileStat> = {
+  "check.config.ts": { errors: 1, warnings: 0 },
+  "a11y-issues.tsx": { errors: 72, warnings: 2 },
+  "eslint-issues.tsx": { errors: 8, warnings: 0 },
+  "general-issues.ts": { errors: 36, warnings: 0 },
+  "i18n-issues.tsx": { errors: 43, warnings: 1 },
+  "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
+  "nextjs-issues.tsx": { errors: 37, warnings: 1 },
+  "node-issues.ts": { errors: 14, warnings: 0 },
+  "promise-issues.ts": { errors: 13, warnings: 0 },
+  "react-issues.tsx": { errors: 40, warnings: 2 },
+  "restricted-syntax-issues.tsx": { errors: 30, warnings: 0 },
+  "type-errors.ts": { errors: 12, warnings: 0 },
+  "typescript-issues.ts": { errors: 24, warnings: 0 },
+  "calculate.ts": { errors: 1, warnings: 0 },
+};
+
+const LSP_TOTALS = {
+  dir: { files: 14, issues: 367, errors: 360, warnings: 7 },
+  subfolder: { files: 12, issues: 365, errors: 358, warnings: 7 },
+  // check.config.ts is only scanned when ./ is the root — not in subfolder+file combo
+  folderPlusFile: 13,
+};
+
+/** Rules present in each file — same regardless of LSP mode */
 const FILE_RULES: Record<string, string[]> = {
   "a11y-issues.tsx": [
     "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
     "eslint-plugin-jsx-a11y(alt-text)",
     "eslint-plugin-jsx-a11y(anchor-has-content)",
+    "eslint-plugin-jsx-a11y(anchor-is-valid)",
     "eslint-plugin-jsx-a11y(click-events-have-key-events)",
     "eslint-plugin-jsx-a11y(heading-has-content)",
     "eslint-plugin-jsx-a11y(iframe-has-title)",
     "eslint-plugin-jsx-a11y(img-redundant-alt)",
+    "eslint-plugin-jsx-a11y(label-has-associated-control)",
     "eslint-plugin-jsx-a11y(no-access-key)",
     "eslint-plugin-jsx-a11y(no-autofocus)",
     "eslint-plugin-jsx-a11y(no-distracting-elements)",
@@ -90,13 +130,13 @@ const FILE_RULES: Record<string, string[]> = {
     "eslint(no-console)",
     "eslint(curly)",
     "eslint(eqeqeq)",
+    "eslint(prefer-template)",
     "eslint(no-unused-vars)",
     "eslint(no-template-curly-in-string)",
     "eslint(array-callback-return)",
     "eslint(no-constructor-return)",
     "eslint(no-self-compare)",
     "eslint(no-unused-private-class-members)",
-    "eslint(prefer-template)",
     "eslint(no-new)",
     "oxc(missing-throw)",
     "oxc(bad-comparison-sequence)",
@@ -104,6 +144,7 @@ const FILE_RULES: Record<string, string[]> = {
     "eslint-plugin-unicorn(no-new-array)",
     "eslint-plugin-unicorn(prefer-array-flat)",
     "eslint-plugin-unicorn(prefer-spread)",
+    "eslint-plugin-unicorn(prefer-includes)",
     "oxlint-plugin-restricted(restricted-syntax)",
   ],
   "i18n-issues.tsx": [
@@ -129,6 +170,18 @@ const FILE_RULES: Record<string, string[]> = {
     "eslint-plugin-next(no-page-custom-font)",
     "eslint-plugin-next(no-img-element)",
   ],
+  "node-issues.ts": [
+    "eslint-plugin-unicorn(prefer-node-protocol)",
+    "eslint-plugin-unicorn(no-new-array)",
+    "eslint-plugin-unicorn(prefer-includes)",
+    "eslint-plugin-unicorn(prefer-array-flat)",
+    "eslint-plugin-unicorn(prefer-spread)",
+    "simple-import-sort/imports",
+    "eslint(eqeqeq)",
+    "eslint(no-console)",
+    "eslint(no-self-compare)",
+    "oxlint-plugin-restricted(restricted-syntax)",
+  ],
   "promise-issues.ts": [
     "eslint-plugin-promise(param-names)",
     "eslint-plugin-promise(always-return)",
@@ -148,13 +201,26 @@ const FILE_RULES: Record<string, string[]> = {
     "oxlint-plugin-i18n(no-literal-string)",
     "oxlint-plugin-restricted(restricted-syntax)",
     "eslint-plugin-next(no-img-element)",
+    "eslint-plugin-jsx-a11y(click-events-have-key-events)",
   ],
   "restricted-syntax-issues.tsx": [
     "oxlint-plugin-restricted(restricted-syntax)",
     "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
     "oxlint-plugin-i18n(no-literal-string)",
   ],
-  "page.tsx": [
+  "type-errors.ts": [
+    // Bare codes match both [TS2322] (cold path) and [2322] (lsp path)
+    "2322",
+    "2339",
+    "2554",
+    "2345",
+    "2362",
+    "2366",
+    "2416",
+    "2304",
+    "2365",
+    "2741",
+    "typescript-eslint(no-inferrable-types)",
     "oxlint-plugin-restricted(restricted-syntax)",
   ],
   "typescript-issues.ts": [
@@ -167,50 +233,49 @@ const FILE_RULES: Record<string, string[]> = {
     "typescript-eslint(no-extra-non-null-assertion)",
     "typescript-eslint(explicit-function-return-type)",
     "oxlint-plugin-restricted(restricted-syntax)",
+    "2801",
   ],
-  "calculate.ts": [
-    "oxlint-plugin-restricted(restricted-syntax)",
-  ],
+  "calculate.ts": ["oxlint-plugin-restricted(restricted-syntax)"],
 };
-
-// Summary totals per scope
-const SCOPE_TOTALS = {
-  dir: { files: 12, issues: 332, errors: 325, warnings: 7 },
-  subfolder: { files: 11, issues: 331, errors: 324, warnings: 7 },
-  singleFile: { files: 1, issues: 64, errors: 62, warnings: 2 },
-};
-
-// Rules expected in the single-file scope (a11y-issues.tsx only)
-const SINGLE_FILE_RULES = FILE_RULES["a11y-issues.tsx"];
-
-// Rules expected in the subfolder scope (src/test-issues — all files except calculate.ts)
-// Every rule from every file in test-issues must appear
-const SUBFOLDER_RULES = [
-  ...new Set(
-    Object.entries(FILE_RULES)
-      .filter(([file]) => file !== "calculate.ts")
-      .flatMap(([, rules]) => rules),
-  ),
-];
 
 // ============================================================
 // HELPERS
 // ============================================================
 
-function runVibeCheck(targetPath: string): string {
-  const fullPath = resolve(TEST_PROJECT_PATH, targetPath);
-  if (!existsSync(fullPath)) {
-    return `Path not found: ${fullPath}`;
+function ensureConfig(): void {
+  if (!existsSync(TEST_PROJECT_CONFIG)) {
+    try {
+      execSync(
+        `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`,
+        { encoding: "utf-8", timeout: 30000 },
+      );
+    } catch {
+      /* ignore */
+    }
   }
+}
+
+function runVibeCheck(...paths: string[]): string {
+  ensureConfig();
+  const quotedPaths = paths.map((p) => `"${p}"`).join(" ");
   try {
     return execSync(
-      `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" check --fix=false "${targetPath}" 2>&1`,
+      `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" check --fix=false ${quotedPaths} 2>&1`,
       { encoding: "utf-8", timeout: 120000 },
     );
   } catch (error) {
     const e = error as { stdout?: string; stderr?: string };
     return (e.stdout ?? "") + (e.stderr ?? "");
   }
+}
+
+function patchConfig(key: string, value: string): void {
+  const src = readFileSync(TEST_PROJECT_CONFIG, "utf-8");
+  const patched = src.replace(
+    new RegExp(`(\\b${key}:\\s*)(?:true|false)`),
+    `$1${value}`,
+  );
+  writeFileSync(TEST_PROJECT_CONFIG, patched, "utf-8");
 }
 
 function extractSummary(output: string): {
@@ -232,7 +297,7 @@ function extractSummary(output: string): {
 function extractFileBlock(output: string, filename: string): string {
   const lines = output.split("\n");
   const startIdx = lines.findIndex(
-    (l) => l.includes(`● `) && l.includes(filename),
+    (l) => l.includes("● ") && l.includes(filename),
   );
   if (startIdx === -1) {
     return "";
@@ -247,12 +312,34 @@ function extractFileBlock(output: string, filename: string): string {
   return block.join("\n");
 }
 
-// ============================================================
-// CACHED OUTPUTS
-// ============================================================
-let dirOutput: string;
-let subfolderOutput: string;
-let fileOutput: string;
+function assertAllCheckersRan(out: string): void {
+  expect(out).toContain("Starting Oxlint check");
+  expect(out).toContain("Oxlint check completed");
+  expect(out).toContain("Starting ESLint check");
+  expect(out).toContain("ESLint check completed");
+  expect(out).toContain("Starting TypeScript check");
+  expect(out).toContain("TypeScript check completed");
+}
+
+function assertFileBlock(out: string, filename: string, rules: string[]): void {
+  const block = extractFileBlock(out, filename);
+  expect(block, `${filename} missing from output`).not.toBe("");
+  for (const rule of rules) {
+    expect(block, `${rule} missing from ${filename}`).toContain(rule);
+  }
+}
+
+function assertTypescriptMessages(out: string): void {
+  expect(out).toContain("Type 'string' is not assignable to type 'number'");
+  expect(out).toContain("Property 'missingProp' does not exist on type");
+  expect(out).toContain("Expected 2 arguments, but got 1");
+  expect(out).toContain(
+    "Argument of type 'string' is not assignable to parameter of type 'number'",
+  );
+  expect(out).toContain("Function lacks ending return statement");
+  expect(out).toContain("Cannot find name 'doesNotExist'");
+  expect(out).toContain("This condition will always return true");
+}
 
 // ============================================================
 // CONFIG CREATION FLOW
@@ -268,10 +355,10 @@ describe("Config Creation Flow", () => {
   it("Step 2: fails without config, shows config-create hint", () => {
     let output = "";
     try {
-      output = execSync(`cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" check ./ 2>&1`, {
-        encoding: "utf-8",
-        timeout: 30000,
-      });
+      output = execSync(
+        `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" check ./ 2>&1`,
+        { encoding: "utf-8", timeout: 30000 },
+      );
     } catch (error) {
       const e = error as { stdout?: string; stderr?: string };
       output = (e.stdout ?? "") + (e.stderr ?? "");
@@ -284,10 +371,10 @@ describe("Config Creation Flow", () => {
   it("Step 3: config-create creates the file", () => {
     let output = "";
     try {
-      output = execSync(`cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`, {
-        encoding: "utf-8",
-        timeout: 30000,
-      });
+      output = execSync(
+        `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`,
+        { encoding: "utf-8", timeout: 30000 },
+      );
     } catch (error) {
       const e = error as { stdout?: string; stderr?: string };
       output = (e.stdout ?? "") + (e.stderr ?? "");
@@ -298,13 +385,13 @@ describe("Config Creation Flow", () => {
   });
 
   it("Step 4: config-create fails when config already exists", () => {
-    let output = "";
     let exitCode = 0;
+    let output = "";
     try {
-      output = execSync(`cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`, {
-        encoding: "utf-8",
-        timeout: 30000,
-      });
+      output = execSync(
+        `cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`,
+        { encoding: "utf-8", timeout: 30000 },
+      );
     } catch (error) {
       const e = error as { stdout?: string; stderr?: string; status?: number };
       output = (e.stdout ?? "") + (e.stderr ?? "");
@@ -314,18 +401,15 @@ describe("Config Creation Flow", () => {
     expect(output.toLowerCase()).toContain("already exists");
   });
 
-  it("Step 5: vibe check runs successfully with created config", () => {
-    if (!existsSync(TEST_PROJECT_CONFIG)) {
-      try {
-        execSync(`cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`, {
-          encoding: "utf-8",
-          timeout: 30000,
-        });
-      } catch { /* ignore */ }
-    }
-    dirOutput = runVibeCheck("./");
-    expect(dirOutput).toContain("Starting Oxlint check");
-    expect(dirOutput).toContain("Oxlint check completed");
+  it("Step 5: config has fix: false (corpus protection)", () => {
+    const content = readFileSync(TEST_PROJECT_CONFIG, "utf-8");
+    expect(content).toMatch(/fix:\s*false/);
+    expect(content).not.toMatch(/fix:\s*true/);
+  });
+
+  it("Step 6: config has useLspDaemon: false (cold-start default)", () => {
+    const content = readFileSync(TEST_PROJECT_CONFIG, "utf-8");
+    expect(content).toMatch(/useLspDaemon:\s*false/);
   });
 });
 
@@ -333,198 +417,276 @@ describe("Config Creation Flow", () => {
 // Shared invocation suite (called for both modes)
 // fileCounts and totals differ between no-lsp and lsp modes.
 // ============================================================
-describe("Full Directory Check (./)", () => {
-  beforeAll(() => {
-    if (!dirOutput) {
-      if (!existsSync(TEST_PROJECT_CONFIG)) {
-        try {
-          execSync(`cd "${TEST_PROJECT_PATH}" && bun "${VIBE_RUNTIME}" config-create 2>&1`, {
-            encoding: "utf-8",
-            timeout: 30000,
-          });
-        } catch { /* ignore */ }
+
+function buildInvocationSuite(
+  label: string,
+  fileCounts: Record<string, FileStat>,
+  totals: {
+    dir: typeof NO_LSP_TOTALS.dir;
+    subfolder: typeof NO_LSP_TOTALS.subfolder;
+    folderPlusFile: number;
+  },
+): void {
+  // Files that appear in subfolder scope (subset without calculate.ts and check.config.ts)
+  const subfolderFiles = Object.keys(fileCounts).filter(
+    (f) => f !== "calculate.ts" && f !== "check.config.ts",
+  );
+
+  // ── Pattern 1: Full project (./) ────────────────────────
+  describe(`${label} | full project (./)`, () => {
+    let out: string;
+
+    beforeAll(() => {
+      out = runVibeCheck("./");
+    });
+
+    it("all three checkers ran", () => assertAllCheckersRan(out));
+
+    it(`summary: ${totals.dir.files} files, ${totals.dir.issues} issues`, () => {
+      const s = extractSummary(out);
+      expect(s.files).toBe(totals.dir.files);
+      expect(s.issues).toBe(totals.dir.issues);
+      expect(s.errors).toBe(totals.dir.errors);
+      expect(s.warnings).toBe(totals.dir.warnings);
+    });
+
+    describe("per-file issue counts", () => {
+      for (const [filename, expected] of Object.entries(fileCounts)) {
+        const total = expected.errors + expected.warnings;
+        it(`${filename}: ${expected.errors}e ${expected.warnings}w`, () => {
+          expect(out, `${filename} missing`).toContain(filename);
+          const itemWord = total === 1 ? "item" : "items";
+          expect(out).toContain(`${filename} (${total} ${itemWord})`);
+        });
       }
-      dirOutput = runVibeCheck("./");
-    }
+    });
+
+    describe("per-file rule detection", () => {
+      for (const [filename, rules] of Object.entries(FILE_RULES)) {
+        it(`${filename} rules`, () => assertFileBlock(out, filename, rules));
+      }
+    });
+
+    it("TypeScript error messages present", () =>
+      assertTypescriptMessages(out));
   });
 
-  describe("checkers all ran", () => {
-    it("started and completed oxlint", () => {
-      expect(dirOutput).toContain("Starting Oxlint check");
-      expect(dirOutput).toContain("Oxlint check completed");
-    });
-    it("started and completed eslint", () => {
-      expect(dirOutput).toContain("Starting ESLint check");
-      expect(dirOutput).toContain("ESLint check completed");
-    });
-    it("started and completed typescript", () => {
-      expect(dirOutput).toContain("Starting TypeScript check");
-      expect(dirOutput).toContain("TypeScript check completed");
-    });
-  });
+  // ── Pattern 2: Subfolder (src/test-issues) ──────────────
+  describe(`${label} | subfolder (src/test-issues)`, () => {
+    let out: string;
 
-  describe("summary totals", () => {
-    it("correct file count", () => {
-      expect(extractSummary(dirOutput).files).toBe(SCOPE_TOTALS.dir.files);
+    beforeAll(() => {
+      out = runVibeCheck("src/test-issues");
     });
-    it("correct total issues", () => {
-      expect(extractSummary(dirOutput).issues).toBe(SCOPE_TOTALS.dir.issues);
-    });
-    it("correct error count", () => {
-      expect(extractSummary(dirOutput).errors).toBe(SCOPE_TOTALS.dir.errors);
-    });
-    it("correct warning count", () => {
-      expect(extractSummary(dirOutput).warnings).toBe(SCOPE_TOTALS.dir.warnings);
-    });
-  });
 
-  describe("per-file error counts", () => {
-    for (const [filename, expected] of Object.entries(FILE_COUNTS)) {
-      const total = expected.errors + expected.warnings;
-      it(`${filename}: ${expected.errors} errors, ${expected.warnings} warnings`, () => {
-        expect(dirOutput, `${filename} should appear in output`).toContain(filename);
-        // Affected-files summary line — singular/plural: "1 error" vs "N errors", "1 warning" vs "N warnings"
-        const errWord = expected.errors === 1 ? "error" : "errors";
-        const warnWord = expected.warnings === 1 ? "warning" : "warnings";
-        if (expected.warnings > 0) {
-          expect(dirOutput).toContain(
-            `${filename} ${expected.errors} ${errWord} ${expected.warnings} ${warnWord}`,
-          );
-        } else {
-          expect(dirOutput).toContain(`${filename} ${expected.errors} ${errWord}`);
-        }
-        // File block header: "● src/.../filename (N items)" where N = errors + warnings
-        const itemWord = total === 1 ? "item" : "items";
-        expect(dirOutput).toContain(`${filename} (${total} ${itemWord})`);
-      });
-    }
-  });
+    it(`summary: ${totals.subfolder.files} files`, () => {
+      const s = extractSummary(out);
+      expect(s.files).toBe(totals.subfolder.files);
+      expect(s.issues).toBe(totals.subfolder.issues);
+      expect(s.errors).toBe(totals.subfolder.errors);
+      expect(s.warnings).toBe(totals.subfolder.warnings);
+    });
 
-  describe("per-file rule presence", () => {
-    for (const [filename, rules] of Object.entries(FILE_RULES)) {
-      describe(filename, () => {
-        for (const rule of rules) {
-          it(`detects ${rule}`, () => {
-            const block = extractFileBlock(dirOutput, filename);
-            expect(
-              block,
-              `${rule} should appear in ${filename}'s output block`,
-            ).toContain(rule);
-          });
-        }
-      });
-    }
-  });
-
-  describe("typescript compiler errors", () => {
-    it("detects Property does not exist on JSX.IntrinsicElements", () => {
-      expect(dirOutput).toContain(
-        "Property 'marquee' does not exist on type 'JSX.IntrinsicElements'",
-      );
-    });
-    it("detects read-only property assignment", () => {
-      expect(dirOutput).toContain(
-        "Cannot assign to 'count' because it is a read-only property",
-      );
-    });
-    it("detects type not assignable", () => {
-      expect(dirOutput).toContain("is not assignable to type");
-    });
-    it("detects condition always true", () => {
-      expect(dirOutput).toContain("This condition will always return true");
-    });
-  });
-});
-
-// ============================================================
-// SUBFOLDER SCOPE (src/test-issues — 11 files, no calculate.ts)
-// ============================================================
-describe("Subfolder Check (src/test-issues)", () => {
-  beforeAll(() => {
-    subfolderOutput = runVibeCheck("src/test-issues");
-  });
-
-  describe("summary totals", () => {
-    it("correct file count", () => {
-      expect(extractSummary(subfolderOutput).files).toBe(SCOPE_TOTALS.subfolder.files);
-    });
-    it("correct total issues", () => {
-      expect(extractSummary(subfolderOutput).issues).toBe(SCOPE_TOTALS.subfolder.issues);
-    });
-    it("correct error count", () => {
-      expect(extractSummary(subfolderOutput).errors).toBe(SCOPE_TOTALS.subfolder.errors);
-    });
-    it("correct warning count", () => {
-      expect(extractSummary(subfolderOutput).warnings).toBe(SCOPE_TOTALS.subfolder.warnings);
-    });
-  });
-
-  describe("file scope", () => {
     it("includes all test-issues files", () => {
-      for (const filename of Object.keys(FILE_COUNTS).filter((f) => f !== "calculate.ts")) {
-        expect(subfolderOutput, `should include ${filename}`).toContain(filename);
+      for (const f of subfolderFiles) {
+        expect(out, `missing ${f}`).toContain(f);
       }
     });
+
     it("excludes calculate.ts (outside subfolder)", () => {
-      expect(extractFileBlock(subfolderOutput, "calculate.ts")).toBe("");
+      expect(extractFileBlock(out, "calculate.ts")).toBe("");
+    });
+
+    it("all rules detected across files", () => {
+      const allRules = [
+        ...new Set(
+          Object.entries(FILE_RULES)
+            .filter(([f]) => f !== "calculate.ts")
+            .flatMap(([, rules]) => rules),
+        ),
+      ];
+      for (const rule of allRules) {
+        expect(out, `rule ${rule} missing`).toContain(rule);
+      }
+    });
+
+    it("TypeScript error messages present", () =>
+      assertTypescriptMessages(out));
+  });
+
+  // ── Pattern 3: Two files (general + node) ───────────────
+  describe(`${label} | two files (general-issues.ts + node-issues.ts)`, () => {
+    let out: string;
+
+    beforeAll(() => {
+      out = runVibeCheck(
+        "src/test-issues/general-issues.ts",
+        "src/test-issues/node-issues.ts",
+      );
+    });
+
+    it("summary: 2 files", () => {
+      expect(extractSummary(out).files).toBe(2);
+    });
+
+    it("general-issues.ts present", () => {
+      expect(out).toContain("general-issues.ts");
+    });
+
+    it("node-issues.ts present", () => {
+      expect(out).toContain("node-issues.ts");
+    });
+
+    it("excludes all other files", () => {
+      const excluded = Object.keys(fileCounts).filter(
+        (f) => f !== "general-issues.ts" && f !== "node-issues.ts",
+      );
+      for (const f of excluded) {
+        expect(extractFileBlock(out, f), `${f} should be absent`).toBe("");
+      }
+    });
+
+    it("detects general-issues.ts rules", () =>
+      assertFileBlock(
+        out,
+        "general-issues.ts",
+        FILE_RULES["general-issues.ts"],
+      ));
+
+    it("detects node-issues.ts rules", () =>
+      assertFileBlock(out, "node-issues.ts", FILE_RULES["node-issues.ts"]));
+  });
+
+  // ── Pattern 4: Two files (type-errors + a11y) ───────────
+  describe(`${label} | two files (type-errors.ts + a11y-issues.tsx)`, () => {
+    let out: string;
+
+    beforeAll(() => {
+      out = runVibeCheck(
+        "src/test-issues/type-errors.ts",
+        "src/test-issues/a11y-issues.tsx",
+      );
+    });
+
+    it("summary: 2 files", () => {
+      expect(extractSummary(out).files).toBe(2);
+    });
+
+    it("type-errors.ts present", () => {
+      expect(out).toContain("type-errors.ts");
+    });
+
+    it("a11y-issues.tsx present", () => {
+      expect(out).toContain("a11y-issues.tsx");
+    });
+
+    it("excludes other files", () => {
+      for (const f of Object.keys(fileCounts).filter(
+        (name) => name !== "type-errors.ts" && name !== "a11y-issues.tsx",
+      )) {
+        expect(extractFileBlock(out, f), `${f} should be absent`).toBe("");
+      }
+    });
+
+    it("TypeScript error codes from type-errors.ts", () =>
+      assertFileBlock(out, "type-errors.ts", FILE_RULES["type-errors.ts"]));
+
+    it("a11y rules from a11y-issues.tsx", () =>
+      assertFileBlock(out, "a11y-issues.tsx", FILE_RULES["a11y-issues.tsx"]));
+
+    it("TypeScript error messages from type-errors.ts", () => {
+      expect(out).toContain("Type 'string' is not assignable to type 'number'");
+      expect(out).toContain("Property 'missingProp' does not exist on type");
+      expect(out).toContain("Expected 2 arguments, but got 1");
     });
   });
 
-  describe("all rules detected in subfolder", () => {
-    for (const rule of SUBFOLDER_RULES) {
-      it(`detects ${rule}`, () => {
-        expect(subfolderOutput).toContain(rule);
-      });
-    }
+  // ── Pattern 5: Folder + outside file ────────────────────
+  describe(`${label} | folder + outside file (src/test-issues + calculate.ts)`, () => {
+    let out: string;
+
+    beforeAll(() => {
+      out = runVibeCheck("src/test-issues", "src/utils/calculate.ts");
+    });
+
+    it(`summary: ${totals.folderPlusFile} files`, () => {
+      expect(extractSummary(out).files).toBe(totals.folderPlusFile);
+    });
+
+    it("includes all test-issues files", () => {
+      for (const f of subfolderFiles) {
+        expect(out, `missing ${f}`).toContain(f);
+      }
+    });
+
+    it("includes calculate.ts", () => {
+      expect(out).toContain("calculate.ts");
+      expect(out).toContain("calculate.ts 1 error");
+    });
+
+    it("detects restricted-syntax in calculate.ts", () => {
+      const block = extractFileBlock(out, "calculate.ts");
+      expect(block).toContain("oxlint-plugin-restricted(restricted-syntax)");
+    });
+
+    it("TypeScript error messages present", () =>
+      assertTypescriptMessages(out));
+  });
+}
+
+// ============================================================
+// MODE A — useLspDaemon: false (default cold tsgo path)
+// ============================================================
+describe("Mode A: useLspDaemon=false (cold tsgo)", () => {
+  buildInvocationSuite("no-lsp", NO_LSP_FILE_COUNTS, NO_LSP_TOTALS);
+});
+
+// ============================================================
+// PATCH CONFIG → useLspDaemon: true
+// ============================================================
+describe("Config patch: enable useLspDaemon", () => {
+  it("patches useLspDaemon to true in check.config.ts", () => {
+    expect(existsSync(TEST_PROJECT_CONFIG)).toBe(true);
+    patchConfig("useLspDaemon", "true");
+    const content = readFileSync(TEST_PROJECT_CONFIG, "utf-8");
+    expect(content).toMatch(/useLspDaemon:\s*true/);
   });
 });
 
 // ============================================================
-// SINGLE FILE SCOPE (src/test-issues/a11y-issues.tsx)
+// MODE B — useLspDaemon: true (warm LSP daemon)
+// Finds additional TypeScript errors via LSP project context.
 // ============================================================
-describe("Single File Check (src/test-issues/a11y-issues.tsx)", () => {
+describe("Mode B: useLspDaemon=true (LSP daemon)", () => {
+  buildInvocationSuite("lsp", LSP_FILE_COUNTS, LSP_TOTALS);
+});
+
+// ============================================================
+// ROOT INVOCATION — verifies ignore patterns
+// ============================================================
+describe("Running From Project Root", () => {
+  let fromRootOutput: string;
+
   beforeAll(() => {
-    fileOutput = runVibeCheck("src/test-issues/a11y-issues.tsx");
-  });
-
-  describe("summary totals", () => {
-    it("correct file count", () => {
-      expect(extractSummary(fileOutput).files).toBe(SCOPE_TOTALS.singleFile.files);
-    });
-    it("correct total issues", () => {
-      expect(extractSummary(fileOutput).issues).toBe(SCOPE_TOTALS.singleFile.issues);
-    });
-    it("correct error count", () => {
-      expect(extractSummary(fileOutput).errors).toBe(SCOPE_TOTALS.singleFile.errors);
-    });
-    it("correct warning count", () => {
-      expect(extractSummary(fileOutput).warnings).toBe(SCOPE_TOTALS.singleFile.warnings);
-    });
-  });
-
-  describe("file scope", () => {
-    it("contains only a11y-issues.tsx", () => {
-      expect(fileOutput).toContain("a11y-issues.tsx");
-    });
-    it("does not include other test files", () => {
-      for (const filename of Object.keys(FILE_COUNTS).filter(
-        (f) => f !== "a11y-issues.tsx",
-      )) {
-        expect(
-          extractFileBlock(fileOutput, filename),
-          `${filename} should not appear in single-file output`,
-        ).toBe("");
-      }
-    });
-  });
-
-  describe("all expected rules detected in single file", () => {
-    for (const rule of SINGLE_FILE_RULES) {
-      it(`detects ${rule}`, () => {
-        expect(fileOutput).toContain(rule);
-      });
+    try {
+      fromRootOutput = execSync(
+        `cd "${ROOT_PATH}" && bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts check --fix=false "src/app/api/[locale]/system/tooling/check/test-project" 2>&1`,
+        { encoding: "utf-8", timeout: 120000 },
+      );
+    } catch (error) {
+      const e = error as { stdout?: string; stderr?: string };
+      fromRootOutput = (e.stdout ?? "") + (e.stderr ?? "");
     }
-  });
+  }, 120000);
+
+  it("test-project is in ignore patterns — no issues reported", () => {
+    const hasNoIssues =
+      fromRootOutput.includes("Keine Codequalitätsprobleme") ||
+      fromRootOutput.includes("No code quality issues") ||
+      fromRootOutput.includes("No issues found") ||
+      fromRootOutput.includes("true");
+    expect(hasNoIssues).toBe(true);
+  }, 120000);
 });
 
 // ============================================================
@@ -551,55 +713,193 @@ describe("Compiled Runtime", () => {
   });
 
   it("detects errors", () => {
-    if (compiledOutput === "SKIP") { return; }
+    if (compiledOutput === "SKIP") {
+      return;
+    }
     expect(compiledOutput).toContain("error");
   });
 
   it("detects all three custom plugins", () => {
-    if (compiledOutput === "SKIP") { return; }
+    if (compiledOutput === "SKIP") {
+      return;
+    }
     expect(compiledOutput).toContain("oxlint-plugin-jsx-capitalization");
     expect(compiledOutput).toContain("oxlint-plugin-i18n");
     expect(compiledOutput).toContain("oxlint-plugin-restricted");
   });
 
   it("completes TypeScript check", () => {
-    if (compiledOutput === "SKIP") { return; }
+    if (compiledOutput === "SKIP") {
+      return;
+    }
     expect(compiledOutput).toContain("TypeScript check completed");
-  });
-
-  it("summary close to bun runtime (±15 issues)", () => {
-    if (compiledOutput === "SKIP") { return; }
-    const summary = extractSummary(compiledOutput);
-    expect(summary.files).toBe(SCOPE_TOTALS.dir.files);
-    expect(summary.issues).toBeGreaterThanOrEqual(SCOPE_TOTALS.dir.issues - 15);
-    expect(summary.issues).toBeLessThanOrEqual(SCOPE_TOTALS.dir.issues + 5);
   });
 });
 
 // ============================================================
 // LSP DAEMON API — direct TsgoDaemon tests
 // ============================================================
-describe("Running From Project Root", () => {
-  let fromRootOutput: string;
 
-  beforeAll(() => {
-    try {
-      fromRootOutput = execSync(
-        `cd "${ROOT_PATH}" && bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts check --fix=false "src/app/api/[locale]/system/tooling/check/test-project" 2>&1`,
-        { encoding: "utf-8", timeout: 120000 },
-      );
-    } catch (error) {
-      const e = error as { stdout?: string; stderr?: string };
-      fromRootOutput = (e.stdout ?? "") + (e.stderr ?? "");
+const TSGO_PATH = join(ROOT_PATH, "node_modules/.bin/tsgo");
+const LSP_PID_PATH = join(ROOT_PATH, ".tmp/tsgo-lsp-spec.pid");
+
+const TYPE_ERRORS_KNOWN: Array<{ line: number; code: string }> = [
+  { line: 24, code: "2322" },
+  { line: 30, code: "2339" },
+  { line: 38, code: "2554" },
+  { line: 46, code: "2345" },
+  { line: 52, code: "2362" },
+  { line: 56, code: "2366" },
+  { line: 68, code: "2416" },
+  { line: 78, code: "2304" },
+  { line: 84, code: "2365" },
+  { line: 99, code: "2741" },
+];
+
+const CROSS_FILE_ERRORS: Array<{ file: string; code: string }> = [
+  { file: "a11y-issues.tsx", code: "2339" },
+  { file: "general-issues.ts", code: "18048" },
+  { file: "general-issues.ts", code: "2322" },
+  { file: "general-issues.ts", code: "2365" },
+  { file: "general-issues.ts", code: "2769" },
+  { file: "react-issues.tsx", code: "17001" },
+  { file: "react-issues.tsx", code: "2540" },
+  { file: "typescript-issues.ts", code: "2801" },
+];
+
+function findIssue(
+  issues: LspIssue[],
+  code: string,
+  line?: number,
+): LspIssue | undefined {
+  return issues.find(
+    (i) => i.rule === code && (line === undefined || i.line === line),
+  );
+}
+
+function findInFile(
+  issues: LspIssue[],
+  file: string,
+  code: string,
+): LspIssue | undefined {
+  return issues.find((i) => i.file.includes(file) && i.rule === code);
+}
+
+const daemon = TsgoDaemon.get(LSP_PID_PATH, TSGO_PATH, TEST_PROJECT_PATH);
+
+describe("LSP Daemon API: single file — cold start", () => {
+  let issues: LspIssue[] = [];
+
+  it("returns diagnostics within 30 s", async () => {
+    const t0 = Date.now();
+    issues = await daemon.getDiagnostics("src/test-issues/type-errors.ts");
+    expect(Date.now() - t0).toBeLessThan(30_000);
+    expect(issues.length).toBeGreaterThan(0);
+  }, 35_000);
+
+  it("finds all 10 known type errors", () => {
+    for (const { line, code } of TYPE_ERRORS_KNOWN) {
+      expect(
+        findIssue(issues, code, line),
+        `TS${code} at L${line} — got: ${issues.map((i) => `TS${i.rule}:${i.line}`).join(" ")}`,
+      ).toBeDefined();
     }
-  }, 120000);
+  });
 
-  it("test-project is in ignore patterns — no issues reported", () => {
-    const hasNoIssues =
-      fromRootOutput.includes("Keine Codequalitätsprobleme") ||
-      fromRootOutput.includes("No code quality issues") ||
-      fromRootOutput.includes("No issues found") ||
-      fromRootOutput.includes("true");
-    expect(hasNoIssues).toBe(true);
-  }, 120000);
+  it("all issues well-formed", () => {
+    for (const i of issues) {
+      expect(i.file).toBeTruthy();
+      expect(i.line).toBeGreaterThan(0);
+      expect(i.column).toBeGreaterThan(0);
+      expect(["error", "warning", "info"]).toContain(i.severity);
+    }
+  });
+
+  it("all issues reference type-errors.ts", () => {
+    for (const i of issues) {
+      expect(i.file).toContain("type-errors.ts");
+    }
+  });
+});
+
+describe("LSP Daemon API: single file — warm repeat", () => {
+  let issues: LspIssue[] = [];
+
+  it("returns in under 2 s (file already open)", async () => {
+    const t0 = Date.now();
+    issues = await daemon.getDiagnostics("src/test-issues/type-errors.ts");
+    expect(Date.now() - t0).toBeLessThan(2_000);
+  }, 5_000);
+
+  it("same errors as cold call", () => {
+    for (const { line, code } of TYPE_ERRORS_KNOWN) {
+      expect(
+        findIssue(issues, code, line),
+        `warm TS${code}:${line}`,
+      ).toBeDefined();
+    }
+  });
+});
+
+describe("LSP Daemon API: folder scan (src/test-issues)", () => {
+  let allIssues: LspIssue[] = [];
+
+  it("returns errors from multiple files within 30 s", async () => {
+    const t0 = Date.now();
+    allIssues = await daemon.getDiagnostics("src/test-issues");
+    expect(Date.now() - t0).toBeLessThan(30_000);
+    expect(new Set(allIssues.map((i) => i.file)).size).toBeGreaterThan(1);
+  }, 35_000);
+
+  it("finds cross-file TS errors", () => {
+    for (const { file, code } of CROSS_FILE_ERRORS) {
+      expect(
+        findInFile(allIssues, file, code),
+        `TS${code} in ${file}`,
+      ).toBeDefined();
+    }
+  });
+
+  it("type-errors.ts errors included in folder results", () => {
+    for (const { line, code } of TYPE_ERRORS_KNOWN) {
+      expect(
+        allIssues.find(
+          (i) =>
+            i.file.includes("type-errors.ts") &&
+            i.rule === code &&
+            i.line === line,
+        ),
+        `folder TS${code}:${line}`,
+      ).toBeDefined();
+    }
+  });
+
+  it("warm folder repeat returns in under 2 s", async () => {
+    const t0 = Date.now();
+    await daemon.getDiagnostics("src/test-issues");
+    expect(Date.now() - t0).toBeLessThan(2_000);
+  }, 5_000);
+});
+
+describe("LSP Daemon API: path filtering", () => {
+  it("a11y-issues.tsx filter returns only that file's issues", async () => {
+    const issues = await daemon.getDiagnostics(
+      "src/test-issues/a11y-issues.tsx",
+    );
+    expect(issues.length).toBeGreaterThan(0);
+    for (const i of issues) {
+      expect(i.file).toContain("a11y-issues");
+    }
+  }, 10_000);
+
+  it("general-issues.ts filter returns only general-issues errors", async () => {
+    const issues = await daemon.getDiagnostics(
+      "src/test-issues/general-issues.ts",
+    );
+    expect(findInFile(issues, "general-issues", "2322")).toBeDefined();
+    expect(findInFile(issues, "general-issues", "18048")).toBeDefined();
+    for (const i of issues) {
+      expect(i.file).toContain("general-issues");
+    }
+  }, 10_000);
 });

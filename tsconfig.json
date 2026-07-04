@@ -26,16 +26,13 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "next-vibe/*": ["./src/app/api/[locale]/*"],
+      "next-vibe/*": ["./src/app/api/[locale]/system/*"],
+      "next-vibe/ui/*": ["./src/app/api/[locale]/system/ui/web/*"],
       "@next-vibe/checker/oxlint-plugins/*": [
-        "./src/app/api/[locale]/system/check/oxlint/plugins/*/src/index"
+        "./src/app/api/[locale]/system/tooling/check/oxlint/plugins/*/src/index"
       ],
-      "@next-vibe/checker/*": ["./src/app/api/[locale]/*"],
-      "next-vibe-ui/*": ["./src/packages/next-vibe-ui/web/*"],
-      "next-vibe-ui/unified/*": ["./src/packages/next-vibe-ui/unified/*"],
-      "server-only": [
-        "./src/app/api/[locale]/system/unified-interface/shared/server-only/server-only.ts"
-      ]
+      "@next-vibe/checker/*": ["./src/app/api/[locale]/system/*"],
+      "server-only": ["./src/app/api/[locale]/system/core/utils/server-only.ts"]
     }
   },
   "include": [

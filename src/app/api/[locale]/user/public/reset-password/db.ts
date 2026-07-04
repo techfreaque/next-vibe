@@ -23,30 +23,7 @@ export const passwordResets = pgTable("password_resets", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-/**
- * Password reset relations
- */
-export const passwordResetsRelations = relations(passwordResets, ({ one }) => ({
-  user: one(users, {
-    fields: [passwordResets.userId],
-    references: [users.id],
-  }),
-}));
-
-/**
- * Zod schemas for validation
- */
 export const insertPasswordResetSchema = createInsertSchema(passwordResets);
-export const selectPasswordResetSchema = createSelectSchema(passwordResets);
 
-/**
- * Types
- */
-export type InsertPasswordReset = z.infer<typeof insertPasswordResetSchema>;
-export type SelectPasswordReset = z.infer<typeof selectPasswordResetSchema>;
-
-/**
- * Legacy type aliases for backward compatibility
- */
-export type PasswordReset = SelectPasswordReset;
-export type NewPasswordReset = InsertPasswordReset;
+export type NewPasswordReset = z.infer<typeof insertPasswordResetSchema>;
+export type PasswordReset = typeof passwordResets.$inferSelect;

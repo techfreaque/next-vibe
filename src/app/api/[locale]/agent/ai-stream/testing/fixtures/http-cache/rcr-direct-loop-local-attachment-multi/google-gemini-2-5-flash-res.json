@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc28d8f57dbeb-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:23:50 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164229-HwEwyWdn4Ini5mTC1BXY"
+  },
+  "body": {
+    "id": "gen-1783164229-HwEwyWdn4Ini5mTC1BXY",
+    "object": "chat.completion",
+    "created": 1783164229,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short, upbeat instrumental clip, approximately 23 seconds in duration. The sound quality is clear and polished, suggesting a studio recording.\n\n**Music Description:**\n*   **Genre:** Funk/R&B with a playful, retro feel.\n*   **Tempo:** Approximately 110-120 BPM.\n*   **Time Signature:** 4/4.\n*   **Instrumentation:**\n    *   **Electric Guitar:** Plays a clean, funky, arpeggiated riff that forms the main melody. It has a slightly squawking, Wah-like quality, possibly achieved through a filter or pedal. It carries the primary melodic and rhythmic drive, with a consistent, bright tone.\n    *   **Electric Bass:** Provides a simple, walking bass line that underpins the guitar, reinforcing the rhythmic groove. It sounds like a clean, deep tone.\n    *   **Drums:** Feature a standard funk beat with a consistent kick and snare pattern, and a closed hi-hat that largely follows the guitar's rhythm, adding a crisp percussive layer. There are no prominent fills or complex patterns, just a solid, grooving foundation.\n*   **Interaction:** The guitar is the lead melodic voice, with the bass and drums providing a tight, locked-in rhythmic foundation. The instruments are well-balanced and blend cohesively.\n*   **Production Style:** Polished and clean with a tight mix. There isn't much noticeable reverb, giving it a dry, direct sound fitting for the funk genre.\n*   **Mood:** Funky, playful, light, and groovy. It evokes a feeling of cheerful energy.\n*   **Structure:** It appears to be a sustained loop or a continuous groove, without a clear intro/verse/chorus structure within this short clip. The pattern repeats throughout.\n\n**Non-musical Audio Events:** None.\n**Speech:** None.\n**Silence:** None.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 407,
+      "total_tokens": 1479,
+      "cost": 0.0018641,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018641,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0010175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

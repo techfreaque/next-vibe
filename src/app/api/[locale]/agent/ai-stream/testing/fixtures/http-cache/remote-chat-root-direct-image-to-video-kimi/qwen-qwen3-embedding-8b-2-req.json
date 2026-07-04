@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11b follow-up] You may or may not have generated an image previously. Say STEP_OK and continue the conversation.\n\nAssistant: STEP_OK\n\nUser: [T11c i2v-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: [tool:generate_video] {\"prompt\":\"professional portrait, smooth camera pull-back\",\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\"}\n\nTool: [result:generate_video] {\"videoUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/d9e31885-9ede-4cab-9d9a-284978c27c34/b75e66d6-2202-4295-b764-2ccf97011487.mp4\",\"text\":null,\"mediaType\":null,\"creditCost\":124.8}\n\nUser: [T11d i2v-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a video result from an earlier turn. Check that the fresh result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: [tool:generate_video] {\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\",\"prompt\":\"professional portrait, smooth camera pull-back\"}",
+    "encoding_format": "float"
+  }
+}

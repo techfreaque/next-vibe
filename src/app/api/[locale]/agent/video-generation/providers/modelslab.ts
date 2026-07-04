@@ -26,7 +26,10 @@ interface ModelsLabVideoResponse {
 
 // Allow tests to override poll interval to avoid 5s × N waits on fixture replay
 const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
-const MAX_POLL_ATTEMPTS = 80;
+// Video generation routinely takes several minutes (VEO ~1-5 min, heavier
+// models longer). The endpoint is unbounded (timeoutMs: 0) — giving up at
+// 160s produced spurious "Request timed out" failures for jobs that complete.
+const MAX_POLL_ATTEMPTS = 300;
 
 export async function generateVideoWithModelsLab(params: {
   providerModel: string;

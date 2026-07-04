@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:generate_video] {\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/cfd960a5-c25a-41fa-aed5-ce9f25c41b77/50bdf291-9eb4-4045-8f66-33a8ec91adfd.mp4\",\"text\":null,\"mediaType\":null,\"creditCost\":124.8}\n\nUser: [T11d i2v-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a video result from an earlier turn. Check that the fresh result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: [tool:generate_video] {\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\",\"prompt\":\"professional portrait, smooth camera pull-back\"}\n\nAssistant: [tool:tool-help] {\"query\":\"generate_video\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_video\",\"description\":\"Generate a video from a text prompt using AI\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"prompt\":{\"type\":\"string\",\"minLength\":1,\"maxLength\":2000,\"description\":\"Describe the video y\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_video\",\"input\":{\"prompt\":\"professional portrait, smooth camera pull-back\",\"inputMediaUrl\":\"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800\"},\"callbackMode\":\"wa\n\nTool: [result:execute-tool] {\"result\":{\"videoUrl\":\"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/7943db26-d8cb-40de-a210-e26087275314-0.mp4\",\"creditCost\":124.8,\"durationSeconds\":4}}",
+    "encoding_format": "float"
+  }
+}

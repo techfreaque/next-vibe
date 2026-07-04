@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15d49197abcdf1c-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 10:00:59 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783159254-qg7HZuKNeII5YTCE6txB"
+  },
+  "body": {
+    "id": "gen-1783159254-qg7HZuKNeII5YTCE6txB",
+    "object": "chat.completion",
+    "created": 1783159254,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A wide landscape illustration depicts a winding river flowing through a forest towards a large mountain range at sunset. The style is a clean, stylized cartoon with thick black outlines, flat colors, and simple shading.\n\nIn the foreground, a wide river with frothing blue and white water rushing rapidly over grey rocks and boulders. Green bushes and large grey stones line both banks of the river, which snakes from left to right into the midground. On the left and right edges of the frame, large, jagged grey rock formations are partially visible, covered in green bushes.\n\nThe midground is dominated by a dense forest of dark green evergreen trees, extending across the width of the image and upwards towards the base of the mountains. The trees become smaller and less detailed as they recede. Below the mountains, a layer of green foothills and slopes is covered in more evergreen trees and some smaller bushes.\n\nIn the background, a massive range of mountains rises dramatically against the sky. The mountains are painted in purple and violet hues, with prominent snowcaps on their pointed peaks. The snowcaps are white with light blue and grey shading, indicating texture and shadow. The mountain range fills the majority of the upper half of the image, with several peaks visible.\n\nThe sky abovetransitions from a deep blue at the top left to warm orange, yellow, and light blue near the horizon on the right. A large, stylized orange sun is low on the right side of the sky, casting warm light. Several fluffy, cartoon clouds are present: a large white one with grey shading near the top left, another large one at the top center/right, and two smaller clouds partially obscuring the sun on the right. The overall lighting is warm and comes from the sun on the right, casting shadows on the left side of the mountains, trees, and rocks. The mood is peaceful and majestic.",
+          "refusal": null,
+          "reasoning": "**Defining the Visual Narrative**\n\nI'm focusing on crafting a comprehensive visual narrative. I'm prioritizing the sunset/sunrise theme, then the key elements: the foreground river, midground forest, and the snowy mountain range. My current goal is to define the interplay between these elements to convey a strong sense of place.\n\n\n**Describing the Scene**\n\nI'm now zeroing in on detailing the scene's components for an illustrative description. The subject is a cartoon landscape: river in the front, forest in the middle, and mountains behind. I've broken down the sky, lighting from the right, and the style is clean with simple shading. The layout is set, along with the specific details like the foam, rocks, trees, peaks, and clouds.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining the Visual Narrative**\n\nI'm focusing on crafting a comprehensive visual narrative. I'm prioritizing the sunset/sunrise theme, then the key elements: the foreground river, midground forest, and the snowy mountain range. My current goal is to define the interplay between these elements to convey a strong sense of place.\n\n\n**Describing the Scene**\n\nI'm now zeroing in on detailing the scene's components for an illustrative description. The subject is a cartoon landscape: river in the front, forest in the middle, and mountains behind. I've broken down the sky, lighting from the right, and the style is clean with simple shading. The layout is set, along with the specific details like the foam, rocks, trees, peaks, and clouds.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EsAHCr0HARFNMg8FJD+Z3x1VAyy4zoNl0t2eEp+UmqWkuaAY4wU3JK1EyrzPUZR1ZA2lAREathLMljmVLD2PgAb7CUGgvUHJIPzgO+HwSeEXkynCOWtzNO048pS+5dcQYhS2Ovckt1O5lXNzuxSZAFEmcTfbj5xitd6JcO/vLfQ3pgTyQHi9HP1a9bppebjFKEac73+k6TusZSYK/os1o4+L6tQ44v3vb9fBKgWen+FPgBIDWny/NHejwVQP4uVImWNc6qQ4Z7oB70ibrtOgK5CEyeBa4kryqsNS5J80lfiXwpxtLbf+lVGhvwwyFhbQgdzFtdGnlPL1WwTqrSu0BJnar+wuVSHCmhLv0VX8KUjZ0lCTD9+gciqGp5riHZR2cl9zQYww53Bj2zKHCEwX2MHPqJCll6TJk2ozqZsmckU+l5onltyhi3/4bZy1Zd9+celWGFhxt5Gq8IlzJfQ6pnODOwhr3pJ8mxJ2TUCsQxSlh64V30lzXvRxlyQgliFLZ2U3ynVVlDSumFIYmaoYr/6bsZyixEO9xwHDM/3U0lMlfkSVIpwfjEyEDvcYZB5IBbpaE22lc55DyMIrZYlayAQP7mAfsWHRPxaUXrdGulyHXWLnFUP94t+UQDTZ7TT/AXU1MqsrTLP3GVhFrmP816JVngLb2lzcuL3YNjJXp7eRzM6ZySlrBQ1uwYRdalNXOb2JJdsycrqXxZpThHsX6xKOo1ev4FENjS7Rs4MzcCrPJBIRiKNkazZhsfsHUbP6RRMUV50Vgt8ttRF61btjyTuADFBWAyFYvQYNZR87RW5S1ZJLIsjwaLRiPSWPSome7v1QTdg/f4kTdYbGJTKWvsHDUAv8/q6zj8rwVkdWKcwiINeCLQRpvgBC66PXXIfY8i/tphPoN5tnYL3awFSMVkEVo4StwgWcY2o5AjYp0Oc1lw391pqh0K0o6gOITTA9TkIX5lYzr18oiHFECuusMLHc0nxilErfMPMIUsJU4efX68DubQpPdmQwW8/7j/RtiGWvd967jAvBI7OKuZQ9AsEKpMewnlTtEIJcHNEWpSWPDRvhKpufX42DQlPYvZYp66jKutHVNbfgHzj1PYgQKyUxsSz5idzXvoVkrxqpEQq3f38XF9Poyacuh+5jOGVT0wxrEm12lMqH7+8zI6m+2OeB5Wdgzn9339C80Eo6o+/FtdrOzAUK9+i5ZXG0i0gMdcVmBc9kVhnBk9f2kJ2SDW8i7uEAuvD+Q3PiZG96JXXp+AUdcBLnLG+YCcI9MXIjVQlN"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 561,
+      "total_tokens": 1097,
+      "cost": 0.007804,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.007804,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.006732
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 181,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

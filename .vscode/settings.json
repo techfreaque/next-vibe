@@ -50,6 +50,8 @@
     "**/tsconfig.tsbuildinfo": true,
     "**/*.tmp": true,
     "**/*.next": true,
+    "public/vibe-frame/**": true,
+    "src/generated/**": true,
     "**/testing/fixtures/**": true
   },
   // "terminal.integrated.profiles.linux": {

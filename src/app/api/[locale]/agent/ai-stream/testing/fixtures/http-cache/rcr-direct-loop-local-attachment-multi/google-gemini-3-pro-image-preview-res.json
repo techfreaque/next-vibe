@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc28dcdcdd384-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:23:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164228-KH1HRM4Rr3kOu7ycelqZ"
+  },
+  "body": {
+    "id": "gen-1783164228-KH1HRM4Rr3kOu7ycelqZ",
+    "object": "chat.completion",
+    "created": 1783164228,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This square image features a single, solid, vibrant red circle centered precisely on a pure white background. The circle is the dominant element, covering a significant portion of the frame's center. The edges of the circle are clean and smooth. The entire composition is minimalist and graphic, resembling the national flag of Japan. There is no text, texture, or other objects present. The colors are uniform and saturated.",
+          "refusal": null,
+          "reasoning": "**Analyzing the Image**\n\nI'm currently focused on dissecting the visual elements. The square format and the single red circle on white are the key components I am working with. I'm moving toward an organized breakdown.\n\n\n**Detailing the Elements**\n\nI'm now generating a detailed description. I've broken down the image into its core components. The goal is a synthesis; describing the overall composition, the central red circle and its placement, the background, the minimalist design, and the lack of other elements.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing the Image**\n\nI'm currently focused on dissecting the visual elements. The square format and the single red circle on white are the key components I am working with. I'm moving toward an organized breakdown.\n\n\n**Detailing the Elements**\n\nI'm now generating a detailed description. I've broken down the image into its core components. The goal is a synthesis; describing the overall composition, the central red circle and its placement, the background, the minimalist design, and the lack of other elements.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EpALCo0LARFNMg/KtNob+m1l+LIB415gM4BYerHImvGf8DbU3lryhvNTZQ92Z1D+7IYs8Mg4FEKFC2KVO8+XBQDyVxjHbPE8fL6kfl3gWLG3jf8hvF73EHmODwZCWiSuhl/VU/ZIhLm2rbr6CfQ81tH6mAX2Oso4x923kuVrtBO4+WiMkWiGgpyHh31uOqr4wyg/J919LqjCrDmxqu5R90ZEndDcEsEEc2cOO7sjJltpvqRH7Gwn/iE4TqRIt81pEWPhU4IGK+tZDA7YGhkYF0j7ACbnXPOV/wyCL2PzwQ0vifoPcpjE2TqIgqRRS+kHzunpeK9uWoJ+kFHiWia7ltOy33tL4/FeUbbFiPb/l7jh45JoIywa0frZmKOgzPn9vEsZbLnWZ0z0HCYPx7kTXE3YbVA8akJdQr27zbGzxR9qUaXunRU+Wflal2ZFCJbJLiZKEy8zFE7TAgpgXLPIlt2tZF5EjJsSkPN2Ce7yvW1TYBxqCyQ2waEAdhJD/Hmke4Ex+MXTwHPeauQOZqT+kA53OpvCkR38/6yxVtFLVtTwExe69UZ55KCGMjtDtJrLBwiudEDyWZhQPL+TSf0eB76LRdl1JekfmyJxFUz4NwpDqyN+ryMjSgUTPWGQAmEZizy/hoa3wXv7Nf1R/pE5exrN3p2gch34WuQozlwx1mfilXe8VRjNxB59Qy9Yx7sMSklQ7VEXndg5T7IBlp+ZzyTu0hI64dtcLLdsO5cHwsrIcwEJTq5Ytx8RlVxShkY3BVlxQFPJWWOXjB39qPttOr+tKMxY6Dyo7OT3j4XM6YAWvdP5KJNMkMqyR5aBbvw8Dt8Ukr1Q1Ka3ytZxdmPo8GU8y5Lxenn8hWLp8eWvk1ig+8exw/jA4Q4towxQKhrwIaDU/ofZGvwJWGBuHqJSNBYxh0wuNBcrp9A9IMvLBBHQUpsVox1O7Wv2yTrKdqRIErDU2uHYLagDZ84jMI7td2kceuM+M5BgohgoUi++yaAGLEpTsyzR+5R6mkUi4x451ZNQVElj/xHLMOrHLYQEKsnw50NnEYX7cth3JJLRmYIvfkonN+ZhVpdR1+ya9QguaNM9wLZ3pEIvcHBX2Y7DyRw6dd+C4MzCBYAecNOOEzNVRpX2sou4FaqPBShKYIBeP6q6zP1iNVkMdJDpEoI2CXTLMBkj8Gz5xdGtydeEz2Q8YyGakP3xFuLM6boCjtJI9rWNanhLCMO8gapaSk9h7YUN8MhzPWJV/2bN5bHLp31nE94lYzlsnVkUYnP2NUDqyulk2gaxpns+ONT4aL/1AZnETTd6eO7ewGS4Sx7+dH0nd65/MhCOBzgSP7aoLHQ25RR9uZ+bxDFc2ZR342lHZoL/z94JNu1+pqndFNX0mvJpe4puqAm4oF3ZovVIVEPXofIwuMQUgqvLpKlkn/wE/Qz2ThwcAHuoDGs0JSiz3ofFTn1hr0XaYdhh5tPH9oWeIRjx+kZlQ7BdBiQ4sPtzNV5u3Qr7S/TEwF5kztt/762+lx9F3vqWuodQdCF8jhwKa1ZgMD8dVOKPSQJrob1YXtX5IYqJhgV/gM613G1Q6W1qpzTZ87UnfYK28zd4H25bKQSRcqIBJ74r2NVAPtBgLZtl8LVwKHPyL9//esYNL+pVLUfuac2I63Nx/sV0Jz7RSOnzpEblituXjYxTyvazShFWhhz6Jre2DkSH/4mq54rzOYod1uhPgsSDe6Y0XoMUcuf7xHAy6Px6U23OPtIv0hzluxDKbmE1wlFIXM3e9nhwbnM+QLztP3aW7imSu1XokzQTLdvWSgqRDpzW07rnp3624y+bcakBZmsFbmXpPOsQzVEI/RpfOsPY/3Ip2rxzXYW11WXFOSIaHLSXumYptx4zkujCWSS3HqENc8B1EFkRX90="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 360,
+      "total_tokens": 896,
+      "cost": 0.005392,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005392,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.00432
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 278,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

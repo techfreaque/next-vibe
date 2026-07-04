@@ -67,13 +67,34 @@ export function isUiPageImporter(key: string): boolean {
   );
 }
 
+/**
+ * `category.ts` files are framework convention entrypoints — they register
+ * endpoint metadata into the generated category registry. They are discovered
+ * BY LOCATION (like route.ts), not authored domain consumers. A constants.ts
+ * colocated with its definition may be imported by many category.ts files across
+ * domains without that implying the constant "belongs in system/".
+ */
+export function isCategoryImporter(key: string): boolean {
+  const base = key.slice(key.lastIndexOf("/") + 1);
+  return base === "category.ts";
+}
+
 /** Is this key inside the system/ (framework) scope? */
 export function isInSystem(key: string): boolean {
   return key.startsWith(SYSTEM_ROOT);
 }
 
 /**
- * Domain of a file = its owning root segment.
+ * Domain aliases: intentionally split domains that are architecturally one unit.
+ * `user` (public auth endpoints) and `users` (admin user management) are the
+ * same product domain — cross-imports between them are not coupling smells.
+ */
+const DOMAIN_ALIASES: Record<string, string> = {
+  users: "user",
+};
+
+/**
+ * Domain of a file = its owning root segment, with aliases applied.
  *
  * `system/` is treated as a ROOT, so each sub-area is its own domain:
  *   system/realtime  ≠  system/database  ≠  system/platforms  etc.
@@ -89,7 +110,8 @@ export function domainOf(key: string): string {
   }
   if (key.startsWith(LOCALE_ROOT)) {
     const rel = key.slice(LOCALE_ROOT.length);
-    return rel.split("/")[0] ?? rel;
+    const seg = rel.split("/")[0] ?? rel;
+    return DOMAIN_ALIASES[seg] ?? seg;
   }
   const parts = key.split("/");
   return parts.slice(0, 2).join("/");
@@ -270,7 +292,11 @@ export function placementOf(
   // files (see isGeneratedImporter, isUiPageImporter) — none of these are
   // authored API consumers that should pull the file toward them.
   const usable = importers.filter(
-    (i) => !isSelf(i) && !isGeneratedImporter(i) && !isUiPageImporter(i),
+    (i) =>
+      !isSelf(i) &&
+      !isGeneratedImporter(i) &&
+      !isUiPageImporter(i) &&
+      !isCategoryImporter(i),
   );
   const sortedUsable = [...usable].toSorted();
 

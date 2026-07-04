@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T2 image-gen] Call the generate_image tool with prompt='red circle'. You MUST actually invoke the tool in THIS turn — never answer from memory or fabricate a result. Check that the tool's result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to actually call generate_image with prompt='red circle'. I need to look at the parameter schema - it requires `prompt`, and has optional parameters for model, quality, size etc. Let me just call it with the minimum required parameter.\n\nLooking at the schema from the previous call, the parameters are in an object with `prompt` being required. Let me invoke it.\n\nWait - the tool `generate_image` is listed in the catalog but the available tools I have are only the ones at the top: execute-tool, ai-run, coding-agent, cortex-delete, cortex-edit, cortex-exec, cortex-list, cortex-mkdir, cortex-move, cortex-read, cortex-search, cortex-terminals, cortex-tree, cortex-write, await-task, tool-help.\n\nSo to call generate_image, I need to use execute-tool with toolName=\"generate_\n\nAssistant: <think>The user wants me to actually call generate_image with prompt='red circle'. I need to look at the parameter schema - it requires `prompt`, and has optional parameters for model, quality, size etc. Let me just call it with the minimum required parameter.\n\nLooking at the schema from the previous call, the parameters are in an object with `prompt` being required. Let me invoke it.\n\nWait - the tool `generate_image` is listed in the catalog but the available tools I have are only the ones at the top: execute-tool, ai-run, coding-agent, cortex-delete, cortex-edit, cortex-exec, cortex-list, cortex-mkdir, cortex-move, cortex-read, cortex-search, cortex-terminals, cortex-tree, cortex-write, await-task, tool-help.\n\nSo to call generate_image, I need to use execute-tool with toolName=\"generate_\n\nAssistant: <think>Let me check the result:\n- `imageUrl`: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/c3d80da1-970a-434e-b9c7-4c0444d1a99a/ba23754e-bd80-4247-b662-4869e0c6abe0.png\" - non-empty ✓\n- `creditCost`: 2.9 - positive ✓\n\nBoth conditions met. STEP_OK.</think>Result checked:\n\n- **imageUrl**: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/c3d80da1-970a-434e-b9c7-4c0444d1a99a/ba23754e-bd80-4247-b662-4869e0c6abe0.png` — non-empty ✓\n- **creditCost**: `2.9` — positive ✓\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

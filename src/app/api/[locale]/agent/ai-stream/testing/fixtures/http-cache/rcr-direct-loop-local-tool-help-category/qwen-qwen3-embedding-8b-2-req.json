@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:tool-help] {\"hint\":\"12 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"tools\":[{\"name\":\"desktop-accessibility\",\"title\":\"Get Accessibility Tree\",\"description\":\"Get the accessibility tree of the focused window or a specific applicat\n\nAssistant: Both calls checked out perfectly:\n\n**Call 1 (no args):** Returned 22 categories with names and counts. Categories like `desktop` (12), `ai` (69), `cortex` (12), `browser` (26), and more. Clean structure with subCategories.\n\n**Call 2 (category=\"desktop\"):** Returned a non-empty `tools` array with 12 tools. Every tool has a **name** (e.g., `desktop-click`, `desktop-screenshot`, `desktop-press-key`) and a **description**. No missing fields, no garbled data.\n\n**STEP_OK**\n\nSystem: [Context: ID:bfde1554 | Posted:Jul 4, 10:19]\n\nUser: [T1a-cat tool-help-category] Call the tool-help tool with category='ai' to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you \n\nSystem: [Context: ID:f2bbfd95 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 10:19]\n\nAssistant: [tool:tool-help] {\"category\":\"ai\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\",\"description\":\"Retrieve the list of moderators for a specific folder\"},{\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\",\"description",
+    "encoding_format": "float"
+  }
+}

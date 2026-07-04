@@ -60,7 +60,7 @@ interface ElementSets {
 }
 
 /** Default error messages (can be customized via config) */
-interface JsxCapitalizationMessages {
+export interface JsxCapitalizationMessages {
   anchorTag: string;
   typographyElement: string;
   standaloneElement: string;
@@ -75,7 +75,7 @@ interface JsxCapitalizationMessages {
 // Default Configuration
 // ============================================================
 
-const DEFAULT_CONFIG: JsxCapitalizationPluginConfig = {
+export const DEFAULT_CONFIG: JsxCapitalizationPluginConfig = {
   excludedPaths: [],
   excludedFilePatterns: [".email.tsx", ".test.tsx", ".spec.tsx"],
   typographyElements: [
@@ -128,20 +128,20 @@ const DEFAULT_CONFIG: JsxCapitalizationPluginConfig = {
   ],
 };
 
-const DEFAULT_MESSAGES: JsxCapitalizationMessages = {
+export const DEFAULT_MESSAGES: JsxCapitalizationMessages = {
   anchorTag:
-    'Use platform-independent <Link> component instead of <a>. import { Link } from "next-vibe/ui/web/ui/link";',
+    'Use platform-independent <Link> component instead of <a>. import { Link } from "next-vibe/ui/ui/link";',
   typographyElement:
-    'Use typography component <{capitalizedName}> instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/web/ui/typography";',
+    'Use typography component <{capitalizedName}> instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/typography";',
   standaloneElement:
-    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/web/ui/{elementName}";',
+    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/{elementName}";',
   svgElement:
-    "SVG element <{elementName}> detected. For icons, use components from next-vibe/ui/web/ui/icons instead. For custom SVG, create platform-independent components using react-native-svg that work on both web and native.",
+    "SVG element <{elementName}> detected. For icons, use components from next-vibe/ui/ui/icons instead. For custom SVG, create platform-independent components using react-native-svg that work on both web and native.",
   imageElement:
-    'Use platform-independent <Image> component instead of <{elementName}>. import { Image } from "next-vibe/ui/web/ui/image";',
+    'Use platform-independent <Image> component instead of <{elementName}>. import { Image } from "next-vibe/ui/ui/image";',
   commonUiElement:
-    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/web/ui/{elementName}";',
-  form: 'Use platform-independent <Form> component instead of <form>. import { Form } from "next-vibe/ui/web/ui/form/form";',
+    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/{elementName}";',
+  form: 'Use platform-independent <Form> component instead of <form>. import { Form } from "next-vibe/ui/ui/form/form";',
   genericElement:
     "Lowercase element <{elementName}> detected. Create platform-independent components: 1) Create next-vibe/ui/web/ui/{elementName}.tsx for web, 2) Create next-vibe/ui/native/ui/{elementName}.tsx for React Native, or 3) Use an existing component if available.",
 };
@@ -584,8 +584,3 @@ export default {
     "jsx-capitalization": jsxCapitalizationRule,
   },
 };
-
-// Named exports for direct access
-export { DEFAULT_CONFIG as defaultConfig };
-export { DEFAULT_MESSAGES as defaultMessages };
-export type { JsxCapitalizationMessages, JsxCapitalizationPluginConfig };

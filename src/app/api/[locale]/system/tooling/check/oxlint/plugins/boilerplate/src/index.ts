@@ -180,7 +180,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
   i18nEnExtraDeclaration:
     "i18n/en/index.ts must contain only the `export const translations` declaration.",
   i18nLangWrongImport:
-    "i18n/de or i18n/pl index.ts may only import `type { translations as enTranslations } from 'next-vibe/ui/cli/ui/src/app/api/[locale]/system/generated/endpoints-meta/en'`.",
+    "i18n/de or i18n/pl index.ts may only import `type { translations as enTranslations } from 'next-vibe/ui/ui/src/app/api/[locale]/system/generated/endpoints-meta/en'`.",
   i18nLangNotSingleExport:
     "i18n/de or i18n/pl index.ts must export exactly one `export const translations: typeof enTranslations = { ... }`.",
   i18nLangExtraDeclaration:
@@ -189,7 +189,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
     "i18n/de or i18n/pl `translations` must be typed as `typeof enTranslations`.",
   // i18n/index.ts (root scoped translation factory)
   i18nIndexWrongImport:
-    "i18n/index.ts may only import `createScopedTranslation` from 'next-vibe/core/i18n/core/scoped-translation' and `translations as enTranslations` from 'next-vibe/ui/cli/ui/icons/src/app/api/[locale]/system/generated/endpoints-meta/en'.",
+    "i18n/index.ts may only import `createScopedTranslation` from 'next-vibe/core/i18n/core/scoped-translation' and `translations as enTranslations` from 'next-vibe/ui/ui/icons/src/app/api/[locale]/system/generated/endpoints-meta/en'.",
   i18nIndexMissingScopedTranslation:
     "i18n/index.ts must export `const scopedTranslation = createScopedTranslation({...})` and type exports for TranslationKey and T.",
   i18nIndexExtraDeclaration:

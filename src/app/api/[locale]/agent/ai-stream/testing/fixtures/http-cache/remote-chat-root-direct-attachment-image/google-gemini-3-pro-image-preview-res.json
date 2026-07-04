@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15cf7ba3a8c9295-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 09:05:24 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783155921-6dFcEktDiLHPU6gfR2rl"
+  },
+  "body": {
+    "id": "gen-1783155921-6dFcEktDiLHPU6gfR2rl",
+    "object": "chat.completion",
+    "created": 1783155921,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic shows a single solid red circle centered against a plain white background. The circle is saturated and appears perfectly round, dominating the square frame. The white background is uniform and featureless. This image is a representation of the national flag of Japan.",
+          "refusal": null,
+          "reasoning": "**Defining the Graphic Elements**\n\nI'm currently focused on dissecting this visual. I see a minimalist design: a red circle against a white backdrop. My priority is to identify and clarify the subject elements. I am breaking it down into its core components.\n\n\n**Describing the Visual**\n\nI'm now generating a descriptive draft based on the image's components. I've noted a solid red circle as the central subject. I'm focusing on defining the color and form, and then placing that element in front of the pure white background. The goal is a straightforward, factual description of the visual's essence, devoid of any subjective interpretation.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining the Graphic Elements**\n\nI'm currently focused on dissecting this visual. I see a minimalist design: a red circle against a white backdrop. My priority is to identify and clarify the subject elements. I am breaking it down into its core components.\n\n\n**Describing the Visual**\n\nI'm now generating a descriptive draft based on the image's components. I've noted a solid red circle as the central subject. I'm focusing on defining the color and form, and then placing that element in front of the pure white background. The goal is a straightforward, factual description of the visual's essence, devoid of any subjective interpretation.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EqwGCqkGARFNMg9CrjDzAmQoAGk6pRfItugoOsB9BiCY7847XmiIec3Np4/mfwyDP5Zf+k86GVtpAT5dkNppb8jXfj/hKsaCeaQkLftGvz+UFNGUElGSgS+fwCTKbr9tdW1pVxKS4/KG+MJ/9dMIo8CYGHxpEq5KG/kKi2pqN6z3OQEVoxRmtIWWrswLCOF151jnZ/mtwvs8jTLs1WZms+u9nOnokBqXvQIFUPs7l7sDpbHbYbkcJmKuDpkXgu67FUKZTW33fhaAZUrYIFbD6INXlgLRBNNO5PVUQCWQamqFp18wwuTcPiyxbyoNophvjGZuq0IFpiJ+rSncK8wyhpBtr9JYA7kSWc4Xqo11dzzkT3k+47g2pdFRlDs8Dq5YSNIz0/hEVsG7pBmvgRm3taQ0VnfeSFtp1oErE/UQmUMqNYcXG7KS3gkg68oJRJXcdg6+QvFR7hPQmhLNGbnvugtH4s32uUy6MnY8h2cWMqR2PoGSJkwKPgNKUbAfJSRTq90N+8wbYUXcyffASpvo/wISTDyxTDcZxEA+rgCVk7EJ2BLAqrH/s1IcwA/Xd/ES4ytauCY7lcq2vawDMD4HsXihpnvy1vjQtEsosMcXyDhXLqK9mZd4MFkZfXbjEYN1Z04K8gPhvW3HjyerSHWcSDQD8BW/owtzfqhk+7xM1sAZWfnjQSUBAM3+IJYArpDW0zS3t450bhyelW9Myad9E5edNprBw1bGkbQcxnzsotWiT/CIc7Q0Mf++C9aWk36qC3V3KJdtEYTG9oG+WCKpKoHxtQrrkDmv/JFFfpX00lVbs1E34m/eyr77KPMxHBWGi9OWLMs1YYHXhBqemD/ogUX3spPMKcyPF9aRtnP/Xd8uC5WMMp2s2LbxX0byfXMJdXg8e8FtxgaLtUDdJKz7Pug1/hsgZreh0/FWMNQ6jEPSbCPw/ELq/hDrRxGxc6hUWn6pUHI1AZUrUs1vCG5bWfFO85njBVeyvrUm2jw7fdqdG4kR4YtkQgWZYOQJXodQfyEqPxlD2lFEJQ66Gq/qjGnt9XGQefmhm0ax/WtNhGuch1OUSBG+wyAEP2WlEdI="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 217,
+      "total_tokens": 753,
+      "cost": 0.003676,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003676,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.002604
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 166,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----00c29eb0-a743-45b1-a8b4-5dcf4717f93b.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The user is asking me to say exactly \"INVALID_PARENT_TEST STEP_OK\". Let me do that.</think>INVALID_PARENT_TEST ST…",
+    "encoding_format": "float"
+  }
+}

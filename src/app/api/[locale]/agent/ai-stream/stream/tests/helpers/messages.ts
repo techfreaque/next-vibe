@@ -16,6 +16,11 @@ import type { SlimMessage } from "../../../testing/headless-test-runner";
 import { toolResultRecord } from "../../../testing/headless-test-runner";
 import type { ModeConfig } from "./config";
 
+/** A tool message that carries an actual result (settled successfully). */
+function isSettledWithResult(m: SlimMessage): boolean {
+  return m.toolCall?.result !== null && m.toolCall?.result !== undefined;
+}
+
 /**
  * Find a tool message by its logical tool name, handling execute-tool wrapping.
  * Local: finds message where toolCall.toolName === toolName.
@@ -53,18 +58,36 @@ export function findToolMsg(
   };
   // Use findLast to get the final retry when the model retries after validation errors.
   // The first attempt may have a validation error result; the last one has the real result.
+  // Settled-with-result matches take precedence over unsettled/failed ones: the
+  // model may first attempt the tool NATIVELY (not in the receiver catalog →
+  // failed dead-end message) and then self-correct via the execute-tool
+  // wrapper — the wrapper carries the real result.
   if (cfg.remoteInstanceId) {
-    return messages.findLast((m) => m.role === "tool" && wrapsTool(m));
+    return (
+      messages.findLast(
+        (m) => m.role === "tool" && wrapsTool(m) && isSettledWithResult(m),
+      ) ?? messages.findLast((m) => m.role === "tool" && wrapsTool(m))
+    );
   }
-  // Direct match first (last occurrence)
-  const direct = messages.findLast(
-    (m) => m.role === "tool" && matchesName(m.toolCall?.toolName),
+  return (
+    // Settled direct match (last occurrence)
+    messages.findLast(
+      (m) =>
+        m.role === "tool" &&
+        matchesName(m.toolCall?.toolName) &&
+        isSettledWithResult(m),
+    ) ??
+    // Settled execute-tool wrapper (e.g. UNBOTTLED/hermes, native fallback)
+    messages.findLast(
+      (m) => m.role === "tool" && wrapsTool(m) && isSettledWithResult(m),
+    ) ??
+    // Any direct match, then any wrapper (nothing settled — let the caller's
+    // assertion report the unsettled state)
+    messages.findLast(
+      (m) => m.role === "tool" && matchesName(m.toolCall?.toolName),
+    ) ??
+    messages.findLast((m) => m.role === "tool" && wrapsTool(m))
   );
-  if (direct) {
-    return direct;
-  }
-  // Fallback: execute-tool wrapping without instanceId (e.g. UNBOTTLED/hermes)
-  return messages.findLast((m) => m.role === "tool" && wrapsTool(m));
 }
 
 /**

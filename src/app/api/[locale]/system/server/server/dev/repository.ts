@@ -8,7 +8,7 @@
 
 import type { ChildProcess } from "node:child_process";
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
 import { join } from "node:path";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";

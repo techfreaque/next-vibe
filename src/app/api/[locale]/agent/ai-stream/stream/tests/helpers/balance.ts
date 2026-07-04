@@ -104,7 +104,15 @@ export function isIndexingCreditTx(tx: {
     return true;
   }
   const m = tx.modelId ?? "";
-  return m.includes("flash-lite") || m.includes("flash");
+  // Vision-bridge/indexing models only. A bare "flash" match would also
+  // swallow chat charges from deepseek-v4-flash (the budget QA model) and
+  // make truthful-accounting asserts read 0.
+  return (
+    m.includes("flash-lite") ||
+    m.includes("embedding") ||
+    m.startsWith("gemini-2.5-flash") ||
+    m.startsWith("gemini-3.1-flash-lite")
+  );
 }
 
 /** Fetch all wallet transactions for `user` created at/after `since` (newest first). */
@@ -164,7 +172,10 @@ export async function assertDeducted(
   max: number,
 ): Promise<void> {
   const deducted = before - after;
-  if (deducted >= min && deducted <= max) {
+  // Float epsilon: balances are floating-point sums; 0.4 can read as
+  // 0.39999999999… — a hair under min is a rounding artifact, not a miss.
+  const EPSILON = 0.005;
+  if (deducted >= min - EPSILON && deducted <= max + EPSILON) {
     return;
   }
   const { inArray } = await import("drizzle-orm");

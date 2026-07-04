@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b3f0f2d191c3c-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 04:04:32 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783137871-LopnTLmE1JcjTKm7CKng"
+  },
+  "body": {
+    "id": "gen-1783137871-LopnTLmE1JcjTKm7CKng",
+    "object": "chat.completion",
+    "created": 1783137871,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 20-second excerpt of a lo-fi hip-hop beat. The tempo is a slow 80 BPM, with a 4/4 time signature. The overall mood is relaxed and chill, characteristic of the lo-fi subgenre. \n\n**Instruments and Arrangement:**\n- **Drums (0:00-0:20):** A processed drum kit provides a simple, steady beat. A rimshot on beats two and four with a heavy reverb tail creates a noticeable effect, giving the percussion a somewhat muted, ethereal quality. The kick drum is subtle, blending into the mix rather than driving it.\n- **Bass (0:00-0:20):** A warm, synth-bass plays a simple, repetitive two-note melody that anchors the rhythm and adds depth to the track.\n- **Electric Piano (0:00-0:20):** A Rhodes-like electric piano plays a relaxed, jazzy melody with chords sustained for several beats. The chords have a slightly melancholic yet soothing quality.\n- **Flute (0:00-0:20):** A heavily reverbed flute plays a sparse, meandering melody, creating a dreamy and atmospheric texture. It enters and exits almost like a ghost, adding to the lo-fi aesthetic.\n- **Sample (0:00-0:20):** A vinyl scratch sound effect is subtly integrated into the background, further enhancing the lo-fi feel.\n\nThere are no vocals or speech present. The sound quality is clean despite the lo-fi production style, suggesting a studio recording environment. The overall impression is a short, continuous musical loop of a complete piece.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 355,
+      "total_tokens": 1427,
+      "cost": 0.0017341,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017341,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0008875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

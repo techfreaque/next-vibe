@@ -457,6 +457,7 @@ export class StreamingTTSHandler {
     text: string,
     modelOption: TtsModelOption,
   ): Promise<string | null> {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: {
@@ -509,6 +510,7 @@ export class StreamingTTSHandler {
       };
     }
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       "https://api.edenai.run/v2/audio/text_to_speech",
       {
@@ -554,6 +556,7 @@ export class StreamingTTSHandler {
       return null;
     }
 
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const audioResponse = await fetch(audioResourceUrl, {
       signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
     });
@@ -589,6 +592,7 @@ export class StreamingTTSHandler {
     text: string,
     providerModel: string,
   ): Promise<string | null> {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
       {

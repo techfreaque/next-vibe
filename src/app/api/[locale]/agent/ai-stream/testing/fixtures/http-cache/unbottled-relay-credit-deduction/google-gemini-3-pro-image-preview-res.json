@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a159cf41fba518ed-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 23:53:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783122806-agxvRV0ZHspM9kaKL9mZ"
+  },
+  "body": {
+    "id": "gen-1783122806-agxvRV0ZHspM9kaKL9mZ",
+    "object": "chat.completion",
+    "created": 1783122806,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic composition featuring a single geometric shape, an isosceles triangle, centered on a plain white background. The triangle is filled entirely with a solid, deep cobalt blue color, with no gradients, textures, or borders. Its base is horizontally aligned relative to the bottom of the frame, and the vertex points directly upwards. The edges of the triangle are sharp and clean, creating a strong contrast against the stark white backdrop. There is no text, other shapes, or any visual elements present. The image is a clean, bold, and simple illustration.",
+          "refusal": null,
+          "reasoning": "**Analyzing the Geometry**\n\nI'm focusing on the geometric properties of the shape. The image shows a lone, solid blue triangle against a blank white backdrop, and I'm concentrating on the visual and geometric aspects. The next step is a more specific description.\n\n\n**Describing the Image**\n\nI am now structuring the description into categories: subject and composition, the main object's features, and the color palette. I've noted the centered positioning, the solid blue color of the triangle, and the stark white background. This breakdown helps in creating a concise and accurate overview of the visual aspects.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing the Geometry**\n\nI'm focusing on the geometric properties of the shape. The image shows a lone, solid blue triangle against a blank white backdrop, and I'm concentrating on the visual and geometric aspects. The next step is a more specific description.\n\n\n**Describing the Image**\n\nI am now structuring the description into categories: subject and composition, the main object's features, and the color palette. I've noted the centered positioning, the solid blue color of the triangle, and the stark white background. This breakdown helps in creating a concise and accurate overview of the visual aspects.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EtAHCs0HAQw51serEyEJF3ZNZrOw5L9NHLXlYGKs5LoFenlaqQ1Ez53Pg/VOS62CPr3KeXUj6a4s3EsDkUnRLDF0UN/IGiCjU0Di3YHpHB5iPg67pIU/icvZS/k5CecMEmxZdy2kPxlJ2FKixw7FOWcWyQqBopaaREwtQYmrfNuAo5URCuwLgFs0PS1MDqpeAneyak/DC06AekuF/E2ztIAZnC3yX9AsECyhEEX1d2mRKgclp6E4w3ZfYQPh/NElh0sBTcp9B3w/ZeZHR1Z9bZScTuKbE8jpjFtfyxBJnn7jIB42b56YB3YcPjmH0UP+rj3P5x6TTUL1H9bCEeZln6kwdyE7kMkKSlzy2dpCEG43tjodNq1Luy9KwwcUW2Uc+Z5Q8KYymq0wtk8phvJdzsnlx+g35NCZ7Z+fVpoWwxxVjoC63KvEDdovEjkghufzDGsb7Vts7QXxYuFj1Ot8ydtwZpG2wE2GUC8V1tEZuvAEks9nv3RpUNJrQ9DFi1YYcTu8HMrU8sNcTGUzW8VW9pfA8V1+tDms8Cm9D4/Ou6ltzLVWxjSCehDMHol2iJCqDicDGy7kL2pr1wjNq1JQ/S3CWhYnJht9vJBEJS+S0ICUE1EFGm1TCjH+d6L1Mz+JG1vsASaPQ1HAghjDvUDVY/0MjLGXKMkeNE+sBHcdyzIo/97i2puGn13shiBoFCPXgK+mLp+1OYo1dhDClmtmcT6Yv9Jlk+UMk8Jr0GRy/1srmeJ0C+IDKKTfPj7TXPxYNdG9w7E4wi5EBCilvuyOFeSzDt5A7YsnT3mI+lbC3FIG51cZmaJ/7Do+OOo64Lrs7MmwpRgQw+4rc7tzEm4oWT9q0vnSCzoVGxljVgVmENWGon/vX25kBHMPlxJS/WuM9R0ALOqzZ3XtbiqSpY1mBhJrtiJvytSVFrr/nowQcg75LtOjw6M19jf6Fxzpu9/j0IIik8Cus0jib9hHC6z/jkaRl9PVUwUHhU9aQ6N7Rxg0Vpd318ymHMAuphxX89l7/j/mDnlxnapb/p9dHSAh95oJbZ+8UAmHeS7EDbNjq0NrDNWfbMeNr+SVNZCsKJfxfL+JZD82JUg6UxtKJRuIQQcijoTuYMGKvcpy2euFpHNX+6X3njiC03zMX+357p9B1+P8fK14HnJtnK5rwsP2HilUqA5Zy0Wo97iJfO9PxMdA9xnQEOxgsiqjjdBkenev25X2vRp4X5HpoiEbCvj80RSXsGOXb7WrvpWlBUsRl/zE/DwSqUIQez3JUQxNOPH7vYZ8vo1JFbH7fGfRFpVtMUUD2Q=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 296,
+      "total_tokens": 832,
+      "cost": 0.004624,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004624,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.003552
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 185,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

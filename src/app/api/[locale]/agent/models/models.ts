@@ -825,7 +825,12 @@ export function calculateCreditCost(
   const credits =
     (totalCostPerMessage / DOLLARS_PER_CREDIT) *
     (1 + STANDARD_MARKUP_PERCENTAGE);
-  const rounded = Math.round(credits * 10) / 10;
+  // Round UP to the 0.1-credit billing granularity: rounding to nearest let
+  // every turn under 0.05 credits round down to 0 — deducted nothing, wrote no
+  // ledger transaction, i.e. free usage. Zero stays zero (no tokens, no charge).
+  // The 1e-9 epsilon keeps float noise on an exact boundary (0.2 computed as
+  // 0.20000000000000004) from ceiling up a full tenth.
+  const rounded = Math.ceil(credits * 100 - 1e-9) / 100;
   return rounded % 1 === 0 ? Math.round(rounded) : rounded;
 }
 

@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15bf98d8f42d2a1-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 06:11:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783145510-gu6UaKQjdNxo2g79j8B1"
+  },
+  "body": {
+    "id": "gen-1783145510-gu6UaKQjdNxo2g79j8B1",
+    "object": "chat.completion",
+    "created": 1783145510,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A cartoon illustration shows a large bunch of bananas hanging from a tree stem. The bananas display various stages of ripening, with many being a bright yellow and others a gradient of yellow to light green. They are plump and curved, clustered tightly together in hands around a thick, brown, textured central stalk that emerges from the top of the bunch. The stalk connects to a thick, brown, segmented branch of the banana tree on the left. Below the branch, the tree trunk is also visible, colored in shades of brown with dark outlines. Large, broad banana leaves with prominent central ribs and a segmented pattern are present; one large leaf curves over the top and right side of the banana bunch, deep green with lighter green highlights and shadows. The background is a simple, blurred cartoon depiction of a jungle canopy with varied shades of green foliage and a bright blue sky with soft white cloud shapes. The lighting is bright daylight, casting simple shadows on the bananas and leaves to give them volume. The entire image has clean lines and flat colors typical of a cartoon drawing.",
+          "refusal": null,
+          "reasoning": "**Defining Cartoon Aesthetics**\n\nI am working on the visual characteristics. I've considered the illustration style: clean lines, flat colors, with shading using darker hues. The focus is now on the bananas on the tree.\n\n\n**Describing the Scene**\n\nI am now focusing on the scene's individual elements. I have specified the central subject: a large bunch of bananas with varied ripeness. The tree has been detailed, from the trunk to the leaves, and I have given the composition details of the background, framing, and lighting.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining Cartoon Aesthetics**\n\nI am working on the visual characteristics. I've considered the illustration style: clean lines, flat colors, with shading using darker hues. The focus is now on the bananas on the tree.\n\n\n**Describing the Scene**\n\nI am now focusing on the scene's individual elements. I have specified the central subject: a large bunch of bananas with varied ripeness. The tree has been detailed, from the trunk to the leaves, and I have given the composition details of the background, framing, and lighting.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EtsHCtgHAQw51sd0aBF1uj3/ixEcVQX32v8kPt4zdKxI+loZlW1RAleSvf94DbCcXkZyC7JE7NvN4S/iBST/KpUVIEV5csq1NxC5JMaaL/aMRYgAJg9Gqt5byL/bGJ1ZNzoOJl6QRBZlRDuyAHi+QxCs/dCb/TCJ2e9+BzRFrtiMVjPo3LX3JeZOqz3Zv+MHq4i50AITjpIPniF3Yb/UZjfCVx4Yoiw+WJq30zE/OLry8JFtVyh92+6/8k5IaZCPUFRo1pYzy12GuSTS1HHLSSxvEv9VZN/lhDLQh9TDuPeJQEiRElXgbqD1UfIkCe5tFpV2Sxjzc/0nPbcNRZnpkKcCI92x0uW3E0oC0ouu8VCZSrWuavrKsLfxvUV8DsQbEXgaxFdPoscFXGoKbIM6l0PrNN61lKKCjPj/IlJDdErsprczRbZsrdo3gy3JOUwnzRHhRphJrSAmPDHmeYnAI+cUQ0csc1IvS4Z5Ftg0l8Kqf+QXiT5xoRQw5/K2hGnpyW2nELUzokzmBDRrTGVAgWTWu4k0+VkcTSelaG1Fj+1UfZ/YNq/Z0GVn1OD70Sk9+EjV93bZGnNiwIsTSlCJN6SbqvPWePBToXZMZYipR7njtITHiAqyDjXMKPmyilRfbM7emLO0gHEOlslwJ+YXDgX1H8Ng2LHsm3//+6XT26ozxrz0dtzxTwKKx01/YME/jnzr3R6GIQohm2+CKYDP8RXEZZSHkdavBEXVLqYNA4Mvker4FnDcfT1+F7KezrZMAmxZ5fhPQp4eSy9dnd9IraJWRnd6Y4ZxECyIlmgPqCMVS7fZW6bap5ZMbGanV4sPdrOTfQSa1Tfj1JJ82phcMrDxIAN6DrX2tE+04kfFLec6Fqo29n7Lhrmjip6NxFNbEO0kfefS/CSeW9KFLvSKtj7T8NmPviAj/v8w5z/ecEayKek/5/kmku4W9Z458e/RCj5mo6tlM+PMmrt7JbXWnQLOdreHE0866ux67XFZ/fYxNf3ozm7mBevfJAyGAROiWJqXB0we2TkQE2NPNyqgVWy8EPFz01yjLPC/l/41rlWGzoHq/Isqnmm3EzzmzPvf8wrcRfejFgRRxJNH497Z3F8SH86PGKmH8tSihVcuKzXY8OTx6mkK5nQ2G4XqSVTR0Sd3zgEnJgbItgITJL7WZKlmWYOSQMo1ZMdovPhZWnEPFYuHVuq+zlD408Oj1AVSrdyCuyvVmLAqrmHr/pgJkJ+fcYu5yalY3YFT7w8uBrfJTR+36+2+PTXOULJ/TbhS7wdqHyVvBdNagcPzKOos94Nj0nUOLYRYzsPqfETO"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 397,
+      "total_tokens": 933,
+      "cost": 0.005836,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005836,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.004764
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 186,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

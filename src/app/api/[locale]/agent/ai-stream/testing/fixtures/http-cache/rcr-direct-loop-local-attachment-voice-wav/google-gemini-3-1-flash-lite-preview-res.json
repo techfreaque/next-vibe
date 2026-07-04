@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc36efaa6db03-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:24:34 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164265-W8xBVQ2RAgVVjiInvDXo"
+  },
+  "body": {
+    "id": "gen-1783164265-W8xBVQ2RAgVVjiInvDXo",
+    "object": "chat.completion",
+    "created": 1783164265,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The video is a high-quality, professional-grade close-up shot, likely from a tutorial or social media clip, focusing on a Rubik’s cube.\n\n**Visual Content and Setting:**\nThe scene is set indoors, with the primary subject being a pair of tan-skinned hands holding a standard Rubik’s cube. The background is completely filled with a large, unorganized mound of dozens of other Rubik’s cubes, creating a chaotic, colorful, and textured environment of plastic squares. The lighting is bright and even, highlighting the glossy finish of the cubes. The camera angle is a static, slightly high-angle close-up that remains fixed on the hands manipulating the cube throughout the duration of the clip.\n\nThe person holding the cube performs a rapid, calculated series of rotations. Initially, the cube is held with the white-center and blue-center faces visible. The thumbs and fingers dextrously rotate the top and side layers in quick succession. As the cube is manipulated, different colors shift and align. There is a small white sticker with a black \"X\" printed on it positioned on the center of the top (white) face of the cube. No other text or UI elements appear on the screen.\n\n**Audio:**\nThere is no human speech or dialogue in this segment. The audio landscape consists entirely of crisp, rhythmic, mechanical click sounds—sharp, percussive \"clacks\"—as the individual layers of the cube snap into place with each rotation. There is no background music or ambient room noise; the focus is entirely on the tactile sound of the puzzle.\n\n**Style, Mood, and Production:**\n- **Production Quality:** Professional-grade with a shallow depth of field, keeping the focus strictly on the cube in the hands while the background cubes are slightly blurred.\n- **Visual Style:** Realistic, high-definition cinematography.\n- **Mood:** The mood is precise, skillful, and focused. There is an undercurrent of tension or high-energy dexterity due to the speed of the movements.\n- **Narrative:** The video functions as a demonstration, likely showing off a specific solving algorithm or a rapid manipulation technique.\n\n**Duration and Pacing:**\nThe video segment is approximately 3 seconds long. The pacing is fast, characterized by the fluid and rapid-fire movements of the hands. The mechanical sounds are rhythmic and synchronized perfectly with the movements seen on screen. The clip ends abruptly while the person is still in the middle of executing a turn.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "AY89a19lNZuHJegX58ht9qEbgh21RtDcWIPlZ7VMUXVQX35oWOc37ck9OBL91Bz7HOE=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 512,
+      "total_tokens": 920,
+      "cost": 0.00087,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00087,
+        "upstream_inference_prompt_cost": 0.000102,
+        "upstream_inference_completions_cost": 0.000768
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

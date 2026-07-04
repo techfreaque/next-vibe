@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a157569e4a87557f-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 16:41:35 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783096893-lo7q0UcmusXbDO7CvosJ"
+  },
+  "body": {
+    "id": "gen-1783096893-lo7q0UcmusXbDO7CvosJ",
+    "object": "chat.completion",
+    "created": 1783096893,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip that features music.\n\n**Music:**\n- **Genre:** Funk/Soul, with a strong Hip-Hop/Lo-Fi influence evident in the production.\n- **Tempo:** Around 90-100 BPM (a mid-tempo groove).\n- **Time Signature:** 4/4.\n- **Instruments:**\n    - **Electric Guitar:** Plays a distinctive, somewhat muted arpeggiated riff that forms the main melody. It has a clean, slightly funky tone, possibly with a touch of wah or filter. There's a slight pause or \"choked\" effect on some of the notes.\n    - **Bass Guitar:** Provides a solid, walking funk bassline that complements the guitar rhythm. The bass sounds somewhat soft and rounded, possibly with a touch of compression.\n    - **Drums:** A relaxed, groovy drum beat featuring a prominent snare on the 2 and 4, and a consistent hi-hat pattern. The kick drum is subtle, adding to the laid-back feel. The overall drum sound is very clean and dry, typical of 90s hip-hop production samples.\n- **Interaction:** The guitar and bass lay down a tight, interlocking groove. The drums are simple yet effective, providing a steady foundation.\n- **Production Style:** Polished but with a clear \"lo-fi\" or sampled aesthetic. There's a warm, slightly vintage feel to the sound, as if it could be from a sampled breakbeat. No overt reverb or effects beyond what might be inherent in a sample. The dynamic range feels somewhat compressed.\n- **Mood:** Chill, groovy, laid-back, and slightly nostalgic. It evokes a feeling of relaxed head-nodding.\n\n**Sound Quality and Environment:**\n- The sound quality is very good, indicating a well-produced recording. It sounds like a clean, studio-quality track.\n- The clip is quite short, looping a consistent musical phrase.\n\n**Overall Impression:**\nThe audio clip features a pleasant, head-nodding instrumental track that blends funk and soul elements with a lo-fi hip-hop production style. The interplay between the clean guitar riff, walking bassline, and simple drum beat creates a relaxed and groovy atmosphere.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 470,
+      "total_tokens": 1542,
+      "cost": 0.0020216,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020216,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

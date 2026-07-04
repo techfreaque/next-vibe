@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import "next-vibe/ui/tanstack/global-css";
+// import "next-vibe/ui/tanstack/global-css";
 
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";

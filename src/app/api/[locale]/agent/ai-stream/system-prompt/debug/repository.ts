@@ -61,9 +61,26 @@ export async function buildDebugSystemPrompt({
           threadId: threadId ?? null,
         }),
         userMessage && user.id
-          ? loadRawEmbeddingScores(user.id, userMessage)
+          ? loadRawEmbeddingScores(user.id, userMessage, logger)
           : Promise.resolve(undefined),
+        threadId
+          ? db
+              .select()
+              .from(chatMessages)
+              .where(eq(chatMessages.threadId, threadId))
+          : Promise.resolve([] as (typeof chatMessages.$inferSelect)[]),
       ]);
+
+    const timezone = "UTC";
+    const messageContextLines: Record<string, string> = {};
+    for (const msg of threadMsgs) {
+      messageContextLines[msg.id] = createMetadataSystemMessage(
+        msg,
+        rootFolderId,
+        timezone,
+        logger,
+      );
+    }
 
     const totalChars = systemPrompt.length + trailingSystemMessage.length;
 
@@ -78,6 +95,10 @@ export async function buildDebugSystemPrompt({
             topScores: rawScores.scores,
           }
         : undefined,
+      messageContextLines:
+        Object.keys(messageContextLines).length > 0
+          ? messageContextLines
+          : undefined,
     });
   } catch (error) {
     logger.error("Failed to build debug system prompt", parseError(error));

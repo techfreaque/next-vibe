@@ -1,12 +1,10 @@
 // AUTO-GENERATED from src/app/[locale]/tools/[...toolPath]/page.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JSX } from "react";
-
-import { TanstackPage as Page } from "@/app/[locale]/tools/[...toolPath]/page";
-
 import { toNextParams } from "../nextjs-compat-wrapper";
+import { TanstackPage as Page } from "@/app/[locale]/tools/[...toolPath]/page";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)

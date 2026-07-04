@@ -76,6 +76,29 @@ interface ParsedIssue {
 }
 
 /**
+ * Find tsgo binary by walking up from startDir.
+ * Handles nested projects (e.g. test-project) that don't have their own tsgo.
+ */
+function findTsgo(startDir: string): string {
+  if (process.env["TSGO_PATH"]) {
+    return process.env["TSGO_PATH"];
+  }
+  let dir = startDir;
+  while (true) {
+    const candidate = join(dir, "node_modules/.bin/tsgo");
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+    const parent = dirname(dir);
+    if (parent === dir) {
+      break;
+    }
+    dir = parent;
+  }
+  return join(startDir, "node_modules/.bin/tsgo");
+}
+
+/**
  * Run TypeScript type checking Repository
  */
 export class TypecheckRepository {
@@ -94,7 +117,7 @@ export class TypecheckRepository {
         baseUrl: z.string().optional(),
         typeRoots: z.array(z.string()).optional(),
       })
-      .passthrough()
+      .catchall(z.unknown())
       .optional(),
     include: z.array(z.string()).optional(),
     exclude: z.array(z.string()).optional(),
@@ -614,6 +637,38 @@ export class TypecheckRepository {
 
       const typecheckConfig = checkConfig.typecheck;
       const useTsgo = typecheckConfig.useTsgo ?? false;
+      const useLspDaemon = useTsgo && (typecheckConfig.useLspDaemon ?? false);
+
+      // ── LSP daemon fast-path ─────────────────────────────────────────
+      if (useLspDaemon) {
+        const tsgoPath = findTsgo(process.cwd());
+        const pidPath = `${process.cwd()}/.tmp/tsgo-lsp.pid`;
+        const daemon = TsgoDaemon.get(pidPath, tsgoPath, process.cwd());
+
+        logger.debug("[TYPESCRIPT] Using LSP daemon for diagnostics");
+
+        const filterTarget = Array.isArray(data.path) ? data.path : data.path;
+
+        const lspIssues = await daemon.getDiagnostics(
+          filterTarget,
+          activeIgnorePatterns,
+        );
+
+        // Map LspIssue → TypecheckIssue (same shape, compatible)
+        const issues: TypecheckIssue[] = lspIssues.map((i) => ({
+          file: i.file,
+          line: i.line,
+          column: i.column,
+          rule: i.rule,
+          severity: i.severity,
+          message: i.message,
+        }));
+
+        return success(
+          TypecheckRepository.buildResponse(issues, effectiveData, isMCP),
+        );
+      }
+      // ── end LSP daemon fast-path ─────────────────────────────────────
 
       // Get the appropriate base command
       const baseCommand = TypecheckRepository.getBaseCommand(useTsgo);

@@ -104,6 +104,15 @@ export interface ModeConfig {
    */
   hermesThreadFolderId?: string;
   /**
+   * Loop-LOCAL topology: HERMES originates each stream on ITS
+   * REMOTE/<clientId>/tests/<case> folder; the relay executes the loop HERE
+   * (the client) with the client's prompt + tools. Placement flips: caller
+   * side = hermes REMOTE/<clientId>/…, executor side = local
+   * BACKGROUND/remote/<hermesId>/…. Requires rootFolderIdOverride to stay
+   * unset locally (the local copy is the executor landing).
+   */
+  originateOnRemote?: boolean;
+  /**
    * The transport leg the relay MUST have actually used. Asserted in T-RELAY
    * against the REMOTE CONNECTION row's attested `lastTransportUsed` —
    * written by the transport primitive that actually carried the dispatch

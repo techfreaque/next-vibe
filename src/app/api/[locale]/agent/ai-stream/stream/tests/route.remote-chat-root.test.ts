@@ -81,6 +81,19 @@ if (_remoteUrl && _isFixtureMode) {
     teardown: hooks.teardown,
   });
 
+  // ── Loop-LOCAL variant: EXACT same cases, HERMES originates (its REMOTE/atlas
+  //    folder), the loop executes HERE over the reverse-ws leg — client prompt +
+  //    tools both ways. Placement asserted per case on both sides.
+  describeStreamSuite({
+    label: `AI Stream — remote chat root reverse-WS LOOP-LOCAL (${_remoteUrl} originates, AI here)`,
+    cachePrefix: "rcr-rws-loop-local-",
+    assertSystemPromptFromLocal: true,
+    expectRelayTransport: "reverse-ws",
+    originateOnRemote: true,
+    setup: hooks.setup,
+    teardown: hooks.teardown,
+  });
+
   // ── Bidirectional thread location assertions ───────────────────────────────
   // RCR-1: atlas thread in REMOTE/hermes/tests/unbottled-relay
   // RCR-2: atlas has messages with expected marker
@@ -124,6 +137,9 @@ if (_remoteUrl && _isFixtureMode) {
         user: testUser,
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: _rcrSuiteFolderId ?? undefined,
+        // The runner resolves model/skill from a favorite — same budget
+        // favorite (slug id) the main suites create in their setup.
+        favoriteId: "quality-tester-budget",
       });
 
       expect(
@@ -180,13 +196,14 @@ if (_remoteUrl && _isFixtureMode) {
       expect(aiMsg, "RCR-2: AI response must contain RCR_OK").toBeTruthy();
     }, 30_000);
 
-    it("RCR-3: hermes thread is in REMOTE/atlas/tests/unbottled-relay", async () => {
-      // The executor SERVES the originator (atlas connected to hermes), so its
-      // copy lands under REMOTE/<clientInstanceId>/<path>.
+    it("RCR-3: hermes thread is in BACKGROUND/remote/atlas/tests/unbottled-relay", async () => {
+      // Unified executor landing: the EXECUTOR side always lands its thread
+      // copy under BACKGROUND/remote/<callerInstanceId>/<path> — the REMOTE
+      // root belongs exclusively to the CALLER's view.
       await assertHermesFolderChainHasThread({
         prodUserId: hooks.getProdUserId(),
-        rootFolderId: DefaultFolderId.REMOTE,
-        folderChain: [ATLAS_INSTANCE_ID, "tests", "unbottled-relay"],
+        rootFolderId: DefaultFolderId.BACKGROUND,
+        folderChain: ["remote", ATLAS_INSTANCE_ID, "tests", "unbottled-relay"],
         threadId,
       });
     }, 30_000);
@@ -194,16 +211,6 @@ if (_remoteUrl && _isFixtureMode) {
     it("RCR-4: hermes has messages — AI loop ran there", async () => {
       await assertProdDbHasMessages(threadId, 2);
     }, 30_000);
-  });
-  // ── Loop on CLIENT: the cloud (hermes) originates, this side runs the loop.
-  //    Cloud copy:  REMOTE/atlas/tests/loop-on-client-rws
-  //    Client copy: BACKGROUND/remote/hermes/tests/loop-on-client-rws
-  describeLoopOnClientSuite({
-    label: `Remote Chat Root — loop on CLIENT via reverse-WS (${_remoteUrl})`,
-    transport: "reverse-ws",
-    caseName: "loop-on-client-rws",
-    fetchCacheContext: "unbottled-relay-loop-on-client",
-    hooks: makeReverseWsSetup(_remoteUrl, { createRemoteFolder: true }),
   });
 } else if (!_remoteUrl) {
   failSuitePrerequisites(

@@ -54,15 +54,20 @@ const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias: {
       "react-native": "react-native-web",
-      "next-vibe": "./src/app/api/[locale]/v1/core",
-      "next-vibe-ui": "./src/packages/next-vibe-ui/web",
+      // system IS vibe: next-vibe/<area> → src/app/api/[locale]/system/<area>.
+      // Every real next-vibe/* import now lives under system/ (shared moved there too),
+      // so a single prefix alias resolves them all for the Next/Turbopack prod build.
+      // next-vibe/ui/* is the platform-agnostic UI prefix — on Next.js it resolves to
+      // the web platform (system/ui/web/*). Must come before the general next-vibe alias.
+      "next-vibe/ui": "./src/app/api/[locale]/system/ui/web",
+      "next-vibe": "./src/app/api/[locale]/system",
       "@": "./src",
-      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter":
-        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
-      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer":
-        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
-      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage":
-        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
+      "next-vibe/ui/renderers/mcp/McpResultFormatter":
+        "./src/app/api/[locale]/system/ui/renderers/mcp/McpResultFormatter.stub.ts",
+      "next-vibe/ui/renderers/cli/CliEndpointRenderer":
+        "./src/app/api/[locale]/system/ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+      "next-vibe/ui/renderers/cli/CliEndpointPage":
+        "./src/app/api/[locale]/system/ui/renderers/cli/CliEndpointPage.stub.tsx",
     },
     rules: {
       "*.native.tsx": {
@@ -115,7 +120,10 @@ const nextConfig: NextConfig = {
       "src/app/api/**/tanstack-start/generate/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app-native/**": {
+      "src/generated/app-native/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/generated/app-tanstack/**": {
         loaders: ["ignore-loader"],
       },
     },

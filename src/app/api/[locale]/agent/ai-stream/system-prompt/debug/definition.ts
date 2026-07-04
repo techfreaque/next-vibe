@@ -165,6 +165,16 @@ const { GET } = createEndpoint({
           .optional()
           .describe("Raw embedding scores for top 20 matches (debug only)"),
       }),
+      messageContextLines: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.messageContextLines.text" as const,
+        schema: z
+          .record(z.string(), z.string())
+          .optional()
+          .describe(
+            "Map of messageId → context line string injected by the server (debug only)",
+          ),
+      }),
     },
   }),
 

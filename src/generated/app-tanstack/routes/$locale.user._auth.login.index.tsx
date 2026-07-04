@@ -1,11 +1,9 @@
 // AUTO-GENERATED from src/app/[locale]/user/(auth)/login/page.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { JSX } from "react";
-
-import { TanstackPage as Page } from "@/app/[locale]/user/(auth)/login/page";
-
 import { toNextParams } from "../nextjs-compat-wrapper";
+import { TanstackPage as Page } from "@/app/[locale]/user/(auth)/login/page";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: { params: Record<string, string>; search: Record<string, string> }) => data)

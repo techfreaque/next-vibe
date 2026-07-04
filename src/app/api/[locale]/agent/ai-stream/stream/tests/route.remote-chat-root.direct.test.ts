@@ -76,6 +76,20 @@ if (_remoteUrl && _isFixtureMode) {
     teardown: hooks.teardown,
   });
 
+  // ── Loop-LOCAL variant: EXACT same cases, but HERMES originates each stream
+  //    (its REMOTE/atlas folder) and the loop executes HERE — client prompt +
+  //    tools both ways. Placement flips: hermes REMOTE/atlas/tests/<case>,
+  //    local BACKGROUND/remote/hermes/tests/<case> — asserted per case.
+  describeStreamSuite({
+    label: `AI Stream — remote chat root direct-HTTP LOOP-LOCAL (${_remoteUrl} originates, AI here)`,
+    cachePrefix: "rcr-direct-loop-local-",
+    assertSystemPromptFromLocal: true,
+    expectRelayTransport: "direct-http",
+    originateOnRemote: true,
+    setup: hooks.setup,
+    teardown: hooks.teardown,
+  });
+
   // ── Bidirectional thread location assertions ───────────────────────────────
 
   describe(`Remote Chat Root Direct — bidirectional thread location (${_remoteUrl})`, () => {
@@ -191,16 +205,6 @@ if (_remoteUrl && _isFixtureMode) {
     it("RCR-D4: hermes has messages — AI loop ran there", async () => {
       await assertProdDbHasMessages(threadId, 2);
     }, 30_000);
-  });
-  // ── Loop on CLIENT: the cloud (hermes) originates, this side runs the loop.
-  //    Cloud copy:  REMOTE/atlas/tests/loop-on-client-direct
-  //    Client copy: BACKGROUND/remote/hermes/tests/loop-on-client-direct
-  describeLoopOnClientSuite({
-    label: `Remote Chat Root — loop on CLIENT via direct-HTTP (${_remoteUrl})`,
-    transport: "direct-http",
-    caseName: "loop-on-client-direct",
-    fetchCacheContext: "remote-chat-root-direct-loop-on-client",
-    hooks: makeDirectSetup(_remoteUrl, { createRemoteFolder: true }),
   });
 } else if (!_remoteUrl) {
   failSuitePrerequisites(

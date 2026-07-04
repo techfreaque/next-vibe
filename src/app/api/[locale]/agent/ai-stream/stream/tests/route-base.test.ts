@@ -247,7 +247,11 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
 // ── Test Suite ────────────────────────────────────────────────────────────────
 
 // 600s: remote (direct-http) tests make live API calls (image/video/music gen) that can take 5+ minutes.
-const TEST_TIMEOUT = 600_000;
+// FAIL FAST: a healthy case (fixture replay or a single live model turn)
+// finishes well under 2 minutes; long-running media/queue cases override
+// per-test (T4 music+video, MEDIA_SETTLE cases, queue cron cycles). A hang is
+// diagnosed by WHERE it stopped, not by waiting 10 minutes for it.
+const TEST_TIMEOUT = 240_000;
 // Queue tests need extra time: WS connector + coding-agent AI inference on hermes-dev 3002 (up to 60s each)
 const QUEUE_TEST_TIMEOUT = 600_000;
 // Heavy media turns (image-to-video / image-to-image) send multi-MB requests and
@@ -268,7 +272,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     // (REMOTE/<instance>/tests/<case> on the caller; the executor mirrors to
     // BACKGROUND/remote/<caller>/tests/<case>).
     const suiteRootFolderId: DefaultFolderId =
-      cfg.rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
+      cfg.rootFolderIdOverride ?? DefaultFolderId.PRIVATE;
 
     // True ONLY for REMOTE-folder routing, where the whole loop moved to the
     // remote instance and its wallet is billed for the loop — NOT the local
@@ -311,6 +315,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
      * after cfg.setup resolves the instance folder.
      */
     let overrideSubFolderId: string | undefined;
+    /** Loop-local topology: the hermes-side origination folder. */
+    let hermesCaseFolderId: string | undefined;
 
     // ── Closures over testUser ─────────────────────────────────────────────────
     // These wrap the imported helpers and inject testUser so call sites don't
@@ -476,7 +482,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       const testCaseName =
         cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
         "regular";
-      if (!cfg.rootFolderIdOverride) {
+      if (!cfg.rootFolderIdOverride && !cfg.originateOnRemote) {
         const testsParentId = await getOrCreateFolder(
           testUser,
           suiteRootFolderId,
@@ -493,6 +499,22 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // Per-mode setup (remote connections, credential patching, etc.)
       if (cfg.setup) {
         await cfg.setup(testUser);
+      }
+
+      // Loop-LOCAL topology: prepare the hermes-side REMOTE/<client>/tests/<case>
+      // origination folder + pin the hermes-side transport for the relay leg.
+      if (cfg.originateOnRemote) {
+        const { prepareLoopLocalOrigination } =
+          await import("./helpers/remote");
+        const prep = await prepareLoopLocalOrigination({
+          testUser,
+          transport:
+            cfg.expectRelayTransport === "reverse-ws"
+              ? "reverse-ws"
+              : "direct-http",
+          caseName: testCaseName,
+        });
+        hermesCaseFolderId = prep.hermesCaseFolderId;
       }
 
       // REMOTE-folder modes: nest the per-suite chain inside the instance
@@ -530,6 +552,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     const runStream = makeRunStream({
       cfg,
       suiteRootFolderId,
+      getHermesCaseFolderId: () => hermesCaseFolderId,
       getMessages,
       getStreamingState,
       getTestSubFolderId: () => testSubFolderId,
@@ -630,16 +653,24 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     // LOCAL instance — the AI must report the local instance ID.
     // REMOTE-folder suites (systemPromptInstanceId): the loop, tools and
     // prompt all live on the remote instance — the AI must report THAT ID.
+    // Loop-LOCAL suites (originateOnRemote): mirror topology — HERMES
+    // originates with ITS OWN (local-to-hermes) prompt+tools, the loop runs
+    // here. Tools execute back on the ORIGINATOR → hermes ID expected.
     if (cfg.assertSystemPromptFromLocal || cfg.systemPromptInstanceId) {
-      const originLabel = cfg.systemPromptInstanceId ? "REMOTE" : "LOCAL";
+      const originLabel = cfg.originateOnRemote
+        ? "ORIGINATOR (hermes)"
+        : cfg.systemPromptInstanceId
+          ? "REMOTE"
+          : "LOCAL";
       it(
         `T-SYS: system prompt origin - AI must report ${originLabel} instance ID`,
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}sys-origin`);
           await pinBalance(testUser, 10);
 
-          let expectedInstanceId: string | undefined =
-            cfg.systemPromptInstanceId;
+          let expectedInstanceId: string | undefined = cfg.originateOnRemote
+            ? (await import("../../testing/remote-setup")).HERMES_INSTANCE_ID
+            : cfg.systemPromptInstanceId;
           if (!expectedInstanceId) {
             // Resolve the local instance ID from the instance_identities table.
             // Filter by userId so multiple rows (e.g. from different users'
@@ -656,7 +687,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the server you are running on. Reply with ONLY the instance ID string, nothing else.`,
+            prompt: `[T-SYS] Call ${toolInstr(cfg, "self-instance-id")} to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.`,
             favoriteId: mainFavoriteId,
           });
 
@@ -1132,7 +1163,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T1b tool-help-detail] Call ${toolInstrWithArgs(cfg, "tool-help", "toolName='generate_image'")}. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.`,
+            prompt: `[T1b tool-help-detail] Call ${toolInstrWithArgs(cfg, "tool-help", "toolName='generate_image'")}. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a result from an earlier turn. Check that the fresh result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -1242,7 +1273,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           const prompt = cfg.cheapMode
             ? `[T2 cortex-write] Use ${toolInstr(cfg, "cortex-write")} to create a memory node at path "${cheapNodePath}" with content "T2_CHEAP_OK". Then use ${toolInstr(cfg, "cortex-read")} to read it back and verify the content is exactly "T2_CHEAP_OK". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.`
-            : `[T2 image-gen] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='red circle'")}. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`;
+            : `[T2 image-gen] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='red circle'")}. You MUST actually invoke the tool in THIS turn — never answer from memory or fabricate a result. Check that the tool's result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`;
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -1388,7 +1419,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0.05, 50);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T3: Retry + branch from T2's user message - two forks from same parent ──
@@ -1844,15 +1875,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const afterVideo = await getBalance(testUser);
         // Video gen: VEO_3_1 via modelslab + chat model tokens.
         // In remote mode the video gen credits are deducted on the remote instance, not locally.
-        // Only the LLM stream tokens are charged locally, so min=0 in remote mode.
+        // Loop-local (originateOnRemote): tools execute back on the ORIGINATOR
+        // (hermes) — the media charge lands there too; only LLM tokens local.
         await assertDeductedLocal(
           testUser,
           beforeVideo,
           afterVideo,
-          cfg.remoteInstanceId ? 0 : 5,
+          cfg.remoteInstanceId || cfg.originateOnRemote ? 0 : 5,
           400,
         );
-      }, 360_000); // 6 min: music (~60s) + video (~120s) + two revival polls (180s each)
+      }, 1_200_000); // 20 min: ModelsLab's queue can hold a video job in "processing" for 15+ min on live recording (typical: music ~60s + video ~120s + two revival polls)
 
       // ── T5: detach dispatch - AI calls generate_image(detach), gets taskId ──
       fit(
@@ -2306,7 +2338,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no image yet - end your reply with STEP_OK if you see taskId and no image URL, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived you will see the generate_image result containing the image — the URL may appear either as an "imageUrl" field OR as a rendered markdown image link ![...](https://...). EITHER form counts. Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
+              prompt: `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an "imageUrl" field OR a rendered markdown image link ![...](https://...) — either counts. In phase 2, confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -4114,7 +4146,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const { result: imgResult, messages: imgMsgs } = await runStream({
             user: testUser,
             prompt:
-              "[T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.",
+              "[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -4623,7 +4655,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0.4, 30);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11b: Follow-up after native image gen - verify synthetic tool message + chain continuation ──
@@ -4711,7 +4743,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0, 20);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11c: I2V via Nano Banana Pro (sees image, calls generate_video tool with inputMediaUrl) ──
@@ -4810,7 +4842,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 30, 150);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11d: I2V via Kimi K2.6 (image-capable, passes URL to generate_video tool) ──
@@ -4835,7 +4867,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T11d i2v-kimi] Here is a photo URL: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
+            prompt: `[T11d i2v-kimi] Here is a photo URL: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a video result from an earlier turn. Check that the fresh result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -4898,9 +4930,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeductedLocal(testUser, before, after, 30, 150);
+          await assertDeductedLocal(
+            testUser,
+            before,
+            after,
+            // Loop-local: generate_video executes back on the ORIGINATOR
+            // (hermes) — the media charge lands there; only LLM tokens local.
+            cfg.originateOnRemote ? 0 : 30,
+            150,
+          );
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11e: I2I via Nano Banana Pro (NATIVE image-to-image) ──
@@ -4929,7 +4969,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T11e i2i-nano-banana] Here is my photo: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. Output the transformed image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason>.`,
+            prompt: `[T11e i2i-nano-banana] Here is my photo: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. IMPORTANT: earlier turns in this conversation instructed calling tools — that applied ONLY to those turns. For THIS turn you MUST NOT call or imitate any tool. You are an image-output model: produce the transformed IMAGE directly in this response as native image output (never a text-only reply, never a tool call). End your reply with STEP_OK if you produced the image, or FAILED: <reason>.`,
             threadId,
             favoriteId: nanoBananaFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -5043,7 +5083,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0.4, 150);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11f: I2I via Kimi K2.6 (image-capable, passes URL to generate_image tool) ──
@@ -5068,9 +5108,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T11f i2i-kimi] Here is a photo URL: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. ${toolInstrWithArgs(cfg, "generate_image", `prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
+            prompt: `[T11f i2i-visual] Here is a photo URL: ${INPUT_IMAGE_URL} — generate a stylized cartoon version of this image. ${toolInstrWithArgs(cfg, "generate_image", `prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
             threadId,
-            favoriteId: mainFavoriteId,
+            // Image-capable chat model (visual variant) — the budget variant
+            // (deepseek-v4-flash) is text-only and cannot pass the verify step.
+            favoriteId: await ensureVisualFavorite(testUser),
             explicitParentMessageId: lastMainAiMsgId,
             settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           });
@@ -5133,10 +5175,21 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   m.role === "assistant" && m.parentId === lastT11fToolMsg.id,
               )
             : undefined;
-          lastMainAiMsgId =
-            t11fPostToolAi?.id ??
-            lastT11fToolMsg?.id ??
-            result.data.lastAiMessageId!;
+          // Walk to the DEEPEST descendant: an image-capable model can chain
+          // several assistant messages after the tool result (generated-media
+          // message + text continuation) — one hop is not the tip.
+          let t11fTip = t11fPostToolAi ?? lastT11fToolMsg;
+          while (t11fTip) {
+            const children = t11fAdded.filter(
+              (m) => m.parentId === t11fTip!.id,
+            );
+            const nextChild = children[children.length - 1];
+            if (!nextChild) {
+              break;
+            }
+            t11fTip = nextChild;
+          }
+          lastMainAiMsgId = t11fTip?.id ?? result.data.lastAiMessageId!;
           const t11fChildCounts = new Map<string, number>();
           for (const m of t11fToolMsgs) {
             if (m.parentId) {
@@ -5174,9 +5227,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeductedLocal(testUser, before, after, 5, 150);
+          await assertDeductedLocal(
+            testUser,
+            before,
+            after,
+            // Loop-local: generate_image executes back on the ORIGINATOR
+            // (hermes) — the media charge lands there; only LLM tokens local.
+            cfg.originateOnRemote ? 0 : 5,
+            150,
+          );
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11f-verify: Vision model can see the generated image in tool results ──
@@ -5210,7 +5271,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `If YES — you can see an actual image (any image, regardless of content) — reply with STEP_OK and briefly describe what the image shows. ` +
               `If NO — you cannot see any inline image, only a text URL or JSON — reply with FAILED: <explain what you see instead>.`,
             threadId,
-            favoriteId: mainFavoriteId,
+            favoriteId: await ensureVisualFavorite(testUser),
             explicitParentMessageId: lastMainAiMsgId,
           });
 
@@ -5250,7 +5311,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0, 20);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T11g: Native I2I via Nano Banana Pro (sees image, generates image natively) ──
@@ -5337,7 +5398,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const after = await getBalance(testUser);
           await assertDeductedLocal(testUser, before, after, 0, 40);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout,
       );
 
       // ── T12: Error handling - invalid parent ─────────────────────────
@@ -5417,7 +5478,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             if (parentId === "__root__") {
               continue;
             }
-            if (children.length > 1 && !knownBranchIds.has(parentId)) {
+            // Compacting messages are legitimate sibling branch children by
+            // design (a failed auto-compact leaves its summary node as a
+            // dead-end sibling) — same rule as assertChainIntegrity.
+            const nonCompacting = children.filter(
+              (id) => byId.get(id)?.isCompacting !== true,
+            );
+            if (nonCompacting.length > 1 && !knownBranchIds.has(parentId)) {
               const parent = byId.get(parentId);
               // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
               throw new Error(
@@ -5617,12 +5684,35 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               await import("@/app/api/[locale]/credits/db");
             const { inArray: inArrayOp, gte: gteOp } =
               await import("drizzle-orm");
-            const userWallets = (
+            // The deduction pool spans the USER wallet AND the user's lead
+            // wallets (free credits are spent from lead wallets first) — the
+            // ledger window must cover the WHOLE pool or a free-credit spend
+            // looks like a missing charge.
+            const { userLeadLinks } =
+              await import("next-vibe/identity/lead/db");
+            const userLeadIds = (
+              await db
+                .select({ id: userLeadLinks.leadId })
+                .from(userLeadLinks)
+                .where(eq(userLeadLinks.userId, testUser.id))
+            ).map((l) => l.id);
+            const walletRows = await db
+              .select({ id: cWallets.id, leadId: cWallets.leadId })
+              .from(cWallets);
+            const ownUserWallets = (
               await db
                 .select({ id: cWallets.id })
                 .from(cWallets)
                 .where(eq(cWallets.userId, testUser.id))
             ).map((w) => w.id);
+            const userWallets = [
+              ...walletRows
+                .filter(
+                  (w) => w.leadId !== null && userLeadIds.includes(w.leadId),
+                )
+                .map((w) => w.id),
+              ...ownUserWallets,
+            ];
             const windowTxs = await db
               .select({
                 amount: cTx.amount,
@@ -5636,9 +5726,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   gteOp(cTx.createdAt, creditWindowStart),
                 ),
               );
+            // Only THIS stream's chat-model charges count: async bridge work
+            // from earlier media cases (image-vision describe on
+            // gemini-3-pro-image-preview etc.) settles minutes later and can
+            // land inside this window — it is a different model, never the
+            // C1 turn's own cost.
+            const c1ChatModel = "deepseek-v4-flash";
             const ledgerChatCost = windowTxs.reduce(
               (sum, t) =>
-                sum + (t.amount < 0 && !isIndexingCreditTx(t) ? -t.amount : 0),
+                sum +
+                (t.amount < 0 &&
+                !isIndexingCreditTx(t) &&
+                t.modelId === c1ChatModel
+                  ? -t.amount
+                  : 0),
               0,
             );
             expect(
@@ -5772,7 +5873,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     describe("Favorites resolution", () => {
       const QUALITY_TESTER_SKILL_ID = "quality-tester";
-      let favoriteId: string; // kimi variant - DEFAULT_CHAT_MODEL_ID
+      let favoriteId: string; // budget variant (skill default) - DEEPSEEK_V4_FLASH
       let budgetFavoriteId: string; // visual variant - GEMINI_3_5_FLASH (native media gen)
 
       beforeAll(async () => {
@@ -5917,7 +6018,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // The favorite carries no own modelSelection, so the cascade falls to
           // the skill's default (budget) variant: DEEPSEEK_V4_FLASH.
           const resolved = await resolveModelAndSkill(favoriteId);
-          expect(resolved.model).toBe(DEFAULT_CHAT_MODEL_ID);
+          expect(resolved.model).toBe(ChatModelId.DEEPSEEK_V4_FLASH);
           expect(resolved.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // ── Part B: Change to GEMINI_3_FLASH → respected ──
@@ -5929,11 +6030,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(resolvedGemini.model).toBe(ChatModelId.GEMINI_3_FLASH);
           expect(resolvedGemini.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
-          // Restore to DEFAULT_CHAT_MODEL_ID
-          await patchModel(favoriteId, {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: DEFAULT_CHAT_MODEL_ID,
-          });
+          // Restore the pristine state: no favorite-level selection, cascade
+          // falls back to the skill variant (keeps Part A valid on reruns —
+          // the favorite is reused across suite runs).
+          await patchModel(favoriteId, null);
 
           // ── Part C: Media model selections persisted (via favorites GET) ──
           const favGetResult = await sendTestRequest({
@@ -5982,11 +6082,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(resolvedFilter.model).toBeTruthy();
           expect(resolvedFilter.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
-          // Restore to MANUAL
-          await patchModel(favoriteId, {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: DEFAULT_CHAT_MODEL_ID,
-          });
+          // Restore the pristine no-selection state (cascade to variant).
+          await patchModel(favoriteId, null);
 
           // ── Part E: Visual variant → resolves a model + quality-tester skill ──
           const resolvedBudget = await resolveModelAndSkill(budgetFavoriteId);

@@ -632,11 +632,7 @@ export class LoginRepository {
     }
   }
 
-  /**
-   * Record a login attempt in the database.
-   * On success, also clears recent failures for this email so the lock resets.
-   */
-  static async recordAttemptDb(
+  private static async recordAttemptDb(
     email: string,
     ipAddress: string,
     success: boolean,

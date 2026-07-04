@@ -22,7 +22,7 @@
 
 import type { ReleaseConfig } from "./src/app/api/[locale]/system/tooling/release/definition";
 
-const releaseConfig: ReleaseFileConfig = {
+const releaseConfig: ReleaseConfig = {
   // Package manager to use for dependency operations
   packageManager: "bun",
 
@@ -97,8 +97,7 @@ const releaseConfig: ReleaseFileConfig = {
         // Version bumper for additional files
         versionBumper: [
           {
-            filePath:
-              "./src/app/api/[locale]/system/unified-interface/cli/run-cli.ts",
+            filePath: "./src/app/api/[locale]/system/platforms/cli/run-cli.ts",
             varName: "CLI_VERSION",
           },
         ],
@@ -138,7 +137,7 @@ const releaseConfig: ReleaseFileConfig = {
       lint: false,
       typecheck: false,
       build:
-        "vibe builder --configPath=src/app/api/[locale]/system/check/build.config.ts",
+        "vibe builder --configPath=src/app/api/[locale]/system/tooling/check/build.config.ts",
       test: false,
       snyk: false,
       release: {

@@ -383,11 +383,10 @@ class ViteCompiler {
       plugins.push({
         name: "next-vibe-ui-resolver",
         resolveId(id: string): string | null {
-          const prefix = "next-vibe/ui/web/";
-          if (!id.startsWith(prefix)) {
+          if (!id.startsWith("next-vibe/ui/")) {
             return null;
           }
-          const sub = id.slice(prefix.length);
+          const sub = id.slice("next-vibe/ui/".length);
           // Try tanstack override first, then fall back to web
           for (const base of [tanstackUiDir, webUiDir]) {
             for (const ext of [".ts", ".tsx", "/index.ts", "/index.tsx"]) {
@@ -717,8 +716,8 @@ class ViteCompiler {
           name: "next-vibe-ui-ssr-resolver",
           enforce: "pre",
           resolveId(id: string): string | null {
-            if (id.startsWith("next-vibe/ui/web/")) {
-              const sub = id.slice("next-vibe/ui/web/".length);
+            if (id.startsWith("next-vibe/ui/")) {
+              const sub = id.slice("next-vibe/ui/".length);
               return tryResolve([tanstackUiDir, webUiDir], sub);
             }
             if (id in moduleAliases) {
@@ -974,8 +973,8 @@ class ViteCompiler {
         tsconfigPaths: true,
         alias: [
           { find: /^@\//, replacement: `${srcDir}/` },
-          // next-vibe/ui/web/* handled by the ui resolver plugin (tanstack-first).
-          { find: /^next-vibe\/(?!ui\/web\/)/, replacement: `${nextVibeDir}/` },
+          // next-vibe/ui/* and next-vibe/* handled by the ui resolver plugin (tanstack-first).
+          { find: /^next-vibe\/(?!ui\/)/, replacement: `${nextVibeDir}/` },
           ...Object.entries(moduleAliases).map(([specifier, relativePath]) => ({
             find: specifier,
             replacement: resolve(ROOT_DIR, relativePath),
@@ -1026,6 +1025,7 @@ class ViteCompiler {
       if (!process.env.CI) {
         Object.assign(process.env, { CI: "true" });
       }
+
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
       const { tanstackStart } = (await import(
@@ -1306,6 +1306,7 @@ class ViteCompiler {
               } as never);
             },
           } as Plugin,
+
           // Resolve `server-only` with importer tracing: SSR gets the shim,
           // client gets a virtual module whose error message names the source file.
           serverOnlyTracePlugin(moduleAliases, ROOT_DIR),
@@ -1526,8 +1527,9 @@ class ViteCompiler {
                 return null;
               };
 
-              if (id.startsWith("next-vibe/ui/web/")) {
-                const sub = id.slice("next-vibe/ui/web/".length);
+              // next-vibe/ui/* → tanstack/ first, then web/ fallback.
+              if (id.startsWith("next-vibe/ui/")) {
+                const sub = id.slice("next-vibe/ui/".length);
                 return tryResolve([tanstackUiDir, webUiDir], sub);
               }
 
@@ -1790,7 +1792,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
             // (tanstack-first, web fallback). The negative lookahead excludes it
             // from the general alias so the plugin wins.
             {
-              find: /^next-vibe\/(?!ui\/web\/)/,
+              find: /^next-vibe\/(?!ui\/)/,
               replacement: `${nextVibeDir}/`,
             },
             // moduleAliases from build.config.ts viteOptions.moduleAliases.

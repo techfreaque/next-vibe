@@ -5,8 +5,7 @@
 
 // no-debugger - Debugger statement
 export function withDebugger(): void {
-  debugger; // intentional violation for test
-  console.log("debugging");
+  debugger;
 }
 
 // no-console - Console statements
@@ -19,7 +18,7 @@ export function withConsole(): void {
 
 // curly - Missing curly braces
 export function noCurly(x: number): number {
-  if (x > 0) return x; // intentional curly violation
+  if (x > 0) return x;
   else return -x;
 }
 

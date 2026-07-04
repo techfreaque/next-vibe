@@ -138,12 +138,19 @@ export function assertChainIntegrity(
   // 1. + 2. Orphans, creation-order and single-root (shared core)
   assertChainCore(messages, byId);
 
-  // 3. No unexpected branches - every message has ≤1 child unless whitelisted
+  // 3. No unexpected branches - every message has ≤1 child unless whitelisted.
+  // Compacting messages are legitimate SIBLING branch children by design
+  // (auto-compacting inserts a summary node next to the live chain; a FAILED
+  // compact leaves it as a dead-end sibling) — a branch is only a violation
+  // when more than one NON-compacting child competes for the chain.
   for (const [parentId, children] of tree.entries()) {
     if (parentId === "__root__") {
       continue;
     }
-    if (knownBranchPoints.has(parentId) || children.length <= 1) {
+    const nonCompactingChildren = children.filter(
+      (id) => byId.get(id)?.isCompacting !== true,
+    );
+    if (knownBranchPoints.has(parentId) || nonCompactingChildren.length <= 1) {
       continue;
     }
     const parent = byId.get(parentId);
@@ -182,11 +189,16 @@ export function assertChainIntegrity(
     }
   }
 
-  // 5. Leaf whitelist - every leaf must be expectedLeafId or a known dead-end
+  // 5. Leaf whitelist - every leaf must be expectedLeafId or a known dead-end.
+  // Compacting messages are always legitimate leaves (a failed auto-compact
+  // leaves its summary node as a dead-end sibling by design).
   const { expectedLeafId, knownDeadEndLeaves } = options;
   if (expectedLeafId) {
     const unexpectedLeaves = leaves.filter(
-      (m) => m.id !== expectedLeafId && !knownDeadEndLeaves?.has(m.id),
+      (m) =>
+        m.id !== expectedLeafId &&
+        !knownDeadEndLeaves?.has(m.id) &&
+        m.isCompacting !== true,
     );
     if (unexpectedLeaves.length > 0) {
       const leafList = unexpectedLeaves

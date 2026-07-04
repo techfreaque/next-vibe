@@ -41,6 +41,8 @@ import { env } from "@/config/env";
 
 /** instanceId used by atlas to refer to the prod (hermes) connection */
 export const HERMES_INSTANCE_ID = "hermes";
+/** This (caller/atlas) side's self-identity as the executor names it. */
+export const SELF_INSTANCE_ID = "atlas";
 
 /** instanceId used by hermes to refer to the atlas (local) connection */
 export const ATLAS_INSTANCE_ID = "atlas";
@@ -467,12 +469,21 @@ export async function connectToHermes(
     data: {
       transportMode: "direct-http",
       syncScope: {
-        favorites: true,
+        // Favorites sync would LWW-overwrite the test's freshly-created
+        // quality-tester favorite (null whitelist) with the hermes user's
+        // personal config (e.g. a 19-tool activeTools whitelist) mid-run —
+        // silently changing which tools the suites may call. Test favorites
+        // are created locally per run; never sync them.
+        favorites: false,
         documents: true,
         memories: true,
         skills: true,
-        threads: true,
-        chat: true,
+        // Test discipline: NOTHING lands on the remote from same-instance
+        // suites. Thread/chat sync would push every local test thread to the
+        // peer as unplaced strays; the relay suites persist their remote copy
+        // explicitly (executor landing + mirror-back), not via sync.
+        threads: false,
+        chat: false,
       },
     },
     urlPathParams: { instanceId: connectedInstanceId },
@@ -794,6 +805,10 @@ export async function restoreHermesIdentity(
     timeoutMs: 15_000,
   });
   if (!resp.ok || resp.body?.["success"] !== true) {
+    // 404 = no self-identity row yet (fresh DB) — nothing to restore.
+    if (resp.status === 404) {
+      return;
+    }
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
       `restoreHermesIdentity: self-rename failed ${String(resp.status)} ${JSON.stringify(resp.body)}`,
@@ -1129,6 +1144,67 @@ export async function assertProdDbHasThread(
     rows.rows[0]?.folder_id,
     `[assertProdDbHasThread] Thread ${threadId} expected in folder ${folderId}, got ${rows.rows[0]?.folder_id ?? "null"}`,
   ).toBe(folderId);
+}
+
+/**
+ * Assert a thread's EXACT folder placement by walking the folder chain by NAME.
+ * Verifies both the thread's rootFolderId and the full name path from the top
+ * folder down to the thread's folder — e.g. on the caller
+ * (REMOTE, ["hermes","tests","<case>"]) and on the executor
+ * (BACKGROUND, ["remote","atlas","tests","<case>"]). 100% asserted or fail.
+ */
+export async function assertThreadPlacement(params: {
+  db: "local" | "hermes";
+  threadId: string;
+  rootFolderId: string;
+  nameChain: ReadonlyArray<string>;
+}): Promise<void> {
+  const { threadId, rootFolderId, nameChain } = params;
+  const { expect: expectBun } = await import("bun:test");
+  const runQuery =
+    params.db === "hermes"
+      ? async (
+          q: ReturnType<typeof sql>,
+        ): Promise<Array<Record<string, string | null>>> => {
+          const res =
+            await getProdDb().execute<Record<string, string | null>>(q);
+          return res.rows;
+        }
+      : async (
+          q: ReturnType<typeof sql>,
+        ): Promise<Array<Record<string, string | null>>> => {
+          const { db: localDb } = await import("next-vibe/database");
+          const res = await localDb.execute<Record<string, string | null>>(q);
+          return res.rows;
+        };
+  const threadRows = await runQuery(
+    sql`SELECT root_folder_id, folder_id FROM chat_threads WHERE id = ${threadId} LIMIT 1`,
+  );
+  expectBun(
+    threadRows.length,
+    `[assertThreadPlacement:${params.db}] thread ${threadId} not found`,
+  ).toBeGreaterThan(0);
+  expectBun(
+    threadRows[0]?.["root_folder_id"],
+    `[assertThreadPlacement:${params.db}] thread ${threadId} root mismatch`,
+  ).toBe(rootFolderId);
+  // Walk the chain upward from the thread's folder and collect names.
+  const walked: string[] = [];
+  let currentId: string | null = threadRows[0]?.["folder_id"] ?? null;
+  for (let depth = 0; depth < 16 && currentId; depth++) {
+    const rows = await runQuery(
+      sql`SELECT name, parent_id FROM chat_folders WHERE id = ${currentId} LIMIT 1`,
+    );
+    if (rows.length === 0) {
+      break;
+    }
+    walked.unshift(rows[0]?.["name"] ?? "<unnamed>");
+    currentId = rows[0]?.["parent_id"] ?? null;
+  }
+  expectBun(
+    walked.join("/"),
+    `[assertThreadPlacement:${params.db}] thread ${threadId} folder chain mismatch (root ${rootFolderId})`,
+  ).toBe(nameChain.join("/"));
 }
 
 /**

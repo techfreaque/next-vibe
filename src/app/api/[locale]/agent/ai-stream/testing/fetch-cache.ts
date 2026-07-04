@@ -154,7 +154,31 @@ export function clearFixturePatches(): void {
 
 /** Call this at the top of each test to scope cache files to that test. */
 export function setFetchCacheContext(testCase: string): void {
-  sharedState.currentTestCase = slugify(testCase);
+  const slug = slugify(testCase);
+  // Idempotent on unchanged context: the relay forwards the context header on
+  // EVERY bridge POST (tool-execute-request, mirror events), so a receiver
+  // re-applies the same context many times DURING one relayed loop. Clearing
+  // the call counters each time would rewind order-matched replay to index 1
+  // for every model call — the loop replays the same recorded turn forever.
+  // Counters must stay monotonic within a context; a context CHANGE (the next
+  // test case) still resets them.
+  if (sharedState.currentTestCase === slug) {
+    return;
+  }
+  if (process.env["VIBE_FIXTURE_MODE"] === "true") {
+    // Context SWITCHES rewind order-matched replay — when a relayed loop sees
+    // its counters reset mid-stream, this trace names the culprit. Debug-only:
+    // routine switches (server boot, each test case) are not noteworthy.
+    createEndpointLogger(false, defaultLocale).debug(
+      "[FetchCache] context switch",
+      {
+        from: sharedState.currentTestCase ?? "<none>",
+        to: slug,
+        stack: new Error("ctx-switch").stack ?? "",
+      },
+    );
+  }
+  sharedState.currentTestCase = slug;
   sharedState.callCounters.clear();
   sharedState.fixturePatchMap.clear();
   // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
@@ -943,7 +967,8 @@ export function installFetchCache(
     // cached broadcast/bridge POST → dispatch or result never delivered → remote hang.
     if (
       url.includes("/agent/ai-stream/stream") ||
-      url.includes("/ws/broadcast")
+      url.includes("/ws/broadcast") ||
+      url.includes("/system/execute-tool")
     ) {
       return originalFetch(input, init);
     }

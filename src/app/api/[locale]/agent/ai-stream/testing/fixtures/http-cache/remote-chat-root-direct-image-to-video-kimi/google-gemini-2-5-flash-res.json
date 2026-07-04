@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15df58a0a013636-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:58:46 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783166317-4PM7VZI2BE3CnRsF8Krx"
+  },
+  "body": {
+    "id": "gen-1783166317-4PM7VZI2BE3CnRsF8Krx",
+    "object": "chat.completion",
+    "created": 1783166317,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second instrumental track featuring a playful, upbeat melody with a slight retro feel.\n\n**Music:**\n*   **Genre:** Funk, Pop, Lounge, with a modern electronic twist. It has a similar vibe to elevator music but with more character and a distinct groove.\n*   **Tempo:** Approximately 110-120 BPM.\n*   **Instruments:**\n    *   **Electric Guitar (Lead):** Plays a clean, crisp, single-note melody that is the primary focus of the track. It has a slightly bright and percussive tone.\n    *   **Electric Bass:** Provides a simple but effective walking bassline that underpins the melody, giving it a groovy foundation.\n    *   **Drums (Electronic):** Features a tight, punchy snare drum, a clear kick drum, and closed hi-hats. The beat is steady and drives the rhythm. There are no elaborate fills, keeping it consistent.\n    *   **Synthesizer (Pad/Strings):** A subtle, sustained synth pad or string-like sound can be heard in the background, adding a layer of warmth and fullness to the overall sound, particularly noticeable under the guitar melody.\n*   **Interaction:** The lead guitar carries the main melodic theme, supported by the steady, rhythmic foundation of the bass and drums. The synth pad adds texture without competing with the main instruments.\n*   **Mood:** Playful, lighthearted, cheerful, and slightly laid-back. It evokes a feeling of casual optimism or background activity.\n*   **Production Style:** Clean and polished. The instruments are well-balanced with clear separation. There's a hint of reverb on the guitar, giving it a bit of space without sounding overly wet.\n\n**Overall Impression:**\n*   **Duration:** Short clip, likely an excerpt or loop.\n*   **Sound Quality:** High quality, clean recording, sounds professionally produced.\n*   **Recording Environment:** Studio.\n*   **Non-musical Audio Events:** None.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 427,
+      "total_tokens": 1499,
+      "cost": 0.0019141,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019141,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0010675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

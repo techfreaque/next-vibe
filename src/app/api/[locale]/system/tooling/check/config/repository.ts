@@ -700,6 +700,18 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         "@next-vibe/checker/oxlint-plugins/$1.js",
       );
 
+      // New projects default to cold-tsgo; LSP daemon is opt-in per project
+      templateContent = templateContent.replace(
+        /useLspDaemon:\s*true/g,
+        "useLspDaemon: false",
+      );
+
+      // Test-project configs must not auto-fix — corpus files are intentional violations
+      templateContent = templateContent.replace(
+        /\bfix:\s*true\b/g,
+        "fix: false",
+      );
+
       await fs.writeFile(configPath, templateContent, "utf8");
 
       // Also create .mcp.json

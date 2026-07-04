@@ -14,6 +14,7 @@
 import "server-only";
 
 import { sql } from "drizzle-orm";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -263,6 +264,182 @@ export async function assertHermesFolderChainHasThread(params: {
  *   • folders      — cloud copy in REMOTE/<clientId>/…, client copy in
  *                    BACKGROUND/remote/<cloudId>/…
  */
+/**
+ * Loop-LOCAL suite origination (full T-chain topology): HERMES originates the
+ * stream on ITS REMOTE/<clientId>/tests/<case> folder; its relay branch sends
+ * the loop back to THIS side (the client executes with the client's prompt +
+ * tools). Prepare once per suite: transport PATCH on the hermes-side row + the
+ * hermes folder chain. Returns the hermes case-folder id for originations.
+ */
+export async function prepareLoopLocalOrigination(params: {
+  testUser: JwtPrivatePayloadType;
+  transport: "direct-http" | "reverse-ws";
+  caseName: string;
+}): Promise<{ hermesCaseFolderId: string; prodUserId: string }> {
+  const remoteSetup = await import("../../../testing/remote-setup");
+  const { sendTestRequest } =
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+  const { DefaultFolderId: FolderIds } =
+    await import("@/app/api/[locale]/agent/chat/config");
+  const prodUserId = await remoteSetup.resolveProdUserId();
+  expect(prodUserId, "loop-local: hermes user must resolve").toBeTruthy();
+  const connByIdDef = (
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+  ).default;
+  const patchResult = await sendTestRequest({
+    endpoint: connByIdDef.PATCH,
+    data: { transportMode: params.transport },
+    urlPathParams: { instanceId: remoteSetup.ATLAS_INSTANCE_ID },
+    user: params.testUser,
+    instanceId: remoteSetup.HERMES_INSTANCE_ID,
+  });
+  expect(
+    patchResult.success,
+    `loop-local: hermes-side transport PATCH failed: ${!patchResult.success ? patchResult.message : ""}`,
+  ).toBe(true);
+  const pdb = remoteSetup.getProdDb();
+  let parentId: string | null = null;
+  for (const name of [
+    remoteSetup.ATLAS_INSTANCE_ID,
+    "tests",
+    params.caseName,
+  ]) {
+    const found: { rows: Array<{ id: string }> } = await pdb.execute<{
+      id: string;
+    }>(
+      parentId === null
+        ? sql`SELECT id FROM chat_folders
+              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
+                AND name = ${name} AND parent_id IS NULL LIMIT 1`
+        : sql`SELECT id FROM chat_folders
+              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
+                AND name = ${name} AND parent_id = ${parentId} LIMIT 1`,
+    );
+    if (found.rows[0]) {
+      parentId = found.rows[0].id;
+      continue;
+    }
+    const created: { rows: Array<{ id: string }> } = await pdb.execute<{
+      id: string;
+    }>(
+      sql`INSERT INTO chat_folders (user_id, root_folder_id, name, parent_id)
+          VALUES (${prodUserId}, ${FolderIds.REMOTE}, ${name}, ${parentId})
+          RETURNING id`,
+    );
+    parentId = created.rows[0]?.id ?? null;
+  }
+  expect(parentId, "loop-local: hermes folder chain must exist").toBeTruthy();
+  return { hermesCaseFolderId: parentId ?? "", prodUserId: prodUserId ?? "" };
+}
+
+/**
+ * Originate ONE stream on hermes (loop-local topology). threadId is the
+ * SHARED cross-instance identity: the executor (this side) persists under the
+ * same id, so the caller's runStream reads local messages afterwards.
+ */
+export async function originateStreamOnHermes(params: {
+  testUser: JwtPrivatePayloadType;
+  prompt: string;
+  threadId: string;
+  hermesCaseFolderId: string;
+  parentMessageId?: string | null;
+  /** UI-style confirmation continuation (approve phase2) — forwarded on the
+   *  originating POST so the relay re-executes the confirmed tool. */
+  toolConfirmations?: Array<{ messageId: string; confirmed: boolean }> | null;
+  /** File attachments — forwarded on the originating POST (T10 cases). */
+  attachments?: File[];
+  /** The case's LOCAL favorite — resolves the model/skill/favoriteConfig the
+   *  originated stream must run with (media cases pin image-capable models). */
+  favoriteId?: string;
+  /**
+   * Pre-claim the relayed stream so THIS process wins the fan-out race.
+   * Required for reverse-ws (the connector event reaches every local process
+   * holding a socket — dev server + tests); must stay OFF for direct-http
+   * (the relay is a single POST to the dev server — pre-claiming would make
+   * its only recipient skip and the stream would never run).
+   */
+  preClaim: boolean;
+}): Promise<
+  { success: true } | { success: false; failure: ErrorResponseType }
+> {
+  const remoteSetup = await import("../../../testing/remote-setup");
+  const { sendTestRequest } =
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+  const { DefaultFolderId: FolderIds } =
+    await import("@/app/api/[locale]/agent/chat/config");
+  const { ChatMessageRole } =
+    await import("@/app/api/[locale]/agent/chat/enum");
+  const streamDef = (
+    await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
+  ).default;
+  const { DEFAULT_TTS_VOICE_ID } =
+    await import("@/app/api/[locale]/agent/text-to-speech/constants");
+  // Resolve model/skill/favoriteConfig from the case's LOCAL favorite exactly
+  // like a real client (media cases pin image-capable models; the budget
+  // favorite is the default). The favorite row only exists locally (favorites
+  // sync is off for tests) — the resolved CONFIG rides the originating POST.
+  const { fetchFavoriteConfigAndModel } =
+    await import("../../../testing/headless-test-runner");
+  const {
+    favoriteConfig,
+    model: resolvedModel,
+    skill: skillId,
+  } = await fetchFavoriteConfigAndModel(
+    params.favoriteId ?? "quality-tester-budget",
+    params.testUser,
+  );
+  // PRE-claim the relayed stream: the connector event fans out to every local
+  // process (dev server + this test) — the loop MUST run here, where the
+  // fixture context lives. The pid-owned claim makes this process win.
+  const userMessageId = crypto.randomUUID();
+  if (params.preClaim) {
+    const { claimRelayedStream } =
+      await import("@/app/api/[locale]/agent/ai-stream/repository/relay");
+    const { createEndpointLogger } = await import("next-vibe/logger/server");
+    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
+    const preClaimed = await claimRelayedStream(
+      userMessageId,
+      createEndpointLogger(false, defaultLocale),
+    );
+    expect(preClaimed, "loop-local: pre-claim must succeed").toBe(true);
+  }
+  const streamResult = await sendTestRequest({
+    endpoint: streamDef.POST,
+    data: {
+      operation: "send" as const,
+      rootFolderId: FolderIds.REMOTE,
+      subFolderId: params.hermesCaseFolderId,
+      threadId: params.threadId,
+      userMessageId,
+      parentMessageId: params.parentMessageId ?? null,
+      leafMessageId: null,
+      content: params.prompt,
+      role: ChatMessageRole.USER,
+      model: resolvedModel,
+      skill: skillId,
+      favoriteConfig,
+      toolConfirmations: params.toolConfirmations ?? null,
+      messageHistory: [],
+      // The cross-instance transport marshals Files to the base64 wire shape
+      // (execute-tool handlers/remote.ts marshalFilesForWire).
+      attachments: params.attachments ?? [],
+      resumeToken: null,
+      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+      audioInput: { file: null },
+      timezone: "UTC",
+      imageSize: undefined,
+      imageQuality: undefined,
+      musicDuration: undefined,
+      executionContext: { mode: "local" as const },
+    },
+    user: params.testUser,
+    instanceId: remoteSetup.HERMES_INSTANCE_ID,
+  });
+  return streamResult.success
+    ? { success: true }
+    : { success: false, failure: streamResult };
+}
+
 export async function runLoopOnClientScenario(params: {
   testUser: JwtPrivatePayloadType;
   /** Transport the hermes→client relay leg must use (PATCHed + attested). */

@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1575652bbef340d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 16:41:25 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783096881-W8NnGV12HLpeWVtFxT6a"
+  },
+  "body": {
+    "id": "gen-1783096881-W8NnGV12HLpeWVtFxT6a",
+    "object": "chat.completion",
+    "created": 1783096881,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A prominent, solid blue equilateral triangle is centrally positioned against a plain, uniform white background. The triangle's base lies across the lower portion of the frame, while its apex points directly upwards towards the top center. The blue color is a medium-dark shade, resembling royal blue. The entire image is minimalist, with no other shapes, textures, text, or variations in color present. The edges of the triangle are sharp and clean.",
+          "refusal": null,
+          "reasoning": "**Focusing on Detail**\n\nI'm currently concentrating on creating a very precise description of the visual elements. My focus is on the primary subject and its placement within the frame.\n\n**Refining Composition**\n\nI am now focusing on the precise positioning and color saturation of the primary geometric shape. My aim is to capture the exact proportions and hue of the blue triangle against its pure white background.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Focusing on Detail**\n\nI'm currently concentrating on creating a very precise description of the visual elements. My focus is on the primary subject and its placement within the frame.\n\n**Refining Composition**\n\nI am now focusing on the precise positioning and color saturation of the primary geometric shape. My aim is to capture the exact proportions and hue of the blue triangle against its pure white background.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CqEGAY89a18qHmxmvujAxBJe2DtIjygH4QH51lB+Xq0i0IMOCV968Mx2DlhQnlCHGqYdEJbAxchmHT3ICDj7lNBZLsFVOHemO23QhlVIRk+aYQR3V/0WCOFe2Vz/Mfs7/9A6nEhCuASXQhXGNKziQRz40u0jd7EgW0FwmqQ5kriVBVo94hMWkiqHkI9rJNJpuN5clnvSpC5OMVNranhO4LSGvGPAoOHr5kVwxQrXoLlsS1ws+serRJ0bJ2U/jMpa1XodDAuxwdw3d9W6nB45jxABztCBSB2+tRIyVP2INQexj6DnAFvt08HeJssR3/1lW8hd9fjnX+27e/5ttBV0N7Ic4DuySsoI3eISMXPBC3Zo4GHIGF+CK0RS7W5stN0CysI/EmiTO3fsg/zGyDLd7l7gYdzikhKiOfcsx8felX81RjVWnrS6QfxPLAxGcSsGo8xllUnnc1kLImBCxazptnEOk/foBsVrqLNQTat8g3U9UYYV/5oPIN9hnFh/Ga3V02f28vBh1xHYH5M26PY6GLJUuyq+dzrBuQLo+Eq69cmzPWEfIyWSs6EvjmOzWqRs30o+4zIialTjFiKk1QOxKNTLIzuXwRWL08JZVOVApe+PhApOkOVhaLAxMjHKv4MVkJD9jwvcthoFo8dcjzkhy7Q9k+PNEylXAc09B5bnolb1t+axsEPOG40V5fbdkHG4BEyJt4kH4rxBWmqUfHzwGE2YmNvy+Ruo8bkclzZ6ZKvtB4Ujw+i+obAHb+go+WHtw0Eh4RD6P+Gm70qQRT4uY+T00QasG76Py38gfm2611cT+we7S8yfsspWu/6Y9cX0VzqGlP0bRynEThN6HCYsOgkOV9NS3fz5ZA1fp6iUETs1Xp8qYScCrOIEjYnehMe5+TcKowm9qSyeLZA3bfJGmLhigg/c0GzUxWwWpf2elPlgxvj7S9JstGeZN3/Wqmqf/QmccNe24B7Mf2e09jlZgUCZCBiA/4APLPOGBydlDhxyeQ3HNd0n7E5NdPLxdCu5X6FT0JEp4Pae2lirDDaYi+3rdCb9lR4oCX66THhEh0UmSGNH"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 244,
+      "total_tokens": 1081,
+      "cost": 0.004602,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004602,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.002928
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 156,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

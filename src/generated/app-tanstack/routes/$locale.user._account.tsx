@@ -1,11 +1,9 @@
 // AUTO-GENERATED from src/app/[locale]/user/(account)/layout.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { JSX } from "react";
-
-import { TanstackPage as Layout } from "@/app/[locale]/user/(account)/layout";
-
 import { toNextParams } from "../nextjs-compat-wrapper";
+import { TanstackPage as Layout } from "@/app/[locale]/user/(account)/layout";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)

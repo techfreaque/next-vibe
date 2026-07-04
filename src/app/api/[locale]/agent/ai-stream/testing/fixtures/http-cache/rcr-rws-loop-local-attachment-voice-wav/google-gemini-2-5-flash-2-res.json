@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b3f8818a7e7b2-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 04:04:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783137891-7wBth5gcPryFql6ZaEXh"
+  },
+  "body": {
+    "id": "gen-1783137891-7wBth5gcPryFql6ZaEXh",
+    "object": "chat.completion",
+    "created": 1783137891,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is an approximately 18-second clip of upbeat and playful electronic music.\n\nMusic description:\n\nGenre: Electronic Funk/Dance. It has a slightly retro feel, reminiscent of 80s or early 90s dance music, but with a modern production quality.\nTempo: Approximately 110-120 BPM.\nTime Signature: 4/4.\nInstruments:\nDrums: A strong, driving electronic drum beat featuring a prominent snare on beats 2 and 4, a consistent kick drum, and a high-hat pattern that adds to the rhythmic propulsion.\nBass: A clean, punchy synth bassline that plays a melodic, funky riff, providing a strong rhythmic and harmonic foundation.\nSynthesizer: A bright, almost chiptune-like synth plays a catchy, repetitive melody. This synth is the most prominent melodic element and is likely the \"hook\" of the song. Another synth layer, possibly a pad or a sustained chord, occasionally provides harmonic fullness but stays in the background.\nProduction style: Polished and clean. The individual instruments are well-defined and sit nicely in the mix. There's a subtle amount of reverb on some elements, giving a sense of space without being overly ambient.\nMood: Upbeat, light-hearted, energetic, and slightly quirky.\nStructure: The clip seems to be a continuous loop of a main section or hook, as the melodic and rhythmic elements repeat without significant changes.\n\nThere is no speech or other non-musical audio present.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 318,
+      "total_tokens": 1390,
+      "cost": 0.0016416,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016416,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

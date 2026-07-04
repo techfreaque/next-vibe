@@ -13,7 +13,7 @@
 - **Language:** TypeScript ultra strict (NO `any`, NO `unknown`, NO `object`, NO `as X`) - types must align, 0 exceptions
 - **ORM:** Drizzle ORM with PostgreSQL
 - **Validation:** Zod schemas everywhere
-- **Quality:** `mcp atlas check` or fallback `vibe check path1 path2` - never `tsc`/`eslint` directly. Must end at 0 errors, even for out-of-scope issues unless told otherwise.
+- **Quality:** `mcp atlas check` or fallback `vibe check path1 path2` - never `tsc`/`eslint` directly. Must end at 0 errors, even for out-of-scope issues unless told otherwise. **ALWAYS run `vibe check` in the background** (it takes 30s+) and keep working on the next edit/step while it runs - never sit idle waiting on it. Circle back to read the result once you have other work queued or done.
 - **UI/Platform imports:** Always use `next-vibe-ui` - never import from `next/*`, `expo-router`, `react-native`, or `@tanstack/react-router` directly. See `docs/patterns/next-vibe-ui.md`.
 
 ## Instances & Servers
@@ -104,7 +104,7 @@ Explore → implement → test → report. Keep going until blocked by something
 
 Hard gate. Never skip. Never say "should work" — prove it. If something looks wrong while testing, fix it immediately.
 
-1. **Lint/types:** `mcp atlas check` or `vibe check <path>` → 0 errors
+1. **Lint/types:** `mcp atlas check` or `vibe check <path>` → 0 errors. **Launch it in the background and keep working** — it's slow (30s+); never block idle on it. Read the result when you circle back.
 2. **`vibe gen`** → 0 warnings, route count increases
 3. **Tests:** `bun test --bail --isolate <path>` → all pass
 4. **CLI non-interactive:** `vibe <alias> "<arg>"` → fields render, layout intentional, data correct

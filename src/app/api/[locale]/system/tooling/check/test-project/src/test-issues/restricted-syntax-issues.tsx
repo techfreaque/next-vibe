@@ -109,7 +109,7 @@ const configWithParenthesizedJsx = {
 // ============================================================================
 
 function testWindow(): string {
-  return window.location.href; // Should error: use getCurrentUrl() from next-vibe/ui/web/utils/browser
+  return window.location.href; // Should error: use getCurrentUrl() from next-vibe/ui/utils/browser
 }
 
 // ============================================================================
@@ -117,7 +117,7 @@ function testWindow(): string {
 // ============================================================================
 
 function testLocalStorage(): string | null {
-  return localStorage.getItem("key"); // Should error: use storage from next-vibe/ui/web/lib/storage
+  return localStorage.getItem("key"); // Should error: use storage from next-vibe/ui/lib/storage
 }
 
 // ============================================================================
@@ -125,7 +125,7 @@ function testLocalStorage(): string | null {
 // ============================================================================
 
 function testSessionStorage(): string | null {
-  return sessionStorage.getItem("key"); // Should error: use storage from next-vibe/ui/web/lib/storage
+  return sessionStorage.getItem("key"); // Should error: use storage from next-vibe/ui/lib/storage
 }
 
 // ============================================================================
@@ -133,7 +133,7 @@ function testSessionStorage(): string | null {
 // ============================================================================
 
 function testDocument(): string {
-  return document.referrer; // Should error: use getReferrer() from next-vibe/ui/web/utils/browser
+  return document.referrer; // Should error: use getReferrer() from next-vibe/ui/utils/browser
 }
 
 // ============================================================================
@@ -141,7 +141,7 @@ function testDocument(): string {
 // ============================================================================
 
 function testNavigator(): string {
-  return navigator.userAgent; // Should error: use getUserAgent() from next-vibe/ui/web/utils/browser
+  return navigator.userAgent; // Should error: use getUserAgent() from next-vibe/ui/utils/browser
 }
 
 // ============================================================================

@@ -143,7 +143,7 @@ function shortPath(path: string): string {
   return path
     .replace(/^src\//, "")
     .replace("app/api/[locale]/", "")
-    .replace("packages/next-vibe/ui/web/", "nvui/");
+    .replace("packages/next-vibe/ui/", "nvui/");
 }
 
 // ── Web sub-components ──────────────────────────────────────

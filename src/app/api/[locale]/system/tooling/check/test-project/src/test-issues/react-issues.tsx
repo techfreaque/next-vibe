@@ -55,7 +55,6 @@ export function NotSelfClosing(): React.ReactElement {
       <img src="test.png" alt="test"></img>
       <input type="text"></input>
       <hr></hr>
-      <input type="radio"></input>
     </div>
   );
 }

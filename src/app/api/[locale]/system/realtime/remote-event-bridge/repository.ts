@@ -146,6 +146,10 @@ export class RemoteEventBridgeRepository {
     }
 
     if (connections.length === 0) {
+      logger.error("[RemoteEventBridge] pushRemoteEvent: no connections", {
+        userId,
+        eventName: envelope.eventName,
+      });
       return;
     }
 
@@ -168,17 +172,14 @@ export class RemoteEventBridgeRepository {
       }
 
       if (conn.transportMode === "reverse-ws") {
-        // Emit the bridge event onto the peer's own user channel. Without a
-        // known peer userId we can't target it — skip (a re-register backfills).
-        if (!conn.remoteUserId) {
-          logger.warn(
-            "[RemoteEventBridge] reverse-ws peer has no remoteUserId — skipped",
-            { instanceId: conn.instanceId },
-          );
-          continue;
-        }
+        // Emit the bridge event onto OUR account's user channel on OUR hub.
+        // The peer's connector authenticates HERE with this account's token —
+        // i.e. as OUR local userId — and WS channel auth only admits
+        // `user/{auth userId}`, so that is the exact channel it subscribes to.
+        // (Emitting on user/{remoteUserId} — the account's id on the PEER's
+        // DB — targeted a channel nobody on this hub can subscribe to.)
         await RemoteEventBridgeRepository.emitBridgeEventToPeer(
-          conn.remoteUserId,
+          userId,
           conn.tokenLeadId,
           wire,
           logger,
@@ -248,14 +249,14 @@ export class RemoteEventBridgeRepository {
    * normal __event__ envelope and dispatches it.
    */
   private static async emitBridgeEventToPeer(
-    remoteUserId: string,
+    localUserId: string,
     peerLeadId: string,
     wire: RemoteEventWirePayload,
     logger: EndpointLogger,
   ): Promise<void> {
     const { default: bridgeDefinition } = await import("./definition");
     const peerUser: JwtPrivatePayloadType = {
-      id: remoteUserId,
+      id: localUserId,
       leadId: peerLeadId,
       isPublic: false,
       roles: [],

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b3f898e931c3c-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 04:04:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783137891-ifI8uOshmerfD4o8nLsX"
+  },
+  "body": {
+    "id": "gen-1783137891-ifI8uOshmerfD4o8nLsX",
+    "object": "chat.completion",
+    "created": 1783137891,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A male speaker, possibly in his 30s or 40s, with a clear, calm voice and a noticeable European accent (possibly German or Austrian), reads a message at a slow, deliberate pace. He is speaking into a close-up microphone, producing a clear, dry sound with very little reverberation, suggesting an indoor recording environment free of background noise. The audio sounds like a short clip, perhaps 20-30 seconds long.\n\nThe speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be.\" The audio then cuts off abruptly. There's a slight throat clearing sound before the first word, and a distinct clicking sound, possibly from a physical mouth movement, after \"keyword\".",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 177,
+      "total_tokens": 999,
+      "cost": 0.0010391,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010391,
+        "upstream_inference_prompt_cost": 0.0005966,
+        "upstream_inference_completions_cost": 0.0004425
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -519,7 +519,7 @@ export async function fetchThreadTitle(
  * still goes through the endpoint; this only assembles the request payload a
  * real client would send.
  */
-async function fetchFavoriteConfigAndModel(
+export async function fetchFavoriteConfigAndModel(
   favoriteId: string,
   user: JwtPayloadType,
 ): Promise<{

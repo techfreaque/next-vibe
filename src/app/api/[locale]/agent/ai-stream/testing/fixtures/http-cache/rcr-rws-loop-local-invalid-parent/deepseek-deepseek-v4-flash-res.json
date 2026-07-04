@@ -1,0 +1,41 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a15bdbc72c4e18c9-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Sat, 04 Jul 2026 05:51:31 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783144290-yCBAvFHiyecT6vcPuFnn"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" user wants\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" user wants\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" me to\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" me to\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" say\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" say\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" exactly:\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" exactly:\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" \\\"IN\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" \\\"IN\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"VALID_PAR\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"VALID_PAR\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"ENT_TEST\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"ENT_TEST\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" STEP_OK\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" STEP_OK\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"\\\"\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"\\\"\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"INVALID\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_PARENT\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_TEST STEP\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1783144290-yCBAvFHiyecT6vcPuFnn\",\"object\":\"chat.completion.chunk\",\"created\":1783144290,\"model\":\"deepseek/deepseek-v4-flash-20260423\",\"provider\":\"Alibaba\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":11241,\"completion_tokens\":26,\"total_tokens\":11267,\"cost\":0.001513262,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.001513262,\"upstream_inference_prompt_cost\":0.001506294,\"upstream_inference_completions_cost\":0.000006968},\"completion_tokens_details\":{\"reasoning_tokens\":17,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

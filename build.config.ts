@@ -145,7 +145,7 @@ const config: BuildConfig = {
     // `output` = .dist-tanstack (Nitro outputs .dist-tanstack/server/index.mjs).
     {
       disabled: true,
-      input: "src/app-tanstack",
+      input: "src/generated/app-tanstack",
       output: ".dist-tanstack",
       type: ViteBuildTypeEnum.TANSTACK_START,
       viteOptions: {
@@ -154,7 +154,7 @@ const config: BuildConfig = {
         moduleAliases: {
           // server-only throws in Vite SSR (no Next.js boundaries) - stub it out
           "server-only":
-            "src/packages/next-vibe-ui/tanstack/lib/server-only.ts",
+            "src/app/api/[locale]/system/ui/tanstack/lib/server-only.ts",
         },
       },
     },

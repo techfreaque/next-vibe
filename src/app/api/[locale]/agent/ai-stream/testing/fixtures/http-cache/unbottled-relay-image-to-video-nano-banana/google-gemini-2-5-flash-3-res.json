@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a157569fdf58d39a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 16:41:35 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783096893-DwbUJUC5AlQ8Hi7Qu9O3"
+  },
+  "body": {
+    "id": "gen-1783096893-DwbUJUC5AlQ8Hi7Qu9O3",
+    "object": "chat.completion",
+    "created": 1783096893,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A male speaker with a clear, calm voice and no discernible accent begins speaking at a slow, deliberate pace. He sounds like a slightly older adult but this is an estimate. He has a formal and instructional tone throughout the message.\n\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana. And I need to fill up the last few seconds and it will be...\"\n\nDuring the last part of \"and it will be,\" the audio abruptly cuts off.\n\nThe recording environment is quiet with no background noise, suggesting a controlled setting or good microphone quality. The sound quality is excellent. The total duration of the audio is approximately 19 seconds.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 144,
+      "total_tokens": 966,
+      "cost": 0.0009566,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009566,
+        "upstream_inference_prompt_cost": 0.0005966,
+        "upstream_inference_completions_cost": 0.00036
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

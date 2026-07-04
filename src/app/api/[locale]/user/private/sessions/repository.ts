@@ -31,11 +31,7 @@ import type {
 import type { PrivateSessionsT } from "./i18n";
 
 export class SessionManagementRepository {
-  /**
-   * List all active sessions for the authenticated user.
-   * Never returns the token value itself.
-   */
-  static async list(
+  private static async list(
     user: JwtPrivatePayloadType,
     currentToken: string | undefined,
     logger: EndpointLogger,

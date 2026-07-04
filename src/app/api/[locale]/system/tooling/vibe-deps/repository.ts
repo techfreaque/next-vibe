@@ -473,7 +473,7 @@ function collectTestImportedKeys(graph: Graph): Set<string> {
  *   - seeds/*.ts            — sub-domain seed files, aggregated by seed runner
  */
 const CONVENTION_FILE_RE =
-  /(^|\/)(generator|sync-provider)\.tsx?$|(^|\/)system-prompt\/(prompt|server|client)\.tsx?$|(^|\/)seeds\/[^/]+\.tsx?$/;
+  /(^|\/)(generator|sync-provider)\.tsx?$|(^|\/)system-prompt\/(prompt|server|client)\.tsx?$|(^|\/)seeds(\/[^/]+)?\.tsx?$/;
 
 /** Platform-override suffixes the bundler swaps in for the base module. */
 const PLATFORM_VARIANT_RE = /\.(native|cli|web|ios|android)\.(tsx?)$/;
@@ -1681,7 +1681,8 @@ function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
       key.startsWith(scopePrefix) ||
       isSelf(key) ||
       isGeneratedImporter(key) ||
-      isUiPageImporter(key)
+      isUiPageImporter(key) ||
+      isCategoryImporter(key)
     ) {
       continue;
     }

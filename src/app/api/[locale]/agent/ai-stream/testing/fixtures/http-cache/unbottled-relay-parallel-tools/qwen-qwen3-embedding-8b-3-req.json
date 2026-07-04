@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:execute-tool] {\"input\":{\"name\":\"Test User\",\"message\":\"Automated integration test. Please ignore.\",\"subject\":\"subject.generalInquiry\"},\"toolName\":\"contact-form\",\"callbackMode\":\"approve\"}\n\nTool: [result:execute-tool] {\"_hint\":\"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\",\"result\":{\"success\":\"Thank you for contacting us! We've received your message and will get back to you soon.\"}}\n\nAssistant: Contact form submitted successfully with arguments `name='Test User'`, `subject='subject.generalInquiry'`, `message='Automated integration test. Please ignore.'`. The tool requested confirmation (approve mode), which was granted, and returned the success message.\n\n**STEP_OK**\n\nUser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) the tool-help tool with query='image' to look up tools matching 'image' (this returns a tools array, NOT categories), and (2) the generate_image tool with prompt='green square'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. tool-help WITH a query returns a tools array; an empty array only means no match, not a failure. Check that tool-help returned a tools array (any length) and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.\n\nAssistant: [tool:tool-help] {\"toolName\":\"generate_image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_image\",\"description\":\"Generate an image from a text prompt using AI\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"prompt\":{\"type\":\"string\",\"minLength\":1,\"maxLength\":2000,\"description\":\"Describe the image\n\nAssistant: Now calling both in parallel [tool:tool-help] {\"query\":\"image\"} [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"green square\"},\"callbackMode\":\"wait\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"agent-view-image\",\"title\":\"View Image\",\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"obj [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7aac13e7-20d2-475c-b36d-cd7500c194fc/b7b8e6ab-f75a-4270-875d-fd1a9d43735a.png\",\"creditCost\":3}}",
+    "encoding_format": "float"
+  }
+}

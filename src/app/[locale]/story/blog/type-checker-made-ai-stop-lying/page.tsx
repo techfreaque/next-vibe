@@ -400,12 +400,12 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
               {[
                 {
                   from: "<button>",
-                  to: '<Button> from "next-vibe/ui/web/ui/button"',
+                  to: '<Button> from "next-vibe/ui/ui/button"',
                 },
-                { from: "<a>", to: '<Link> from "next-vibe/ui/web/ui/link"' },
+                { from: "<a>", to: '<Link> from "next-vibe/ui/ui/link"' },
                 {
                   from: "<p>",
-                  to: '<P> from "next-vibe/ui/web/ui/typography"',
+                  to: '<P> from "next-vibe/ui/ui/typography"',
                 },
               ].map(({ from, to }) => (
                 <Div

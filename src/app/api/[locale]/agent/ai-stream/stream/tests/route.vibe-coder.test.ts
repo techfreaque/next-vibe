@@ -182,7 +182,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
     const { result, messages } = await runTestStream({
       user: testUser,
-      prompt: `[VC1 vibe-coder-delegation] You need to do a small coding task: find out what the current NODE_ENV is on this system. Delegate this task using the correct tool for coding work. End with STEP_OK once the result is back, or FAILED: <reason> if you didn't use the correct delegation tool or something went wrong.`,
+      prompt: `[VC1 vibe-coder-delegation] You need to do a small coding task: find out the name of the current working directory on this system. Delegate this task using the correct tool for coding work. End with STEP_OK once the result is back, or FAILED: <reason> if you didn't use the correct delegation tool or something went wrong.`,
       favoriteId: VIBE_CODER_FAVORITE_ID,
       rootFolderId: DefaultFolderId.BACKGROUND,
       subFolderId: vibeCoderFolderId,
