@@ -1,0 +1,32 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a13c3a76cf2cdcd1-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 09:43:45 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782812624-v6iMcxKPjQsiQ8A13SBO"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The result contains:\\n- `imageUrl`: \\\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/3489f5aa\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The result contains:\\n- `imageUrl`: \\\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/3489f5aa\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"-addd-40ea-9114-4b6a9f9f9abb.png\\\" — non-empty string ✓\\n- `creditCost`: 4.1 — positive number ✓\\n\\nEverything looks correct.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"-addd-40ea-9114-4b6a9f9f9abb.png\\\" — non-empty string ✓\\n- `creditCost`: 4.1 — positive number ✓\\n\\nEverything looks correct.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Result contained\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" a non-empty `imageUrl` and a positive `creditCost` (4.1). STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782812624-v6iMcxKPjQsiQ8A13SBO\",\"object\":\"chat.completion.chunk\",\"created\":1782812624,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":12142,\"completion_tokens\":126,\"total_tokens\":12268,\"cost\":0.00249906,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":11520,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00249906,\"upstream_inference_prompt_cost\":0.0020694,\"upstream_inference_completions_cost\":0.00042966},\"completion_tokens_details\":{\"reasoning_tokens\":101,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

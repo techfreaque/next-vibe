@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13ccdaf6c5e74e3-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:24:18 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782818655-NiPrtxyoqamTN002meq2"
+  },
+  "body": {
+    "id": "gen-1782818655-NiPrtxyoqamTN002meq2",
+    "object": "chat.completion",
+    "created": 1782818655,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip of a relaxed, groovy instrumental hip-hop song with an estimated duration of about 25 seconds.\nThe sound quality is clean and polished, suggesting a studio recording environment.\n\nThe song features the following instruments:\n- An upright piano playing a laid-back, bluesy melody with a hint of jazz. The piano sets the main melodic theme.\n- A tight, unobtrusive drum kit providing a steady, gentle rhythm section. The drum beat is not overly complex, focusing on a consistent groove.\n- A clean, plucky upright bass that grooves along with the drums, adding depth and rhythm without being overly dominant.\n- A light, airy string section, likely violins, adding a subtle, ethereal layer of harmony. Their presence is soft and atmospheric, enhancing the overall relaxed mood.\n\nThe song is in a major key, possibly C major, and has a tempo of around 85-90 BPM. The time signature is 4/4.\nThe mood is mellow, calming, and reflective, suitable for background music or a chill-out session. There are no vocals or prominent sound effects, allowing the instrumental interplay to shine.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 242,
+      "total_tokens": 1314,
+      "cost": 0.0014516,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014516,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000605
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

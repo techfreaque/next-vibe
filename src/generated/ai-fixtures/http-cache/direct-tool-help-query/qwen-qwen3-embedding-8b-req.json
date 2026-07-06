@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The second call returned 12 tools in the \"desktop\" category, and every single tool has:\n- `name` — e.g. \"desktop-accessibility\", \"desktop-click\", etc.\n- `description` — e.g. \"Get the accessibility tree of the focused window or a specific application\", etc.\n\nThis looks correct. Both calls worked as expected. Let me end with STEP_OK.</think>Everything checks out:\n\n- **First call** (empty input) → returned 22 categories with names, counts, and subcategories. Correct.\n- **Second call** (category: \"desktop\") → returned 12 tools in a non-empty `tools` array. Every tool has both a `name` and a `description`.\n\nAll 12 desktop tool names are clean and descriptions are human-readable — no raw IDs, no internal blobs, no JSON leakage.\n\n**STEP_OK**\n\nUser: [T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with category='ai' on instanceId='hermes' and verify the results.</think>\n\nAssistant: <think>Let me verify the results:\n\n1. The result contains a `tools` array — yes, it does.\n2. It's non-empty — 69 tools returned. ✓\n3. Each tool has a `name` — yes, every entry has a `name` field. ✓\n4. Each tool has a `description` — yes, every entry has a `description` field. ✓\n\nEverything looks good. STEP_OK.</think>All checks pass:\n\n- **tools array**: Non-empty (69 tools) ✓\n- **Every tool has a `name`** field ✓\n- **Every tool has a `description`** field ✓\n\nThe `ai` category covers a broad range: thread management, message CRUD, skill creation/moderation, favorites, search, image/video/music generation, coding agents, web search, and the `ai-run` delegate tool. Clean names, readable descriptions, no garbage.\n\n**STEP_OK**\n\nUser: [T1a-query tool-help-query] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'query':'search'} to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

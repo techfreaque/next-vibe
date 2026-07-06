@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/reply-with-exactly--rcr-ok--nothing----b6291d14-0b89-4237-8f03-a5e19a4c133d.md\n\n# Reply with EXACTLY: RCR_OK. Nothing...\nFolder: cron\nPreview: <think>The user wants me to reply with exactly \"RCR_OK\" and nothing else.</think>RCR_OK",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: <think> The user attached a video file. The system message already contains a detailed description of the video content (from a vision model gap-fill). I can see:\n\n- It's a ~4-second close-up of hands holding a Rubik's cube\n- The cube is unsolved with mixed colors\n- Background is filled with blurred Rubik's cubes\n- A single twist of the top layer is performed\n- There's a mechanical \"click-clack\" sound\n- Professional, well-lit studio setting\n\nThe system provided the description automatically, which counts as the video being processed. I should acknowledge what I see and end with STEP_OK.</think> The video shows a **close-up of hands holding an unsolved Rubik's cube** in a well-lit studio setting. The background is filled with dozens of blurred Rubik's cubes creating a colorful bokeh effect.\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think> The user wants me to repeat back the exact words from the audio and check if the word \"banana\" is present. From the provided transcription/metadata, the speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be.\"\n\nThe word \"banana\" is definitely present. I should output the transcription and end with STEP_OK.</think> Here is the exact transcription from the audio:\n\n> \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be.\"\n\nThe word **\"banana\"** is present.\n\nSTEP_OK\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think>The user wants me to say exactly: \"INVALID_PARENT_TEST STEP_OK\"\n\nThis appears to be an integration test message. I should respond with exactly that text.</think>INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

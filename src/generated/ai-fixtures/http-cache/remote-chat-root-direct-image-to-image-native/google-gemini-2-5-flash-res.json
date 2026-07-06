@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1683c3b7975d22f-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 17:54:32 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783274071-uhb2agCSQB35IxIqgjTr"
+  },
+  "body": {
+    "id": "gen-1783274071-uhb2agCSQB35IxIqgjTr",
+    "object": "chat.completion",
+    "created": 1783274071,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio segment is a 17-second clip of a song.\n\n**Music:**\n*   **Genre:** Funk/Soul with a clear Disco influence.\n*   **Tempo:** Approximately 110-120 BPM, suggesting a moderate, danceable pace.\n*   **Instruments:**\n    *   **Electric Guitar:** Plays a clean, rhythmic, funk-style riff characterized by short, staccato chords and some arpeggiated figures. It's prominent throughout the clip.\n    *   **Electric Bass:** Lays down a groovy, walking bassline that provides a strong rhythmic and harmonic foundation.\n    *   **Drums:** Feature a crisp, driving beat with a prominent snare on the backbeats and hi-hat patterns that emphasize the syncopated rhythm. There's a noticeable snare roll/fill around the 11-second mark, suggesting a potential transition or build-up.\n    *   **Synthesizer/Keyboard:** A synth or electric piano plays clean, sustained chords, adding to the harmonic richness and giving it a classic 70s/80s feel.\n*   **Production Style:** Polished and clean, similar to studio recordings of the era. There's likely some reverb, but it's not overly wet, maintaining clarity.\n*   **Mood:** Upbeat, funky, and danceable. It evokes a feeling of retro fun and good vibes.\n*   **Structure:** The clip seems to be a continuous groove, possibly from a verse or pre-chorus section, without a clear intro, chorus, or bridge within its short duration.\n\n**Sound Quality:** Good quality, seemingly from a well-produced recording.\n**Duration Impression:** A short clip, likely an excerpt from a longer song.\n**Non-musical Audio Events:** None. The audio is purely musical.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 390,
+      "total_tokens": 1462,
+      "cost": 0.0018216,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018216,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

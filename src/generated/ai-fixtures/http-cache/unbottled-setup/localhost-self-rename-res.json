@@ -1,0 +1,18 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-US/remote-connection/self/rename",
+  "status": 200,
+  "headers": {
+    "content-length": "40",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 11:36:59 GMT, Thu, 02 Jul 2026 11:36:59 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "csrf_token_3002=b9b1c080034140d188883ee66931b774; Path=/; Max-Age=86400; SameSite=strict"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "updated": true
+    }
+  }
+}

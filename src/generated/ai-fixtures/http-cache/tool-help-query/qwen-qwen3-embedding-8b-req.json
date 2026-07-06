@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The second call returned a non-empty tools array with 12 tools. Each tool has:\n- name\n- description\n- title\n\nThis looks correct. Both calls succeeded:\n1. First call: returned categories list with names and counts\n2. Second call: returned non-empty tools array with name and description for each tool\n\nSo the answer should end with STEP_OK.</think>First call (no args): returned **22 categories**, each with `name` and `count`. Some also include `subCategories`. Total tool count: **530**.\n\nSecond call (`category=\"cortex\"`): returned **12 tools** in a non-empty `tools` array. Every entry has:\n- `name` — e.g. `cortex-delete`\n- `description` — e.g. `\"Remove a file or folder. Gone forever.\"`\n- `title` — e.g. `\"Delete\"`\n\nBoth responses look exactly as expected.\n\nSTEP_OK\n\nUser: [T1a-cat tool-help-category] Call the tool-help tool with category='ai' to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with category='ai' and check that the result contains a non-empty tools array with each tool having a name and description.</think>\n\nAssistant: <think>The result contains a non-empty tools array with 69 tools. Each tool has a name and description (and some have aliases, title, credits). Everything looks right.\n\nSTEP_OK</think>The result returned **69 tools** in a non-empty `tools` array. Every tool entry includes a `name` and a `description`, and many also have `title` and optional `aliases` / `credits`. Everything looks correct.\n\nSTEP_OK\n\nUser: [T1a-query tool-help-query] Call the tool-help tool with query='search' to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

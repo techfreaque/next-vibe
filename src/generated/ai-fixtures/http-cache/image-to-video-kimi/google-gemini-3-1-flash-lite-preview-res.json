@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13cd7d3fb421cc5-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:31:18 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782819070-Eo95eDliRqD9lcWDZFL2"
+  },
+  "body": {
+    "id": "gen-1782819070-Eo95eDliRqD9lcWDZFL2",
+    "object": "chat.completion",
+    "created": 1782819070,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The video is a high-definition, professional-quality close-up shot of an individual’s hands manipulating a Rubik’s Cube. \n\n**Visual Content and Setting:**\nThe setting is a table surface densely covered with a large collection of Rubik’s Cubes, all appearing to be scrambled and creating a chaotic, cluttered, but organized aesthetic. The lighting is focused and warm, highlighting the plastic texture of the cubes. \n\nAt the center of the frame, a person’s hands are holding a primary Rubik’s Cube. The hands are medium-toned with visible skin texture. The cube being held has a black internal plastic frame. On the top center white square of the cube, there is a small black icon printed—a stylized silhouette of a person’s head profile inside a circle. The person rotates the cube’s top layer with their fingers, then rotates the front face counter-clockwise, demonstrating a quick, fluid turning motion. The background is a sea of similar cubes, some of which are slightly blurred due to the shallow depth of field. \n\n**Camera Work:**\nThe shot is a static, tight close-up focused entirely on the hands and the cube. There are no pans, zooms, or cuts; the framing remains steady throughout the duration of the clip.\n\n**Audio:**\nThere is no dialogue. The audio primarily consists of the sharp, crisp, mechanical \"click-clack\" plastic sounds of the cube being manipulated, which are emphasized and high-fidelity, suggesting a professional studio recording environment. There is no background music.\n\n**Style, Production, and Mood:**\nThe production is professional, likely an excerpt from a tutorial video, product showcase, or a puzzle-solving documentary. The visual style is realistic and sharp. The mood is focused and clinical, emphasizing precision. \n\n**Duration and Pacing:**\nThe video is approximately 3-4 seconds long. The pacing is deliberate and slow-to-moderate, designed to highlight the tactile interaction with the object. The focus remains on the dexterity of the user's hands and the mechanical movement of the puzzle.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "AY89a18hh1FnGA18qhQoCKsdWPMPhL4Pw2yrzhKtL6lnslgpBeU9OdUUPS60KBaHk0c=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 435,
+      "total_tokens": 843,
+      "cost": 0.0007545,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0007545,
+        "upstream_inference_prompt_cost": 0.000102,
+        "upstream_inference_completions_cost": 0.0006525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

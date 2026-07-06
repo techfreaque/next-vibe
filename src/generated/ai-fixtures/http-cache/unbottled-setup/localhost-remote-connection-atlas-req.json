@@ -1,0 +1,8 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/user/remote-connection/atlas",
+  "method": "DELETE",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": ""
+}

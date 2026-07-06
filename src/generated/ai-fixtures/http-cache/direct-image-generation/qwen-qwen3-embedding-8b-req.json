@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>All checks pass:\n\n1. The tools array is non-empty (12 tools matched the query \"search\") ✓\n2. Every tool has a `name` field ✓\n3. Every tool has a `description` field ✓\n\nThe results span multiple categories (account, ai, cortex, leads, pos) and include web search tools, thread/message search, file search, and more. All look properly described.</think>All checks pass:\n\n- **tools array**: Non-empty (12 tools matched) ✓\n- **Every tool has a `name`** ✓\n- **Every tool has a `description`** ✓\n\nThe query caught a nice spread: web search (brave, kagi, web-search), thread/message search, file search (`cortex-search`), model browsing (`models`), user search, product lookup, and even `tool-help` itself. All properly named and described.\n\n**STEP_OK**\n\nUser: [T1b tool-help-detail] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'toolName':'generate_image'}. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with toolName='generate_image' and check for name, description, and parameters schema.</think>\n\nAssistant: <think>Let me check the three requirements:\n\n1. **name** - yes, `\"generate_image\"` ✓\n2. **description** - yes, `\"Generate an image from a text prompt using AI\"` ✓\n3. **parameters schema** - yes, there's a `parameters` object with `$schema`, `properties`, `required`, `type` ✓\n\nAll three are present.</think>All three checks pass:\n\n- **name**: `generate_image` ✓\n- **description**: `\"Generate an image from a text prompt using AI\"` ✓\n- **parameters**: Full JSON schema with `$schema`, `properties` (prompt, model, size, quality, aspectRatio, inputMediaUrl), `required` (prompt), and `type` ✓\n\nAlso includes useful extras like `examples` with sample inputs/outputs and a hint on how to call it. Clean, structured, complete.\n\n**STEP_OK**\n\nUser: [T2 image-gen] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'red circle'}. You MUST actually invoke the tool in THIS turn — never answer from memory or fabricate a result. Check that the tool's result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

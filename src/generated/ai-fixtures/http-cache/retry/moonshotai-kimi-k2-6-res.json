@@ -1,0 +1,33 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a114a8e58be7bbf1-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Thu, 25 Jun 2026 14:28:40 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782397717-OrHNSZpocRL2zpUTrLeb"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782397717-OrHNSZpocRL2zpUTrLeb\",\"object\":\"chat.completion.chunk\",\"created\":1782397717,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to say exactly: \\\"RETRY_RESPONSE STEP_OK\\\"\\n\\nThis is a retry-branch test. I should output exactly that string.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to say exactly: \\\"RETRY_RESPONSE STEP_OK\\\"\\n\\nThis is a retry-branch test. I should output exactly that string.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397717-OrHNSZpocRL2zpUTrLeb\",\"object\":\"chat.completion.chunk\",\"created\":1782397717,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"RETRY_RESPONSE STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397717-OrHNSZpocRL2zpUTrLeb\",\"object\":\"chat.completion.chunk\",\"created\":1782397717,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782397717-OrHNSZpocRL2zpUTrLeb\",\"object\":\"chat.completion.chunk\",\"created\":1782397717,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":11778,\"completion_tokens\":36,\"total_tokens\":11814,\"cost\":0.00327288,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":8960,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00327288,\"upstream_inference_prompt_cost\":0.00315012,\"upstream_inference_completions_cost\":0.00012276},\"completion_tokens_details\":{\"reasoning_tokens\":29,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

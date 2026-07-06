@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The result contains a non-empty tools array with 69 tools. Each tool has a name and description (and some have aliases, title, credits). Everything looks right.\n\nSTEP_OK</think>The result returned **69 tools** in a non-empty `tools` array. Every tool entry includes a `name` and a `description`, and many also have `title` and optional `aliases` / `credits`. Everything looks correct.\n\nSTEP_OK\n\nUser: [T1a-query tool-help-query] Call the tool-help tool with query='generate_image' to search for image-generation tools. The match set is small, so each tool should come back with its full parameters schema. Check that the tools array is non-empty and that at least one tool carries a parameters schema. End your reply with STEP_OK if the search returned tools with parameter schemas, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with query='generate_image' and check that the tools array is non-empty and at least one tool carries a parameters schema.</think>\n\nAssistant: <think>The result returned a non-empty tools array with 1 tool (generate_image). It includes a full parameters schema with properties, types, descriptions, enums, and required fields. Everything looks correct.\n\nI should end with STEP_OK.</think>The search returned **1 tool** (`generate_image`) with a complete `parameters` schema — properties, types, descriptions, enums, and required fields are all present. Everything looks correct.\n\nSTEP_OK\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

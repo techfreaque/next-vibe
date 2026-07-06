@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>Let me check the three requirements:\n\n1. **name** - yes, `\"generate_image\"` ✓\n2. **description** - yes, `\"Generate an image from a text prompt using AI\"` ✓\n3. **parameters schema** - yes, there's a `parameters` object with `$schema`, `properties`, `required`, `type` ✓\n\nAll three are present.</think>All three checks pass:\n\n- **name**: `generate_image` ✓\n- **description**: `\"Generate an image from a text prompt using AI\"` ✓\n- **parameters**: Full JSON schema with `$schema`, `properties` (prompt, model, size, quality, aspectRatio, inputMediaUrl), `required` (prompt), and `type` ✓\n\nAlso includes useful extras like `examples` with sample inputs/outputs and a hint on how to call it. Clean, structured, complete.\n\n**STEP_OK**\n\nUser: [T2 image-gen] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'red circle'}. You MUST actually invoke the tool in THIS turn — never answer from memory or fabricate a result. Check that the tool's result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to actually call the generate_image tool with prompt \"red circle\". Let me do that now.</think>\n\nAssistant: <think>Both fields are present and valid:\n\n1. `imageUrl`: `\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/3a743b34-8853-4e9d-8956-58639531f9ec/8b20adfb-1027-40c1-b64b-b1b75f21c2fd.png\"` — non-empty string ✓\n2. `creditCost`: `2.8` — positive number ✓</think>Both checks pass:\n\n- **imageUrl**: Non-empty string (`http://localhost:3002/.../8b20adfb-....png`) ✓\n- **creditCost**: `2.8` — positive number ✓\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

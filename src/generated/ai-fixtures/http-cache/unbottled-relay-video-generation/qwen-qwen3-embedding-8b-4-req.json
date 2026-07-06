@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----2b450e58-6215-488a-8cc8-dc9a4396890a.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>Let me check the result: 1. audioUrl: \"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/0a798dbc-7…",
+    "encoding_format": "float"
+  }
+}

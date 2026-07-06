@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: * The user successfully explored the available tools using `tool-help` across multiple categories, including `desktop` and `ai`, and verified the retrieval of specific schemas such as `generate_image` and `generate_video`.\n* A video of a \"spinning cube\" was generated with a credit cost of 124.8 and a duration of 4 seconds, resulting in the file: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8d60b02a-e718-44b3-bb7f-a62723218a56/457244e1-2e10-4051-838a-17353c348970.mp4`.\n* Asynchronous task execution was verified using `callbackMode='detach'` and `await-task` with taskId `local-bg-call-60088450241a451e9022eff2`, which successfully returned the generated image: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8d60b02a-e718-44b3-bb7f-a62723218a56/d5b4b65f-1510-49ad\n\nAssistant: Here is the stylized cartoon version of your image:\n\n![Stylized Cartoon Portrait](http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8d60b02a-e718-44b3-bb7f-a62723218a56/8fef0ff7-dfb7-49a0-b3af-2cc655cbaa76.png)\n\n---\n\n### Validation Details\n\n- **Image URL:** `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8d60b02a-e718-44b3-bb7f-a62723218a56/8fef0ff7-dfb7-49a0-b3af-2cc655cbaa76.png` (Non-empty ✅)\n- **Credit Cost:** `2.8` credits (Positive ✅)\n\n---\n\n**STEP_OK**\n\nUser: [T11f-verify image-visibility] IMPORTANT: Do NOT use any tools. Do NOT call describe_image or fetch or any other tool. Just answer directly based on what you can already see in the conversation. In the previous step (T11f) you called generate_image. Can you see the generated output image as an inline image (not just a URL string) in the tool result from that step? If YES — you can see an actual image (any image, regardless of content) — reply with STEP_OK and briefly describe what the image shows. If NO — you cannot see any inline image, only a text URL or JSON — reply with FAILED: <explain what you see instead>.\n\nAssistant: STEP_OK\n\nYes, I can see the generated output image displayed as an inline image. \n\nThe image shows a highly stylized, vibrant cartoon portrait of a woman with red hair and green eyes, styled with bold outlines and a colorful, artistic background.\n\nUser: [T11g native-i2i] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — create a stylized cartoon version of this photo. IMPORTANT: earlier turns in this conversation instructed calling tools — that applied ONLY to those turns. For THIS turn you MUST NOT call or imitate any tool. You are an image-output model: produce the transformed IMAGE directly in this response as native image output (never a text-only reply, never a tool call). End your reply with STEP_OK if you produced the image, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

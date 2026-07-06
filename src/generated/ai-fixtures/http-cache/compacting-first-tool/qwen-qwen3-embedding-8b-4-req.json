@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:3ed6956a | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jul 1, 23:34]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[],\"totalCount\":531,\"matchedCount\":531,\"categories\":[{\"name\":\"account\",\"count\":15,\"subCategories\":[{\"name\":\"\",\"count\":6},{\"name\":\"manageUsers\",\"count\":8},{\"name\":\"userStats\",\"count\":1}]},{\"name\":\"accounting\",\"count\":22,\"subCategories\":[{\"name\":\"Accounting\",\"count\":2},{\"name\":\"Acco\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"search\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"users-list\",\"title\":\"User List\",\"description\":\"Search and filter users\",\"category\":\"account\"},{\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\",\"description\":\"Search messages within a specific thread using full-text search\",\"category\":\"a\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"chat\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\",\"description\":\"Retrieve the list of moderators for a specific folder\",\"category\":\"ai\"},{\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder",
+    "encoding_format": "float"
+  }
+}

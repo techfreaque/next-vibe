@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----8900746f-9157-4ba3-a0c5-b1d6b0eb9d14.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: <think>Now let me check the fields: 1. videoUrl - non-empty ✅ - \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/…",
+    "encoding_format": "float"
+  }
+}

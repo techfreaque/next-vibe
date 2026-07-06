@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/private/-t1-thread-create-tool-call--explore-the-tool----8d2f79f4-3504-47c1-89a5-e2514eba06b3.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: private\nPreview: <think>The contact form was submitted successfully. The tool required user confirmation (approve), and the user confirme…",
+    "encoding_format": "float"
+  }
+}

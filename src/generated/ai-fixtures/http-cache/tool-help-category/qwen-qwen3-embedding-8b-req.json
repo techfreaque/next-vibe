@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1 thread-create+tool-call] Explore the tool catalog gradually with the tool-help tool. First call it with no arguments — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call the tool-help tool again with category='<that category name>' to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the categories list and the narrowed tools list both looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to explore the tool catalog gradually using the tool-help tool. First, I need to call it with no arguments to get a categories list. Then pick one category and call tool-help again with that category to get the tools in it. Finally, check that the second call returns a non-empty tools array with name and description for each tool.\n\nLet me start by calling tool-help with no arguments.</think>\n\nAssistant: <think>The first call returned a categories list with 22 categories, each having a name and count. Some also have subCategories. This looks good. Now I need to pick one category and call tool-help again with category='<that category name>'.\n\nI'll pick the \"cortex\" category since it's relevant to the context and has 12 tools. Let me call tool-help with category=\"cortex\".</think>\n\nAssistant: <think>The second call returned a non-empty tools array with 12 tools. Each tool has:\n- name\n- description\n- title\n\nThis looks correct. Both calls succeeded:\n1. First call: returned categories list with names and counts\n2. Second call: returned non-empty tools array with name and description for each tool\n\nSo the answer should end with STEP_OK.</think>First call (no args): returned **22 categories**, each with `name` and `count`. Some also include `subCategories`. Total tool count: **530**.\n\nSecond call (`category=\"cortex\"`): returned **12 tools** in a non-empty `tools` array. Every entry has:\n- `name` — e.g. `cortex-delete`\n- `description` — e.g. `\"Remove a file or folder. Gone forever.\"`\n- `title` — e.g. `\"Delete\"`\n\nBoth responses look exactly as expected.\n\nSTEP_OK\n\nUser: [T1a-cat tool-help-category] Call the tool-help tool with category='ai' to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

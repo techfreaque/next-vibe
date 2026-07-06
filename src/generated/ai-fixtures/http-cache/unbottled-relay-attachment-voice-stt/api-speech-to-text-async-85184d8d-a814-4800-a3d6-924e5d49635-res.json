@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async/85184d8d-a814-4800-a3d6-924e5d49635e",
+  "status": 200,
+  "headers": {
+    "allow": "GET, OPTIONS",
+    "connection": "keep-alive",
+    "content-length": "313",
+    "content-type": "application/json",
+    "cross-origin-opener-policy": "same-origin",
+    "date": "Sun, 05 Jul 2026 16:35:44 GMT",
+    "referrer-policy": "same-origin",
+    "server": "granian",
+    "vary": "Accept, origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "body": {
+    "public_id": "85184d8d-a814-4800-a3d6-924e5d49635e",
+    "status": "finished",
+    "error": null,
+    "results": {
+      "openai": {
+        "id": "a72617dc-4cbe-4ad9-90b7-6f12e27b1fc7",
+        "model": null,
+        "error": null,
+        "final_status": "succeeded",
+        "cost": 0.0030024,
+        "text": "Bye for now.",
+        "diarization": {
+          "entries": [],
+          "error_message": null,
+          "total_speakers": 0
+        }
+      }
+    }
+  }
+}

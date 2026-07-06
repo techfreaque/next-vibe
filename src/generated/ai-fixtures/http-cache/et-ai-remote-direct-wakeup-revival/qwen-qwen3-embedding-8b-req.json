@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user wants me to call `execute-tool` with specific parameters:\n- toolName='tool-help'\n- instanceId='hermes'\n- callbackMode='wakeUp'\n- input={}\n\nThen I need to reply with PHASE1_OK taskId=<value>.\n\nWhen revived (Phase 2), I need to check if the result includes tool information (non-empty tools array), and end with WAKEUP_OK or WAKEUP_FAILED.\n\nLet me make the call.</think>\n\nAssistant: <think> The user asked me to call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='wakeUp', input={}.\n\nBut I see from the tool catalog that `tool-help` is a local tool available to me directly. The user wants me to call it on the `hermes` instance with `callbackMode='wakeUp'`.\n\nLet me call it as requested.</think>\n\nAssistant: <think> The user wants me to call execute-tool with specific parameters, get a taskId in Phase 1, reply PHASE1_OK with the taskId, then in Phase 2 when I'm revived, check if the result includes tool information and reply WAKEUP_OK or WAKEUP_FAILED.\n\nI've already made the call with callbackMode='wakeUp'. The result shows:\n- hint: \"Dispatched — taskId returned. The result will be injected automatically when ready and will wake up this thread. Do NOT call this tool again and do NOT call await-task. Acknowledge the taskId to the user in one short sentence, then STOP this turn.\"\n- taskId: \"remote-ws-hermes-functions-execute-tool-1\"\n\nThis is Phase 1. I need to reply with PHASE1_OK taskId=<value> and stop.</think> PHASE1_OK taskId=remote-ws-hermes-functions-execute-tool-1\n\nUser:",
+    "encoding_format": "float"
+  }
+}

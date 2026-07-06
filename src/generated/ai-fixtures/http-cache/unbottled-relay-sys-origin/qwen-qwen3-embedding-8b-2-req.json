@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Tool: [result:execute-tool] {\"result\":{\"hint\":\"26 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"tools\":[{\"name\":\"browser-click\",\"title\":\"Click Element\",\"description\":\"Click an element by its UID from a snapshot. Get a snapshot first with take-sn\n\nAssistant: Both calls succeeded. Let me verify:\n\n**Call 1 — no arguments:**\n- Returned **22 categories** (account, accounting, ai, analytics, browser, companies, etc.)\n- Each category has `name` and `count` — all present ✓\n- Hint says \"528 tools across 22 categories\" ✓\n\n**Call 2 — `category='browser'`:**\n- Returned **26 tools** in a non-empty `tools` array ✓\n- Every tool has a `name` (e.g., `browser-click`, `browser-fill`, `browser-screenshot`) ✓\n- Every tool has a `description` (e.g., \"Click an element by its UID from a snapshot...\") ✓\n\n**Result:** All checks passed.\n\nSTEP_OK\n\nSystem: [Context: ID:5109fc64 | Posted:Jul 5, 15:07]\n\nUser: [T-SYS] Call the self-instance-id tool to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test [80%]\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- Ho\n\nSystem: [Context: ID:d2c90e12 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:07]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"self-instance-id\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"self-instance-id\",\"title\":\"This Instance's ID\",\"description\":\"Read the identifier of your own instance on this machine\",\"category\":\"devTools\",\"aliases\":[\"my-instance-id\"],\"examples\":{\"responses\":{\"default\":{\"instanceId\":\"atlas\"}}}}],\"totalCount\":528,\"matchedCount\":1,\"hin",
+    "encoding_format": "float"
+  }
+}

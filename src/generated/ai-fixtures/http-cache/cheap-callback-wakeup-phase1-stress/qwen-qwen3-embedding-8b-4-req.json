@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----51812a4f-db8d-4725-9a66-56905667420c.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The user sent T6c wakeUp-repeat. I already called generate_image with callbackMode='wakeUp' and got a taskId (de…",
+    "encoding_format": "float"
+  }
+}

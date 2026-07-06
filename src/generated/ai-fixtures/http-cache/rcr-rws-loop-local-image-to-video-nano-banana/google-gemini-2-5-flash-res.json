@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b9636a836d282-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 05:04:03 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783141441-yMSn9JOrV3LtKr007w0L"
+  },
+  "body": {
+    "id": "gen-1783141441-yMSn9JOrV3LtKr007w0L",
+    "object": "chat.completion",
+    "created": 1783141441,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio features a short, playful, and funky instrumental track, approximately 20 seconds in duration. The key seems to be in a major scale, likely G or C major (though not definitively discernible). The tempo is moderately fast, estimated around 120-130 BPM, with a 4/4 time signature.\n\nThe primary instruments are a clean electric guitar, which plays a funky, rhythm-and-lead style, and a drum machine.\n\n**Instrumentation and Interaction:**\n\n*   **Electric Guitar:** A single electric guitar is prominent throughout the track. It plays a syncopated, staccato riff that establishes the funky feel. The notes are clean and bright, with a hint of a wah pedal or an auto-wah effect adding a percussive, vowel-like quality to the sound. The guitar doubles as both a rhythmic element and a melodic fill instrument, interjecting short, catchy licks between the main rhythmic phrases. The picking is precise, contributing to the tight groove.\n*   **Drum Machine:** The drum machine provides a straightforward, driving beat. It consists of a kick drum on the downbeats, a snare drum on beats two and four, and a closed hi-hat playing eighth notes, creating a steady pulse. The drum sounds are crisp and uncolored by significant reverb, typical of a clean drum machine or sampled drums.\n\n**Song Structure and Production:**\n\nThe track appears to be a single, looping section, possibly a sample or a short musical idea. There's no discernible verse-chorus structure. The sound quality is clean and well-produced, suggesting a studio recording or high-quality digital production. There is no perceptible reverb, giving the track a dry and immediate feel.\n\n**Mood and Emotional Arc:**\n\nThe mood is lighthearted, energetic, and groovy. The chosen instrumentation and playing style evoke a sense of fun and playfulness, typical of classic funk and disco but with a modern, clean production.\n\n**Absence of Speech and Other Sounds:**\n\nThere is no speech, vocals, or any other non-musical audio events present in the clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 437,
+      "total_tokens": 1509,
+      "cost": 0.0019391,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019391,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0010925
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

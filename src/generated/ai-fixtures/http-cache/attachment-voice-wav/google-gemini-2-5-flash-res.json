@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13ccdaeabe53745-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:24:16 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782818654-mMSY4jq1HUDmnHTHpnmW"
+  },
+  "body": {
+    "id": "gen-1782818654-mMSY4jq1HUDmnHTHpnmW",
+    "object": "chat.completion",
+    "created": 1782818654,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second instrumental music clip with a bouncy, upbeat feel, reminiscent of elevator music or a light-hearted, whimsical cartoon soundtrack. The recording quality is clean and polished with no noticeable background noise or imperfections.\n\nThe music appears to be in 4/4 time and has a moderate tempo, अनुमानित रूप से around 120-130 BPM. The key sounds like it could be C major or G major, contributing to its bright and cheerful mood.\n\nThe primary instruments are:\n-   **Electric Guitar:** Playing a clean, bright melody with a somewhat staccato feel, often with a slight tremolo or vibrato effect on sustained notes. It has a jazzy, R&B-influenced tone.\n-   **Synthesizer/Keyboard:** Providing chordal accompaniment, likely a pad or a clean electric piano sound, offering a warm and full harmonic bed.\n-   **Electric Bass:** A simple, grooving bassline that provides a solid rhythmic foundation and harmonic support. It's not overly complex but effective in driving the rhythm.\n-   **Drums:** A standard drum kit providing a light, steady beat. It includes a kick drum, snare (often on the off-beats, giving it a slightly syncopated feel), and hi-hats or ride cymbal. The drumming is not aggressive but keeps the rhythm flowing.\n\nThe song structure seems to be a repeating melodic phrase, possibly a verse or chorus that loops. The arrangement is fairly consistent throughout the clip, with all instruments playing together. There are no vocal elements or dramatic shifts in dynamics within this short excerpt. The overall mood is cheerful, positive, and light.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 349,
+      "total_tokens": 1421,
+      "cost": 0.0017191,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017191,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0008725
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

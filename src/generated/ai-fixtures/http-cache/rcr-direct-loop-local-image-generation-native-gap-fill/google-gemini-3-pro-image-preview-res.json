@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc49f6e2fe282-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:25:17 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164313-RSbG9Xb4WwyTziNTET7A"
+  },
+  "body": {
+    "id": "gen-1783164313-RSbG9Xb4WwyTziNTET7A",
+    "object": "chat.completion",
+    "created": 1783164313,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A clean, minimalist digital graphic features a single, solid equilateral triangle centered precisely against a plain, flat off-white background. The triangle is flooded with a vibrant, saturated cerulean blue color and has sharp, clean edges. There are no other elements, text, textures, or tonal variations present in the composition.",
+          "refusal": null,
+          "reasoning": "**Analyzing Visual Attributes**\n\nI'm currently focusing on a single, equilateral, blue triangle centered on a plain background. I'm noting the shape's position and color to provide a detailed and concise description.\n\n\n**Describing Geometric Shapes**\n\nI've refined my description to include details about the triangle. It's an equilateral shape and is centered against a flat, off-white background. I have also added information about the color and style. The image is a clean, simple digital illustration with no textures, gradients, or shadows.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Visual Attributes**\n\nI'm currently focusing on a single, equilateral, blue triangle centered on a plain background. I'm noting the shape's position and color to provide a detailed and concise description.\n\n\n**Describing Geometric Shapes**\n\nI've refined my description to include details about the triangle. It's an equilateral shape and is centered against a flat, off-white background. I have also added information about the color and style. The image is a clean, simple digital illustration with no textures, gradients, or shadows.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EvIGCu8GARFNMg+1x9L8VqR3jCE1l+MSE00Wef/JPN93wM2BocAXrcLSzm2YV6t0Faq0O55q2lOs1zhNHN11QMIaSn2VsfATOdD4A12yrDnUnsl7uS5zqpooeR3KfF830cwrn2TxH5wZ56tDuFpFd1YX37mFc6HiwoRtjf+M3VVttU4m/Rus1WYbnFl89g4qfJUajKzI+4rD4zMP4Z2HbX7YNq0KRxs0BQKsM5wtkm1UUzzD+fZqQ0K2RhmbHRv2IEZRQmdvq30jwreFZeB7zXb7W6Q5ZKzJ3vi5hYnkZIMtYUesoinRGQc7NNHXE15b5drhYNiVYsnzDfEkrMIfRYMbVKdhpr/0xya/b2LbSYZRcK52p3bP//Jkq5AiPh3hMqbEiSGrebGzWLab+pYPnx5Wg1a9dpKfBjZOfaU+XAZQ9UShNo6LEBcrLkwkyDaJtD5uOXVvG5gAvvdP1I3Yha31qed/G4Chw/x6eg8Oszc5W5KYqJWFG7XCHMeVYo1mfICdKeJtSonRAmPf+gYPh3KrahaNlcQHIIjUFFR5o3ZNcNLhfiDdKAjd987F//BXyRm6AdgZEp2DtgzeJOuIEhVNbjEy+n4eAoUvPZh/0pvReK3r2Btw4sedjBxOCt553/fmCTFMtnQad7HXnYdKTjNWqk9yXvDZFI7OKGYiqDpJ3OMWLM7khI/f/IHZO3XJPr7I6axf9wiQYiWLfS6i5LVSwkgcWkKFctChNc0ZPVDFKzWA3Ndsum90CWfZG/6IIqKcYljdUee1Dod33CyA/13N7L9of0i77WG6uGfyS92QfsfL3piSV3EXqhnw+yt9Od3uO5aK2o8hP1RSrZqhIXI95+2GndLIGBinCmwtGDM4Brtqyrpzqwk+/+YUSTmHoqfbzJE7miInhsxRruq23pzqL6CbLukh7d5gJRi0S0qqX9rs2f7oxAARuMGAfTBZA/Lkae/DWmhI2jl1aTjtt7unDgQ7j09N9U2OlPKbc17A2+LSENgOz2hOQV/f2IqgP3tLxgEt0Q5+JFLAzSi3Ixxpe/5OYnFbvjcde1o86PMXjNI4ZmoAtj7GEyNa7sZDy2Iuu2WOEIiOGzGVjUc5tBuN7U/os3YvNi5/5XWA3Zv2osuW6Y2n+MyL8sTnF2WDT+BPW9RUYNVkhZ6l3Ir18ABAMiLR"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 225,
+      "total_tokens": 761,
+      "cost": 0.003772,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003772,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.0027
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 161,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

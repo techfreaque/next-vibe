@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----d44efed0-8a69-4da9-9826-c0e62ec9c0e1.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote\nPreview: <think>The tool returned {\"instanceId\":\"hermes\"}. The user wants ONLY the instance ID string, nothing else.</think>herme…",
+    "encoding_format": "float"
+  }
+}

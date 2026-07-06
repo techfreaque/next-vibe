@@ -1,0 +1,162 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[HT1 direct-wakeup] Use the tool-help tool on the thea instance (prefix: thea__) to look up \"generate_image\". Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nTask initiated with wakeUp mode. TaskId: `local-wu-1775434873120-qb008x`. Status: pending. Awaiting automatic result injection...\n[HT2 direct-wa",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to execute HT4, which is to use the tool-help tool with the \"thea__\" prefix in"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " detach mode.\n\nHowever, from the previous results, we"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " learned that there is no capability snapshot for instance \"thea\" - it's"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " not connected or synced.\n\nLet me follow the instructions:\n- Use tool-help with instanceId=\"thea\" "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- Look up \"generate_image\"\n- Use callbackMode=\"detach\"\n- Return immediately\n\nThe detach mode means it returns"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a taskId immediately and runs in the background. I"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " should just call the tool and report the taskId.\n\nWait, looking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the context again - it mentions that the user has 1 connected local"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instance \"hermes\". The \"thea\" instance doesn't exist. But I should"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " still try to execute the tool call as requested.\n\nLet me call tool-help with:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- toolName=\"generate_image\" (or query=\"generate_image\")\n- instanceId=\"thea\"\n- call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "backMode=\"detach\""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "01759b8e-528a-45a3-90a9-e9dd69938985",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"detach\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "01759b8e-528a-45a3-90a9-e9dd69938985",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-bg-1775434976631-tj17vu\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Task detached. Use wait-for-task with this taskId if you need the result.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Perfect"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". The detach mode worked as expected. It returned immediately with a task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id. The task is now running in the background.\n\nHT4 is complete:\n- TaskId: local-bg-1775434976631-tj17vu"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- Status: Pending\n- The task has been detached and will run in background"
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**HT4 Status:**\n- **TaskId:** local-bg-"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "1775434976631-tj17vu\n- **CallbackMode:** detach\n- **Status:** Pending - running in background\n- **Note:** Task det"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "ached. Result available later via `wait-for-task` with taskId if needed."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 496,
+        "totalTokens": 514,
+        "cachedInputTokens": 7252
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7668
+        }
+      }
+    }
+  ]
+}

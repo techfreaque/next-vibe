@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1558fbdba22d2ce-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 11:31:04 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783078261-H7q3rbIzodzHXbScgjsf"
+  },
+  "body": {
+    "id": "gen-1783078261-H7q3rbIzodzHXbScgjsf",
+    "object": "chat.completion",
+    "created": 1783078261,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic illustration dominates the square frame, featuring a large, perfectly circular shape rendered in a vibrant, saturated red hue. This red circle is positioned precisely in the center of the composition, set against a plain, uniform white background that extends to the very edges of the image. The contrast between the bold red circle and the stark white field is sharp and clean, creating a striking visual impact. The entire composition is characterized by its geometric simplicity and lack of texture, shadows, or gradients, giving it a clean, modern, and symbolic appearance, closely resembling the national flag of Japan, also known as the Nisshōki or Hinomaru.",
+          "refusal": null,
+          "reasoning": "**Focusing on Image Details**\n\nI am now focusing on the image's key details. The image consists of a simple geometric composition. There is a red circle that is centered on a white square background. I am working on a description of the subject and its composition.\n\n\n**Describing the Geometric Composition**\n\nI am working on detailing the image's characteristics. My latest efforts involve describing the subject and its composition. The subject is a red circle, precisely centered on a white square. I've also noted that the circle has a vibrant red hue. The image itself appears to be a minimalist digital rendering with sharp, precise lines and no textures.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Focusing on Image Details**\n\nI am now focusing on the image's key details. The image consists of a simple geometric composition. There is a red circle that is centered on a white square background. I am working on a description of the subject and its composition.\n\n\n**Describing the Geometric Composition**\n\nI am working on detailing the image's characteristics. My latest efforts involve describing the subject and its composition. The subject is a red circle, precisely centered on a white square. I've also noted that the circle has a vibrant red hue. The image itself appears to be a minimalist digital rendering with sharp, precise lines and no textures.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EucGCuQGAQw51sd0o2ulQmG88SoBt6q1rwMBwTxWi0V6wBluUpivzFH8IA+mWRHuP/l+y5pzNIQhiCXyYyUBaGwfwQKwlP2PKl4hksHD9EtETTO33A4tQkV2awrhlOtCp9eBbq3wMvDsfjffhI+/A64Rft/iUfBmBpf7hSiHih3bdig8kuEqh2WvuZgWuVhIivJWMMvs/AMdPjsJuHKfctoiW4H4T53133RfQYb+IRdmVOQLxlo5kMjaz4rRvRKTO2HVRb7egP/0C5qw8tb1+Sx6ToRH5T6BOwjcB+AeZ9EhmbicT5/XuVjjgXloCi/2UXsBZjlU748QJs7vRfGkGcOBtLtaFbKQALn3VXBD/Ahj4cF2Qaxi914B3+qimoRC9Zwv6u8n4Uw2adnKoEMPnOP5Ahf6PCAwcLJHPn0Ed0aM9qmcksotEhTmCyMNIcd8setx/zmNMMyIgo8Y/7pM03lvZr5dSKzAC+U5rtoR5BJ/TaWYZ5SZzYbDlNftZAWnp8j3qblUQyw2l6orqLE5mrrFrmeH4RaqZw07vZIjSYry2iBDKo9P8k40TLh4ErbYU0tgb7S8hrDCbjD5C1D+1+s2tYoqfsL36J/q8+os+rykW1F4aBuW4JZuB7zmoKxE+MZ+sWYjusQQw/z4iB6eNUsCkAK8/kdbQYfOZIcwRxJtidJX+LDLVldQjJqczHvx4aEDYqAcsMV5PGhFkbEqkcjrPj/+szK4bNXLORNW/AtqkdiV+4C+B07HgeOFtjIQOWHuOXVPLkrPRUk5TSpy8bMQpHRyOD44L/QnrwQYDlmnuGdHod6YfyRwlMiVUjpjAJiyaAMvAvFhQFWl7s0SYr6eCPRqty6j05UBmeoFamMCR0dfYPt8cm3a0HttR84wvbukEXIPlbOgr76wfY+42FFmB9HosX9KiaYS4KLl4vRmOTNEmViv97w5ATJ0Rztf7jYVdVn+lnw9Wpqj45lfU23Z8FPXeU5s2mM+al2Pjjy1bNaNtP4vQhbdPLA6mi7IOtLbDsPhwUqFlso09bhaAoX+hYvoYfxI2jKyVgEm6jFN/23l3T3qVnwS3VQSnDOCAug5Khr+gSYNIvuCkO8DK2Lnf8TLax24B+rBkYZqdqaCyvdTEoa44ByqLtGoUlb7uOXLAfSnP+7lUA=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 291,
+      "total_tokens": 827,
+      "cost": 0.004564,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004564,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.003492
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 161,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

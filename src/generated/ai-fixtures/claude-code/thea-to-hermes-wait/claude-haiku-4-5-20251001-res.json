@@ -1,0 +1,132 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[TH2 wait-mode] Use the LOCAL tool-help tool (no instance prefix) to look up \"generate_image\". Do NOT use any remote instance prefix. Reply STEP_OK when done, or FAILED: <reason>.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the LOCAL tool-help tool to look up \"generate_image\". This is a test or verification task to make sure I can call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tools correctly.\n\nI need to call the `mcp"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "__vibe-tools__tool-help` function with a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " query parameter set to \"generate_image\" and NOT specify any instance ID (to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the local instance).\n\nLet me do this now."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "ac3a9938-fdd4-40e4-912e-b8bd44ff5383",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "ac3a9938-fdd4-40e4-912e-b8bd44ff5383",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [\n    {\n      \"name\": \"generate_image\",\n      \"title\": \"Generate Image\",\n      \"description\": \"Generate an image from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ],\n      \"parameters\": {\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n        \"type\": \"object\",\n        \"properties\": {\n          \"prompt\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"maxLength\": 2000,\n            \"description\": \"Describe the image you want to generate\"\n          },\n          \"model\": {\n            \"default\": \"gemini-3-pro-image-preview\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"flux-pro\",\n              \"flux-2-max\",\n              \"flux-2-klein-4b\",\n              \"riverflow-v2-pro\",\n              \"riverflow-v2-fast\",\n              \"riverflow-v2-max-preview\",\n              \"riverflow-v2-standard-preview\",\n              \"riverflow-v2-fast-preview\",\n              \"flux-2-flex\",\n              \"flux-2-pro\",\n              \"seedream-4.5\",\n              \"gen4-t2i-turbo\",\n              \"gen4-image\",\n              \"wan-2.7-t2i\",\n              \"grok-t2i\",\n              \"z-image-base\",\n              \"z-image-turbo\",\n              \"flux-pro-1.1-ultra\",\n              \"imagen-4-ultra\",\n              \"imagen-4\",\n              \"imagen-4-fast\",\n              \"qwen-t2i\",\n              \"realtime-t2i\",\n              \"gemini-3.1-flash-image-preview\",\n              \"gemini-3-pro-image-preview\",\n              \"gpt-5-image-mini\",\n              \"gpt-5-image\"\n            ],\n            \"description\": \"Select an image generation model\"\n          },\n          \"size\": {\n            \"default\": \"post.size.square1024\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.size.square1024\",\n              \"post.size.landscape1792\",\n              \"post.size.portrait1792\"\n            ],\n            \"description\": \"Select output image dimensions\"\n          },\n          \"quality\": {\n            \"default\": \"post.quality.standard\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.quality.standard\",\n              \"post.quality.hd\"\n            ],\n            \"description\": \"Select output image quality\"\n          },\n          \"aspectRatio\": {\n            \"type\": \"string\",\n            \"description\": \"Output image aspect ratio\"\n          }\n        },\n        \"required\": [\n          \"prompt\"\n        ]\n      },\n      \"examples\": {\n        \"inputs\": {\n          \"default\": {\n            \"prompt\": \"A photorealistic sunset over a mountain lake\",\n            \"model\": \"gemini-3-pro-image-preview\",\n            \"size\": \"post.size.square1024\",\n            \"quality\": \"post.quality.standard\"\n          }\n        },\n        \"responses\": {\n          \"default\": {\n            \"imageUrl\": \"https://example.com/generated-image.png\",\n            \"creditCost\": 4\n          }\n        }\n      }\n    }\n  ],\n  \"totalCount\": 350,\n  \"matchedCount\": 1,\n  \"hint\": \"Call as: execute-tool toolName=\\\"generate_image\\\". CLI: vibe generate_image [--field=value].\",\n  \"currentPlatform\": \"ai\",\n  \"currentEnv\": \"development\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Perfect! I"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " successfully looked up the generate_image tool using the LOCAL tool-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "help tool. The function returned full details about the generate_image tool, including its parameters, available"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " models, sizes, quality options, and examples.\n\nThe task asked me to reply \"STEP"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "_OK\" when done, or \"FAILED: <reason"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ">\" if it failed. Since I successfully retrieved the tool information, I should respond"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with STEP_OK."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "STEP_OK"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 265,
+        "totalTokens": 283,
+        "cachedInputTokens": 6908
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 8060
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc3218a7bdb03-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:24:14 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164253-Zb9qFwy0B5YnNWkAPbDp"
+  },
+  "body": {
+    "id": "gen-1783164253-Zb9qFwy0B5YnNWkAPbDp",
+    "object": "chat.completion",
+    "created": 1783164253,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio features a short, playful, retro-inspired electronic music track with a strong dance vibe.\n\n**Music:**\n*   **Genre:** Electronic, Dance-Pop, Retro (possibly Chiptune-influenced due to the synthesized sounds).\n*   **Tempo:** Approximately 115-120 BPM, giving it a moderate, danceable pace.\n*   **Key/Scale:** Difficult to discern precisely in this short clip, but it has a bright, major feel.\n*   **Time Signature:** 4/4.\n*   **Instruments:**\n    *   **Synthesized drums:** A classic electronic drum kit with a clear kick drum, snare (snappy, slightly reverbed), and closed hi-hats providing a steady, driving rhythm. The hi-hats play on the 8th notes, giving it a consistent pulse.\n    *   **Synthesized bass:** A clean, sine-wave-like bass provides a simple, foundational rhythmic pattern that outlines the harmony. It's not overly dominant but underpins the melody.\n    *   **Synthesized melody (lead):** A bright, short, staccato melody played by a synthesized instrument reminiscent of a vintage video game sound or a simplified bell-like synth. It consists of short, repeated phrases that loop.\n    *   **Pizzicato-like synth:** There's a subtle, higher-pitched synth playing a similar rhythmic pattern as the bass, adding a plucked string texture or a more percussive melodic counterpoint.\n*   **Interactions:** The drums provide a steady, consistent beat. The bass and pizzicato synth lay down a simple, repetitive harmonic and rhythmic foundation. The lead synth plays a catchy, repeating melodic motif over this foundation.\n*   **Song Structure:** This appears to be a short loop, possibly a segment from a larger track, like a pre-chorus or an outro. The musical pattern repeats consistently throughout the clip.\n*   **Production Style:** Clean and polished, with clear separation between instruments. There's a slight retro feel, but it's not overly lo-fi. Some subtle reverb is present, particularly on the snare drum.\n*   **Mood:** Playful, lighthearted, energetic, and optimistic. It evokes a feeling of simple fun and encourages dancing.\n\n**Audio Characteristics:**\n*   **Duration:** The clip is an extended loop of a musical segment.\n*   **Sound Quality:** High quality, clean recording, likely from a studio production.\n*   **No speech or other discernible sound effects.**\n*   **Overall:** The audio is solely a musical track loop.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 552,
+      "total_tokens": 1624,
+      "cost": 0.0022266,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022266,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00138
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

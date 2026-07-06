@@ -1,0 +1,117 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/14 - pass page=2 to continue.\",\n  \"tools\": [\n    {\n      \"na",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user wants"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me to call the generate_image tool with the prompt 'red circle'. They specifically say not to add any other commentary, and to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " report if anything seems wrong or unexpected.\n\nLet me call the generate_image tool with the prompt 'red circle'."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "4bd7e733-3a19-4e34-8c35-b91846cdb6b8",
+      "toolName": "generate_image",
+      "input": "{\"prompt\":\"red circle\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "4bd7e733-3a19-4e34-8c35-b91846cdb6b8",
+      "toolName": "generate_image",
+      "result": "{\n  \"imageUrl\": \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e9/035927d2-4c0e-4082-86a4-240957d6db16.png\",\n  \"creditCost\": 0.6\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " executed successfully. It generated an image with the URL http://localhost:3000/api/en-GLOBAL/agent/chat"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e9/035927d2-4c0e-4082-86a4-240957d6db16.png and cost"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " 0.6 credits. Nothing seems wrong or unexpected.\n\nThe user asked for no"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " other commentary, so I should just report the result directly."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Image generated"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " successfully:\n- URL: http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "9/035927d2-4c0e-4082-86a4-240957d6db16.png\n- Credit cost: 0.6"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 347,
+        "totalTokens": 365,
+        "cachedInputTokens": 10924
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 11165
+        }
+      }
+    }
+  ]
+}

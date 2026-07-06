@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a14cad480e66972f-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 09:38:21 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782985099-N44WAiIwfkpKpWeEt7AJ"
+  },
+  "body": {
+    "id": "gen-1782985099-N44WAiIwfkpKpWeEt7AJ",
+    "object": "chat.completion",
+    "created": 1782985099,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is 18 seconds long and features music that can be primarily categorized as an instrumental, upbeat, and somewhat quirky theme, reminiscent of old-school video game music mixed with a classic sitcom or cartoon vibe.\n\nThe main instruments are:\n-   **Electric Guitar:** Playing a clean, melodic lead line that carries the main melody. It has a slightly tinny, perhaps mid-range focused tone.\n-   **Drum Kit:** Providing a consistent, driving beat. It includes a kick drum, snare with a good snap, and hi-hats. The rhythm is fairly straightforward and energetic.\n-   **Bass Guitar:** A smooth, walking bass line that provides a solid harmonic foundation and keeps the groove moving.\n-   **Synthesizer/Keyboard:** Used for rhythmic accentuation, playing short, staccato chords in sync with the drum beat, adding to the bouncy feel.\n\nThe tempo is medium-fast, estimated around 120-130 BPM. The overall feel is major and lighthearted, suggesting a comedic or playful scenario. There are no vocals or perceptible lyrics.\n\nThe production quality is clean and polished, with clear separation between instruments, suggesting a studio recording. The sound is balanced, without excessive reverb or other overt effects, maintaining a somewhat retro, lo-fi aesthetic while still being well-produced.\n\nThe 18-second clip presents a continuous musical loop without a clear beginning, middle, or end, suggesting it's part of a longer piece or a short segment designed for repetitive play. The energy level remains consistent throughout the clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 328,
+      "total_tokens": 1400,
+      "cost": 0.0016666,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016666,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00082
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

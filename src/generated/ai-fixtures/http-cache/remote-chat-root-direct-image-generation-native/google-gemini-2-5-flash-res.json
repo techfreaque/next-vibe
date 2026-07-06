@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15d39a379f4d87f-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 09:50:22 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783158621-UztgzzyrOiqbSfdKWbm6"
+  },
+  "body": {
+    "id": "gen-1783158621-UztgzzyrOiqbSfdKWbm6",
+    "object": "chat.completion",
+    "created": 1783158621,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second audio clip of a hip-hop/trap instrumental with a smooth, laid-back vibe.\n\n**Tempo:** Approximately 90 BPM.\n**Key/Scale:** Seems to be in a minor key, possibly E minor.\n**Time Signature:** 4/4\n\n**Instruments and Interaction:**\n\n*   **Drums (0:00 - 0:24):** A classic hip-hop drum beat with a relatively fast, closed hi-hat pattern (eighth notes), a strong, prominent clap on beats 2 and 4, and a kick drum that plays a syncopated rhythm, often emphasizing the \"and\" of beat 1 and the \"and\" of beat 3, creating a mellow head-nodding groove. The hi-hats have a slightly metallic, crisp sound.\n*   **Bass (0:00 - 0:24):** A deep, resonant 808 bass provides the foundation of the track. It plays a simple, repetitive, sustained melodic line that underpins the harmony. The bass has a smooth, slightly subby quality.\n*   **Melody/Chords (0:00 - 0:24):** A sustained pad-like synth or orchestral string/brass section plays a smooth, repeating chord progression that follows the bass line. It provides a mellow, almost dreamy backdrop to the beat. This sound might be coming from an electric piano or a warm synth pad.\n\n**Song Structure:** This clip appears to be a continuous loop of a verse or main section, as the elements remain consistent throughout its duration.\n\n**Production Style:** The production sounds polished and clean. There's a good amount of reverb on the pad/synth, giving it a spacious feel, while the drums are crisp and dry. The overall mix is well-balanced.\n\n**Mood and Emotional Arc:** The mood is chill, relaxed, and slightly contemplative. It evokes a feeling of calm or cruising.\n\n**Sound Quality:** High fidelity, studio-recorded quality.\n\nThere is no speech, vocals, or external sound effects present.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 443,
+      "total_tokens": 1515,
+      "cost": 0.0019541,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019541,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0011075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

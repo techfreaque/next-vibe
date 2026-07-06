@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to call the `generate_image` tool with prompt='wakeup-e2e-test' and callbackMode='wakeUp'. Then I need to report PHASE1_OK with the taskId. When I'm automatically revived (woken up), I need to check if the result contains an http/https image URL and report WAKEUP_OK or WAKEUP_FAILED.\n\nFirst, I need to get the schema for `generate_image` to make sure I call it correctly.</think>\n\nAssistant: <think>Now I have the schema. I need to call `generate_image` with `prompt='wakeup-e2e-test'` and `callbackMode='wakeUp'`. I don't need to specify other parameters since they have defaults.</think>\n\nAssistant: <think>The tool returned a taskId: \"local-wu-functions-execute-tool-1\". I need to reply PHASE1_OK with this taskId. The user said \"reply PHASE1_OK taskId=<value>\".</think>PHASE1_OK taskId=local-wu-functions-execute-tool-1\n\nUser:",
+    "encoding_format": "float"
+  }
+}

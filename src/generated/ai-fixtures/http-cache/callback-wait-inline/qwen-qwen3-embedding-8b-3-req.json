@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:execute-tool] {\"input\":{},\"toolName\":\"tool-help\",\"callbackMode\":\"endLoop\"}\n\nTool: [result:execute-tool] {\"result\":{\"hint\":\"530 tools across 22 categories. Use category=\\\"<name>\\\" to narrow results (accepts parent category or sub-category). Under 100 results shows tool names; under 5 shows full schemas.\",\"tools\":[],\"categories\":[{\"name\":\"account\",\"count\":15,\"subCategories\":[{\"name\":\"\",\"count\":6},{\"name\n\nSystem: [Context: ID:777252b1 | Posted:Jun 30, 10:09]\n\nUser: [T5d wait-inline] Call the generate_image tool with prompt='wait-inline-test' and callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:775047ca | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 10:09]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"wait-inline-test\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/cf74e291-c087-4445-8713-e267b3fcb342/4d2f385f-0822-462e-948f-bdcfc3c21030.png\",\"creditCost\":2.9}}",
+    "encoding_format": "float"
+  }
+}

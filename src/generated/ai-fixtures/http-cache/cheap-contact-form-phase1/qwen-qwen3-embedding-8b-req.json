@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nAssistant: <think> The user wants me to call BOTH tools at the same time in a single response:\n1. tool-help with no args (to list available tools)\n2. generate_image with prompt='approve-test'\n\nThe generate_image tool requires user confirmation, so it should use callbackMode='approve'.\n\nBut wait - the instructions say \"In a single response, call BOTH at the same time\". So I need to make parallel tool calls.\n\nLet me check the generate_image tool from earlier - it had these parameters:\n- model (optional)\n- prompt (required)\n- size (optional)\n- quality (optional)\n- aspectRatio (optional)\n- inputMediaUrl (optional)\n\nFor the generate_image call, I should use callbackMode='approve' since the user says it requires user confirmation and should NOT execute yet.\n\nFor tool-help, I'll call it normally.\n\nLet me ma\n\nAssistant: <think> The user is testing the approve callback mode. They asked me to call (1) tool-help and (2) generate_image with callbackMode='approve' in a single response. The generate_image call should require user confirmation and NOT execute yet.\n\nHowever, looking at the results:\n1. tool-help returned successfully\n2. generate_image with callbackMode='approve' actually executed and returned an image!\n\nThis is a problem. The whole point of `callbackMode='approve'` is that it should pause for user confirmation before executing. But it seems like the tool executed immediately without approval.\n\nWait, let me re-read the instructions. The user said: \"The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\"\n\nBut looking at the a\n\nUser: [CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.",
+    "encoding_format": "float"
+  }
+}

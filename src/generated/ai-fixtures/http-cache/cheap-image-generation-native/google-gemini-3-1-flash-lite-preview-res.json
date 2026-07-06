@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a11cea0cfef1dc86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 26 Jun 2026 14:31:15 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782484273-tu5ctLnDfSfUEyiTCv4y"
+  },
+  "body": {
+    "id": "gen-1782484273-tu5ctLnDfSfUEyiTCv4y",
+    "object": "chat.completion",
+    "created": 1782484273,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a short, cinematic-style professional clip, likely a social media advertisement or a creative short focusing on a collection of Rubik’s cubes.\n\n**Visual Content and Sequence**\nThe video opens with a tight close-up shot of a pair of hands holding a standard 3x3 Rubik’s cube. The cube’s colors are vibrant and slightly glossy. On the center white tile of the top face, there is a small black logo consisting of a stylized icon and the text \"YUXIN\". The hands are positioned in the center of the frame, manipulating the cube, rotating the top layer clockwise and then the right vertical slice. The background is a dense, out-of-focus pile of dozens of other Rubik’s cubes, creating a colorful, chaotic bokeh effect.\n\nAs the video progresses, the hands demonstrate quick, rhythmic movements, rotating different sections of the cube. The lighting is controlled, studio-quality, emphasizing the reflections on the plastic edges of the cubes. The camera remains in a steady, fixed close-up throughout the entire sequence, maintaining focus on the primary cube being handled. There are no cuts; the video is a single, continuous shot.\n\n**Text and UI Elements**\nThe only text present is the \"YUXIN\" logo printed on the white center square of the cube's top face. There are no other overlays, watermarks, or text elements on the screen.\n\n**Audio**\nThere is no human speech in the video. The background audio consists of a rhythmic, percussion-heavy electronic track with a steady, upbeat tempo. There are distinct, crisp foley sound effects layered over the music, capturing the tactile mechanical \"clicks\" and sliding sounds of the plastic cube layers moving against each other. The audio quality is high-fidelity and balanced.\n\n**Style and Production**\nThe style is realistic and highly polished, characteristic of high-quality product cinematography. The depth of field is very shallow, keeping the primary cube in sharp focus while turning the surrounding mountain of cubes into a soft, abstract sea of red, blue, green, yellow, and white squares. The production quality is professional, likely intended for a commercial or social media showcase.\n\n**Mood and Arc**\nThe mood is focused, rhythmic, and satisfying. The narrative purpose is to demonstrate the smooth, mechanical quality of the specific cube brand (Yuxin) by showing it in use amidst a display of a large collection. There is no shift in tone; the video maintains a consistent, energetic, and satisfying aesthetic from start to finish.\n\n**Duration and Pacing**\nThe video is approximately 4 seconds long. The pacing is fast and precise, matching the speed of the cube rotations to the rhythm of the electronic music track.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgEMOdbHhDOJjioYXO3SmWF0XCyCHGLGAY0oqLyBOhL2S0MM+gUhD+Q0+OPQs8xYRwN2",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 567,
+      "total_tokens": 976,
+      "cost": 0.00095275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00095275,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.0008505
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

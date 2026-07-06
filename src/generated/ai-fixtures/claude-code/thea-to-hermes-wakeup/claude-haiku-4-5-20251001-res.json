@@ -1,0 +1,206 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[TH1 queue-wakeup] Use the tool-help tool on the hermes-dev instance (prefix: hermes-dev__) to look up the \"generate_image\" tool. Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason> if anything went wrong.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user wants"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me to:\n1. Use the tool-help tool on the hermes-dev instance\n2. Look up the \"generate_image\" tool\n3. Use wakeUp callback mode\n4. Reply STEP_OK when the tool result is available, or"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " FAILED: <reason> if anything went wrong\n\nLooking at the context, I can see:\n- I have a hermes-dev instance\n- I need"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to use tool-help with instanceId\n- The tool-help function signature"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " shows: `toolName` parameter to get"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " full parameter schema for a specific tool\n- I need to use \"w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp\" callback mode\n\nLet me call the tool-help function with:\n- instanceId: \"hermes-dev\"\n- toolName: \"generate_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "image\"\n- callbackMode: \"wakeUp\""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "e4eec41d-1b20-4455-95e2-0fe821f0c52c",
+      "toolName": "tool-help",
+      "input": "{\"toolName\":\"generate_image\",\"instanceId\":\"hermes-dev\",\"callbackMode\":\"wakeUp\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "e4eec41d-1b20-4455-95e2-0fe821f0c52c",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-wu-1775435008269-odolch\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Result will be injected when complete. Call wait-for-task only if you need the result before continuing.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The tool-help was"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " called with wakeUp mode and returned a taskId. The status is"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " pending, which means the result will be injected into this thread automatically when ready"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". I should wait for the result to be injected before replying.\n\nSince I used wakeUp mode, the stream"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " will revive automatically with the tool result. Let me wait for that to happen."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Waiting for w"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "akeUp result..."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "d139d6c6-a81d-4d7d-9846-bc21a3e3c4d9",
+      "toolName": "wait-for-task",
+      "input": "{\"taskId\":\"local-wu-1775435008269-odolch\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "d139d6c6-a81d-4d7d-9846-bc21a3e3c4d9",
+      "toolName": "wait-for-task",
+      "result": "{\n  \"status\": \"status.completed\",\n  \"result\": {\n    \"hint\": \"No capability snapshot for instance \\\"hermes-dev\\\". Connect the instance and wait for a sync pulse.\",\n    \"tools\": [],\n    \"totalCount\": 0,\n    \"matchedCount\": 0\n  },\n  \"waiting\": false,\n  \"originalToolName\": \"tool-help\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help completed but returned an error: \"No capability snapshot for instance 'hermes-dev'. Connect the instance and wait for a sync pulse.\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThis means the hermes-dev instance is not currently connected or synchronized. The tools"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " array is empty and totalCount is 0.\n\nThe task failed because the instance is not properly connected. I should report"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " this as FAILED with the reason."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-1"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "FAILED: No capability snapshot for instance \"hermes-dev\". The"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": " instance is not currently connected or synchronized. Unable to retrieve generate_image tool information until"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": " the instance connects and completes a sync pulse."
+    },
+    {
+      "type": "text-end",
+      "id": "text-1"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 26,
+        "outputTokens": 604,
+        "totalTokens": 630,
+        "cachedInputTokens": 13863
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7402
+        }
+      }
+    }
+  ]
+}

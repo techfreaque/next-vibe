@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:37920b78 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 12:45]\n\nAssistant: The immediate result contains a `taskId` string (`local-bg-det-000001`) and does **not** contain an `imageUrl`.\n\nSTEP_OK taskId=local-bg-det-000001\n\nSystem: [Context: ID:49dbc6aa | Posted:Jun 30, 12:45]\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-functions-execute-tool-7'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (18)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── note.md\n│   │   · Nested memory test. · Marker: rws-mqlflpj2\n│   ├── e2e-sync-rws-mqlflpj2.md\n│   │   · Memory\n\nSystem: [Context: ID:97b21d70 | Model:kimi-k2.6 | Skill:quality-tester__kimi | Posted:Jun 30, 12:45]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"await-task\",\"input\":{\"taskId\":\"local-bg-functions-execute-tool-7\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"status\":\"status.completed\",\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/28a01e11-d75d-4f1f-afe4-e3e0a60d8f68/3900878a-58ba-48c2-a463-03e5b83e9a0f.png\",\"creditCost\":3.8},\"waiting\":false,\"originalToolName\":\"generate_image\",\"originalArgs\":{\"prompt\":\"awa",
+    "encoding_format": "float"
+  }
+}

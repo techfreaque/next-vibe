@@ -1,0 +1,34 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a11cc4f05cbae85a-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 26 Jun 2026 14:05:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782482752-QeO90PeQL8wUwZmMeqJb"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The result returned 69 tools in the \\\"ai\\\" category. The tools array is non-empty and every tool entry has a `name` and a `description`. Some also have `title` and `aliases`, but the required fields are present. I\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The result returned 69 tools in the \\\"ai\\\" category. The tools array is non-empty and every tool entry has a `name` and a `description`. Some also have `title` and `aliases`, but the required fields are present. I\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" should verify a few samples to be sure:\\n\\n- `agent_chat_folders_subfolders_subFolderId_permissions_GET` has description \\\"Retrieve the list of moderators for a specific folder\\\"\\n- `ai-run` has description \\\"Delegate a task to a specialist AI agent\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" should verify a few samples to be sure:\\n\\n- `agent_chat_folders_subfolders_subFolderId_permissions_GET` has description \\\"Retrieve the list of moderators for a specific folder\\\"\\n- `ai-run` has description \\\"Delegate a task to a specialist AI agent\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"...\\\"\\n- `brave-search` has description \\\"Search the internet for current information...\\\"\\n- `execute-tool` has description \\\"Execute any registered endpoint by name...\\\"\\n\\nYes, every tool in the list has both `name` and `description`. The\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"...\\\"\\n- `brave-search` has description \\\"Search the internet for current information...\\\"\\n- `execute-tool` has description \\\"Execute any registered endpoint by name...\\\"\\n\\nYes, every tool in the list has both `name` and `description`. The\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" list looks right.\\n\\nSTEP_OK\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" list looks right.\\n\\nSTEP_OK\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The `category='ai'` call returned **69 tools**. The `tools` array is non-empty, and every entry includes both a `name` and a `description`. A few examples:\\n\\n- `ai-run` — \\\"\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Delegate a task to a specialist AI agent...\\\"\\n- `brave-search` — \\\"Search the internet for current information...\\\"\\n- `execute-tool` — \\\"Execute any registered endpoint by name...\\\"\\n- `generate_image` — \\\"Generate an image from a text prompt\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" using AI\\\"\\n\\nAll entries in the list follow the same pattern.\\n\\nSTEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782482752-QeO90PeQL8wUwZmMeqJb\",\"object\":\"chat.completion.chunk\",\"created\":1782482752,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10155,\"completion_tokens\":275,\"total_tokens\":10430,\"cost\":0.00367717,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":7680,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00367717,\"upstream_inference_prompt_cost\":0.00273942,\"upstream_inference_completions_cost\":0.00093775},\"completion_tokens_details\":{\"reasoning_tokens\":160,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

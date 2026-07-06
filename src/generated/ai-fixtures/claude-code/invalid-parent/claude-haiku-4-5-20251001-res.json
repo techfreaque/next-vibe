@@ -1,0 +1,76 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T12 invalid-parent] Say: INVALID_PARENT_TEST. If anything seems wrong or unexpected, report it instead.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is sending"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a test message with \"[T12 invalid-parent]\" which appears to be a test marker. The instruction"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is to say \"INVALID_PARENT_TEST\" and if anything seems wrong or unexpected, report it instead.\n\nLooking at this, I should just"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " respond with the requested phrase. There's nothing wrong or unexpected here - this is a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " straightforward test instruction.\n\nThis appears to be a test of the system to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " see if I'm processing instructions correctly. I should comply with the instruction."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "INVALID_PARENT_TEST"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 125,
+        "totalTokens": 135,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 6089
+        }
+      }
+    }
+  ]
+}

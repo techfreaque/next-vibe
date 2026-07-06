@@ -1,0 +1,280 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[CB-D1 direct-wait] Use the tool-help tool (thea__ prefix, wait mode) to look up \"generate_image\". Reply STEP_OK when done.\n[Tool result for tool-help]:\n{\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\",\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0\n}\nSTEP_OK\n[CB-D2 direct-wakeup] Use the tool-help tool (thea__ prefix, wakeUp mode) to look up \"generate_image\". Reply STEP_OK after revival.\n[Tool result for tool-help]:\n{\n  \"status\":",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to execute three steps using the tool-help tool with different callback modes"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ":\n\n1. **CB-D1**: Call tool-help with \"thea__\" prefix in"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wait mode (default), look up \"generate_image\", reply STEP_OK when done\n2"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". **CB-D2**: Call tool-help with \"thea__\" prefix in wakeUp mode, look up \"generate_image\", reply STEP_OK after revival\n3. **CB-D3**: Call tool-help with \"thea__\" prefix in detach mode, look"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " up \"generate_image\", return immediately\n\nLooking at the instructions:\n- **Wait mode (default)**: Execute"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " normally, return result synchronously\n- **wakeUp mode**: Fire and forget, returns"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " taskId immediately, result is automatically injected when ready\n- **detach mode**:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " Fire and forget, returns taskId immediately, tool runs in background\n\nHowever, I notice that steps CB-D1 and CB-D"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "2 have already been shown with results in the prompt. Let me read"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " carefully:\n\nCB-D1 shows:\n- Used tool-help with thea__ prefix in wait mode\n- Got"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a result: `{\"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\", \"tools\": [], ..."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "}`\n- The user said \"Reply STEP_OK when done\"\n- The result shows the thea instance doesn"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'t have a capability snapshot\n\nCB-D2 shows:\n- Used tool-help with thea__ prefix in wakeUp mode\n- Got a pending result: `{\"status\": \"pending\", \"hint\": \"Result will be injected into this thread when ready."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " Do NOT call this tool again.\"}`\n- Message says \"Waiting for wakeUp injection...\"\n- A task was submitted with taskId `local-wu-1775435562600-85b551`\n- Then"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " it says \"Task submitted with taskId `local-wu-1775435562600-85b551` in wakeUp mode. "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " stream is paused pending automatic result injection while waiting for the thea instance to sync and reply. Now I need to execute CB-D3 in"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " detach mode, which should return immediately without waiting for the result."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the test sequence, CB-D1 and CB-D2 have already executed with their"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " respective results shown. For CB-D3, I need to call tool-help with the detach callback mode to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " generate an image. The tool-help function accepts callbackMode as a parameter with options including"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"detach\", \"wakeUp\", and \"endLoop\", so I can specify detach mode"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " directly in the call."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "I'll execute CB-D3 now using tool-help with detach mode to query"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " the thea instance for \"generate_image\":"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "110c9e4d-2a9b-49d5-b440-32b72a9b1aa5",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"detach\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "110c9e4d-2a9b-49d5-b440-32b72a9b1aa5",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-bg-1775435578151-j3041x\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Task detached. Use wait-for-task with this taskId if you need the result.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Perfect."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " CB-D3 executed successfully in detach mode. The tool returned immediately with:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n- taskId: \"local-bg-1775435578151-j3041x\"\n- status: \"status.pending\"\n- hint: Task detached, can"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " use wait-for-task if needed\n\nSince the user asked to \"Return immediately\" for CB-D3, I've fulfilled that requirement"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". The task is now running in the background and can be checked later with wait"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-for-task if needed.\n\nNow let me summarize the three steps as requested."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-1"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "**CB-D3 COMPLETE**\n\nTask detached with ID"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": ": `local-bg-1775435578151-j3041x` (status: pending)\n\n---\n\n**Summary"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": " of callback modes:**\n- **CB-D1 (wait)"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "**: Synchronous execution. Tool blocked until thea instance replied"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": " (no capability snapshot available).\n- **CB-D2 (wakeUp)**: Fire-and-forget with automatic result injection. Task"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": " `local-wu-1775435562600-85b551` submitted; stream paused awaiting thea sync."
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "\n- **CB-D3 (detach)**: Fire-and-forget with manual polling. Task `local-bg-1775435578151-j3041x` submitted in background"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "; call `wait-for-task` only if result needed."
+    },
+    {
+      "type": "text-end",
+      "id": "text-1"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 1446,
+        "totalTokens": 1464,
+        "cachedInputTokens": 7194
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 8400
+        }
+      }
+    }
+  ]
+}

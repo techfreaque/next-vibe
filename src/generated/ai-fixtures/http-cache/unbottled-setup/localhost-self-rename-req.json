@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:3002/api/en-US/remote-connection/self/rename",
+  "method": "PATCH",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "newInstanceId": "hermes",
+    "propagate": false
+  }
+}

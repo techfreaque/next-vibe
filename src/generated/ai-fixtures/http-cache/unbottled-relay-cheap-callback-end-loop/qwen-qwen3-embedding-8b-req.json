@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The result has a `taskId` string and no `imageUrl`. The hint confirms the task was detached. This is exactly what was expected.</think>## Result\n\n| Check | Status |\n|-------|--------|\n| Has `taskId` (string) | ✅ `\"local-bg-call-72aa168d5ec345aa9b48210a\"` |\n| Has `imageUrl` | ✅ Not present — task runs in background |\n| Hint confirms detached | ✅ `\"Task detached. Use await-task with this taskId if you need the result.\"` |\n\n**STEP_OK taskId=local-bg-call-72aa168d5ec345aa9b48210a**\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-72aa168d5ec345aa9b48210a'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The task was dispatched in the previous turn. Now I need to await it and check for an imageUrl in the result.</think>\n\nAssistant: <think>The result contains an `imageUrl` string nested inside `result.result.imageUrl`. That's present and valid. Let me verify the checks pass.</think>## Result\n\n| Check | Status |\n|-------|--------|\n| Result returned successfully | ✅ |\n| `imageUrl` present in result | ✅ `\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/226652be-0c52-44f6-b1b7-63ae37e60bc2/8327a812-cec8-47dc-a145-53dbc6341bb8.png\"` |\n| Task status | ✅ `\"status.completed\"` |\n\n**STEP_OK**\n\nUser: [T5a endLoop] Call the tool-help tool with callbackMode='endLoop'. After receiving the result, try to call the tool-help tool again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.",
+    "encoding_format": "float"
+  }
+}

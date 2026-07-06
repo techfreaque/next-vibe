@@ -1,0 +1,40 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a11cc55e8fd6e85a-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 26 Jun 2026 14:06:13 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782482769-1ryZ1zh7LeIhi2v6XOze"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The query='search' call returned 12 tools. Each tool has:\\n- A `name` field (e.g., `users-list`, `agent-search-messages`, `brave-search`, etc.)\\n- A `description` field (e.g.,\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The query='search' call returned 12 tools. Each tool has:\\n- A `name` field (e.g., `users-list`, `agent-search-messages`, `brave-search`, etc.)\\n- A `description` field (e.g.,\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" \\\"Search and filter users\\\", \\\"Search messages within a specific thread...\\\", etc.)\\n\\nThe tools array is non-empty (12 items), and every entry includes both a name and a description. This looks correct.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" \\\"Search and filter users\\\", \\\"Search messages within a specific thread...\\\", etc.)\\n\\nThe tools array is non-empty (12 items), and every entry includes both a name and a description. This looks correct.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The `query='search'` call returned **12 tools\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"**. Every entry includes both a `name` and a `description`. Examples:\\n\\n- `users-list` — \\\"Search and filter users\\\"\\n- `agent-search-messages` — \\\"Search messages across all threads using full-text search\\\"\\n- `brave\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"-search` — \\\"Search the internet for current information...\\\"\\n- `cortex-search` — \\\"Find files by name or content. Searches everything.\\\"\\n\\nAll 12 entries follow the same pattern.\\n\\nSTEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782482769-1ryZ1zh7LeIhi2v6XOze\",\"object\":\"chat.completion.chunk\",\"created\":1782482769,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":11094,\"completion_tokens\":198,\"total_tokens\":11292,\"cost\":0.002845476,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":9984,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.002845476,\"upstream_inference_prompt_cost\":0.002170296,\"upstream_inference_completions_cost\":0.00067518},\"completion_tokens_details\":{\"reasoning_tokens\":93,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

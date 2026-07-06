@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T6d wakeUp-stress] Call the generate_image tool with prompt='wakeup-stress-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think> The user wants me to call generate_image with prompt='wakeup-stress-test' and callbackMode='wakeUp'. Let me do that.</think>\n\nAssistant: <think> The generate_image call with callbackMode='wakeUp' returned a deferred result with a taskId and no image URL. This is valid outcome (a) — DEFERRED. I should end with STEP_OK.</think> The result is **deferred** — contains a `taskId` (`local-wu-det-000004`) and no image URL.\n\nSTEP_OK\n\nAssistant: <think> The user message is a continuation of the T6d wakeUp-stress test. The first call returned a deferred taskId. Now I have been revived with the actual image result.\n\nLooking at the revived result:\n- It contains a markdown image link: `![wakeup-stress-test](http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/86f6586c-f7d1-4463-be7c-9dd69011c413.png)`\n- It also contains an `imageUrl` field: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8dd3065e-c186-4625-bf45-1d4ea996cbeb/86f6586c-f7d1-4463-be7c-9dd69011c413.png`\n\nBoth are present and non-empty. The image URL is valid (http/https).\n\nI should end with WAKEUP_OK as instructed.</think> The revived result contains the generated image in both forms:\n- Markdown image link: `![wake\n\nUser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.",
+    "encoding_format": "float"
+  }
+}

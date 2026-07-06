@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----4b9080fb-bc7a-4cf4-a22d-777298803bff.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think> The result shows a taskId (\"local-wu-functions-execute-tool-11\") and no imageUrl. This is exactly what we expect…",
+    "encoding_format": "float"
+  }
+}

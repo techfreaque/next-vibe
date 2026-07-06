@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:execute-tool] {\"toolName\":\"self-instance-id\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Forbidden\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"self-instance-id\",\"input\":{},\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-bg-functions-execute-tool-3\",\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"toolName\":\"dismiss-task\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"dismiss-task\",\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07\n\nAssistant: [tool:execute-tool] {\"toolName\":\"dismiss-task\",\"input\":{\"callId\":\"local-bg-functions-execute-tool-3\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Forbidden\"}",
+    "encoding_format": "float"
+  }
+}

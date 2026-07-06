@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b7b8defb7dc84-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 04:45:50 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783140349-ZYK0OGudN2boo6KWsR7l"
+  },
+  "body": {
+    "id": "gen-1783140349-ZYK0OGudN2boo6KWsR7l",
+    "object": "chat.completion",
+    "created": 1783140349,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio sample features a 16-second instrumental track.\n\n**Music:**\n- **Genre:** Funk/Hip-Hop inspired instrumental.\n- **Tempo:** Moderate, around 90-100 BPM.\n- **Time Signature:** 4/4.\n- **Instruments:**\n    - **Electric Guitar:** Plays a main melody with a clean, slightly funky tone. The melody consists of short, rhythmic phrases that repeat.\n    - **Electric Bass:** Provides a simple, walking bass line that grooves with the drums.\n    - **Drum Machine/Percussion:** Features a standard drum kit sound with a consistent kick and snare pattern, and a closed hi-hat keeping a steady rhythm. The kick and snare have a bit of a \"boom-bap\" feel, characteristic of older hip-hop production.\n- **Interaction:** The guitar leads the melodic content, while the bass and drums lay down a solid, head-nodding groove. All elements are well-synchronized, creating a cohesive funky feel.\n- **Production Style:** The production sounds clean and relatively polished, with clear separation between instruments. There is some reverb on the instruments, giving it a somewhat spacious feel without being overly wet.\n- **Mood:** Upbeat, groovy, and slightly laid-back. It evokes a feeling of chill coolness.\n\n**Sound Quality:** The recording quality is good, suggesting a studio or well-produced environment. The instruments are balanced and clear.\n\n**Duration Impression:** Short clip, likely a snippet or loop from a larger track.\n\n**Non-musical audio events:** None.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 332,
+      "total_tokens": 1404,
+      "cost": 0.0016766,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016766,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00083
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

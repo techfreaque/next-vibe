@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b3f893b58dbe4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 04:04:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783137891-39Uxza1sfLXgXipRg1Nj"
+  },
+  "body": {
+    "id": "gen-1783137891-39Uxza1sfLXgXipRg1Nj",
+    "object": "chat.completion",
+    "created": 1783137891,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a 24-second, professionally produced, close-up cinematography piece featuring a person solving a Rubik's Cube. The visual style is realistic, cinematic, and saturated with high-contrast lighting that emphasizes colors against a somewhat dark, bokeh-heavy background.\n\n**Visual Content and Sequence**\nThe video opens with an extreme close-up of a pair of hands holding a standard 3x3 Rubik's Cube. The environment is crowded with numerous other Rubik's Cubes scattered on a tabletop surface, out of focus in the background, creating a textured, colorful, and chaotic depth. Throughout the video, the person’s fingers manipulate the cube with precision and high speed, rotating the rows and columns to align the colors.\n\nThe focus remains tightly locked on the cube itself. The person’s skin tone is warm, and the lighting catches the smooth plastic tiles of the cube as they click into place. The scene is static in terms of camera position—there are no cuts or pans; the shot is a continuous, steady, macro-style close-up that follows the action of the hands.\n\n**Text and UI**\nThere is no text, watermarks, or UI elements visible in the video frame at any point.\n\n**Audio**\nThe audio consists entirely of ambient sound effects associated with the manipulation of the object. There is no background music or spoken dialogue. The primary sound is a crisp, rhythmic, and mechanical \"clacking\" or \"clicking\" noise as each layer of the cube is turned. The sound is amplified and distinct, emphasizing the tactile nature of the puzzle-solving process. The audio quality is professional and clear.\n\n**Style, Mood, and Arc**\nThe production quality is high, suggesting a professional studio setting or a high-end social media demonstration video. The mood is focused, rhythmic, and satisfying. There is no clear narrative arc beyond the demonstration of the task, starting with the cube in a partially scrambled state and ending with the person continuing to manipulate it as the video loop concludes. The pacing is dictated by the finger movements, which are fluid and swift, creating a sense of capability and order amidst the chaotic heap of cubes in the background.\n\n**Environment and Atmosphere**\n- **Setting:** An indoor studio or workbench, heavily cluttered with dozens of brightly colored Rubik's Cubes of various sizes, shapes, and states of solved/unsolved status.\n- **Lighting:** Warm, directional light that highlights the gloss of the cube faces and creates soft shadows in the gaps between the cubes in the background.\n- **Camera Work:** A steady, fixed close-up (macro shot). The focal plane is narrow, keeping the primary cube in sharp focus while the surrounding cubes fade into a soft, blurry wash of color.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgEMOdbHs3iqx3ZSaLeFe/EfCVnmPJ5cadSjBE81qY5/I9U1oSut69nVix3hg0dNbhGo",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 574,
+      "total_tokens": 983,
+      "cost": 0.00096325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00096325,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.000861
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

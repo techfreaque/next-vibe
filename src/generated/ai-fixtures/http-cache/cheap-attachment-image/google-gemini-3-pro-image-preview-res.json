@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15560f10a92db06-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 10:59:07 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783076344-6yrkXZobdnkhqpMMS6N9"
+  },
+  "body": {
+    "id": "gen-1783076344-6yrkXZobdnkhqpMMS6N9",
+    "object": "chat.completion",
+    "created": 1783076344,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A clean, graphic illustration shows a single, perfectly circular shape rendered in a solid, vibrant crimson red. This circle is completely centered within a plain, uniformly bright white background that extends to the edges of the square frame. The composition is minimalist and symmetrical, with no other elements, textures, or text present. The edges of the circle are sharp and defined. The image appears to be a digital creation or a clean photograph of a graphic design.",
+          "refusal": null,
+          "reasoning": "**Defining Visual Simplicity**\n\nI'm focusing on distilling the essence of visual simplicity. Currently, my thought process revolves around defining the core elements, like the centered red circle on a white background, and how to describe this primary scene. The circle and background have been identified as key elements of this design.\n\n\n**Analyzing Core Elements**\n\nI've broken down the image into its fundamental components. The central red circle and the white background have been analyzed separately. I've considered the spatial layout, the colors, and the general style. There are no distracting elements like text or complex details. The visual is uncomplicated, appearing as a clean, digital graphic.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining Visual Simplicity**\n\nI'm focusing on distilling the essence of visual simplicity. Currently, my thought process revolves around defining the core elements, like the centered red circle on a white background, and how to describe this primary scene. The circle and background have been identified as key elements of this design.\n\n\n**Analyzing Core Elements**\n\nI've broken down the image into its fundamental components. The central red circle and the white background have been analyzed separately. I've considered the spatial layout, the colors, and the general style. There are no distracting elements like text or complex details. The visual is uncomplicated, appearing as a clean, digital graphic.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EvsHCvgHAQw51seU+g1HD0zompfsQQpejGMXMxwF3fhTB4zLtwYcKkmISBn1u6ixp/pWeUenvBXLcsJZ3Yg9KzynPoU5EPwNCiabYmwC6DSm4LyCTkFXWW7fWquWwQ+zl9B17pHeUWdEvlIV36h7TAvnKiuGGSAOSMZ34GroBsMGuGVXO+dAuw066RxXIGl/TWTrZY3Dfekj185v2bYQR3fnfVBZasEkGjRUdhQXMQWQ7ErwepRsU97SB7GxkWAmZIxVsGBBIKXFSTGN3womv0J35KKANihiqVjfPxEkRNiCQxcgbMLosxod9+NZrLhJmEaxSAiZrHWiTTrVwbq79I1GqcOuWSSq/ZePy10vqakt2khLEo8yKqF0Ef/W53aE5ufNNy7IVS5S/PSSxWU0ewuOdNvkfWrV51BUenHHoYUJGFhqSY5mxMHhKXjoL4jxNTukzN4ZhNDv5qa8reO7drSLsrtD6R++J5yF6170Lfqj0IMCDN+RRyHuSYb6t9rRFxuf+SB2m5ACqR7bRJTjmWJ1LM3qS+d+JbLYilnGiCOMiELF8d68RDRleRrTgpFGxlBG09wQYcELDwiW5aZDf9dmL1nfg11RKSReW4nNwKtMBhvk/BY41FAcvrSiGTrhwHPnaXq4y37pU43KJBo7/zwgNxTeloIB8ftX8O9N5J1YH/LFjlbdFEdmarnK2OD4u9+owws/kIxVR3RkAO5dEg19AVz51cW4ODDyqZVB5COpi4UE1alyOtw3G6ogHQg5nsESvVOd9EdXSM7bX2yVHpjWD3MVC+7cfN5q+uojHNI6DXOuh+AamUFfxgf4PnEi04kRDfLTGA5Ih/s9ZvhKL8k5h45twQPyaxdbgKY2tUWzBBOe/F3YX83LRxmfU85Zqf++ct3Y3ownwR0nA88BI4sbJP3sZjHp97zkQ16UceNBFF4UJ3KfIWwtsyhvWIRaKRlWlHckK+mqb1mSPU/VplBpeFKSdyEcE4uss0VAjJ6J3MEyQfGHNXarfG3jPKyhdwjDj3ToR9LBFYT1eDmzy1z6vz0s8Jdsf0IPiW3e5OgRCE65DO04zD6HB8L70V5H+JjpHTHgg0v/e6ey6G/tya4A9sXc6XuQD00NjCuZ8svmEGTDaFwy9WY3yNHRJEBqD2UgkzLQ4+n+QXatQQT1mqYskQTdgbo/Bkx2vEcnHqnn7Baa3Ah+7NhG9LI6O3RCySjSo84etMYwlCWpbCZX++Aub2UwOeoa2n0letqh+QdImZu2VOz8dx9cFF8hy0U3uPM0GSjOaiCVff6PC8iclwsB5RqBg5Wvq4IAjhUlhtSE4Zcn2gDK4vAW+6/UI7hLP5rSXZ1mdxiWAlZ+YhI="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 290,
+      "total_tokens": 826,
+      "cost": 0.004552,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004552,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.00348
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 201,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15b95ca4e19d282-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 05:03:45 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783141424-dVdlofuxNk79i2W9LknJ"
+  },
+  "body": {
+    "id": "gen-1783141424-dVdlofuxNk79i2W9LknJ",
+    "object": "chat.completion",
+    "created": 1783141424,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A male voice, likely adult, speaks in a slow, deliberate pace with a somewhat formal or annunciated tone, possibly with an Eastern European accent, in a quiet, likely indoor recording environment. His voice sounds clear and direct, despite a slight echo or room resonance, and he seems to be precisely following instructions, adopting a neutral, instructional tone.\n\nHe states: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword banana banana, and I need to fill up the last few seconds, and it will be\". The audio ends abruptly during his final word \"be\".\n\nThe entire clip lasts approximately 18 seconds. There are no other discernible sound effects, music, or background voices.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 150,
+      "total_tokens": 972,
+      "cost": 0.0009716,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009716,
+        "upstream_inference_prompt_cost": 0.0005966,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/remote-stream-af64f6af-253c-4e71-8db7-45b2e3c4a8af.md\n\n# Remote Stream\nFolder: remote",
+    "encoding_format": "float"
+  }
+}

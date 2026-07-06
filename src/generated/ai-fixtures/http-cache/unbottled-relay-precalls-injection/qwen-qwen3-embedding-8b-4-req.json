@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T9 setup] Call the generate_image tool with prompt='mountain landscape at golden hour' to generate an image. End your reply with STEP_OK once the image is generated.\n\nAssistant: <think>The user wants me to call generate_image with a specific prompt. Let me check the schema first to make sure I pass the right parameters.</think>\n\nAssistant: <think>Good, I have the schema. The only required parameter is `prompt`. I'll call it with the specified prompt.</think>\n\nAssistant: <think>The image was generated successfully. The result includes an imageUrl and a creditCost of 2.6 credits. Let me end with STEP_OK.</think>Image generated successfully: `mountain landscape at golden hour` — 2.6 credits, image available at the returned URL.\n\n**STEP_OK**\n\nUser: [T9 report] An image was generated for you earlier in this conversation. Look at the generate_image tool result in your context and report the exact imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://' or 'http://', or FAILED: <reason> if no imageUrl was visible.",
+    "encoding_format": "float"
+  }
+}

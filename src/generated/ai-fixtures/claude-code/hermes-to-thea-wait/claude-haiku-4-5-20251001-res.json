@@ -1,0 +1,550 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[HT1 direct-wakeup] Use the tool-help tool on the thea instance (prefix: thea__) to look up \"generate_image\". Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason>.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nTask initiated with wakeUp mode. TaskId: `local-wu-1775434873120-qb008x`. Status: pending. Awaiting automatic result injection...\n[HT2 direct-wa",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to execute two tasks:\n\n1. HT1: Use tool-help on the \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "thea\" instance (with prefix \"thea__\") to look up \"generate_image\" using wakeUp callback mode. Reply STEP_OK when the tool result is available"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", or FAILED with reason.\n\n2. HT2: Use tool-help on the \"thea\" instance (with \"thea__\" prefix) to look up \"generate_image\" using wait callback mode. Reply STEP_OK when done, or FAILED with reason"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ".\n\nLet me understand the context:\n- There's a remote instance called \"thea\" (in addition"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to \"hermes\" mentioned in the context)\n- I need to use the tool-help tool with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instanceId=\"thea\" \n- The prefix \"thea__\" suggests this is how to"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " reference remote instance tools\n- For HT1: use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " callbackMode=\"wakeUp\"\n- For HT2: use callbackMode=\"wait\"\n\nLooking at the available tools, I have `"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "mcp__vibe-tools__"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "tool-help` which can accept an `instanceId` parameter.\n\nFor HT1 (w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp mode):\n- Fire and forget with wakeUp means it returns task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id immediately\n- The result gets automatically injected into the thread when ready\n- I should reply STEP_OK when the result"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " arrives\n\nFor HT2 (wait callback mode):\n- Execute with wait callback (which is actually"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the default)\n- Block until result returns\n- Reply STEP_OK when done\n\nLet me execute both tasks:\n\nHT1: tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-help with instanceId=\"thea\" (or should it be just the remote instance context"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "?), query=\"generate_image\", callbackMode=\"wakeUp\"\n\nActually, looking at the context more carefully:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"Remote tools use the same callbackMode system as local"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tools. Default is 'wait' - the tool result"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " arrives automatically once the remote instance finishes execution.\"\n\nAnd:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"execute-tool(toolName, instanceId='hermes', input)\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " shows the pattern for remote execution.\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool-help endpoint accepts an instanceId parameter, so I can query the remote \"thea\" instance directly."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " For HT1, I'll invoke tool-help with callbackMode=\"wakeUp\" and instanceId=\"thea\" to look up \"generate_image\","
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " then wait for the result to arrive. For HT2, I'll make the same call but with callbackMode=\"wait\" to block until completion."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "I'll execute both tasks. Starting with HT1 using wakeUp mode, then HT2 using wait mode"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "6492d660-f9e2-41fa-84bc-fdd7f6bf20fc",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\",\"callbackMode\":\"wakeUp\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "6492d660-f9e2-41fa-84bc-fdd7f6bf20fc",
+      "toolName": "tool-help",
+      "result": "{\n  \"taskId\": \"local-wu-1775434923348-ip23ow\",\n  \"status\": \"status.pending\",\n  \"hint\": \"Result will be injected when complete. Call wait-for-task only if you need the result before continuing.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Good."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " HT1 is initiated with wakeUp mode. TaskId: `local-wu-1775434923348-ip23ow`."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The result will be injected automatically into the thread when ready.\n\nNow I should wait for it to arrive. According"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to the instructions, the stream will revive automatically when the result is"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " ready. But I have another task to execute (HT2),"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " so I can proceed to execute HT2 now while the w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp is pending.\n\nActually, let me re-read the instructions for wakeUp:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"Fire and forget. Returns `{taskId}` immediately. The result is automatically injected into this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " thread when ready - the stream revives and you will see the tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " result as a new message. Do NOT call wait"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-for-task for wakeUp.\"\n\nSo I should NOT call wait-for-task for HT1. But I can execute"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " HT2 now. HT2 uses wait callback mode (or default), which means it will block until done"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ".\n\nLet me execute HT2 now:"
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-1"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-1",
+      "delta": "Now executing HT2 with wait callback mode:"
+    },
+    {
+      "type": "text-end",
+      "id": "text-1"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Ah, I see. \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "wait\" is not a valid callbackMode option. The valid options are:\n- \"detach\"\n- \"wakeUp\"\n- \"endLoop\"\n- \"approve\"\n\nThere"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is no \"wait\" mode. The default behavior (when no callbackMode is specified) is synchronous/"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "wait behavior. Let me re-read the instructions:\n\n\"Default is \"wait"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\" - the tool result arrives automatically once the remote"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " instance finishes execution.\"\n\nSo \"wait\" is the default, but it's not explicitly"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " named as a callbackMode option. When I omit call"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "backMode, it defaults to wait behavior.\n\nFor HT2, I should call tool-help without specifying callbackMode (or"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I could use endLoop to explicitly finish after getting the result). Let"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me call it without callbackMode, which should give the default synchron"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ous/wait behavior:"
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-2"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-2",
+      "delta": "Let me correct HT2 - \""
+    },
+    {
+      "type": "text-delta",
+      "id": "text-2",
+      "delta": "wait\" is the default behavior. Calling without specifying callbackMode:"
+    },
+    {
+      "type": "text-end",
+      "id": "text-2"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "369b8ae1-52a3-4ff9-b85f-6f56feeb1ec8",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"instanceId\":\"thea\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "369b8ae1-52a3-4ff9-b85f-6f56feeb1ec8",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0,\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\"\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "I see"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". HT2 completed with a result indicating that"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the \"thea\" instance has no capability snapshot. This means the instance is either not connected or hasn"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'t synced yet.\n\nHT1 is still pending with w"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "akeUp mode. The result should be automatically injected when ready. But I'm getting"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the same error condition for both - the \"thea\" instance doesn't have a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " capability snapshot.\n\nLet me check the status. The instructions say for HT1: \"Reply STEP_"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "OK when the tool result is available, or FAILED:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " <reason>.\"\n\nSo:\n- HT1: wakeUp mode initiated, Task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id: local-wu-1775434923348-ip23ow, pending result injection\n- HT2: wait mode (default) executed"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", result: \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\"\n\nActually, wait. Let me re-read the task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " again. It says \"thea__ prefix\". Let me check if there's a \"thea\" instance mentioned in"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the context.\n\nLooking at the context:\n\"## Remote Instances\n\nUser"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " has 1 connected local instance:\n\n- \""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "hermes\" - use help(instanceId=\"hermes\") to discover"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tools, execute-tool(toolName, instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id=\"hermes\", input) to run them\"\n\nSo the context only mentions \"hermes\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " as a connected instance. There's no mention of \"thea\". The user is asking me to use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the \"thea\" instance with the \"thea__\" prefix, but this instance doesn't appear"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to be configured.\n\nBoth HT1 and HT2 are hitting the same issue: the \"thea\" instance either doesn't exist"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " or isn't connected.\n\nFor HT1, the wakeUp task is still pending."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " I should wait to see if the result gets injected. But the synchronous HT2 call already"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " returned with the error condition.\n\nLet me report the status:\n- HT1: Initiated"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " (wakeUp), TaskId: local-wu-1775434923348-ip23ow, awaiting result injection\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\n- HT2: Failed"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " because the \"thea\" instance isn't connected or properly configured in the system."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-3"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": "**HT1 Status:**\n- **TaskId:** local-wu-1775434923348-ip23ow\n- **CallbackMode:** wakeUp"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": "\n- **Status:** Pending - awaiting automatic result injection\n\n**HT2 Status:**\n- **CallbackMode:** wait (default, omitted)\n- **Result:**"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": " FAILED\n- **Reason:** No capability snapshot for instance \"thea\". Instance is not connected or not synced. The"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": " remote instance \"thea\" is not available in this environment.\n\nThe"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": " context indicates only the \"hermes\" instance is connected. The \"thea\" instance referenced in the tasks does not appear"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-3",
+      "delta": " to be configured or connected to this session."
+    },
+    {
+      "type": "text-end",
+      "id": "text-3"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 34,
+        "outputTokens": 2281,
+        "totalTokens": 2315,
+        "cachedInputTokens": 23064
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 8747
+        }
+      }
+    }
+  ]
+}

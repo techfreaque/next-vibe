@@ -1,0 +1,8 @@
+{
+  "url": "https://0fd6-194-54-76-84.ngrok-free.app/api/en-US/system/server/server/health",
+  "method": "GET",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": ""
+}

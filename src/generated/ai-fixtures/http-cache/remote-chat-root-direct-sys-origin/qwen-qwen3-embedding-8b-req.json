@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1 thread-create+tool-call] Explore the tool catalog gradually with the tool-help tool. First call it with no arguments — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call the tool-help tool again with category='<that category name>' to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the categories list and the narrowed tools list both looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>Let me start by calling tool-help with no arguments to get the categories list.</think>\n\nAssistant: <think>The first call returned a categories list with 22 categories and 528 tools total. Each category has a name and count. Let me pick one category and drill into it. I'll pick \"browser\" since it has 26 tools and manageable subcategories - that should give me a good non-empty list.</think>Good — 22 categories returned, 528 tools total. Let me drill into one.\n\nAssistant: <think>The second call returned a non-empty tools array with 26 tools, each having a name and description. Let me verify:\n\n- `name`: \"browser-click\", `description`: \"Click an element by its UID from a snapshot...\"\n- `name`: \"browser-close-page\", `description`: \"Close the current session page...\"\n- etc.\n\nAll 26 tools have both a name and description. This looks correct.\n\nSTEP_OK - both calls worked correctly:\n1. First call (no args) → returned 22 categories with counts, hint about using category parameter\n2. Second call (category=\"browser\") → returned 26 tools, each with name and description</think>**First call (no args):** Returned 22 categories (e.g. `browser (26)`, `ai (69)`, `accounting (22)`, `desktop (12)`, etc.) with counts and subcategories. 528 tools total.\n\n**Second call (category\n\nUser: [T-SYS] Call the self-instance-id tool to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.",
+    "encoding_format": "float"
+  }
+}

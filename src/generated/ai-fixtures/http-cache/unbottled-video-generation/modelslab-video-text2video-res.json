@@ -1,0 +1,59 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/video/text2video",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a153cec4d9cb39bc-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 06:24:36 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=%2Bjzmc5Wm9YAzMXIy5e9GHVMKkr%2FaSbolbtVdqmbdt3ZF2UneFJvHsq21dxik8r%2Bm%2FfomksHW9KjXrbHa9nQf%2BGYGlzkqIG%2FCInqtzqh6Jy5STiI4DzpW7yESoAqPELA%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "3254c6b486ec5a387675e02946fe394a",
+    "x-request-time": "4.447",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 80,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/video/fetch/181421317",
+    "id": 181421317,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/34d065fd-8435-4ea9-92f6-30f4dde25668-0.mp4"
+    ],
+    "meta": {
+      "id": 181421317,
+      "model_id": "wan2.2",
+      "prompt": "spinning cube",
+      "seed": 538860,
+      "portrait": "no",
+      "negative_prompt": "low quality",
+      "num_frames": 25,
+      "num_inference_steps": 8,
+      "guidance_scale": 1,
+      "fps": 16,
+      "temp": "no",
+      "base64": "no",
+      "webhook": null,
+      "track_id": null,
+      "watermark": "no",
+      "file_prefix": "34d065fd-8435-4ea9-92f6-30f4dde25668",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/34d065fd-8435-4ea9-92f6-30f4dde25668-0.mp4"
+      ]
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/remote-connection/connect-reverse",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "instanceId": "atlas",
+    "localUrl": "http://localhost:3000",
+    "selfUserId": "fa8f2bae-a0ac-4c48-83d7-f33ce074085e",
+    "reverseToken": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImZhOGYyYmFlLWEwYWMtNGM0OC04M2Q3LWYzM2NlMDc0MDg1ZSIsImxlYWRJZCI6ImQzNmQzNjhhLWZlYjMtNDJjNy1hNDVjLTM0MTY4NzQ2ZGFkMiIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgyOTkyMjIxLCJleHAiOjQ5MzY1OTIyMjF9._1-g9ztGMgb6Hz5q5jekmOfbUsBWXnw2hw6gq9MV2WA",
+    "reverseLeadId": "d36d368a-feb3-42c7-a45c-34168746dad2"
+  }
+}

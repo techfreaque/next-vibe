@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>Good, I have the schemas. Now I'll write the file and then read it back. I can do write first, then read.</think>\n\nAssistant: <think>Write succeeded. Now read it back to verify the content.</think>\n\nAssistant: <think>The write succeeded (created: true, size: 11) and the read returned content exactly \"T2_CHEAP_OK\". Everything is correct.</think>Write succeeded (`created: true`, size 11). Read-back confirmed content is exactly **\"T2_CHEAP_OK\"**.\n\nSTEP_OK\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/uploads/audio/t1-thread-create-tool-call-explore-the-tool-1be1a9d7-4864-4fc2-81ff-ea5efd7eb316/test-voice.wav.md\n\n---\nfilename: \"test-voice.wav\"\nembedded: true\nmimeType: \"audio/wav\"\nsize: \"625.0 KB\"\nthreadId: \"1be1a9d7-4864-4fc2-81ff-ea5efd7eb316\"\nthreadTitle: \"[T1 thread-create+tool-call] Explore the tool...\"\nuploadedAt: \"2026-06-30T11:24:03.804Z\"\n---\n\n# test-voice.wav\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/wav` |\n| Size | 625.0 KB |\n| Thread | [T1 thread-create+tool-call] Explore the tool... |\n| Uploaded | 2026-06-30 |\n\n## Message Context\n\n[T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.",
+    "encoding_format": "float"
+  }
+}

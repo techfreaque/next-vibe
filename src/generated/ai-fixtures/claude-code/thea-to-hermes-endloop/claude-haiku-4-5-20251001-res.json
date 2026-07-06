@@ -1,0 +1,201 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[TH1 queue-wakeup] Use the tool-help tool on the hermes-dev instance (prefix: hermes-dev__) to look up the \"generate_image\" tool. Use wakeUp callback mode. Reply STEP_OK when the tool result is available, or FAILED: <reason> if anything went wrong.\n[Tool result for tool-help]:\n{\n  \"status\": \"pending\",\n  \"hint\": \"Result will be injected into this thread when ready. Do NOT call this tool again.\"\n}\nWaiting for wakeUp result...\n[Tool result for wait-for-task]:\n{\n  \"result\": {\n    \"hint\": \"No capabil",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to execute a tool-help query on the hermes-dev instance with endLoop callback mode to look up \"generate_image\". The previous attempts"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " have all failed because the hermes-dev instance is not connected or synchronized.\n\nLet me try to call execute-tool with:\n- tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Name: \"tool-help\" but with the hermes-dev__ prefix - actually, looking at the usage"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " pattern, I think I need to call it as a regular tool-help call but maybe with instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id specified\n- Actually, looking more carefully at the system context, it"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " says: \"Remote tools use the same callbackMode system"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " as local tools. Default is \"wait\" - the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool result arrives automatically once the remote instance finishes execution"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ".\"\n\nAnd for remote execution: \"use help(instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Id=\"hermes\") to discover tools, execute-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "tool(toolName, instanceId=\"hermes\", input) to run them\"\n\nWait"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ", but I've been trying execute-tool with \"hermes-dev__\" prefix which is returning"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " Tool Not Found. Let me look at what the actual available tools are. The system"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " says I have access to tools like:\n- mcp__v"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "ibe-tools__ai-run\n- mcp__vibe-tools__brave-search\n- mcp__vibe-tools__coding"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-agent\n- mcp__vibe-tools__execute-tool\n- etc.\n\nSo execute-tool is the universal dispatcher."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The instanceId parameter should be passed separately, not as a prefix. Let me try calling tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-help directly with instanceId=\"hermes-dev\".\n\nActually, wait - let me re-read the system context. It says:\n\"Remote Instances: User"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " has 1 connected local instance: \"hermes\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " - use help(instanceId=\"hermes\") to discover tools, execute-tool(toolName, instanceId=\"hermes\", input) to run them\"\n\nSo the connected instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is \"hermes\", not \"hermes-dev\". But the task says to use hermes-dev instance. There seems to be a mismatch. The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " context says only \"hermes\" is connected.\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the task queue, I see there are multiple test cases queued up -"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " one for queue-wakeup, queue-wait, queue-detach, and queue-endLoop modes, all using"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the hermes-dev__ prefix. The instance information at the top indicates this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is running against a cloud production environment at localhost:3000 with instance"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " ID \"hermes-\". This suggests the hermes-dev instance should be available, but my attempts to reach it with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the prefix notation have failed. I need to reconsider whether the prefix"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " approach is correct or if I should be using the instanceId parameter instead."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "e1eb8aa9-ae47-467e-9041-6198642c6bd9",
+      "toolName": "tool-help",
+      "input": "{\"query\":\"generate_image\",\"callbackMode\":\"endLoop\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "e1eb8aa9-ae47-467e-9041-6198642c6bd9",
+      "toolName": "tool-help",
+      "result": "{\n  \"tools\": [\n    {\n      \"name\": \"generate_image\",\n      \"title\": \"Generate Image\",\n      \"description\": \"Generate an image from a text prompt using AI\",\n      \"category\": \"AI\",\n      \"platforms\": [\n        \"cli\",\n        \"ai\",\n        \"mcp\",\n        \"remote-skill\",\n        \"trpc\",\n        \"next-page\",\n        \"next-api\",\n        \"cron\",\n        \"electron\",\n        \"frame\"\n      ],\n      \"parameters\": {\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n        \"type\": \"object\",\n        \"properties\": {\n          \"prompt\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"maxLength\": 2000,\n            \"description\": \"Describe the image you want to generate\"\n          },\n          \"model\": {\n            \"default\": \"gemini-3-pro-image-preview\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"flux-pro\",\n              \"flux-2-max\",\n              \"flux-2-klein-4b\",\n              \"riverflow-v2-pro\",\n              \"riverflow-v2-fast\",\n              \"riverflow-v2-max-preview\",\n              \"riverflow-v2-standard-preview\",\n              \"riverflow-v2-fast-preview\",\n              \"flux-2-flex\",\n              \"flux-2-pro\",\n              \"seedream-4.5\",\n              \"gen4-t2i-turbo\",\n              \"gen4-image\",\n              \"wan-2.7-t2i\",\n              \"grok-t2i\",\n              \"z-image-base\",\n              \"z-image-turbo\",\n              \"flux-pro-1.1-ultra\",\n              \"imagen-4-ultra\",\n              \"imagen-4\",\n              \"imagen-4-fast\",\n              \"qwen-t2i\",\n              \"realtime-t2i\",\n              \"gemini-3.1-flash-image-preview\",\n              \"gemini-3-pro-image-preview\",\n              \"gpt-5-image-mini\",\n              \"gpt-5-image\"\n            ],\n            \"description\": \"Select an image generation model\"\n          },\n          \"size\": {\n            \"default\": \"post.size.square1024\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.size.square1024\",\n              \"post.size.landscape1792\",\n              \"post.size.portrait1792\"\n            ],\n            \"description\": \"Select output image dimensions\"\n          },\n          \"quality\": {\n            \"default\": \"post.quality.standard\",\n            \"type\": \"string\",\n            \"enum\": [\n              \"post.quality.standard\",\n              \"post.quality.hd\"\n            ],\n            \"description\": \"Select output image quality\"\n          },\n          \"aspectRatio\": {\n            \"type\": \"string\",\n            \"description\": \"Output image aspect ratio\"\n          }\n        },\n        \"required\": [\n          \"prompt\"\n        ]\n      },\n      \"examples\": {\n        \"inputs\": {\n          \"default\": {\n            \"prompt\": \"A photorealistic sunset over a mountain lake\",\n            \"model\": \"gemini-3-pro-image-preview\",\n            \"size\": \"post.size.square1024\",\n            \"quality\": \"post.quality.standard\"\n          }\n        },\n        \"responses\": {\n          \"default\": {\n            \"imageUrl\": \"https://example.com/generated-image.png\",\n            \"creditCost\": 4\n          }\n        }\n      }\n    }\n  ],\n  \"totalCount\": 350,\n  \"matchedCount\": 1,\n  \"hint\": \"Call as: execute-tool toolName=\\\"generate_image\\\". CLI: vibe generate_image [--field=value].\",\n  \"currentPlatform\": \"ai\",\n  \"currentEnv\": \"development\"\n}"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 20,
+        "outputTokens": 2,
+        "totalTokens": 22,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "other",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 14958
+        }
+      }
+    }
+  ]
+}

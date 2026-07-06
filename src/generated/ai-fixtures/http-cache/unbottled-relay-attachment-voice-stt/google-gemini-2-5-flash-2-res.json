@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a167c8e5a8f23eba-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 16:35:47 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783269346-4JuXfvoezYE38I7BO820"
+  },
+  "body": {
+    "id": "gen-1783269346-4JuXfvoezYE38I7BO820",
+    "object": "chat.completion",
+    "created": 1783269346,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip that is 14 seconds long. It features an upbeat, funky, and jazzy tune with a prominent bassline that drives the rhythm. The song has a clean, polished production style with a crisp sound quality.\n\nA funky guitar riff plays a repeating, rhythmic pattern. The bassline is in a call-and-response style, playing an accompanying funk bassline. There is a prominent clap sound effect on the second and fourth beats that sounds like a drum machine or clap sample. A light cymbal accent emphasizes the groove, and a closed high-hat plays a brisk, consistent eighth-note pattern.\n\nThe tempo is moderate, at approximately 100-110 BPM. There are no vocals, speech, or other accompanying sounds.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 159,
+      "total_tokens": 1231,
+      "cost": 0.0012441,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012441,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0003975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

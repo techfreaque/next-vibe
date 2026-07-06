@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1556210385dd29c-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 10:59:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783076391-4srVzz7U4gbdlhnt4gSN"
+  },
+  "body": {
+    "id": "gen-1783076391-4srVzz7U4gbdlhnt4gSN",
+    "object": "chat.completion",
+    "created": 1783076391,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio features a short, looped instrumental track, predominantly electronic, with a slight \"lo-fi\" or retro feel. It plays for 25 seconds before fading out, suggesting a snippet rather than a full song.\n\n**Instrumentation and Arrangement:**\n\n- **Drums:** A prominent, consistent electronic drum beat forms the backbone of the track. It features a sharp, almost hip-hop-influenced kick drum, a clear snare with a little reverb, and a tight closed hi-hat. The tempo is a steady 105-110 BPM, giving it a relaxed but rhythmic feel. The drums are the most stable element throughout the loop.\n- **Bass:** A \"wobbly\" or slightly detuned synth bass provides a groovy, almost funky underpinning. It's not a driving 808 but rather a melodic bassline that adds character and movement.\n- **Synth Melody/Lead:** A clean, almost bell-like synth melody plays a repetitive, simple but catchy motif. It doesn't have a lot of complex counterpoint but serves as the main melodic hook. There's a slight reverb on this synth, giving it a bit of space.\n- **Synth Pads/Chords:** Subtle, sustained synth chords or pads provide harmonic texture in the background, filling out the sound without being overly dominant.\n\n**Genre & Mood:**\n\n- **Genre:** The track leans towards genres like \"chillhop,\" \"lo-fi hip-hop,\" or possibly \"easy listening electronic.\" It evokes a calm, perhaps slightly nostalgic, and relaxed mood.\n- **Mood:** The overall mood is cool, laid-back, and slightly groovy. It’s the kind of background music one might hear in a relaxed cafe or a study session.\n\n**Production & Sound Quality:**\n\n- The production is clean but not overly polished, contributing to the \"lo-fi\" aesthetic. There's a slight warmth to the sound.\n- There are no discernible vocal elements or specific sound effects beyond the instruments themselves.\n\n**Structure:**\n\n- The audio appears to be a single, short loop playing repeatedly without significant changes in arrangement until it fades out.\n- It doesn't present a clear verse-chorus structure but rather a continuous groove.\n\n**Duration Impression:**\n\n- This is a short, isolated clip, likely an excerpt or a short background music loop.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 491,
+      "total_tokens": 1563,
+      "cost": 0.0020741,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020741,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0012275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

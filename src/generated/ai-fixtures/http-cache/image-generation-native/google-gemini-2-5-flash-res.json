@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a13ccee9aaac35e4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 30 Jun 2026 11:25:06 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782818705-JbsojTV5Vy6xWRPjQt4j"
+  },
+  "body": {
+    "id": "gen-1782818705-JbsojTV5Vy6xWRPjQt4j",
+    "object": "chat.completion",
+    "created": 1782818705,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio presents a brief, approximately 20-second musical instrumental track, characterized by a smooth, upbeat, and slightly funky disco sound.\n\n**Genre:** Disco, Funk\n**Tempo:** Approximately 110-120 BPM, giving it a moderate, danceable pace.\n**Time Signature:** 4/4\n\n**Instrumentation:**\n- **Electric Guitar:** Plays a prominent, clean, and rhythmic funk riff. The guitar is likely processed with a wah pedal or an auto-wah effect, contributing significantly to the funky feel. It consistently maintains a steady, syncopated groove.\n- **Bass Guitar:** Provides a driving and melodic bassline, locking in with the drums and supporting the guitar riff. It has a classic disco/funk bass tone, likely with a slight slap or pop element.\n- **Drums:** A standard drum kit provides a solid, four-on-the-floor disco beat with a prominent hi-hat pattern and snare accents on the off-beats. There are no complex fills, maintaining a steady rhythmic foundation.\n- **Synth/Keyboard:** A clean, bright synth chord progression is layered over the other instruments, adding a harmonic richness characteristic of disco music. It seems to be playing sustained chords rather than a lead melody.\n\n**Interaction:** The instruments interact in a classic disco/funk arrangement. The bass and drums lay down a tight rhythmic foundation, over which the electric guitar weaves its distinctive funk riff. The synth chords provide harmonic depth, filling out the sonic space.\n\n**Production Style:** The production sounds clean and polished, characteristic of a studio recording. There's a good balance between instruments, and the overall mix is bright and clear. Slight reverb might be present on some elements, but it's not overly drenched.\n\n**Mood and Emotional Arc:** The track maintains an consistently upbeat, playful, and energetic mood throughout its short duration. It evokes feelings of lightheartedness and a desire to dance.\n\n**Duration Impression:** This is a very short clip, likely an excerpt or a jingle. It doesn't have a discernible song structure (intro, verse, chorus) beyond its immediate groove.\n\n**Sound Quality:** The sound quality is high, clear, and well-produced. The recording environment sounds like a professional studio.\n\nNo speech, background voices, overlapping speech, or notable sound effects are present.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 487,
+      "total_tokens": 1559,
+      "cost": 0.0020641,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020641,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0012175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

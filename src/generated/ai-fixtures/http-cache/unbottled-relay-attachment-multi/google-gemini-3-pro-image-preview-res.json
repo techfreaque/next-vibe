@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1573f651a98e85a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 16:25:46 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783095941-3b68bYwrdL6tRQdsQXT7"
+  },
+  "body": {
+    "id": "gen-1783095941-3b68bYwrdL6tRQdsQXT7",
+    "object": "chat.completion",
+    "created": 1783095942,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A graphic illustration featuring a single, solid red circle, perfectly centered against a plain white background. The circle is sharply defined with clean edges and has a uniform, vibrant red color without any gradients or textures. The white background is also uniform and lacks any details, shadows, or elements. The overall composition is minimalist and symmetrical, resembling the national flag of Japan.",
+          "refusal": null,
+          "reasoning": "**Defining the Subject**\n\nI'm currently focused on precisely defining the subject. It's a single, solid red circle, completely centered on a white backdrop. The style leans towards minimalist and graphic, possibly an illustration. There are no other elements present.\n\n\n**Analyzing the Visuals**\n\nI've broken down the image into specific features for analysis. I'm noting the singular circular shape, its precise central placement, and the stark contrast with the white background. I've also identified the color palette and the overall style as a minimalist illustration. Additional details, like the crisp edges and even lighting, are also being considered.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining the Subject**\n\nI'm currently focused on precisely defining the subject. It's a single, solid red circle, completely centered on a white backdrop. The style leans towards minimalist and graphic, possibly an illustration. There are no other elements present.\n\n\n**Analyzing the Visuals**\n\nI've broken down the image into specific features for analysis. I'm noting the singular circular shape, its precise central placement, and the stark contrast with the white background. I've also identified the color palette and the overall style as a minimalist illustration. Additional details, like the crisp edges and even lighting, are also being considered.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EqQLCqELAQw51scpjbKFGww7hgzqLEPPP4tep2qT/mbTiRiigcy1JS1whGsyfQ6gc51vg2NZPl1NMzNbVV+DxXO7g5lVxNln8X8rPHF6Vvjzv5+ASPQsQufJPPE413sf3OPx3qRbFc28Vpor13LHyj7kcdB6iSqaXjLtw29ox6dHWsryQmBvs7Cu3Q0JDfg+WgnDFTf0yy11OwVr3ZCi3979Xdb4RuwDvd4LaEEp9tWNNa4iBJS+5o2FvpgsnjreT8KdffdJQf8TevHIgUte8RQx8Qvo0q05brsE6dK1jKYPy3RyEEJUpQE+d6WFTVFFK3DAgzZUMiakE1SHLSFtFXM4HfmcdifAh3Eare06VyW1V8+nG66PWcimu00BjXxLBGvaThUPQYjw7UYlrl5ZSV5/pyeiUtNrUJTJI2wiriMbfaCERlgTS7cNEl9/t5hE1XeUwTImvpt+eL6ndgq/3ndtnL6YRHIMbVGMsrii/G6KKMQrTL/GeEleY2ke494pNl2LpFbq5YJ/Od02h+3o2S/++7WHW9uUzYrW4gtzKwd5ee/y3bgnmFi5Sp94EJ4yZt3SWhQ1z4zLtC+oW2oqrfAbrbu8PGku3XNbSKZWy5L6YoXl+SLWh3SqdGiIfigp7RX14rMRQufDiw2XOivzOScEhcIBHwyebEPQ0gZWk/LiXBpfmOtz7fi3pwJpd8/LClh7yFy2UW53K2yO37n4GryvNqjqt9odub/WLaIePrSr1dDYf2ON9T6g1BimBEGUOYzSesupy58HFDdPPVFI/+usHiFd+unpxjj8qNIu6C7OYAgztUo3RNfisWz+70UnSz/i9Ha0OixYlB+49KnRvo5IhdrAZiKLxPg5K4OmNqvtV7tCb02Br+sCepElHzOyKC67Zk9EDfjJOlEYnA3XnqxWqAsMi+vjRuwC8irM9wcwktPhTGlXhtCBKywqYe3zmI+P2tUNiYXvzqsm5uJNBzODraZFm6lR2Hpf555lRWA1FSIiXzxzx7sesZqv9WKM16Y6ncf8YFtfYfaUxQ6E0cKwtppHY46CScCkrqYaAPfbPkPc3bfxCpXaLdw+z6AlPukJ1q4zU0o7eT1DgFitDd1Q5L9t3aI90JbParuNI/JnEr9+2JTzZnb8Gah7G1cGd8XEb+w0zX/W0vGXBPwQu65Dz7ZOCCjdBC/cTR6usuQ72pSBlMaZEjP4MvbDeRddEToo9QnhYmRIK+vhIO6wjYDDUBH83Xibeh8VpKc43MjYSDEF3CdrPt2LdTXyLDOJFf/oT9Ww1Szg2xVKHG5l0eF7xj72c7oZb0DZWil8XtUMU8ngeA32nWqtPeqSbtXRNkp57AhQrAR1eB1C4L5m9SRBOgvH/uz6XvPOhfl+dnInCdo4SnhGCVBmj4OhywvCedyzP2Uk8i2l3N1SDQQEYVB1dmo6WceJ+69Y0x0qPRgYqXRXikCjkt+Dxn8ju0x6aWBNdPgq639Q9h/qe4hfKreY+nYoXdI1A+cv+h9s6NO1hqgO4t51v0yQDsVxwl/psyUIE1belGiUVK+m/36enQdQf9dmsseyTgQBVnBLJniL4carwx0n5eE1C69vFY8tPoq1Zu3xo/sgrrYSGQYyD83FHxU8FilQXhrrXLa/+t5wuEmMR8ZrOWf3XvC5b5yrBdHwCJ43fl40o+CRcdbZ3144NNt1UBtZOR/FHuv3+5+EqbiDktdNJ3fWrB/b9PC9iv+cDnztQqyvbdFka91I66jodDOa0xQNR9RsxcbcAecCQvzwdOt4OIxAeATzICZIfz06EyQ3joKj9Hb760SayCbbswVqIqVTmazO65/xMUuXMfcltmV/hrnesTn1JMAnhD+MIoOuu6TExrULgKApKy9fKs+JRRV3at6dQo9m6xrZBKdOQx8mppX7lnO6DQbubvP8IwMM+g=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 353,
+      "total_tokens": 889,
+      "cost": 0.005308,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005308,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.004236
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 281,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a13c3dfd4d03dcd1-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Tue, 30 Jun 2026 09:46:09 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782812768-pDKQELiIM48qk5RBvq95"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The result has:\\n- `audioUrl`: \\\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/82c77b\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The result has:\\n- `audioUrl`: \\\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/82c77b\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"20-dcfe-4b4a-850f-218756b84323.mp3\\\" — non-empty\\n- `creditCost`: 10.4 — positive\\n- `durationSeconds`: 8 — between 8 and 120 (\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"20-dcfe-4b4a-850f-218756b84323.mp3\\\" — non-empty\\n- `creditCost`: 10.4 — positive\\n- `durationSeconds`: 8 — between 8 and 120 (\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"inclusive)\\n\\nEverything looks correct. I should end with STEP_OK.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"inclusive)\\n\\nEverything looks correct. I should end with STEP_OK.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The result contains:\\n- **`audioUrl`** — non-empty URL\\n- **`creditCost`** — 10.4 (positive)\\n- **`durationSeconds`** — 8 (within\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" 8–120 range)\\n\\nEverything was correct.\\n\\nSTEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782812768-pDKQELiIM48qk5RBvq95\",\"object\":\"chat.completion.chunk\",\"created\":1782812768,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":12843,\"completion_tokens\":169,\"total_tokens\":13012,\"cost\":0.003372542,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":11008,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.003372542,\"upstream_inference_prompt_cost\":0.002796252,\"upstream_inference_completions_cost\":0.00057629},\"completion_tokens_details\":{\"reasoning_tokens\":118,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

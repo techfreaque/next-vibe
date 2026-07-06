@@ -1,0 +1,81 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[F2 unbottled-relay] Reply with exactly the word: HELLO_TEST. If anything seems wrong or unexpected, report it instead.",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to reply"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " with exactly the word \"HELLO_TEST\". This is a simple, straightforward task. Let me check if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " there's anything wrong or unexpected:\n\n1. The task is clear and unambiguous\n2. There's a lot"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " of context about claudeMd and the Next Vibe project, but it's marked as context that \"may or may not be relevant\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n3. The instruction is to reply with exactly \"HELLO_TEST\" or report if something seems wrong"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n4. Nothing seems wrong or unexpected - this appears to be a legitimate test request\n\nI should simply"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " respond with exactly: HELLO_TEST"
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "HELLO_TEST"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 150,
+        "totalTokens": 160,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 6095
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "file": {},
+    "providers": "openai",
+    "language": "en"
+  }
+}

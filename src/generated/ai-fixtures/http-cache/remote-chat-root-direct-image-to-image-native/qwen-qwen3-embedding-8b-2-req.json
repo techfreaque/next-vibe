@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/remote-stream-1af2053b-b4b7-4f18-9713-e565a1942c21.md\n\n# Remote Stream\nFolder: remote\nPreview: STEP_OK The image is clearly visible as an inline graphic. It shows a stylized, vibrant cartoon portrait of a young man…",
+    "encoding_format": "float"
+  }
+}

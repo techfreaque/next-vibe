@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async/9274084f-552a-42b6-9d35-484ba6dc677c",
+  "status": 200,
+  "headers": {
+    "allow": "GET, OPTIONS",
+    "connection": "keep-alive",
+    "content-length": "352",
+    "content-type": "application/json",
+    "cross-origin-opener-policy": "same-origin",
+    "date": "Sat, 04 Jul 2026 22:24:06 GMT",
+    "referrer-policy": "same-origin",
+    "server": "granian",
+    "vary": "Accept, origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "body": {
+    "public_id": "9274084f-552a-42b6-9d35-484ba6dc677c",
+    "status": "finished",
+    "error": null,
+    "results": {
+      "openai": {
+        "id": "9ba5e2f5-9570-4f5f-accf-3c61ca81f0e0",
+        "model": null,
+        "error": null,
+        "final_status": "succeeded",
+        "cost": 0.0030024,
+        "text": "This video ends here. Thanks for watching. Goodbye.",
+        "diarization": {
+          "entries": [],
+          "error_message": null,
+          "total_speakers": 0
+        }
+      }
+    }
+  }
+}

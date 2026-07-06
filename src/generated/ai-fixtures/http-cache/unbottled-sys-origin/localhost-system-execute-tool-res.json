@@ -1,0 +1,22 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/system/execute-tool",
+  "status": 200,
+  "headers": {
+    "content-length": "160",
+    "content-type": "application/json",
+    "date": "Thu, 02 Jul 2026 11:37:35 GMT, Thu, 02 Jul 2026 11:37:36 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "csrf_token_3002=0421535049e94af9ac54076a0abd2899; Path=/; Max-Age=86400; SameSite=strict"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "result": {
+        "success": true,
+        "messageId": "d53d0a8f-839e-4d8d-b01c-d66d958bd55e",
+        "responseThreadId": "3590e3d4-4f8c-4366-a159-ad5331c3c3f9"
+      }
+    }
+  }
+}

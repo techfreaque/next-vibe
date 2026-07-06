@@ -1,0 +1,371 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me to describe an attached image. However, I don't see any image attached to their message. They said \"Describe the attached image briefly\" but there's no image data"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " in the message for me to analyze.\n\nLet me check the context again. The user provided a test"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " scenario labeled \"[T10a image-attach] Describe the attached image briefly. If anything seems wrong or unexpected, report it instead.\"\n\nBut then there"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'s a response that describes a Japanese flag. This seems to be part"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " of the test scenario - either showing what the expected output should be, or showing what was"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " already returned.\n\nWait, I need to re-read the entire message. Looking at the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " structure:\n\nThe user has provided a series of test tasks labeled T1 "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "through T10a, all within the context of running various tools. Each"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " task has a description followed by tool results.\n\n[T10a image-attach] is the last task listed, and it says \"Describe the attached image briefly.\""
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nBut I don't see where an image is actually attached in the user's message that I need"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to describe. The paragraph about the Japanese flag appears to be either:\n1. An"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " example response showing what a correct answer would look like\n2. A description that was already"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " provided \n3. Part of the test scenario\n\nActually, looking more carefully at the format, I think this entire message IS a test scenario being"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " run on the unbottled.ai system. The user (or the system) is showing me a series of"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " tool execution tests with their results.\n\nThe instruction at"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the beginning says: \"[T1 thread-create+tool-call] Use"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the tool-help tool to list available tools. Return the tool names you find"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". If anything seems wrong or unexpected, report it instead.\"\n\nAnd then each subsequent test (T3a,"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " T4a, T5a, etc.) shows:\n- The task instruction\n- The tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " result (if any)\n- My response/analysis\n\nSo this entire thread is a"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " record of executed tests, and I'm being asked to respond to this whole scenario.\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the very end:\n"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\n["
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "T10a image-attach] Describe the attached image briefly. If anything seems wrong or unexpected, report it instead.\nThis is an image of the national flag of Japan...\n\nThe Japanese flag description that follows seems to be showing me what the response would be, or perhaps it"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "'s asking me to acknowledge/verify this response. Given the instruction \"If anything seems wrong or unexpected, report it instead,\" I should check whether there actually IS an image attached. Looking at the user's message, I don't see an actual image file"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " attached. The description of the Japanese flag is provided as text, but that's not the same as me using a describe_image tool on an actual image. So either an image was supposed to be attached but"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " wasn't, or this is testing whether I'll notice the discrepancy."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nI"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " don't have access to a describe_image tool in my available tools, so I can't actually describe an"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " image even if one were present. The task structure suggests each test item shows the task followed by the result obtained, which"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " means the Japanese flag description appears to be what would result from calling describe_image on an attached image."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " across the test results, most operations appear normal—tool help,"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " music generation, image description all seem fine. However, T9 shows a critical failure:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " image generation returned placeholder text `[generated media]` with `mediaType: null`. This is problematic because if"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " T10a is trying to describe an image from that failed generation, the describe_image tool somehow analyzed"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " something despite T9's systemic failure. That inconsistency seems wrong"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " and worth reporting."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " image appears to be the Japanese flag—a minimalist design with a centered red circle ("
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "Hinomaru) on a white rectangular field. The red disc is vibrant and solid, positioned equidistantly"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " from all edges, dominating the composition against the stark white background. No text or additional"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " imagery is present; the flag's defining characteristic is its bold simpl"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "icity and color contrast."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nThe"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " description itself is accurate and complete. However, there's an inconsistency worth noting: earlier"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " attempts at image generation failed with null mediaType values, yet this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " image is being described as if it exists. This raises a question about where this"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " image actually came from—whether it's a previously generated image, a reference image, or something"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " else entirely."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nMore"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " importantly, the current message contains only text describing an image, not an actual image attachment"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ". The instruction asks me to describe an attached image, but no image is present in what I've"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " received."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**Issue Detected:"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " No Image Actually Attached**\n\nThe message contains a text description of the Japanese flag but no actual image file is attached for"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " me to analyze with the `describe_image` tool.\n\nThe provided text description is accurate"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " and well-detailed (red Hinomaru on white field, proper positioning, minimalist design),"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " but I cannot independently verify or describe an image that isn't present."
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "\n\n**To properly execute T10a:**\nPlease attach an actual image file."
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Then I can call the `describe_image` tool on it and provide my own description.\n\nIf"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " this was meant to be a test of whether I would blind"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "ly accept a pre-written description as valid, I'm reporting the m"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "ismatch instead. The instruction says \"if anything seems wrong or unexpected, report it instead\" —"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " and providing text without an actual image is unexpected."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 2083,
+        "totalTokens": 2093,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 13458
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The tool returned `{\"instanceId\":\"hermes\"}`. The user wants ONLY the instance ID string, nothing else.</think>hermes\n\nUser: [T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user is asking me to re-do the second call I already did in the previous turn. Let me just call it again and verify.</think>\n\nAssistant: <think>The result contains:\n- `tools`: an array of 69 tools (non-empty ✓)\n- Every tool has a `name` (e.g. \"agent_chat_threads_POST\") and a `description` (e.g. \"Create a new chat thread\") ✓\n- `matchedCount`: 69 ✓\n- `totalCount`: 528 ✓\n\nEverything checks out.</think>Result checks out:\n\n- **non-empty tools array** ✓ — 69 tools returned\n- **every tool has a `name`** ✓ — e.g. `ai-run`, `brave-search`, `tool-help`, etc.\n- **every tool has a `description`** ✓ — each one is descriptive and meaningful\n\n**STEP_OK**\n\nUser: [T1a-query tool-help-query] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'query':'search'} to find tools related to search. This matches many tools, so the result is a list of tool names with descriptions (not full schemas). Check that the tools array is non-empty and that each tool has a name and a description. End your reply with STEP_OK if the search returned a usable list of named tools, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

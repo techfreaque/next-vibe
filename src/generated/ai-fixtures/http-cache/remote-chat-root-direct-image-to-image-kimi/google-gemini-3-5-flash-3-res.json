@@ -1,0 +1,38 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a15d46efff08df1c-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Sat, 04 Jul 2026 09:59:28 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783159165-q3btw7txfcRvKNOQrZ78"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"The\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\" image-to-image generation test completed successfully.\\n\\n- **Image URL:** `http://localhost\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\":3000/api/en-GLOBAL/agent/chat/threads/files/e975\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"321d-d430-476e-9cfa-3e04ec\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"308072/7e427f95-7b61-4f6\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"3-98cc-ca57cb467d62.png`\\n- **Credit Cost\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\":** `2.8` (Positive value)\\n\\nSTEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"STOP\"}]}",
+    "data: {\"id\":\"gen-1783159165-q3btw7txfcRvKNOQrZ78\",\"object\":\"chat.completion.chunk\",\"created\":1783159165,\"model\":\"google/gemini-3.5-flash-20260519\",\"provider\":\"Google\",\"service_tier\":\"provisioned\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"STOP\"}],\"usage\":{\"prompt_tokens\":15040,\"completion_tokens\":131,\"total_tokens\":15171,\"cost\":0.01006755,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":10127,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.01006755,\"upstream_inference_prompt_cost\":0.00888855,\"upstream_inference_completions_cost\":0.001179},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

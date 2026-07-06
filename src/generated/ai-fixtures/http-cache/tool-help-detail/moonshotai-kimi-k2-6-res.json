@@ -1,0 +1,33 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a114a75fbb82bbf1-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Thu, 25 Jun 2026 14:27:36 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782397655-1AKG7MigsKTaUhW0jXh2"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782397655-1AKG7MigsKTaUhW0jXh2\",\"object\":\"chat.completion.chunk\",\"created\":1782397655,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The user wants me to call tool-help with toolName='generate_image'. I need to check that the result contains a name, a description, and a parameters schema. Then end with STEP_OK or FAILED.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to call tool-help with toolName='generate_image'. I need to check that the result contains a name, a description, and a parameters schema. Then end with STEP_OK or FAILED.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397655-1AKG7MigsKTaUhW0jXh2\",\"object\":\"chat.completion.chunk\",\"created\":1782397655,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"functions.execute-tool:4\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397655-1AKG7MigsKTaUhW0jXh2\",\"object\":\"chat.completion.chunk\",\"created\":1782397655,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"wait\\\",\\\"input\\\":{\\\"toolName\\\":\\\"generate_image\\\"},\\\"toolName\\\":\\\"tool-help\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782397655-1AKG7MigsKTaUhW0jXh2\",\"object\":\"chat.completion.chunk\",\"created\":1782397655,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1782397655-1AKG7MigsKTaUhW0jXh2\",\"object\":\"chat.completion.chunk\",\"created\":1782397655,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":11078,\"completion_tokens\":74,\"total_tokens\":11152,\"cost\":0.00360094,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":7680,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00360094,\"upstream_inference_prompt_cost\":0.0033486,\"upstream_inference_completions_cost\":0.00025234},\"completion_tokens_details\":{\"reasoning_tokens\":42,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

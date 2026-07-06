@@ -1,0 +1,34 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cache-control": "no-cache",
+    "cf-ray": "a14c61259e95dbce-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Thu, 02 Jul 2026 08:46:23 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1782981981-pCmuoHVFxOOPbQuEaO3a"
+  },
+  "events": [
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1782981981-pCmuoHVFxOOPbQuEaO3a\",\"object\":\"chat.completion.chunk\",\"created\":1782981981,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"The result contains:\\n- name: \\\"generate_image\\\" (in the tools array, the tool object has \\\"name\\\":\\\"generate_image\\\")\\n- description: \\\"Generate an image from a text prompt using AI\\\"\\n- parameters schema: Yes, there's a \\\"parameters\\\"\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The result contains:\\n- name: \\\"generate_image\\\" (in the tools array, the tool object has \\\"name\\\":\\\"generate_image\\\")\\n- description: \\\"Generate an image from a text prompt using AI\\\"\\n- parameters schema: Yes, there's a \\\"parameters\\\"\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782981981-pCmuoHVFxOOPbQuEaO3a\",\"object\":\"chat.completion.chunk\",\"created\":1782981981,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" field with a JSON schema containing properties like aspectRatio, inputMediaUrl, model, prompt, quality, size, etc.\\n\\nAll three are present. So the answer is STEP_OK.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" field with a JSON schema containing properties like aspectRatio, inputMediaUrl, model, prompt, quality, size, etc.\\n\\nAll three are present. So the answer is STEP_OK.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782981981-pCmuoHVFxOOPbQuEaO3a\",\"object\":\"chat.completion.chunk\",\"created\":1782981981,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"STEP_OK\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1782981981-pCmuoHVFxOOPbQuEaO3a\",\"object\":\"chat.completion.chunk\",\"created\":1782981981,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1782981981-pCmuoHVFxOOPbQuEaO3a\",\"object\":\"chat.completion.chunk\",\"created\":1782981981,\"model\":\"moonshotai/kimi-k2.6-20260420\",\"provider\":\"Decart\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":25449,\"completion_tokens\":93,\"total_tokens\":25542,\"cost\":0.006281598,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":20992,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.006281598,\"upstream_inference_prompt_cost\":0.005964468,\"upstream_inference_completions_cost\":0.00031713},\"completion_tokens_details\":{\"reasoning_tokens\":89,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

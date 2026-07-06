@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The execute-tool call with instanceId='hermes' returned a \"Forbidden\" error. This is unexpected and indicates a potential issue with either the instanceId, permissions, or how the tool routing works. \n\nHowever, looking back at the system prompt, I see that `tool-help` is a local tool (no instanceId prefix), and the instructions say `instanceId='hermes' is REQUIRED on every execute-tool call`. But `tool-help` might not be a remote instance tool - it's listed in the local tool catalog. The system prompt says \"Remote Instances: 'atlas' - use tool-help(instanceId='atlas')\", and hermes is listed as a remote machine with pinned tools prefixed as `hermes__toolName`. \n\nWait, actually in the tool catalog, I see `hermes__coding-agent [remote]` and `hermes__cortex-exec [remote]`. The instruct\n\nAssistant: <think> The user wants me to explore the tool catalog on the remote instance `hermes` using `execute-tool` with `toolName='tool-help'`. The first call with empty input returned successfully. I can see a `categories` array with objects like `{count:5, name:'account'}`, etc.\n\nNow I need to pick one category and call `execute-tool` with `toolName='tool-help'`, `instanceId='hermes'`, and `input={category:'<that category name>'}`.\n\nI'll pick the 'ai' category since it seems relevant and has 12 tools.\n\nLet me make the second call.</think>\n\nAssistant: <think> The second call returned data for the 'ai' category. I need to verify:\n1. It returns a non-empty tools array - Yes, there are 12 tools in the `tools` array.\n2. Each tool has a name and description - Let me check a few:\n   - `agent_chat_public-feed_GET`: has `name` and `description`\n   - `agent_text-to-speech_POST`: has `name` and `description`\n   - `ai-stream`: has `name` and `description`\n   - `chat-settings`: has `name` and `description`\n   - `coding-agent`: has `name` and `description`\n   - `favorites`: has `name` and `description`\n   - `generate_image`: has `name` and `description`\n   - `generate_music`: has `name` and `description`\n   - `generate_video`: has `name` and `description`\n   - `skills`: has `name` and `description`\n   - `transcribe_audio`: has `name` and `descriptio\n\nUser: [T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

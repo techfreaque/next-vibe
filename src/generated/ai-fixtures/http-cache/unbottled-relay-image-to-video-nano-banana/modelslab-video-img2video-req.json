@@ -1,0 +1,15 @@
+{
+  "url": "https://modelslab.com/api/v6/video/img2video",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
+    "model_id": "veo-3.1-fast",
+    "prompt": "professional portrait, smooth camera pull-back",
+    "output_type": "mp4",
+    "num_frames": 25,
+    "init_image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800"
+  }
+}

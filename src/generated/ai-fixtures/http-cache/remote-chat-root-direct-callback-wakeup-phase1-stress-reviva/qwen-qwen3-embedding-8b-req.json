@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The deferred result arrived with the image. The `imageUrl` field is present and non-empty (http URL). This is WAKEUP_OK.</think>WAKEUP_OK\n\nUser: [T6d wakeUp-stress] Call the generate_image tool with prompt='wakeup-stress-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.\n\nAssistant: <think>I see that the previous wakeUp calls have been returning the image inline rather than deferred (the model is fast enough). Let me make the call.</think>\n\nAssistant: <think>This time it was deferred - I got a taskId and no image. I need to acknowledge and stop, as instructed. I'll be revived when the image is ready.</think>Dispatched — taskId `local-wu-call-b5b90cb5e5a34fa8a2fab58c` running in background, waiting for the result to arrive automatically.\n\nSTEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

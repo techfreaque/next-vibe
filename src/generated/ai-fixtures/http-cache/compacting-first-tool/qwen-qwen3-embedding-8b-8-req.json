@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"image\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"agent-view-image\",\"title\":\"View Image\",\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"audio\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[],\"totalCount\":531,\"matchedCount\":0,\"categories\":[],\"hint\":\"No tools matched. Try a broader query or call without params to see all categories.\"}}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"list\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\",\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a s\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"search\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"users-list\",\"title\":\"User List\",\"description\":\"Search and filter users\",\"category\":\"account\"},{\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\",\"description\":\"Search messages within a specific thread using full-text search\",\"category\":\"a",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15dc3dfcfa5d384-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 11:24:44 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783164283-M38yImExTGElSi5Y6m3j"
+  },
+  "body": {
+    "id": "gen-1783164283-M38yImExTGElSi5Y6m3j",
+    "object": "chat.completion",
+    "created": 1783164283,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of a Hip Hop/Rap instrumental with a duration of 28 seconds. The production style is polished and clean.\n\nThe primary instruments are a drum machine and an electric guitar, with an electric bass joining in at 0:08 and a steel drum entering at 0:15.\n\nThe drum machine lays down a steady, mid-tempo beat at approximately 90 BPM. It features a clap on the 2nd and 4th beats of each measure, hi-hats on the 1/8th notes, and a snare drum hitting on the 2nd and 4th beats as well, sometimes alternating with the clap. There is also a kick drum providing a walking pattern, accenting the 1st beat of each measure.\n\nThe electric guitar plays a repetitive, clean chord progression with a slightly jazzy feel. It has a slightly muted, plucked sound.\n\nThe electric bass (from 0:08) provides a driving low end, complementing the kick drum pattern and outlining the chord changes.\n\nThe steel drum (from 0:15) enters with a catchy, repetitive melodic phrase, adding a distinct tropical/Caribbean flavor to the track. Its melody is bright and clear, providing a counterpoint to the guitar and bass.\n\nThe overall mood is chill, relaxed, and slightly groovy. The sound quality is excellent, suggesting a studio recording environment. There are no vocals or notable sound effects.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 303,
+      "total_tokens": 1375,
+      "cost": 0.0016041,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016041,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0007575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The result has:\n- `videoUrl`: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7e832591-d9ac-4168-9730-7d1b7302c255/60b2f841-a828-41f8-82fc-f778703f03f1.mp4\" — non-empty ✓\n- `creditCost`: 124.8 — positive ✓\n- `durationSeconds`: 4 — positive ✓\n\nEverything looks correct. I'll end with STEP_OK.\n\nWait, I should also note that `creditCost` is 124.8 which is quite high for a 4-second video. The task says to check for positive values, which it is. But I should also be aware that 124.8 credits = $1.25 for a 4-second video. That's actually very expensive — Veo 3.1 fast typically costs less. However, the task only asks me to check that the values are non-empty/positive, so I'll proceed with STEP_OK.</think>Result check:\n- **`videoUrl`** — non-empty (`http://localhost:3000/api/...\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call generate_image with prompt='await-task-test' and callbackMode='detach'. Then check the immediate result has a taskId string and does NOT have an imageUrl.</think>\n\nAssistant: <think>The result shows:\n- `taskId`: \"local-bg-1782397734876-p7pj9m\" (a string)\n- No `imageUrl` present\n- `hint` says \"Task detached. Use await-task with this taskId if you need the result.\"\n\nThis matches expectations: immediate result has taskId, does NOT have imageUrl.</think>The immediate result contains a `taskId` string (`local-bg-1782397734876-p7pj9m`) and does **not** contain an `imageUrl`. The task is running in the background as expected.\n\nSTEP_OK taskId=local-bg-1782397734876-p7pj9m\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-functions-execute-tool-9'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a15d35efbb0fb201-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 04 Jul 2026 09:47:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783158469-y54D9ziddOJisf6Hncwx"
+  },
+  "body": {
+    "id": "gen-1783158469-y54D9ziddOJisf6Hncwx",
+    "object": "chat.completion",
+    "created": 1783158469,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A perfectly centered, solid crimson red circle is positioned against a plain, stark white square background. The edges of the circle are clean and sharp, with no gradients, shadows, or textures present within the shape or the background. The image is a clean, minimalist graphic illustration.",
+          "refusal": null,
+          "reasoning": "**Analyzing the Composition**\n\nI'm currently focused on dissecting the components of this graphic. The red circle dominates the composition, centered within a square white backdrop. Now I will determine the visual relationship.\n\n\n**Describing the Graphic**\n\nI'm now formulating a detailed caption to describe the image. The graphic presents a red circle, precisely centered on a white square. I've noted the color palette; it's a solid red circle against a stark white backdrop. This is a clean, modern digital illustration. There are no textures or gradients, and the edges appear sharp, contributing to a minimalist and bold overall mood.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing the Composition**\n\nI'm currently focused on dissecting the components of this graphic. The red circle dominates the composition, centered within a square white backdrop. Now I will determine the visual relationship.\n\n\n**Describing the Graphic**\n\nI'm now formulating a detailed caption to describe the image. The graphic presents a red circle, precisely centered on a white square. I've noted the color palette; it's a solid red circle against a stark white backdrop. This is a clean, modern digital illustration. There are no textures or gradients, and the edges appear sharp, contributing to a minimalist and bold overall mood.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EpsGCpgGARFNMg9XfxnMUzYfDsjwyL7/v81bSl/SHoBG3CFhTeNsZEx+pO2fdVjFCmCGw77djiVsumevvMkUrHrYUsmXxfdxhRcwQnfcYNEk4kAgkd0pP1XW+irXeqIoaU91NeHniwVn9EL96KJVcMt12xRZgFiOJuzYi8xdjxSSeEQgPl3B4sE9s/AXH8aRv1W3cCA0SxeJa21nsmEz6og+GAwudWCoaJJVqHmYICAPvcS1Y4s2PfRgbJD0locYUNFgImQevP5iEgrJfi3HJojmzTT2i9Rh5Ybu3sfGD0p0OglJy7jUf3hxqbZKrwAA28hw+6sTYIkkebUPlBnZihfwDrpOT/GBVEBjtXRPiNNjXw57ahNG2mVOM9W15akAkimQj1lfcUdVV//eWZxSnpDVaYuD+JdaCBa4s+hddWhKAoSn7FFrgO0wcf+fnZ5XB9IMRjrXCTe5hQqsSzdMRPtQm8l6v5PJZbYzSkOhVRDWPfMMPp5uqZFNxfYDj8MnE4oLaET3AqcaTC22NgsFvhTgRxFHI0CWh8qkSLdTDyA7Ks8AtTbFc152EFLxrDbzPCMXJDWHT/Dd55MsBnRIV94yixHdFBHduQXzCyjbukyOq2TgvnyGFW3S0D53WLDB4EHDoPX4b0RBSHDprE54zHZ484t939AViV+rIHuupr0+7FGVChRk66sJeik76rLFn40/TnlrK6JPpEeM/k3jNVkNejA23G3n8IcZh5izaHwHeuGssLLBsDJ4HEz70GVm+C2E9fo1QIqfZ9tVUkKGcP4P9Xst6JtbcgDjfIzyX0vvFdFnEdThOz0X2nk+PZCcOo41BTr3s3p7YwfJG+8R3Ei4k1bY4OVNHZpDCqFORXsaDYPdEKq1ESqu0aoZwSkg/hV5P3jMm0DeCtTbECoFxDIakwZ015Rxi/qlxhX3fGAU6xlpsLMuhtuIUkLQU4cEQU5WArAqYfWZijsK7qL2WcWw9hYRosdVluERsTV2TL7j2k9xogFLIJZwM+XR3XiaSN9hoVZkTPMr9y/7IkLXIazLP1iWx5vnLE4V+YHk"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 205,
+      "total_tokens": 741,
+      "cost": 0.003532,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003532,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.00246
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 150,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

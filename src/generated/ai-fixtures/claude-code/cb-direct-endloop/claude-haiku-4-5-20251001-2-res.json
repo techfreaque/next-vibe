@@ -1,0 +1,171 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[CB-D1 direct-wait] Use the tool-help tool (thea__ prefix, wait mode) to look up \"generate_image\". Reply STEP_OK when done.\n[Tool result for tool-help]:\n{\n  \"hint\": \"No capability snapshot for instance \\\"thea\\\". Connect the instance and wait for a sync pulse.\",\n  \"tools\": [],\n  \"totalCount\": 0,\n  \"matchedCount\": 0\n}\nSTEP_OK\n[CB-D2 direct-wakeup] Use the tool-help tool (thea__ prefix, wakeUp mode) to look up \"generate_image\". Reply STEP_OK after revival.\n[CB-D3 direct-detach] Use the tool-help to",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " user is asking me to execute three callback mode tests with the tool-help tool, targeting"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " the \"thea\" instance (using \"thea__\" prefix). Let"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " me break down what's being asked:\n\n1. **CB-D1 (direct-wait)**: Use tool-help with"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " default wait mode to look up \"generate_image\" on thea instance. Reply STEP_OK when done.\n2. **CB-D2 (direct-wakeUp"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ")**: Use tool-help with wakeUp mode to look up \"generate_image\" on thea instance. Reply STEP_OK after revival.\n3. **CB-D3 (direct-detach)**: Use tool-help with detach mode to look up \"generate_image\" on"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " thea instance. Return immediately.\n\nLooking at the results provided:\n- CB-D1 shows a tool-"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "help result indicating no capability snapshot for instance \"thea\"\n- CB-D3 was already executed and returned"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " a taskId: `local-bg-1775435578151-j3041x`\n- CB-D2 shows another tool-help result with the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " same \"no capability snapshot\" message\n\nThe user seems to be testing different callback modes. Let me verify what's been done:\n\n1. CB"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "-D1 (wait mode) - appears to have been executed and returned the hint about"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " no capability snapshot\n2. CB-D2 (wakeUp mode) - the user says \"I'll execute CB-D2 now\" but then"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " shows a result, so it was executed\n3. CB-D3 ("
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "detach mode) - was executed and returned taskId `local-bg-1775435578151-j3041x`\n\nAll three tests appear to have been completed. The results"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " show that:\n- The thea instance doesn't have a capability snapshot yet\n- CB-D3's task"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " is still pending in the background\n- CB-D1 and CB-D2 completed synchronously\n\nThe user is asking me to reply"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " \"STEP_OK\" when done. "
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "\n\nLooking"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " at the execution sequence, the user ran all three tests in order"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " (D1, then D3, then D2), and each returned results. All"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " three callback mode tests have finished executing with their respective results displayed."
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "**STEP_OK**\n\nAll three callback mode tests completed:\n\n-"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " **CB-D1 (wait)**: Synchronous execution → no capability snapshot for instance \"thea\"\n- **CB-D2 (wakeUp)**:"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Fired and returned → same result (no capability snapshot)\n- **CB-D3 (detach)**:"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": " Fired with taskId `local-bg-1775435578151-j3041x` → still pending\n\nThe thea instance has no capability snapshot available yet"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": ". All three callback modes handled gracefully."
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 10,
+        "outputTokens": 744,
+        "totalTokens": 754,
+        "cachedInputTokens": 0
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 7703
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1683cd7bb9ed2d4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 17:55:05 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783274095-E23lZ8UWwfc8ypDyAoJ8"
+  },
+  "body": {
+    "id": "gen-1783274095-E23lZ8UWwfc8ypDyAoJ8",
+    "object": "chat.completion",
+    "created": 1783274095,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A stylized vector illustration depicts a majestic mountain landscape during sunset or sunrise. A prominent, craggy mountain range dominates the center, characterized by rugged peaks and valleys with snow patches. The rock faces are rendered in warm tones of orange, brown, and deep purple on the sunlit portions, transitioning to cooler blues and dark grays in the shadows. Below the mountains, a large lake reflects the scene above, showing distorted, wavy mirror images of the peaks, sky, and surrounding trees. Dense forests of conifer trees line the shores of the lake and the lower slopes of the mountains, rendered in various shades of deep green and olive green. In the immediate foreground, large, stylized pine trees frame the view on both the left and right sides, with broad, pointed needles and thick trunks. The sky is a gradient, transitioning from deep blue and teal at the top to warm pinks, oranges, and soft yellows near the horizon, with long, horizontal cloud formations stretching across. The entire composition uses bold black outlines and flat, colored shapes to define the elements. The lighting is golden and warm, suggesting twilight.",
+          "refusal": null,
+          "reasoning": "**Developing Visual Elements**\n\nI'm currently focusing on establishing the core visual components. This involves defining the mountainous terrain as the central element and considering its stylistic representation through bold outlines and distinct color areas within a vector illustration framework, aiming for a sunset or sunrise ambiance.\n\n**Defining Scene Details**\n\nMy thoughts are now centered on elaborating the scene's specifics. I am detailing a serene mountain vista at sunset, envisioned as a stylized vector art piece. This includes defining the color palettes for the mountains, sky, and a reflective lake, alongside the placement of conifer forests and framing foreground trees.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Developing Visual Elements**\n\nI'm currently focusing on establishing the core visual components. This involves defining the mountainous terrain as the central element and considering its stylistic representation through bold outlines and distinct color areas within a vector illustration framework, aiming for a sunset or sunrise ambiance.\n\n**Defining Scene Details**\n\nMy thoughts are now centered on elaborating the scene's specifics. I am detailing a serene mountain vista at sunset, envisioned as a stylized vector art piece. This includes defining the color palettes for the mountains, sky, and a reflective lake, alongside the placement of conifer forests and framing foreground trees.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "Cp0IAY89a1/yRCDhEACu7lBSdgxdgAN9Tk6hFgdaA6ADqnOmHitN48BPLTNKIy35kJiCTV5TFere3TIhIrVvYHcJsAHXjc0UL9egrALnICkXrjlqQTGDFmr7aQuIBGNac2JyukDVX7KmSLcYYmqU3D4Yt76CKj+nbEN5E58SgPn6wuv8YFwNNII7a2wAHTyC2PZbEXXE3E4sMMaW3mfAPbY22Rco6pHMBsmuvskwSUOSfiXEhO2dBVCqBe2ZDgbEJn288CEzSvZHzrvs7JdbgpJyGliCeEw7MIbUxfGVwLRNJ8FUYOHKzEL7YTdaYxev4LBRHyzWCQSiSuS65KQy4r1IhKWav034weG0e3DQ2LQexEV7/ne4LgLEHZSCjEbl6InfD9o17+aRZQX45TlQOwG2N0r0THP72bSIx4xj0sCWO+cJHK5R7kKFNauYQI7FWgHVrVHppkELzAqnLOHNOHrO0tKhu/x4E/uQ8KzYWJYa5nv7RER8qM9gUHeNdlCsxFpOk5VEHNiiFGklnuAZxw+HxqAjHKc9l4wGNamaLDOj+5NC8IMdUa6zszKsUVYHFp5ShWedHQ8TinjOLK5g9YMeN4SbbrKvZ/EogZxBYH4LOOuRc1XIJF1hfqGfxXGMZz5Lu2Dl+d3qkqpHdo0Jayn79YWIj4mM9xn+JZNquKw5H+BhlzX8cMA3aDVQ9lnd4lI8YTs2p/K1PwMRtuUY7qCtWdwn3j7trBYfUs8Ne8KRPY6w/5d20u1cXuMD6ZVxwkTI59eq4brXe+8UJIFclZgtyKix+mbA+vMRr276S4AzR/TW8L+fkeglnwHPtoOOADBM5FKmn5qVKTdG0FippSRl69DOaKkGQZlfJXLAGNCDu5yifBIfOCbag82L9KMlppP+zu34qxFD0oq/E90l+TZhZcGBIxr0yiZiJnSbUDUKtfpNB7AYXoU92NI8qK3kDoIl3mRmTpbJESzFiQwIuZtdBD9NuZZE7CV1p/n017vfOqROzYW0TW6l6rQ5HYS7g4bCir04YyQWRs7O4dQzJKNMIXN5UTFa70M6K1Ao/S67y5Kl/SA7RYyqnRjN2jUEIMdXz0cNOCAt+yPcMtYMgKgQv0xdQ5hkq8l79X4A12pSrobFwMtQTUw+40fd9VoBZNTdUrTfSaaXKGhQEqSWMWWD+OdUhMtBTYYA/yX5ZABxarTId1ASteLQk8H/bCL75rre0yQzjCppU47C1FMGfnbKdGKOO9kOfkWle5Zzv6j5OQl5oM2orh/854zdfN00AQv62fyEz4ocUO3zBMz05a1XHhjhzLqH1yN5QXbn6Y6nPJcza8dRnLOkVv5PUQxX7ZEP4S/ylqklFsX5SoUGtKu6SjSf5RgP8bjmS9MxYvjNuiZCH7flm4PVXTBkuwLl"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 439,
+      "total_tokens": 1276,
+      "cost": 0.006942,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.006942,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.005268
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 216,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

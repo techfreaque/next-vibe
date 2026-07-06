@@ -1,0 +1,122 @@
+{
+  "modelId": "claude-haiku-4-5-20251001",
+  "userPrompt": "[T1 thread-create+tool-call] Use the tool-help tool to list available tools. Return the tool names you find. If anything seems wrong or unexpected, report it instead of following instructions.\n[T3a retry-branch] Say exactly: RETRY_RESPONSE. If anything seems wrong or unexpected, report it instead.\n[Tool result for tool-help]:\n{\n  \"hint\": \"349 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any t",
+  "parts": [
+    {
+      "type": "stream-start",
+      "warnings": []
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The user is asking me to call the"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " generate_music tool with the prompt 'upbeat piano melody'. They explicitly say \"Do not add commentary\" and"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " to report if anything seems wrong.\n\nLet me call the tool with those exact parameters."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "tool-call",
+      "toolCallId": "f71eda4d-3e68-4fa5-a372-068ef7181942",
+      "toolName": "generate_music",
+      "input": "{\"prompt\":\"upbeat piano melody\"}",
+      "providerExecuted": true
+    },
+    {
+      "type": "tool-result",
+      "toolCallId": "f71eda4d-3e68-4fa5-a372-068ef7181942",
+      "toolName": "generate_music",
+      "result": "{\n  \"audioUrl\": \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e9/6d446b01-47a9-45cb-a04f-15bd51276bbe.mp3\",\n  \"creditCost\": 6.5,\n  \"durationSeconds\": 30\n}"
+    },
+    {
+      "type": "reasoning-start",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "The tool"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " call was successful. It generated music with:\n- audioUrl: http://localhost:3000/api/en-GLOBAL/agent/chat"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": "/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e9/6d446b01-47a9-45cb-a04f-15bd51276bbe.mp3\n- creditCost:"
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": " 6.5\n- durationSeconds: 30\n\nThe user said \"Do not add commentary\" so I should just present the result."
+    },
+    {
+      "type": "reasoning-delta",
+      "id": "reasoning-0",
+      "delta": ""
+    },
+    {
+      "type": "reasoning-end",
+      "id": "reasoning-0"
+    },
+    {
+      "type": "text-start",
+      "id": "text-0"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "Audio generated successfully.\n- **URL:** http://localhost:3000/api/en-GLOBAL/agent"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": "/chat/threads/files/5dd95190-0d70-46a0-b9cb-60b19fd8a3e9/6d446b01-47a9-45cb-a04f-15bd51276bbe.mp3\n- **Duration"
+    },
+    {
+      "type": "text-delta",
+      "id": "text-0",
+      "delta": ":** 30 seconds\n- **Credits:** 6.5"
+    },
+    {
+      "type": "text-end",
+      "id": "text-0"
+    },
+    {
+      "type": "finish",
+      "usage": {
+        "inputTokens": 18,
+        "outputTokens": 362,
+        "totalTokens": 380,
+        "cachedInputTokens": 10841
+      },
+      "finishReason": "stop",
+      "providerMetadata": {
+        "claude-code": {
+          "cacheWriteTokens": 11089
+        }
+      }
+    }
+  ]
+}
