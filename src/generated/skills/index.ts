@@ -128,10 +128,7 @@ import { embedding as uncensoredWriterSkillEmbedding } from "../../app/api/[loca
 import { embedding as vibeCoderSkillEmbedding } from "../../app/api/[locale]/agent/skills/default-skills/vibe-coder/skill.embedding";
 import { embedding as writerSkillEmbedding } from "../../app/api/[locale]/agent/skills/default-skills/writer/skill.embedding";
 
-export const COMPANION_SKILLS: Skill[] = [
-  theaSkill,
-  hermesSkill,
-];
+export const COMPANION_SKILLS: Skill[] = [theaSkill, hermesSkill];
 
 export const DEFAULT_SKILL_IDS = [
   "thea",

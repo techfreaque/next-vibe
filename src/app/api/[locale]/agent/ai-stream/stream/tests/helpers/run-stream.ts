@@ -16,7 +16,6 @@ import { expect } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
-import type { HeadlessAiStreamResult } from "../../../repository/headless";
 import type { SlimMessage } from "../../../testing/headless-test-runner";
 import {
   runTestStream,
@@ -72,8 +71,6 @@ export interface RunStreamDeps {
   getTestSubFolderId: () => string | undefined;
   /** REMOTE-folder modes: per-suite folder nested inside the instance folder. */
   getOverrideSubFolderId: () => string | undefined;
-  /** Loop-local topology: the hermes-side REMOTE/<client>/tests/<case> folder. */
-  getHermesCaseFolderId?: () => string | undefined;
 }
 
 export type RunStreamParams = Parameters<typeof runTestStream>[0] & {
@@ -125,17 +122,15 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           : effectiveRootFolderId === suiteRootFolderId
             ? deps.getTestSubFolderId()
             : undefined;
-    // Loop-local origination applies only to the SHARED-thread relay cases.
-    // Cases with an explicit rootFolderId (C2 incognito) are locality-pinned
-    // by definition — incognito never rides the REMOTE-folder relay; run them
-    // as a normal local stream.
-    if (cfg.originateOnRemote && params.rootFolderId === undefined) {
-      return runLoopLocalStream(deps, params, preStreamMessageIds);
-    }
     const firstResult = await runTestStream({
       ...params,
       rootFolderId: effectiveRootFolderId,
       subFolderId: effectiveSubFolderId,
+      // Remote-folder loop-local: the "self" sentinel forces the loop HERE;
+      // prompt + tools still come from the remote. Incognito stays pinned.
+      ...(cfg.forceLocalLoop && effectiveRootFolderId === DefaultFolderId.REMOTE
+        ? { loopInstanceId: "self" }
+        : {}),
     });
 
     // Waiting-state handling — two flavors:
@@ -156,100 +151,151 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
       // each tick and poll the local mirror until the pending async tool
       // message resolves, so assertions see the final state in both modes.
       if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
-        const MIRROR_WAIT_MS = 60_000;
+        // Media turns replay long recorded poll chains (a 300-poll video
+        // replay alone runs tens of seconds) — honor the caller's settle
+        // budget instead of racing it with a flat cap.
+        const MIRROR_WAIT_MS = params.settleTimeoutMs ?? 30_000;
         const mirrorStart = Date.now();
-        for (;;) {
-          const snapshot = await getMessages(tid);
-          // Three convergence conditions, all must clear:
-          //  1. No pending async tool (detach/wakeUp result not yet mirrored).
-          //  2. No dead-end compacting message — a compacting node with no
-          //     child means the owner's re-parent of the following turn has
-          //     not synced yet (the turn still points at the pre-compacting
-          //     leaf locally). Both resolve once sync applies the
-          //     owner-authoritative state.
-          //  3. This turn's assistant reply has mirrored back. The relayed
-          //     loop runs on the remote and the final assistant message arrives
-          //     via the sync/WS mirror AFTER the relay HTTP response returns —
-          //     so without this, a no-tool turn (e.g. T-SYS "reply RELAY_OK")
-          //     breaks before the reply lands and `messages` has no assistant.
-          const childIds = new Set(
-            snapshot.map((m) => m.parentId).filter((id): id is string => !!id),
-          );
-          const pendingAsync = snapshot.filter((m) => {
-            if (
-              m.role !== "tool" ||
-              preStreamMessageIds.has(m.id) ||
-              (m.toolCall?.callbackMode !== "detach" &&
-                m.toolCall?.callbackMode !== "wakeUp")
-            ) {
-              return false;
-            }
-            if (
-              m.toolCall?.status === "pending" ||
-              resolveToolResult(m) === null
-            ) {
-              return true;
-            }
-            // Detach hint: execute-tool returned {hint, taskId} but the
-            // background task hasn't backfilled a terminal result yet.
-            const res = resolveToolResult(m);
-            return (
-              typeof res?.["hint"] === "string" &&
-              res["imageUrl"] === undefined &&
-              res["audioUrl"] === undefined &&
-              res["videoUrl"] === undefined
+        // Hold a live connection for the whole wait: getWsConnection returns
+        // null when the connector idled out, silently killing every driven
+        // pull — acquire opens it on demand and keeps it up.
+        const { acquireConnection } =
+          await import("next-vibe/realtime/connector");
+        const releaseConn = cfg.systemPromptInstanceId
+          ? await acquireConnection(cfg.systemPromptInstanceId)
+          : (): void => undefined;
+        try {
+          for (;;) {
+            const snapshot = await getMessages(tid);
+            // Three convergence conditions, all must clear:
+            //  1. No pending async tool (detach/wakeUp result not yet mirrored).
+            //  2. No dead-end compacting message — a compacting node with no
+            //     child means the owner's re-parent of the following turn has
+            //     not synced yet (the turn still points at the pre-compacting
+            //     leaf locally). Both resolve once sync applies the
+            //     owner-authoritative state.
+            //  3. This turn's assistant reply has mirrored back. The relayed
+            //     loop runs on the remote and the final assistant message arrives
+            //     via the sync/WS mirror AFTER the relay HTTP response returns —
+            //     so without this, a no-tool turn (e.g. T-SYS "reply RELAY_OK")
+            //     breaks before the reply lands and `messages` has no assistant.
+            const childIds = new Set(
+              snapshot
+                .map((m) => m.parentId)
+                .filter((id): id is string => !!id),
             );
-          });
-          const danglingCompacting = snapshot.filter(
-            (m) =>
-              m.isCompacting &&
-              !preStreamMessageIds.has(m.id) &&
-              !childIds.has(m.id),
-          );
-          // WAIT-mode tool results mirror as separate events — a snapshot
-          // taken between the final assistant and a still-in-flight
-          // tool-result reads a resultless tool row. Wait for every new tool
-          // message to carry its result.
-          const unresolvedWaitTools = snapshot.filter(
-            (m) =>
-              m.role === "tool" &&
-              !preStreamMessageIds.has(m.id) &&
-              m.toolCall?.callbackMode !== "detach" &&
-              m.toolCall?.callbackMode !== "wakeUp" &&
-              (m.toolCall?.status === "pending" ||
-                resolveToolResult(m) === null),
-          );
-          // This turn's assistant reply must have mirrored back: at least one
-          // new (post-pre-stream) assistant message with non-empty content.
-          const hasNewAssistantReply = snapshot.some(
-            (m) =>
-              m.role === "assistant" &&
-              !preStreamMessageIds.has(m.id) &&
-              (m.content ?? "").trim() !== "",
-          );
-          if (
-            (pendingAsync.length === 0 &&
-              danglingCompacting.length === 0 &&
-              unresolvedWaitTools.length === 0 &&
-              hasNewAssistantReply) ||
-            Date.now() - mirrorStart > MIRROR_WAIT_MS
-          ) {
-            break;
-          }
-          // Drive an explicit pull each tick — broadcastSyncNotify from the
-          // remote may have been lost if the WS dropped (e.g. HMR). Pulling
-          // guarantees the mirror converges even without a live WS push.
-          {
-            const { getWsConnection } =
-              await import("next-vibe/realtime/connector");
-            const conn = cfg.systemPromptInstanceId
-              ? getWsConnection(cfg.systemPromptInstanceId)
+            const pendingAsync = snapshot.filter((m) => {
+              if (
+                m.role !== "tool" ||
+                preStreamMessageIds.has(m.id) ||
+                (m.toolCall?.callbackMode !== "detach" &&
+                  m.toolCall?.callbackMode !== "wakeUp")
+              ) {
+                return false;
+              }
+              if (
+                m.toolCall?.status === "pending" ||
+                resolveToolResult(m) === null
+              ) {
+                return true;
+              }
+              // Detach hint: execute-tool returned {hint, taskId} but the
+              // background task hasn't backfilled a terminal result yet.
+              const res = resolveToolResult(m);
+              return (
+                typeof res?.["hint"] === "string" &&
+                res["imageUrl"] === undefined &&
+                res["audioUrl"] === undefined &&
+                res["videoUrl"] === undefined
+              );
+            });
+            const danglingCompacting = snapshot.filter(
+              (m) =>
+                m.isCompacting &&
+                !preStreamMessageIds.has(m.id) &&
+                !childIds.has(m.id),
+            );
+            // WAIT-mode tool results mirror as separate events — a snapshot
+            // taken between the final assistant and a still-in-flight
+            // tool-result reads a resultless tool row. Wait for every new tool
+            // message to carry its result.
+            const unresolvedWaitTools = snapshot.filter(
+              (m) =>
+                m.role === "tool" &&
+                !preStreamMessageIds.has(m.id) &&
+                m.toolCall?.callbackMode !== "detach" &&
+                m.toolCall?.callbackMode !== "wakeUp" &&
+                (m.toolCall?.status === "pending" ||
+                  resolveToolResult(m) === null),
+            );
+            // This turn's assistant reply must have mirrored back. The relay
+            // response names the AUTHORITATIVE final assistant — anything less
+            // (an interim think-message) converges mid-turn and the assertions
+            // read a half-mirrored thread.
+            const finalAiId = firstResult.result.success
+              ? firstResult.result.data.lastAiMessageId
               : null;
-            conn?.doPullNow();
+            const hasNewAssistantReply = finalAiId
+              ? snapshot.some(
+                  (m) => m.id === finalAiId && (m.content ?? "").trim() !== "",
+                )
+              : snapshot.some(
+                  (m) =>
+                    m.role === "assistant" &&
+                    !preStreamMessageIds.has(m.id) &&
+                    (m.content ?? "").trim() !== "",
+                );
+            // Chain chronology must hold: a lost live message-created leaves a
+            // delta-built stub with arrival-time createdAt (child older than its
+            // parent). The driven pull below heals it — wait for that.
+            const byId = new Map(snapshot.map((m) => [m.id, m]));
+            // A lost message-created leaves a PARENTLESS stub — a phantom
+            // second root chainTimeSane cannot see (no parent to compare).
+            // Only the turn's user message may be a root.
+            const noPhantomRoots = snapshot.every(
+              (m) =>
+                preStreamMessageIds.has(m.id) ||
+                m.parentId !== null ||
+                m.role === "user",
+            );
+            const chainTimeSane = snapshot.every((m) => {
+              if (!m.parentId || preStreamMessageIds.has(m.id)) {
+                return true;
+              }
+              const parent = byId.get(m.parentId);
+              if (!parent || parent.isCompacting) {
+                return true;
+              }
+              return parent.createdAt.getTime() <= m.createdAt.getTime();
+            });
+            if (
+              (pendingAsync.length === 0 &&
+                danglingCompacting.length === 0 &&
+                unresolvedWaitTools.length === 0 &&
+                chainTimeSane &&
+                noPhantomRoots &&
+                hasNewAssistantReply) ||
+              Date.now() - mirrorStart > MIRROR_WAIT_MS
+            ) {
+              break;
+            }
+            // Drive an explicit pull each tick — broadcastSyncNotify from the
+            // remote may have been lost if the WS dropped (e.g. HMR). Pulling
+            // guarantees the mirror converges even without a live WS push.
+            {
+              const { getWsConnection } =
+                await import("next-vibe/realtime/connector");
+              const conn = cfg.systemPromptInstanceId
+                ? getWsConnection(cfg.systemPromptInstanceId)
+                : null;
+              conn?.doPullNow();
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 500);
+            });
           }
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, 500);
-          });
+        } finally {
+          releaseConn();
         }
       }
 
@@ -617,184 +663,10 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
 }
 
 /**
- * Loop-LOCAL stream: originate on hermes (REMOTE/<client>/tests/<case> there),
- * the relay executes the loop HERE. Wait for the LOCAL executor copy
- * (BACKGROUND/remote/<hermes>/tests/<case>) to converge, then return the
- * standard runStream shape read from the LOCAL thread.
- */
-async function runLoopLocalStream(
-  deps: RunStreamDeps,
-  params: RunStreamParams,
-  preStreamMessageIds: Set<string>,
-): Promise<ReturnType<typeof runTestStream>> {
-  const { cfg, getMessages } = deps;
-  const { originateStreamOnHermes } = await import("./remote");
-  const hermesFolder = deps.getHermesCaseFolderId?.();
-  if (!hermesFolder) {
-    // oxlint-disable-next-line restricted-syntax -- test wiring error
-    throw new Error("loop-local: hermesCaseFolderId not prepared in beforeAll");
-  }
-  if (params.user.isPublic) {
-    // oxlint-disable-next-line restricted-syntax -- test wiring error
-    throw new Error("loop-local: requires an authenticated test user");
-  }
-  const threadId = params.threadId ?? crypto.randomUUID();
-  const origin = await originateStreamOnHermes({
-    testUser: params.user,
-    prompt: params.prompt,
-    threadId,
-    hermesCaseFolderId: hermesFolder,
-    parentMessageId: params.explicitParentMessageId ?? null,
-    toolConfirmations: params.toolConfirmations ?? null,
-    attachments: params.attachments,
-    favoriteId: params.favoriteId,
-    // Reverse-ws fans the relayed stream to every local connector holder —
-    // this process must pre-claim to win. Direct-http is a single POST to the
-    // dev server; pre-claiming would starve its only recipient.
-    preClaim: cfg.expectRelayTransport !== "direct-http",
-  });
-  if (!origin.success) {
-    // Return the REAL failure response — cases like C3 (insufficient credits)
-    // assert on result.errorType, exactly like a locally-failed stream.
-    return {
-      result: origin.failure,
-      messages: [],
-      pinnedToolCount: 0,
-    };
-  }
-  // Local executor convergence: the loop runs HERE — the local thread row
-  // carries its real streaming state. Wait until the stream has finished
-  // (state back to idle/null) AND a new assistant message exists; a
-  // fingerprint heuristic converges too early during model-latency gaps
-  // (stable throttled writes mid-turn look "settled").
-  const WAIT_MS = 180_000;
-  const start = Date.now();
-  let messages: SlimMessage[] = [];
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
-  const { eq: eqOp } = await import("drizzle-orm");
-  for (;;) {
-    const [threadRow] = await db
-      .select({ streamingState: chatThreads.streamingState })
-      .from(chatThreads)
-      .where(eqOp(chatThreads.id, threadId))
-      .limit(1);
-    const idle =
-      threadRow !== undefined &&
-      (threadRow.streamingState === null ||
-        threadRow.streamingState === "idle");
-    if (idle) {
-      messages = await getMessages(threadId);
-      const hasNewAssistant = messages.some(
-        (m) =>
-          m.role === "assistant" &&
-          !preStreamMessageIds.has(m.id) &&
-          (m.content ?? "").trim() !== "",
-      );
-      if (hasNewAssistant) {
-        break;
-      }
-    }
-    if (Date.now() - start > WAIT_MS) {
-      messages = await getMessages(threadId);
-      break;
-    }
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 500);
-    });
-  }
-  const newestAi = messages.findLast((m) => m.role === "assistant");
-  assertParentTimeOrder(messages);
-  await assertLoopLocalPlacement(cfg, threadId);
-  const { success: successResponse } =
-    await import("next-vibe/core/route/response.schema");
-  // The loop ran HERE as the relay executor — its assistant messages carry the
-  // per-turn creditCost in metadata. Sum the NEW ones so callers can assert
-  // real billing (the deduction happened on this instance).
-  const newAssistantIds = messages
-    .filter((m) => m.role === "assistant" && !preStreamMessageIds.has(m.id))
-    .map((m) => m.id);
-  let totalCreditsDeducted = 0;
-  if (newAssistantIds.length > 0) {
-    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
-    const { inArray } = await import("drizzle-orm");
-    const rows = await db
-      .select({ metadata: chatMessages.metadata })
-      .from(chatMessages)
-      .where(inArray(chatMessages.id, newAssistantIds));
-    for (const row of rows) {
-      const cost = row.metadata?.creditCost;
-      if (typeof cost === "number") {
-        totalCreditsDeducted += cost;
-      }
-    }
-  }
-  // Native media file parts surface as a synthetic tool message
-  // (FilePartHandler: toolName=generate_image/... with the media URL in the
-  // result) — mirror what the in-process stream reports as
-  // lastGeneratedMediaUrl.
-  let lastGeneratedMediaUrl: string | null = null;
-  for (const m of messages) {
-    if (m.role !== "tool" || preStreamMessageIds.has(m.id)) {
-      continue;
-    }
-    const toolResult = resolveToolResult(m);
-    const mediaUrl =
-      toolResult?.["imageUrl"] ??
-      toolResult?.["videoUrl"] ??
-      toolResult?.["audioUrl"] ??
-      toolResult?.["musicUrl"] ??
-      // Native file parts: FilePartHandler's synthetic tool message stores
-      // the stored-media URL under `file`.
-      toolResult?.["file"];
-    if (typeof mediaUrl === "string" && mediaUrl.length > 0) {
-      lastGeneratedMediaUrl = mediaUrl;
-    }
-  }
-  const data: HeadlessAiStreamResult = {
-    threadId,
-    lastAiMessageId: newestAi?.id ?? "",
-    lastAiMessageContent: newestAi?.content ?? null,
-    totalCreditsDeducted,
-    lastGeneratedMediaUrl,
-    // The loop ran via the hermes-originated relay; the local observer never
-    // sees the receiver's tool-schema count.
-    pinnedToolCount: 0,
-  };
-  return {
-    result: successResponse(data),
-    messages,
-    pinnedToolCount: 0,
-  };
-}
-
-/** Loop-local placement: local=BACKGROUND/remote/<hermes>/tests/<case>, hermes=REMOTE/<client>/tests/<case>. */
-async function assertLoopLocalPlacement(
-  cfg: ModeConfig,
-  threadId: string,
-): Promise<void> {
-  const testCaseName =
-    cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") || "regular";
-  const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
-    await import("../../../testing/remote-setup");
-  await assertThreadPlacement({
-    db: "local",
-    threadId,
-    rootFolderId: DefaultFolderId.BACKGROUND,
-    nameChain: ["remote", HERMES_INSTANCE_ID, "tests", testCaseName],
-  });
-  await assertThreadPlacement({
-    db: "hermes",
-    threadId,
-    rootFolderId: DefaultFolderId.REMOTE,
-    nameChain: [SELF_INSTANCE_ID, "tests", testCaseName],
-  });
-}
-
-/**
  * Placement discipline — asserted after EVERY successful stream (100% or fail):
  *   same-instance suites → local PRIVATE/tests/<case>, nothing anywhere else;
  *   REMOTE-folder suites → caller REMOTE/<remoteId>/tests/<case> AND executor
- *   BACKGROUND/remote/<callerId>/tests/<case> on the hermes DB.
+ *   REMOTE/<callerId>/tests/<case> on the hermes DB (ONE foreign-copy rule).
  * Streams explicitly targeting another root (e.g. INCOGNITO cases) are exempt —
  * the effectiveRootFolderId reflects the caller's explicit override.
  */
@@ -815,17 +687,27 @@ async function assertCasePlacement(
     if (effectiveRootFolderId !== DefaultFolderId.REMOTE) {
       return; // explicit non-default root (e.g. incognito case) — exempt
     }
+    // FOLDER-driven remote suites: the thread is CREATED inside
+    // REMOTE/<instance>/tests/<case> — the folder's instance id stamps
+    // loop_instance_id at creation and routes the loop. The executor's
+    // foreign copy nests the origin root: REMOTE/<caller>/private/<chain>.
     await assertThreadPlacement({
       db: "local",
       threadId,
       rootFolderId: DefaultFolderId.REMOTE,
       nameChain: [HERMES_INSTANCE_ID, "tests", testCaseName],
     });
+    if (cfg.forceLocalLoop) {
+      // Loop-LOCAL topology: the "self" sentinel keeps the loop here — no
+      // relay ever lands on hermes, so no executor copy exists there. Tools
+      // still execute remotely, but execute-tool creates no threads.
+      return;
+    }
     await assertThreadPlacement({
       db: "hermes",
       threadId,
-      rootFolderId: DefaultFolderId.BACKGROUND,
-      nameChain: ["remote", SELF_INSTANCE_ID, "tests", testCaseName],
+      rootFolderId: DefaultFolderId.REMOTE,
+      nameChain: [SELF_INSTANCE_ID, "private", "tests", testCaseName],
     });
     return;
   }
@@ -841,4 +723,34 @@ async function assertCasePlacement(
     rootFolderId: suiteRootFolderId,
     nameChain: ["tests", testCaseName],
   });
+  if (cfg.assertMirrorOnHermes) {
+    // The mirror lands via the thread-updated push at stream completion — an
+    // async relay hop behind the local idle signal. Converge on it instead of
+    // racing it; the LAST failure is authoritative.
+    const deadline = Date.now() + 30_000;
+    const { assertMirrorMessageParity } =
+      await import("../../../testing/remote-setup");
+    for (;;) {
+      try {
+        await assertThreadPlacement({
+          db: "hermes",
+          threadId,
+          rootFolderId: DefaultFolderId.REMOTE,
+          nameChain: [SELF_INSTANCE_ID, "private", "tests", testCaseName],
+        });
+        // Placement alone is not the contract: every local message must have
+        // mirrored with the same role + parent (the user message included).
+        await assertMirrorMessageParity(threadId);
+        return;
+      } catch (err) {
+        if (Date.now() > deadline) {
+          // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+          throw err;
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500);
+        });
+      }
+    }
+  }
 }

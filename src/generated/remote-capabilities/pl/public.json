@@ -673,9 +673,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -739,9 +737,7 @@
                 "schema": {
                   "def": {
                     "type": "string",
-                    "checks": [
-                      {}
-                    ]
+                    "checks": [{}]
                   },
                   "type": "string",
                   "format": null,
@@ -1013,9 +1009,7 @@
                         {
                           "def": {
                             "type": "literal",
-                            "values": [
-                              ""
-                            ]
+                            "values": [""]
                           },
                           "type": "literal",
                           "values": {}
@@ -1051,9 +1045,7 @@
                       {
                         "def": {
                           "type": "literal",
-                          "values": [
-                            ""
-                          ]
+                          "values": [""]
                         },
                         "type": "literal",
                         "values": {}
@@ -1105,9 +1097,7 @@
                       {
                         "def": {
                           "type": "literal",
-                          "values": [
-                            ""
-                          ]
+                          "values": [""]
                         },
                         "type": "literal",
                         "values": {}
@@ -1143,9 +1133,7 @@
                     {
                       "def": {
                         "type": "literal",
-                        "values": [
-                          ""
-                        ]
+                        "values": [""]
                       },
                       "type": "literal",
                       "values": {}
@@ -1281,9 +1269,7 @@
                         {
                           "def": {
                             "type": "literal",
-                            "values": [
-                              ""
-                            ]
+                            "values": [""]
                           },
                           "type": "literal",
                           "values": {}
@@ -1319,9 +1305,7 @@
                       {
                         "def": {
                           "type": "literal",
-                          "values": [
-                            ""
-                          ]
+                          "values": [""]
                         },
                         "type": "literal",
                         "values": {}
@@ -1373,9 +1357,7 @@
                       {
                         "def": {
                           "type": "literal",
-                          "values": [
-                            ""
-                          ]
+                          "values": [""]
                         },
                         "type": "literal",
                         "values": {}
@@ -1411,9 +1393,7 @@
                     {
                       "def": {
                         "type": "literal",
-                        "values": [
-                          ""
-                        ]
+                        "values": [""]
                       },
                       "type": "literal",
                       "values": {}
@@ -1823,15 +1803,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "AI",
-      "Czat"
-    ],
-    "aliases": [
-      "ai-run",
-      "run-ai",
-      "agent-run"
-    ],
+    "tags": ["AI", "Czat"],
+    "aliases": ["ai-run", "run-ai", "agent-run"],
     "credits": 0
   },
   {
@@ -2133,10 +2106,7 @@
                     "folder": "folder",
                     "thread": "thread"
                   },
-                  "options": [
-                    "folder",
-                    "thread"
-                  ]
+                  "options": ["folder", "thread"]
                 },
                 "usage": {
                   "response": true
@@ -3398,12 +3368,7 @@
                     "aborting": "aborting",
                     "waiting": "waiting"
                   },
-                  "options": [
-                    "idle",
-                    "streaming",
-                    "aborting",
-                    "waiting"
-                  ]
+                  "options": ["idle", "streaming", "aborting", "waiting"]
                 },
                 "usage": {
                   "response": true
@@ -3677,13 +3642,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Zawartość folderu"
-    ],
-    "aliases": [
-      "folder-contents",
-      "get-folder"
-    ],
+    "tags": ["Zawartość folderu"],
+    "aliases": ["folder-contents", "get-folder"],
     "credits": 0
   },
   {
@@ -4848,13 +4808,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Foldery"
-    ],
-    "aliases": [
-      "folders-list",
-      "folders"
-    ],
+    "tags": ["Foldery"],
+    "aliases": ["folders-list", "folders"],
     "credits": 0
   },
   {
@@ -4948,12 +4903,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Foldery"
-    ],
-    "aliases": [
-      "folder-permissions"
-    ],
+    "tags": ["Foldery"],
+    "aliases": ["folder-permissions"],
     "credits": 0
   },
   {
@@ -5069,9 +5020,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {}
-                      ]
+                      "checks": [{}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -5108,10 +5057,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -5561,12 +5507,7 @@
                     "aborting": "aborting",
                     "waiting": "waiting"
                   },
-                  "options": [
-                    "idle",
-                    "streaming",
-                    "aborting",
-                    "waiting"
-                  ]
+                  "options": ["idle", "streaming", "aborting", "waiting"]
                 },
                 "usage": {
                   "response": true
@@ -6065,9 +6006,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Publiczny Feed"
-    ],
+    "tags": ["Publiczny Feed"],
     "credits": 0
   },
   {
@@ -7072,12 +7011,7 @@
               "aborting": "aborting",
               "waiting": "waiting"
             },
-            "options": [
-              "idle",
-              "streaming",
-              "aborting",
-              "waiting"
-            ]
+            "options": ["idle", "streaming", "aborting", "waiting"]
           },
           "hidden": true,
           "usage": {
@@ -7092,9 +7026,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wątki"
-    ],
+    "tags": ["Wątki"],
     "credits": 0
   },
   {
@@ -7216,10 +7148,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {},
-                    {}
-                  ]
+                  "checks": [{}, {}]
                 },
                 "type": "string",
                 "format": null,
@@ -7919,9 +7848,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wątki"
-    ],
+    "tags": ["Wątki"],
     "credits": 0
   },
   {
@@ -8494,9 +8421,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wątki"
-    ],
+    "tags": ["Wątki"],
     "credits": 0
   },
   {
@@ -8650,13 +8575,7 @@
               "TOOL": "tool",
               "ERROR": "error"
             },
-            "options": [
-              "user",
-              "assistant",
-              "system",
-              "tool",
-              "error"
-            ]
+            "options": ["user", "assistant", "system", "tool", "error"]
           },
           "usage": {
             "response": true
@@ -9124,9 +9043,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
+    "tags": ["Wiadomości"],
     "credits": 0
   },
   {
@@ -9266,9 +9183,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -9329,13 +9244,7 @@
                   "TOOL": "tool",
                   "ERROR": "error"
                 },
-                "options": [
-                  "user",
-                  "assistant",
-                  "system",
-                  "tool",
-                  "error"
-                ]
+                "options": ["user", "assistant", "system", "tool", "error"]
               }
             },
             "type": "optional"
@@ -9390,13 +9299,7 @@
               "TOOL": "tool",
               "ERROR": "error"
             },
-            "options": [
-              "user",
-              "assistant",
-              "system",
-              "tool",
-              "error"
-            ]
+            "options": ["user", "assistant", "system", "tool", "error"]
           },
           "usage": {
             "response": true
@@ -9601,9 +9504,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
+    "tags": ["Wiadomości"],
     "credits": 0
   },
   {
@@ -9753,13 +9654,7 @@
               "TOOL": "tool",
               "ERROR": "error"
             },
-            "options": [
-              "user",
-              "assistant",
-              "system",
-              "tool",
-              "error"
-            ]
+            "options": ["user", "assistant", "system", "tool", "error"]
           },
           "usage": {
             "response": true
@@ -10075,9 +9970,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
+    "tags": ["Wiadomości"],
     "credits": 0
   },
   {
@@ -10266,12 +10159,7 @@
               "aborting": "aborting",
               "waiting": "waiting"
             },
-            "options": [
-              "idle",
-              "streaming",
-              "aborting",
-              "waiting"
-            ]
+            "options": ["idle", "streaming", "aborting", "waiting"]
           },
           "usage": {
             "response": true
@@ -10440,13 +10328,7 @@
                     "TOOL": "tool",
                     "ERROR": "error"
                   },
-                  "options": [
-                    "user",
-                    "assistant",
-                    "system",
-                    "tool",
-                    "error"
-                  ]
+                  "options": ["user", "assistant", "system", "tool", "error"]
                 },
                 "usage": {
                   "response": true
@@ -11511,12 +11393,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
-    "aliases": [
-      "thread-messages"
-    ],
+    "tags": ["Wiadomości"],
+    "aliases": ["thread-messages"],
     "credits": 0
   },
   {
@@ -11698,10 +11576,7 @@
                       "user": "user",
                       "assistant": "assistant"
                     },
-                    "options": [
-                      "user",
-                      "assistant"
-                    ]
+                    "options": ["user", "assistant"]
                   }
                 },
                 "type": "optional"
@@ -11723,9 +11598,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -12258,9 +12131,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
+    "tags": ["Wiadomości"],
     "credits": 0
   },
   {
@@ -12524,13 +12395,7 @@
                     "TOOL": "tool",
                     "ERROR": "error"
                   },
-                  "options": [
-                    "user",
-                    "assistant",
-                    "system",
-                    "tool",
-                    "error"
-                  ]
+                  "options": ["user", "assistant", "system", "tool", "error"]
                 },
                 "usage": {
                   "response": true
@@ -13610,9 +13475,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wiadomości"
-    ],
+    "tags": ["Wiadomości"],
     "credits": 0
   },
   {
@@ -13669,9 +13532,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {}
-                      ]
+                      "checks": [{}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -13708,10 +13569,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -14788,12 +14646,7 @@
                     "aborting": "aborting",
                     "waiting": "waiting"
                   },
-                  "options": [
-                    "idle",
-                    "streaming",
-                    "aborting",
-                    "waiting"
-                  ]
+                  "options": ["idle", "streaming", "aborting", "waiting"]
                 },
                 "usage": {
                   "response": true
@@ -15232,12 +15085,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wątki"
-    ],
-    "aliases": [
-      "agent-chat-threads"
-    ],
+    "tags": ["Wątki"],
+    "aliases": ["agent-chat-threads"],
     "credits": 0
   },
   {
@@ -15281,9 +15130,7 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "hiddenForPlatforms": ["ai"],
           "usage": {
             "request": "data"
           },
@@ -15301,10 +15148,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {},
-                    {}
-                  ]
+                  "checks": [{}, {}]
                 },
                 "type": "string",
                 "format": null,
@@ -15331,9 +15175,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {}
-                  ]
+                  "checks": [{}]
                 },
                 "type": "string",
                 "format": null,
@@ -15582,9 +15424,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wątki"
-    ],
+    "tags": ["Wątki"],
     "credits": 0
   },
   {
@@ -15748,14 +15588,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Obraz",
-      "Wizja",
-      "AI"
-    ],
-    "aliases": [
-      "describe_image"
-    ],
+    "tags": ["Obraz", "Wizja", "AI"],
+    "aliases": ["describe_image"],
     "credits": 0
   },
   {
@@ -15919,14 +15753,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wideo",
-      "Wizja",
-      "AI"
-    ],
-    "aliases": [
-      "describe_video"
-    ],
+    "tags": ["Wideo", "Wizja", "AI"],
+    "aliases": ["describe_video"],
     "credits": 0
   },
   {
@@ -16172,16 +16000,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Scraping",
-      "Internet",
-      "Zawartość"
-    ],
-    "aliases": [
-      "fetch-url-content",
-      "fetch",
-      "fetch-url"
-    ],
+    "tags": ["Scraping", "Internet", "Zawartość"],
+    "aliases": ["fetch-url-content", "fetch", "fetch-url"],
     "credits": 0.13
   },
   {
@@ -16232,10 +16052,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -16469,9 +16286,7 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "hiddenForPlatforms": ["ai"],
           "usage": {
             "request": "data"
           },
@@ -16497,10 +16312,7 @@
               "label": "post.size.portrait1792"
             }
           ],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "default",
@@ -16550,10 +16362,7 @@
               "label": "post.quality.hd"
             }
           ],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "default",
@@ -16570,10 +16379,7 @@
                   "STANDARD": "post.quality.standard",
                   "HD": "post.quality.hd"
                 },
-                "options": [
-                  "post.quality.standard",
-                  "post.quality.hd"
-                ]
+                "options": ["post.quality.standard", "post.quality.hd"]
               },
               "defaultValue": "post.quality.standard"
             },
@@ -16591,10 +16397,7 @@
           "description": "Proporcje wyjściowego obrazu",
           "columns": 6,
           "options": [],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
@@ -16749,14 +16552,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Obraz",
-      "Generowanie",
-      "AI"
-    ],
-    "aliases": [
-      "generate_image"
-    ],
+    "tags": ["Obraz", "Generowanie", "AI"],
+    "aliases": ["generate_image"],
     "credits": 0
   },
   {
@@ -16807,10 +16604,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -16883,9 +16677,7 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "hiddenForPlatforms": ["ai"],
           "usage": {
             "request": "data"
           },
@@ -17098,14 +16890,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Muzyka",
-      "Generowanie",
-      "AI"
-    ],
-    "aliases": [
-      "generate_music"
-    ],
+    "tags": ["Muzyka", "Generowanie", "AI"],
+    "aliases": ["generate_music"],
     "credits": 0
   },
   {
@@ -17133,10 +16919,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -17164,10 +16947,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -17262,12 +17042,7 @@
                   "past_month": "past_month",
                   "past_year": "past_year"
                 },
-                "options": [
-                  "past_day",
-                  "past_week",
-                  "past_month",
-                  "past_year"
-                ]
+                "options": ["past_day", "past_week", "past_month", "past_year"]
               }
             },
             "type": "optional"
@@ -17416,14 +17191,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wyszukiwanie",
-      "Sieć",
-      "Internet"
-    ],
-    "aliases": [
-      "brave-search"
-    ],
+    "tags": ["Wyszukiwanie", "Sieć", "Internet"],
+    "aliases": ["brave-search"],
     "credits": 0.65
   },
   {
@@ -17451,10 +17220,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -17589,14 +17355,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wyszukiwanie",
-      "Sieć",
-      "AI"
-    ],
-    "aliases": [
-      "kagi-search"
-    ],
+    "tags": ["Wyszukiwanie", "Sieć", "AI"],
+    "aliases": ["kagi-search"],
     "credits": 1.95
   },
   {
@@ -17624,10 +17384,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -17710,10 +17467,7 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "number",
                     "minValue": 1,
@@ -17808,12 +17562,7 @@
                   "past_month": "past_month",
                   "past_year": "past_year"
                 },
-                "options": [
-                  "past_day",
-                  "past_week",
-                  "past_month",
-                  "past_year"
-                ]
+                "options": ["past_day", "past_week", "past_month", "past_year"]
               }
             },
             "type": "optional"
@@ -18003,14 +17752,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wyszukiwanie",
-      "Sieć",
-      "Internet"
-    ],
-    "aliases": [
-      "web-search"
-    ],
+    "tags": ["Wyszukiwanie", "Sieć", "Internet"],
+    "aliases": ["web-search"],
     "credits": 0.65
   },
   {
@@ -18086,10 +17829,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {},
-                    {}
-                  ]
+                  "checks": [{}, {}]
                 },
                 "type": "string",
                 "format": null,
@@ -18114,10 +17854,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {},
-                    {}
-                  ]
+                  "checks": [{}, {}]
                 },
                 "type": "string",
                 "format": null,
@@ -18141,10 +17878,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "checks": [
-                    {},
-                    {}
-                  ]
+                  "checks": [{}, {}]
                 },
                 "type": "string",
                 "format": null,
@@ -18584,9 +18318,7 @@
                     "id": {
                       "def": {
                         "type": "string",
-                        "checks": [
-                          {}
-                        ]
+                        "checks": [{}]
                       },
                       "type": "string",
                       "format": "regex",
@@ -18599,9 +18331,7 @@
                         "innerType": {
                           "def": {
                             "type": "string",
-                            "checks": [
-                              {}
-                            ]
+                            "checks": [{}]
                           },
                           "type": "string",
                           "format": null,
@@ -18622,9 +18352,7 @@
                                 "selectionType": {
                                   "def": {
                                     "type": "literal",
-                                    "values": [
-                                      "enums.selectionType.manual"
-                                    ]
+                                    "values": ["enums.selectionType.manual"]
                                   },
                                   "type": "literal",
                                   "values": {}
@@ -19169,9 +18897,7 @@
                                 "selectionType": {
                                   "def": {
                                     "type": "literal",
-                                    "values": [
-                                      "enums.selectionType.filters"
-                                    ]
+                                    "values": ["enums.selectionType.filters"]
                                   },
                                   "type": "literal",
                                   "values": {}
@@ -19500,9 +19226,7 @@
                               "selectionType": {
                                 "def": {
                                   "type": "literal",
-                                  "values": [
-                                    "enums.selectionType.manual"
-                                  ]
+                                  "values": ["enums.selectionType.manual"]
                                 },
                                 "type": "literal",
                                 "values": {}
@@ -20047,9 +19771,7 @@
                               "selectionType": {
                                 "def": {
                                   "type": "literal",
-                                  "values": [
-                                    "enums.selectionType.filters"
-                                  ]
+                                  "values": ["enums.selectionType.filters"]
                                 },
                                 "type": "literal",
                                 "values": {}
@@ -31926,9 +31648,7 @@
                   "id": {
                     "def": {
                       "type": "string",
-                      "checks": [
-                        {}
-                      ]
+                      "checks": [{}]
                     },
                     "type": "string",
                     "format": "regex",
@@ -31941,9 +31661,7 @@
                       "innerType": {
                         "def": {
                           "type": "string",
-                          "checks": [
-                            {}
-                          ]
+                          "checks": [{}]
                         },
                         "type": "string",
                         "format": null,
@@ -31964,9 +31682,7 @@
                               "selectionType": {
                                 "def": {
                                   "type": "literal",
-                                  "values": [
-                                    "enums.selectionType.manual"
-                                  ]
+                                  "values": ["enums.selectionType.manual"]
                                 },
                                 "type": "literal",
                                 "values": {}
@@ -32511,9 +32227,7 @@
                               "selectionType": {
                                 "def": {
                                   "type": "literal",
-                                  "values": [
-                                    "enums.selectionType.filters"
-                                  ]
+                                  "values": ["enums.selectionType.filters"]
                                 },
                                 "type": "literal",
                                 "values": {}
@@ -32842,9 +32556,7 @@
                             "selectionType": {
                               "def": {
                                 "type": "literal",
-                                "values": [
-                                  "enums.selectionType.manual"
-                                ]
+                                "values": ["enums.selectionType.manual"]
                               },
                               "type": "literal",
                               "values": {}
@@ -33389,9 +33101,7 @@
                             "selectionType": {
                               "def": {
                                 "type": "literal",
-                                "values": [
-                                  "enums.selectionType.filters"
-                                ]
+                                "values": ["enums.selectionType.filters"]
                               },
                               "type": "literal",
                               "values": {}
@@ -34478,9 +34188,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -35925,9 +35633,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -37357,9 +37063,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -38804,9 +38508,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -40188,9 +39890,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -41671,9 +41371,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -43169,9 +42867,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -44559,9 +44255,7 @@
                                     "selectionType": {
                                       "def": {
                                         "type": "literal",
-                                        "values": [
-                                          "enums.selectionType.manual"
-                                        ]
+                                        "values": ["enums.selectionType.manual"]
                                       },
                                       "type": "literal",
                                       "values": {}
@@ -45608,12 +45302,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Postacie"
-    ],
-    "aliases": [
-      "skill-get"
-    ],
+    "tags": ["Postacie"],
+    "aliases": ["skill-get"],
     "credits": 0
   },
   {
@@ -45663,9 +45353,7 @@
             },
             "type": "optional"
           },
-          "visibleFor": [
-            "enums.userRole.admin"
-          ],
+          "visibleFor": ["enums.userRole.admin"],
           "hidden": true,
           "usage": {
             "request": "data"
@@ -46894,12 +46582,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Postacie"
-    ],
-    "aliases": [
-      "skills"
-    ],
+    "tags": ["Postacie"],
+    "aliases": ["skills"],
     "credits": 0
   },
   {
@@ -46950,10 +46634,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {},
-                {}
-              ]
+              "checks": [{}, {}]
             },
             "type": "string",
             "format": null,
@@ -46972,9 +46653,7 @@
           "description": "Wybierz model do generowania wideo",
           "columns": 12,
           "options": [],
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "hiddenForPlatforms": ["ai"],
           "schema": {
             "def": {
               "type": "optional",
@@ -47074,10 +46753,7 @@
           "description": "Długość wygenerowanego klipu wideo",
           "columns": 12,
           "options": [],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "default",
@@ -47126,10 +46802,7 @@
           "description": "Proporcje wyjściowego wideo",
           "columns": 12,
           "options": [],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
@@ -47157,10 +46830,7 @@
           "description": "Rozdzielczość wyjściowego wideo",
           "columns": 12,
           "options": [],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
@@ -47341,14 +47011,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wideo",
-      "Generowanie",
-      "AI"
-    ],
-    "aliases": [
-      "generate_video"
-    ],
+    "tags": ["Wideo", "Generowanie", "AI"],
+    "aliases": ["generate_video"],
     "credits": 0
   },
   {
@@ -47409,13 +47073,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "Wizja",
-      "AI"
-    ],
-    "aliases": [
-      "agent-view-image"
-    ],
+    "tags": ["Wizja", "AI"],
+    "aliases": ["agent-view-image"],
     "credits": 0
   },
   {
@@ -47433,9 +47092,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -47605,9 +47262,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -47729,9 +47384,7 @@
       "Przesłanie kontaktu",
       "Pomoc i wsparcie"
     ],
-    "aliases": [
-      "contact-form"
-    ],
+    "aliases": ["contact-form"],
     "credits": 0
   },
   {
@@ -48050,13 +47703,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "credits",
-    "tags": [
-      "kredyty",
-      "saldo"
-    ],
-    "aliases": [
-      "credits-balance"
-    ],
+    "tags": ["kredyty", "saldo"],
+    "aliases": ["credits-balance"],
     "credits": 0
   },
   {
@@ -48549,10 +48197,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "credits",
-    "tags": [
-      "kredyty",
-      "saldo"
-    ],
+    "tags": ["kredyty", "saldo"],
     "credits": 0
   },
   {
@@ -48647,9 +48292,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "aliases": [
-      "newsletter-status"
-    ],
+    "aliases": ["newsletter-status"],
     "credits": 0
   },
   {
@@ -48929,14 +48572,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "tags": [
-      "Newsletter",
-      "Subskrypcja"
-    ],
-    "aliases": [
-      "newsletter-subscribe",
-      "subscribe"
-    ],
+    "tags": ["Newsletter", "Subskrypcja"],
+    "aliases": ["newsletter-subscribe", "subscribe"],
     "credits": 0
   },
   {
@@ -49025,13 +48662,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "tags": [
-      "Newsletter"
-    ],
-    "aliases": [
-      "newsletter-unsubscribe",
-      "unsubscribe"
-    ],
+    "tags": ["Newsletter"],
+    "aliases": ["newsletter-unsubscribe", "unsubscribe"],
     "credits": 0
   },
   {
@@ -49079,9 +48711,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -49807,10 +49437,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "payments",
-    "tags": [
-      "płatność",
-      "faktura"
-    ],
+    "tags": ["płatność", "faktura"],
     "credits": 0
   },
   {
@@ -49835,9 +49462,7 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {}
-              ]
+              "checks": [{}]
             },
             "type": "string",
             "format": null,
@@ -50196,10 +49821,7 @@
                   "completed": "completed",
                   "failed": "failed"
                 },
-                "options": [
-                  "completed",
-                  "failed"
-                ]
+                "options": ["completed", "failed"]
               }
             },
             "type": "optional"
@@ -50217,12 +49839,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "narzędzia"
-    ],
-    "aliases": [
-      "execute-tool"
-    ],
+    "tags": ["narzędzia"],
+    "aliases": ["execute-tool"],
     "credits": 0
   },
   {
@@ -50526,18 +50144,9 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
-          "visibleFor": [
-            "enums.userRole.admin"
-          ],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill"
-          ],
+          "userRoles": ["enums.userRole.admin"],
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
           "usage": {
             "request": "data"
           },
@@ -50565,26 +50174,14 @@
                   "enums.userRole.public": "enums.userRole.public",
                   "enums.userRole.customer": "enums.userRole.customer"
                 },
-                "options": [
-                  "enums.userRole.public",
-                  "enums.userRole.customer"
-                ]
+                "options": ["enums.userRole.public", "enums.userRole.customer"]
               }
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
-          "visibleFor": [
-            "enums.userRole.admin"
-          ],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill"
-          ],
+          "userRoles": ["enums.userRole.admin"],
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
           "usage": {
             "request": "data"
           },
@@ -50611,10 +50208,7 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.customer",
-            "enums.userRole.admin"
-          ],
+          "userRoles": ["enums.userRole.customer", "enums.userRole.admin"],
           "usage": {
             "request": "data"
           },
@@ -50665,12 +50259,7 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
           "usage": {
             "request": "data"
           },
@@ -51945,12 +51534,8 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "userRoles": ["enums.userRole.admin"],
+          "hiddenForPlatforms": ["ai"],
           "usage": {
             "response": true
           },
@@ -51975,20 +51560,13 @@
                   "development": "development",
                   "production": "production"
                 },
-                "options": [
-                  "development",
-                  "production"
-                ]
+                "options": ["development", "production"]
               }
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
-          "hiddenForPlatforms": [
-            "ai"
-          ],
+          "userRoles": ["enums.userRole.admin"],
+          "hiddenForPlatforms": ["ai"],
           "usage": {
             "response": true
           },
@@ -52219,9 +51797,7 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
+          "userRoles": ["enums.userRole.admin"],
           "usage": {
             "response": true
           },
@@ -52248,9 +51824,7 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
+          "userRoles": ["enums.userRole.admin"],
           "usage": {
             "response": true
           },
@@ -52277,9 +51851,7 @@
             },
             "type": "optional"
           },
-          "userRoles": [
-            "enums.userRole.admin"
-          ],
+          "userRoles": ["enums.userRole.admin"],
           "usage": {
             "response": true
           },
@@ -52371,9 +51943,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": [
-      "narzędzia"
-    ],
+    "tags": ["narzędzia"],
     "aliases": [
       "tool-help",
       "help",
@@ -52428,9 +51998,7 @@
           "schema": {
             "def": {
               "type": "literal",
-              "values": [
-                false
-              ]
+              "values": [false]
             },
             "type": "literal",
             "values": {}
@@ -54406,12 +53974,8 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "account",
-    "tags": [
-      "Profil użytkownika"
-    ],
-    "aliases": [
-      "user-me"
-    ],
+    "tags": ["Profil użytkownika"],
+    "aliases": ["user-me"],
     "credits": 0
   },
   {
@@ -54477,10 +54041,7 @@
                   "innerType": {
                     "def": {
                       "type": "string",
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "string",
                     "format": null,
@@ -54508,10 +54069,7 @@
                   "innerType": {
                     "def": {
                       "type": "string",
-                      "checks": [
-                        {},
-                        {}
-                      ]
+                      "checks": [{}, {}]
                     },
                     "type": "string",
                     "format": null,
@@ -54597,9 +54155,7 @@
                       "innerType": {
                         "def": {
                           "type": "string",
-                          "checks": [
-                            {}
-                          ]
+                          "checks": [{}]
                         },
                         "type": "string",
                         "format": null,
@@ -55101,10 +54657,7 @@
                       "innerType": {
                         "def": {
                           "type": "string",
-                          "checks": [
-                            {},
-                            {}
-                          ]
+                          "checks": [{}, {}]
                         },
                         "type": "string",
                         "format": "regex",
@@ -55138,9 +54691,7 @@
                       "innerType": {
                         "def": {
                           "type": "string",
-                          "checks": [
-                            {}
-                          ]
+                          "checks": [{}]
                         },
                         "type": "string",
                         "format": "regex",
@@ -55322,9 +54873,7 @@
               "schema": {
                 "def": {
                   "type": "literal",
-                  "values": [
-                    false
-                  ]
+                  "values": [false]
                 },
                 "type": "literal",
                 "values": {}
@@ -57281,9 +56830,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "account",
-    "tags": [
-      "Profil użytkownika"
-    ],
+    "tags": ["Profil użytkownika"],
     "credits": 0
   }
 ]

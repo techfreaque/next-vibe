@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/lead-magnet/providers/google-sheets/oauth/start")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/lead-magnet/providers/google-sheets/oauth/start/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/lead-magnet/providers/google-sheets/oauth/start",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/lead-magnet/providers/google-sheets/oauth/start/route"),
+    ),
+  },
 });

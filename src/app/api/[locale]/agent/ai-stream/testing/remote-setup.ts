@@ -478,12 +478,11 @@ export async function connectToHermes(
         documents: true,
         memories: true,
         skills: true,
-        // Test discipline: NOTHING lands on the remote from same-instance
-        // suites. Thread/chat sync would push every local test thread to the
-        // peer as unplaced strays; the relay suites persist their remote copy
-        // explicitly (executor landing + mirror-back), not via sync.
-        threads: false,
-        chat: false,
+        // Threads/chat mirror LIVE to the peer: origin-aware placement lands
+        // every local thread at REMOTE/<origin>/<its local folder chain> on
+        // hermes, and pull-on-connect reconciles anything missed offline.
+        threads: true,
+        chat: true,
       },
     },
     urlPathParams: { instanceId: connectedInstanceId },
@@ -653,32 +652,14 @@ async function waitForHermesConnectorReady(
 /**
  * Tear down a connectToHermesLocalAi session.
  *
- * Resets hermes's reverse-WS connector back to cloud-only (closes the open WS),
- * then removes the atlas → hermes connection from both sides.
+ * Removing the connection row from both sides closes hermes's reverse-WS
+ * connector — deletion propagates and the socket owner tears down with it.
  */
 export async function disconnectFromHermesLocalAi(
   user: JwtPrivatePayloadType,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
-  // Best-effort: ask hermes to reset its atlas connection to cloud-only via its
-  // PATCH endpoint so its WS connector closes cleanly.
-  try {
-    const { sendTestRequest } =
-      await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-    const connByIdDef = (
-      await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
-    ).default;
-    await sendTestRequest({
-      endpoint: connByIdDef.PATCH,
-      data: { transportMode: "cloud-only" },
-      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-      user,
-      instanceId: HERMES_INSTANCE_ID,
-    });
-  } catch {
-    /* best-effort */
-  }
   await disconnectFromHermes(user.id);
 }
 
@@ -713,6 +694,55 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
         endpoint: connByIdDef.DELETE,
+        urlPathParams: { instanceId: conn.instanceId },
+        user: adminUser,
+      });
+    }
+  }
+}
+
+/**
+ * Normalize the atlas → hermes connection for LOCAL suites: the connection
+ * stays ALIVE (live thread/chat mirroring to the peer is a feature under
+ * test), but favorites sync is forced OFF so peer favorites can never
+ * LWW-overwrite the suite's freshly-created quality-tester favorite mid-run.
+ * No-op when no connection exists — local suites don't require hermes.
+ */
+export async function normalizeHermesSyncScope(): Promise<void> {
+  const { sendTestRequest } =
+    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+  if (!adminUser) {
+    return;
+  }
+  const listDef = (
+    await import("@/app/api/[locale]/remote-connection/list/definition")
+  ).default;
+  const listResult = await sendTestRequest({
+    endpoint: listDef.GET,
+    data: {},
+    user: adminUser,
+  });
+  if (!listResult.success) {
+    return;
+  }
+  const connByIdDef = (
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+  ).default;
+  for (const conn of listResult.data.connections) {
+    if (conn.instanceId.startsWith("hermes")) {
+      await sendTestRequest({
+        endpoint: connByIdDef.PATCH,
+        data: {
+          syncScope: {
+            favorites: false,
+            documents: true,
+            memories: true,
+            skills: true,
+            threads: true,
+            chat: true,
+          },
+        },
         urlPathParams: { instanceId: conn.instanceId },
         user: adminUser,
       });
@@ -1016,7 +1046,11 @@ export async function resolveProdAdminToken(
       const unhandled =
         (response.body as { unhandled?: boolean } | undefined)?.unhandled ===
         true;
-      if (response.status >= 500 && (unhandled || attempt < 4)) {
+      // status 0 = network error (connection reset after WS teardown) — always retry
+      if (
+        response.status === 0 ||
+        (response.status >= 500 && (unhandled || attempt < 4))
+      ) {
         continue;
       }
       break;
@@ -1205,6 +1239,58 @@ export async function assertThreadPlacement(params: {
     walked.join("/"),
     `[assertThreadPlacement:${params.db}] thread ${threadId} folder chain mismatch (root ${rootFolderId})`,
   ).toBe(nameChain.join("/"));
+}
+
+/**
+ * Assert MESSAGE PARITY between the local thread and its hermes mirror:
+ * every local message id must exist on hermes with the SAME role and the
+ * SAME parentId. Catches dropped events (e.g. a user message that only ever
+ * materialized as a role-less parent stub) and chain corruption — placement
+ * alone cannot.
+ */
+export async function assertMirrorMessageParity(
+  threadId: string,
+): Promise<void> {
+  const { db: localDb } = await import("next-vibe/database");
+  const { expect: expectBun } = await import("bun:test");
+  const localRes = await localDb.execute<{
+    id: string;
+    role: string;
+    parent_id: string | null;
+    content: string | null;
+  }>(
+    sql`SELECT id, role, parent_id, content FROM chat_messages WHERE thread_id = ${threadId} ORDER BY created_at`,
+  );
+  const remoteRes = await getProdDb().execute<{
+    id: string;
+    role: string;
+    parent_id: string | null;
+    content: string | null;
+  }>(
+    sql`SELECT id, role, parent_id, content FROM chat_messages WHERE thread_id = ${threadId}`,
+  );
+  const remoteById = new Map(remoteRes.rows.map((r) => [r.id, r]));
+  for (const local of localRes.rows) {
+    const remote = remoteById.get(local.id);
+    expectBun(
+      remote,
+      `[assertMirrorMessageParity] message ${local.id} (${local.role}) missing on hermes`,
+    ).toBeDefined();
+    expectBun(
+      remote?.role,
+      `[assertMirrorMessageParity] message ${local.id} role mismatch on hermes`,
+    ).toBe(local.role);
+    expectBun(
+      remote?.parent_id ?? null,
+      `[assertMirrorMessageParity] message ${local.id} parent mismatch on hermes`,
+    ).toBe(local.parent_id ?? null);
+    if (local.role === "user") {
+      expectBun(
+        remote?.content ?? "",
+        `[assertMirrorMessageParity] user message ${local.id} content missing on hermes`,
+      ).toBe(local.content ?? "");
+    }
+  }
 }
 
 /**

@@ -14,9 +14,10 @@
 import "server-only";
 
 import { sql } from "drizzle-orm";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { expect } from "vitest";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
@@ -38,7 +39,7 @@ export interface RemoteSuiteHooks {
 export interface RemoteSetupOptions {
   /**
    * Create the REMOTE/<hermes> subfolder on the local instance during setup
-   * (remote-chat-root suites route their streams through it).
+   * (remote-folder suites route their streams through it).
    */
   createRemoteFolder?: boolean;
   /** Remote credit floor (default 20000). */
@@ -256,503 +257,69 @@ export async function assertHermesFolderChainHasThread(params: {
 }
 
 /**
- * Loop-on-client scenario: the CLOUD (hermes) ORIGINATES a stream in its
- * REMOTE/<clientId>/tests/<case> folder; the CLIENT (this side) executes the
- * loop. Returns everything the caller needs to assert the contract:
- *   • loop location — a new usage deduction lands on the LOCAL ledger
- *   • transport    — attested on both sides (relayTransport / relayArrivedVia)
- *   • folders      — cloud copy in REMOTE/<clientId>/…, client copy in
- *                    BACKGROUND/remote/<cloudId>/…
+ * Find-or-create a folder NAME chain ON A REMOTE INSTANCE through the REAL
+ * folder endpoints (list + create), dispatched over the connection exactly
+ * like the product UI does. NO direct DB writes — end to end or nothing.
+ * Returns the leaf folder id on the remote.
  */
-/**
- * Loop-LOCAL suite origination (full T-chain topology): HERMES originates the
- * stream on ITS REMOTE/<clientId>/tests/<case> folder; its relay branch sends
- * the loop back to THIS side (the client executes with the client's prompt +
- * tools). Prepare once per suite: transport PATCH on the hermes-side row + the
- * hermes folder chain. Returns the hermes case-folder id for originations.
- */
-export async function prepareLoopLocalOrigination(params: {
-  testUser: JwtPrivatePayloadType;
-  transport: "direct-http" | "reverse-ws";
-  caseName: string;
-}): Promise<{ hermesCaseFolderId: string; prodUserId: string }> {
-  const remoteSetup = await import("../../../testing/remote-setup");
+export async function getOrCreateRemoteFolderChain(params: {
+  user: JwtPrivatePayloadType;
+  instanceId: string;
+  rootFolderId: DefaultFolderId;
+  names: readonly string[];
+}): Promise<string> {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const { DefaultFolderId: FolderIds } =
-    await import("@/app/api/[locale]/agent/chat/config");
-  const prodUserId = await remoteSetup.resolveProdUserId();
-  expect(prodUserId, "loop-local: hermes user must resolve").toBeTruthy();
-  const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+  const listDef = (
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
   ).default;
-  const patchResult = await sendTestRequest({
-    endpoint: connByIdDef.PATCH,
-    data: { transportMode: params.transport },
-    urlPathParams: { instanceId: remoteSetup.ATLAS_INSTANCE_ID },
-    user: params.testUser,
-    instanceId: remoteSetup.HERMES_INSTANCE_ID,
-  });
-  expect(
-    patchResult.success,
-    `loop-local: hermes-side transport PATCH failed: ${!patchResult.success ? patchResult.message : ""}`,
-  ).toBe(true);
-  const pdb = remoteSetup.getProdDb();
+  const createDef = (
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
+  ).default;
   let parentId: string | null = null;
-  for (const name of [
-    remoteSetup.ATLAS_INSTANCE_ID,
-    "tests",
-    params.caseName,
-  ]) {
-    const found: { rows: Array<{ id: string }> } = await pdb.execute<{
-      id: string;
-    }>(
-      parentId === null
-        ? sql`SELECT id FROM chat_folders
-              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
-                AND name = ${name} AND parent_id IS NULL LIMIT 1`
-        : sql`SELECT id FROM chat_folders
-              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
-                AND name = ${name} AND parent_id = ${parentId} LIMIT 1`,
-    );
-    if (found.rows[0]) {
-      parentId = found.rows[0].id;
-      continue;
-    }
-    const created: { rows: Array<{ id: string }> } = await pdb.execute<{
-      id: string;
-    }>(
-      sql`INSERT INTO chat_folders (user_id, root_folder_id, name, parent_id)
-          VALUES (${prodUserId}, ${FolderIds.REMOTE}, ${name}, ${parentId})
-          RETURNING id`,
-    );
-    parentId = created.rows[0]?.id ?? null;
-  }
-  expect(parentId, "loop-local: hermes folder chain must exist").toBeTruthy();
-  return { hermesCaseFolderId: parentId ?? "", prodUserId: prodUserId ?? "" };
-}
-
-/**
- * Originate ONE stream on hermes (loop-local topology). threadId is the
- * SHARED cross-instance identity: the executor (this side) persists under the
- * same id, so the caller's runStream reads local messages afterwards.
- */
-export async function originateStreamOnHermes(params: {
-  testUser: JwtPrivatePayloadType;
-  prompt: string;
-  threadId: string;
-  hermesCaseFolderId: string;
-  parentMessageId?: string | null;
-  /** UI-style confirmation continuation (approve phase2) — forwarded on the
-   *  originating POST so the relay re-executes the confirmed tool. */
-  toolConfirmations?: Array<{ messageId: string; confirmed: boolean }> | null;
-  /** File attachments — forwarded on the originating POST (T10 cases). */
-  attachments?: File[];
-  /** The case's LOCAL favorite — resolves the model/skill/favoriteConfig the
-   *  originated stream must run with (media cases pin image-capable models). */
-  favoriteId?: string;
-  /**
-   * Pre-claim the relayed stream so THIS process wins the fan-out race.
-   * Required for reverse-ws (the connector event reaches every local process
-   * holding a socket — dev server + tests); must stay OFF for direct-http
-   * (the relay is a single POST to the dev server — pre-claiming would make
-   * its only recipient skip and the stream would never run).
-   */
-  preClaim: boolean;
-}): Promise<
-  { success: true } | { success: false; failure: ErrorResponseType }
-> {
-  const remoteSetup = await import("../../../testing/remote-setup");
-  const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const { DefaultFolderId: FolderIds } =
-    await import("@/app/api/[locale]/agent/chat/config");
-  const { ChatMessageRole } =
-    await import("@/app/api/[locale]/agent/chat/enum");
-  const streamDef = (
-    await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
-  ).default;
-  const { DEFAULT_TTS_VOICE_ID } =
-    await import("@/app/api/[locale]/agent/text-to-speech/constants");
-  // Resolve model/skill/favoriteConfig from the case's LOCAL favorite exactly
-  // like a real client (media cases pin image-capable models; the budget
-  // favorite is the default). The favorite row only exists locally (favorites
-  // sync is off for tests) — the resolved CONFIG rides the originating POST.
-  const { fetchFavoriteConfigAndModel } =
-    await import("../../../testing/headless-test-runner");
-  const {
-    favoriteConfig,
-    model: resolvedModel,
-    skill: skillId,
-  } = await fetchFavoriteConfigAndModel(
-    params.favoriteId ?? "quality-tester-budget",
-    params.testUser,
-  );
-  // PRE-claim the relayed stream: the connector event fans out to every local
-  // process (dev server + this test) — the loop MUST run here, where the
-  // fixture context lives. The pid-owned claim makes this process win.
-  const userMessageId = crypto.randomUUID();
-  if (params.preClaim) {
-    const { claimRelayedStream } =
-      await import("@/app/api/[locale]/agent/ai-stream/repository/relay");
-    const { createEndpointLogger } = await import("next-vibe/logger/server");
-    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-    const preClaimed = await claimRelayedStream(
-      userMessageId,
-      createEndpointLogger(false, defaultLocale),
-    );
-    expect(preClaimed, "loop-local: pre-claim must succeed").toBe(true);
-  }
-  const streamResult = await sendTestRequest({
-    endpoint: streamDef.POST,
-    data: {
-      operation: "send" as const,
-      rootFolderId: FolderIds.REMOTE,
-      subFolderId: params.hermesCaseFolderId,
-      threadId: params.threadId,
-      userMessageId,
-      parentMessageId: params.parentMessageId ?? null,
-      leafMessageId: null,
-      content: params.prompt,
-      role: ChatMessageRole.USER,
-      model: resolvedModel,
-      skill: skillId,
-      favoriteConfig,
-      toolConfirmations: params.toolConfirmations ?? null,
-      messageHistory: [],
-      // The cross-instance transport marshals Files to the base64 wire shape
-      // (execute-tool handlers/remote.ts marshalFilesForWire).
-      attachments: params.attachments ?? [],
-      resumeToken: null,
-      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
-      audioInput: { file: null },
-      timezone: "UTC",
-      imageSize: undefined,
-      imageQuality: undefined,
-      musicDuration: undefined,
-      executionContext: { mode: "local" as const },
-    },
-    user: params.testUser,
-    instanceId: remoteSetup.HERMES_INSTANCE_ID,
-  });
-  return streamResult.success
-    ? { success: true }
-    : { success: false, failure: streamResult };
-}
-
-export async function runLoopOnClientScenario(params: {
-  testUser: JwtPrivatePayloadType;
-  /** Transport the hermes→client relay leg must use (PATCHed + attested). */
-  transport: "direct-http" | "reverse-ws";
-  /** Case folder name, e.g. "loop-on-client-direct". */
-  caseName: string;
-  /** Fixture context for the client-side model call. */
-  fetchCacheContext: string;
-  prompt: string;
-}): Promise<{
-  threadId: string;
-  prodUserId: string | null;
-}> {
-  const remoteSetup = await import("../../../testing/remote-setup");
-  const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const { setFetchCacheContext } = await import("../../../testing/fetch-cache");
-  const { DefaultFolderId: FolderIds } =
-    await import("@/app/api/[locale]/agent/chat/config");
-
-  setFetchCacheContext(params.fetchCacheContext);
-
-  const prodUserId = await remoteSetup.resolveProdUserId();
-  expect(
-    prodUserId,
-    "loop-on-client: hermes prod user must resolve",
-  ).toBeTruthy();
-
-  // 1. The hermes→client leg must use the scenario's transport — update the
-  //    HERMES-side connection row for this client.
-  const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
-  ).default;
-  const patchResult = await sendTestRequest({
-    endpoint: connByIdDef.PATCH,
-    data: { transportMode: params.transport },
-    urlPathParams: { instanceId: remoteSetup.ATLAS_INSTANCE_ID },
-    user: params.testUser,
-    instanceId: remoteSetup.HERMES_INSTANCE_ID,
-  });
-  expect(
-    patchResult.success,
-    `loop-on-client: hermes-side transport PATCH failed: ${!patchResult.success ? patchResult.message : ""}`,
-  ).toBe(true);
-
-  // 2. Originator folder chain on hermes: REMOTE/<clientId>/tests/<case>.
-  //    Created directly in the prod DB (deterministic, no extra wire deps).
-  const pdb = remoteSetup.getProdDb();
-  let parentId: string | null = null;
-  for (const name of [
-    remoteSetup.ATLAS_INSTANCE_ID,
-    "tests",
-    params.caseName,
-  ]) {
-    const found: { rows: Array<{ id: string }> } = await pdb.execute<{
-      id: string;
-    }>(
-      parentId === null
-        ? sql`SELECT id FROM chat_folders
-              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
-                AND name = ${name} AND parent_id IS NULL LIMIT 1`
-        : sql`SELECT id FROM chat_folders
-              WHERE user_id = ${prodUserId} AND root_folder_id = ${FolderIds.REMOTE}
-                AND name = ${name} AND parent_id = ${parentId} LIMIT 1`,
-    );
-    if (found.rows[0]) {
-      parentId = found.rows[0].id;
-      continue;
-    }
-    const created: { rows: Array<{ id: string }> } = await pdb.execute<{
-      id: string;
-    }>(
-      sql`INSERT INTO chat_folders (user_id, root_folder_id, name, parent_id)
-          VALUES (${prodUserId}, ${FolderIds.REMOTE}, ${name}, ${parentId})
-          RETURNING id`,
-    );
-    parentId = created.rows[0]?.id ?? null;
-  }
-  expect(
-    parentId,
-    "loop-on-client: hermes folder chain must exist",
-  ).toBeTruthy();
-
-  // 3. Originate the stream ON HERMES (routed execute-tool). Its relay branch
-  //    resolves the REMOTE/<clientId> folder → relays the loop to this side.
-  const streamDef = (
-    await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
-  ).default;
-  // Resolve the chat model from the SKILL VARIANT (options on the ai-stream,
-  // like every client does) — tests never hard-code model names.
-  const { resolveSkillVariant } =
-    await import("@/app/api/[locale]/agent/skills/resolver");
-  const { getBestChatModel } =
-    await import("@/app/api/[locale]/agent/ai-stream/models");
-  const { getInstanceAvailability } =
-    await import("@/app/api/[locale]/agent/env-availability");
-  const skillId = "quality-tester__budget";
-  const variant = await resolveSkillVariant(skillId, null);
-  const resolvedModel = variant?.modelSelection
-    ? getBestChatModel(
-        variant.modelSelection,
-        params.testUser,
-        await getInstanceAvailability(),
-      )?.id
-    : undefined;
-  expect(
-    resolvedModel,
-    "loop-on-client: skill variant must resolve a chat model",
-  ).toBeTruthy();
-  const { ChatMessageRole } =
-    await import("@/app/api/[locale]/agent/chat/enum");
-  const { DEFAULT_TTS_VOICE_ID } =
-    await import("@/app/api/[locale]/agent/text-to-speech/constants");
-  const threadId = crypto.randomUUID();
-  const streamResult = await sendTestRequest({
-    endpoint: streamDef.POST,
-    data: {
-      operation: "send" as const,
-      rootFolderId: FolderIds.REMOTE,
-      subFolderId: parentId,
-      threadId,
-      userMessageId: crypto.randomUUID(),
-      parentMessageId: null,
-      leafMessageId: null,
-      content: params.prompt,
-      role: ChatMessageRole.USER,
-      model: resolvedModel!,
-      skill: skillId,
-      favoriteConfig: null,
-      toolConfirmations: null,
-      messageHistory: [],
-      attachments: [],
-      resumeToken: null,
-      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
-      audioInput: { file: null },
-      timezone: "UTC",
-      imageSize: undefined,
-      imageQuality: undefined,
-      musicDuration: undefined,
-      executionContext: { mode: "local" as const },
-    },
-    user: params.testUser,
-    instanceId: remoteSetup.HERMES_INSTANCE_ID,
-  });
-  expect(
-    streamResult.success,
-    `loop-on-client: hermes-originated stream failed: ${!streamResult.success ? streamResult.message : ""}`,
-  ).toBe(true);
-
-  return { threadId, prodUserId };
-}
-
-/**
- * Register the loop-on-client suite: the CLOUD originates, the CLIENT runs the
- * loop. Asserts the full contract Max specified: loop location (local ledger),
- * ATTESTED transport on both sides, and thread placement on both sides
- * (cloud: REMOTE/<clientId>/…, client: BACKGROUND/remote/<cloudId>/…).
- */
-export function describeLoopOnClientSuite(params: {
-  label: string;
-  transport: "direct-http" | "reverse-ws";
-  caseName: string;
-  fetchCacheContext: string;
-  hooks: RemoteSuiteHooks;
-}): void {
-  const expectFn = expect;
-
-  describe(params.label, () => {
-    let testUser: JwtPrivatePayloadType;
-    let threadId = "";
-    let prodUserId: string | null = null;
-    let localLedgerMarker: string | null = null;
-
-    beforeAll(async () => {
-      const remoteSetup = await import("../../../testing/remote-setup");
-      const { env } = await import("@/config/env");
-      const resolved = await remoteSetup.resolveDevUser(
-        env.VIBE_ADMIN_USER_EMAIL,
-      );
-      expectFn(resolved, "admin user not found — run: vibe dev").toBeTruthy();
-      if (!resolved) {
-        // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-        throw new Error("loop-on-client setup failed: admin user not found");
-      }
-      testUser = resolved;
-
-      await params.hooks.setup(testUser);
-
-      const { readLocalDeductionMarker } = await import("./balance");
-      localLedgerMarker = await readLocalDeductionMarker(testUser.id);
-
-      const scenario = await runLoopOnClientScenario({
-        testUser,
-        transport: params.transport,
-        caseName: params.caseName,
-        fetchCacheContext: params.fetchCacheContext,
-        prompt: "Reply with EXACTLY: LOC_OK. Nothing else.",
-      });
-      threadId = scenario.threadId;
-      prodUserId = scenario.prodUserId;
-    }, 600_000);
-
-    afterAll(async () => {
-      const { closeProdDb } = await import("../../../testing/remote-setup");
-      if (testUser) {
-        await params.hooks.teardown(testUser);
-      }
-      await closeProdDb();
+  for (const name of params.names) {
+    const listResult = await sendTestRequest({
+      endpoint: listDef.GET,
+      urlPathParams: { rootFolderId: params.rootFolderId },
+      user: params.user,
+      instanceId: params.instanceId,
     });
-
-    it("LOC-1: loop ran on the CLIENT — local ledger has a new usage deduction", async () => {
-      const { waitForLocalDeductionAfter } = await import("./balance");
-      const deductions = await waitForLocalDeductionAfter(
-        testUser.id,
-        localLedgerMarker,
-      );
-      expectFn(
-        deductions.length,
-        `LOC-1: no new usage deduction on the client after marker ${String(localLedgerMarker)} — the loop did not run here`,
-      ).toBeGreaterThan(0);
-    }, 90_000);
-
-    it(`LOC-2: dispatch transport ATTESTED = ${params.transport}`, async () => {
-      // The DISPATCHING side (hermes, the originator) attests the leg on its
-      // connection row toward the client — stamped by the transport primitive
-      // that actually carried the relay, never by configuration.
-      const remoteSetup = await import("../../../testing/remote-setup");
-      const pdb = remoteSetup.getProdDb();
-      const row: {
-        rows: Array<{ transport: string | null; at: string | null }>;
-      } = await pdb.execute<{ transport: string | null; at: string | null }>(
-        sql`SELECT last_transport_used AS transport, last_transport_used_at::text AS at
-            FROM remote_connections
-            WHERE instance_id = ${remoteSetup.ATLAS_INSTANCE_ID}
-            ORDER BY last_transport_used_at DESC NULLS LAST LIMIT 1`,
-      );
-      expectFn(
-        row.rows[0]?.transport,
-        `LOC-2: hermes must have ACTUALLY dispatched over '${params.transport}' — attested '${String(row.rows[0]?.transport)}'`,
-      ).toBe(params.transport);
-    }, 60_000);
-
-    it(`LOC-3: cloud thread is in REMOTE/atlas/tests/${params.caseName}`, async () => {
-      const remoteSetup = await import("../../../testing/remote-setup");
-      const { DefaultFolderId: FolderIds } =
-        await import("@/app/api/[locale]/agent/chat/config");
-      await assertHermesFolderChainHasThread({
-        prodUserId,
-        rootFolderId: FolderIds.REMOTE,
-        folderChain: [remoteSetup.ATLAS_INSTANCE_ID, "tests", params.caseName],
-        threadId,
-        minMessages: 2,
+    const folders =
+      listResult.success && Array.isArray(listResult.data?.["folders"])
+        ? (listResult.data["folders"] as Array<{
+            id: string;
+            name: string;
+            parentId: string | null;
+          }>)
+        : [];
+    const existing = folders.find(
+      (f) => f.name === name && (f.parentId ?? null) === parentId,
+    );
+    if (existing) {
+      parentId = existing.id;
+      continue;
+    }
+    const createResult: ResponseType<Record<string, WidgetData>> =
+      await sendTestRequest({
+        endpoint: createDef.POST,
+        data: { name, parentId: parentId ?? undefined },
+        urlPathParams: { rootFolderId: params.rootFolderId },
+        user: params.user,
+        instanceId: params.instanceId,
       });
-    }, 60_000);
-
-    it(`LOC-4: client thread is in BACKGROUND/remote/hermes/tests/${params.caseName}`, async () => {
-      const remoteSetup = await import("../../../testing/remote-setup");
-      const { db: localDb } = await import("next-vibe/database");
-      const { DefaultFolderId: FolderIds } =
-        await import("@/app/api/[locale]/agent/chat/config");
-      // Walk the local folder chain name-by-name from the BACKGROUND root.
-      let parentId: string | null = null;
-      const walked: string[] = [];
-      for (const name of [
-        "remote",
-        remoteSetup.HERMES_INSTANCE_ID,
-        "tests",
-        params.caseName,
-      ]) {
-        walked.push(name);
-        const rows: { rows: Array<{ id: string }> } = await localDb.execute<{
-          id: string;
-        }>(
-          parentId === null
-            ? sql`SELECT id FROM chat_folders
-                  WHERE root_folder_id = ${FolderIds.BACKGROUND}
-                    AND name = ${name} AND parent_id IS NULL LIMIT 1`
-            : sql`SELECT id FROM chat_folders
-                  WHERE root_folder_id = ${FolderIds.BACKGROUND}
-                    AND name = ${name} AND parent_id = ${parentId} LIMIT 1`,
-        );
-        expectFn(
-          rows.rows.length,
-          `LOC-4: BACKGROUND/${walked.join("/")} folder must exist on the client`,
-        ).toBeGreaterThan(0);
-        parentId = rows.rows[0]!.id;
-      }
-      const threadRows: { rows: Array<{ id: string }> } =
-        await localDb.execute<{
-          id: string;
-        }>(
-          sql`SELECT id FROM chat_threads
-            WHERE id = ${threadId} AND folder_id = ${parentId} LIMIT 1`,
-        );
-      expectFn(
-        threadRows.rows.length,
-        "LOC-4: client thread must sit in the final folder of the chain",
-      ).toBeGreaterThan(0);
-    }, 60_000);
-
-    it("LOC-5: both sides hold the messages", async () => {
-      const remoteSetup = await import("../../../testing/remote-setup");
-      await remoteSetup.assertProdDbHasMessages(threadId, 2);
-      const { db: localDb } = await import("next-vibe/database");
-      const rows: { rows: Array<{ n: string | number }> } =
-        await localDb.execute<{ n: string | number }>(
-          sql`SELECT COUNT(*) AS n FROM chat_messages WHERE thread_id = ${threadId}`,
-        );
-      const n = Number(rows.rows[0]?.n ?? 0);
-      expectFn(
-        n,
-        "LOC-5: client must hold the messages",
-      ).toBeGreaterThanOrEqual(2);
-    }, 60_000);
-  });
+    expect(
+      createResult.success,
+      `remote folder create failed for "${name}": ${!createResult.success ? createResult.message : ""}`,
+    ).toBe(true);
+    const folderId: WidgetData = createResult.success
+      ? createResult.data?.["folderId"]
+      : undefined;
+    expect(
+      typeof folderId === "string" && folderId.length > 0,
+      `remote folder create returned no folderId for "${name}"`,
+    ).toBe(true);
+    parentId = String(folderId);
+  }
+  expect(parentId, "remote folder chain must resolve").toBeTruthy();
+  return parentId ?? "";
 }

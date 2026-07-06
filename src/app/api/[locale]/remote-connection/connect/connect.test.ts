@@ -42,10 +42,7 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
-import {
-  instanceIdentities,
-  remoteConnections,
-} from "../db";
+import { instanceIdentities, remoteConnections } from "../db";
 
 // ── Skip guard ────────────────────────────────────────────────────────────────
 

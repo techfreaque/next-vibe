@@ -13,6 +13,7 @@
 "use client";
 
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import {
   Card,
   CardContent,
@@ -25,9 +26,12 @@ import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
 import { Link2 } from "next-vibe/ui/ui/icons/Link2";
 import { Lock } from "next-vibe/ui/ui/icons/Lock";
+import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { Switch } from "next-vibe/ui/ui/switch";
 import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
@@ -38,12 +42,80 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
+import type { SyncScope } from "../db";
+import type { SyncProviderInfo } from "../sync/providers/definition";
+import syncProvidersDefinitions from "../sync/providers/definition";
 import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
 interface ConnectWidgetProps {
   field: (typeof definitions.POST)["fields"];
+}
+
+function SyncScopeEditor({
+  t,
+}: {
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+}): JSX.Element {
+  const { setValue } = useFormContext();
+  const syncScope = useWatch({ name: "syncScope" }) as SyncScope | undefined;
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const syncProvidersEndpoint = useEndpoint(
+    syncProvidersDefinitions,
+    undefined,
+    logger,
+    user,
+  );
+  const providers: SyncProviderInfo[] =
+    syncProvidersEndpoint.read?.data?.providers ?? [];
+
+  const current: Record<string, boolean> = {};
+  for (const p of providers) {
+    current[p.key] = syncScope?.[p.key] ?? false;
+  }
+
+  const toggle = (key: string): void => {
+    setValue(
+      "syncScope",
+      { ...current, [key]: !current[key] },
+      { shouldDirty: true },
+    );
+  };
+
+  if (providers.length === 0) {
+    return <></>;
+  }
+
+  return (
+    <SectionGroup title={t("post.syncScope.label")}>
+      <P className="text-xs text-muted-foreground mb-3">
+        {t("post.syncScope.description")}
+      </P>
+      <Div className="grid grid-cols-1 gap-2">
+        {providers.map((p) => (
+          <Div
+            key={p.key}
+            className="flex items-center justify-between rounded-md border px-3 py-2 bg-background"
+          >
+            <Div className="flex flex-col gap-0.5">
+              <P className="text-sm font-medium">{p.label}</P>
+              {p.description && (
+                <P className="text-xs text-muted-foreground">{p.description}</P>
+              )}
+            </Div>
+            <Switch
+              checked={current[p.key] ?? false}
+              onCheckedChange={() => toggle(p.key)}
+              aria-label={p.label}
+            />
+          </Div>
+        ))}
+      </Div>
+    </SectionGroup>
+  );
 }
 
 export function RemoteConnectWidget({
@@ -159,6 +231,8 @@ export function RemoteConnectWidget({
             fieldName="isInferenceProvider"
             field={field.children.isInferenceProvider}
           />
+
+          <SyncScopeEditor t={t} />
 
           <FormAlertWidget field={field.children.formAlert} />
 

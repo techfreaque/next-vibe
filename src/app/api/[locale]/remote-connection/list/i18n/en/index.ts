@@ -63,11 +63,12 @@ export const translations = {
     never: "Never",
     connectButton: "Link Local Instance",
     connectButtonLocal: "Connect to Cloud",
+    incomingBadge: "Incoming",
     inactiveBadge: "Inactive",
     instanceId: "Instance ID",
     remoteUrl: "Remote URL",
     viewButton: "View",
-    editButton: "Rename",
+    editButton: "Edit",
     deleteButton: "Disconnect",
     // Cloud marketing panel
     cloud: {

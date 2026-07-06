@@ -8,46 +8,362 @@
 
 /* eslint-disable prettier/prettier */
 
-import type { CategoryDefinitionSerialized, AdminGroup } from "next-vibe/help-tool/category-types";
+import type {
+  AdminGroup,
+  CategoryDefinitionSerialized,
+} from "next-vibe/help-tool/category-types";
 
-export type CategoryKey = "ai" | "cortex" | "analytics" | "payments" | "subscriptions" | "credits" | "leads" | "accounting" | "companies" | "products" | "pos" | "inventory" | "purchasing" | "referral" | "tax" | "messenger" | "newsletter" | "browser" | "ssh" | "desktop" | "account" | "devTools" | "database";
+export type CategoryKey =
+  | "ai"
+  | "cortex"
+  | "analytics"
+  | "payments"
+  | "subscriptions"
+  | "credits"
+  | "leads"
+  | "accounting"
+  | "companies"
+  | "products"
+  | "pos"
+  | "inventory"
+  | "purchasing"
+  | "referral"
+  | "tax"
+  | "messenger"
+  | "newsletter"
+  | "browser"
+  | "ssh"
+  | "desktop"
+  | "account"
+  | "devTools"
+  | "database";
 
-export type SubCategoryKey = "Inference" | "Generation" | "Tools" | "Search" | "chat" | "chatFavorites" | "chatOrganization" | "chatSettings" | "skillsManagement" | "skillsCommunity" | "skillsModeration" | "threadsManagement" | "threadsSharing" | "threadsSearch" | "messagesModerating" | "messagesSearch" | "messagesFiles" | "tasksCron" | "Vibe Sense" | "Indicators" | "Evaluators" | "Transformers" | "leadsData" | "usersData" | "messengerData" | "paymentsData" | "creditsData" | "subscriptionsData" | "referralData" | "newsletterData" | "chatData" | "systemData" | "Transactions" | "Providers" | "Subscriptions" | "Management" | "subscriptionAnalytics" | "Credits" | "Import" | "Leads" | "emailCampaignsProcessing" | "emailCampaignsJourneys" | "emailCampaignsQueue" | "emailCampaignsStats" | "leadMagnetIntegrations" | "Accounts" | "Journal" | "Ledger" | "Periods" | "Accounting" | "Company Management" | "Company Members" | "Catalog Management" | "Category Management" | "POS: Orders" | "POS: Sessions" | "POS: Terminals" | "POS: Products" | "Inventory: Stock" | "Inventory: Transfers" | "Inventory: Warehouses" | "Purchasing: Orders" | "Purchasing: Vendors" | "Program" | "Payouts" | "Tax Rates" | "Tax Reports" | "Inbox" | "Messages" | "Pages" | "Interaction" | "Inspection" | "DevTools" | "Connections" | "Linux" | "Windows" | "Capture" | "login" | "profile" | "sessions" | "directory" | "manageUsers" | "userStats" | "remoteInstances" | "remoteSelf" | "Generators" | "Build" | "Check" | "serverManagement" | "serverGuard" | "serverElectron" | "settingsEnv" | "settingsKeys" | "interfacesCli" | "interfacesMcp" | "interfacesFrame" | "tasksMonitoring" | "tasksPulse" | "tasksSync" | "Migrations";
+export type SubCategoryKey =
+  | "Inference"
+  | "Generation"
+  | "Tools"
+  | "Search"
+  | "chat"
+  | "chatFavorites"
+  | "chatOrganization"
+  | "chatSettings"
+  | "skillsManagement"
+  | "skillsCommunity"
+  | "skillsModeration"
+  | "threadsManagement"
+  | "threadsSharing"
+  | "threadsSearch"
+  | "messagesModerating"
+  | "messagesSearch"
+  | "messagesFiles"
+  | "tasksCron"
+  | "Vibe Sense"
+  | "Indicators"
+  | "Evaluators"
+  | "Transformers"
+  | "leadsData"
+  | "usersData"
+  | "messengerData"
+  | "paymentsData"
+  | "creditsData"
+  | "subscriptionsData"
+  | "referralData"
+  | "newsletterData"
+  | "chatData"
+  | "systemData"
+  | "Transactions"
+  | "Providers"
+  | "Subscriptions"
+  | "Management"
+  | "subscriptionAnalytics"
+  | "Credits"
+  | "Import"
+  | "Leads"
+  | "emailCampaignsProcessing"
+  | "emailCampaignsJourneys"
+  | "emailCampaignsQueue"
+  | "emailCampaignsStats"
+  | "leadMagnetIntegrations"
+  | "Accounts"
+  | "Journal"
+  | "Ledger"
+  | "Periods"
+  | "Accounting"
+  | "Company Management"
+  | "Company Members"
+  | "Catalog Management"
+  | "Category Management"
+  | "POS: Orders"
+  | "POS: Sessions"
+  | "POS: Terminals"
+  | "POS: Products"
+  | "Inventory: Stock"
+  | "Inventory: Transfers"
+  | "Inventory: Warehouses"
+  | "Purchasing: Orders"
+  | "Purchasing: Vendors"
+  | "Program"
+  | "Payouts"
+  | "Tax Rates"
+  | "Tax Reports"
+  | "Inbox"
+  | "Messages"
+  | "Pages"
+  | "Interaction"
+  | "Inspection"
+  | "DevTools"
+  | "Connections"
+  | "Linux"
+  | "Windows"
+  | "Capture"
+  | "login"
+  | "profile"
+  | "sessions"
+  | "directory"
+  | "manageUsers"
+  | "userStats"
+  | "remoteInstances"
+  | "remoteSelf"
+  | "Generators"
+  | "Build"
+  | "Check"
+  | "serverManagement"
+  | "serverGuard"
+  | "serverElectron"
+  | "settingsEnv"
+  | "settingsKeys"
+  | "interfacesCli"
+  | "interfacesMcp"
+  | "interfacesFrame"
+  | "tasksMonitoring"
+  | "tasksPulse"
+  | "tasksSync"
+  | "Migrations";
 
 export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
   {
     key: "ai",
     label: "AI Agent",
-    labels: {"en-US":"AI Agent","en-GLOBAL":"AI Agent","de-DE":"KI-Agent","pl-PL":"Agent AI"},
+    labels: {
+      "en-US": "AI Agent",
+      "en-GLOBAL": "AI Agent",
+      "de-DE": "KI-Agent",
+      "pl-PL": "Agent AI",
+    },
     group: "ai",
     icon: "bot",
     order: 10,
     defaultEntryAlias: "ai-stream",
     subcategories: {
-      "Inference": { icon: "cpu", order: 0, label: "Inference", labels: {"en-US":"Inference","en-GLOBAL":"Inference","de-DE":"Inferenz","pl-PL":"Wnioskowanie"} },
-      "Generation": { icon: "sparkles", order: 1, label: "Generation", labels: {"en-US":"Generation","en-GLOBAL":"Generation","de-DE":"Generierung","pl-PL":"Generowanie"} },
-      "Tools": { icon: "wrench", order: 2, label: "Tools", labels: {"en-US":"Tools","en-GLOBAL":"Tools","de-DE":"Werkzeuge","pl-PL":"Narzędzia"} },
-      "Search": { icon: "search", order: 3, label: "Search", labels: {"en-US":"Search","en-GLOBAL":"Search","de-DE":"Suche","pl-PL":"Wyszukiwanie"} },
-      "chat": { icon: "message-circle", order: 4, label: "Chat", labels: {"en-US":"Chat","en-GLOBAL":"Chat","de-DE":"Chat","pl-PL":"Chat"} },
-      "chatFavorites": { icon: "star", order: 5, label: "Favorites", labels: {"en-US":"Favorites","en-GLOBAL":"Favorites","de-DE":"Favoriten","pl-PL":"Ulubione"} },
-      "chatOrganization": { icon: "folder", order: 6, label: "Organization", labels: {"en-US":"Organization","en-GLOBAL":"Organization","de-DE":"Organisation","pl-PL":"Organizacja"} },
-      "chatSettings": { icon: "settings", order: 7, label: "Chat Settings", labels: {"en-US":"Chat Settings","en-GLOBAL":"Chat Settings","de-DE":"Chat-Einstellungen","pl-PL":"Ustawienia czatu"} },
-      "skillsManagement": { icon: "book-open", order: 8, label: "Skills", labels: {"en-US":"Skills","en-GLOBAL":"Skills","de-DE":"Skills","pl-PL":"Umiejętności"} },
-      "skillsCommunity": { icon: "users", order: 9, label: "Community Skills", labels: {"en-US":"Community Skills","en-GLOBAL":"Community Skills","de-DE":"Community-Skills","pl-PL":"Umiejętności społeczności"} },
-      "skillsModeration": { icon: "shield", order: 10, label: "Skills Moderation", labels: {"en-US":"Skills Moderation","en-GLOBAL":"Skills Moderation","de-DE":"Skills-Moderation","pl-PL":"Moderacja umiejętności"} },
-      "threadsManagement": { icon: "list", order: 11, label: "Threads", labels: {"en-US":"Threads","en-GLOBAL":"Threads","de-DE":"Threads","pl-PL":"Wątki"} },
-      "threadsSharing": { icon: "share-2", order: 12, label: "Thread Sharing", labels: {"en-US":"Thread Sharing","en-GLOBAL":"Thread Sharing","de-DE":"Thread-Freigabe","pl-PL":"Udostępnianie wątków"} },
-      "threadsSearch": { icon: "search", order: 13, label: "Thread Search", labels: {"en-US":"Thread Search","en-GLOBAL":"Thread Search","de-DE":"Thread-Suche","pl-PL":"Wyszukiwanie wątków"} },
-      "messagesModerating": { icon: "message-square", order: 14, label: "Messages", labels: {"en-US":"Messages","en-GLOBAL":"Messages","de-DE":"Nachrichten","pl-PL":"Wiadomości"} },
-      "messagesSearch": { icon: "search", order: 15, label: "Message Search", labels: {"en-US":"Message Search","en-GLOBAL":"Message Search","de-DE":"Nachrichtensuche","pl-PL":"Wyszukiwanie wiadomości"} },
-      "messagesFiles": { icon: "paperclip", order: 16, label: "Message Files", labels: {"en-US":"Message Files","en-GLOBAL":"Message Files","de-DE":"Nachrichtendateien","pl-PL":"Pliki wiadomości"} },
-      "tasksCron": { icon: "clock", order: 17, label: "Scheduled Tasks", labels: {"en-US":"Scheduled Tasks","en-GLOBAL":"Scheduled Tasks","de-DE":"Geplante Aufgaben","pl-PL":"Zadania cykliczne"} },
+      Inference: {
+        icon: "cpu",
+        order: 0,
+        label: "Inference",
+        labels: {
+          "en-US": "Inference",
+          "en-GLOBAL": "Inference",
+          "de-DE": "Inferenz",
+          "pl-PL": "Wnioskowanie",
+        },
+      },
+      Generation: {
+        icon: "sparkles",
+        order: 1,
+        label: "Generation",
+        labels: {
+          "en-US": "Generation",
+          "en-GLOBAL": "Generation",
+          "de-DE": "Generierung",
+          "pl-PL": "Generowanie",
+        },
+      },
+      Tools: {
+        icon: "wrench",
+        order: 2,
+        label: "Tools",
+        labels: {
+          "en-US": "Tools",
+          "en-GLOBAL": "Tools",
+          "de-DE": "Werkzeuge",
+          "pl-PL": "Narzędzia",
+        },
+      },
+      Search: {
+        icon: "search",
+        order: 3,
+        label: "Search",
+        labels: {
+          "en-US": "Search",
+          "en-GLOBAL": "Search",
+          "de-DE": "Suche",
+          "pl-PL": "Wyszukiwanie",
+        },
+      },
+      chat: {
+        icon: "message-circle",
+        order: 4,
+        label: "Chat",
+        labels: {
+          "en-US": "Chat",
+          "en-GLOBAL": "Chat",
+          "de-DE": "Chat",
+          "pl-PL": "Chat",
+        },
+      },
+      chatFavorites: {
+        icon: "star",
+        order: 5,
+        label: "Favorites",
+        labels: {
+          "en-US": "Favorites",
+          "en-GLOBAL": "Favorites",
+          "de-DE": "Favoriten",
+          "pl-PL": "Ulubione",
+        },
+      },
+      chatOrganization: {
+        icon: "folder",
+        order: 6,
+        label: "Organization",
+        labels: {
+          "en-US": "Organization",
+          "en-GLOBAL": "Organization",
+          "de-DE": "Organisation",
+          "pl-PL": "Organizacja",
+        },
+      },
+      chatSettings: {
+        icon: "settings",
+        order: 7,
+        label: "Chat Settings",
+        labels: {
+          "en-US": "Chat Settings",
+          "en-GLOBAL": "Chat Settings",
+          "de-DE": "Chat-Einstellungen",
+          "pl-PL": "Ustawienia czatu",
+        },
+      },
+      skillsManagement: {
+        icon: "book-open",
+        order: 8,
+        label: "Skills",
+        labels: {
+          "en-US": "Skills",
+          "en-GLOBAL": "Skills",
+          "de-DE": "Skills",
+          "pl-PL": "Umiejętności",
+        },
+      },
+      skillsCommunity: {
+        icon: "users",
+        order: 9,
+        label: "Community Skills",
+        labels: {
+          "en-US": "Community Skills",
+          "en-GLOBAL": "Community Skills",
+          "de-DE": "Community-Skills",
+          "pl-PL": "Umiejętności społeczności",
+        },
+      },
+      skillsModeration: {
+        icon: "shield",
+        order: 10,
+        label: "Skills Moderation",
+        labels: {
+          "en-US": "Skills Moderation",
+          "en-GLOBAL": "Skills Moderation",
+          "de-DE": "Skills-Moderation",
+          "pl-PL": "Moderacja umiejętności",
+        },
+      },
+      threadsManagement: {
+        icon: "list",
+        order: 11,
+        label: "Threads",
+        labels: {
+          "en-US": "Threads",
+          "en-GLOBAL": "Threads",
+          "de-DE": "Threads",
+          "pl-PL": "Wątki",
+        },
+      },
+      threadsSharing: {
+        icon: "share-2",
+        order: 12,
+        label: "Thread Sharing",
+        labels: {
+          "en-US": "Thread Sharing",
+          "en-GLOBAL": "Thread Sharing",
+          "de-DE": "Thread-Freigabe",
+          "pl-PL": "Udostępnianie wątków",
+        },
+      },
+      threadsSearch: {
+        icon: "search",
+        order: 13,
+        label: "Thread Search",
+        labels: {
+          "en-US": "Thread Search",
+          "en-GLOBAL": "Thread Search",
+          "de-DE": "Thread-Suche",
+          "pl-PL": "Wyszukiwanie wątków",
+        },
+      },
+      messagesModerating: {
+        icon: "message-square",
+        order: 14,
+        label: "Messages",
+        labels: {
+          "en-US": "Messages",
+          "en-GLOBAL": "Messages",
+          "de-DE": "Nachrichten",
+          "pl-PL": "Wiadomości",
+        },
+      },
+      messagesSearch: {
+        icon: "search",
+        order: 15,
+        label: "Message Search",
+        labels: {
+          "en-US": "Message Search",
+          "en-GLOBAL": "Message Search",
+          "de-DE": "Nachrichtensuche",
+          "pl-PL": "Wyszukiwanie wiadomości",
+        },
+      },
+      messagesFiles: {
+        icon: "paperclip",
+        order: 16,
+        label: "Message Files",
+        labels: {
+          "en-US": "Message Files",
+          "en-GLOBAL": "Message Files",
+          "de-DE": "Nachrichtendateien",
+          "pl-PL": "Pliki wiadomości",
+        },
+      },
+      tasksCron: {
+        icon: "clock",
+        order: 17,
+        label: "Scheduled Tasks",
+        labels: {
+          "en-US": "Scheduled Tasks",
+          "en-GLOBAL": "Scheduled Tasks",
+          "de-DE": "Geplante Aufgaben",
+          "pl-PL": "Zadania cykliczne",
+        },
+      },
     },
   },
   {
     key: "cortex",
     label: "Cortex",
-    labels: {"en-US":"Cortex","en-GLOBAL":"Cortex","de-DE":"Cortex","pl-PL":"Cortex"},
+    labels: {
+      "en-US": "Cortex",
+      "en-GLOBAL": "Cortex",
+      "de-DE": "Cortex",
+      "pl-PL": "Cortex",
+    },
     group: "ai",
     icon: "brain",
     order: 20,
@@ -56,327 +372,1382 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
   {
     key: "analytics",
     label: "Analytics",
-    labels: {"en-US":"Analytics","en-GLOBAL":"Analytics","de-DE":"Analytik","pl-PL":"Analityka"},
+    labels: {
+      "en-US": "Analytics",
+      "en-GLOBAL": "Analytics",
+      "de-DE": "Analytik",
+      "pl-PL": "Analityka",
+    },
     group: "analytics",
     icon: "bar-chart-2",
     order: 10,
     defaultEntryAlias: "vibe-sense-graphs",
     subcategories: {
-      "Vibe Sense": { icon: "activity", order: 0, label: "Vibe Sense", labels: {"en-US":"Vibe Sense","en-GLOBAL":"Vibe Sense","de-DE":"Vibe Sense","pl-PL":"Vibe Sense"} },
-      "Indicators": { icon: "trending-up", order: 1, label: "Indicators", labels: {"en-US":"Indicators","en-GLOBAL":"Indicators","de-DE":"Indikatoren","pl-PL":"Wskaźniki"} },
-      "Evaluators": { icon: "check-circle", order: 2, label: "Evaluators", labels: {"en-US":"Evaluators","en-GLOBAL":"Evaluators","de-DE":"Auswertungen","pl-PL":"Ewaluatory"} },
-      "Transformers": { icon: "shuffle", order: 3, label: "Transformers", labels: {"en-US":"Transformers","en-GLOBAL":"Transformers","de-DE":"Transformatoren","pl-PL":"Transformatory"} },
-      "leadsData": { icon: "users", order: 10, label: "Leads Data", labels: {"en-US":"Leads Data","en-GLOBAL":"Leads Data","de-DE":"Lead-Daten","pl-PL":"Dane leadów"} },
-      "usersData": { icon: "user", order: 11, label: "Users Data", labels: {"en-US":"Users Data","en-GLOBAL":"Users Data","de-DE":"Nutzerdaten","pl-PL":"Dane użytkowników"} },
-      "messengerData": { icon: "mail", order: 12, label: "Messenger Data", labels: {"en-US":"Messenger Data","en-GLOBAL":"Messenger Data","de-DE":"Messenger-Daten","pl-PL":"Dane komunikatora"} },
-      "paymentsData": { icon: "credit-card", order: 13, label: "Payments Data", labels: {"en-US":"Payments Data","en-GLOBAL":"Payments Data","de-DE":"Zahlungsdaten","pl-PL":"Dane płatności"} },
-      "creditsData": { icon: "coins", order: 14, label: "Credits Data", labels: {"en-US":"Credits Data","en-GLOBAL":"Credits Data","de-DE":"Guthaben-Daten","pl-PL":"Dane kredytów"} },
-      "subscriptionsData": { icon: "repeat", order: 15, label: "Subscriptions Data", labels: {"en-US":"Subscriptions Data","en-GLOBAL":"Subscriptions Data","de-DE":"Abonnement-Daten","pl-PL":"Dane subskrypcji"} },
-      "referralData": { icon: "share-2", order: 16, label: "Referral Data", labels: {"en-US":"Referral Data","en-GLOBAL":"Referral Data","de-DE":"Empfehlungsdaten","pl-PL":"Dane poleceń"} },
-      "newsletterData": { icon: "newspaper", order: 17, label: "Newsletter Data", labels: {"en-US":"Newsletter Data","en-GLOBAL":"Newsletter Data","de-DE":"Newsletter-Daten","pl-PL":"Dane newslettera"} },
-      "chatData": { icon: "message-square", order: 18, label: "Chat Data", labels: {"en-US":"Chat Data","en-GLOBAL":"Chat Data","de-DE":"Chat-Daten","pl-PL":"Dane czatu"} },
-      "systemData": { icon: "server", order: 19, label: "System Data", labels: {"en-US":"System Data","en-GLOBAL":"System Data","de-DE":"Systemdaten","pl-PL":"Dane systemowe"} },
+      "Vibe Sense": {
+        icon: "activity",
+        order: 0,
+        label: "Vibe Sense",
+        labels: {
+          "en-US": "Vibe Sense",
+          "en-GLOBAL": "Vibe Sense",
+          "de-DE": "Vibe Sense",
+          "pl-PL": "Vibe Sense",
+        },
+      },
+      Indicators: {
+        icon: "trending-up",
+        order: 1,
+        label: "Indicators",
+        labels: {
+          "en-US": "Indicators",
+          "en-GLOBAL": "Indicators",
+          "de-DE": "Indikatoren",
+          "pl-PL": "Wskaźniki",
+        },
+      },
+      Evaluators: {
+        icon: "check-circle",
+        order: 2,
+        label: "Evaluators",
+        labels: {
+          "en-US": "Evaluators",
+          "en-GLOBAL": "Evaluators",
+          "de-DE": "Auswertungen",
+          "pl-PL": "Ewaluatory",
+        },
+      },
+      Transformers: {
+        icon: "shuffle",
+        order: 3,
+        label: "Transformers",
+        labels: {
+          "en-US": "Transformers",
+          "en-GLOBAL": "Transformers",
+          "de-DE": "Transformatoren",
+          "pl-PL": "Transformatory",
+        },
+      },
+      leadsData: {
+        icon: "users",
+        order: 10,
+        label: "Leads Data",
+        labels: {
+          "en-US": "Leads Data",
+          "en-GLOBAL": "Leads Data",
+          "de-DE": "Lead-Daten",
+          "pl-PL": "Dane leadów",
+        },
+      },
+      usersData: {
+        icon: "user",
+        order: 11,
+        label: "Users Data",
+        labels: {
+          "en-US": "Users Data",
+          "en-GLOBAL": "Users Data",
+          "de-DE": "Nutzerdaten",
+          "pl-PL": "Dane użytkowników",
+        },
+      },
+      messengerData: {
+        icon: "mail",
+        order: 12,
+        label: "Messenger Data",
+        labels: {
+          "en-US": "Messenger Data",
+          "en-GLOBAL": "Messenger Data",
+          "de-DE": "Messenger-Daten",
+          "pl-PL": "Dane komunikatora",
+        },
+      },
+      paymentsData: {
+        icon: "credit-card",
+        order: 13,
+        label: "Payments Data",
+        labels: {
+          "en-US": "Payments Data",
+          "en-GLOBAL": "Payments Data",
+          "de-DE": "Zahlungsdaten",
+          "pl-PL": "Dane płatności",
+        },
+      },
+      creditsData: {
+        icon: "coins",
+        order: 14,
+        label: "Credits Data",
+        labels: {
+          "en-US": "Credits Data",
+          "en-GLOBAL": "Credits Data",
+          "de-DE": "Guthaben-Daten",
+          "pl-PL": "Dane kredytów",
+        },
+      },
+      subscriptionsData: {
+        icon: "repeat",
+        order: 15,
+        label: "Subscriptions Data",
+        labels: {
+          "en-US": "Subscriptions Data",
+          "en-GLOBAL": "Subscriptions Data",
+          "de-DE": "Abonnement-Daten",
+          "pl-PL": "Dane subskrypcji",
+        },
+      },
+      referralData: {
+        icon: "share-2",
+        order: 16,
+        label: "Referral Data",
+        labels: {
+          "en-US": "Referral Data",
+          "en-GLOBAL": "Referral Data",
+          "de-DE": "Empfehlungsdaten",
+          "pl-PL": "Dane poleceń",
+        },
+      },
+      newsletterData: {
+        icon: "newspaper",
+        order: 17,
+        label: "Newsletter Data",
+        labels: {
+          "en-US": "Newsletter Data",
+          "en-GLOBAL": "Newsletter Data",
+          "de-DE": "Newsletter-Daten",
+          "pl-PL": "Dane newslettera",
+        },
+      },
+      chatData: {
+        icon: "message-square",
+        order: 18,
+        label: "Chat Data",
+        labels: {
+          "en-US": "Chat Data",
+          "en-GLOBAL": "Chat Data",
+          "de-DE": "Chat-Daten",
+          "pl-PL": "Dane czatu",
+        },
+      },
+      systemData: {
+        icon: "server",
+        order: 19,
+        label: "System Data",
+        labels: {
+          "en-US": "System Data",
+          "en-GLOBAL": "System Data",
+          "de-DE": "Systemdaten",
+          "pl-PL": "Dane systemowe",
+        },
+      },
     },
   },
   {
     key: "payments",
     label: "Payments",
-    labels: {"en-US":"Payments","en-GLOBAL":"Payments","de-DE":"Zahlungen","pl-PL":"Płatności"},
+    labels: {
+      "en-US": "Payments",
+      "en-GLOBAL": "Payments",
+      "de-DE": "Zahlungen",
+      "pl-PL": "Płatności",
+    },
     group: "business",
     icon: "credit-card",
     order: 10,
     defaultEntryAlias: "payment-dashboard",
     subcategories: {
-      "Transactions": { icon: "receipt", order: 0, label: "Transactions", labels: {"en-US":"Transactions","en-GLOBAL":"Transactions","de-DE":"Transaktionen","pl-PL":"Transakcje"} },
-      "Providers": { icon: "plug", order: 2, label: "Providers", labels: {"en-US":"Providers","en-GLOBAL":"Providers","de-DE":"Anbieter","pl-PL":"Dostawcy"} },
+      Transactions: {
+        icon: "receipt",
+        order: 0,
+        label: "Transactions",
+        labels: {
+          "en-US": "Transactions",
+          "en-GLOBAL": "Transactions",
+          "de-DE": "Transaktionen",
+          "pl-PL": "Transakcje",
+        },
+      },
+      Providers: {
+        icon: "plug",
+        order: 2,
+        label: "Providers",
+        labels: {
+          "en-US": "Providers",
+          "en-GLOBAL": "Providers",
+          "de-DE": "Anbieter",
+          "pl-PL": "Dostawcy",
+        },
+      },
     },
   },
   {
     key: "subscriptions",
     label: "Subscriptions",
-    labels: {"en-US":"Subscriptions","en-GLOBAL":"Subscriptions","de-DE":"Abonnements","pl-PL":"Subskrypcje"},
+    labels: {
+      "en-US": "Subscriptions",
+      "en-GLOBAL": "Subscriptions",
+      "de-DE": "Abonnements",
+      "pl-PL": "Subskrypcje",
+    },
     group: "business",
     icon: "refresh-cw",
     order: 12,
     defaultEntryAlias: "subscription-dashboard",
     subcategories: {
-      "Subscriptions": { icon: "refresh-cw", order: 0, label: "Subscriptions", labels: {"en-US":"Subscriptions","en-GLOBAL":"Subscriptions","de-DE":"Abonnements","pl-PL":"Subskrypcje"} },
-      "Management": { icon: "settings-2", order: 1, label: "Management", labels: {"en-US":"Management","en-GLOBAL":"Management","de-DE":"Verwaltung","pl-PL":"Zarządzanie"} },
-      "subscriptionAnalytics": { icon: "bar-chart-2", order: 2, label: "Analytics", labels: {"en-US":"Analytics","en-GLOBAL":"Analytics","de-DE":"Analytik","pl-PL":"Analityka"} },
+      Subscriptions: {
+        icon: "refresh-cw",
+        order: 0,
+        label: "Subscriptions",
+        labels: {
+          "en-US": "Subscriptions",
+          "en-GLOBAL": "Subscriptions",
+          "de-DE": "Abonnements",
+          "pl-PL": "Subskrypcje",
+        },
+      },
+      Management: {
+        icon: "settings-2",
+        order: 1,
+        label: "Management",
+        labels: {
+          "en-US": "Management",
+          "en-GLOBAL": "Management",
+          "de-DE": "Verwaltung",
+          "pl-PL": "Zarządzanie",
+        },
+      },
+      subscriptionAnalytics: {
+        icon: "bar-chart-2",
+        order: 2,
+        label: "Analytics",
+        labels: {
+          "en-US": "Analytics",
+          "en-GLOBAL": "Analytics",
+          "de-DE": "Analytik",
+          "pl-PL": "Analityka",
+        },
+      },
     },
   },
   {
     key: "credits",
     label: "Credits",
-    labels: {"en-US":"Credits","en-GLOBAL":"Credits","de-DE":"Guthaben","pl-PL":"Środki"},
+    labels: {
+      "en-US": "Credits",
+      "en-GLOBAL": "Credits",
+      "de-DE": "Guthaben",
+      "pl-PL": "Środki",
+    },
     group: "business",
     icon: "coins",
     order: 15,
     defaultEntryAlias: "credits-balance",
     subcategories: {
-      "Credits": { icon: "coins", order: 0, label: "Credits", labels: {"en-US":"Credits","en-GLOBAL":"Credits","de-DE":"Guthaben","pl-PL":"Środki"} },
-      "Management": { icon: "shield", order: 1, label: "Management", labels: {"en-US":"Management","en-GLOBAL":"Management","de-DE":"Verwaltung","pl-PL":"Zarządzanie"} },
+      Credits: {
+        icon: "coins",
+        order: 0,
+        label: "Credits",
+        labels: {
+          "en-US": "Credits",
+          "en-GLOBAL": "Credits",
+          "de-DE": "Guthaben",
+          "pl-PL": "Środki",
+        },
+      },
+      Management: {
+        icon: "shield",
+        order: 1,
+        label: "Management",
+        labels: {
+          "en-US": "Management",
+          "en-GLOBAL": "Management",
+          "de-DE": "Verwaltung",
+          "pl-PL": "Zarządzanie",
+        },
+      },
     },
   },
   {
     key: "leads",
     label: "Leads",
-    labels: {"en-US":"Leads","en-GLOBAL":"Leads","de-DE":"Leads","pl-PL":"Leady"},
+    labels: {
+      "en-US": "Leads",
+      "en-GLOBAL": "Leads",
+      "de-DE": "Leads",
+      "pl-PL": "Leady",
+    },
     group: "business",
     icon: "target",
     order: 20,
     defaultEntryAlias: "leads-dashboard",
     subcategories: {
-      "Management": { icon: "users", order: 0, label: "Management", labels: {"en-US":"Management","en-GLOBAL":"Management","de-DE":"Verwaltung","pl-PL":"Zarządzanie"} },
-      "Import": { icon: "upload", order: 1, label: "Import", labels: {"en-US":"Import","en-GLOBAL":"Import","de-DE":"Import","pl-PL":"Import"} },
-      "Leads": { icon: "target", order: 2, label: "Leads", labels: {"en-US":"Leads","en-GLOBAL":"Leads","de-DE":"Leads","pl-PL":"Leady"} },
-      "emailCampaignsProcessing": { icon: "mail", order: 3, label: "Campaigns", labels: {"en-US":"Campaigns","en-GLOBAL":"Campaigns","de-DE":"Kampagnen","pl-PL":"Kampanie"} },
-      "emailCampaignsJourneys": { icon: "git-branch", order: 4, label: "Journeys", labels: {"en-US":"Journeys","en-GLOBAL":"Journeys","de-DE":"Journeys","pl-PL":"Ścieżki"} },
-      "emailCampaignsQueue": { icon: "list", order: 5, label: "Queue", labels: {"en-US":"Queue","en-GLOBAL":"Queue","de-DE":"Warteschlange","pl-PL":"Kolejka"} },
-      "emailCampaignsStats": { icon: "bar-chart-2", order: 6, label: "Campaign Stats", labels: {"en-US":"Campaign Stats","en-GLOBAL":"Campaign Stats","de-DE":"Kampagnenstatistiken","pl-PL":"Statystyki kampanii"} },
-      "leadMagnetIntegrations": { icon: "plug", order: 7, label: "Integrations", labels: {"en-US":"Integrations","en-GLOBAL":"Integrations","de-DE":"Integrationen","pl-PL":"Integracje"} },
+      Management: {
+        icon: "users",
+        order: 0,
+        label: "Management",
+        labels: {
+          "en-US": "Management",
+          "en-GLOBAL": "Management",
+          "de-DE": "Verwaltung",
+          "pl-PL": "Zarządzanie",
+        },
+      },
+      Import: {
+        icon: "upload",
+        order: 1,
+        label: "Import",
+        labels: {
+          "en-US": "Import",
+          "en-GLOBAL": "Import",
+          "de-DE": "Import",
+          "pl-PL": "Import",
+        },
+      },
+      Leads: {
+        icon: "target",
+        order: 2,
+        label: "Leads",
+        labels: {
+          "en-US": "Leads",
+          "en-GLOBAL": "Leads",
+          "de-DE": "Leads",
+          "pl-PL": "Leady",
+        },
+      },
+      emailCampaignsProcessing: {
+        icon: "mail",
+        order: 3,
+        label: "Campaigns",
+        labels: {
+          "en-US": "Campaigns",
+          "en-GLOBAL": "Campaigns",
+          "de-DE": "Kampagnen",
+          "pl-PL": "Kampanie",
+        },
+      },
+      emailCampaignsJourneys: {
+        icon: "git-branch",
+        order: 4,
+        label: "Journeys",
+        labels: {
+          "en-US": "Journeys",
+          "en-GLOBAL": "Journeys",
+          "de-DE": "Journeys",
+          "pl-PL": "Ścieżki",
+        },
+      },
+      emailCampaignsQueue: {
+        icon: "list",
+        order: 5,
+        label: "Queue",
+        labels: {
+          "en-US": "Queue",
+          "en-GLOBAL": "Queue",
+          "de-DE": "Warteschlange",
+          "pl-PL": "Kolejka",
+        },
+      },
+      emailCampaignsStats: {
+        icon: "bar-chart-2",
+        order: 6,
+        label: "Campaign Stats",
+        labels: {
+          "en-US": "Campaign Stats",
+          "en-GLOBAL": "Campaign Stats",
+          "de-DE": "Kampagnenstatistiken",
+          "pl-PL": "Statystyki kampanii",
+        },
+      },
+      leadMagnetIntegrations: {
+        icon: "plug",
+        order: 7,
+        label: "Integrations",
+        labels: {
+          "en-US": "Integrations",
+          "en-GLOBAL": "Integrations",
+          "de-DE": "Integrationen",
+          "pl-PL": "Integracje",
+        },
+      },
     },
   },
   {
     key: "accounting",
     label: "Accounting",
-    labels: {"en-US":"Accounting","en-GLOBAL":"Accounting","de-DE":"Buchhaltung","pl-PL":"Księgowość"},
+    labels: {
+      "en-US": "Accounting",
+      "en-GLOBAL": "Accounting",
+      "de-DE": "Buchhaltung",
+      "pl-PL": "Księgowość",
+    },
     group: "business",
     icon: "receipt",
     order: 30,
     defaultEntryAlias: "accounting-dashboard",
     subcategories: {
-      "Accounts": { icon: "book-open", order: 0, label: "Accounts", labels: {"en-US":"Accounts","en-GLOBAL":"Accounts","de-DE":"Konten","pl-PL":"Konta"} },
-      "Journal": { icon: "edit", order: 1, label: "Journal", labels: {"en-US":"Journal","en-GLOBAL":"Journal","de-DE":"Journal","pl-PL":"Dziennik"} },
-      "Ledger": { icon: "bar-chart-2", order: 2, label: "Ledger", labels: {"en-US":"Ledger","en-GLOBAL":"Ledger","de-DE":"Hauptbuch","pl-PL":"Księga główna"} },
-      "Periods": { icon: "calendar", order: 3, label: "Periods", labels: {"en-US":"Periods","en-GLOBAL":"Periods","de-DE":"Perioden","pl-PL":"Okresy"} },
-      "Accounting": { icon: "settings", order: 4, label: "Setup", labels: {"en-US":"Setup","en-GLOBAL":"Setup","de-DE":"Einrichtung","pl-PL":"Konfiguracja"} },
+      Accounts: {
+        icon: "book-open",
+        order: 0,
+        label: "Accounts",
+        labels: {
+          "en-US": "Accounts",
+          "en-GLOBAL": "Accounts",
+          "de-DE": "Konten",
+          "pl-PL": "Konta",
+        },
+      },
+      Journal: {
+        icon: "edit",
+        order: 1,
+        label: "Journal",
+        labels: {
+          "en-US": "Journal",
+          "en-GLOBAL": "Journal",
+          "de-DE": "Journal",
+          "pl-PL": "Dziennik",
+        },
+      },
+      Ledger: {
+        icon: "bar-chart-2",
+        order: 2,
+        label: "Ledger",
+        labels: {
+          "en-US": "Ledger",
+          "en-GLOBAL": "Ledger",
+          "de-DE": "Hauptbuch",
+          "pl-PL": "Księga główna",
+        },
+      },
+      Periods: {
+        icon: "calendar",
+        order: 3,
+        label: "Periods",
+        labels: {
+          "en-US": "Periods",
+          "en-GLOBAL": "Periods",
+          "de-DE": "Perioden",
+          "pl-PL": "Okresy",
+        },
+      },
+      Accounting: {
+        icon: "settings",
+        order: 4,
+        label: "Setup",
+        labels: {
+          "en-US": "Setup",
+          "en-GLOBAL": "Setup",
+          "de-DE": "Einrichtung",
+          "pl-PL": "Konfiguracja",
+        },
+      },
     },
   },
   {
     key: "companies",
     label: "Companies",
-    labels: {"en-US":"Companies","en-GLOBAL":"Companies","de-DE":"Unternehmen","pl-PL":"Firmy"},
+    labels: {
+      "en-US": "Companies",
+      "en-GLOBAL": "Companies",
+      "de-DE": "Unternehmen",
+      "pl-PL": "Firmy",
+    },
     group: "business",
     icon: "building",
     order: 35,
     defaultEntryAlias: "companies-list",
     subcategories: {
-      "Company Management": { icon: "building", order: 0, label: "Companies", labels: {"en-US":"Companies","en-GLOBAL":"Companies","de-DE":"Unternehmen","pl-PL":"Firmy"} },
-      "Company Members": { icon: "user-plus", order: 1, label: "Members", labels: {"en-US":"Members","en-GLOBAL":"Members","de-DE":"Mitglieder","pl-PL":"Członkowie"} },
+      "Company Management": {
+        icon: "building",
+        order: 0,
+        label: "Companies",
+        labels: {
+          "en-US": "Companies",
+          "en-GLOBAL": "Companies",
+          "de-DE": "Unternehmen",
+          "pl-PL": "Firmy",
+        },
+      },
+      "Company Members": {
+        icon: "user-plus",
+        order: 1,
+        label: "Members",
+        labels: {
+          "en-US": "Members",
+          "en-GLOBAL": "Members",
+          "de-DE": "Mitglieder",
+          "pl-PL": "Członkowie",
+        },
+      },
     },
   },
   {
     key: "products",
     label: "Products",
-    labels: {"en-US":"Products","en-GLOBAL":"Products","de-DE":"Produkte","pl-PL":"Produkty"},
+    labels: {
+      "en-US": "Products",
+      "en-GLOBAL": "Products",
+      "de-DE": "Produkte",
+      "pl-PL": "Produkty",
+    },
     group: "business",
     icon: "package",
     order: 40,
     defaultEntryAlias: "products-catalog-list",
     subcategories: {
-      "Catalog Management": { icon: "package", order: 0, label: "Catalog", labels: {"en-US":"Catalog","en-GLOBAL":"Catalog","de-DE":"Katalog","pl-PL":"Katalog"} },
-      "Category Management": { icon: "tag", order: 1, label: "Categories", labels: {"en-US":"Categories","en-GLOBAL":"Categories","de-DE":"Kategorien","pl-PL":"Kategorie"} },
+      "Catalog Management": {
+        icon: "package",
+        order: 0,
+        label: "Catalog",
+        labels: {
+          "en-US": "Catalog",
+          "en-GLOBAL": "Catalog",
+          "de-DE": "Katalog",
+          "pl-PL": "Katalog",
+        },
+      },
+      "Category Management": {
+        icon: "tag",
+        order: 1,
+        label: "Categories",
+        labels: {
+          "en-US": "Categories",
+          "en-GLOBAL": "Categories",
+          "de-DE": "Kategorien",
+          "pl-PL": "Kategorie",
+        },
+      },
     },
   },
   {
     key: "pos",
     label: "Point of Sale",
-    labels: {"en-US":"Point of Sale","en-GLOBAL":"Point of Sale","de-DE":"Kasse","pl-PL":"Punkt sprzedaży"},
+    labels: {
+      "en-US": "Point of Sale",
+      "en-GLOBAL": "Point of Sale",
+      "de-DE": "Kasse",
+      "pl-PL": "Punkt sprzedaży",
+    },
     group: "business",
     icon: "shopping-cart",
     order: 45,
     defaultEntryAlias: "pos-dashboard",
     subcategories: {
-      "POS: Orders": { icon: "shopping-bag", order: 0, label: "Orders", labels: {"en-US":"Orders","en-GLOBAL":"Orders","de-DE":"Bestellungen","pl-PL":"Zamówienia"} },
-      "POS: Sessions": { icon: "clock", order: 1, label: "Sessions", labels: {"en-US":"Sessions","en-GLOBAL":"Sessions","de-DE":"Sitzungen","pl-PL":"Sesje"} },
-      "POS: Terminals": { icon: "monitor", order: 2, label: "Terminals", labels: {"en-US":"Terminals","en-GLOBAL":"Terminals","de-DE":"Terminals","pl-PL":"Terminale"} },
-      "POS: Products": { icon: "package", order: 3, label: "Products", labels: {"en-US":"Products","en-GLOBAL":"Products","de-DE":"Produkte","pl-PL":"Produkty"} },
+      "POS: Orders": {
+        icon: "shopping-bag",
+        order: 0,
+        label: "Orders",
+        labels: {
+          "en-US": "Orders",
+          "en-GLOBAL": "Orders",
+          "de-DE": "Bestellungen",
+          "pl-PL": "Zamówienia",
+        },
+      },
+      "POS: Sessions": {
+        icon: "clock",
+        order: 1,
+        label: "Sessions",
+        labels: {
+          "en-US": "Sessions",
+          "en-GLOBAL": "Sessions",
+          "de-DE": "Sitzungen",
+          "pl-PL": "Sesje",
+        },
+      },
+      "POS: Terminals": {
+        icon: "monitor",
+        order: 2,
+        label: "Terminals",
+        labels: {
+          "en-US": "Terminals",
+          "en-GLOBAL": "Terminals",
+          "de-DE": "Terminals",
+          "pl-PL": "Terminale",
+        },
+      },
+      "POS: Products": {
+        icon: "package",
+        order: 3,
+        label: "Products",
+        labels: {
+          "en-US": "Products",
+          "en-GLOBAL": "Products",
+          "de-DE": "Produkte",
+          "pl-PL": "Produkty",
+        },
+      },
     },
   },
   {
     key: "inventory",
     label: "Inventory",
-    labels: {"en-US":"Inventory","en-GLOBAL":"Inventory","de-DE":"Lager","pl-PL":"Magazyn"},
+    labels: {
+      "en-US": "Inventory",
+      "en-GLOBAL": "Inventory",
+      "de-DE": "Lager",
+      "pl-PL": "Magazyn",
+    },
     group: "business",
     icon: "box",
     order: 50,
     defaultEntryAlias: "inventory-dashboard",
     subcategories: {
-      "Inventory: Stock": { icon: "layers", order: 0, label: "Stock", labels: {"en-US":"Stock","en-GLOBAL":"Stock","de-DE":"Bestand","pl-PL":"Zapasy"} },
-      "Inventory: Transfers": { icon: "move", order: 1, label: "Transfers", labels: {"en-US":"Transfers","en-GLOBAL":"Transfers","de-DE":"Transfers","pl-PL":"Transfery"} },
-      "Inventory: Warehouses": { icon: "archive", order: 2, label: "Warehouses", labels: {"en-US":"Warehouses","en-GLOBAL":"Warehouses","de-DE":"Lagerhäuser","pl-PL":"Magazyny"} },
+      "Inventory: Stock": {
+        icon: "layers",
+        order: 0,
+        label: "Stock",
+        labels: {
+          "en-US": "Stock",
+          "en-GLOBAL": "Stock",
+          "de-DE": "Bestand",
+          "pl-PL": "Zapasy",
+        },
+      },
+      "Inventory: Transfers": {
+        icon: "move",
+        order: 1,
+        label: "Transfers",
+        labels: {
+          "en-US": "Transfers",
+          "en-GLOBAL": "Transfers",
+          "de-DE": "Transfers",
+          "pl-PL": "Transfery",
+        },
+      },
+      "Inventory: Warehouses": {
+        icon: "archive",
+        order: 2,
+        label: "Warehouses",
+        labels: {
+          "en-US": "Warehouses",
+          "en-GLOBAL": "Warehouses",
+          "de-DE": "Lagerhäuser",
+          "pl-PL": "Magazyny",
+        },
+      },
     },
   },
   {
     key: "purchasing",
     label: "Purchasing",
-    labels: {"en-US":"Purchasing","en-GLOBAL":"Purchasing","de-DE":"Einkauf","pl-PL":"Zakupy"},
+    labels: {
+      "en-US": "Purchasing",
+      "en-GLOBAL": "Purchasing",
+      "de-DE": "Einkauf",
+      "pl-PL": "Zakupy",
+    },
     group: "business",
     icon: "shopping-bag",
     order: 55,
     defaultEntryAlias: "purchasing-dashboard",
     subcategories: {
-      "Purchasing: Orders": { icon: "file-plus", order: 0, label: "Orders", labels: {"en-US":"Orders","en-GLOBAL":"Orders","de-DE":"Bestellungen","pl-PL":"Zamówienia"} },
-      "Purchasing: Vendors": { icon: "briefcase", order: 1, label: "Vendors", labels: {"en-US":"Vendors","en-GLOBAL":"Vendors","de-DE":"Lieferanten","pl-PL":"Dostawcy"} },
+      "Purchasing: Orders": {
+        icon: "file-plus",
+        order: 0,
+        label: "Orders",
+        labels: {
+          "en-US": "Orders",
+          "en-GLOBAL": "Orders",
+          "de-DE": "Bestellungen",
+          "pl-PL": "Zamówienia",
+        },
+      },
+      "Purchasing: Vendors": {
+        icon: "briefcase",
+        order: 1,
+        label: "Vendors",
+        labels: {
+          "en-US": "Vendors",
+          "en-GLOBAL": "Vendors",
+          "de-DE": "Lieferanten",
+          "pl-PL": "Dostawcy",
+        },
+      },
     },
   },
   {
     key: "referral",
     label: "Referral",
-    labels: {"en-US":"Referral","en-GLOBAL":"Referral","de-DE":"Empfehlungen","pl-PL":"Polecenia"},
+    labels: {
+      "en-US": "Referral",
+      "en-GLOBAL": "Referral",
+      "de-DE": "Empfehlungen",
+      "pl-PL": "Polecenia",
+    },
     group: "business",
     icon: "share-2",
     order: 60,
     defaultEntryAlias: "referral-stats",
     subcategories: {
-      "Program": { icon: "share-2", order: 0, label: "Program", labels: {"en-US":"Program","en-GLOBAL":"Program","de-DE":"Programm","pl-PL":"Program"} },
-      "Payouts": { icon: "banknote", order: 1, label: "Payouts", labels: {"en-US":"Payouts","en-GLOBAL":"Payouts","de-DE":"Auszahlungen","pl-PL":"Wypłaty"} },
+      Program: {
+        icon: "share-2",
+        order: 0,
+        label: "Program",
+        labels: {
+          "en-US": "Program",
+          "en-GLOBAL": "Program",
+          "de-DE": "Programm",
+          "pl-PL": "Program",
+        },
+      },
+      Payouts: {
+        icon: "banknote",
+        order: 1,
+        label: "Payouts",
+        labels: {
+          "en-US": "Payouts",
+          "en-GLOBAL": "Payouts",
+          "de-DE": "Auszahlungen",
+          "pl-PL": "Wypłaty",
+        },
+      },
     },
   },
   {
     key: "tax",
     label: "Tax",
-    labels: {"en-US":"Tax","en-GLOBAL":"Tax","de-DE":"Steuern","pl-PL":"Podatki"},
+    labels: {
+      "en-US": "Tax",
+      "en-GLOBAL": "Tax",
+      "de-DE": "Steuern",
+      "pl-PL": "Podatki",
+    },
     group: "business",
     icon: "file-text",
     order: 65,
     defaultEntryAlias: "tax-rate-list",
     subcategories: {
-      "Tax Rates": { icon: "receipt", order: 0, label: "Tax Rates", labels: {"en-US":"Tax Rates","en-GLOBAL":"Tax Rates","de-DE":"Steuersätze","pl-PL":"Stawki podatkowe"} },
-      "Tax Reports": { icon: "bar-chart-2", order: 1, label: "Reports", labels: {"en-US":"Reports","en-GLOBAL":"Reports","de-DE":"Berichte","pl-PL":"Raporty"} },
+      "Tax Rates": {
+        icon: "receipt",
+        order: 0,
+        label: "Tax Rates",
+        labels: {
+          "en-US": "Tax Rates",
+          "en-GLOBAL": "Tax Rates",
+          "de-DE": "Steuersätze",
+          "pl-PL": "Stawki podatkowe",
+        },
+      },
+      "Tax Reports": {
+        icon: "bar-chart-2",
+        order: 1,
+        label: "Reports",
+        labels: {
+          "en-US": "Reports",
+          "en-GLOBAL": "Reports",
+          "de-DE": "Berichte",
+          "pl-PL": "Raporty",
+        },
+      },
     },
   },
   {
     key: "messenger",
     label: "Messenger",
-    labels: {"en-US":"Messenger","en-GLOBAL":"Messenger","de-DE":"Messenger","pl-PL":"Komunikator"},
+    labels: {
+      "en-US": "Messenger",
+      "en-GLOBAL": "Messenger",
+      "de-DE": "Messenger",
+      "pl-PL": "Komunikator",
+    },
     group: "comms",
     icon: "mail",
     order: 10,
     defaultEntryAlias: "messenger-accounts",
     subcategories: {
-      "Accounts": { icon: "at-sign", order: 0, label: "Accounts", labels: {"en-US":"Accounts","en-GLOBAL":"Accounts","de-DE":"Konten","pl-PL":"Konta"} },
-      "Inbox": { icon: "inbox", order: 1, label: "Inbox", labels: {"en-US":"Inbox","en-GLOBAL":"Inbox","de-DE":"Posteingang","pl-PL":"Skrzynka odbiorcza"} },
-      "Messages": { icon: "mail-open", order: 2, label: "Messages", labels: {"en-US":"Messages","en-GLOBAL":"Messages","de-DE":"Nachrichten","pl-PL":"Wiadomości"} },
-      "Providers": { icon: "plug", order: 3, label: "Providers", labels: {"en-US":"Providers","en-GLOBAL":"Providers","de-DE":"Anbieter","pl-PL":"Dostawcy"} },
+      Accounts: {
+        icon: "at-sign",
+        order: 0,
+        label: "Accounts",
+        labels: {
+          "en-US": "Accounts",
+          "en-GLOBAL": "Accounts",
+          "de-DE": "Konten",
+          "pl-PL": "Konta",
+        },
+      },
+      Inbox: {
+        icon: "inbox",
+        order: 1,
+        label: "Inbox",
+        labels: {
+          "en-US": "Inbox",
+          "en-GLOBAL": "Inbox",
+          "de-DE": "Posteingang",
+          "pl-PL": "Skrzynka odbiorcza",
+        },
+      },
+      Messages: {
+        icon: "mail-open",
+        order: 2,
+        label: "Messages",
+        labels: {
+          "en-US": "Messages",
+          "en-GLOBAL": "Messages",
+          "de-DE": "Nachrichten",
+          "pl-PL": "Wiadomości",
+        },
+      },
+      Providers: {
+        icon: "plug",
+        order: 3,
+        label: "Providers",
+        labels: {
+          "en-US": "Providers",
+          "en-GLOBAL": "Providers",
+          "de-DE": "Anbieter",
+          "pl-PL": "Dostawcy",
+        },
+      },
     },
   },
   {
     key: "newsletter",
     label: "Newsletter",
-    labels: {"en-US":"Newsletter","en-GLOBAL":"Newsletter","de-DE":"Newsletter","pl-PL":"Newsletter"},
+    labels: {
+      "en-US": "Newsletter",
+      "en-GLOBAL": "Newsletter",
+      "de-DE": "Newsletter",
+      "pl-PL": "Newsletter",
+    },
     group: "comms",
     icon: "send",
     order: 20,
     defaultEntryAlias: "campaign-stats",
     subcategories: {
-      "emailCampaignsStats": { icon: "bar-chart-2", order: 0, label: "Campaign Stats", labels: {"en-US":"Campaign Stats","en-GLOBAL":"Campaign Stats","de-DE":"Kampagnen-Statistiken","pl-PL":"Statystyki kampanii"} },
-      "emailCampaignsProcessing": { icon: "mail", order: 1, label: "Campaigns", labels: {"en-US":"Campaigns","en-GLOBAL":"Campaigns","de-DE":"Kampagnen","pl-PL":"Kampanie"} },
-      "emailCampaignsJourneys": { icon: "git-branch", order: 2, label: "Journeys", labels: {"en-US":"Journeys","en-GLOBAL":"Journeys","de-DE":"Journeys","pl-PL":"Podróże"} },
-      "emailCampaignsQueue": { icon: "list", order: 3, label: "Queue", labels: {"en-US":"Queue","en-GLOBAL":"Queue","de-DE":"Warteschlange","pl-PL":"Kolejka"} },
-      "Subscriptions": { icon: "user-check", order: 4, label: "Subscriptions", labels: {"en-US":"Subscriptions","en-GLOBAL":"Subscriptions","de-DE":"Abonnements","pl-PL":"Subskrypcje"} },
+      emailCampaignsStats: {
+        icon: "bar-chart-2",
+        order: 0,
+        label: "Campaign Stats",
+        labels: {
+          "en-US": "Campaign Stats",
+          "en-GLOBAL": "Campaign Stats",
+          "de-DE": "Kampagnen-Statistiken",
+          "pl-PL": "Statystyki kampanii",
+        },
+      },
+      emailCampaignsProcessing: {
+        icon: "mail",
+        order: 1,
+        label: "Campaigns",
+        labels: {
+          "en-US": "Campaigns",
+          "en-GLOBAL": "Campaigns",
+          "de-DE": "Kampagnen",
+          "pl-PL": "Kampanie",
+        },
+      },
+      emailCampaignsJourneys: {
+        icon: "git-branch",
+        order: 2,
+        label: "Journeys",
+        labels: {
+          "en-US": "Journeys",
+          "en-GLOBAL": "Journeys",
+          "de-DE": "Journeys",
+          "pl-PL": "Podróże",
+        },
+      },
+      emailCampaignsQueue: {
+        icon: "list",
+        order: 3,
+        label: "Queue",
+        labels: {
+          "en-US": "Queue",
+          "en-GLOBAL": "Queue",
+          "de-DE": "Warteschlange",
+          "pl-PL": "Kolejka",
+        },
+      },
+      Subscriptions: {
+        icon: "user-check",
+        order: 4,
+        label: "Subscriptions",
+        labels: {
+          "en-US": "Subscriptions",
+          "en-GLOBAL": "Subscriptions",
+          "de-DE": "Abonnements",
+          "pl-PL": "Subskrypcje",
+        },
+      },
     },
   },
   {
     key: "browser",
     label: "Browser",
-    labels: {"en-US":"Browser","en-GLOBAL":"Browser","de-DE":"Browser","pl-PL":"Przeglądarka"},
+    labels: {
+      "en-US": "Browser",
+      "en-GLOBAL": "Browser",
+      "de-DE": "Browser",
+      "pl-PL": "Przeglądarka",
+    },
     group: "platform",
     icon: "globe",
     order: 10,
     defaultEntryAlias: "browser-new-page",
     subcategories: {
-      "Pages": { icon: "layout", order: 0, label: "Pages", labels: {"en-US":"Pages","en-GLOBAL":"Pages","de-DE":"Seiten","pl-PL":"Strony"} },
-      "Interaction": { icon: "mouse-pointer", order: 1, label: "Interaction", labels: {"en-US":"Interaction","en-GLOBAL":"Interaction","de-DE":"Interaktion","pl-PL":"Interakcja"} },
-      "Inspection": { icon: "camera", order: 2, label: "Inspection", labels: {"en-US":"Inspection","en-GLOBAL":"Inspection","de-DE":"Inspektion","pl-PL":"Inspekcja"} },
-      "DevTools": { icon: "terminal", order: 3, label: "DevTools", labels: {"en-US":"DevTools","en-GLOBAL":"DevTools","de-DE":"Entwicklertools","pl-PL":"Narzędzia Dev"} },
+      Pages: {
+        icon: "layout",
+        order: 0,
+        label: "Pages",
+        labels: {
+          "en-US": "Pages",
+          "en-GLOBAL": "Pages",
+          "de-DE": "Seiten",
+          "pl-PL": "Strony",
+        },
+      },
+      Interaction: {
+        icon: "mouse-pointer",
+        order: 1,
+        label: "Interaction",
+        labels: {
+          "en-US": "Interaction",
+          "en-GLOBAL": "Interaction",
+          "de-DE": "Interaktion",
+          "pl-PL": "Interakcja",
+        },
+      },
+      Inspection: {
+        icon: "camera",
+        order: 2,
+        label: "Inspection",
+        labels: {
+          "en-US": "Inspection",
+          "en-GLOBAL": "Inspection",
+          "de-DE": "Inspektion",
+          "pl-PL": "Inspekcja",
+        },
+      },
+      DevTools: {
+        icon: "terminal",
+        order: 3,
+        label: "DevTools",
+        labels: {
+          "en-US": "DevTools",
+          "en-GLOBAL": "DevTools",
+          "de-DE": "Entwicklertools",
+          "pl-PL": "Narzędzia Dev",
+        },
+      },
     },
   },
   {
     key: "ssh",
     label: "SSH & Infra",
-    labels: {"en-US":"SSH & Infra","en-GLOBAL":"SSH & Infra","de-DE":"SSH & Infra","pl-PL":"SSH i Infra"},
+    labels: {
+      "en-US": "SSH & Infra",
+      "en-GLOBAL": "SSH & Infra",
+      "de-DE": "SSH & Infra",
+      "pl-PL": "SSH i Infra",
+    },
     group: "platform",
     icon: "terminal",
     order: 20,
     defaultEntryAlias: "ssh-connections-list",
     subcategories: {
-      "Connections": { icon: "link-2", order: 0, label: "Connections", labels: {"en-US":"Connections","en-GLOBAL":"Connections","de-DE":"Verbindungen","pl-PL":"Połączenia"} },
-      "Linux": { icon: "user", order: 1, label: "Linux Users", labels: {"en-US":"Linux Users","en-GLOBAL":"Linux Users","de-DE":"Linux-Benutzer","pl-PL":"Użytkownicy Linux"} },
+      Connections: {
+        icon: "link-2",
+        order: 0,
+        label: "Connections",
+        labels: {
+          "en-US": "Connections",
+          "en-GLOBAL": "Connections",
+          "de-DE": "Verbindungen",
+          "pl-PL": "Połączenia",
+        },
+      },
+      Linux: {
+        icon: "user",
+        order: 1,
+        label: "Linux Users",
+        labels: {
+          "en-US": "Linux Users",
+          "en-GLOBAL": "Linux Users",
+          "de-DE": "Linux-Benutzer",
+          "pl-PL": "Użytkownicy Linux",
+        },
+      },
     },
   },
   {
     key: "desktop",
     label: "Desktop",
-    labels: {"en-US":"Desktop","en-GLOBAL":"Desktop","de-DE":"Desktop","pl-PL":"Pulpit"},
+    labels: {
+      "en-US": "Desktop",
+      "en-GLOBAL": "Desktop",
+      "de-DE": "Desktop",
+      "pl-PL": "Pulpit",
+    },
     group: "platform",
     icon: "monitor",
     order: 30,
     defaultEntryAlias: "desktop-list-windows",
     subcategories: {
-      "Windows": { icon: "layout", order: 0, label: "Windows", labels: {"en-US":"Windows","en-GLOBAL":"Windows","de-DE":"Fenster","pl-PL":"Okna"} },
-      "Interaction": { icon: "mouse-pointer", order: 1, label: "Interaction", labels: {"en-US":"Interaction","en-GLOBAL":"Interaction","de-DE":"Interaktion","pl-PL":"Interakcja"} },
-      "Capture": { icon: "camera", order: 2, label: "Capture", labels: {"en-US":"Capture","en-GLOBAL":"Capture","de-DE":"Erfassung","pl-PL":"Przechwytywanie"} },
-      "Inspection": { icon: "eye", order: 3, label: "Inspection", labels: {"en-US":"Inspection","en-GLOBAL":"Inspection","de-DE":"Inspektion","pl-PL":"Inspekcja"} },
+      Windows: {
+        icon: "layout",
+        order: 0,
+        label: "Windows",
+        labels: {
+          "en-US": "Windows",
+          "en-GLOBAL": "Windows",
+          "de-DE": "Fenster",
+          "pl-PL": "Okna",
+        },
+      },
+      Interaction: {
+        icon: "mouse-pointer",
+        order: 1,
+        label: "Interaction",
+        labels: {
+          "en-US": "Interaction",
+          "en-GLOBAL": "Interaction",
+          "de-DE": "Interaktion",
+          "pl-PL": "Interakcja",
+        },
+      },
+      Capture: {
+        icon: "camera",
+        order: 2,
+        label: "Capture",
+        labels: {
+          "en-US": "Capture",
+          "en-GLOBAL": "Capture",
+          "de-DE": "Erfassung",
+          "pl-PL": "Przechwytywanie",
+        },
+      },
+      Inspection: {
+        icon: "eye",
+        order: 3,
+        label: "Inspection",
+        labels: {
+          "en-US": "Inspection",
+          "en-GLOBAL": "Inspection",
+          "de-DE": "Inspektion",
+          "pl-PL": "Inspekcja",
+        },
+      },
     },
   },
   {
     key: "account",
     label: "Account",
-    labels: {"en-US":"Account","en-GLOBAL":"Account","de-DE":"Konto","pl-PL":"Konto"},
+    labels: {
+      "en-US": "Account",
+      "en-GLOBAL": "Account",
+      "de-DE": "Konto",
+      "pl-PL": "Konto",
+    },
     group: "system",
     icon: "user",
     order: 10,
     defaultEntryAlias: "user-me",
     subcategories: {
-      "login": { icon: "log-in", order: 0, label: "Login & Signup", labels: {"en-US":"Login & Signup","en-GLOBAL":"Login & Signup","de-DE":"Login & Registrierung","pl-PL":"Logowanie i rejestracja"} },
-      "profile": { icon: "user", order: 1, label: "Profile", labels: {"en-US":"Profile","en-GLOBAL":"Profile","de-DE":"Profil","pl-PL":"Profil"} },
-      "sessions": { icon: "activity", order: 2, label: "Sessions", labels: {"en-US":"Sessions","en-GLOBAL":"Sessions","de-DE":"Sitzungen","pl-PL":"Sesje"} },
-      "directory": { icon: "book", order: 3, label: "Directory", labels: {"en-US":"Directory","en-GLOBAL":"Directory","de-DE":"Verzeichnis","pl-PL":"Katalog"} },
-      "manageUsers": { icon: "users", order: 4, label: "Manage Users", labels: {"en-US":"Manage Users","en-GLOBAL":"Manage Users","de-DE":"Nutzer verwalten","pl-PL":"Zarządzaj użytkownikami"} },
-      "userStats": { icon: "bar-chart-2", order: 5, label: "User Stats", labels: {"en-US":"User Stats","en-GLOBAL":"User Stats","de-DE":"Nutzerstatistiken","pl-PL":"Statystyki użytkowników"} },
-      "remoteInstances": { icon: "link-2", order: 6, label: "Remote Instances", labels: {"en-US":"Remote Instances","en-GLOBAL":"Remote Instances","de-DE":"Remote-Instanzen","pl-PL":"Zdalne instancje"} },
-      "remoteSelf": { icon: "globe", order: 7, label: "Self", labels: {"en-US":"Self","en-GLOBAL":"Self","de-DE":"Eigene Instanz","pl-PL":"Własna instancja"} },
+      login: {
+        icon: "log-in",
+        order: 0,
+        label: "Login & Signup",
+        labels: {
+          "en-US": "Login & Signup",
+          "en-GLOBAL": "Login & Signup",
+          "de-DE": "Login & Registrierung",
+          "pl-PL": "Logowanie i rejestracja",
+        },
+      },
+      profile: {
+        icon: "user",
+        order: 1,
+        label: "Profile",
+        labels: {
+          "en-US": "Profile",
+          "en-GLOBAL": "Profile",
+          "de-DE": "Profil",
+          "pl-PL": "Profil",
+        },
+      },
+      sessions: {
+        icon: "activity",
+        order: 2,
+        label: "Sessions",
+        labels: {
+          "en-US": "Sessions",
+          "en-GLOBAL": "Sessions",
+          "de-DE": "Sitzungen",
+          "pl-PL": "Sesje",
+        },
+      },
+      directory: {
+        icon: "book",
+        order: 3,
+        label: "Directory",
+        labels: {
+          "en-US": "Directory",
+          "en-GLOBAL": "Directory",
+          "de-DE": "Verzeichnis",
+          "pl-PL": "Katalog",
+        },
+      },
+      manageUsers: {
+        icon: "users",
+        order: 4,
+        label: "Manage Users",
+        labels: {
+          "en-US": "Manage Users",
+          "en-GLOBAL": "Manage Users",
+          "de-DE": "Nutzer verwalten",
+          "pl-PL": "Zarządzaj użytkownikami",
+        },
+      },
+      userStats: {
+        icon: "bar-chart-2",
+        order: 5,
+        label: "User Stats",
+        labels: {
+          "en-US": "User Stats",
+          "en-GLOBAL": "User Stats",
+          "de-DE": "Nutzerstatistiken",
+          "pl-PL": "Statystyki użytkowników",
+        },
+      },
+      remoteInstances: {
+        icon: "link-2",
+        order: 6,
+        label: "Remote Instances",
+        labels: {
+          "en-US": "Remote Instances",
+          "en-GLOBAL": "Remote Instances",
+          "de-DE": "Remote-Instanzen",
+          "pl-PL": "Zdalne instancje",
+        },
+      },
+      remoteSelf: {
+        icon: "globe",
+        order: 7,
+        label: "Self",
+        labels: {
+          "en-US": "Self",
+          "en-GLOBAL": "Self",
+          "de-DE": "Eigene Instanz",
+          "pl-PL": "Własna instancja",
+        },
+      },
     },
   },
   {
     key: "devTools",
     label: "System",
-    labels: {"en-US":"System","en-GLOBAL":"System","de-DE":"System","pl-PL":"System"},
+    labels: {
+      "en-US": "System",
+      "en-GLOBAL": "System",
+      "de-DE": "System",
+      "pl-PL": "System",
+    },
     group: "system",
     icon: "settings",
     order: 20,
     defaultEntryAlias: "system-settings",
     subcategories: {
-      "Generators": { icon: "code-2", order: 0, label: "Generators", labels: {"en-US":"Generators","en-GLOBAL":"Generators","de-DE":"Generatoren","pl-PL":"Generatory"} },
-      "Build": { icon: "zap", order: 1, label: "Build", labels: {"en-US":"Build","en-GLOBAL":"Build","de-DE":"Build","pl-PL":"Kompilacja"} },
-      "Check": { icon: "check-circle", order: 2, label: "Check", labels: {"en-US":"Check","en-GLOBAL":"Check","de-DE":"Prüfen","pl-PL":"Sprawdź"} },
-      "serverManagement": { icon: "server", order: 3, label: "Server", labels: {"en-US":"Server","en-GLOBAL":"Server","de-DE":"Server","pl-PL":"Serwer"} },
-      "serverGuard": { icon: "shield", order: 4, label: "Guard", labels: {"en-US":"Guard","en-GLOBAL":"Guard","de-DE":"Guard","pl-PL":"Guard"} },
-      "serverElectron": { icon: "monitor", order: 5, label: "Electron", labels: {"en-US":"Electron","en-GLOBAL":"Electron","de-DE":"Electron","pl-PL":"Electron"} },
-      "settingsEnv": { icon: "sliders", order: 6, label: "Settings", labels: {"en-US":"Settings","en-GLOBAL":"Settings","de-DE":"Einstellungen","pl-PL":"Ustawienia"} },
-      "settingsKeys": { icon: "key", order: 7, label: "Keys", labels: {"en-US":"Keys","en-GLOBAL":"Keys","de-DE":"Schlüssel","pl-PL":"Klucze"} },
-      "interfacesCli": { icon: "terminal", order: 8, label: "CLI", labels: {"en-US":"CLI","en-GLOBAL":"CLI","de-DE":"CLI","pl-PL":"CLI"} },
-      "interfacesMcp": { icon: "cpu", order: 9, label: "MCP", labels: {"en-US":"MCP","en-GLOBAL":"MCP","de-DE":"MCP","pl-PL":"MCP"} },
-      "interfacesFrame": { icon: "layout", order: 10, label: "Frame", labels: {"en-US":"Frame","en-GLOBAL":"Frame","de-DE":"Frame","pl-PL":"Frame"} },
-      "tasksCron": { icon: "clock", order: 11, label: "Cron Tasks", labels: {"en-US":"Cron Tasks","en-GLOBAL":"Cron Tasks","de-DE":"Cron-Aufgaben","pl-PL":"Zadania cron"} },
-      "tasksMonitoring": { icon: "activity", order: 12, label: "Monitoring", labels: {"en-US":"Monitoring","en-GLOBAL":"Monitoring","de-DE":"Überwachung","pl-PL":"Monitoring"} },
-      "tasksPulse": { icon: "radio", order: 13, label: "Pulse", labels: {"en-US":"Pulse","en-GLOBAL":"Pulse","de-DE":"Pulse","pl-PL":"Puls"} },
-      "tasksSync": { icon: "refresh-cw", order: 14, label: "Sync", labels: {"en-US":"Sync","en-GLOBAL":"Sync","de-DE":"Synchronisierung","pl-PL":"Synchronizacja"} },
+      Generators: {
+        icon: "code-2",
+        order: 0,
+        label: "Generators",
+        labels: {
+          "en-US": "Generators",
+          "en-GLOBAL": "Generators",
+          "de-DE": "Generatoren",
+          "pl-PL": "Generatory",
+        },
+      },
+      Build: {
+        icon: "zap",
+        order: 1,
+        label: "Build",
+        labels: {
+          "en-US": "Build",
+          "en-GLOBAL": "Build",
+          "de-DE": "Build",
+          "pl-PL": "Kompilacja",
+        },
+      },
+      Check: {
+        icon: "check-circle",
+        order: 2,
+        label: "Check",
+        labels: {
+          "en-US": "Check",
+          "en-GLOBAL": "Check",
+          "de-DE": "Prüfen",
+          "pl-PL": "Sprawdź",
+        },
+      },
+      serverManagement: {
+        icon: "server",
+        order: 3,
+        label: "Server",
+        labels: {
+          "en-US": "Server",
+          "en-GLOBAL": "Server",
+          "de-DE": "Server",
+          "pl-PL": "Serwer",
+        },
+      },
+      serverGuard: {
+        icon: "shield",
+        order: 4,
+        label: "Guard",
+        labels: {
+          "en-US": "Guard",
+          "en-GLOBAL": "Guard",
+          "de-DE": "Guard",
+          "pl-PL": "Guard",
+        },
+      },
+      serverElectron: {
+        icon: "monitor",
+        order: 5,
+        label: "Electron",
+        labels: {
+          "en-US": "Electron",
+          "en-GLOBAL": "Electron",
+          "de-DE": "Electron",
+          "pl-PL": "Electron",
+        },
+      },
+      settingsEnv: {
+        icon: "sliders",
+        order: 6,
+        label: "Settings",
+        labels: {
+          "en-US": "Settings",
+          "en-GLOBAL": "Settings",
+          "de-DE": "Einstellungen",
+          "pl-PL": "Ustawienia",
+        },
+      },
+      settingsKeys: {
+        icon: "key",
+        order: 7,
+        label: "Keys",
+        labels: {
+          "en-US": "Keys",
+          "en-GLOBAL": "Keys",
+          "de-DE": "Schlüssel",
+          "pl-PL": "Klucze",
+        },
+      },
+      interfacesCli: {
+        icon: "terminal",
+        order: 8,
+        label: "CLI",
+        labels: {
+          "en-US": "CLI",
+          "en-GLOBAL": "CLI",
+          "de-DE": "CLI",
+          "pl-PL": "CLI",
+        },
+      },
+      interfacesMcp: {
+        icon: "cpu",
+        order: 9,
+        label: "MCP",
+        labels: {
+          "en-US": "MCP",
+          "en-GLOBAL": "MCP",
+          "de-DE": "MCP",
+          "pl-PL": "MCP",
+        },
+      },
+      interfacesFrame: {
+        icon: "layout",
+        order: 10,
+        label: "Frame",
+        labels: {
+          "en-US": "Frame",
+          "en-GLOBAL": "Frame",
+          "de-DE": "Frame",
+          "pl-PL": "Frame",
+        },
+      },
+      tasksCron: {
+        icon: "clock",
+        order: 11,
+        label: "Cron Tasks",
+        labels: {
+          "en-US": "Cron Tasks",
+          "en-GLOBAL": "Cron Tasks",
+          "de-DE": "Cron-Aufgaben",
+          "pl-PL": "Zadania cron",
+        },
+      },
+      tasksMonitoring: {
+        icon: "activity",
+        order: 12,
+        label: "Monitoring",
+        labels: {
+          "en-US": "Monitoring",
+          "en-GLOBAL": "Monitoring",
+          "de-DE": "Überwachung",
+          "pl-PL": "Monitoring",
+        },
+      },
+      tasksPulse: {
+        icon: "radio",
+        order: 13,
+        label: "Pulse",
+        labels: {
+          "en-US": "Pulse",
+          "en-GLOBAL": "Pulse",
+          "de-DE": "Pulse",
+          "pl-PL": "Puls",
+        },
+      },
+      tasksSync: {
+        icon: "refresh-cw",
+        order: 14,
+        label: "Sync",
+        labels: {
+          "en-US": "Sync",
+          "en-GLOBAL": "Sync",
+          "de-DE": "Synchronisierung",
+          "pl-PL": "Synchronizacja",
+        },
+      },
     },
   },
   {
     key: "database",
     label: "Database",
-    labels: {"en-US":"Database","en-GLOBAL":"Database","de-DE":"Datenbank","pl-PL":"Baza danych"},
+    labels: {
+      "en-US": "Database",
+      "en-GLOBAL": "Database",
+      "de-DE": "Datenbank",
+      "pl-PL": "Baza danych",
+    },
     group: "system",
     icon: "database",
     order: 30,
     defaultEntryAlias: "sql",
     subcategories: {
-      "Migrations": { icon: "file-plus", order: 0, label: "Migrations", labels: {"en-US":"Migrations","en-GLOBAL":"Migrations","de-DE":"Migrationen","pl-PL":"Migracje"} },
-      "Tools": { icon: "wrench", order: 1, label: "Tools", labels: {"en-US":"Tools","en-GLOBAL":"Tools","de-DE":"Werkzeuge","pl-PL":"Narzędzia"} },
+      Migrations: {
+        icon: "file-plus",
+        order: 0,
+        label: "Migrations",
+        labels: {
+          "en-US": "Migrations",
+          "en-GLOBAL": "Migrations",
+          "de-DE": "Migrationen",
+          "pl-PL": "Migracje",
+        },
+      },
+      Tools: {
+        icon: "wrench",
+        order: 1,
+        label: "Tools",
+        labels: {
+          "en-US": "Tools",
+          "en-GLOBAL": "Tools",
+          "de-DE": "Werkzeuge",
+          "pl-PL": "Narzędzia",
+        },
+      },
     },
   },
 ];

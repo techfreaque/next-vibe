@@ -1,8 +1,3 @@
-/**
- * CLI Stripe API Definition
- * Defines endpoints for Stripe CLI integration operations
- */
-
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -12,18 +7,11 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
 import { scopedTranslation } from "../i18n";
 
-/**
- * CLI Stripe Endpoint Definition
- */
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -42,9 +30,12 @@ const { POST } = createEndpoint({
     UserRole.PRODUCTION_OFF,
   ],
   aliases: ["stripe", "stripe-cli"],
+  timeoutMs: 0,
 
-  cli: {
-    firstCliArgKey: "operation",
+  examples: {
+    requests: {
+      default: { port: 3000 },
+    },
   },
 
   fields: objectField(scopedTranslation, {
@@ -55,39 +46,6 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      // REQUEST FIELDS
-      operation: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "form.fields.operation.label" as const,
-        description: "form.fields.operation.description" as const,
-        placeholder: "form.fields.operation.placeholder" as const,
-        columns: 6,
-        options: [
-          {
-            value: "check",
-            label: "operations.check" as const,
-          },
-          {
-            value: "install",
-            label: "operations.install" as const,
-          },
-          {
-            value: "listen",
-            label: "operations.listen" as const,
-          },
-          {
-            value: "login",
-            label: "operations.login" as const,
-          },
-          {
-            value: "status",
-            label: "operations.status" as const,
-          },
-        ],
-        schema: z.enum(["check", "install", "listen", "login", "status"]),
-      }),
-
       port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -95,149 +53,10 @@ const { POST } = createEndpoint({
         description: "form.fields.port.description" as const,
         placeholder: "form.fields.port.placeholder" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
-      }),
-
-      events: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
-        label: "form.fields.events.label" as const,
-        description: "form.fields.events.description" as const,
-        placeholder: "form.fields.events.placeholder" as const,
-        columns: 12,
-        options: [
-          {
-            value: "payment_intent.succeeded",
-            label: "form.fields.events.paymentIntentSucceeded" as const,
-          },
-          {
-            value: "payment_intent.payment_failed",
-            label: "form.fields.events.paymentIntentFailed" as const,
-          },
-          {
-            value: "customer.subscription.created",
-            label: "form.fields.events.subscriptionCreated" as const,
-          },
-          {
-            value: "customer.subscription.updated",
-            label: "form.fields.events.subscriptionUpdated" as const,
-          },
-          {
-            value: "invoice.payment_succeeded",
-            label: "form.fields.events.invoicePaymentSucceeded" as const,
-          },
-          {
-            value: "invoice.payment_failed",
-            label: "form.fields.events.invoicePaymentFailed" as const,
-          },
-        ],
-        schema: z.array(z.string()).optional(),
-      }),
-
-      forwardTo: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "form.fields.forwardTo.label" as const,
-        description: "form.fields.forwardTo.description" as const,
-        placeholder: "form.fields.forwardTo.placeholder" as const,
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-
-      skipSslVerify: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "form.fields.skipSslVerify.label" as const,
-        description: "form.fields.skipSslVerify.description" as const,
-        columns: 6,
-        schema: z.boolean().default(false),
-      }),
-
-      // RESPONSE FIELDS
-      success: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.success" as const,
-        schema: z.boolean(),
-      }),
-
-      installed: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.installed" as const,
-        schema: z.boolean().optional(),
-      }),
-
-      version: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.version" as const,
-        schema: z.string().optional(),
-      }),
-
-      status: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.status" as const,
-        schema: z.string().optional(),
-      }),
-
-      output: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.output" as const,
-        schema: z.string().optional(),
-      }),
-
-      instructions: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.instructions" as const,
-        schema: z.string().optional(),
-      }),
-
-      webhookEndpoint: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "response.webhookEndpoint" as const,
-        schema: z.string().optional(),
+        schema: z.coerce.number().int().positive().default(3000),
       }),
     },
   }),
-
-  examples: {
-    requests: {
-      default: {
-        operation: "status",
-        port: 4242,
-        events: ["payment_intent.succeeded", "customer.subscription.created"],
-        forwardTo: "localhost:3000/api/webhooks/stripe",
-        skipSslVerify: false,
-      },
-      check: {
-        operation: "check",
-      },
-      listen: {
-        operation: "listen",
-        port: 4242,
-        events: ["payment_intent.succeeded"],
-        forwardTo: "localhost:3000/api/webhooks/stripe",
-      },
-    },
-    responses: {
-      default: {
-        success: true,
-        installed: true,
-        version: "1.19.1",
-        status: "ready",
-        output: "Stripe CLI is installed and ready to use",
-      },
-      check: {
-        success: true,
-        installed: true,
-        version: "1.19.1",
-      },
-      listen: {
-        success: true,
-        status: "listening",
-        output: "Ready! Your webhook signing secret is whsec_...",
-        webhookEndpoint: "https://webhook.stripe.com/listen",
-      },
-    },
-  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -284,11 +103,8 @@ const { POST } = createEndpoint({
   },
 });
 
-// Export types for repository
 export type CliStripeRequestInput = typeof POST.types.RequestInput;
 export type CliStripeRequestOutput = typeof POST.types.RequestOutput;
-export type CliStripeResponseInput = typeof POST.types.ResponseInput;
-export type CliStripeResponseOutput = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

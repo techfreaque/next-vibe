@@ -510,11 +510,23 @@ class RouteHandlersGenerator {
       return (await import(${ignoreComment}"${importPath}"))
         .tools.${method} as GenericHandlerBase;`);
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        cases.push(`    case "${path}":
+        const awaitLine = `        await import(${ignoreComment}"${importPath}")`;
+        if (awaitLine.length <= 80) {
+          // eslint-disable-next-line i18next/no-literal-string
+          cases.push(`    case "${path}":
       return (
         await import(${ignoreComment}"${importPath}")
       ).tools.${method} as GenericHandlerBase;`);
+        } else {
+          // Import path too long even inside parens: break the import args
+          // eslint-disable-next-line i18next/no-literal-string
+          cases.push(`    case "${path}":
+      return (
+        await import(
+          ${ignoreComment}"${importPath}"
+        )
+      ).tools.${method} as GenericHandlerBase;`);
+        }
       }
 
       // eslint-disable-next-line i18next/no-literal-string

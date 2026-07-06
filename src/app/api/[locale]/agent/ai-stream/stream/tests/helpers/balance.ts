@@ -339,7 +339,7 @@ async function queryRemoteDeductionsAfter(
 /**
  * LOCAL-side twins of the remote ledger helpers: marker + poll for a new
  * usage deduction (amount < 0) on the LOCAL admin's wallets. Used by the
- * loop-on-client scenarios to prove the loop ran (and billed) on THIS side.
+ * loop-LOCAL topology to prove the loop ran (and billed) on THIS side.
  */
 export async function readLocalDeductionMarker(
   userId: string,

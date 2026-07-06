@@ -384,6 +384,14 @@ export function nodeMetaResponseField<TST extends AnyScoped>(
   });
 }
 
+// ─── Data Source Built-in Widget ─────────────────────────────────────────────
+
+const DataSourceChartWidgetLazy = lazyWidget(() =>
+  import("./data-source-widget").then((m) => ({
+    default: m.DataSourceChartWidget,
+  })),
+);
+
 interface DataSourceWidgetReturn<TST extends AnyScoped> {
   render: typeof DataSourceChartWidgetLazy;
   noFormElement: true;
@@ -399,23 +407,6 @@ interface DataSourceWidgetReturn<TST extends AnyScoped> {
   schemaType: "object";
 }
 
-// ─── Data Source Built-in Widget ─────────────────────────────────────────────
-
-/**
- * Shared lazy widget for all data source chart endpoints.
- * Defined once here so no per-endpoint widget.tsx is needed.
- */
-const DataSourceChartWidgetLazy = lazyWidget(() =>
-  import("./data-source-widget").then((m) => ({
-    default: m.DataSourceChartWidget,
-  })),
-);
-
-/**
- * Creates the full customWidgetObject for a data source endpoint.
- * Replaces the per-endpoint widget.tsx + lazyWidget boilerplate.
- * Pass scoped translation keys for each of the 5 standard fields.
- */
 export function dataSourceWidget<TST extends AnyScoped>(
   st: TST,
   keys: {

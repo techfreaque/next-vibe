@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
         : undefined, // 8 GB
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,
-    turbopackFileSystemCacheForDev: true,
+    turbopackFileSystemCacheForDev: false,
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-icons",

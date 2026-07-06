@@ -99,10 +99,7 @@ function generateContent(
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type {
-  Task,
-  TaskRegistry,
-} from "next-vibe/tasks/unified-runner/types";
+import type { Task, TaskRegistry } from "next-vibe/tasks/unified-runner/types";
 
 ${imports.join("\n")}
 

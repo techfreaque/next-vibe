@@ -1,6 +1,7 @@
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { ChatModelId } from "../../../ai-stream/models";
+import { ImageGenModelId } from "../../../image-generation/models";
 import type { Skill } from "../../config";
 import {
   ContentLevel,

@@ -9,7 +9,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 
-import type { RequestSchema, ResponseSchema } from "./definition";
+import type { RequestSchema } from "./definition";
 import type { NowpaymentsCliT } from "./i18n";
 
 interface NgrokTunnel {
@@ -26,80 +26,33 @@ export class CliNowpaymentsRepositoryImpl {
     params: RequestSchema,
     locale: string,
     t: NowpaymentsCliT,
-  ): Promise<ResponseType<ResponseSchema>> {
-    const { operation, port = 3000 } = params;
+  ): Promise<ResponseType<never>> {
+    const { port = 3000 } = params;
 
-    switch (operation) {
-      case "check":
-        return CliNowpaymentsRepositoryImpl.checkNgrokInstallation();
-      case "install":
-        return CliNowpaymentsRepositoryImpl.getInstallInstructions();
-      case "tunnel":
-        return CliNowpaymentsRepositoryImpl.executeNgrokTunnelBlocking(
-          port,
-          locale,
-          t,
-        );
-      case "status":
-        return CliNowpaymentsRepositoryImpl.checkTunnelStatus();
-      default:
-        return fail({
-          message: t("post.errors.validationFailed.title"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { operation },
-        });
+    const installed = await CliNowpaymentsRepositoryImpl.isNgrokInstalled();
+    if (!installed) {
+      return fail({
+        message: t("post.errors.notInstalled.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: {
+          instructions: CliNowpaymentsRepositoryImpl.getInstallInstructions(),
+        },
+      });
     }
+
+    return CliNowpaymentsRepositoryImpl.runTunnel(port, locale, t);
   }
 
-  private static checkNgrokInstallation(): Promise<
-    ResponseType<ResponseSchema>
-  > {
+  private static isNgrokInstalled(): Promise<boolean> {
     return new Promise((resolve) => {
       const ngrok = spawn("ngrok", ["version"]);
-      let output = "";
-
-      ngrok.stdout.on("data", (data) => {
-        output += data.toString();
-      });
-
-      ngrok.on("close", (code) => {
-        if (code === 0) {
-          const version = output.trim().split(" ")[2] || output.trim();
-          resolve(
-            success({
-              success: true,
-              installed: true,
-              version,
-              status: "ngrok is installed and ready",
-            }),
-          );
-        } else {
-          resolve(
-            success({
-              success: false,
-              installed: false,
-              status: "ngrok is not installed",
-            }),
-          );
-        }
-      });
-
-      ngrok.on("error", () => {
-        resolve(
-          success({
-            success: false,
-            installed: false,
-            status: "ngrok is not installed",
-          }),
-        );
-      });
+      ngrok.on("close", (code) => resolve(code === 0));
+      ngrok.on("error", () => resolve(false));
     });
   }
 
-  private static getInstallInstructions(): ResponseType<ResponseSchema> {
-    return success({
-      success: true,
-      instructions: `To install ngrok:
+  private static getInstallInstructions(): string {
+    return `To install ngrok:
 
 1. Visit https://ngrok.com/download
 2. Download ngrok for your platform
@@ -109,27 +62,24 @@ export class CliNowpaymentsRepositoryImpl {
 Or use package managers:
 - macOS: brew install ngrok/ngrok/ngrok
 - Linux: snap install ngrok
-- Windows: choco install ngrok`,
-    });
+- Windows: choco install ngrok`;
   }
 
-  private static async executeNgrokTunnelBlocking(
+  private static async runTunnel(
     port: number,
     locale: string,
     t: NowpaymentsCliT,
-  ): Promise<ResponseType<ResponseSchema>> {
+  ): Promise<ResponseType<never>> {
     process.stdout.write(`\n🚀 Starting ngrok tunnel on port ${port}...\n\n`);
 
-    spawn("ngrok", ["http", port.toString()], {
-      stdio: "inherit",
+    spawn("ngrok", ["http", port.toString()], { stdio: "inherit" });
+
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 2000);
     });
 
-    // Wait for ngrok to start
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
-
-    // Query ngrok API to get tunnel URL
     const tunnelUrl = await CliNowpaymentsRepositoryImpl.getTunnelUrl();
 
     if (!tunnelUrl) {
@@ -142,31 +92,32 @@ Or use package managers:
 
     const webhookUrl = `${tunnelUrl}/api/${locale}/payment/providers/nowpayments/webhook`;
 
-    // Update .env file
     CliNowpaymentsRepositoryImpl.updateTunnelUrl(tunnelUrl);
 
-    process.stdout.write(`\n✅ ngrok tunnel started successfully!\n\n`);
-    process.stdout.write(`📍 Tunnel URL: ${tunnelUrl}\n`);
-    process.stdout.write(`🔗 Webhook URL: ${webhookUrl}\n\n`);
-    process.stdout.write(`⚙️  Configuration:\n`);
+    process.stdout.write(`\n✅ Tunnel started!\n`);
+    process.stdout.write(`📍 ${tunnelUrl}\n`);
+    process.stdout.write(`🔗 Webhook: ${webhookUrl}\n\n`);
     process.stdout.write(
-      `   1. Go to https://nowpayments.io/app/settings/api\n`,
+      `Set IPN Callback URL in NOWPayments dashboard:\n  ${webhookUrl}\n\n`,
     );
-    process.stdout.write(`   2. Set IPN Callback URL to: ${webhookUrl}\n`);
-    process.stdout.write(`   3. Save your settings\n\n`);
-    process.stdout.write(`🔄 Press Ctrl+C to stop the tunnel\n\n`);
+    process.stdout.write(`Press Ctrl+C to stop.\n\n`);
 
-    // Block forever - keep process running
+    // Remove env var on exit
+    process.on("SIGINT", () => {
+      CliNowpaymentsRepositoryImpl.removeTunnelUrl();
+      process.exit(0);
+    });
+    process.on("SIGTERM", () => {
+      CliNowpaymentsRepositoryImpl.removeTunnelUrl();
+      process.exit(0);
+    });
+
+    // Block forever — keep process running until Ctrl+C
     await new Promise<void>(() => {
-      // This promise never resolves, keeping the tunnel alive
+      // intentionally never resolves
     });
 
-    return success({
-      success: true,
-      tunnelUrl,
-      webhookUrl,
-      instructions: `Set this webhook URL in NOWPayments dashboard: ${webhookUrl}`,
-    });
+    return success();
   }
 
   private static async getTunnelUrl(): Promise<string | null> {
@@ -175,7 +126,7 @@ Or use package managers:
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;
       const tunnel = data.tunnels?.find((t) => t.proto === "https");
-      return tunnel?.public_url || null;
+      return tunnel?.public_url ?? null;
     } catch {
       return null;
     }
@@ -185,45 +136,27 @@ Or use package managers:
     const envPath = join(process.cwd(), ".env");
     let envContent = readFileSync(envPath, "utf-8");
 
-    // Update or add NEXT_PUBLIC_APP_URL
-    if (envContent.includes("NEXT_PUBLIC_APP_URL=")) {
+    if (envContent.includes("NOWPAYMENTS_CALLBACK_DOMAIN=")) {
       envContent = envContent.replace(
-        /NEXT_PUBLIC_APP_URL=.*/,
-        `NEXT_PUBLIC_APP_URL="${tunnelUrl}"`,
+        /NOWPAYMENTS_CALLBACK_DOMAIN=.*/,
+        `NOWPAYMENTS_CALLBACK_DOMAIN="${tunnelUrl}"`,
       );
     } else {
-      envContent += `\nNEXT_PUBLIC_APP_URL="${tunnelUrl}"\n`;
+      envContent += `\nNOWPAYMENTS_CALLBACK_DOMAIN="${tunnelUrl}"\n`;
     }
 
     writeFileSync(envPath, envContent);
-    process.stdout.write(`✅ Updated .env file with tunnel URL\n`);
+    process.stdout.write(`✅ Updated .env NOWPAYMENTS_CALLBACK_DOMAIN\n`);
   }
 
-  private static async checkTunnelStatus(): Promise<
-    ResponseType<ResponseSchema>
-  > {
-    try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-      const response = await fetch("http://localhost:4040/api/tunnels");
-      const data = (await response.json()) as NgrokApiResponse;
-      const tunnel = data.tunnels?.find((t) => t.proto === "https");
-
-      if (tunnel) {
-        return success({
-          success: true,
-          status: "Tunnel is running",
-          tunnelUrl: tunnel.public_url,
-        });
-      }
-      return success({
-        success: false,
-        status: "No tunnel found",
-      });
-    } catch {
-      return success({
-        success: false,
-        status: "ngrok is not running",
-      });
-    }
+  static removeTunnelUrl(): void {
+    const envPath = join(process.cwd(), ".env");
+    let envContent = readFileSync(envPath, "utf-8");
+    envContent = envContent.replace(
+      /\nNOWPAYMENTS_CALLBACK_DOMAIN=.*\n?/,
+      "\n",
+    );
+    writeFileSync(envPath, envContent);
+    process.stdout.write(`✅ Removed NOWPAYMENTS_CALLBACK_DOMAIN from .env\n`);
   }
 }

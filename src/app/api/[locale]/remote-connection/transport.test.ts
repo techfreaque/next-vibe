@@ -40,7 +40,7 @@ function resolveByPriority(
     return activeRows.find((r) => r.instanceId === params.instanceId) ?? null;
   }
 
-  // 2. REMOTE root folder lookup is tested in DB-layer tests (route.transport.test.ts)
+  // 2. loopInstanceId resolution is tested in DB-layer tests (route.transport.test.ts)
 
   return null;
 }

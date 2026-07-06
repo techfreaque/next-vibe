@@ -338,10 +338,11 @@ export class FavoritesCreateRepository {
         });
       }
 
-      // This op owns its `favorite-created` event. The payload is the request the
-      // user submitted (requestFields) plus the new `id` (response field). Locally
-      // its client onEvent rebuilds the card and patches the favorites list cache;
-      // cross-instance (remoteEvent) the peer's route onRemoteEvent re-runs create.
+      // Emit `favorite-created` on both endpoints:
+      //  1. POST — triggers cross-instance relay (remoteEvent:true); the peer's
+      //     onRemoteEvent applies the DB insert and emits on GET for its browser.
+      //  2. GET  — updates the local browser's favorites list (GET is what the
+      //     favorites page subscribes to via EndpointsPage).
       // Suppressed when applying a relayed create (avoids re-relay ping-pong).
       if (!relayed) {
         createEndpointEmitter(
@@ -395,6 +396,7 @@ export class FavoritesCreateRepository {
    */
   static async applyRemoteFavoriteCreate({
     requestData,
+    responseData,
     user,
     logger,
   }: RemoteEventHandlerProps<
@@ -414,6 +416,7 @@ export class FavoritesCreateRepository {
       t,
       locale,
       true,
+      remoteSlug,
     );
     if (!result.success) {
       logger.error("Failed to apply remote favorite create", {

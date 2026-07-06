@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
       content: "Heute verbleibend",
     },
     percentUsed: {
-      content: "Prozent genutzt",
+      content: "genutzt",
     },
     lastResetAt: {
       content: "Letzter Reset",

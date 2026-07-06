@@ -118,6 +118,7 @@ interface NOWPaymentsPaymentStatus {
   created_at: string;
   updated_at: string;
   purchase_id: string;
+  invoice_id?: string;
   outcome_amount?: number;
   outcome_currency?: string;
 }
@@ -313,12 +314,17 @@ export class NOWPaymentsProvider implements PaymentProvider {
       "",
     );
 
+    const callbackDomain = process.env["NOWPAYMENTS_CALLBACK_DOMAIN"];
+    const webhookBase = callbackDomain
+      ? callbackDomain.replace(/\/$/, "")
+      : env.NEXT_PUBLIC_APP_URL;
+
     const invoiceData = {
       price_amount: totalAmount,
       price_currency: product.currency,
       order_id: `${params.userId}_${Date.now()}`,
       order_description: `${params.productId} - ${totalCredits} credits`,
-      ipn_callback_url: `${env.NEXT_PUBLIC_APP_URL}/api/${params.locale}/payment/providers/nowpayments/webhook`,
+      ipn_callback_url: `${webhookBase}/api/${params.locale}/payment/providers/nowpayments/webhook`,
       success_url: successUrlWithoutPlaceholder,
       cancel_url: params.cancelUrl,
       is_fee_paid_by_user: true,

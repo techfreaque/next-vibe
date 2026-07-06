@@ -33,9 +33,9 @@ import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
 import { Compass } from "next-vibe/ui/ui/icons/Compass";
+import { Eye } from "next-vibe/ui/ui/icons/Eye";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
@@ -405,6 +405,8 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   locale,
   isTouch,
   isPickerMode,
+  logger,
+  user,
 }: {
   item: FavoriteCard;
   index: number;
@@ -1356,6 +1358,7 @@ function DeleteGroupButton({
   logger,
   user,
   locale,
+  size,
 }: {
   group: SkillGroup;
   logger: ReturnType<typeof useWidgetContext>["logger"];
@@ -1466,6 +1469,7 @@ function DeleteGroupButton({
 function FavoriteReportButton({
   skillId,
   navigate,
+  locale,
 }: {
   skillId: string;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];

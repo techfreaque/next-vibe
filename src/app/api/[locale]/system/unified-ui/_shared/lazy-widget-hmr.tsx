@@ -3,16 +3,15 @@
 /**
  * Client-only HMR wrapper for lazyWidget.
  *
- * This file is "use client" so hooks are allowed. It handles the Vite dev
- * hot-reload subscription: when window.__vibeWidgetHmr fires, it swaps the
- * React.lazy reference and forces a re-render via useState.
- *
- * In Next.js (both dev and prod) this file is rendered as a Client Component.
- * In Vite dev this provides the HMR subscription so widget.tsx changes
- * update the UI without a full reload.
+ * Uses React.use() + Suspense to load lazy widgets uniformly on both server
+ * and client. The modulePromise is created lazily on first render (not at
+ * module init time, to avoid circular import issues during Vite module graph
+ * initialization). It is cached on state so SSR and client hydration share
+ * the same promise — React.use() deduplicates by promise identity, ensuring
+ * both sides render the same output and hydration succeeds.
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 
 import type { UpdateCallback } from "./lazy-widget";
 import { ensureGlobals } from "./lazy-widget";
@@ -30,22 +29,45 @@ interface HmrWrapperProps {
   state: {
     lazy: ReturnType<typeof React.lazy<AnyComponent>>;
     resolved: AnyComponent | null;
+    modulePromise: Promise<AnyComponent> | null;
   };
   factory: () => Promise<{ default: AnyComponent }>;
+  getModulePromise: () => Promise<AnyComponent> | null;
+}
+
+// Inner component: calls use() to suspend until promise resolves.
+// Must be inside a <Suspense> boundary.
+function ResolvedWidget({
+  promise,
+  widgetProps,
+}: {
+  promise: Promise<AnyComponent>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dispatch-boundary
+  widgetProps: any;
+}): React.ReactElement {
+  const Component = use(promise);
+  return React.createElement(Component, widgetProps);
+}
+
+// A promise stamped with status="fulfilled" by React's thenable tracking.
+type FulfilledPromise<T> = Promise<T> & { status: "fulfilled"; value: T };
+
+function isFulfilled<T>(p: Promise<T>): p is FulfilledPromise<T> {
+  return (p as FulfilledPromise<T>).status === "fulfilled";
 }
 
 export function HmrWrapper({
   widgetProps,
   state,
   factory,
+  getModulePromise,
 }: HmrWrapperProps): React.ReactElement {
-  const [, setTick] = useState(0);
-  // resolvedRef tracks the eagerly-preloaded component. On the server (SSR) this
-  // is populated by lazyWidget.preload() before rendering, giving us full SSR HTML
-  // with no Suspense gap. On the client it stays set until an HMR update fires.
-  const resolvedRef = useRef(state.resolved);
+  // On first render, getModulePromise() creates and caches the promise on state.
+  // Subsequent renders (and client hydration) get the same cached instance.
+  const modulePromiseRef = useRef(getModulePromise());
   const lazyRef = useRef(state.lazy);
   const registeredRef = useRef(false);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     if (registeredRef.current) {
@@ -83,8 +105,7 @@ export function HmrWrapper({
             Promise.resolve({ default: Component }),
         );
         lazyRef.current = freshLazy;
-        // Clear resolved so HMR update switches to the fresh lazy component
-        resolvedRef.current = null;
+        modulePromiseRef.current = Promise.resolve(Component);
         setTick((n) => n + 1);
       };
 
@@ -99,15 +120,38 @@ export function HmrWrapper({
     };
   }, [factory, state]);
 
-  // If the component was preloaded (SSR path or first client render before HMR),
-  // render it directly - no Suspense, no streaming gap, no flash.
-  const Resolved = resolvedRef.current;
-  if (Resolved) {
-    return React.createElement(Resolved, widgetProps);
+  // Fast path: component already resolved (prior render, preload(), or HMR update).
+  // Render directly — no Suspense, no async wait. This is the hot path for every
+  // request after the first SSR cold-start and for all hydrated client renders.
+  if (state.resolved !== null) {
+    return React.createElement(state.resolved, widgetProps);
   }
 
-  // Fallback: lazy with Suspense - used when preload() was not called before render
-  // (non-SSR pages, or after HMR clears resolvedRef).
+  const currentPromise = modulePromiseRef.current;
+
+  // If the promise is already fulfilled (React stamps .status on resolved thenables),
+  // extract the value and render synchronously — avoids Suspense entirely.
+  // (state.resolved is set by the .then() in getOrCreateModulePromise, so this
+  // branch is only hit in the same render cycle where the promise just resolved.)
+  if (currentPromise !== null && isFulfilled(currentPromise)) {
+    return React.createElement(currentPromise.value, widgetProps);
+  }
+
+  // Async path: promise is pending (first SSR cold-start or not yet preloaded).
+  // React.use() inside Suspense suspends until the promise resolves.
+  // React streaming waits inline before flushing this boundary's HTML.
+  if (currentPromise !== null) {
+    return React.createElement(
+      React.Suspense,
+      { fallback: null },
+      React.createElement(ResolvedWidget, {
+        promise: currentPromise,
+        widgetProps,
+      }),
+    );
+  }
+
+  // Fallback: no promise (drizzle-kit or non-Vite context).
   return React.createElement(
     React.Suspense,
     { fallback: null },

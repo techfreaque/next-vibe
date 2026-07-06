@@ -10,7 +10,10 @@ import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/langua
 import { db } from "next-vibe/database";
 import { Environment } from "next-vibe/env/env-util";
 import { leads } from "next-vibe/identity/lead/db";
-import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
+import {
+  createAnonymousLead,
+  validateLeadIdExists,
+} from "next-vibe/identity/lead/middleware-ops";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { frameExchangeTokens } from "next-vibe/platforms/vibe-frame/db";
 import { shouldSkipPath } from "next-vibe/server/middleware/utils";
@@ -46,8 +49,7 @@ export function getLeadIdFromRequest(request: NextRequest): string | undefined {
  */
 export async function isLeadIdValid(leadId: string): Promise<boolean> {
   try {
-    const result = await LeadAuthRepository.validateLeadIdExists(leadId);
-    return result;
+    return await validateLeadIdExists(leadId);
   } catch {
     return false;
   }
@@ -166,27 +168,18 @@ export async function createLeadId(
       undefined,
   };
 
-  // Always create a fresh leadId (pass undefined)
-  // This ensures exactly ONE new leadId is created, not duplicates from parallel requests
-  const result = await LeadAuthRepository.ensurePublicLeadId(
-    undefined,
-    clientInfo,
-    locale,
-    logger,
-  );
+  const leadId = await createAnonymousLead(clientInfo, locale, logger);
 
-  if (!result.leadId) {
+  if (!leadId) {
     logger.error("Failed to create leadId in middleware");
     return NextResponseClass.next();
   }
 
   const response = NextResponseClass.next();
 
-  // Set lead ID cookie
-  // IMPORTANT: Lead ID cookie NEVER expires - it persists across all sessions
   response.cookies.set({
     name: LEAD_ID_COOKIE_NAME,
-    value: result.leadId,
+    value: leadId,
     httpOnly: true,
     path: "/",
     secure: env.NODE_ENV === Environment.PRODUCTION,
@@ -194,9 +187,7 @@ export async function createLeadId(
     maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });
 
-  logger.debug("Lead ID cookie set in middleware", {
-    leadId: result.leadId,
-  });
+  logger.debug("Lead ID cookie set in middleware", { leadId });
 
   return response;
 }

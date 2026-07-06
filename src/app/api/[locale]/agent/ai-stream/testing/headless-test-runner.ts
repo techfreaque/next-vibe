@@ -151,14 +151,18 @@ export interface TestStreamParams {
   skill?: string;
   /**
    * Root folder override. Defaults to DefaultFolderId.BACKGROUND.
-   * Use DefaultFolderId.REMOTE + subFolderId to test remote-folder routing and thread mirroring.
+   * Loop location is a separate explicit param (loopInstanceId) — placement never routes.
    */
   rootFolderId?: DefaultFolderId;
   /**
-   * Subfolder UUID. Required when rootFolderId is REMOTE so the thread is
-   * placed in the instance subfolder and routing rules can match it.
+   * Subfolder UUID within the root folder.
    */
   subFolderId?: string;
+  /**
+   * Explicit loop location for the stream (a connection's instanceId).
+   * Placement never routes — this is the only way the loop moves.
+   */
+  loopInstanceId?: string;
   /**
    * Explicit parent message ID for retry/branch tests.
    * When set, the user message is created as a child of this message
@@ -638,6 +642,7 @@ export async function runTestStream(
     skill: skillParam,
     rootFolderId: rootFolderIdOverride,
     subFolderId,
+    loopInstanceId,
     explicitParentMessageId,
     attachments,
     audioInput,
@@ -730,6 +735,7 @@ export async function runTestStream(
       operation,
       rootFolderId,
       subFolderId: subFolderId ?? null,
+      loopInstanceId: loopInstanceId ?? null,
       threadId: threadId ?? crypto.randomUUID(),
       userMessageId,
       parentMessageId: resolvedParentMessageId,

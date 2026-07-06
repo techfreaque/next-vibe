@@ -13,7 +13,7 @@
  *
  *   B. Remote folder (DefaultFolderId.REMOTE, instance subfolder):
  *      Thread lives in the hermes instance subfolder (REMOTE-folder routing, deterministic).
- *      AI loop runs on hermes (loopLocation='server'); cortex tools are hermes-local.
+ *      The folder stamps loop_instance_id at creation — the AI loop runs on hermes; cortex tools are hermes-local.
  *      Verifies: routing via REMOTE folder ancestry, AI on hermes can read/write its own cortex.
  *
  * Folder hierarchy per run:
@@ -25,8 +25,7 @@
  *
  * Setup mirrors route.direct.test.ts:
  *   1. connectToHermes → registers atlas on hermes, syncs capabilities
- *   2. transportMode='direct-http', loopLocation='server', toolSource='local', threadMirrorMode='both'
- *      (set by connectToHermes for E2E tests)
+ *   2. transportMode='direct-http' (set by connectToHermes for E2E tests)
  *   4. For scenario B: create REMOTE subfolder for hermes (routing is deterministic — no DB rule needed)
  *
  * Requirements:
@@ -350,8 +349,8 @@ if (!_resolvedRemoteUrl) {
 
           // Stream into REMOTE/hermes/tests/cortex-remote.
           // REMOTE-folder routing: folder ancestry resolves to hermes connection deterministically.
-          // loopLocation='server' → hermes runs the AI loop.
-          // toolSource='local' → atlas sends tool schemas to hermes.
+          // The REMOTE folder stamped loop_instance_id=hermes at thread
+          // creation → hermes runs the AI loop with its own tools.
           // On hermes, cortex tools are native (no execute-tool wrapper needed).
           const { result, messages } = await runTestStream({
             prompt:
@@ -378,7 +377,7 @@ if (!_resolvedRemoteUrl) {
           sharedThreadId = result.data.threadId;
           expect(sharedThreadId, "threadId must be set").toBeTruthy();
 
-          // In remote folder with loopLocation='server': AI runs on hermes.
+          // Remote-folder thread: the loop runs on hermes.
           // Hermes uses its own tools natively — cortex-list should appear as a direct
           // tool call (no execute-tool wrapper) since hermes calls its own cortex.
           const cortexMsg = messages.find(
@@ -410,7 +409,7 @@ if (!_resolvedRemoteUrl) {
       );
 
       it(
-        "B2: Thread created in REMOTE folder is stored in local DB (threadMirrorMode='both')",
+        "B2: Thread created in REMOTE folder is stored in local DB (caller keeps its copy)",
         async () => {
           setFetchCacheContext(`${CACHE_PREFIX}b2`);
           expect(
@@ -424,7 +423,7 @@ if (!_resolvedRemoteUrl) {
             );
           }
 
-          // Verify the thread exists locally (threadMirrorMode='both' from connectToHermes)
+          // Verify the thread exists locally (the caller owns its copy)
           const threadDef =
             await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
           const localThreadResult =
@@ -440,7 +439,7 @@ if (!_resolvedRemoteUrl) {
 
           expect(
             localThreadResult.success,
-            `Thread ${sharedThreadId} must exist in local DB (threadMirrorMode='both'): ${!localThreadResult.success ? localThreadResult.message : ""}`,
+            `Thread ${sharedThreadId} must exist in local DB (caller copy): ${!localThreadResult.success ? localThreadResult.message : ""}`,
           ).toBeTruthy();
 
           const localThreadRow = localThreadResult.success

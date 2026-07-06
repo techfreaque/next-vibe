@@ -21,7 +21,7 @@ export const translations = {
       content: "Remaining Today",
     },
     percentUsed: {
-      content: "Percent Used",
+      content: "Used",
     },
     lastResetAt: {
       content: "Last Reset At",

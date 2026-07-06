@@ -28,7 +28,7 @@ import type {
 
 import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
 
-import { buildUserChannel, buildWsChannel } from "./channel";
+import { buildUserWsChannel, buildWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";
 import type {
   AnyEndpointEventEnvelope,
@@ -310,7 +310,10 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
     erasedBinding.requestData,
     logger,
   );
-  // kind "user"     → the identity's own user/{id} channel.
+  // kind "user"     → the owner's user-scoped channel for THIS endpoint instance
+  //                   (user/{id}/ + the same canonical key — unique per endpoint
+  //                   + params + user, so delivery never reaches a socket that
+  //                   subscribed to a different endpoint).
   // kind "resource" → the shared ws-channel (path + params + requestData).
   // For scope:"resolved" the repository passes the resolved kind via kindOverride;
   // otherwise the definition's static scope decides.

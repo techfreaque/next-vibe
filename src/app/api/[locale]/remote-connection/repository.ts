@@ -13,7 +13,7 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -237,7 +237,6 @@ export class RemoteConnectionRepository {
       token,
       leadId,
       instanceId: rawInstanceId,
-      remoteInstanceId,
       remoteUserId,
       isReverseEntry = false,
       transportMode,
@@ -469,7 +468,7 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Get capabilities snapshot for a connection by instanceId or remoteInstanceId.
+   * Get capabilities snapshot for a connection by instanceId.
    */
   static async getCapabilities(
     userId: string,
@@ -483,8 +482,7 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Get connection row (capabilities + remoteInstanceId) by instanceId label.
-   * Matches by either instanceId (local label) or remoteInstanceId (remote's name).
+   * Get connection row by instanceId label.
    */
   static async getConnectionForInstance(
     userId: string,

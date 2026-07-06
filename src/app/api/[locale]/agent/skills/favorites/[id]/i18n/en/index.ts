@@ -162,6 +162,9 @@ export const translations = {
     viewSkillButton: {
       label: "View Skill",
     },
+    reportButton: {
+      label: "Report",
+    },
     useThisSkillButton: {
       label: "Use This Skill",
     },

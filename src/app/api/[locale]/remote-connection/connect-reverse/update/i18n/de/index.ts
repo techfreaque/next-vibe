@@ -21,6 +21,11 @@ export const translations: typeof enTranslations = {
       description:
         "Welche Datenbereiche über diese Verbindung synchronisiert werden",
     },
+    newInstanceId: {
+      label: "Neuer Instanzname",
+      description:
+        "Der neue Instanzname der Gegenseite — aktualisiert unsere Bezeichnung dafür",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

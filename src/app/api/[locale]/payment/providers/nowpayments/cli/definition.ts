@@ -7,13 +7,10 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
+import { NOWPAYMENTS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
@@ -37,45 +34,12 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
-  aliases: ["nowpayments", "nowpayments-cli", "nowpayments-tunnel"],
+  aliases: [NOWPAYMENTS_ALIAS],
+  timeoutMs: 0,
 
-  cli: {
-    firstCliArgKey: "operation",
-  },
   examples: {
     requests: {
-      default: {
-        operation: "status",
-        port: 3000,
-      },
-      check: {
-        operation: "check",
-      },
-      tunnel: {
-        operation: "tunnel",
-        port: 3000,
-      },
-    },
-    responses: {
-      default: {
-        success: true,
-        status: "Tunnel is running",
-        tunnelUrl: "https://abc123.ngrok.io",
-      },
-      check: {
-        success: true,
-        installed: true,
-        version: "3.5.0",
-        status: "ngrok is installed and ready",
-      },
-      tunnel: {
-        success: true,
-        tunnelUrl: "https://abc123.ngrok.io",
-        webhookUrl:
-          "https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
-        instructions:
-          "Set this webhook URL in NOWPayments dashboard: https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
-      },
+      default: { port: 3000 },
     },
   },
 
@@ -87,33 +51,6 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      operation: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "post.form.fields.operation.label" as const,
-        description: "post.form.fields.operation.description" as const,
-        placeholder: "post.form.fields.operation.placeholder" as const,
-        columns: 6,
-        options: [
-          {
-            value: "check",
-            label: "post.operations.check" as const,
-          },
-          {
-            value: "install",
-            label: "post.operations.install" as const,
-          },
-          {
-            value: "tunnel",
-            label: "post.operations.tunnel" as const,
-          },
-          {
-            value: "status",
-            label: "post.operations.status" as const,
-          },
-        ],
-        schema: z.enum(["check", "install", "tunnel", "status"]),
-      }),
       port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -122,55 +59,6 @@ const { POST } = createEndpoint({
         placeholder: "post.form.fields.port.placeholder" as const,
         columns: 6,
         schema: z.coerce.number().int().positive().default(3000),
-      }),
-
-      // RESPONSE FIELDS
-      success: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.success" as const,
-        schema: z.boolean().optional(),
-      }),
-
-      installed: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.installed" as const,
-        schema: z.boolean().optional(),
-      }),
-
-      version: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.version" as const,
-        schema: z.string().optional(),
-      }),
-
-      status: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.status" as const,
-        schema: z.string().optional(),
-      }),
-
-      output: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.output" as const,
-        schema: z.string().optional(),
-      }),
-
-      instructions: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.instructions" as const,
-        schema: z.string().optional(),
-      }),
-
-      tunnelUrl: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.tunnelUrl" as const,
-        schema: z.string().optional(),
-      }),
-
-      webhookUrl: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.response.fields.webhookUrl" as const,
-        schema: z.string().optional(),
       }),
     },
   }),
@@ -221,7 +109,6 @@ const { POST } = createEndpoint({
 });
 
 export type RequestSchema = typeof POST.types.RequestOutput;
-export type ResponseSchema = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST } as const;
 export default endpoints;

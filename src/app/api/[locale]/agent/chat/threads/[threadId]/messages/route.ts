@@ -19,6 +19,12 @@ export const { GET, POST, tools } = endpointsHandler({
       error: (props) => MessagesRemoteRepository.applyRemoteError(props),
       "content-done": (props) =>
         MessagesRemoteRepository.applyRemoteContentDone(props),
+      "content-delta": (props) =>
+        MessagesRemoteRepository.applyRemoteContentDelta(props),
+      "reasoning-delta": (props) =>
+        MessagesRemoteRepository.applyRemoteReasoningDelta(props),
+      "reasoning-done": (props) =>
+        MessagesRemoteRepository.applyRemoteReasoningDone(props),
       "tool-result": (props) =>
         MessagesRemoteRepository.applyRemoteToolResult(props),
       "tool-result-updated": (props) =>

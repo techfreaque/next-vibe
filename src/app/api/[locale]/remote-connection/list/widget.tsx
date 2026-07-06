@@ -316,6 +316,11 @@ function ConnectionRow({
           <Badge variant={badgeVariant} className="text-[10px]">
             {badge}
           </Badge>
+          {conn.isReverseEntry && (
+            <Badge variant="outline" className="text-[10px]">
+              {t("widget.incomingBadge")}
+            </Badge>
+          )}
           {!conn.isActive && (
             <Badge variant="destructive" className="text-[10px]">
               {t("widget.inactiveBadge")}
@@ -323,7 +328,7 @@ function ConnectionRow({
           )}
         </Div>
         <Span className="text-xs text-muted-foreground font-mono truncate">
-          {conn.remoteUrl || "—"}
+          {conn.remoteUrl || conn.localUrl || "—"}
         </Span>
         {conn.lastSyncedAt && (
           <Span className="text-xs text-muted-foreground">

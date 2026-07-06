@@ -16,11 +16,9 @@ import {
   isNull,
   lte,
   or,
+  sql,
 } from "drizzle-orm";
-import {
-  type CountryLanguage,
-  defaultLocale,
-} from "next-vibe/core/i18n/core/config";
+import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
 import {
   ErrorResponseTypes,
@@ -34,10 +32,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";
 import { DefaultFolderId } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
-import { ThreadStatus } from "../enum";
+import { ThreadStatus, ThreadStreamingState } from "../enum";
 import {
   canCreateThreadInFolder,
   canDeleteThread,
@@ -158,6 +155,9 @@ export class ThreadsRepository {
     user,
     leadId,
     locale,
+    originInstanceId,
+    loopInstanceId,
+    syncEligible,
   }: {
     threadId: string;
     rootFolderId: DefaultFolderId;
@@ -807,6 +807,7 @@ export class ThreadsRepository {
         title: data.title || t("post.threadTitle.default"),
         rootFolderId: data.rootFolderId,
         folderId: data.subFolderId ?? null,
+        loopInstanceId,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.model ?? null,
         defaultSkill: data.character ?? null,
@@ -943,8 +944,13 @@ export class ThreadsRepository {
   }
 
   /**
-   * Cross-instance applier for the `thread-created` event: re-run create on this
-   * instance with the relayed inputs. Reuses createThread so there is one path.
+   * Cross-instance applier for the `thread-created` event: materialize a
+   * FOREIGN MIRROR of the sender's new thread. NEVER re-run createThread with
+   * the wire inputs — that fabricates a local-looking thread (raw wire root,
+   * origin NULL) and poisons every later ownership check. Placement is data:
+   * REMOTE root, origin column = the bridge wire's sender label, folderId =
+   * the SAME-id wire subFolderId when that folder already synced (folder
+   * events / pull heal it otherwise).
    */
   static async applyRemoteThreadCreate(
     props: RemoteEventHandlerProps<typeof definitions.POST, "thread-created">,

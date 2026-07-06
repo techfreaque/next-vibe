@@ -175,7 +175,8 @@ export class FolderRepository {
 
       logger.info("Folder updated", { folderId: data.id });
 
-      // Emit WS event so all open tabs update the folder in the sidebar immediately
+      // Emit WS event so all open tabs update the folder in the sidebar
+      // immediately. Folder CRUD SYNCS by SAME id — regular fields only.
       const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,
@@ -262,7 +263,8 @@ export class FolderRepository {
 
       logger.info("Folder deleted", { folderId: data.id });
 
-      // Emit WS event so all open tabs remove the folder from the sidebar immediately
+      // Emit WS event so all open tabs remove the folder from the sidebar
+      // immediately. Folder CRUD SYNCS by SAME id — regular fields only.
       const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,

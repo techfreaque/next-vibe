@@ -168,6 +168,9 @@ export const translations: typeof enTranslations = {
     viewSkillButton: {
       label: "Skill ansehen",
     },
+    reportButton: {
+      label: "Melden",
+    },
     useThisSkillButton: {
       label: "Diesen Charakter verwenden",
     },

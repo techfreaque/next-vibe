@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/newsletter/data-sources/newsletter-subscriptions-new")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/newsletter/data-sources/newsletter-subscriptions-new/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/newsletter/data-sources/newsletter-subscriptions-new",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/newsletter/data-sources/newsletter-subscriptions-new/route"),
+    ),
+  },
 });

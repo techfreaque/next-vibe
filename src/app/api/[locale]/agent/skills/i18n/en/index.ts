@@ -1711,6 +1711,8 @@ export const translations = {
       variants: {
         budget: "Budget",
         visual: "Visual",
+        nativeImage: "Native Image",
+        nanoBananaPro: "Nano Banana Pro",
       },
     },
   },
@@ -1807,7 +1809,7 @@ export const translations = {
         edit: "Edit",
         vote: "Vote",
         report: "Report",
-        addMissing: "Add Missing",
+        addMissing: "Add",
       },
       showVariants: "Variants ({{count}})",
     },

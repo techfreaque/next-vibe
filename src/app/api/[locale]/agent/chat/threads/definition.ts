@@ -665,16 +665,17 @@ const { POST } = createEndpoint({
   channel: { scope: "user" } as const,
 
   // This op owns its `thread-created` event. `requestFields` carry the title +
-  // rootFolderId the user submitted (the id rides too); the client onEvent inserts
-  // a fresh thread into the sidebar list cache; remoteEvent relays the create
-  // cross-instance, where the route's onRemoteEvent re-runs createThread.
+  // rootFolderId + subFolderId the user submitted (the id rides too); the client
+  // onEvent inserts a fresh thread into the sidebar list cache; remoteEvent
+  // relays the create cross-instance, where the applier materializes a FOREIGN
+  // MIRROR (REMOTE root + origin column), never a local-looking thread.
   events: {
     "thread-created": {
       remoteEvent: true as const,
       syncDomain: "threads" as const,
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-      requestFields: ["id", "title", "rootFolderId"] as const,
+      requestFields: ["id", "title", "rootFolderId", "subFolderId"] as const,
       onEvent: async ({ requestData, logger }) => {
         const rootFolderId =
           requestData.rootFolderId ?? DefaultFolderId.PRIVATE;

@@ -69,6 +69,16 @@ const { PATCH } = createEndpoint({
         description: "patch.syncScope.description" as const,
         schema: TransportModeSchema.optional(),
       }),
+      // The caller renamed itself: update OUR label for it (row instanceId +
+      // REMOTE subfolder + task targets). `instanceId` above still carries the
+      // caller's OLD id — that is how the row is found.
+      newInstanceId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.newInstanceId.label" as const,
+        description: "patch.newInstanceId.description" as const,
+        schema: z.string().min(1).max(32).optional(),
+      }),
       updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),

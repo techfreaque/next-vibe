@@ -4,5 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
 export const Route = createFileRoute("/api/$locale/agent/fetch-url-content")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/fetch-url-content/route")) },
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/agent/fetch-url-content/route"),
+    ),
+  },
 });

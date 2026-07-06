@@ -1,0 +1,43 @@
+{
+  "type": "json",
+  "url": "https://api-sandbox.nowpayments.io/v1/invoice",
+  "status": 200,
+  "headers": {
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a15eeb66affb6d26-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json; charset=utf-8",
+    "date": "Sat, 04 Jul 2026 14:46:27 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=fgcj%2FSV4aPPQNgi%2Fvz49u1D%2BqcpX5IVBogkG76IY9Y33DYn8GkKMoDbHkXVSELztwRsZ6DUGISIeVX8PnkqUoNTZSVpXAvg9DRx48SLGLGW0KN5AlO14WikoD5AwS%2F0QAkXWaekftpyekvCo\"}]}",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=15552000; includeSubDomains, max-age=15768000",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Accept-Encoding",
+    "x-content-type-options": "nosniff",
+    "x-dns-prefetch-control": "off",
+    "x-download-options": "noopen",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block"
+  },
+  "body": {
+    "id": "5600518211",
+    "token_id": "6257403581",
+    "order_id": "a595c70a-8c30-4e45-af89-ec8d5264ea9b_1783176387621",
+    "order_description": "subscription - 800 credits",
+    "price_amount": "88",
+    "price_currency": "USD",
+    "pay_currency": null,
+    "ipn_callback_url": "http://localhost:3000/api/en-US/payment/providers/nowpayments/webhook",
+    "invoice_url": "https://sandbox.nowpayments.io/payment/?iid=5600518211",
+    "success_url": "http://localhost:3000/en-US/subscription/overview?payment=success&type=subscription",
+    "cancel_url": "http://localhost:3000/en-US/subscription/overview?payment=canceled&type=subscription",
+    "partially_paid_url": null,
+    "payout_currency": null,
+    "created_at": "2026-07-04T14:46:27.655Z",
+    "updated_at": "2026-07-04T14:46:27.655Z",
+    "is_fixed_rate": true,
+    "is_fee_paid_by_user": true
+  }
+}

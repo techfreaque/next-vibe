@@ -4,29 +4,17 @@ export const translations: typeof enTranslations = {
   post: {
     title: "NOWPayments CLI",
     titleShort: "NOWPayments",
-    description: "NOWPayments Webhook-Tunneling mit ngrok verwalten",
+    description: "ngrok-Tunnel für NOWPayments Webhooks starten",
     category: "Zahlung",
     tags: {
       nowpayments: "NOWPayments",
       cli: "CLI",
       webhook: "Webhook",
     },
-    operations: {
-      check: "Prüfen",
-      install: "Installieren",
-      tunnel: "Tunnel",
-      status: "Status",
-    },
     form: {
-      title: "NOWPayments CLI Operationen",
-      description:
-        "ngrok-Tunnel für NOWPayments Webhooks konfigurieren und verwalten",
+      title: "NOWPayments Tunnel",
+      description: "ngrok-Tunnel für lokale NOWPayments Webhooks starten",
       fields: {
-        operation: {
-          label: "Operation",
-          description: "Wählen Sie die auszuführende Operation",
-          placeholder: "Wählen Sie eine Operation",
-        },
         port: {
           label: "Port",
           description: "Lokaler Port für Tunnel (Standard: 3000)",
@@ -35,9 +23,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      notInstalled: {
+        title: "ngrok nicht installiert",
+        description:
+          "ngrok wird für den Tunnel benötigt. Installieren und erneut versuchen.",
+      },
       validationFailed: {
         title: "Validierungsfehler",
-        description: "Ungültige Operation oder Parameter",
+        description: "Ungültige Parameter",
       },
       networkError: {
         title: "Netzwerkfehler",
@@ -57,7 +50,7 @@ export const translations: typeof enTranslations = {
       },
       serverError: {
         title: "Serverfehler",
-        description: "Fehler beim Ausführen der Operation",
+        description: "Tunnel konnte nicht gestartet werden",
       },
       unknownError: {
         title: "Unbekannter Fehler",
@@ -72,23 +65,9 @@ export const translations: typeof enTranslations = {
         description: "Ressourcenkonflikt",
       },
     },
-    response: {
-      title: "Antwort",
-      description: "Operationsergebnis",
-      fields: {
-        success: "Erfolg",
-        installed: "Installiert",
-        version: "Version",
-        status: "Status",
-        output: "Ausgabe",
-        instructions: "Anweisungen",
-        tunnelUrl: "Tunnel-URL",
-        webhookUrl: "Webhook-URL",
-      },
-    },
     success: {
-      title: "Erfolg",
-      description: "Operation erfolgreich abgeschlossen",
+      title: "Tunnel gestartet",
+      description: "ngrok-Tunnel läuft",
     },
   },
 };

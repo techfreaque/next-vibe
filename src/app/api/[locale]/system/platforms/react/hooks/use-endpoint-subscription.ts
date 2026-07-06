@@ -14,9 +14,10 @@
  *  3. Calls declaration.onEvent?.({ responseData, requestData, urlPathParams, queryClient, logger })
  *     where partial is the typed event payload from types.EventPayloads
  *
- * Subscribes to TWO channels:
- *  - path-based channel (e.g. "agent/chat/threads/abc/messages") - for direct emits
- *  - user channel (e.g. "user/xyz") - for batched events routed by the server
+ * Subscribes to TWO channels for the SAME endpoint instance:
+ *  - the shared path channel (kind:"resource" emits)
+ *  - the user-scoped channel `user/{uid}/{pathChannel}` (kind:"user" emits)
+ * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
  */
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
@@ -25,7 +26,7 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { buildUserChannel, buildWsChannel } from "next-vibe/realtime/channel";
+import { buildUserWsChannel, buildWsChannel } from "next-vibe/realtime/channel";
 import { subscribeToChannel } from "next-vibe/realtime/client";
 import type { AnyEndpointEventEnvelope } from "next-vibe/realtime/structured-events";
 import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events";
@@ -93,7 +94,17 @@ export function useEndpointSubscription(
       requestDataRef.current as any,
       logger,
     );
-    const userChannel = userId ? buildUserChannel(userId) : undefined;
+    const userChannel = userId
+      ? buildUserWsChannel(
+          endpoint,
+          userId,
+          resolvedParams,
+          // Same erased-boundary cast as the path channel above.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          requestDataRef.current as any,
+          logger,
+        )
+      : undefined;
 
     // Structured descriptor for the endpoint (path) channel. The server rebuilds
     // and authorizes the channel from this — never from the channel string — and
@@ -171,9 +182,10 @@ export function useEndpointSubscription(
     // We listen on BOTH channels because the delivery channel is decided per
     // resource at emit time by the route's resolveChannel:
     //   - resource-scope events ride the shared PATH channel,
-    //   - user-scope events ride the subscriber's own USER channel.
-    // An envelope on the user channel carries the path channel in `envelope.channel`,
-    // so we filter it to this endpoint instance.
+    //   - user-scope events ride the user-scoped channel of the SAME endpoint
+    //     instance (`user/{uid}/{pathChannel}`).
+    // Both channels are unique to this endpoint + params, so everything that
+    // arrives is ours — no envelope filtering.
     unsubscribers.push(
       subscribeToChannel<AnyEndpointEventEnvelope>(
         pathChannel,
@@ -190,11 +202,7 @@ export function useEndpointSubscription(
         subscribeToChannel<AnyEndpointEventEnvelope>(
           userChannel,
           "__event__",
-          (envelope) => {
-            if (envelope.channel === pathChannel) {
-              handleEvent(envelope);
-            }
-          },
+          handleEvent,
           locale,
           logger,
         ),

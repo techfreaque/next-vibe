@@ -13,6 +13,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { scopedTranslation } from "@/app/api/[locale]/agent/music-generation/i18n";
+import { pollDelay } from "@/app/api/[locale]/agent/shared/poll-delay";
 
 interface ReplicatePrediction {
   id: string;

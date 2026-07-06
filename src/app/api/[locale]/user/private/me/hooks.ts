@@ -46,7 +46,7 @@ const queryEnabledKey = createCustomStateKey<boolean>(USER_QUERY_ENABLED_KEY);
  *
  * @returns User data and loading state
  */
-export interface UseUserReturn {
+interface UseUserReturn {
   user: MeGetResponseOutput | undefined;
   isLoggedIn: boolean;
   isLoading: boolean;
@@ -97,85 +97,4 @@ export function useUser(
     refetch,
     error,
   };
-}
-
-/****************************
- * MUTATION HOOKS
- ****************************/
-
-/**
- * Hook for updating user profile
- *
- * Features:
- * - Handles success and error toasts
- * - Automatically re-fetches user data on success
- * - Properly handles error responses from server
- *
- * @returns Profile update mutation
- */
-export function useUpdateProfile(
-  logger: EndpointLogger,
-  user: JwtPayloadType,
-): EnhancedMutationResult<MePostResponseOutput, MePostRequestOutput, never> {
-  const { toast } = useToast();
-  const { locale } = useTranslation();
-  const { t } = scopedTranslation.scopedT(locale);
-
-  return useApiMutation(meEndpoints.POST, logger, user, {
-    onSuccess: async () => {
-      toast({
-        title: t("update.success.title"),
-        description: t("update.success.description"),
-        variant: "default",
-      });
-    },
-    onError: ({ error }) => {
-      toast({
-        title: t("update.errors.unknown.title"),
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-}
-
-/**
- * Hook for deleting user account
- *
- * Features:
- * - Handles success and error toasts
- * - Properly handles error responses from server
- *
- * @returns Account deletion mutation
- */
-export function useDeleteAccount(
-  logger: EndpointLogger,
-  user: JwtPayloadType,
-): EnhancedMutationResult<
-  MeDeleteResponseOutput,
-  MeDeleteRequestOutput,
-  never
-> {
-  const { toast } = useToast();
-  const { locale } = useTranslation();
-  const { t } = scopedTranslation.scopedT(locale);
-
-  return useApiMutation(meEndpoints.DELETE, logger, user, {
-    onSuccess: () => {
-      toast({
-        title: t("delete.success.title"),
-        description: t("delete.success.description"),
-        variant: "default",
-      });
-
-      // Note: Redirect should be handled in the component that uses this hook
-    },
-    onError: ({ error }) => {
-      toast({
-        title: t("delete.errors.unknown.title"),
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 }

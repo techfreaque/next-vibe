@@ -14,7 +14,7 @@
 
 import "server-only";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -128,12 +128,6 @@ export class RemoteConnectionRegisterRepository {
     }
 
     // Upsert cloud-side record with optional reverse token for bidirectional auth.
-    // remoteInstanceId = selfInstanceId: "MY name as the PEER knows me" — the client
-    // names this connection by the cloud's self-identity. Every consumer relies on
-    // that semantic: the relay sends it as executionContext.instanceId (the receiver's
-    // callerInstanceId → landing folders BACKGROUND/remote/<caller>, tool prefixes)
-    // and task-sync resolves it against the RECEIVER's connection rows. Storing the
-    // client's own id here made a client-side executor land threads under its OWN id.
     // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
     // this instance to call /report on the connector (push task completion status back).
     // Reconnect is allowed - update localUrl/isActive if the record already exists.
@@ -158,10 +152,8 @@ export class RemoteConnectionRegisterRepository {
         leadId: reverseLeadId,
         isActive: true,
         isReverseEntry: true,
-        remoteInstanceId: instanceId,
         remoteUserId: selfUserId ?? null,
         // Mirror threads on both sides by default so remote folder shows history.
-        threadMirrorMode: "both",
         // The passive side serves whatever the initiator pulls. Default ALL
         // domains on — a null syncScope makes the server-side serve filter
         // drop everything, so the initiator's pull returns nothing.
@@ -175,7 +167,6 @@ export class RemoteConnectionRegisterRepository {
           remoteUrl: localUrl,
           isActive: true,
           isReverseEntry: true,
-          remoteInstanceId: instanceId,
           remoteUserId: selfUserId ?? null,
           token: encryptedReverseToken,
           leadId: reverseLeadId,
@@ -245,47 +236,21 @@ export class RemoteConnectionRegisterRepository {
       .values({
         userId: user.id,
         instanceId: selfInstanceId,
-        isDefault: true,
         updatedAt: new Date(),
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: [instanceIdentities.userId],
+        set: { instanceId: selfInstanceId, updatedAt: new Date() },
+      });
 
     // ── Create a remote subfolder for this instance + set routing rule ──────
     // Awaited: must exist before register() returns so the first relay can
     // resolve it immediately. Mirrors connect/repository.ts Step 6b.
     try {
-      const { chatFolders } = await import("@/app/api/[locale]/agent/chat/db");
-      const { DefaultFolderId } =
-        await import("@/app/api/[locale]/agent/chat/config");
-      const [existing] = await db
-        .select({ id: chatFolders.id })
-        .from(chatFolders)
-        .where(
-          and(
-            eq(chatFolders.userId, user.id),
-            eq(chatFolders.rootFolderId, DefaultFolderId.REMOTE),
-            eq(chatFolders.name, instanceId),
-            isNull(chatFolders.parentId),
-          ),
-        )
-        .limit(1);
-      let folderId: string;
-      if (existing) {
-        folderId = existing.id;
-      } else {
-        const [inserted] = await db
-          .insert(chatFolders)
-          .values({
-            userId: user.id,
-            rootFolderId: DefaultFolderId.REMOTE,
-            name: instanceId,
-            parentId: null,
-          })
-          .returning({ id: chatFolders.id });
-        folderId = inserted!.id;
-      }
+      const { ensureInstanceFolder } = await import("../instance-folder");
+      const folderId = await ensureInstanceFolder(user.id, instanceId, logger);
 
-      logger.debug("[REGISTER] Created remote subfolder", {
+      logger.debug("[REGISTER] Ensured remote subfolder", {
         instanceId,
         folderId,
       });

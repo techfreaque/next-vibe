@@ -5,26 +5,26 @@
   "headers": {
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "X-Generation-Id,cf-ray",
-    "cf-ray": "a15df58b8fb25d92-FRA",
+    "cf-ray": "a16839c30d7cd398-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Sat, 04 Jul 2026 11:58:39 GMT",
+    "date": "Sun, 05 Jul 2026 17:52:51 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1783166318-wOIJocGuVfsYmIHho8IH"
+    "x-generation-id": "gen-1783273970-ltgakf1s2znmjiCNLjag"
   },
   "body": {
-    "id": "gen-1783166318-wOIJocGuVfsYmIHho8IH",
+    "id": "gen-1783273970-ltgakf1s2znmjiCNLjag",
     "object": "chat.completion",
-    "created": 1783166318,
+    "created": 1783273970,
     "model": "google/gemini-2.5-flash",
     "provider": "Google",
     "system_fingerprint": null,
-    "service_tier": "provisioned",
+    "service_tier": "default",
     "choices": [
       {
         "index": 0,
@@ -33,7 +33,7 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "This is a 24-second instrumental track featuring a playful, upbeat melody with a strong jazz and pop influence. The primary instruments are a clean-toned electric guitar, an electric bass, and drums, which maintain a steady, swung rhythm.\n\n**Musical Elements:**\n\n*   **Tempo:** Approximately 110-120 BPM, giving it a moderate, comfortable pace.\n*   **Time Signature:** 4/4.\n*   **Instruments and Interaction:**\n    *   **Electric Guitar:** Plays the main melody with a bright, clean tone. It features a slightly twangy, almost surf-rock-like quality, but with a smoother, jazzier phrasing. The melody is fairly simple and repetitive, creating a catchy, familiar feel. It uses single notes, outlining a cheerful harmonic progression.\n    *   **Electric Bass:** Provides a walking bassline, typical of jazz and blues, that underpins the guitar melody. It's groovy and moves consistently, giving the track a solid foundation.\n    *   **Drums:** The drum pattern features a light, driving rhythm with a prominent snare drum on beats 2 and 4 (backbeat), often with rimshots, contributing to the \"walking\" feel. There's a closed hi-hat keeping a steady eighth-note pulse, and occasional light cymbal accents. The drumming is precise and supportive, not overly complex.\n    *   **Synthesizer/Keyboard (Implied):** While not explicitly clear in the initial seconds, the overall polished sound suggests some light pads or another synthesized instrument might be subtly filling out the harmonic space, but it's not a prominent feature.\n*   **Structure:** The clip is too short to determine a full song structure, but it sounds like a riff or a main theme that could repeat throughout a longer piece. There are no distinct sections within this clip; it maintains a consistent groove and melody.\n*   **Production:** The production is clean and polished, with clear separation between instruments. There's a subtle amount of reverb on the guitar, giving it a bit of space without sounding distant.\n*   **Mood:** The mood is lighthearted, cheerful, and slightly whimsical. It evokes a feeling of relaxed optimism.\n\n**Other Audio Elements:**\n\n*   **Silence:** The clip ends abruptly after 24 seconds.\n\n**Overall Impression:**\n\nThis sounds like a snippet from a track that could be used as background music for a lighthearted video, a commercial, or a casual online game. The sound quality is excellent, suggesting a studio recording. The lack of vocals makes it versatile as a looped background track.",
+          "content": "The audio clip presents an upbeat, instrumental funk-pop song.\n\n**Music:**\n*   **Genre:** Funk-Pop. It has strong elements of 70s and 80s funk, with a modern pop sensibility due to its crisp production.\n*   **Tempo:** Approximately 115-120 BPM, giving it a moderate, danceable groove.\n*   **Instruments:**\n    *   **Drums:** A tight, driving drum beat featuring a prominent snare on beats 2 and 4, a consistent hi-hat pattern (likely 8th notes with some 16th note fills), and a steady kick drum providing the rhythmic foundation. The drum sound is clean and punchy.\n    *   **Bass Guitar:** A foundational electric bass line, playing a funky, syncopated groove that works in tandem with the drums. It features some slap bass elements and arpeggiated figures that define the harmonic progression.\n    *   **Electric Guitar (Rhythm):** A clean, bright electric guitar laying down consistent funk strumming/chords, characterized by a muted, percussive sound with occasional open chords ringing out.\n    *   **Electric Guitar (Lead/Melody):** A clean-toned lead electric guitar playing a sprightly, melodic figure that acts as the primary hook. This guitar often features a slight wah-like modulation or envelope filter effect.\n    *   **Synthesizer/Keyboard:** A clean, bright synthesizer playing a melodic counterpoint to the lead guitar, sometimes doubling it, sometimes offering its own complementary phrases. It sounds like a plucked or bell-like synth patch.\n*   **Interaction:** The drums and bass provide a solid, interlocking rhythmic foundation. The rhythm guitar adds texture and harmonic propulsion. The lead guitar and synth share melodic duties, creating a call-and-response or harmonized effect.\n*   **Production Style:** Polished and clean, with a modern feel despite the retro influences. Good stereo imaging, clear separation of instruments. No notable reverb on most instruments, contributing to a tight, dry funk sound for the rhythm section.\n*   **Mood:** Energetic, funky, positive, and danceable.\n\n**Overall Impression:**\n*   **Duration:** The clip is 22 seconds long, suggesting it's an excerpt or a jingle. It presents a complete musical idea, acting like a short loop or intro.\n*   **Sound Quality:** High fidelity, studio-recorded quality.\n*   **Non-musical audio events:** None.\n\nThis audio would be suitable for background music in a commercial, film/TV scene, or a video game with a retro-futuristic or feel-good vibe.",
           "refusal": null,
           "reasoning": null
         }
@@ -41,9 +41,9 @@
     ],
     "usage": {
       "prompt_tokens": 1072,
-      "completion_tokens": 548,
-      "total_tokens": 1620,
-      "cost": 0.0022166,
+      "completion_tokens": 566,
+      "total_tokens": 1638,
+      "cost": 0.0022616,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
@@ -52,9 +52,9 @@
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.0022166,
+        "upstream_inference_cost": 0.0022616,
         "upstream_inference_prompt_cost": 0.0008466,
-        "upstream_inference_completions_cost": 0.00137
+        "upstream_inference_completions_cost": 0.001415
       },
       "completion_tokens_details": {
         "reasoning_tokens": 0,

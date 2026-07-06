@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----0e66e81f-362d-430d-9b47-3d93a8aba94e.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>Let me check the result: 1. videoUrl: \"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/f5eda9ef-9…",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----eceb04b1-5b1c-47a1-bbcf-23a634a80d1f.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote\nPreview: <think>Let me check the result: videoUrl: \"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/f5eda9ef-9b42…",
     "encoding_format": "float"
   }
 }

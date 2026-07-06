@@ -20,6 +20,11 @@ export const translations: typeof enTranslations = {
       label: "Zakres synchronizacji",
       description: "Które domeny danych synchronizować przez to połączenie",
     },
+    newInstanceId: {
+      label: "Nowa nazwa instancji",
+      description:
+        "Nowa nazwa instancji drugiej strony — aktualizuje naszą etykietę",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

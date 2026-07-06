@@ -23,7 +23,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
@@ -41,6 +40,7 @@ import {
 import {
   ChatMessageRole,
   type ChatMessageRoleDB,
+  ThreadStatus,
   ThreadStatusDB,
   ThreadStreamingState,
 } from "../../../enum";
@@ -48,11 +48,13 @@ import {
   canPostInThread,
   canViewThread,
 } from "../../../permissions/permissions";
-import definitions, {
+import type definitions from "./definition";
+import {
   type MessageCreateRequestOutput,
   type MessageCreateResponseOutput,
   type MessageListResponseOutput,
 } from "./definition";
+import type { MessagesWsEmit } from "./emitter";
 import { type MessagesT, scopedTranslation } from "./i18n";
 
 /**
@@ -1116,6 +1118,7 @@ export class MessagesRemoteRepository {
     urlPathParams,
     user,
     logger,
+    originInstanceId,
   }: RemoteEventHandlerProps<
     typeof definitions.GET,
     "message-created"
@@ -1181,9 +1184,13 @@ export class MessagesRemoteRepository {
         target: chatMessages.id,
         // USER rows are CALLER-authoritative (the originator wrote them before
         // the relay; the receiver's mirrored copy carries receiver-side noise
-        // like the resolved model) — merge metadata only. ASSISTANT/TOOL rows
-        // are receiver-authoritative: backfill the structural fields a
-        // content-done/tool-result stub lacks.
+        // like the resolved model) — merge metadata, but HEAL stub rows: when
+        // an out-of-order assistant event materialized this id as a role-less
+        // parent stub (role defaulted, content ''), the real user
+        // message-created MUST claim role/content/parent/createdAt or the
+        // mirror permanently shows an empty assistant where the user message
+        // belongs. Content only fills emptiness — never clobbers a
+        // caller-written body.
         set:
           role === ChatMessageRole.USER
             ? {

@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { scopedTranslation } from "@/app/api/[locale]/agent/image-generation/i18n";
+import { pollDelay } from "@/app/api/[locale]/agent/shared/poll-delay";
 
 interface ModelsLabImageResponse {
   status: "success" | "processing" | "error";

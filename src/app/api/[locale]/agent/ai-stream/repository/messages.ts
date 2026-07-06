@@ -381,6 +381,7 @@ export class UserMessageHandler {
 
     return success({
       userMessageId,
+      resolvedParentMessageId,
       fileUploadPromise,
       attachmentMetadata:
         attachmentMetadata.length > 0 ? attachmentMetadata : undefined,

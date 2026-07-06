@@ -582,6 +582,9 @@ export const translations = {
       },
     },
     addVariant: "Add Variant",
+    viewSkill: "Details",
+    deleteVariant: "Remove this variant?",
+    deleteVariantAction: "Remove",
     deleteGroup: {
       trigger: "Delete all variants",
       confirm: "Delete all {{count}} variants?",

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1681584feded2f7-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 17:28:06 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783272485-U5I9J2EZUtiPICNjh6UR"
+  },
+  "body": {
+    "id": "gen-1783272485-U5I9J2EZUtiPICNjh6UR",
+    "object": "chat.completion",
+    "created": 1783272485,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio features a cheerful instrumental hip-hop track, likely synthesized digitally. The music has a steady, moderate tempo of approximately 80 BPM, in a 4/4 time signature. The key sounds like it's in a major scale, contributing to its bright mood.\n\n**Instrumentation:**\n*   **Drums:** The drum beat is classic hip-hop, featuring a prominent kick drum on beats one and three, a snare on beats two and four, and a closed hi-hat on every eighth note, driving the rhythm.\n*   **Bass:** A clean electric bass provides a steady, simple, walking bassline, anchoring the harmony.\n*   **Guitar:** A clean electric guitar plays a rhythmic, staccato funk riff. It's not a lead melody but rather a rhythmic accompaniment that adds to the groove.\n*   **Keyboard/Synth:** A bright, bell-like synthesizer or keyboard plays a repetitive, catchy melody that is the most prominent melodic element. It has a slightly playful quality.\n\n**Structure & Dynamics:**\nThe track appears to be a looping segment of a larger song, as there are no distinct structural changes like verses or choruses within this short clip. The instrumentation remains consistent throughout, with all elements playing simultaneously for the entire duration.\n\n**Production:**\nThe production is clean and polished, suggesting a studio recording. There's no noticeable reverb or other significant effects that stand out, keeping the sound quite dry and direct.\n\nThe overall mood is upbeat, positive, and even a little funky, suitable for background music or a light-hearted scene.\n\nThe audio is a short clip, lasting approximately 47 seconds. There are no spoken words, vocals, or specific sound effects other than the musical instruments themselves.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 363,
+      "total_tokens": 1435,
+      "cost": 0.0017541,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017541,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0009075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

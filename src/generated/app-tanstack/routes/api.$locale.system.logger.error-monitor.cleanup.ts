@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/logger/error-monitor/cleanup")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/system/logger/error-monitor/cleanup/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/system/logger/error-monitor/cleanup",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/system/logger/error-monitor/cleanup/route"),
+    ),
+  },
 });

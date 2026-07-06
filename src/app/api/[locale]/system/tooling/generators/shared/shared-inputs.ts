@@ -216,9 +216,7 @@ export async function buildGeneratorContext(
 
   let modelDefinitions: ModelDefinitions = null;
   if (opts.need?.modelDefinitions) {
-    const mod = (await import(`${apiDir}/agent/models/models`)) as {
-      MODEL_DEFINITIONS?: WidgetData;
-    };
+    const mod = await import(`@/app/api/[locale]/agent/models/models`);
     modelDefinitions = mod.MODEL_DEFINITIONS ?? null;
   }
 

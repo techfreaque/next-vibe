@@ -10,10 +10,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type {
-  Task,
-  TaskRegistry,
-} from "next-vibe/tasks/unified-runner/types";
+import type { Task, TaskRegistry } from "next-vibe/tasks/unified-runner/types";
 
 import { tasks as taskModule0 } from "../../app/api/[locale]/agent/fetch-url-content/cleanup/task";
 import { tasks as taskModule1 } from "../../app/api/[locale]/agent/models/model-prices/task";

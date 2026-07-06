@@ -65,11 +65,9 @@ const features = {
 // ============================================================
 
 const nonExtensivePatterns = [
-  "**/generated/**",
+  "src/generated/**",
   "**/*.test.ts",
   "**/*.test.tsx",
-  "src/app-tanstack/routes/**",
-  "src/app-tanstack/routeTree.gen.ts",
   "**/registry/generated.ts",
   "**/registry/generated.client.ts",
 ];
@@ -132,6 +130,10 @@ const typecheck = {
   cachePath: ".tmp/typecheck-cache",
   useTsgo: features.tsgo,
   nonExtensiveIgnorePatterns: nonExtensivePatterns,
+  // Keep a warm tsgo LSP daemon instead of cold-spawning tsgo on every check.
+  // First run pays the cold-start cost; subsequent runs return in ~1-3s.
+  // Requires useTsgo: true. Daemon socket at .tmp/tsgo-lsp.sock.
+  useLspDaemon: false,
 };
 
 // --------------------------------------------------------

@@ -5,9 +5,9 @@
  * Called at both upgrade time (channel query param) and subscribe-message time.
  *
  * Auth model:
- *   user/{userId}            — only the matching user (also how a reverse-ws
- *                              connector, authed as the peer user, joins for the
- *                              bridge transport event)
+ *   user/{userId}/ws-*       — user-scoped endpoint channels; only the matching
+ *                              user (also how a reverse-ws connector, authed as
+ *                              the peer user, joins the bridge endpoint's channel)
  *   ws-* endpoint channels   — rebuilt from the client's structured descriptor
  *                              (anti-spoof), role check via permissionsRegistry,
  *                              then the route's resolveChannel decides admission
@@ -133,7 +133,7 @@ export async function authenticateWsRequest(
  * Authorize a channel subscription request.
  *
  * Rules:
- *   user/{userId}            → only the owner (incl. a reverse-ws connector authed
+ *   user/{userId}/ws-*       → only the owner (incl. a reverse-ws connector authed
  *                              as the peer user, for the bridge transport event)
  *   ws-* endpoint channels   → role check + resolveChannel; the route resolver
  *                              decides the channel from the structured descriptor

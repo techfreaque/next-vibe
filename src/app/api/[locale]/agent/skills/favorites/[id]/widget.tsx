@@ -8,6 +8,7 @@ import helpDefinitions from "next-vibe/help-tool/definition";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Brain } from "next-vibe/ui/ui/icons/Brain";
 import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";

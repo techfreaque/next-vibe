@@ -8,17 +8,17 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "a13cd8d89badd22b-FRA",
+    "cf-ray": "a1683a3d2a96dcb1-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Tue, 30 Jun 2026 11:31:54 GMT",
+    "date": "Sun, 05 Jul 2026 17:53:11 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=%2FL%2Fh3j8rCXNKpAkTSbVPkw3ywR5wS1MSP%2BG14C5RqKO0NV7NA0gikY1S6C72Lc6%2BBs6n9iealqi7imTV%2BZSGfLFoadDp9XeHCxF4S3nEIZ0CJbnv14ES2C1V%2BGfUzCg%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=88CyMoaNqSB%2FZMJ%2Fs8YCMHyHnDL3gv4hZ6xHi1PyNKEia4O8jjbfw99oaEmLfCv7RZ0xQRArBMiOTWMAHZKQLXxDCz7iHGQQm%2FIm8xLR%2BCthjT1iWdLp%2BNrnu4yXrGM%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "e80fb6e4225ff28fa68dca65e325b8e0",
-    "x-request-time": "2.933",
+    "x-cloud-trace-context": "6abe95ad9ca5d12a3283bbdba7e58794",
+    "x-request-time": "2.737",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
@@ -28,14 +28,14 @@
     "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
     "eta": 80,
     "message": "Request queued for processing. Try to fetch request after estimated seconds.",
-    "fetch_result": "https://modelslab.com/api/v6/video/fetch/181215972",
-    "id": 181215972,
+    "fetch_result": "https://modelslab.com/api/v6/video/fetch/181610878",
+    "id": 181610878,
     "output": [],
     "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/7943db26-d8cb-40de-a210-e26087275314-0.mp4"
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/81d649f5-1ac0-4caa-a17c-b069a44f2372-0.mp4"
     ],
     "meta": {
-      "id": 181215972,
+      "id": 181610878,
       "model_id": "wan2.2",
       "num_frames": 25,
       "num_inference_steps": 4,
@@ -43,7 +43,7 @@
       "num_samples": 1,
       "adaptive_resolution": "no",
       "init_image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
-      "seed": 233662,
+      "seed": 821877,
       "prompt": "professional portrait, smooth camera pull-back",
       "base64": "no",
       "webhook": null,
@@ -51,9 +51,9 @@
       "temp": "no",
       "watermark": "no",
       "output_type": "mp4",
-      "file_prefix": "7943db26-d8cb-40de-a210-e26087275314",
+      "file_prefix": "81d649f5-1ac0-4caa-a17c-b069a44f2372",
       "output": [
-        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/7943db26-d8cb-40de-a210-e26087275314-0.mp4"
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/81d649f5-1ac0-4caa-a17c-b069a44f2372-0.mp4"
       ]
     }
   }

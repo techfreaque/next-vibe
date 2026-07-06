@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----6c39b609-c8b8-4b0e-b591-aee56249738b.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>The result from generate_image with callbackMode='wait' has an imageUrl (not a taskId). The imageUrl is non-empty…",
+    "input": "Generate an image: wakeup-test",
     "encoding_format": "float"
   }
 }

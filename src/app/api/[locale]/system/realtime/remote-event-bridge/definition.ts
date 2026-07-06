@@ -109,15 +109,18 @@ const { POST } = createEndpoint({
 
   // === EVENTS ===
   // ONE transport event — a REGULAR scope:"user" client-delivered event, like any
-  // other. The bridge is the generic runner: a peer's connector subscribes to this
-  // event on the user's own channel and dispatches the carried envelope to the
-  // target route's onRemoteEvent (connector.handleRemoteEvent → dispatchRemoteEvent).
+  // other. The bridge is the generic runner: a peer's connector subscribes to THIS
+  // endpoint's user-scoped channel (`user/{uid}/ws-…-remote-event-bridge-POST`) and
+  // dispatches the carried envelope to the target route's onRemoteEvent
+  // (connector.handleRemoteEvent → dispatchRemoteEvent). Only connectors subscribe
+  // to that channel — browser tabs subscribe to the endpoints they render, so
+  // bridge frames (incl. execution requests) never reach them.
   // It must NOT carry remoteEvent:true — that would make it re-enter the relay; it
   // is delivered locally to the subscribed connector, not re-relayed.
   //
   // The relay payload (originInstanceId/syncDomain/envelope) rides the event's own
-  // responseData. The sender emits it per qualifying peer onto user/{remoteUserId}
-  // (see repository.pushRemoteEvent), gated by that connection's syncScope.
+  // responseData, gated per connection by its syncScope (see
+  // repository.pushRemoteEvent).
   channel: { scope: "user" } as const,
   events: {
     "remote-event": {

@@ -994,6 +994,11 @@ export function installFetchCache(
 
       // ── Cache hit ────────────────────────────────────────────────────────────
       if (existsSync(rp)) {
+        // Poll loops collapse their sleeps after a replayed response
+        // (agent/shared/poll-delay.ts) — replays must not sleep real time.
+        (
+          globalThis as { __vibeFetchCacheLastHit?: boolean }
+        ).__vibeFetchCacheLastHit = true;
         // eslint-disable-next-line no-console
         logger.debug("[FetchCache] HIT", {
           rp: rp.split("/").slice(-3).join("/"),

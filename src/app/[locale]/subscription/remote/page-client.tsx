@@ -39,9 +39,6 @@ export function RemotePageClient({ locale, user }: Props): JSX.Element {
           nativePush(endpoint, options);
         }
       },
-      pop: (): void => {
-        router.push(`/${locale}/subscription/overview`);
-      },
       canGoBack: false,
     }),
     [locale, router],

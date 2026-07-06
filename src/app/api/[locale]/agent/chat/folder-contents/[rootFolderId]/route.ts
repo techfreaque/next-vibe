@@ -27,6 +27,12 @@ export const { GET, tools } = endpointsHandler({
     onRemoteEvent: {
       "thread-title-updated": (props) =>
         FolderContentsRepository.applyRemoteThreadTitleUpdated(props),
+      "folder-created": (props) =>
+        FolderContentsRepository.applyRemoteFolderCreated(props),
+      "folder-updated": (props) =>
+        FolderContentsRepository.applyRemoteFolderUpdated(props),
+      "folder-deleted": (props) =>
+        FolderContentsRepository.applyRemoteFolderDeleted(props),
     },
   },
 });

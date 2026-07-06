@@ -44,14 +44,13 @@ export function toolInstrWithArgs(
   toolName: string,
   argsStr: string,
 ): string {
-  // Both direct-http (remoteInstanceId) and reverse-ws relay (systemPromptInstanceId)
-  // run the loop on the remote, where every tool is invoked through the execute-tool
-  // meta-tool. callbackMode is an execute-tool TOP-LEVEL field — it must NOT be nested
-  // inside `input` (the wrapped tool's own args), or the dispatch runs the tool inline
-  // (WAIT) and callback modes like detach/wakeUp never engage. Direct mode also pins
-  // instanceId; reverse-ws relay omits it (the receiver prefixes its own caller id).
-  const runsViaExecuteTool =
-    !!cfg.remoteInstanceId || !!cfg.systemPromptInstanceId;
+  // Tools-remote (remoteInstanceId): every tool is invoked through the
+  // execute-tool meta-tool. callbackMode is an execute-tool TOP-LEVEL field —
+  // it must NOT be nested inside `input` (the wrapped tool's own args), or the
+  // dispatch runs the tool inline (WAIT) and callback modes like detach/wakeUp
+  // never engage. Loop-on-remote suites (systemPromptInstanceId WITHOUT
+  // remoteInstanceId) stay PLAIN: the executor calls its own tools natively.
+  const runsViaExecuteTool = !!cfg.remoteInstanceId;
   if (runsViaExecuteTool) {
     // Split argsStr into execute-tool top-level args and tool-specific (input) args.
     // Top-level execute-tool fields: callbackMode

@@ -140,6 +140,12 @@ export async function handleHttpProxy(
           path: `${url.pathname}${url.search}`,
           method: req.method,
           headers: outHeaders,
+          // Disable keep-alive pooling: each proxy request gets a fresh TCP connection.
+          // With keep-alive (the Node default), the proxy reuses idle sockets; when
+          // Vite's keepAliveTimeout closes a socket on its end, the next reuse attempt
+          // gets ECONNRESET before the request is even sent. A fresh connection per
+          // request is marginally slower but eliminates this entire failure class.
+          agent: false,
         },
         (proxyRes) => {
           // Use Headers so Set-Cookie entries are appended individually (joining

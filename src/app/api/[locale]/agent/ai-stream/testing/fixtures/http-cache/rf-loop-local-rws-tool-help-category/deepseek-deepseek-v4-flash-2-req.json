@@ -1,0 +1,316 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/2.5.1 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai\n\n**Current Date:** 2026-07-05\n\nYou are an AI on unbottled.ai - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.\n\n## unbottled.ai\n\n- **Models:** 133 — Claude, GPT, Gemini, Llama, and uncencored ones UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## User Language and Location\n\n**Default language:** English (en-GLOBAL) | **Location:** Global 🌐\n\nALWAYS respond in the language of the user's current message. Default language is a fallback only.\nWhen writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers).\n\n## Current Context\n\n- **Folder:** remote - Unknown folder type\n- **Sub-folder:** a0ad02ef-1b75-4560-821f-aa034e0bba3d\n\n## Message Context\n\nEach message is prefixed with auto-generated metadata: `[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]`\n\n**Fields (only non-empty shown):** ID (8-char ref), Model, Skill, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).\n\n- Check metadata before responding - multiple skills/models may be active in one thread.\n- Do NOT reproduce `[Context: ...]` tags in your responses - they are injected automatically.\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  DP-1 [PRIMARY]: 1440×2560 @(3734,92)\n  DP-2: 1440×2560 @(0,92)\n  HDMI-A-1: 1920×1200 @(1667,0)\n  DP-3: 2294×960 @(1440,1200)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: DP-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.\n\n## Media capabilities\n- Images: GPT-5 Image Mini available. Use `tool-help` with `toolName=\"generate_image\"` to get the full schema, then call it via `execute-tool`.\n- Music/audio: Sonauto Song available. Use `tool-help` with `toolName=\"generate_music\"` to get the full schema, then call it via `execute-tool`.\n- Video: Veo 3.1 Fast available. Use `tool-help` with `toolName=\"generate_video\"` to get the full schema, then call it via `execute-tool`.\n\n# Formatting Instructions\n\n- CRITICAL: Add blank lines between all content blocks (paragraphs, headings, lists, code, quotes)\n- Use **bold** for emphasis, *italic* for subtle emphasis\n- Use ## headings and ### subheadings (only in detailed responses)\n- Use (-) for lists, (1.) for ordered lists\n- Use `backticks` for inline code, ```blocks``` for code examples\n- Use > for important notes\n- Use tables for comparisons, matrices, and structured data\n- NEVER write walls of text - always break into readable paragraphs\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\nFor JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## User\n\n**Name:** Admin User\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Background Agents\n\nNeither **Dreamer** nor **Autopilot** is enabled.\n\n- **Dreamer** runs on a schedule (e.g. nightly) to reorganize the cortex - consolidate scattered memories, update life areas, and spot gaps. Think of it as your AI keeping the filing system clean while you sleep.\n- **Autopilot** runs on a schedule (e.g. weekday mornings) to advance stalled projects, clear your task queue, and execute real output on your goals.\n\nBoth can be enabled in **chat settings** (the gear icon in the model selector). They run in the background folder and create session logs so you can review what they did.\n\n## System Context\n\n- **Instance:** Self-hosted / local (unbottled.ai)\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 133\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n**Known instances:** `hermes`\n\n## Remote Instances\n\n- \"hermes\" - use tool-help(instanceId=\"hermes\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"hermes\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: omit=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: { prompt: string, provider: claude-code|open-code, model: string, taskTitle: string, interactiveMode: boolean }\ncortex-delete — Remove a file or folder. Gone forever. | input: { path: string, recursive: boolean }\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: { path: string, find: string, replace: string, startLine: integer, endLine: integer, newContent: string }\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: { path: string, command: string, workingDir: string, terminalId: string, timeoutMs: number }\ncortex-list — See what's in a folder. | input: { path: string }\ncortex-mkdir — Create a folder. | input: { path: string, viewType: enums.viewType.list|enums.viewType.kanban|enums.viewType.calendar|enums.viewType.grid|enums.viewType.wiki, createParents: boolean }\ncortex-move — Move or rename a file or folder. | input: { from: string, to: string }\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: { path: string, maxLines: integer }\ncortex-search — Find files by name or content. Searches everything. | input: { query: string, path: string, maxResults: integer }\ncortex-terminals — List active terminal sessions with current working directories. | input: { path: string }\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: { path: string, depth: integer }\ncortex-write — Save a file. Give it a path and content - done. | input: { path: string, content: string, createParents: boolean }\nawait-task — Wait on a dispatched background task. Returns immediately if already done, or pauses the AI stream until the task finishes. | input: { taskId: string }\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:40705655 | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T1 thread-create+tool-call] Explore the tool catalog gradually with execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it). First call it with input={} (empty tool-help arguments — but ALWAYS keep toolName and instanceId set) — there are many tools, so it returns a categories list (each with a name and count) instead of every tool. Pick one category from that list and call execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) again with input={category:'<that category name>'} to get the tools in it. Check that this second call returns a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the categories list and the narrowed tools list both looked right, or FAILED: <reason> if anything was wrong.",
+        "role": "user"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"instanceId\":\"hermes\",\"toolName\":\"tool-help\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_c1273a5f33aa4cb5b7365bba",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"categories\":[{\"count\":15,\"name\":\"account\",\"subCategories\":[{\"count\":6,\"name\":\"\"},{\"count\":8,\"name\":\"manageUsers\"},{\"count\":1,\"name\":\"userStats\"}]},{\"count\":22,\"name\":\"accounting\",\"subCategories\":[{\"count\":2,\"name\":\"Accounting\"},{\"count\":5,\"name\":\"Accounts\"},{\"count\":5,\"name\":\"Journal\"},{\"count\":6,\"name\":\"Ledger\"},{\"count\":4,\"name\":\"Periods\"}]},{\"count\":69,\"name\":\"ai\",\"subCategories\":[{\"count\":4,\"name\":\"\"},{\"count\":5,\"name\":\"chatFavorites\"},{\"count\":11,\"name\":\"chatOrganization\"},{\"count\":2,\"name\":\"chatSettings\"},{\"count\":3,\"name\":\"Generation\"},{\"count\":2,\"name\":\"Inference\"},{\"count\":7,\"name\":\"messagesModerating\"},{\"count\":2,\"name\":\"messagesSearch\"},{\"count\":3,\"name\":\"Search\"},{\"count\":3,\"name\":\"skillsCommunity\"},{\"count\":4,\"name\":\"skillsManagement\"},{\"count\":2,\"name\":\"skillsModeration\"},{\"count\":7,\"name\":\"threadsManagement\"},{\"count\":1,\"name\":\"threadsSearch\"},{\"count\":4,\"name\":\"threadsSharing\"},{\"count\":9,\"name\":\"Tools\"}]},{\"count\":123,\"name\":\"analytics\",\"subCategories\":[{\"count\":13,\"name\":\"chatData\"},{\"count\":17,\"name\":\"creditsData\"},{\"count\":6,\"name\":\"Evaluators\"},{\"count\":10,\"name\":\"Indicators\"},{\"count\":15,\"name\":\"leadsData\"},{\"count\":6,\"name\":\"messengerData\"},{\"count\":4,\"name\":\"newsletterData\"},{\"count\":8,\"name\":\"paymentsData\"},{\"count\":6,\"name\":\"referralData\"},{\"count\":6,\"name\":\"subscriptionsData\"},{\"count\":6,\"name\":\"systemData\"},{\"count\":5,\"name\":\"Transformers\"},{\"count\":9,\"name\":\"usersData\"},{\"count\":12,\"name\":\"Vibe Sense\"}]},{\"count\":26,\"name\":\"browser\",\"subCategories\":[{\"count\":8,\"name\":\"DevTools\"},{\"count\":3,\"name\":\"Inspection\"},{\"count\":8,\"name\":\"Interaction\"},{\"count\":7,\"name\":\"Pages\"}]},{\"count\":9,\"name\":\"companies\",\"subCategories\":[{\"count\":5,\"name\":\"Company Management\"},{\"count\":4,\"name\":\"Company Members\"}]},{\"count\":12,\"name\":\"cortex\"},{\"count\":5,\"name\":\"credits\",\"subCategories\":[{\"count\":1,\"name\":\"Credits\"},{\"count\":4,\"name\":\"Management\"}]},{\"count\":12,\"name\":\"desktop\",\"subCategories\":[{\"count\":2,\"name\":\"Capture\"},{\"count\":1,\"name\":\"Inspection\"},{\"count\":5,\"name\":\"Interaction\"},{\"count\":4,\"name\":\"Windows\"}]},{\"count\":37,\"name\":\"devTools\",\"subCategories\":[{\"count\":5,\"name\":\"Generators\"},{\"count\":9,\"name\":\"remoteInstances\"},{\"count\":2,\"name\":\"remoteSelf\"},{\"count\":1,\"name\":\"serverManagement\"},{\"count\":3,\"name\":\"settingsEnv\"},{\"count\":1,\"name\":\"settingsKeys\"},{\"count\":13,\"name\":\"tasksCron\"},{\"count\":2,\"name\":\"tasksMonitoring\"},{\"count\":1,\"name\":\"tasksSync\"}]},{\"count\":14,\"name\":\"inventory\",\"subCategories\":[{\"count\":5,\"name\":\"Inventory: Stock\"},{\"count\":5,\"name\":\"Inventory: Transfers\"},{\"count\":4,\"name\":\"Inventory: Warehouses\"}]},{\"count\":43,\"name\":\"leads\",\"subCategories\":[{\"count\":3,\"name\":\"Capture\"},{\"count\":8,\"name\":\"Import\"},{\"count\":21,\"name\":\"leadMagnetIntegrations\"},{\"count\":11,\"name\":\"Management\"}]},{\"count\":17,\"name\":\"messenger\",\"subCategories\":[{\"count\":5,\"name\":\"Accounts\"},{\"count\":4,\"name\":\"Inbox\"},{\"count\":7,\"name\":\"Messages\"},{\"count\":1,\"name\":\"Providers\"}]},{\"count\":16,\"name\":\"newsletter\",\"subCategories\":[{\"count\":3,\"name\":\"emailCampaignsJourneys\"},{\"count\":8,\"name\":\"emailCampaignsProcessing\"},{\"count\":1,\"name\":\"emailCampaignsQueue\"},{\"count\":1,\"name\":\"emailCampaignsStats\"},{\"count\":3,\"name\":\"Subscriptions\"}]},{\"count\":36,\"name\":\"payments\",\"subCategories\":[{\"count\":6,\"name\":\"Management\"},{\"count\":30,\"name\":\"Transactions\"}]},{\"count\":15,\"name\":\"pos\",\"subCategories\":[{\"count\":8,\"name\":\"POS: Orders\"},{\"count\":1,\"name\":\"POS: Products\"},{\"count\":3,\"name\":\"POS: Sessions\"},{\"count\":3,\"name\":\"POS: Terminals\"}]},{\"count\":7,\"name\":\"products\",\"subCategories\":[{\"count\":5,\"name\":\"Catalog Management\"},{\"count\":2,\"name\":\"Category Management\"}]},{\"count\":17,\"name\":\"purchasing\",\"subCategories\":[{\"count\":12,\"name\":\"Purchasing: Orders\"},{\"count\":5,\"name\":\"Purchasing: Vendors\"}]},{\"count\":8,\"name\":\"referral\",\"subCategories\":[{\"count\":4,\"name\":\"Payouts\"},{\"count\":4,\"name\":\"Program\"}]},{\"count\":14,\"name\":\"ssh\",\"subCategories\":[{\"count\":11,\"name\":\"Connections\"},{\"count\":3,\"name\":\"Linux\"}]},{\"count\":6,\"name\":\"subscriptions\",\"subCategories\":[{\"count\":1,\"name\":\"Management\"},{\"count\":4,\"name\":\"subscriptionAnalytics\"},{\"count\":1,\"name\":\"Subscriptions\"}]},{\"count\":5,\"name\":\"tax\",\"subCategories\":[{\"count\":4,\"name\":\"Tax Rates\"},{\"count\":1,\"name\":\"Tax Reports\"}]}],\"hint\":\"528 tools across 22 categories. Use category=\\\"<name>\\\" to narrow results (accepts parent category or sub-category). Under 100 results shows tool names; under 5 shows full schemas.\",\"matchedCount\":528,\"tools\":[],\"totalCount\":528}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_c1273a5f33aa4cb5b7365bba"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:34d4c1b9 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Got the categories — 528 tools across 22 categories. Let me drill into the **ai** category (69 tools, lots of subcategories",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"category\":\"ai\"},\"instanceId\":\"hermes\",\"toolName\":\"tool-help\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_05c02e776efd4159bc131718",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"hint\":\"69 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"matchedCount\":69,\"tools\":[{\"description\":\"Retrieve the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\"},{\"description\":\"Update the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\"},{\"description\":\"Public threads shared with the community\",\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\"},{\"description\":\"Create a new chat thread\",\"name\":\"agent_chat_threads_POST\",\"title\":\"New Thread\"},{\"description\":\"Update the title and preview of a chat thread\",\"name\":\"agent_chat_threads_rename_PATCH\",\"title\":\"Rename Thread\"},{\"description\":\"Delete a chat thread\",\"name\":\"agent_chat_threads_threadId_DELETE\",\"title\":\"Delete Chat Thread\"},{\"description\":\"Retrieve a specific chat thread by ID\",\"name\":\"agent_chat_threads_threadId_GET\",\"title\":\"Get Chat Thread\"},{\"description\":\"Delete a message from the thread\",\"name\":\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"title\":\"Delete Message\"},{\"description\":\"Retrieve a specific message by ID\",\"name\":\"agent_chat_threads_threadId_messages_messageId_GET\",\"title\":\"Get Message\"},{\"description\":\"Update a message's content\",\"name\":\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"title\":\"Update Message\"},{\"description\":\"Upvote or downvote a message\",\"name\":\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"title\":\"Vote on Message\"},{\"description\":\"Retrieve messages following a specific conversation path\",\"name\":\"agent_chat_threads_threadId_messages_path_GET\",\"title\":\"Get Conversation Path\"},{\"description\":\"Create a new message in a chat thread\",\"name\":\"agent_chat_threads_threadId_messages_POST\",\"title\":\"Create Message\"},{\"description\":\"Search messages within a specific thread using full-text search\",\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\"},{\"description\":\"Update an existing chat thread\",\"name\":\"agent_chat_threads_threadId_PATCH\",\"title\":\"Update Chat Thread\"},{\"description\":\"Retrieve the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_GET\",\"title\":\"Get Thread Permissions\"},{\"description\":\"Update the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_PATCH\",\"title\":\"Update Thread Permissions\"},{\"description\":\"Revoke an active share link\",\"name\":\"agent_chat_threads_threadId_share-links_DELETE\",\"title\":\"Revoke Share Link\"},{\"description\":\"Update an existing share link\",\"name\":\"agent_chat_threads_threadId_share-links_PATCH\",\"title\":\"Update Share Link\"},{\"description\":\"Create a new share link for a thread\",\"name\":\"agent_chat_threads_threadId_share-links_POST\",\"title\":\"Create Share Link\"},{\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_skills_moderation_PATCH\",\"title\":\"Moderate Skill\"},{\"description\":\"Retrieve a paginated list of chat threads with filtering options\",\"name\":\"agent-chat-threads\",\"title\":\"Threads\"},{\"description\":\"Search messages across all threads using full-text search\",\"name\":\"agent-search-messages\",\"title\":\"Global Message Search\"},{\"description\":\"Search across thread titles, previews, and system prompts using full-text search\",\"name\":\"agent-search-threads\",\"title\":\"Search Threads\"},{\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"name\":\"agent-view-image\",\"title\":\"View Image\"},{\"aliases\":[\"run-ai\"],\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.\",\"name\":\"ai-run\",\"title\":\"Run AI Agent\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"title\":\"Search the Web\"},{\"description\":\"Retrieve user's chat settings and preferences\",\"name\":\"chat-settings\",\"title\":\"Settings\"},{\"description\":\"Update user's chat settings and preferences\",\"name\":\"chat-settings-update\",\"title\":\"Save Settings\"},{\"aliases\":[\"claude-code\"],\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"title\":\"Run Coding Agent\"},{\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\"},{\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\"},{\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"name\":\"dismiss-task\"},{\"description\":\"Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.\",\"name\":\"execute-tool\"},{\"description\":\"Create a new favorite character configuration\",\"name\":\"favorite-create\",\"title\":\"Create Favorite\"},{\"description\":\"Remove a favorite configuration\",\"name\":\"favorite-delete\",\"title\":\"Delete Favorite\"},{\"description\":\"Retrieve a specific favorite configuration\",\"name\":\"favorite-get\",\"title\":\"Get Favorite\"},{\"description\":\"Update an existing favorite configuration\",\"name\":\"favorite-update\",\"title\":\"Update Favorite\"},{\"description\":\"Retrieve all your saved favorite character configurations\",\"name\":\"favorites\",\"title\":\"Get Favorites\"},{\"description\":\"Update the order of your favorite configurations\",\"name\":\"favorites-reorder\",\"title\":\"Reorder Favorites\"},{\"aliases\":[\"fetch\"],\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\"},{\"aliases\":[\"get-folder\"],\"description\":\"Retrieve merged list of folders and threads for a given folder level\",\"name\":\"folder-contents\",\"title\":\"Get Folder Contents\"},{\"description\":\"Create a new folder\",\"name\":\"folder-create\",\"title\":\"Create Folder\"},{\"description\":\"Delete a folder by ID\",\"name\":\"folder-delete\",\"title\":\"Delete Folder\"},{\"description\":\"Get a folder by ID\",\"name\":\"folder-get\",\"title\":\"Get Folder\"},{\"description\":\"Move a folder to a different parent\",\"name\":\"folder-move\",\"title\":\"Move Folder\"},{\"description\":\"Compute permissions for a root folder\",\"name\":\"folder-permissions\",\"title\":\"Get Root Folder Permissions\"},{\"description\":\"Rename an existing folder\",\"name\":\"folder-rename\",\"title\":\"Rename Folder\"},{\"description\":\"Update an existing folder\",\"name\":\"folder-update\",\"title\":\"Update Folder\"},{\"aliases\":[\"folders\"],\"description\":\"Retrieve all folders for the current root folder\",\"name\":\"folders-list\",\"title\":\"Get Folders\"},{\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\"},{\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\"},{\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\"},{\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"title\":\"Search with Kagi\"},{\"aliases\":[\"list-models\"],\"description\":\"Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.\",\"name\":\"models\"},{\"description\":\"Create a new custom skill\",\"name\":\"skill-create\",\"title\":\"Create Skill\"},{\"description\":\"Delete a custom skill\",\"name\":\"skill-delete\",\"title\":\"Delete skill\"},{\"description\":\"Retrieve a specific skill by ID\",\"name\":\"skill-get\",\"title\":\"Get skill\"},{\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"title\":\"Reported Skills\"},{\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"title\":\"Publish Skill\"},{\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"title\":\"Report Skill\"},{\"description\":\"Modify an existing custom skill\",\"name\":\"skill-update\",\"title\":\"Update skill\"},{\"description\":\"Vote up or down on a community skill. Re-sending your current direction removes the vote; sending the opposite flips it.\",\"name\":\"skill-vote\",\"title\":\"Vote for Skill\"},{\"description\":\"Get all available skills (default + custom)\",\"name\":\"skills\"},{\"description\":\"Render the full system prompt for a given user context. Admin/dev only.\",\"name\":\"system-prompt-debug\"},{\"description\":\"Retrieve all messages in a chat thread\",\"name\":\"thread-messages\",\"title\":\"List Thread Messages\"},{\"description\":\"Retrieve all share links for a thread\",\"name\":\"thread-share-links\",\"title\":\"Get Share Links\"},{\"aliases\":[\"help\"],\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.\",\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"name\":\"web-search\",\"title\":\"Search the Web\"}],\"totalCount\":528}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_05c02e776efd4159bc131718"
+      },
+      {
+        "content": "Both calls checked out perfectly:\n\n1. **First call** (empty `input={}`) — returned a clean categories list with **22 categories**, each with `name`, `count`, and `subCategories`. Total: 528 tools. ✓\n\n2. **Second call** with `category=\"ai\"` — returned **69 tools**, **every one** with a non-empty `name` and `description`. Examples: `agent_chat_threads_POST` (\"New Thread\"), `ai-run` (\"Delegate to a specialist AI\"), `brave-search` (\"Search the web\"), `tool-help` itself, etc. ✓\n\nEverything looks right — proper category structure, tool names, and descriptions are all present and well-formed.\n\n**STEP_OK**",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:a205f89a | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T-SYS] Call execute-tool with toolName='self-instance-id' and instanceId='hermes' (instanceId='hermes' is REQUIRED on every execute-tool call - never omit it) to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.",
+        "role": "user"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"instanceId\":\"hermes\",\"toolName\":\"self-instance-id\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_e5a501afda604ba39bb8b2f5",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"instanceId\":\"hermes\"}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_e5a501afda604ba39bb8b2f5"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:3694d269 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "hermes",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:03a7d3eb | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T1a-cat tool-help-category] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'category':'ai'} to list the tools in the \"ai\" category. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if the narrowed list looked right, or FAILED: <reason> if anything was wrong.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 1 · 1 background)\n│   ├── -t1-thread-create-tool-call--explore-the-tool----6f84cda9-ac84-485e-a96e-4b35a723b2b7 [87%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----ca402363-35da-49bf-afd6-927e1b1fdb45 [85%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----0b89b459-7a80-4719-874a-1a497c9c3fb0 [82%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----3a512b59-7fdc-405b-b0a8-af21a796296e [82%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----d8ef1a1e-09e6-478d-ba64-b23aee24c855 [82%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----8f604a21-d067-497c-bf20-31267cebc674 [79%]\n│   ├── -t1-thread-create-tool-call--explore-the-tool----cdc1918e-c0ce-4521-aa19-650c258fa3f0 [75%]\n│   └── -t1-thread-create-tool-call--explore-the-tool----b64c7cf2-6115-4a95-9ae9-0e3c168280ee [74%]\n├── skills/ (4 created)\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n└── favorites/ (11)\n    ├── thea-brilliant\n    │   model: skill:thea\n    ├── thea-cheap\n    │   model: skill:thea\n    ├── thea-oracle\n    │   model: skill:thea\n    ├── thea-elon-tusk\n    │   model: skill:thea\n    ├── thea-vision\n    │   model: skill:thea\n    ├── thea-uncensored\n    │   model: skill:thea\n    ├── career-coach-intern\n    │   model: skill:career-coach\n    ├── career-coach-headhunter\n    │   model: skill:career-coach\n    ├── quality-tester-budget\n    │   model: skill:quality-tester\n    ├── quality-tester-native-image\n    │   model: skill:quality-tester\n    └── +1 more\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (11)\n- [thea-brilliant] Thea - Brilliant | char:Thea - Brilliant (thea) | model:\n- [thea-cheap] Thea - Smart & Cheap | char:Thea - Smart & Cheap (thea) | model:\n- [thea-oracle] Thea - Classic | char:Thea - Classic (thea) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [career-coach-intern] Career Coach - Intern | char:Career Coach - Intern (career-coach) | model:\n- [career-coach-headhunter] Career Coach - Headhunter | char:Career Coach - Headhunter (career-coach) | model:\n- [quality-tester-budget] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-native-image] Quality Tester - Native Image | char:Quality Tester - Native Image (quality-tester) | model:\n- [quality-tester-nano-banana-pro] Quality Tester - Nano Banana Pro | char:Quality Tester - Nano Banana Pro (quality-tester) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:04aa2fdb | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 17:56]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "",
+        "reasoning": "The user is asking me to re-do the second call I already did in the previous turn. Let me just call it again and verify.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": "The user is asking me to re-do the second call I already did in the previous turn. Let me just call it again and verify.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"category\":\"ai\"},\"instanceId\":\"hermes\",\"toolName\":\"tool-help\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_8e001389d5434327a8ff9d0f",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"result\":{\"hint\":\"69 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"matchedCount\":69,\"tools\":[{\"description\":\"Retrieve the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\"},{\"description\":\"Update the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\"},{\"description\":\"Public threads shared with the community\",\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\"},{\"description\":\"Create a new chat thread\",\"name\":\"agent_chat_threads_POST\",\"title\":\"New Thread\"},{\"description\":\"Update the title and preview of a chat thread\",\"name\":\"agent_chat_threads_rename_PATCH\",\"title\":\"Rename Thread\"},{\"description\":\"Delete a chat thread\",\"name\":\"agent_chat_threads_threadId_DELETE\",\"title\":\"Delete Chat Thread\"},{\"description\":\"Retrieve a specific chat thread by ID\",\"name\":\"agent_chat_threads_threadId_GET\",\"title\":\"Get Chat Thread\"},{\"description\":\"Delete a message from the thread\",\"name\":\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"title\":\"Delete Message\"},{\"description\":\"Retrieve a specific message by ID\",\"name\":\"agent_chat_threads_threadId_messages_messageId_GET\",\"title\":\"Get Message\"},{\"description\":\"Update a message's content\",\"name\":\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"title\":\"Update Message\"},{\"description\":\"Upvote or downvote a message\",\"name\":\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"title\":\"Vote on Message\"},{\"description\":\"Retrieve messages following a specific conversation path\",\"name\":\"agent_chat_threads_threadId_messages_path_GET\",\"title\":\"Get Conversation Path\"},{\"description\":\"Create a new message in a chat thread\",\"name\":\"agent_chat_threads_threadId_messages_POST\",\"title\":\"Create Message\"},{\"description\":\"Search messages within a specific thread using full-text search\",\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\"},{\"description\":\"Update an existing chat thread\",\"name\":\"agent_chat_threads_threadId_PATCH\",\"title\":\"Update Chat Thread\"},{\"description\":\"Retrieve the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_GET\",\"title\":\"Get Thread Permissions\"},{\"description\":\"Update the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_PATCH\",\"title\":\"Update Thread Permissions\"},{\"description\":\"Revoke an active share link\",\"name\":\"agent_chat_threads_threadId_share-links_DELETE\",\"title\":\"Revoke Share Link\"},{\"description\":\"Update an existing share link\",\"name\":\"agent_chat_threads_threadId_share-links_PATCH\",\"title\":\"Update Share Link\"},{\"description\":\"Create a new share link for a thread\",\"name\":\"agent_chat_threads_threadId_share-links_POST\",\"title\":\"Create Share Link\"},{\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_skills_moderation_PATCH\",\"title\":\"Moderate Skill\"},{\"description\":\"Retrieve a paginated list of chat threads with filtering options\",\"name\":\"agent-chat-threads\",\"title\":\"Threads\"},{\"description\":\"Search messages across all threads using full-text search\",\"name\":\"agent-search-messages\",\"title\":\"Global Message Search\"},{\"description\":\"Search across thread titles, previews, and system prompts using full-text search\",\"name\":\"agent-search-threads\",\"title\":\"Search Threads\"},{\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"name\":\"agent-view-image\",\"title\":\"View Image\"},{\"aliases\":[\"run-ai\"],\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.\",\"name\":\"ai-run\",\"title\":\"Run AI Agent\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"title\":\"Search the Web\"},{\"description\":\"Retrieve user's chat settings and preferences\",\"name\":\"chat-settings\",\"title\":\"Settings\"},{\"description\":\"Update user's chat settings and preferences\",\"name\":\"chat-settings-update\",\"title\":\"Save Settings\"},{\"aliases\":[\"claude-code\"],\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"title\":\"Run Coding Agent\"},{\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\"},{\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\"},{\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"name\":\"dismiss-task\"},{\"description\":\"Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.\",\"name\":\"execute-tool\"},{\"description\":\"Create a new favorite character configuration\",\"name\":\"favorite-create\",\"title\":\"Create Favorite\"},{\"description\":\"Remove a favorite configuration\",\"name\":\"favorite-delete\",\"title\":\"Delete Favorite\"},{\"description\":\"Retrieve a specific favorite configuration\",\"name\":\"favorite-get\",\"title\":\"Get Favorite\"},{\"description\":\"Update an existing favorite configuration\",\"name\":\"favorite-update\",\"title\":\"Update Favorite\"},{\"description\":\"Retrieve all your saved favorite character configurations\",\"name\":\"favorites\",\"title\":\"Get Favorites\"},{\"description\":\"Update the order of your favorite configurations\",\"name\":\"favorites-reorder\",\"title\":\"Reorder Favorites\"},{\"aliases\":[\"fetch\"],\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\"},{\"aliases\":[\"get-folder\"],\"description\":\"Retrieve merged list of folders and threads for a given folder level\",\"name\":\"folder-contents\",\"title\":\"Get Folder Contents\"},{\"description\":\"Create a new folder\",\"name\":\"folder-create\",\"title\":\"Create Folder\"},{\"description\":\"Delete a folder by ID\",\"name\":\"folder-delete\",\"title\":\"Delete Folder\"},{\"description\":\"Get a folder by ID\",\"name\":\"folder-get\",\"title\":\"Get Folder\"},{\"description\":\"Move a folder to a different parent\",\"name\":\"folder-move\",\"title\":\"Move Folder\"},{\"description\":\"Compute permissions for a root folder\",\"name\":\"folder-permissions\",\"title\":\"Get Root Folder Permissions\"},{\"description\":\"Rename an existing folder\",\"name\":\"folder-rename\",\"title\":\"Rename Folder\"},{\"description\":\"Update an existing folder\",\"name\":\"folder-update\",\"title\":\"Update Folder\"},{\"aliases\":[\"folders\"],\"description\":\"Retrieve all folders for the current root folder\",\"name\":\"folders-list\",\"title\":\"Get Folders\"},{\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\"},{\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\"},{\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\"},{\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"title\":\"Search with Kagi\"},{\"aliases\":[\"list-models\"],\"description\":\"Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.\",\"name\":\"models\"},{\"description\":\"Create a new custom skill\",\"name\":\"skill-create\",\"title\":\"Create Skill\"},{\"description\":\"Delete a custom skill\",\"name\":\"skill-delete\",\"title\":\"Delete skill\"},{\"description\":\"Retrieve a specific skill by ID\",\"name\":\"skill-get\",\"title\":\"Get skill\"},{\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"title\":\"Reported Skills\"},{\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"title\":\"Publish Skill\"},{\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"title\":\"Report Skill\"},{\"description\":\"Modify an existing custom skill\",\"name\":\"skill-update\",\"title\":\"Update skill\"},{\"description\":\"Vote up or down on a community skill. Re-sending your current direction removes the vote; sending the opposite flips it.\",\"name\":\"skill-vote\",\"title\":\"Vote for Skill\"},{\"description\":\"Get all available skills (default + custom)\",\"name\":\"skills\"},{\"description\":\"Render the full system prompt for a given user context. Admin/dev only.\",\"name\":\"system-prompt-debug\"},{\"description\":\"Retrieve all messages in a chat thread\",\"name\":\"thread-messages\",\"title\":\"List Thread Messages\"},{\"description\":\"Retrieve all share links for a thread\",\"name\":\"thread-share-links\",\"title\":\"Get Share Links\"},{\"aliases\":[\"help\"],\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.\",\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"name\":\"web-search\",\"title\":\"Search the Web\"}],\"totalCount\":528}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_8e001389d5434327a8ff9d0f"
+      }
+    ],
+    "model": "deepseek/deepseek-v4-flash",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {},
+                  {},
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "callbackMode": {
+                "default": "wait",
+                "enum": [
+                  "wait",
+                  "detach",
+                  "endLoop",
+                  "wakeUp",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "callerFavoriteId": {
+                "type": "string"
+              },
+              "callerPlatform": {
+                "enum": [
+                  "cli",
+                  "cli-package",
+                  "ai",
+                  "mcp",
+                  "remote-skill",
+                  "trpc",
+                  "next-page",
+                  "next-api",
+                  "cron",
+                  "electron",
+                  "frame"
+                ],
+                "type": "string"
+              },
+              "callerSkillId": {
+                "type": "string"
+              },
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "toolName"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

@@ -51,16 +51,18 @@ type FileLogFn = (
   data?: Record<string, LoggerMetadata>,
 ) => void;
 
-export function formatLogPrefix(
-  startTime = Number(process.env["VIBE_START_TIME"] ?? Date.now()),
-): string {
+function getTimePrefix(): string {
+  if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
+    return new Date().toISOString().slice(11, 23);
+  }
+  return `${((Date.now() - Number(process.env["VIBE_START_TIME"])) / 1000).toFixed(3)}s`;
+}
+
+export function formatLogPrefix(): string {
   if (process.env["NEXT_RUNTIME"]) {
     return "";
   }
-  if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
-    return `[${new Date().toISOString().slice(11, 23)}] `;
-  }
-  return `[${((Date.now() - startTime) / 1000).toFixed(3)}s] `;
+  return `[${getTimePrefix()}] `;
 }
 
 export function createLogger(
@@ -69,15 +71,7 @@ export function createLogger(
   onPersist?: PersistFn,
   onFileLog?: FileLogFn,
 ): EndpointLogger {
-  const startTime = Number(process.env["VIBE_START_TIME"] ?? Date.now());
   const noTimePrefix = !!process.env["NEXT_RUNTIME"];
-
-  const getTimePrefix = (): string => {
-    if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
-      return new Date().toISOString().slice(11, 23);
-    }
-    return `${((Date.now() - startTime) / 1000).toFixed(3)}s`;
-  };
 
   const fmt = (message: string): string =>
     noTimePrefix ? message : `[${getTimePrefix()}] ${message}`;

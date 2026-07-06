@@ -51,7 +51,6 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
-import { remoteConnections } from "../db";
 
 // ── Remote URL — skip all suites if unreachable ───────────────────────────────
 
@@ -70,7 +69,7 @@ if (!_remoteUrl) {
   );
 }
 
-// REMOTE root folder routing is tested in route.remote-chat-root.test.ts
+// REMOTE root folder routing is tested in the route.remote-folder.* suites
 // (deterministic — folder ancestry, no DB routing setting needed).
 
 // ── Thread mirroring suite ────────────────────────────────────────────────────
@@ -308,6 +307,10 @@ if (_remoteUrl && _isFixtureMode) {
       // Poll the prod DB to find any thread in the expected folder. The relay
       // happens synchronously before runTestStream returns, so it should be there.
       const pdb = getProdDb();
+      // Placement-is-data model: the relay-run loop places foreign threads at
+      // REMOTE/<origin>/<private|background>/<chain>, so the thread lives in a
+      // DESCENDANT of remote/atlas (e.g. remote/atlas/private) — accept the
+      // whole subtree, not just the top-level folder.
       let remoteThread: { id: string } | undefined;
       const deadline = Date.now() + 5_000;
       while (!remoteThread && Date.now() < deadline) {

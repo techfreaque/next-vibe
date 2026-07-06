@@ -30,7 +30,9 @@ import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 
+import { parseSkillId } from "../../chat/slugify";
 import { FAVORITES_LIST_ALIAS } from "./constants";
+import { favoriteCreatedPayloadSchema } from "./event-schemas";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 

@@ -3580,8 +3580,8 @@ export class CreditRepository {
 
   /**
    * Handle NOWPayments success redirect for credit pack purchases.
-   * Called from the subscription page when NP_id is present and type=credits.
-   * Looks up invoice by callbackToken, verifies ownership, grants credits.
+   * Token is encoded in the `type` param as "credits.TOKEN" — NowPayments
+   * preserves the `type` param through the redirect, so the token always arrives.
    * Idempotent via providerInvoiceId.
    */
   static async handleNowPaymentsCreditSuccessRedirect(
@@ -3644,14 +3644,12 @@ export class CreditRepository {
       );
 
       logger.info("NOWPayments credit pack processed on redirect", {
-        npId,
         invoiceId: invoice.providerInvoiceId,
         userId,
       });
     } catch (error) {
       logger.error("Failed to process NOWPayments credit redirect", {
         error: String(error),
-        npId,
         userId,
       });
     }

@@ -8,17 +8,17 @@
  * transportMode='ws-provider' + isInferenceProvider=true + forceSystemProvider=true.
  * Atlas posts to hermes's /ws-provider/stream; hermes runs the AI loop and
  * dispatches tool-execute-request back to atlas over WS. Atlas executes tools
- * locally and returns results. Thread stored on atlas (threadMirrorMode='both').
+ * locally and returns results. Atlas owns and stores the thread.
  * System prompt is built locally (atlas) and sent in the POST body.
  *
  * Standalone assertions (WP3–WP6):
- *   WP3 — threadMirrorMode=both → thread + messages exist in atlas DB
+ *   WP3 — originator owns the thread → thread + messages exist in atlas DB
  *   WP4 — provider stateless → prod DB has ZERO chatMessages for the thread
  *   WP5 — tool roundtrip completed → atlas TOOL message has non-null result
  *   WP6 — hermes ran the AI loop → final message contains marker
  *
  * ── Suite B: UNBOTTLED Remote Mode ───────────────────────────────────────────
- * hermes as isInferenceProvider with toolSource='remote', threadMirrorMode='both'.
+ * hermes as isInferenceProvider: the loop relays to hermes, atlas owns the thread.
  * The AI loop, system prompt, and tool belt all live on hermes. Atlas relays
  * the request and mirrors events via the standard onRemoteEvent framework.
  * Identical to regular suite from test perspective — same prompts, same
@@ -29,9 +29,9 @@
  * Local AI loop + remote tool execution via reverse-WS connector.
  * atlas runs the AI; when the AI calls execute-tool(instanceId='hermes'),
  * hermes executes it over its persistent reverse-WS connection to atlas.
- * Setup forces transportMode='cloud-only' so the first broadcast has no open
- * channel → thread enters 'waiting'. runReverseWsPulse PATCHes to 'reverse-ws'
- * which opens the connector, picks up the queued request, and delivers the result.
+ * Setup closes the standing connector socket so the first broadcast has no
+ * open channel → thread enters 'waiting'. runReverseWsPulse restarts the
+ * connector, which picks up the queued request and delivers the result.
  *
  * PREREQUISITES
  * ─────────────
@@ -48,7 +48,11 @@ import { installWsFixture } from "../../testing/ws-fixture";
 installWsFixture();
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { reloadWsProviderConnector } from "next-vibe/realtime/connector";
+import {
+  closeConnection,
+  reloadWsProviderConnector,
+  restartConnection,
+} from "next-vibe/realtime/connector";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -214,18 +218,11 @@ async function setupReverseWs(testUser: JwtPrivatePayloadType): Promise<void> {
   _rwsTestUser = testUser;
   _rwsProdUserId = await _resolveId();
 
-  // NAT simulation: force cloud-only so the first tool broadcast has no WS channel.
-  // Thread enters 'waiting'. runReverseWsPulse then switches to 'reverse-ws' which
-  // opens the connector and delivers the missed request.
-  const connByIdDefSetup =
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-  await sendTestRequest({
-    endpoint: connByIdDefSetup.default.PATCH,
-    data: { transportMode: "cloud-only" as const },
-    urlPathParams: { instanceId: HERMES_INSTANCE_ID },
-    user: testUser,
-    instanceId: HERMES_INSTANCE_ID,
-  });
+  // NAT simulation: close the standing connector socket so the first tool
+  // broadcast finds no WS channel. Thread enters 'waiting'. runReverseWsPulse
+  // then restarts the connector, which reopens the channel and delivers the
+  // missed request.
+  closeConnection(HERMES_INSTANCE_ID);
 }
 
 async function teardownReverseWs(
@@ -237,15 +234,7 @@ async function teardownReverseWs(
   } = await import("../../testing/remote-setup");
 
   try {
-    const connByIdDefTeardown =
-      await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-    await sendTestRequest({
-      endpoint: connByIdDefTeardown.default.PATCH,
-      data: { transportMode: "cloud-only" as const },
-      urlPathParams: { instanceId: HERMES_INSTANCE_ID },
-      user: testUser,
-      instanceId: HERMES_INSTANCE_ID,
-    });
+    closeConnection(HERMES_INSTANCE_ID);
   } catch {
     /* best-effort */
   }
@@ -273,25 +262,12 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
     );
   }
 
-  const connByIdDefPulse =
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-  const patchResult = await sendTestRequest({
-    endpoint: connByIdDefPulse.default.PATCH,
-    data: { transportMode: "reverse-ws" as const },
-    urlPathParams: { instanceId: HERMES_INSTANCE_ID },
-    user: _rwsTestUser,
-    instanceId: HERMES_INSTANCE_ID,
-  });
-
-  if (!patchResult.success) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
-    throw new Error(
-      `runReverseWsPulse: PATCH transportMode failed: ${patchResult.message ?? "unknown"}`,
-    );
-  }
+  // Reopen the reverse-ws channel: the connector reconnects and the
+  // receiver delivers the queued tool-execute-request over the fresh socket.
+  await restartConnection(HERMES_INSTANCE_ID);
 
   // eslint-disable-next-line no-console
-  console.log("[runReverseWsPulse] transportMode=reverse-ws PATCH succeeded");
+  console.log("[runReverseWsPulse] connector restarted — channel reopened");
 
   const threadByIdDef =
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
@@ -424,7 +400,7 @@ if (_remoteUrl && _isFixtureMode) {
       await closeProdDb();
     });
 
-    it("WP3: threadMirrorMode=both → thread + messages exist in atlas DB", async () => {
+    it("WP3: originator owns the thread → thread + messages exist in atlas DB", async () => {
       const threadDef =
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
       const threadResult = await sendTestRequest({
@@ -483,7 +459,7 @@ if (_remoteUrl && _isFixtureMode) {
     }, 30_000);
   });
 
-  // B: UNBOTTLED — hermes as full inference provider; toolSource='remote', threadMirrorMode='both'
+  // B: UNBOTTLED — hermes as full inference provider; atlas owns the thread
   describeStreamSuite({
     label: `AI Stream — UNBOTTLED Remote Mode (${_remoteUrl}, AI on hermes)`,
     cachePrefix: "unbottled-",

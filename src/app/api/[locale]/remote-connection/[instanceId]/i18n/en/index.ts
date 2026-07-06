@@ -13,7 +13,8 @@ export const translations = {
       title: "Connected",
       badge: "Active",
       connectedTo: "Remote URL",
-      transport: "Transport",
+      transport: "Transport (outbound)",
+      remoteTransport: "Transport (inbound)",
       remoteInstance: "Remote instance",
       capabilities: "Capabilities version",
       lastSynced: "Last synced",
@@ -135,11 +136,10 @@ export const translations = {
     transportMode: {
       label: "Transport Mode",
       description:
-        "How this connection communicates. reverse-ws: persistent outbound WS (opens immediately on save). direct-http: direct HTTP calls. ws-provider: remote runs AI loop. cloud-only: no outbound connection.",
+        "How this connection communicates. reverse-ws: persistent outbound WS (opens immediately on save). direct-http: direct HTTP calls.",
       options: {
         reverseWs: "Reverse WS",
         directHttp: "Direct HTTP",
-        cloudOnly: "Cloud Only",
       },
     },
     // ── Behavior ────────────────────────────────────────────────────────────

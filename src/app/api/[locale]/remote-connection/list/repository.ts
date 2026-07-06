@@ -37,12 +37,8 @@ export class RemoteConnectionListRepository {
             ? and(
                 eq(remoteConnections.userId, user.id),
                 eq(remoteConnections.isActive, true),
-                eq(remoteConnections.isReverseEntry, false),
               )
-            : and(
-                eq(remoteConnections.userId, user.id),
-                eq(remoteConnections.isReverseEntry, false),
-              ),
+            : eq(remoteConnections.userId, user.id),
         )
         .orderBy(remoteConnections.updatedAt),
       isAdmin
@@ -66,12 +62,7 @@ export class RemoteConnectionListRepository {
               isInferenceProvider: remoteConnections.isInferenceProvider,
             })
             .from(remoteConnections)
-            .where(
-              and(
-                eq(remoteConnections.isActive, true),
-                eq(remoteConnections.isReverseEntry, false),
-              ),
-            )
+            .where(eq(remoteConnections.isActive, true))
         : Promise.resolve([]),
     ]);
 
@@ -98,6 +89,7 @@ export class RemoteConnectionListRepository {
         lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
         hasToken: !!r.token,
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),
+        isReverseEntry: r.isReverseEntry,
       })),
       selfInstanceId,
       syncEnabled,

@@ -393,12 +393,10 @@ const { POST } = createEndpoint({
     },
   }),
 
-  // This op's event. `requestFields` carries the favorite the user submitted (the
-  // request config), `fields` adds the new `id` from the response. Delivered to
-  // the client (its onEvent optimistically adds the favorite to the list + get
-  // caches) AND relayed cross-instance (remoteEvent), where the peer's
-  // onRemoteEvent upserts the row from the same payload. No schema, no extra
-  // events — the request data IS the payload.
+  // Cross-instance relay only — no onEvent here. The GET list endpoint owns the
+  // onEvent handler (it's what the favorites page subscribes to). This event on
+  // POST exists solely so the emitter relays cross-instance; the peer's POST
+  // onRemoteEvent (route.ts) applies the DB insert and then emits on GET for its browser.
   channel: { scope: "user" } as const,
   events: {
     "favorite-created": {

@@ -70,6 +70,8 @@ export const { GET } = createEndpoint({
             lastSyncedAt: z.string().nullable(),
             hasToken: z.boolean(),
             healthStatus: ConnectionHealthSchema,
+            /** True for incoming connections (cloud-side reverse entries) */
+            isReverseEntry: z.boolean(),
           }),
         ),
       }),
@@ -145,6 +147,7 @@ export const { GET } = createEndpoint({
             lastSyncedAt: "2026-03-01T12:00:00.000Z",
             hasToken: true,
             healthStatus: "healthy",
+            isReverseEntry: true,
           },
         ],
         selfInstanceId: "atlas",

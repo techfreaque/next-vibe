@@ -4,5 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
 export const Route = createFileRoute("/api/$locale/agent/cortex/read")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/cortex/read/route")) },
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/agent/cortex/read/route"),
+    ),
+  },
 });

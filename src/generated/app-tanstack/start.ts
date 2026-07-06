@@ -10,6 +10,7 @@ import { createMiddleware, createStart } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
 import { serverFileLog } from "next-vibe/logger/file";
+import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 // ANSI helpers (inline - avoid importing heavy logger chain at middleware level)
 const C = {
@@ -119,7 +120,18 @@ function shouldSkipLog(pathname: string): boolean {
   return false;
 }
 
+// Resolves once widgets are preloaded. Reset on HMR to pick up new factories.
+let _widgetPreloadDone = false;
+
 const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
+  // Preload all lazy widgets before the first SSR render. By the time this
+  // middleware runs, all route modules that call lazyWidget() have been
+  // evaluated and registered their factories. Awaiting here ensures the first
+  // SSR render never suspends on a cold Vite dynamic import.
+  if (!_widgetPreloadDone) {
+    _widgetPreloadDone = true;
+    await preloadAllLazyWidgets();
+  }
   const requestStart = Date.now();
   const url = new URL(request.url);
   const rawPath = `${url.pathname}${url.search ? url.search : ""}`;

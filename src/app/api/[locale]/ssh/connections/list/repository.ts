@@ -127,7 +127,7 @@ export class ConnectionsListRepository {
           createdAt: r.createdAt.toISOString(),
           connectionType: r.authType === SshAuthType.LOCAL ? "local" : "ssh",
           health: null,
-          remoteInstanceId: null,
+          instanceId: null,
           transportMode: null,
         });
       }
@@ -147,7 +147,7 @@ export class ConnectionsListRepository {
           createdAt: r.createdAt.toISOString(),
           connectionType: "remote",
           health: RemoteConnectionRepository.getConnectionHealth(r),
-          remoteInstanceId: r.instanceId,
+          instanceId: r.instanceId,
           transportMode: r.transportMode,
         });
       }

@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/tooling/check/vibe-check")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/system/tooling/check/vibe-check/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/system/tooling/check/vibe-check",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/system/tooling/check/vibe-check/route"),
+    ),
+  },
 });

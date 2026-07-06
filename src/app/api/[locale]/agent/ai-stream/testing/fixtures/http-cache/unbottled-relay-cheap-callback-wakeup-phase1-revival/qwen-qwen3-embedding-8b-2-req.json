@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool-cata-2c84b253-f249-4526-8c8d-74fc7620f1fd.md\n\n# [T1 thread-create+tool-call] Explore the tool cata\nFolder: remote",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----226652be-0c52-44f6-b1b7-63ae37e60bc2.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote",
     "encoding_format": "float"
   }
 }

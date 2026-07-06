@@ -4,29 +4,18 @@ export const translations: typeof enTranslations = {
   post: {
     title: "NOWPayments CLI",
     titleShort: "NOWPayments",
-    description: "Zarządzaj tunelowaniem webhooków NOWPayments za pomocą ngrok",
+    description: "Uruchom tunel ngrok dla webhooków NOWPayments",
     category: "Płatność",
     tags: {
       nowpayments: "NOWPayments",
       cli: "CLI",
       webhook: "Webhook",
     },
-    operations: {
-      check: "Sprawdź",
-      install: "Zainstaluj",
-      tunnel: "Tunel",
-      status: "Status",
-    },
     form: {
-      title: "Operacje NOWPayments CLI",
+      title: "Tunel NOWPayments",
       description:
-        "Konfiguruj i zarządzaj tunelem ngrok dla webhooków NOWPayments",
+        "Uruchom tunel ngrok do lokalnego odbioru webhooków NOWPayments",
       fields: {
-        operation: {
-          label: "Operacja",
-          description: "Wybierz operację do wykonania",
-          placeholder: "Wybierz operację",
-        },
         port: {
           label: "Port",
           description: "Lokalny port do tunelowania (domyślnie: 3000)",
@@ -35,9 +24,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      notInstalled: {
+        title: "ngrok nie jest zainstalowany",
+        description:
+          "ngrok jest wymagany do uruchomienia tunelu. Zainstaluj go i spróbuj ponownie.",
+      },
       validationFailed: {
         title: "Błąd walidacji",
-        description: "Nieprawidłowa operacja lub parametry",
+        description: "Nieprawidłowe parametry",
       },
       networkError: {
         title: "Błąd sieci",
@@ -57,7 +51,7 @@ export const translations: typeof enTranslations = {
       },
       serverError: {
         title: "Błąd serwera",
-        description: "Nie udało się wykonać operacji",
+        description: "Nie udało się uruchomić tunelu",
       },
       unknownError: {
         title: "Nieznany błąd",
@@ -72,23 +66,9 @@ export const translations: typeof enTranslations = {
         description: "Konflikt zasobów",
       },
     },
-    response: {
-      title: "Odpowiedź",
-      description: "Wynik operacji",
-      fields: {
-        success: "Sukces",
-        installed: "Zainstalowane",
-        version: "Wersja",
-        status: "Status",
-        output: "Wyjście",
-        instructions: "Instrukcje",
-        tunnelUrl: "URL tunelu",
-        webhookUrl: "URL webhooka",
-      },
-    },
     success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
+      title: "Tunel uruchomiony",
+      description: "Tunel ngrok działa",
     },
   },
 };

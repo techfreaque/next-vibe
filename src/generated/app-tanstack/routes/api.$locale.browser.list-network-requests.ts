@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/browser/list-network-requests")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/browser/list-network-requests/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/browser/list-network-requests",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/browser/list-network-requests/route"),
+    ),
+  },
 });

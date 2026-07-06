@@ -15,6 +15,11 @@
  * Components. The HMR subscription lives in lazy-widget-hmr.tsx ("use client").
  * Client Components render on both server (for SSR HTML) and client (hydration),
  * with hooks running only on the client — exactly what we want.
+ *
+ * Preloading: all registered factories are collected in `_lazyWidgetRegistry`.
+ * Call preloadAllLazyWidgets() before SSR render and before hydrateRoot()
+ * so every factory() is resolved and state.resolved is set — eliminating
+ * Suspense boundaries during SSR and hydration flashes on the client.
  */
 
 import React from "react";
@@ -62,16 +67,61 @@ export function ensureGlobals(): void {
   };
 }
 
+// Registry of all lazyWidget preload functions. Populated at module-eval time
+// (factory references only — no imports fired). Call preloadAllLazyWidgets()
+// to fire them all.
+const _lazyWidgetRegistry: Array<() => Promise<void>> = [];
+
+/**
+ * Fires every registered lazyWidget factory in parallel and awaits resolution.
+ * Call this before SSR render (server side) and before hydrateRoot() (client)
+ * so all custom widgets are fully resolved — no Suspense, no hydration flash.
+ *
+ * Safe to call in drizzle-kit context: each factory guards itself with
+ * the import.meta.env check.
+ */
+export function preloadAllLazyWidgets(): Promise<void> {
+  return Promise.all(_lazyWidgetRegistry.map((fn) => fn())).then(
+    () => undefined,
+  );
+}
+
 export function lazyWidget(
   factory: () => Promise<{ default: AnyComponent }>,
 ): CliComponent {
   const state: {
     lazy: ReturnType<typeof React.lazy<AnyComponent>>;
     resolved: AnyComponent | null;
+    modulePromise: Promise<AnyComponent> | null;
   } = {
     lazy: React.lazy(factory),
     resolved: null,
+    modulePromise: null,
   };
+
+  function getOrCreateModulePromise(): Promise<AnyComponent> | null {
+    // drizzle-kit: plain Node.js ESM, no import.meta.env, can't resolve .tsx
+    if (typeof import.meta.env === "undefined") {
+      return null;
+    }
+    if (state.modulePromise === null) {
+      state.modulePromise = factory().then((mod) => {
+        state.resolved = mod.default;
+        return mod.default;
+      });
+    }
+    return state.modulePromise;
+  }
+
+  // Register this widget's preload in the global registry.
+  // Only the factory reference is stored here — no import is triggered.
+  _lazyWidgetRegistry.push(async () => {
+    // Skip in drizzle-kit / plain Node contexts without Vite.
+    if (typeof import.meta.env === "undefined") {
+      return;
+    }
+    await getOrCreateModulePromise();
+  });
 
   /**
    * Renders the widget via HmrWrapper ("use client").
@@ -86,11 +136,10 @@ export function lazyWidget(
       widgetProps: props,
       state,
       factory,
+      getModulePromise: getOrCreateModulePromise,
     });
   }
 
-  // resolved is set by preload() so the CLI EndpointRenderer can render
-  // the component directly without hitting Suspense.
   const widget = Object.assign(HmrWidget, {
     cliWidget: true as const,
     get resolved(): AnyComponent | null {

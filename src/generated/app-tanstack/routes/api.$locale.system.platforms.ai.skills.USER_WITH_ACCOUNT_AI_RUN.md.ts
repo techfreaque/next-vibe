@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md/route"),
+    ),
+  },
 });

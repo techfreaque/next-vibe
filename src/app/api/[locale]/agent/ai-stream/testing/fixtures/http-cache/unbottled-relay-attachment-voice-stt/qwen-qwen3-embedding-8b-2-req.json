@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t1-thread-create-tool-call--explore-the-tool----e5752897-f5bd-444f-aadb-b8d0949cba4c.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: remote\nPreview: <think>The user is asking me to describe/transcribe an audio file. Looking at the context, there's an attachment descrip…",
+    "encoding_format": "float"
+  }
+}

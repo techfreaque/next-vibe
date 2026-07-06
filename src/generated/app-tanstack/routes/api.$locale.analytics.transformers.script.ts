@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/analytics/transformers/script")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/analytics/transformers/script/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/analytics/transformers/script",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/analytics/transformers/script/route"),
+    ),
+  },
 });

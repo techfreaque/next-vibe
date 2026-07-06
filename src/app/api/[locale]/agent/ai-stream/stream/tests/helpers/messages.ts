@@ -53,6 +53,14 @@ export function findToolMsg(
     if (matchesName(args?.["toolName"])) {
       return true;
     }
+    // Inner-envelope nesting (callback-mode dispatch): input carries the
+    // wrapped call. Valid ONLY when the top-level toolName does not name a
+    // DIFFERENT tool — a tool-help lookup ABOUT generate_video also has
+    // input.toolName='generate_video' and must never match as the call.
+    const rawTop = String(args?.["toolName"] ?? "");
+    if (rawTop !== "" && rawTop !== "execute-tool") {
+      return false;
+    }
     const inner = toolResultRecord(args?.["input"]);
     return matchesName(inner?.["toolName"]);
   };

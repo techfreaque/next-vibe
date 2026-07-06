@@ -206,6 +206,7 @@ function EndpointsPageInternal<
   const navigationPop = navigation.pop;
   const navigationReplace = navigation.replace;
   const navigationStack = navigation.stack;
+  const navigationIsPushPending = navigation.isPushPending;
 
   // Apply navigationOverride if provided.
   // IMPORTANT: navigation is a new plain object every render (useNavigationStack returns
@@ -223,6 +224,7 @@ function EndpointsPageInternal<
       stack: navigationStack,
       canGoBack: navigationCanGoBack,
       current: navigationCurrent,
+      isPushPending: navigationIsPushPending,
     };
     if (!navigationOverrideRaw) {
       return base;
@@ -249,6 +251,7 @@ function EndpointsPageInternal<
     navigationPop,
     navigationCanGoBack,
     navigationCurrent,
+    navigationIsPushPending,
   ]);
   // Determine which endpoint to use for base layer
   // If forceMethod is provided, use that; otherwise use default priority
@@ -708,16 +711,18 @@ function EndpointsPageInternal<
   const topEntry = finalNavigation.stack[finalNavigation.stack.length - 1];
   const topIsModal = topEntry?.renderInModal ?? false;
 
-  // Base layer is visible only when:
+  // Base layer is visible when:
   // - Disabled (read-only display mode), OR
   // - Stack is disabled, OR
   // - Stack is empty, OR
-  // - Stack has ONLY a modal (base is the background for that modal)
+  // - Stack has ONLY a modal (base is the background for that modal), OR
+  // - A push/replace is pending (widget preloading — keep old view while loading)
   const isBaseVisible =
     disabled ||
     _disableNavigationStack ||
     finalNavigation.stack.length === 0 ||
-    (finalNavigation.stack.length === 1 && topIsModal);
+    (finalNavigation.stack.length === 1 && topIsModal) ||
+    navigationIsPushPending;
 
   return (
     <>

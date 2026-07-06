@@ -3,7 +3,8 @@
  * createEndpointEmitter — unit tests for the v2 delivery model.
  *
  * EMIT-KIND-*     : the ChannelKind decides the delivery channel
- *                   (user → user/{id}, resource → the shared ws-channel).
+ *                   (user → user/{id}/{ws-channel}, resource → the shared
+ *                   ws-channel).
  * EMIT-PRESENCE-* : when the proxy is in-process, delivery is skipped for a
  *                   channel with zero local subscribers.
  * EMIT-RESULT-*   : every emit returns { delivered, relayed, dropped }.
@@ -14,6 +15,7 @@
 
 import "server-only";
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -21,7 +23,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
 
-import { buildUserChannel } from "./channel";
+import { buildUserWsChannel } from "./channel";
 import { createEndpointEmitter } from "./emitter";
 import {
   clearLocalBroadcast,

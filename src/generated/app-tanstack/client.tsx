@@ -2,19 +2,21 @@ import type { AnyRouter } from "@tanstack/react-router";
 import { Await, RouterProvider } from "@tanstack/react-router";
 import { hydrateStart } from "@tanstack/react-start/client";
 import { TSR_DEFERRED_PROMISE } from "@tanstack/router-core";
+import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 
 hydrateStart()
   .then(async (router) => {
-    await Promise.all(
-      router.state.matches.flatMap((match) => {
+    await Promise.all([
+      ...router.state.matches.flatMap((match) => {
         const route =
           router.routesByPath[match.routeId] ??
           router.routesById[match.routeId];
         return [route?.lazyFn?.(), route?.options?.component?.preload?.()];
       }),
-    );
+      preloadAllLazyWidgets(),
+    ]);
 
     // React 19's trackUsedThenable checks thenable.status first:
     //   "fulfilled" → returns thenable.value synchronously (no suspend)

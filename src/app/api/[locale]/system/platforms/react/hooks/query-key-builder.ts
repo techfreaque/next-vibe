@@ -160,7 +160,15 @@ export function buildKey<TEndpoint extends CreateApiEndpointAny>(
       const cacheKeyFields: FormQueryParams = {};
       const data = requestData as FormQueryParams;
       for (const [key, field] of Object.entries(children)) {
-        if (field.includeInCacheKey && key in data) {
+        // Absent, undefined and null are all the SAME "not keyed" state — they
+        // must produce identical keys. `{subFolderId: undefined}` serializing
+        // differently from `{}` split the WS channel between subscriber and
+        // emitter, silently dropping every event on that channel.
+        if (
+          field.includeInCacheKey &&
+          data[key] !== undefined &&
+          data[key] !== null
+        ) {
           cacheKeyFields[key] = data[key];
         }
       }

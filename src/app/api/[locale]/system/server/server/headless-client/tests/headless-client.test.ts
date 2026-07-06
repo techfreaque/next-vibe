@@ -135,8 +135,6 @@ beforeAll(async () => {
   });
 
   // Register headless-client → atlas connection with a real JWT token.
-  // remoteInstanceId=COMPUTER_NAME: atlas ws-provider uses this to store the thread
-  // under BACKGROUND/headless-client and to find the peer connection row.
   const upsertResult = await RemoteConnectionRepository.upsertRemoteConnection({
     userId: user.id,
     instanceId: COMPUTER_NAME,

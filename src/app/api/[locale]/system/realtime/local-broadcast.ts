@@ -21,6 +21,7 @@ export interface LocalBroadcastTarget {
     channel: string,
     event: string,
     data: WsWireMessage["data"],
+    delivery?: "unicast",
   ) => void;
   broadcastBatch: (events: WsBatchEvent[]) => void;
   /**

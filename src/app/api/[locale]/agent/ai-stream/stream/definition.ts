@@ -450,6 +450,9 @@ const { POST } = createEndpoint({
             label: "post.audioInput.file.label",
             description: "post.audioInput.file.description",
             columns: 12,
+            // Accept both browser File objects (normal UI) and the base64
+            // wire shape (remote relay POST bodies) — same contract as
+            // attachments; a relayed STT turn must survive the hop.
             schema: z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {

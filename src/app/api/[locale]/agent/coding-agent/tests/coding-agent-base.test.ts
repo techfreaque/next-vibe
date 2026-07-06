@@ -13,9 +13,10 @@
  * The request args (toolName, instanceId, callbackMode) must match across modes.
  * The response must have the same keys (output, taskId, status, etc.) across modes.
  *
- * Two transport modes exercised by separate test entry points:
+ * Transport modes exercised by separate test entry points:
  *   - Direct (transportMode='direct-http'): WAIT/END_LOOP return inline, no queue.
- *   - Queue (transportMode='cloud-only'): WAIT/END_LOOP → stream waits → pulse → revival.
+ *   - Queue (reverse-ws with the connector closed): WAIT/END_LOOP → stream
+ *     waits → connector restart delivers → revival.
  */
 
 import "server-only";

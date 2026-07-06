@@ -37,7 +37,7 @@ var __export = (target, all) => {
 };
 var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 
-// src/app/api/[locale]/shared/i18n/de/index.ts
+// src/app/[locale]/shared/i18n/de/index.ts
 var exports_de = {};
 __export(exports_de, {
   translations: () => translations2
@@ -146,7 +146,7 @@ var init_de = __esm(() => {
   };
 });
 
-// src/app/api/[locale]/shared/i18n/pl/index.ts
+// src/app/[locale]/shared/i18n/pl/index.ts
 var exports_pl = {};
 __export(exports_pl, {
   translations: () => translations3
@@ -254,6 +254,7 @@ var init_pl = __esm(() => {
     }
   };
 });
+
 // node_modules/zod/v4/classic/external.js
 var exports_external = {};
 __export(exports_external, {
@@ -13867,7 +13868,7 @@ var languageConfig = {
   }
 };
 
-// src/i18n/core/config.ts
+// src/app/api/[locale]/system/core/i18n/core/config.ts
 var Countries = languageConfig.countries;
 var Currencies = languageConfig.currencies;
 var Languages = languageConfig.languages;
@@ -13900,7 +13901,7 @@ var availableCountries = [
 ];
 var availableLanguages = Object.values(languageConfig.languages);
 
-// src/i18n/core/language-utils.ts
+// src/app/api/[locale]/system/core/i18n/core/language-utils.ts
 function getLanguageFromLocale(locale) {
   const parts = locale.split("-");
   if (parts.length !== 2 || !parts[0]) {
@@ -13913,7 +13914,7 @@ function getLanguageFromLocale(locale) {
 var debugMiddleware = process.env["NEXT_PUBLIC_VIBE_DEBUG"] === "true";
 var translationsKeyMode = false;
 
-// src/i18n/core/shared-translation-utils.ts
+// src/app/api/[locale]/system/core/i18n/core/shared-translation-utils.ts
 function navigateTranslationObject(startValue, keys) {
   let value = startValue;
   for (const k of keys) {
@@ -13959,7 +13960,7 @@ function processTranslationValue(value, key, params) {
   return key;
 }
 
-// src/i18n/core/scoped-translation.ts
+// src/app/api/[locale]/system/core/i18n/core/scoped-translation.ts
 function resolveTranslation(entry) {
   if (typeof entry === "function") {
     return entry();
@@ -14006,7 +14007,7 @@ function createScopedTranslation(translationsByLanguage) {
   };
 }
 
-// src/app/api/[locale]/shared/i18n/en/index.ts
+// src/app/[locale]/shared/i18n/en/index.ts
 var translations = {
   stats: {
     timePeriod: {
@@ -14108,7 +14109,7 @@ var translations = {
   }
 };
 
-// src/app/api/[locale]/shared/i18n/index.ts
+// src/app/[locale]/shared/i18n/index.ts
 var scopedTranslation = createScopedTranslation({
   en: translations,
   de: () => (init_de(), __toCommonJS(exports_de)).translations,
@@ -14137,6 +14138,7 @@ var Environment;
   Environment2["TEST"] = "test";
   Environment2["DEVELOPMENT"] = "development";
 })(Environment ||= {});
+
 // src/config/constants.ts
 var DEFAULT_PROJECT_URL = "https://unbottled.ai";
 var ENDPOINT_PLATFORMS = [
@@ -14370,7 +14372,7 @@ var {
   }
 });
 
-// src/packages/next-vibe-ui/web/lib/cookies.ts
+// src/app/api/[locale]/system/ui/web/lib/cookies.ts
 function getRawCookieString() {
   if (typeof document === "undefined") {
     return "";
@@ -14383,7 +14385,7 @@ function setRawCookieString(value) {
   }
 }
 
-// src/packages/next-vibe-ui/web/lib/dom.ts
+// src/app/api/[locale]/system/ui/web/lib/dom.ts
 function getScrollX() {
   return window.scrollX;
 }
@@ -14421,7 +14423,7 @@ function appendToBody(el) {
   document.body.appendChild(el);
 }
 
-// src/packages/next-vibe-ui/web/lib/storage.ts
+// src/app/api/[locale]/system/ui/web/lib/storage.ts
 function getLocalItem(key) {
   try {
     return localStorage.getItem(key);
@@ -14457,7 +14459,7 @@ function removeSessionItem(key) {
   } catch {}
 }
 
-// src/app/api/[locale]/system/unified-interface/vibe-frame/types.ts
+// src/app/api/[locale]/system/platforms/vibe-frame/types.ts
 var DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-popups";
 var BRIDGE_PREFIX = "vf:";
 var FREQUENCY_KEY_PREFIX = "vf-freq-";
@@ -14475,7 +14477,7 @@ function isFrameMessage(msg) {
   return "frameId" in msg;
 }
 
-// src/app/api/[locale]/system/unified-interface/vibe-frame/bridge.ts
+// src/app/api/[locale]/system/platforms/vibe-frame/bridge.ts
 function getCookieAction(payload) {
   try {
     const cookieStr = getRawCookieString();
@@ -14854,12 +14856,12 @@ function recordDisplay(frameId, frequency) {
       break;
   }
 }
-// src/packages/next-vibe-ui/web/lib/media.ts
+// src/app/api/[locale]/system/ui/web/lib/media.ts
 function getLanguage() {
   return navigator.language;
 }
 
-// src/app/api/[locale]/system/unified-interface/vibe-frame/triggers.ts
+// src/app/api/[locale]/system/platforms/vibe-frame/triggers.ts
 var sharedState = {
   scroll: 0,
   time: 0,
@@ -15039,7 +15041,7 @@ function viewportTrigger(config2, callback) {
   return addWindowListener("resize", handler);
 }
 
-// src/app/api/[locale]/system/unified-interface/vibe-frame/embed.ts
+// src/app/api/[locale]/system/platforms/vibe-frame/embed.ts
 var frames = new Map;
 var configSignal;
 var configSubscribers = [];
@@ -15481,4 +15483,4 @@ export {
   DEFAULT_SANDBOX
 };
 
-//# debugId=938127A1254B1CCF64756E2164756E21
+//# debugId=790741B55260B37B64756E2164756E21

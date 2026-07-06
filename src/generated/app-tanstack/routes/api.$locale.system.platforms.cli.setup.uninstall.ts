@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/platforms/cli/setup/uninstall")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/system/platforms/cli/setup/uninstall/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/system/platforms/cli/setup/uninstall",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/system/platforms/cli/setup/uninstall/route"),
+    ),
+  },
 });

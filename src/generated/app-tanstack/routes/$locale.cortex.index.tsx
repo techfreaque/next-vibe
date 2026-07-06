@@ -1,9 +1,11 @@
 // AUTO-GENERATED from src/app/[locale]/cortex/page.tsx. Add "use custom" to this file to preserve customizations.
-import type { JSX } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { toNextParams } from "../nextjs-compat-wrapper";
+import type { JSX } from "react";
+
 import { TanstackPage as Page } from "@/app/[locale]/cortex/page";
+
+import { toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
@@ -12,7 +14,9 @@ const loadData = createServerFn({ method: "GET" })
     return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
-function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }
+function PageComponent(): JSX.Element {
+  return <Page {...Route.useLoaderData()} />;
+}
 
 export const Route = createFileRoute("/$locale/cortex/")({
   staleTime: 0,

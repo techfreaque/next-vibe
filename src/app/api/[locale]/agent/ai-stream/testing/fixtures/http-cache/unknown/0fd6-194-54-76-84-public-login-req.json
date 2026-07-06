@@ -1,0 +1,13 @@
+{
+  "url": "https://0fd6-194-54-76-84.ngrok-free.app/api/en-US/user/public/login",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Connection": "close"
+  },
+  "body": {
+    "email": "max@tfq.at",
+    "password": "password123",
+    "rememberMe": true
+  }
+}

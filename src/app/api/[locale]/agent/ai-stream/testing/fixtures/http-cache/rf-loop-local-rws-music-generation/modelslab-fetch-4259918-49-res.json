@@ -1,0 +1,33 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v7/voice/fetch/4259918",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a1684a7d7b63f5a6-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 18:04:14 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=prbcvOiRUpuP4daHzhIz0ni6NAn8I39bk3iZrZW6UYcW3qlK9XKDkFpUsO7usBcKvT3nlY5%2FQv%2FDEWF9LwjuLXjrep88IRhrxjvfLaeGYEmOiVCOBq1tP4AoD8dnYnA%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "5e4b18e7776e97d0dd3450cb786af4df",
+    "x-request-time": "0.166",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "id": 4259918,
+    "message": "audio is processing",
+    "output": [],
+    "tip": "Get 20x faster audio generation using enterprise plan. Click here https://modelslab.com/enterprise"
+  }
+}

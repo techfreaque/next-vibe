@@ -11,6 +11,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { pollDelay } from "@/app/api/[locale]/agent/shared/poll-delay";
 import { scopedTranslation } from "@/app/api/[locale]/agent/video-generation/i18n";
 
 interface ModelsLabVideoResponse {

@@ -152,6 +152,8 @@ export class AiStreamRepository {
     headless = false,
     isRevival,
     relayReceiver,
+    originInstanceId,
+    syncEligible,
     suppressSelfIdentity,
     t: aiStreamT,
     extraInstructions,
@@ -328,6 +330,8 @@ export class AiStreamRepository {
       subAgentDepth,
       isRevival,
       relayReceiver,
+      originInstanceId,
+      syncEligible,
       suppressSelfIdentity,
       extraInstructions,
       excludeMemories,
@@ -740,7 +744,9 @@ export class AiStreamRepository {
           // Emit USER MESSAGE_CREATED AFTER the compacting check so ordering is always correct:
           // - Non-compacting: user message emitted here with original parentId
           // - Compacting: CompactingHandler emits it with parentId = compactingMessageId
-          // Emit user MESSAGE_CREATED - WS subscribers see the user message appear.
+          // NEVER for confirmation turns: no user-message ROW is created for
+          // them (UserMessageHandler skips) — emitting one materializes an
+          // empty phantom user leaf on every mirror.
           if (
             userMessageId &&
             data.operation !== "answer-as-ai" &&

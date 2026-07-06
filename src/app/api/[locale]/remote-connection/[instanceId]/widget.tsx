@@ -15,16 +15,6 @@
 import { Methods } from "next-vibe/core/definition/enums";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
   Card,
@@ -52,6 +42,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -65,7 +56,7 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import connectDefinitions from "../connect/definition";
@@ -632,6 +623,7 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
 
 function DeleteWidget(): JSX.Element {
   const emptyField = useMemo(() => ({}), []);
+
   return (
     <Div className="flex flex-col gap-4 px-6 py-6">
       <FormAlertWidget field={emptyField} />

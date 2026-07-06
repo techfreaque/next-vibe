@@ -367,6 +367,8 @@ export class ChatFoldersRepository {
         user,
         newFolder.rootFolderId,
       );
+      // Folder CRUD SYNCS by SAME id: the item's regular fields carry
+      // everything the peer needs; the applier gates on rootFolderId.
       emitFolderContents("folder-created", {
         responseData: {
           items: [

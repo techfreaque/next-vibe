@@ -42,7 +42,7 @@ import {
   formatTask,
   formatWarning,
 } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger, LoggerMetadata } from "next-vibe/logger/types";
 import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
 import type { Task } from "next-vibe/tasks/unified-runner/types";
@@ -57,6 +57,7 @@ import {
   getPidOnPort,
   HERMES_DEV_PID_FILE,
   killPreviousInstance,
+  LOCAL_BASE_PORT,
   removePidFromFile,
   writePidFile,
 } from "../pid";
@@ -294,12 +295,112 @@ export class DevRepository {
     // Truncate log files at session start (VIBE_LOG_PATH controls whether active)
     void truncateServerLog();
     void truncateClientLogs();
-    // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash
-    process.on("exit", writeServerLogOfflineHint);
+    // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash.
+    // Skip if we're being replaced: the new instance already owns (or deleted) the PID file.
+    process.on("exit", () => {
+      const pidFile = DevRepository.activePidFile;
+      if (pidFile) {
+        try {
+          if (!existsSync(pidFile)) {
+            return; // PID file gone — new instance cleaned up ours before writing its own
+          }
+          const firstLine =
+            readFileSync(pidFile, "utf-8").trim().split("\n")[0] ?? "";
+          const ownerPid = parseInt(firstLine, 10);
+          if (!isNaN(ownerPid) && ownerPid !== process.pid) {
+            return; // New instance took ownership — don't pollute its log
+          }
+        } catch {
+          // Ignore read errors; fall through to write the hint
+        }
+      }
+      writeServerLogOfflineHint();
+    });
 
-    // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
+    // Capture Nitro worker thread crashes into the log file.
+    // Worker threads write console.error() to fd 2 directly, bypassing all JS hooks.
+    // Solution: dup2 fd 2 → log file so worker fd-2 writes land there automatically.
+    // Parent console.error is overridden to write to terminal (termFd) + log file instead,
+    // so normal app logs go to the right place without double-writing via fd 2.
+    if (process.env["VIBE_LOG_TARGET"] === "file") {
+      try {
+        const logPath = process.env["VIBE_LOG_FILE"] ?? ".atlas.log";
+        const logDir = process.env["VIBE_LOG_PATH"];
+        if (logDir) {
+          const { isAbsolute, join: pathJoin } = await import("node:path");
+          const { openSync } = await import("node:fs");
+          const absDir = isAbsolute(logDir)
+            ? logDir
+            : pathJoin(process.env["PROJECT_ROOT"] ?? process.cwd(), logDir);
+          if (!existsSync(absDir)) {
+            mkdirSync(absDir, { recursive: true });
+          }
+          const { dlopen } = await import("bun:ffi");
+          const lib = dlopen("libc.so.6", {
+            dup: { args: ["i32" as const], returns: "i32" as const },
+            dup2: {
+              args: ["i32" as const, "i32" as const],
+              returns: "i32" as const,
+            },
+          });
+          const termFd = lib.symbols.dup(2);
+          const logFd = openSync(pathJoin(absDir, logPath), "a");
+          lib.symbols.dup2(logFd, 2);
+
+          // Override console.error and console.warn to write to the terminal only.
+          // Both write to fd 2 in Bun; with fd 2 redirected to the log file they would
+          // double-write (once via fd 2, once via logger's onFileLog/appendFileSync).
+          // The override sends to terminal; logger's onFileLog handles the log file write.
+          // Worker threads bypass this JS override → their fd-2 writes land in the log file directly.
+          const toTerminal = (args: LoggerMetadata[]): void => {
+            const text = args
+              .map((a) =>
+                typeof a === "string"
+                  ? a
+                  : a instanceof Error
+                    ? `${a.message}${a.stack ? `\n${a.stack}` : ""}`
+                    : JSON.stringify(a, null, 2),
+              )
+              .join(" ");
+            writeSync(termFd, `${text}\n`);
+          };
+          // eslint-disable-next-line no-console
+          console.error = (...args: LoggerMetadata[]): void => {
+            toTerminal(args);
+          };
+          // eslint-disable-next-line no-console
+          console.warn = (...args: LoggerMetadata[]): void => {
+            toTerminal(args);
+          };
+
+          // JS-layer process.stderr.write → terminal only (fd 2 is now the log file).
+          process.stderr.write = (
+            chunk: string | Uint8Array,
+            encodingOrCb?: BufferEncoding | ((err?: Error | null) => void),
+            cb?: (err?: Error | null) => void,
+          ): boolean => {
+            writeSync(
+              termFd,
+              typeof chunk === "string"
+                ? chunk
+                : Buffer.from(chunk).toString("utf-8"),
+            );
+            const done = typeof encodingOrCb === "function" ? encodingOrCb : cb;
+            done?.(undefined);
+            return true;
+          };
+        }
+      } catch {
+        // bun:ffi unavailable — stderr capture skipped
+      }
+    }
+
+    // Derive port: explicit --port > LOCAL_BASE_PORT for Hermes dev > NEXT_PUBLIC_APP_URL port > default 3000
     const port =
-      data.port ?? DevRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
+      data.port ??
+      (isLocalDev ? LOCAL_BASE_PORT : undefined) ??
+      DevRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ??
+      3000;
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
     // This ensures runtime env reads (and all child processes) see the correct URL.
@@ -318,6 +419,34 @@ export class DevRepository {
     };
     process.on("SIGINT", earlyExitHandler);
     process.on("SIGTERM", earlyExitHandler);
+
+    // Catch unhandled errors so crashes (including in-process Vite/Nitro worker threads)
+    // are always written to the log file, not just terminal stderr.
+    process.on("uncaughtException", (err) => {
+      const mem = process.memoryUsage();
+      logger.error("[Dev] Uncaught exception - shutting down", {
+        error: err.message,
+        stack: err.stack,
+        uptime: Math.floor(process.uptime()),
+        heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        rssMb: Math.round(mem.rss / 1024 / 1024),
+      });
+      cleanupPidFile(DevRepository.activePidFile);
+      writeServerLogOfflineHint();
+      process.exit(1);
+    });
+    process.on("unhandledRejection", (reason) => {
+      const mem = process.memoryUsage();
+      const message = reason instanceof Error ? reason.message : String(reason);
+      const stack = reason instanceof Error ? reason.stack : undefined;
+      logger.error("[Dev] Unhandled promise rejection", {
+        error: message,
+        stack,
+        uptime: Math.floor(process.uptime()),
+        heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        rssMb: Math.round(mem.rss / 1024 / 1024),
+      });
+    });
 
     // Setup database if not skipped
     const dbSetupSuccess = await DevRepository.setupDatabase(
@@ -476,6 +605,11 @@ export class DevRepository {
       }
 
       logger.info(formatDatabase("Database ready", "🗄️ "));
+
+      // Auto-open all active reverse-ws connectors so cross-instance sync works
+      // after server restart without requiring the user to reconnect manually.
+      void DevRepository.openReverseWsConnectors(logger);
+
       return true;
     } catch (error) {
       const parsedError = parseError(error);
@@ -483,6 +617,47 @@ export class DevRepository {
       logger.error("Database setup error details", parsedError);
       logger.vibe(`💡 Error: ${parsedError.message}`);
       return true;
+    }
+  }
+
+  private static async openReverseWsConnectors(
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const { RemoteConnectionRepository } =
+        await import("@/app/api/[locale]/remote-connection/repository");
+      const { openConnection } = await import("next-vibe/realtime/connector");
+      const connections =
+        await RemoteConnectionRepository.getAllActiveConnectionsForSync();
+      let opened = 0;
+      for (const conn of connections) {
+        if (conn.transportMode === "reverse-ws") {
+          openConnection({
+            id: conn.id,
+            instanceId: conn.instanceId,
+            remoteUrl: conn.remoteUrl,
+            token: conn.token,
+            leadId: conn.leadId,
+            userId: conn.userId,
+            remoteUserId: conn.remoteUserId,
+            capabilitiesVersion: conn.capabilitiesVersion,
+            sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
+            syncScope: conn.syncScope,
+            syncCursors: conn.syncCursors,
+            pushCursors: null,
+          });
+          opened++;
+        }
+      }
+      if (opened > 0) {
+        logger.info(
+          `[Connector] Auto-opened ${String(opened)} reverse-ws connector(s) on startup`,
+        );
+      }
+    } catch (err) {
+      logger.warn("[Connector] Failed to auto-open reverse-ws connectors", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 

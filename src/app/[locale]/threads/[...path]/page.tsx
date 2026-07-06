@@ -149,8 +149,12 @@ export async function tanstackLoader({
     };
   }
 
-  if (env.NEXT_PUBLIC_LOCAL_MODE && user.isPublic) {
-    redirect(`/${locale}/user/login`);
+  if (
+    env.NEXT_PUBLIC_LOCAL_MODE &&
+    user.isPublic &&
+    earlyRootFolderId !== DefaultFolderId.INCOGNITO
+  ) {
+    redirect(`/${locale}/threads/incognito`);
   }
 
   // Fetch credit balance for all users (both authenticated and public)

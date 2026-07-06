@@ -129,17 +129,11 @@ export class HeadlessClientRepository {
           error: upsertResult.message,
         });
       } else {
-        // Set connection mode: AI loop runs on cloud (loopLocation=server = relay to us).
-        // toolSource=local: atlas builds system prompt + tools locally using the client's
-        // identity (headless-client), then sends them in the relay body. The remote ws-provider
-        // runs the AI with those tools — so the AI's system prompt says "Instance ID: headless-client".
-        // toolSource=remote would mean the provider builds its own prompt (atlas identity) — wrong.
+        // Loop location is a per-thread/per-stream property now (loopInstanceId).
+        // Tools + system prompt are ALWAYS client-owned on the relay wire.
         await db
           .update(remoteConnections)
           .set({
-            threadMirrorMode: "cloud",
-            loopLocation: "server",
-            toolSource: "local",
             updatedAt: new Date(),
           })
           .where(
@@ -151,9 +145,6 @@ export class HeadlessClientRepository {
           );
         logger.info("[HeadlessClient] Connection mode set", {
           transportMode: "reverse-ws",
-          threadMirrorMode: "cloud",
-          loopLocation: "server",
-          toolSource: "local",
         });
       }
 
@@ -164,7 +155,7 @@ export class HeadlessClientRepository {
       for (const conn of connections) {
         if (conn.transportMode === "reverse-ws" && !conn.isReverseEntry) {
           openConnection({
-            id: conn.instanceId,
+            id: conn.id,
             instanceId: conn.instanceId,
             remoteUrl: conn.remoteUrl,
             token: conn.token,

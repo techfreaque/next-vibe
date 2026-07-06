@@ -186,7 +186,8 @@ type ApiHandlerFunction<TEndpoint extends CreateApiEndpointAny> = (
  * The channel an endpoint's events ride on, decided per (resource, identity) at
  * runtime — NOT a static convention. Returned by `resolveChannel`.
  *
- *   - `user`     — deliver on / admit to the identity's own `user/{id}` channel.
+ *   - `user`     — deliver on / admit to the identity's own user-scoped channel
+ *                  for this endpoint instance (`user/{id}/ws-…`).
  *                  The identity IS the authorization boundary; nothing shared.
  *                  Owner-private resources (the caller's own list/thread/skill).
  *   - `resource` — deliver on / admit to the shared `buildWsChannel` channel
@@ -197,7 +198,7 @@ type ApiHandlerFunction<TEndpoint extends CreateApiEndpointAny> = (
  *                  for this identity.
  *
  * The resolver returns *intent* (a kind), never a channel string — the framework
- * builds the concrete channel (`buildUserChannel` / `buildWsChannel`) from the
+ * builds the concrete channel (`buildUserWsChannel` / `buildWsChannel`) from the
  * kind so emit-side and subscribe-side construct byte-identical channels and
  * cannot drift.
  */
@@ -238,7 +239,14 @@ type ChannelResolverFn<TEndpoint extends CreateApiEndpointAny> = {
  * a non-authenticated origin is rejected before any handler runs.
  */
 export interface RemoteEventContext {
+  /** THIS instance's configured id (self). */
   readonly instanceId: string;
+  /**
+   * The SENDING instance's id as stamped on the bridge wire. Instance names
+   * are globally consistent (the echo-guard relies on the same invariant), so
+   * appliers use this directly as the origin label for mirror rows.
+   */
+  readonly originInstanceId: string;
   readonly user: JwtPrivatePayloadType;
   readonly locale: CountryLanguage;
   readonly logger: EndpointLogger;
@@ -270,6 +278,8 @@ export interface RemoteEventHandlerProps<
       keyof TEndpoint["types"]["EventPayloadTypes"]]
   >;
   readonly instanceId: string;
+  /** The SENDING instance's id (globally-consistent name) — see RemoteEventContext. */
+  readonly originInstanceId: string;
   readonly user: JwtPrivatePayloadType;
   readonly locale: CountryLanguage;
   readonly logger: EndpointLogger;

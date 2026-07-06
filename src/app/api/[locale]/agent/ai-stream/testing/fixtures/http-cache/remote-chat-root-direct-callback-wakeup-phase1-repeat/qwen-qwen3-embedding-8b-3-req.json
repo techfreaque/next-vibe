@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/-t1-thread-create-tool-call--explore-the-tool----cf886057-dad1-4e1b-89c4-9756502deaac.md\n\n# [T1 thread-create+tool-call] Explore the tool...\nFolder: cron\nPreview: <think>Phase 2: The deferred result has arrived. It contains an imageUrl field with a non-empty string value. This is co…",
+    "input": "Generate an image: wakeup-repeat-test",
     "encoding_format": "float"
   }
 }

@@ -588,6 +588,9 @@ export const translations: typeof enTranslations = {
       },
     },
     addVariant: "Variante hinzufügen",
+    viewSkill: "Details",
+    deleteVariant: "Variante entfernen?",
+    deleteVariantAction: "Entfernen",
     deleteGroup: {
       trigger: "Alle Varianten löschen",
       confirm: "Alle {{count}} Varianten löschen?",

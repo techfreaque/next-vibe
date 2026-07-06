@@ -140,7 +140,7 @@ export class RemoteConnectionInstanceRepository {
       });
     }
 
-    // If enabling forceSystemProvider: clear it on all other connections first
+    // If enabling forceSystemProvider: clear it on all connections instance-wide first
     if (forceSystemProvider === true) {
       await db
         .update(remoteConnections)

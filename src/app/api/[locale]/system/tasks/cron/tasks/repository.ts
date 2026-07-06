@@ -537,8 +537,7 @@ export class CronTasksListRepository {
               errorType: ErrorResponseTypes.FORBIDDEN,
             });
           }
-          // Use the canonical remoteInstanceId so task-sync routes it correctly.
-          resolvedTargetInstance = conn.remoteInstanceId ?? data.targetInstance;
+          resolvedTargetInstance = conn.instanceId;
         }
       }
 

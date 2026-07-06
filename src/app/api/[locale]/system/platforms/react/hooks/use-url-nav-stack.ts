@@ -297,6 +297,8 @@ export function useUrlNavStack(
     stack,
     canGoBack: stack.length > 0,
     current: stack.length > 0 ? (stack[stack.length - 1] ?? null) : null,
+    // URL-driven pushes are synchronous history operations — never pending.
+    isPushPending: false,
     // Extra: reset in-memory stack without touching browser history.
     // Not part of UseNavigationStackReturn — accessed directly by the widget.
     _clearStack: clearStack,

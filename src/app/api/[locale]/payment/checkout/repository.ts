@@ -142,7 +142,7 @@ export class SubscriptionCheckoutRepository {
           interval,
           country,
           locale,
-          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription/overview?payment=success&type=subscription&session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription/overview?cbtoken=${callbackToken}&payment=success&type=subscription&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription/overview?payment=canceled&type=subscription`,
           metadata: {
             type: "subscription",

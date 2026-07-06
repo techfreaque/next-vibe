@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:e097eabb | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 17:58]\n\nAssistant: ## Result\n\n`tool-help(query=\"search\")` returned:\n- **matchedCount:** 12\n- **tools array:** 12 entries, non-empty\n- **Every tool** has both a `name` and a `description` — all present and properly structured\n\nExamples:\n\n| `name` | `description` |\n|--------|---------------|\n| `web-search` | Search the internet for current information, news, facts, or recent events |\n| `cortex-search` | Find files by name or content. Searches everything. |\n| `agent-search-messages` | Search messages across all threads using full-text search |\n| `brave-search` | Search the internet for current information, news, facts, or recent events |\n| `models` | Browse and search all available AI models... |\n\nNo missing fields, no errors, no malformed entries.\n\n**STEP_OK**\n\nSystem: [Context: ID:583e58bc | Posted:Jul 4, 19:58]\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a result from an earlier turn. Check that the fresh result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test [90%]\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- Ho\n\nSystem: [Context: ID:eafe72cb | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 19:58]\n\nAssistant: [tool:tool-help] {\"toolName\":\"generate_image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_image\",\"description\":\"Generate an image from a text prompt using AI\",\"category\":\"ai\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"prompt\":{\"type\":\"string\",\"minLength\":1,\"maxLength\":2000,\"description\":\"Describe the image",
+    "encoding_format": "float"
+  }
+}

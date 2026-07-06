@@ -71,11 +71,12 @@ export const translations: typeof enTranslations = {
     never: "Nie",
     connectButton: "Lokale Instanz verknüpfen",
     connectButtonLocal: "Mit Cloud verbinden",
+    incomingBadge: "Eingehend",
     inactiveBadge: "Inaktiv",
     instanceId: "Instanz-ID",
     remoteUrl: "Remote-URL",
     viewButton: "Ansehen",
-    editButton: "Umbenennen",
+    editButton: "Bearbeiten",
     deleteButton: "Trennen",
     cloud: {
       heroTitle: "Deine KI. Überall.",

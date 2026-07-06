@@ -2,28 +2,18 @@ export const translations = {
   post: {
     title: "NOWPayments CLI",
     titleShort: "NOWPayments",
-    description: "Manage NOWPayments webhook tunneling with ngrok",
+    description: "Start ngrok tunnel for NOWPayments webhook forwarding",
     category: "Payment",
     tags: {
       nowpayments: "NOWPayments",
       cli: "CLI",
       webhook: "Webhook",
     },
-    operations: {
-      check: "Check",
-      install: "Install",
-      tunnel: "Tunnel",
-      status: "Status",
-    },
     form: {
-      title: "NOWPayments CLI Operations",
-      description: "Configure and manage ngrok tunnel for NOWPayments webhooks",
+      title: "NOWPayments Tunnel",
+      description:
+        "Start an ngrok tunnel to receive NOWPayments webhooks locally",
       fields: {
-        operation: {
-          label: "Operation",
-          description: "Select the operation to perform",
-          placeholder: "Choose an operation",
-        },
         port: {
           label: "Port",
           description: "Local port to tunnel (default: 3000)",
@@ -32,9 +22,14 @@ export const translations = {
       },
     },
     errors: {
+      notInstalled: {
+        title: "ngrok not installed",
+        description:
+          "ngrok is required to start the tunnel. Install it and try again.",
+      },
       validationFailed: {
         title: "Validation Error",
-        description: "Invalid operation or parameters",
+        description: "Invalid parameters",
       },
       networkError: {
         title: "Network Error",
@@ -54,7 +49,7 @@ export const translations = {
       },
       serverError: {
         title: "Server Error",
-        description: "Failed to execute operation",
+        description: "Failed to start tunnel",
       },
       unknownError: {
         title: "Unknown Error",
@@ -69,23 +64,9 @@ export const translations = {
         description: "Resource conflict",
       },
     },
-    response: {
-      title: "Response",
-      description: "Operation result",
-      fields: {
-        success: "Success",
-        installed: "Installed",
-        version: "Version",
-        status: "Status",
-        output: "Output",
-        instructions: "Instructions",
-        tunnelUrl: "Tunnel URL",
-        webhookUrl: "Webhook URL",
-      },
-    },
     success: {
-      title: "Success",
-      description: "Operation completed successfully",
+      title: "Tunnel Started",
+      description: "ngrok tunnel is running",
     },
   },
 };

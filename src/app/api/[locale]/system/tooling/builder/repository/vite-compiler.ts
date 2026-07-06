@@ -1692,7 +1692,15 @@ class ViteCompiler {
                 void forceOptimize; // unused - fresh start always re-optimizes
                 void originalRestart; // kept for reference
                 try {
+                  // Use closeRef.fn (which calls closeAllConnections first) so the
+                  // TCP socket on port 3100 is released before we try to re-bind it.
+                  // Plain srv.close() leaves keep-alive proxy connections open, causing
+                  // EADDRINUSE on the fresh startTanstackDevServer call.
+                  if (closeRef?.fn) {
+                    await closeRef.fn();
+                  } else {
                   await srv.close();
+                  }
                 } catch {
                   /* ignore close errors */
                 }
@@ -1869,9 +1877,10 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           // their own package directory (e.g. drizzle-zod → node_modules/src/).
           // false = never ignore any sourcemap, serve them all.
           sourcemapIgnoreList: false,
-          // Pre-transform the SSR entry so the first real request doesn't
-          // pay the cold module-evaluation cost (avoids Suspense boundary
-          // errors and ECONNRESET on the first page load).
+          // Pre-transform the SSR entry + all definition files so the first
+          // real request doesn't pay the cold module-evaluation cost.
+          // Definition files call lazyWidget() and those dynamic imports are
+          // pre-compiled here so Suspense boundaries resolve fast on first load.
           warmup: {
             ssrFiles: [`${srcDirectory}/router.tsx`],
           },
@@ -2001,15 +2010,25 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       });
 
       await server.listen();
-      // Disable Node.js HTTP server timeouts - SSR renders can take >5s on
-      // first load (cold module evaluation) and the default keepAliveTimeout
-      // (5s) / headersTimeout (60s) would close the socket mid-render.
+      // Tune Node.js HTTP server timeouts on Vite's internal server (port 3100).
+      //
+      // headersTimeout (default 60s): time allowed to receive the full request headers.
+      // Disable — the Bun proxy sometimes takes a moment to forward headers on first connect.
+      //
+      // timeout / requestTimeout: time allowed for a complete request-response cycle.
+      // Disable — SSR renders can take >5s on cold start; we want no hard deadline here.
+      //
+      // keepAliveTimeout (default 5s): idle time before the server closes a keep-alive
+      // connection. Do NOT set to 0. keepAliveTimeout=0 causes the server to close
+      // idle connections immediately; when the Bun proxy reuses a keep-alive socket
+      // for the next request, the server has already closed it, producing ECONNRESET
+      // on the first request after any brief idle period. Leave at a generous value
+      // so keep-alive connections outlive typical SSR render gaps.
       if (server.httpServer) {
         const httpServer = server.httpServer as NodeHttpServer;
-        httpServer.keepAliveTimeout = 0;
+        httpServer.keepAliveTimeout = 65_000; // longer than proxy idle gaps
         httpServer.headersTimeout = 0;
         httpServer.timeout = 0;
-        // Node 14+: disable request timeout so slow SSR renders don't abort
         (
           httpServer as NodeHttpServer & { requestTimeout?: number }
         ).requestTimeout = 0;

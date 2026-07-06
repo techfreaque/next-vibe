@@ -3,8 +3,27 @@
 import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import type { CliComponent } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { createContext, type ReactNode, useContext, useRef } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
+
+/** Preload the lazyWidget for an endpoint before pushing it onto the stack. */
+async function preloadEndpointWidget(
+  endpoint: CreateApiEndpointAny,
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- runtime duck-typing on lazyWidget
+  const render = (endpoint.fields as Record<string, any>)?.render;
+  if (
+    render &&
+    typeof render === "function" &&
+    "cliWidget" in render &&
+    "preload" in render &&
+    typeof (render as CliComponent).preload === "function" &&
+    (render as CliComponent).resolved === null
+  ) {
+    await (render as CliComponent).preload();
+  }
+}
 
 /**
  * Navigation options
@@ -48,7 +67,15 @@ interface NavigationStackStore {
   stack: NavigationStackEntry[];
 
   /**
-   * Navigate to a new endpoint with type-safe parameters
+   * True while a push/replace is preloading the widget for the next entry.
+   * The base layer stays visible during this time.
+   */
+  isPushPending: boolean;
+
+  /**
+   * Navigate to a new endpoint with type-safe parameters.
+   * Preloads the endpoint's lazy widget before pushing so the old view
+   * stays visible until the new one is fully ready.
    */
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
@@ -78,6 +105,7 @@ interface NavigationStackStore {
 function createNavigationStackStore(): StoreApi<NavigationStackStore> {
   return createStore<NavigationStackStore>((set) => ({
     stack: [],
+    isPushPending: false,
 
     push: <TEndpoint extends CreateApiEndpointAny>(
       endpoint: TEndpoint,
@@ -112,20 +140,16 @@ function createNavigationStackStore(): StoreApi<NavigationStackStore> {
         modalPosition,
       };
 
-      set((state) => ({
-        stack: [...state.stack, entry as NavigationStackEntry],
-      }));
-
-      // The EndpointRenderer will check the current stack entry and fetch GET data
-      // before rendering the PATCH/PUT form if prefillFromGet is true
-      if (prefillFromGet) {
-        // eslint-disable-next-line no-console
-        console.log(
-          "Navigation: Prefill from GET",
-          endpoint.path.join("/"),
-          getEndpoint ? `using ${getEndpoint.path.join("/")}` : "",
-        );
-      }
+      // Preload the widget before showing the new view so the old view stays
+      // visible until the new one is fully ready (no flash / blank frame).
+      set({ isPushPending: true });
+      void preloadEndpointWidget(endpoint).then(() => {
+        set((state) => ({
+          stack: [...state.stack, entry as NavigationStackEntry],
+          isPushPending: false,
+        }));
+        return undefined;
+      });
     },
 
     replace: <TEndpoint extends CreateApiEndpointAny>(
@@ -161,17 +185,21 @@ function createNavigationStackStore(): StoreApi<NavigationStackStore> {
         modalPosition,
       };
 
-      set((state) => {
-        if (state.stack.length === 0) {
-          // If stack is empty, just push the new entry
+      set({ isPushPending: true });
+      void preloadEndpointWidget(endpoint).then(() => {
+        set((state) => {
+          if (state.stack.length === 0) {
+            return {
+              stack: [entry as NavigationStackEntry],
+              isPushPending: false,
+            };
+          }
           return {
-            stack: [entry as NavigationStackEntry],
+            stack: [...state.stack.slice(0, -1), entry as NavigationStackEntry],
+            isPushPending: false,
           };
-        }
-        // Replace the top of the stack
-        return {
-          stack: [...state.stack.slice(0, -1), entry as NavigationStackEntry],
-        };
+        });
+        return undefined;
       });
     },
 
@@ -284,6 +312,7 @@ export function useNavigationStack(): {
   stack: NavigationStackEntry[];
   canGoBack: boolean;
   current: NavigationStackEntry | null;
+  isPushPending: boolean;
 } {
   const store = useContext(NavigationStackContext);
 
@@ -299,6 +328,7 @@ export function useNavigationStack(): {
   const push = useStore(store, (state) => state.push);
   const replace = useStore(store, (state) => state.replace);
   const pop = useStore(store, (state) => state.pop);
+  const isPushPending = useStore(store, (state) => state.isPushPending);
 
   const canGoBack = stack.length > 0;
   const current = stack.length > 0 ? stack[stack.length - 1] : null;
@@ -310,6 +340,7 @@ export function useNavigationStack(): {
     stack,
     canGoBack,
     current,
+    isPushPending,
   };
 }
 

@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/purchasing/order/$poId/convert-to-bill")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/purchasing/order/[poId]/convert-to-bill/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/purchasing/order/$poId/convert-to-bill",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () =>
+        import("@/app/api/[locale]/purchasing/order/[poId]/convert-to-bill/route"),
+    ),
+  },
 });

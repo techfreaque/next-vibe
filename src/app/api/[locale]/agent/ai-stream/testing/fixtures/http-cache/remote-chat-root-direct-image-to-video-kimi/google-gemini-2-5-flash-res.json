@@ -5,22 +5,22 @@
   "headers": {
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "X-Generation-Id,cf-ray",
-    "cf-ray": "a15df58a0a013636-FRA",
+    "cf-ray": "a16839c25a1ed22f-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Sat, 04 Jul 2026 11:58:46 GMT",
+    "date": "Sun, 05 Jul 2026 17:52:50 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1783166317-4PM7VZI2BE3CnRsF8Krx"
+    "x-generation-id": "gen-1783273969-4lqnzX1rXtLu1blnxGQP"
   },
   "body": {
-    "id": "gen-1783166317-4PM7VZI2BE3CnRsF8Krx",
+    "id": "gen-1783273969-4lqnzX1rXtLu1blnxGQP",
     "object": "chat.completion",
-    "created": 1783166317,
+    "created": 1783273969,
     "model": "google/gemini-2.5-flash",
     "provider": "Google",
     "system_fingerprint": null,
@@ -33,7 +33,7 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "This is a 24-second instrumental track featuring a playful, upbeat melody with a slight retro feel.\n\n**Music:**\n*   **Genre:** Funk, Pop, Lounge, with a modern electronic twist. It has a similar vibe to elevator music but with more character and a distinct groove.\n*   **Tempo:** Approximately 110-120 BPM.\n*   **Instruments:**\n    *   **Electric Guitar (Lead):** Plays a clean, crisp, single-note melody that is the primary focus of the track. It has a slightly bright and percussive tone.\n    *   **Electric Bass:** Provides a simple but effective walking bassline that underpins the melody, giving it a groovy foundation.\n    *   **Drums (Electronic):** Features a tight, punchy snare drum, a clear kick drum, and closed hi-hats. The beat is steady and drives the rhythm. There are no elaborate fills, keeping it consistent.\n    *   **Synthesizer (Pad/Strings):** A subtle, sustained synth pad or string-like sound can be heard in the background, adding a layer of warmth and fullness to the overall sound, particularly noticeable under the guitar melody.\n*   **Interaction:** The lead guitar carries the main melodic theme, supported by the steady, rhythmic foundation of the bass and drums. The synth pad adds texture without competing with the main instruments.\n*   **Mood:** Playful, lighthearted, cheerful, and slightly laid-back. It evokes a feeling of casual optimism or background activity.\n*   **Production Style:** Clean and polished. The instruments are well-balanced with clear separation. There's a hint of reverb on the guitar, giving it a bit of space without sounding overly wet.\n\n**Overall Impression:**\n*   **Duration:** Short clip, likely an excerpt or loop.\n*   **Sound Quality:** High quality, clean recording, sounds professionally produced.\n*   **Recording Environment:** Studio.\n*   **Non-musical Audio Events:** None.",
+          "content": "This is a 21-second audio clip of an electronic instrumental track.\n\n**Music Description:**\nThe genre is upbeat, modern electronic music, possibly a house or disco-influenced track.\nThe tempo is approximately 120-125 BPM, suggesting a driving but not frantic pace. The time signature appears to be 4/4.\n\n**Instruments and Their Interaction:**\n-   **Synthesized Bass:** A prominent, deep synthesized bass line provides the core rhythmic and harmonic foundation. It's a driving 8th-note pattern with some melodic variations, giving it a funky feel.\n-   **Electronic Drums:** The drums feature a consistent, driving beat with a prominent snare on the 2 and 4, and regular hi-hat patterns. There are no obvious fills or complex rhythms in this short segment.\n-   **Synthesized Lead Melody:** A bright, high-pitched synthesized melody plays a discernible pattern over the bass and drums. It has a slightly playful or catchy quality.\n-   **Percussion:** There are subtle percussive elements that add texture and rhythm, possibly including shakers or other high-frequency percussive sounds, contributing to the overall groove.\n\n**Production Style:**\nThe production sounds polished and clean. There's a slight amount of reverb on the melodic elements, contributing to a spacious feel without being overly drenched. The mix is balanced, with all elements clearly audible.\n\n**Mood and Emotional Arc:**\nThe mood is decidedly upbeat, positive, and energetic. It evokes a feeling of dancing or a lively atmosphere.\n\n**Song Structure Impression:**\nThis clip feels like a steady groove from part of a song, possibly a verse or a pre-chorus section, rather than an intro or a dramatic build-up.\n\n**Sound Quality and Recording Environment:**\nThe sound quality is excellent, indicative of a studio recording or professionally produced electronic track. There are no discernible ambient sounds or recording artifacts to suggest otherwise.\n\n**Duration Impression:**\nThis is a short clip, likely an excerpt from a longer piece of music.",
           "refusal": null,
           "reasoning": null
         }
@@ -41,9 +41,9 @@
     ],
     "usage": {
       "prompt_tokens": 1072,
-      "completion_tokens": 427,
-      "total_tokens": 1499,
-      "cost": 0.0019141,
+      "completion_tokens": 429,
+      "total_tokens": 1501,
+      "cost": 0.0019191,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
@@ -52,9 +52,9 @@
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.0019141,
+        "upstream_inference_cost": 0.0019191,
         "upstream_inference_prompt_cost": 0.0008466,
-        "upstream_inference_completions_cost": 0.0010675
+        "upstream_inference_completions_cost": 0.0010725
       },
       "completion_tokens_details": {
         "reasoning_tokens": 0,

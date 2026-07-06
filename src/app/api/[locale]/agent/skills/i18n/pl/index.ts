@@ -1711,6 +1711,8 @@ export const translations: typeof enTranslations = {
       variants: {
         budget: "Budżetowy",
         visual: "Wizualny",
+        nativeImage: "Natywne obrazy",
+        nanoBananaPro: "Nano Banana Pro",
       },
     },
   },
@@ -1809,7 +1811,7 @@ export const translations: typeof enTranslations = {
         edit: "Edytuj",
         vote: "Oceń",
         report: "Zgłoś",
-        addMissing: "Dodaj brakujące",
+        addMissing: "Dodaj",
       },
       showVariants: "Warianty ({{count}})",
     },

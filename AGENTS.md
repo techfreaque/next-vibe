@@ -35,7 +35,6 @@ Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and 
 | Hermes prod | `vibe rebuild` / `vibe build && vibe start` | `.tmp/.hermes.pid`     | `.tmp/.hermes.log`     | `grep "^PORT:" .tmp/.hermes.pid`     |
 
 **Rules:**
-
 - Default work target is **Atlas dev** (`vibe dev`). Safe to run anytime — replaces any existing Atlas dev instance.
 - **Hermes dev** (`vibe --hermes dev`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
 - **Hermes prod** (`vibe rebuild`) — zero-downtime update. `vibe build && vibe start` only for a fresh first start. Max's live preview — only touch when explicitly asked.

@@ -6,7 +6,7 @@
  * - `remote_connections`  - actual outbound connections with tokens (who do I talk to?)
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   jsonb,
@@ -14,6 +14,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -72,11 +73,7 @@ export type ConnectionHealth = z.infer<typeof ConnectionHealthSchema>;
  * direct-http  — both instances publicly reachable; per-request HTTP, no persistent
  *                socket. Short-lived WS per streaming session.
  */
-export const TransportModeSchema = z.enum([
-  "reverse-ws",
-  "direct-http",
-  "cloud-only",
-]);
+export const TransportModeSchema = z.enum(["reverse-ws", "direct-http"]);
 export type TransportMode = z.infer<typeof TransportModeSchema>;
 export type TransportModeValue = TransportMode;
 
@@ -160,36 +157,24 @@ export const ToolSourceSchema = z.enum(["local", "remote", "both"]);
 export type ToolSource = z.infer<typeof ToolSourceSchema>;
 
 // ─── Instance Identities ──────────────────────────────────────────────────────
-// Per-user self-identity records. Replaces the old token="self" pattern.
-// Each user can have their own instance identities (e.g. "hermes", "thea").
+// Per-user self-identity record. One row per user — their canonical instance name.
 
-export const instanceIdentities = pgTable(
-  "instance_identities",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
+export const instanceIdentities = pgTable("instance_identities", {
+  id: uuid("id").primaryKey().defaultRandom(),
 
-    // Owner
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+  // Owner — unique: exactly one identity per user
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
 
-    // Canonical identifier for this instance (e.g. "hermes", "thea")
-    instanceId: text("instance_id").notNull(),
+  // Canonical identifier for this instance (e.g. "hermes", "thea")
+  instanceId: text("instance_id").notNull(),
 
-    // Whether this is the default identity for this user
-    isDefault: boolean("is_default").notNull().default(false),
-
-    // Timestamps
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  },
-  (t) => [
-    unique("instance_identities_user_instance_unique").on(
-      t.userId,
-      t.instanceId,
-    ),
-  ],
-);
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export const instanceIdentitiesRelations = relations(
   instanceIdentities,
@@ -237,9 +222,6 @@ export const remoteConnections = pgTable(
     // URL of the local instance (cloud-side records: so cloud knows where local lives)
     localUrl: text("local_url"),
 
-    // The instanceId the remote uses to identify itself (from register endpoint)
-    remoteInstanceId: text("remote_instance_id"),
-
     // The PEER-side userId (the same account has a different userId on each
     // instance's DB). Learned once on the connect/register handshake and stable
     // thereafter. Lets the reverse-ws connector subscribe to the peer's concrete
@@ -254,7 +236,7 @@ export const remoteConnections = pgTable(
      * Auto-detected on connect (ping → direct-http if reachable, else reverse-ws).
      */
     transportMode: text("transport_mode", {
-      enum: ["reverse-ws", "direct-http", "cloud-only"],
+      enum: ["reverse-ws", "direct-http"],
     })
       .notNull()
       .default("reverse-ws"),
@@ -267,45 +249,10 @@ export const remoteConnections = pgTable(
      * via reverse-ws, i.e. remoteTransportMode === "reverse-ws".
      */
     remoteTransportMode: text("remote_transport_mode", {
-      enum: ["reverse-ws", "direct-http", "cloud-only"],
+      enum: ["reverse-ws", "direct-http"],
     })
       .notNull()
       .default("direct-http"),
-
-    /**
-     * Where threads created over this connection are stored.
-     * Per-connection override of the folder-type default.
-     */
-    threadMirrorMode: text("thread_mirror_mode", {
-      enum: ["cloud", "local", "both", "none"],
-    })
-      .notNull()
-      .default("cloud"),
-
-    /**
-     * Where the AI inference loop runs for streams in this connection's folder.
-     * server — relay to remote; remote runs the AI loop (default).
-     * client — run AI loop locally; routing rule match is ignored for relay.
-     */
-    loopLocation: text("loop_location", {
-      enum: ["client", "server"],
-    })
-      .notNull()
-      .default("server"),
-
-    /**
-     * Where tools and the system prompt come from for AI stream requests
-     * routed to this connection. Independent of transportMode.
-     *
-     * local  — local schemas + prompt sent to provider (default).
-     * remote — provider resolves its own tools/prompt; nothing sent.
-     * both   — local schemas sent; remote merges with its own.
-     */
-    toolSource: text("tool_source", {
-      enum: ["local", "remote", "both"],
-    })
-      .notNull()
-      .default("local"),
 
     /**
      * Which data providers sync over this connection.
@@ -351,6 +298,17 @@ export const remoteConnections = pgTable(
     // Last time a sync was triggered
     lastSyncedAt: timestamp("last_synced_at"),
 
+    /**
+     * ATTESTED transport of the most recent outbound dispatch over this
+     * connection — written by the transport primitive that actually carried
+     * the call (never by configuration). Tests and observers verify the leg
+     * really used here.
+     */
+    lastTransportUsed: text("last_transport_used", {
+      enum: ["reverse-ws", "direct-http"],
+    }),
+    lastTransportUsedAt: timestamp("last_transport_used_at"),
+
     // Tool manifest snapshot - updated on capability version change
     capabilities: jsonb("capabilities").$type<RemoteToolCapability[]>(),
 
@@ -380,6 +338,14 @@ export const remoteConnections = pgTable(
       t.userId,
       t.instanceId,
     ),
+    // At most one inference provider across the entire instance
+    uniqueIndex("remote_connections_one_inference_provider")
+      .on(t.isInferenceProvider)
+      .where(sql`${t.isInferenceProvider} = true`),
+    // At most one forced system provider across the entire instance
+    uniqueIndex("remote_connections_one_force_system_provider")
+      .on(t.forceSystemProvider)
+      .where(sql`${t.forceSystemProvider} = true`),
   ],
 );
 

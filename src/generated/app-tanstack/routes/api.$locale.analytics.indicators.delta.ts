@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/analytics/indicators/delta")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/analytics/indicators/delta/route")) },
-});
+export const Route = createFileRoute("/api/$locale/analytics/indicators/delta")(
+  {
+    server: {
+      handlers: wrapNextApiRoute(
+        () => import("@/app/api/[locale]/analytics/indicators/delta/route"),
+      ),
+    },
+  },
+);

@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
       title: "Połączono",
       badge: "Aktywne",
       connectedTo: "Adres zdalny",
-      transport: "Transport",
+      transport: "Transport (wychodzący)",
+      remoteTransport: "Transport (przychodzący)",
       remoteInstance: "Zdalna instancja",
       capabilities: "Wersja capabilities",
       lastSynced: "Ostatnia synchronizacja",
@@ -128,11 +129,10 @@ export const translations: typeof enTranslations = {
     transportMode: {
       label: "Tryb transportu",
       description:
-        "Jak to połączenie komunikuje się. reverse-ws: stały wychodzący WS (otwiera się natychmiast po zapisie). direct-http: bezpośrednie wywołania HTTP. ws-provider: zdalna instancja uruchamia pętlę AI. cloud-only: brak połączenia wychodzącego.",
+        "Jak to połączenie komunikuje się. reverse-ws: stały wychodzący WS (otwiera się natychmiast po zapisie). direct-http: bezpośrednie wywołania HTTP.",
       options: {
         reverseWs: "Reverse WS",
         directHttp: "Bezpośredni HTTP",
-        cloudOnly: "Tylko chmura",
       },
     },
     isInferenceProvider: {

@@ -78,8 +78,11 @@ type SyncedThread = z.infer<typeof syncedThreadSchema>;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Look up or create the REMOTE/{instanceId} subfolder for this user.
- * Returns the folder UUID (to use as folderId on thread rows).
+ * Whether a thread may leave the instance via thread sync. Pure COLUMN read:
+ * INCOGNITO threads have no rows (viewer-local), and transient plumbing
+ * threads carry sync_eligible=false — never derived from folder names.
+ * Missing thread → eligible (a deletion may relay after the row is gone; the
+ * peer's applier no-ops when irrelevant). Cached per thread (hot relay path).
  */
 async function resolveRemoteSubfolderId(
   userId: string,
@@ -98,7 +101,6 @@ async function resolveRemoteSubfolderId(
         ),
       )
       .limit(1);
-
     if (existing) {
       return existing.id;
     }
@@ -138,6 +140,8 @@ export async function pushThreadSync(
       .from(chatThreads)
       .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)))
       .limit(1);
+    // COLUMN-gated: incognito never persists server-side; transient plumbing
+    // threads carry sync_eligible=false. Never derived from folder names.
     if (
       !thread ||
       (thread.rootFolderId !== DefaultFolderId.REMOTE &&
@@ -155,10 +159,10 @@ export async function pushThreadSync(
       .where(eq(chatThreads.id, threadId));
 
     // Relay this thread as the [threadId] PATCH thread-updated remoteEvent —
-    // its own per-op event carrying the changed fields. createEndpointEmitter
-    // fans it out through the unified bridge, gated per-connection by
-    // syncScope["threads"] and applied on the peer via the [threadId] route's
-    // onRemoteEvent (which re-runs updateThread).
+    // regular fields ONLY. folderId is the SAME id on every instance (folders
+    // sync by id via the folder-created/updated/deleted events); ownership is
+    // the receiver's own origin_instance_id column + the bridge wire's sender
+    // label. No payload.
     const [{ createEndpointEmitter }, { default: threadsByIdDefinitions }] =
       await Promise.all([
         import("next-vibe/realtime/emitter"),
@@ -544,7 +548,9 @@ export const threadsSyncProvider: SyncProvider = {
               );
           }
         } else {
-          // New thread from remote — land in REMOTE/{instanceId} subfolder
+          // New thread: foreign-origin → REMOTE/<origin>/<folderPath> mirror;
+          // own-origin (restoring our own thread from a peer's backup) → the
+          // original root, unplaced (the local folder chain may not exist).
           threadInsertRows.push({
             id: remoteThread.id,
             userId,
@@ -563,9 +569,9 @@ export const threadsSyncProvider: SyncProvider = {
           });
         }
 
-        // A thread arriving under REMOTE/<instanceId> is OWNED by that remote
-        // instance from this receiver's view — we are its mirror. The owner's
-        // copy is authoritative for structure (parentId, content), so accept it
+        // A foreign-origin thread is OWNED by that instance from this
+        // receiver's view — we are its mirror. The owner's copy is
+        // authoritative for structure (parentId, content), so accept it
         // unconditionally instead of LWW: the local mirror's updatedAt is set
         // by the live-relay processor on an independent clock and would race
         // the owner's out-of-band edits (compacting re-parent, detach backfill).

@@ -1,9 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Stripe CLI Integration",
+  title: "Stripe CLI",
   titleShort: "Stripe CLI",
-  description: "Stripe CLI-Operationen und Webhook-Listening verwalten",
+  description: "Stripe Webhooks lokal empfangen",
   category: "Payment Integration",
   tags: {
     stripe: "Stripe",
@@ -11,114 +11,62 @@ export const translations: typeof enTranslations = {
     webhook: "Webhook",
   },
 
-  operations: {
-    check: "Installation prüfen",
-    install: "Stripe CLI installieren",
-    listen: "Webhook-Listener starten",
-    login: "Bei Stripe anmelden",
-    status: "Status prüfen",
-  },
-
   form: {
-    title: "Stripe CLI-Konfiguration",
-    description:
-      "Stripe CLI-Operationen und Webhook-Einstellungen konfigurieren",
+    title: "Stripe CLI",
+    description: "Stripe Webhook-Events an deinen lokalen Server weiterleiten",
     fields: {
-      operation: {
-        label: "Operationstyp",
-        description: "Wählen Sie die auszuführende Stripe CLI-Operation",
-        placeholder: "Wählen Sie eine Operation...",
-      },
       port: {
-        label: "Portnummer",
-        description: "Portnummer für Webhook-Weiterleitung (1000-65535)",
-        placeholder: "4242",
-      },
-      events: {
-        label: "Webhook-Events",
-        description: "Wählen Sie Stripe-Events zum Abhören",
-        placeholder: "Wählen Sie zu überwachende Events...",
-        paymentIntentSucceeded: "Zahlungsabsicht erfolgreich",
-        paymentIntentFailed: "Zahlungsabsicht fehlgeschlagen",
-        subscriptionCreated: "Abonnement erstellt",
-        subscriptionUpdated: "Abonnement aktualisiert",
-        invoicePaymentSucceeded: "Rechnungszahlung erfolgreich",
-        invoicePaymentFailed: "Rechnungszahlung fehlgeschlagen",
-      },
-      forwardTo: {
-        label: "Weiterleiten an URL",
-        description: "Lokaler Endpunkt zur Weiterleitung von Webhook-Events",
-        placeholder: "localhost:3000/api/webhooks/stripe",
-      },
-      skipSslVerify: {
-        label: "SSL-Verifizierung überspringen",
-        description: "SSL-Zertifikatverifizierung für Entwicklung überspringen",
+        label: "Port",
+        description: "Lokaler Port für Webhook-Weiterleitung (Standard: 3000)",
+        placeholder: "3000",
       },
     },
   },
 
-  response: {
-    success: "Operation erfolgreich abgeschlossen",
-    installed: "Stripe CLI-Installationsstatus",
-    version: "Installierte Stripe CLI-Version",
-    status: "Aktueller Operationsstatus",
-    output: "Befehlsausgabe und Logs",
-    instructions: "Nächste Schritte und Anweisungen",
-    webhookEndpoint: "Webhook-Endpunkt-URL",
-  },
-
-  login: {
-    instructions:
-      "Um sich bei Stripe zu authentifizieren, führen Sie 'stripe login' in Ihrem Terminal aus und folgen Sie den Anweisungen, um Ihr Stripe-Konto zu verbinden.",
-  },
-
   status: {
     authenticated: "Authentifiziert und bereit",
-    not_authenticated: "Nicht authentifiziert - führen Sie 'stripe login' aus",
+    not_authenticated: "Nicht authentifiziert — führe 'stripe login' aus",
     not_installed: "Stripe CLI ist nicht installiert",
   },
 
   errors: {
     validation: {
       title: "Ungültige Konfiguration",
-      description:
-        "Bitte überprüfen Sie Ihre Stripe CLI-Konfiguration und versuchen Sie es erneut",
+      description: "Stripe CLI-Konfiguration prüfen und erneut versuchen",
     },
     network: {
       title: "Netzwerkfehler",
-      description: "Verbindung zu Stripe-Diensten nicht möglich",
+      description: "Verbindung zu Stripe fehlgeschlagen",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description: "Sie haben keine Berechtigung, diese Operation auszuführen",
+      description: "Keine Berechtigung für diese Operation",
     },
     forbidden: {
       title: "Zugriff verboten",
-      description: "Diese Operation ist für Ihr Konto nicht erlaubt",
+      description: "Diese Operation ist für dein Konto nicht erlaubt",
     },
     notFound: {
-      title: "Ressource nicht gefunden",
-      description: "Die angeforderte Stripe-Ressource wurde nicht gefunden",
+      title: "Nicht gefunden",
+      description: "Stripe CLI ist nicht installiert",
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein Fehler ist bei der Verarbeitung der Stripe-Operation aufgetreten",
+      description: "Fehler beim Starten des Stripe Listeners",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unerwarteter Fehler ist mit Stripe CLI aufgetreten",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Konfigurationsänderungen",
+      description: "Es gibt nicht gespeicherte Konfigurationsänderungen",
     },
     conflict: {
       title: "Operationskonflikt",
-      description: "Eine andere Stripe-Operation läuft derzeit",
+      description: "Eine andere Stripe-Operation läuft bereits",
     },
-    execution_failed:
-      "Stripe CLI-Operation konnte nicht ordnungsgemäß ausgeführt werden",
+    execution_failed: "Stripe CLI-Operation fehlgeschlagen",
     userNotFound: {
       title: "Benutzer nicht gefunden",
       description: "Der angegebene Benutzer wurde nicht gefunden",
@@ -153,48 +101,14 @@ export const translations: typeof enTranslations = {
     },
     notConfigured: {
       title: "Stripe nicht konfiguriert",
-      description:
-        "Stripe ist nicht konfiguriert - setze STRIPE_SECRET_KEY in deiner .env",
+      description: "STRIPE_SECRET_KEY in .env setzen",
     },
     stripeCliNotInstalled: "Stripe CLI ist nicht installiert",
     listenerFailed: "Stripe Webhook-Listener konnte nicht gestartet werden",
   },
 
   success: {
-    title: "Operation erfolgreich",
-    description: "Stripe CLI-Operation erfolgreich abgeschlossen",
-  },
-
-  installInstructions: {
-    documentation:
-      "Bitte installieren Sie Stripe CLI gemäß der offiziellen Dokumentation unter: https://docs.stripe.com/stripe-cli",
-    quickInstallation: "Schnelle Installationsoptionen:",
-    macOS: {
-      title: "macOS (mit Homebrew):",
-      command: "brew install stripe/stripe-cli/stripe",
-    },
-    linux: {
-      title: "Linux (mit Paketmanager):",
-      debian: {
-        title: "Debian/Ubuntu",
-      },
-      fedora: {
-        title: "CentOS/RHEL/Fedora",
-      },
-    },
-    windows: {
-      title: "Windows:",
-      scoop: {
-        title: "Mit Scoop",
-      },
-      github: {
-        title: "Oder direkt von GitHub-Releases herunterladen:",
-        url: "https://github.com/stripe/stripe-cli/releases",
-      },
-    },
-    authentication: {
-      title: "Nach der Installation authentifizieren mit:",
-      command: "stripe login",
-    },
+    title: "Listener gestartet",
+    description: "Stripe CLI lauscht auf Webhooks",
   },
 };

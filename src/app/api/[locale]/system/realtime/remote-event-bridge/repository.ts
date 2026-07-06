@@ -157,10 +157,11 @@ export class RemoteEventBridgeRepository {
     // mode (the local side's choice). One direction only; the back channel is a
     // separate pushRemoteEvent on the peer, decided by the peer's own mode.
     //
-    //  • reverse-ws: the peer's connector is subscribed to THIS account's user
-    //    channel on us (it authenticates here as our local userId). We emit the
-    //    bridge transport event — a regular scope:"user" event — onto
-    //    user/{userId}. One emit per qualifying peer.
+    //  • reverse-ws: the peer's connector is subscribed to the BRIDGE endpoint's
+    //    user-scoped channel on us (it authenticates here as our local userId).
+    //    We emit the bridge transport event — a regular scope:"user" event —
+    //    and the emitter delivers it on that channel. Only connectors subscribe
+    //    to it; browser tabs never see bridge frames.
     //
     //  • direct-http: POST to the peer's bridge via the canonical remote-call.
     for (const conn of connections) {
@@ -172,12 +173,11 @@ export class RemoteEventBridgeRepository {
       }
 
       if (conn.transportMode === "reverse-ws") {
-        // Emit the bridge event onto OUR account's user channel on OUR hub.
-        // The peer's connector authenticates HERE with this account's token —
-        // i.e. as OUR local userId — and WS channel auth only admits
-        // `user/{auth userId}`, so that is the exact channel it subscribes to.
-        // (Emitting on user/{remoteUserId} — the account's id on the PEER's
-        // DB — targeted a channel nobody on this hub can subscribe to.)
+        // Emit the bridge event on OUR hub as OUR local userId. The peer's
+        // connector authenticates HERE with this account's token — i.e. as
+        // OUR local userId — and subscribes to the bridge endpoint's
+        // user-scoped channel for exactly that identity, which is where the
+        // emitter delivers a scope:"user" event.
         await RemoteEventBridgeRepository.emitBridgeEventToPeer(
           userId,
           conn.tokenLeadId,

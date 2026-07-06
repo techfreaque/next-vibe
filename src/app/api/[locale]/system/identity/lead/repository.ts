@@ -1,0 +1,2547 @@
+/**
+ * Leads Repository
+ * Core functionality for lead management operations
+ */
+
+import type { SQL } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  convertCountryFilter,
+  convertLanguageFilter,
+  type Countries,
+  type CountryFilter,
+  type LanguageFilter,
+  type Languages,
+} from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { withTransaction } from "next-vibe/database/utils/repository-helpers";
+import type { LeadsT } from "next-vibe/identity/lead/i18n";
+import { scopedTranslation } from "next-vibe/identity/lead/i18n";
+import { users } from "next-vibe/identity/user/db";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import type { BatchUpdateRequestOutput } from "@/app/api/[locale]/leads/batch/definition";
+import { BatchOperationScope } from "@/app/api/[locale]/leads/batch/definition";
+import type { LeadCreateRequestTypeOutput } from "@/app/api/[locale]/leads/create/definition";
+import type {
+  LeadExportRequestOutput,
+  LeadExportResponseOutput,
+} from "@/app/api/[locale]/leads/export/definition";
+import type { LeadListGetRequestTypeOutput } from "@/app/api/[locale]/leads/list/definition";
+import type { LeadEngagementResponseOutput } from "@/app/api/[locale]/leads/tracking/definition";
+import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
+import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
+import { leadReferrals, referralCodes } from "@/app/api/[locale]/referral/db";
+
+import {
+  emailCampaigns,
+  type Lead,
+  leadEngagements,
+  leadLeadLinks,
+  leads,
+  userLeadLinks,
+} from "./db";
+import type {
+  BatchOperationScopeValue,
+  LeadSortFieldValue,
+  LeadSourceFilterValue,
+  SortOrderValue,
+} from "./enum";
+import {
+  EmailCampaignStage,
+  type EmailCampaignStageFilterValue,
+  type EmailCampaignStageValue,
+  EngagementTypes,
+  type EngagementTypesValue,
+  ExportFormat,
+  getWebsiteUserStatus,
+  isStatusTransitionAllowed,
+  LeadSortField,
+  type LeadSourceValue,
+  LeadStatus,
+  type LeadStatusFilterValue,
+  type LeadStatusValue,
+  mapCampaignStageFilter,
+  mapSourceFilter,
+  mapStatusFilter,
+  MimeType,
+  SortOrder,
+} from "./enum";
+import type {
+  LeadDetailResponse,
+  LeadListResponseType,
+  LeadResponseType,
+  LeadUpdateType,
+  LeadWithEmailType,
+} from "./types";
+
+/**
+ * Leads Repository - Static class pattern
+ */
+export class LeadsRepository {
+  /**
+   * Type guard to check if a lead has an email
+   */
+  private static leadHasEmail(
+    lead: LeadResponseType,
+  ): lead is LeadWithEmailType {
+    return Boolean(lead.email);
+  }
+
+  /**
+   * Create a new lead with business logic
+   */
+  static async createLead(
+    data: LeadCreateRequestTypeOutput,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<
+    ResponseType<{
+      lead: {
+        summary: {
+          id: string;
+          businessName: string;
+          email: string | null;
+          status: typeof LeadStatusValue;
+        };
+        contactDetails: {
+          phone: string | null;
+          website: string | null;
+          country: string;
+          language: string;
+        };
+        trackingInfo: {
+          source: typeof LeadSourceValue | null;
+          emailsSent: number;
+          currentCampaignStage: string | null;
+        };
+        metadata: {
+          notes: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+        };
+      };
+    }>
+  > {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      logger.debug("Creating new lead", {
+        email: data.contactInfo?.email,
+        businessName: data.contactInfo?.businessName,
+      });
+
+      if (data.contactInfo?.email) {
+        // Check if lead already exists
+        const existingLead = await db
+          .select()
+          .from(leads)
+          .where(eq(leads.email, data.contactInfo.email.toLowerCase().trim()))
+          .limit(1);
+
+        if (existingLead.length > 0) {
+          return fail({
+            message: t("leadsErrors.leads.post.error.duplicate.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+      }
+
+      // Filter out null values from metadata (if exists in leadDetails)
+      const metadata: Record<string, string | number | boolean | null> = {};
+      // Note: metadata is not in the current definition, keeping empty for now
+
+      // Create lead directly in insert statement to avoid type inference issues
+      const country = data.locationPreferences?.country ?? "GLOBAL";
+      const language = data.locationPreferences?.language ?? "en";
+      const email = data.contactInfo?.email ?? null;
+      const businessName = data.contactInfo?.businessName ?? "";
+      const phone = data.contactInfo?.phone ?? null;
+      const website = data.contactInfo?.website ?? null;
+      const source = data.leadDetails?.source;
+      const notes = data.leadDetails?.notes ?? null;
+
+      const [createdLead] = await db
+        .insert(leads)
+        .values({
+          email,
+          businessName,
+          phone,
+          website,
+          country,
+          language,
+          source,
+          notes,
+          status: LeadStatus.PENDING, // Default status for general lead creation
+          currentCampaignStage: EmailCampaignStage.INITIAL,
+          metadata,
+        })
+        .returning();
+
+      logger.debug("Lead created successfully", {
+        leadId: createdLead.id,
+        trackingId: createdLead.id,
+        status: createdLead.status,
+        note: "Lead marked as NOT_STARTED - campaign starter cron will process it",
+      });
+
+      return success({
+        lead: {
+          summary: {
+            id: createdLead.id,
+            businessName: createdLead.businessName,
+            email: createdLead.email,
+            status: createdLead.status,
+          },
+          contactDetails: {
+            phone: createdLead.phone,
+            website: createdLead.website,
+            country: createdLead.country,
+            language: createdLead.language,
+          },
+          trackingInfo: {
+            source: createdLead.source,
+            emailsSent: createdLead.emailsSent,
+            currentCampaignStage: createdLead.currentCampaignStage,
+          },
+          metadata: {
+            notes: createdLead.notes,
+            createdAt: createdLead.createdAt,
+            updatedAt: createdLead.updatedAt,
+          },
+        },
+      });
+    } catch (error) {
+      logger.error("Error creating lead", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.post.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get lead by ID with business logic (public API with auth)
+   */
+  static async getLeadById(
+    id: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    logger.debug("Getting lead by ID", { id });
+    return await LeadsRepository.getLeadByIdInternal(id, logger, t);
+  }
+
+  /**
+   * Update lead with business logic (public API with auth)
+   * Includes status transition validation
+   */
+  static async updateLead(
+    id: string,
+    data: Partial<LeadUpdateType>,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      logger.debug("Updating lead", {
+        id,
+        updates: Object.keys(data),
+      });
+
+      const flattenedData: Partial<LeadUpdateType> = data;
+
+      // If status is being updated, validate the transition
+      if (flattenedData.status) {
+        // Get current lead to check current status
+        const currentLeadResult = await LeadsRepository.getLeadByIdInternal(
+          id,
+          logger,
+          t,
+        );
+        if (!currentLeadResult.success) {
+          return fail({
+            message: t("leadsErrors.leads.patch.error.not_found.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            cause: currentLeadResult,
+          });
+        }
+
+        const currentStatus = currentLeadResult.data.lead.basicInfo.status;
+        const newStatus = flattenedData.status;
+
+        // Validate status transition
+        if (!isStatusTransitionAllowed(currentStatus, newStatus)) {
+          logger.error("Invalid lead status transition", {
+            id,
+            currentStatus,
+            newStatus,
+          });
+          return fail({
+            message: t("leadsErrors.batch.update.error.default"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
+
+        logger.debug("Lead status transition validated", {
+          id,
+          from: currentStatus,
+          to: newStatus,
+        });
+      }
+
+      // Delegate to internal method
+      const result = await LeadsRepository.updateLeadInternal(
+        id,
+        flattenedData,
+        logger,
+        t,
+      );
+
+      // After a successful status change, trigger campaign lifecycle transitions
+      if (result.success && flattenedData.status) {
+        const { campaignSchedulerService } =
+          await import("@/app/api/[locale]/leads/campaigns/emails");
+        await campaignSchedulerService.haltCampaignsForStatusChange(
+          id,
+          flattenedData.status,
+          logger,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      logger.error("Error updating lead", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.patch.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * List leads with filtering and pagination with business logic
+   */
+  static async listLeads(
+    query: LeadListGetRequestTypeOutput,
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadListResponseType>> {
+    try {
+      // Extract values from nested structure with type safety
+      const page = query.paginationInfo?.page ?? 1;
+      const limit = query.paginationInfo?.limit ?? 20;
+      const search = query.statusFilters?.search;
+      const statusFilters = query.statusFilters?.status;
+      const campaignStageFilters = query.statusFilters?.currentCampaignStage;
+      const sourceFilters = query.statusFilters?.source;
+      const countryFilters = query.locationFilters?.country;
+      const languageFilters = query.locationFilters?.language;
+      const sortByField =
+        query.sortingOptions?.sortBy ?? LeadSortField.CREATED_AT;
+      const sortDirection = query.sortingOptions?.sortOrder ?? SortOrder.DESC;
+
+      const offset = (page - 1) * limit;
+
+      // Build where conditions
+      const conditions: SQL[] = [];
+
+      // Handle status filters (array of filters)
+      if (statusFilters && statusFilters.length > 0) {
+        const mappedStatuses = statusFilters
+          .map((filter) => mapStatusFilter(filter))
+          .filter(
+            (status): status is typeof LeadStatusValue => status !== null,
+          );
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((status) => eq(leads.status, status)))!,
+          );
+        }
+      }
+
+      // Handle campaign stage filters (array of filters)
+      if (campaignStageFilters && campaignStageFilters.length > 0) {
+        const mappedStages = campaignStageFilters
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter(
+            (stage): stage is typeof EmailCampaignStageValue => stage !== null,
+          );
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(
+              ...mappedStages.map((stage) =>
+                eq(leads.currentCampaignStage, stage),
+              ),
+            )!,
+          );
+        }
+      }
+
+      // Handle source filters (array of filters)
+      if (sourceFilters && sourceFilters.length > 0) {
+        const mappedSources = sourceFilters
+          .map((filter) => mapSourceFilter(filter))
+          .filter(
+            (source): source is typeof LeadSourceValue => source !== null,
+          );
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((source) => eq(leads.source, source)))!,
+          );
+        }
+      }
+
+      // Handle country filters (array of countries)
+      if (countryFilters && countryFilters.length > 0) {
+        const convertedCountries = countryFilters
+          .map((filter) => convertCountryFilter(filter))
+          .filter((country): country is Countries => country !== null);
+        conditions.push(
+          or(
+            ...convertedCountries.map((country) => eq(leads.country, country)),
+          )!,
+        );
+      }
+
+      // Handle language filters (array of languages)
+      if (languageFilters && languageFilters.length > 0) {
+        const convertedLanguages = languageFilters
+          .map((filter) => convertLanguageFilter(filter))
+          .filter((language): language is Languages => language !== null);
+        conditions.push(
+          or(
+            ...convertedLanguages.map((language) =>
+              eq(leads.language, language),
+            ),
+          )!,
+        );
+      }
+
+      // Handle search filter
+      if (search) {
+        conditions.push(
+          or(
+            ilike(leads.email, `%${search}%`),
+            ilike(leads.businessName, `%${search}%`),
+          )!,
+        );
+      }
+
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      // Build base conditions without status filter - used for per-status counts
+      // so all tabs show accurate counts simultaneously regardless of active status filter
+      const baseConditions: SQL[] = [];
+      if (campaignStageFilters && campaignStageFilters.length > 0) {
+        const mappedStages = campaignStageFilters
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter(
+            (stage): stage is typeof EmailCampaignStageValue => stage !== null,
+          );
+        if (mappedStages.length > 0) {
+          baseConditions.push(
+            or(
+              ...mappedStages.map((stage) =>
+                eq(leads.currentCampaignStage, stage),
+              ),
+            )!,
+          );
+        }
+      }
+      if (sourceFilters && sourceFilters.length > 0) {
+        const mappedSources = sourceFilters
+          .map((filter) => mapSourceFilter(filter))
+          .filter(
+            (source): source is typeof LeadSourceValue => source !== null,
+          );
+        if (mappedSources.length > 0) {
+          baseConditions.push(
+            or(...mappedSources.map((source) => eq(leads.source, source)))!,
+          );
+        }
+      }
+      if (countryFilters && countryFilters.length > 0) {
+        const convertedCountries = countryFilters
+          .map((filter) => convertCountryFilter(filter))
+          .filter((country): country is Countries => country !== null);
+        baseConditions.push(
+          or(
+            ...convertedCountries.map((country) => eq(leads.country, country)),
+          )!,
+        );
+      }
+      if (languageFilters && languageFilters.length > 0) {
+        const convertedLanguages = languageFilters
+          .map((filter) => convertLanguageFilter(filter))
+          .filter((language): language is Languages => language !== null);
+        baseConditions.push(
+          or(
+            ...convertedLanguages.map((language) =>
+              eq(leads.language, language),
+            ),
+          )!,
+        );
+      }
+      if (search) {
+        baseConditions.push(
+          or(
+            ilike(leads.email, `%${search}%`),
+            ilike(leads.businessName, `%${search}%`),
+          )!,
+        );
+      }
+      const baseWhereClause =
+        baseConditions.length > 0 ? and(...baseConditions) : undefined;
+
+      const makeStatusCountWhere = (
+        statusVal: (typeof LeadStatus)[keyof typeof LeadStatus],
+      ): ReturnType<typeof eq> | ReturnType<typeof and> =>
+        baseWhereClause
+          ? and(baseWhereClause, eq(leads.status, statusVal))!
+          : eq(leads.status, statusVal);
+
+      // Get total count
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(leads)
+        .where(whereClause);
+
+      // Per-status counts - independent of the active status filter
+      const [
+        countNew,
+        countPending,
+        countCampaignRunning,
+        countWebsiteUser,
+        countNewsletterSubscriber,
+        countInContact,
+        countSignedUp,
+        countSubscriptionConfirmed,
+        countUnsubscribed,
+        countBounced,
+        countInvalid,
+      ] = await Promise.all([
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.NEW))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.PENDING))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.CAMPAIGN_RUNNING))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.WEBSITE_USER))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.NEWSLETTER_SUBSCRIBER))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.IN_CONTACT))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.SIGNED_UP))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.SUBSCRIPTION_CONFIRMED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.UNSUBSCRIBED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.BOUNCED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.INVALID))
+          .then(([r]) => r?.n ?? 0),
+      ]);
+
+      const countsByStatus = {
+        new: countNew,
+        pending: countPending,
+        campaignRunning: countCampaignRunning,
+        websiteUser: countWebsiteUser,
+        newsletterSubscriber: countNewsletterSubscriber,
+        inContact: countInContact,
+        signedUp: countSignedUp,
+        subscriptionConfirmed: countSubscriptionConfirmed,
+        unsubscribed: countUnsubscribed,
+        bounced: countBounced,
+        invalid: countInvalid,
+      };
+
+      // Get leads with sorting
+      let orderClause;
+      switch (sortByField) {
+        case LeadSortField.EMAIL:
+          orderClause =
+            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
+          break;
+        case LeadSortField.BUSINESS_NAME:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.businessName
+              : desc(leads.businessName);
+          break;
+        case LeadSortField.UPDATED_AT:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.updatedAt
+              : desc(leads.updatedAt);
+          break;
+        case LeadSortField.LAST_ENGAGEMENT_AT:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.lastEngagementAt
+              : desc(leads.lastEngagementAt);
+          break;
+        default:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.createdAt
+              : desc(leads.createdAt);
+      }
+
+      const leadsList = await db
+        .select({
+          // All lead columns
+          id: leads.id,
+          email: leads.email,
+          businessName: leads.businessName,
+          contactName: leads.contactName,
+          phone: leads.phone,
+          website: leads.website,
+          country: leads.country,
+          language: leads.language,
+          status: leads.status,
+          source: leads.source,
+          notes: leads.notes,
+          convertedUserId: leads.convertedUserId,
+          convertedAt: leads.convertedAt,
+          signedUpAt: leads.signedUpAt,
+          subscriptionConfirmedAt: leads.subscriptionConfirmedAt,
+          currentCampaignStage: leads.currentCampaignStage,
+          emailsSent: leads.emailsSent,
+          lastEmailSentAt: leads.lastEmailSentAt,
+          unsubscribedAt: leads.unsubscribedAt,
+          emailsOpened: leads.emailsOpened,
+          emailsClicked: leads.emailsClicked,
+          lastEngagementAt: leads.lastEngagementAt,
+          metadata: leads.metadata,
+          createdAt: leads.createdAt,
+          updatedAt: leads.updatedAt,
+          ipAddress: leads.ipAddress,
+          userAgent: leads.userAgent,
+          deviceType: leads.deviceType,
+          browser: leads.browser,
+          os: leads.os,
+          referralCode: leads.referralCode,
+          skillId: leads.skillId,
+          emailJourneyVariant: leads.emailJourneyVariant,
+          bouncedAt: leads.bouncedAt,
+          invalidAt: leads.invalidAt,
+          campaignStartedAt: leads.campaignStartedAt,
+          // Subqueries for link counts
+          linkedLeadsCount: sql<number>`(
+            SELECT COUNT(*)::int FROM lead_lead_links
+            WHERE lead_id_1 = ${leads.id} OR lead_id_2 = ${leads.id}
+          )`,
+          hasLinkedUser: sql<boolean>`EXISTS (
+            SELECT 1 FROM user_lead_links WHERE lead_id = ${leads.id}
+          )`,
+        })
+        .from(leads)
+        .where(whereClause)
+        .orderBy(orderClause)
+        .limit(limit)
+        .offset(offset);
+
+      const totalPages = Math.ceil(total / limit);
+
+      logger.debug("Leads listed successfully", {
+        total,
+        page,
+        limit,
+        totalPages,
+        resultsCount: leadsList.length,
+      });
+
+      return success<LeadListResponseType>({
+        response: {
+          leads: leadsList.map((lead) =>
+            LeadsRepository.formatLeadResponse(lead),
+          ),
+        },
+        paginationInfo: {
+          totalCount: total,
+          pageCount: totalPages,
+        },
+        countsByStatus,
+      });
+    } catch (error) {
+      logger.error("Error listing leads", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.get.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Convert lead - handles both anonymous lead conversion and user-lead relationship establishment (public API with auth)
+   */
+  static async convertLead(
+    leadId: string,
+    options: {
+      userId: string;
+      email: string;
+      additionalData?: {
+        businessName?: string;
+        contactName?: string;
+        phone?: string;
+        website?: string;
+      };
+    },
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadResponseType>> {
+    return await LeadsRepository.convertLeadInternal(
+      leadId,
+      options,
+      logger,
+      t,
+    );
+  }
+
+  /**
+   * Private helper methods
+   */
+  private static formatLeadResponse(
+    lead: Lead & { linkedLeadsCount?: number; hasLinkedUser?: boolean },
+  ): LeadResponseType {
+    return {
+      id: lead.id,
+      email: lead.email,
+      businessName: lead.businessName,
+      contactName: lead.contactName,
+      phone: lead.phone,
+      website: lead.website,
+      country: lead.country,
+      language: lead.language,
+      status: lead.status,
+      source: lead.source,
+      notes: lead.notes,
+      convertedUserId: lead.convertedUserId,
+      convertedAt: lead.convertedAt,
+      signedUpAt: lead.signedUpAt,
+      subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
+      currentCampaignStage: lead.currentCampaignStage,
+      emailsSent: lead.emailsSent,
+      lastEmailSentAt: lead.lastEmailSentAt,
+      unsubscribedAt: lead.unsubscribedAt,
+      emailsOpened: lead.emailsOpened,
+      emailsClicked: lead.emailsClicked,
+      lastEngagementAt: lead.lastEngagementAt,
+      metadata: lead.metadata || {},
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt,
+      linkedLeadsCount: lead.linkedLeadsCount ?? 0,
+      hasLinkedUser: lead.hasLinkedUser ?? false,
+      referralCode: lead.referralCode ?? null,
+    };
+  }
+
+  /**
+   * Get referral codes used by a lead (pre-signup history from lead_referrals table)
+   */
+  private static async getLeadReferralHistory(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<LeadDetailResponse["lead"]["referralHistory"]> {
+    try {
+      const rows = await db
+        .select({
+          code: referralCodes.code,
+          ownerUserId: referralCodes.ownerUserId,
+          clickedAt: leadReferrals.createdAt,
+        })
+        .from(leadReferrals)
+        .leftJoin(
+          referralCodes,
+          eq(leadReferrals.referralCodeId, referralCodes.id),
+        )
+        .where(eq(leadReferrals.leadId, leadId))
+        .orderBy(desc(leadReferrals.createdAt));
+
+      return rows
+        .filter(
+          (r): r is { code: string; ownerUserId: string; clickedAt: Date } =>
+            r.code !== null && r.ownerUserId !== null,
+        )
+        .map((r) => ({
+          code: r.code,
+          ownerUserId: r.ownerUserId,
+          clickedAt: r.clickedAt,
+        }));
+    } catch (error) {
+      logger.error("Error fetching lead referral history", {
+        leadId,
+        ...parseError(error),
+      });
+      return [];
+    }
+  }
+
+  private static formatLeadDetailResponse(
+    lead: Lead,
+    linkedLeads: LeadDetailResponse["lead"]["linkedLeads"] = [],
+    linkedUsers: LeadDetailResponse["lead"]["linkedUsers"] = [],
+    referralHistory: LeadDetailResponse["lead"]["referralHistory"] = [],
+  ): LeadDetailResponse {
+    return {
+      lead: {
+        basicInfo: {
+          id: lead.id,
+          email: lead.email,
+          businessName: lead.businessName,
+          contactName: lead.contactName,
+          status: lead.status,
+        },
+        contactDetails: {
+          phone: lead.phone,
+          website: lead.website,
+          country: lead.country,
+          language: lead.language,
+        },
+        campaignTracking: {
+          source: lead.source,
+          currentCampaignStage: lead.currentCampaignStage,
+          emailJourneyVariant: lead.emailJourneyVariant,
+          emailsSent: lead.emailsSent,
+          lastEmailSentAt: lead.lastEmailSentAt,
+        },
+        engagement: {
+          emailsOpened: lead.emailsOpened,
+          emailsClicked: lead.emailsClicked,
+          lastEngagementAt: lead.lastEngagementAt,
+          unsubscribedAt: lead.unsubscribedAt,
+        },
+        conversion: {
+          convertedUserId: lead.convertedUserId,
+          convertedAt: lead.convertedAt,
+          signedUpAt: lead.signedUpAt,
+          subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
+        },
+        metadata: {
+          notes: lead.notes,
+          metadata: lead.metadata || {},
+          createdAt: lead.createdAt,
+          updatedAt: lead.updatedAt,
+        },
+        identity: {
+          ipAddress: lead.ipAddress,
+          userAgent: lead.userAgent,
+          deviceType: lead.deviceType,
+          browser: lead.browser,
+          os: lead.os,
+          referralCode: lead.referralCode,
+        },
+        lifecycle: {
+          bouncedAt: lead.bouncedAt,
+          invalidAt: lead.invalidAt,
+          campaignStartedAt: lead.campaignStartedAt,
+        },
+        linkedLeads,
+        linkedUsers,
+        referralHistory,
+      },
+    };
+  }
+
+  /**
+   * Internal method to unsubscribe from newsletter
+   * Handles newsletter opt-out as part of lead unsubscribe process
+   */
+  private static async unsubscribeFromNewsletterInternal(
+    email: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.debug("Unsubscribing from newsletter (internal)", { email });
+
+      // Check if newsletter subscription exists
+      const [subscription] = await db
+        .select()
+        .from(newsletterSubscriptions)
+        .where(eq(newsletterSubscriptions.email, email))
+        .limit(1);
+
+      if (!subscription) {
+        // Create an opt-out record for users who haven't subscribed yet
+        // This prevents future unwanted subscriptions and ensures compliance
+        logger.debug("Creating newsletter opt-out record for non-subscriber", {
+          email,
+        });
+
+        await db.insert(newsletterSubscriptions).values({
+          email,
+          status: NewsletterSubscriptionStatus.UNSUBSCRIBED,
+          marketingConsent: false,
+          subscriptionDate: new Date(), // Required field
+          unsubscribedDate: new Date(),
+          source: "lead-unsubscribe",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } else if (
+        subscription.status !== NewsletterSubscriptionStatus.UNSUBSCRIBED
+      ) {
+        // Update existing subscription status
+        await db
+          .update(newsletterSubscriptions)
+          .set({
+            status: NewsletterSubscriptionStatus.UNSUBSCRIBED,
+            marketingConsent: false,
+            unsubscribedDate: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(newsletterSubscriptions.email, email));
+      }
+
+      logger.debug("Newsletter opt-out completed", { email });
+    } catch (error) {
+      logger.error(
+        "Error unsubscribing from newsletter (internal)",
+        parseError(error),
+      );
+      // Don't re-throw - we want lead opt-out to succeed even if newsletter fails
+    }
+  }
+
+  /**
+   * Update lead status to unsubscribed when unsubscribing from newsletter
+   * This method is called from newsletter unsubscribe to ensure lead status is updated
+   */
+  static async updateLeadStatusOnNewsletterUnsubscribe(
+    email: string,
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<{ success: boolean; leadFound: boolean }>> {
+    try {
+      logger.debug("Updating lead status on newsletter unsubscribe", { email });
+
+      // Check if lead exists with this email
+      const [existingLead] = await db
+        .select({ id: leads.id, status: leads.status })
+        .from(leads)
+        .where(eq(leads.email, email))
+        .limit(1);
+
+      if (!existingLead) {
+        logger.debug("No lead found for email during newsletter unsubscribe", {
+          email,
+        });
+        return success({
+          success: true,
+          leadFound: false,
+        });
+      }
+
+      // Only update if lead is not already unsubscribed
+      if (existingLead.status === LeadStatus.UNSUBSCRIBED) {
+        logger.debug("Lead already unsubscribed", {
+          email,
+          leadId: existingLead.id,
+        });
+      } else {
+        await db
+          .update(leads)
+          .set({
+            status: LeadStatus.UNSUBSCRIBED,
+            unsubscribedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(leads.email, email));
+
+        logger.debug("Lead status updated to unsubscribed", {
+          email,
+          leadId: existingLead.id,
+        });
+      }
+
+      return success({
+        success: true,
+        leadFound: true,
+      });
+    } catch (error) {
+      logger.error(
+        "Error updating lead status on newsletter unsubscribe",
+        parseError(error).message,
+      );
+      return fail({
+        message: t("leadsErrors.leads.get.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Internal: Get lead by ID (no auth required)
+   * Used by internal services like tracking
+   */
+  static async getLeadByIdInternal(
+    id: string,
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    try {
+      logger.debug("Fetching lead by ID (internal)", { id });
+
+      const [lead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.id, id))
+        .limit(1);
+
+      if (!lead) {
+        return fail({
+          message: t("leadsErrors.leads.get.error.not_found.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      const [linkedLeads, linkedUsers, referralHistory] = await Promise.all([
+        LeadsRepository.getLinkedLeads(id, logger),
+        LeadsRepository.getLinkedUsers(id, logger),
+        LeadsRepository.getLeadReferralHistory(id, logger),
+      ]);
+
+      return success(
+        LeadsRepository.formatLeadDetailResponse(
+          lead,
+          linkedLeads,
+          linkedUsers,
+          referralHistory,
+        ),
+      );
+    } catch (error) {
+      logger.error("Error fetching lead by ID (internal)", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.get.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Internal: Update lead (no auth required, no status transition validation)
+   * Used by internal services like tracking
+   */
+  static async updateLeadInternal(
+    id: string,
+    data: Partial<LeadUpdateType>,
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    try {
+      logger.debug("Updating lead (internal)", {
+        id,
+        updates: Object.keys(data),
+      });
+
+      // Filter out null values and prepare update data
+      const updateData: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | Date
+        | null
+        | Record<string, string | number | boolean | null>
+      > = {
+        updatedAt: new Date(),
+      };
+
+      // Only include non-null values in the update
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          updateData[key] = value;
+        }
+      });
+
+      const [updatedLead] = await db
+        .update(leads)
+        .set(updateData)
+        .where(eq(leads.id, id))
+        .returning();
+
+      if (!updatedLead) {
+        return fail({
+          message: t("leadsErrors.leads.patch.error.not_found.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      logger.debug("Lead updated successfully (internal)", { id });
+
+      return success(LeadsRepository.formatLeadDetailResponse(updatedLead));
+    } catch (error) {
+      logger.error("Error updating lead (internal)", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.patch.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Internal: Set skill attribution on a lead.
+   * @param overwrite - if false (default), only sets if skill_id is currently NULL (first-touch)
+   *                    if true, always overwrites (e.g. user explicitly interacted with a skill)
+   */
+  static async updateLeadSkillId(
+    leadId: string,
+    skillId: string,
+    overwrite: boolean,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      if (overwrite) {
+        await db
+          .update(leads)
+          .set({ skillId, updatedAt: new Date() })
+          .where(eq(leads.id, leadId));
+      } else {
+        // Only set if not already attributed (first-touch wins)
+        await db
+          .update(leads)
+          .set({ skillId, updatedAt: new Date() })
+          .where(and(eq(leads.id, leadId), sql`${leads.skillId} IS NULL`));
+      }
+      logger.debug("Lead skillId updated", { leadId, skillId, overwrite });
+    } catch (error) {
+      logger.error("Failed to update lead skillId", {
+        leadId,
+        skillId,
+        error: parseError(error).message,
+      });
+    }
+  }
+
+  /**
+   * Internal: Convert lead (no auth required)
+   * Used by internal services like tracking
+   */
+  static async convertLeadInternal(
+    leadId: string,
+    options: {
+      userId: string;
+      email: string;
+      additionalData?: {
+        businessName?: string;
+        contactName?: string;
+        phone?: string;
+        website?: string;
+      };
+    },
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadResponseType>> {
+    try {
+      logger.debug("Converting lead (internal)", {
+        leadId,
+        userId: options.userId,
+        email: options.email,
+        hasAdditionalData: !!options.additionalData,
+      });
+
+      // Use transaction to ensure data consistency
+      const result = await withTransaction<ResponseType<LeadResponseType>>(
+        logger,
+        async (tx) => {
+          // Find the lead
+          const [existingLead] = await tx
+            .select()
+            .from(leads)
+            .where(eq(leads.id, leadId))
+            .limit(1);
+
+          if (!existingLead) {
+            return fail({
+              message: t("leadsErrors.leads.patch.error.not_found.title"),
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
+          }
+
+          // Check if lead is already converted to a user
+          if (existingLead.convertedUserId && options.userId) {
+            logger.debug("Lead already converted to user (internal)", {
+              leadId,
+              existingUserId: existingLead.convertedUserId,
+              newUserId: options.userId,
+            });
+            return success(LeadsRepository.formatLeadResponse(existingLead));
+          }
+
+          // Prepare update data
+          const updateData: Partial<Lead> = {
+            updatedAt: new Date(),
+          };
+
+          // Handle anonymous lead conversion (email update)
+          if (options.email && existingLead.metadata?.anonymous) {
+            logger.debug(
+              "Converting anonymous lead with real email (internal)",
+              {
+                leadId,
+                oldEmail: existingLead.email,
+                newEmail: options.email,
+              },
+            );
+
+            // Check for duplicate email
+            const [duplicateLead] = await tx
+              .select()
+              .from(leads)
+              .where(eq(leads.email, options.email.toLowerCase().trim()))
+              .limit(1);
+
+            if (duplicateLead && duplicateLead.id !== existingLead.id) {
+              return fail({
+                message: t("leadsErrors.leads.post.error.duplicate.title"),
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
+            }
+
+            updateData.email = options.email.toLowerCase().trim();
+            updateData.status = getWebsiteUserStatus(existingLead.status);
+            updateData.metadata = {
+              ...existingLead.metadata,
+              anonymous: false,
+              convertedAt: new Date().toISOString(),
+              originalEmail: existingLead.email,
+            };
+          }
+
+          // Handle additional data updates
+          if (options.additionalData) {
+            if (options.additionalData.businessName) {
+              updateData.businessName = options.additionalData.businessName;
+            }
+            if (options.additionalData.contactName) {
+              updateData.contactName = options.additionalData.contactName;
+            }
+            if (options.additionalData.phone) {
+              updateData.phone = options.additionalData.phone;
+            }
+            if (options.additionalData.website) {
+              updateData.website = options.additionalData.website;
+            }
+          }
+
+          // Handle user-lead relationship establishment
+          if (options.userId) {
+            updateData.status = LeadStatus.SIGNED_UP;
+            updateData.convertedUserId = options.userId;
+            updateData.convertedAt = new Date();
+            updateData.signedUpAt = new Date();
+
+            // Check if user-lead relationship already exists
+            const [existingRelationship] = await tx
+              .select()
+              .from(userLeadLinks)
+              .where(
+                and(
+                  eq(userLeadLinks.userId, options.userId),
+                  eq(userLeadLinks.leadId, existingLead.id),
+                ),
+              )
+              .limit(1);
+
+            if (existingRelationship) {
+              logger.debug("User-lead relationship already exists (internal)", {
+                userId: options.userId,
+                leadId: existingLead.id,
+                relationshipId: existingRelationship.id,
+              });
+            } else {
+              await tx
+                .insert(userLeadLinks)
+                .values({
+                  userId: options.userId,
+                  leadId: existingLead.id,
+                  linkReason: "manual",
+                })
+                .onConflictDoNothing();
+
+              logger.debug("User-lead relationship created (internal)", {
+                userId: options.userId,
+                leadId: existingLead.id,
+              });
+            }
+          }
+
+          // Apply updates
+          const [updatedLead] = await tx
+            .update(leads)
+            .set(updateData)
+            .where(eq(leads.id, existingLead.id))
+            .returning();
+
+          return success(LeadsRepository.formatLeadResponse(updatedLead));
+        },
+      );
+
+      if (result?.success) {
+        logger.debug("Lead converted successfully (internal)", {
+          leadId,
+          userId: options.userId,
+          email: options.email,
+        });
+        // Halt COLD and NEWSLETTER_NURTURE campaigns on signup
+        const { campaignSchedulerService } =
+          await import("@/app/api/[locale]/leads/campaigns/emails");
+        await campaignSchedulerService.haltCampaignsForStatusChange(
+          leadId,
+          LeadStatus.SIGNED_UP,
+          logger,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      logger.error("Error converting lead (internal)", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.patch.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Internal: Record engagement event for a lead (no auth required)
+   * Used by internal services like tracking
+   */
+  static async recordEngagementInternal(
+    data: {
+      leadId: string;
+      engagementType: typeof EngagementTypesValue;
+      campaignId?: string;
+      metadata?: Record<string, string | number | boolean>;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>> {
+    try {
+      logger.debug("Recording lead engagement", {
+        leadId: data.leadId,
+        engagementType: data.engagementType,
+        campaignId: data.campaignId,
+      });
+
+      // First, check if the lead exists
+      const [lead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.id, data.leadId))
+        .limit(1);
+
+      if (!lead) {
+        return fail({
+          message: t("leadsErrors.leadsEngagement.post.error.validation.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      // Create the engagement record
+      const [engagement] = await db
+        .insert(leadEngagements)
+        .values({
+          leadId: data.leadId,
+          campaignId: data.campaignId || null,
+          engagementType: data.engagementType,
+          metadata: data.metadata || {},
+          ipAddress: data.ipAddress || null,
+          userAgent: data.userAgent || null,
+        })
+        .returning();
+
+      if (!engagement) {
+        return fail({
+          message: t("leadsErrors.leadsEngagement.post.error.server.title"),
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+        });
+      }
+
+      // Update lead engagement counters
+      const updateData: Record<string, Date | ReturnType<typeof sql>> = {
+        lastEngagementAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
+        updateData.emailsOpened = sql`${leads.emailsOpened} + 1`;
+      } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
+        updateData.emailsClicked = sql`${leads.emailsClicked} + 1`;
+      }
+
+      await db.update(leads).set(updateData).where(eq(leads.id, data.leadId));
+
+      // Update campaign if provided
+      if (data.campaignId) {
+        const campaignUpdateData: Record<string, Date> = {
+          updatedAt: new Date(),
+        };
+
+        if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
+          // Only update timestamp, keep status as SENT
+          campaignUpdateData.openedAt = new Date();
+        } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
+          // Only update timestamp, keep status as SENT
+          campaignUpdateData.clickedAt = new Date();
+          // Also mark as opened if not already opened
+          const [campaign] = await db
+            .select({ openedAt: emailCampaigns.openedAt })
+            .from(emailCampaigns)
+            .where(eq(emailCampaigns.id, data.campaignId))
+            .limit(1);
+
+          if (campaign && !campaign.openedAt) {
+            campaignUpdateData.openedAt = new Date();
+          }
+        }
+
+        await db
+          .update(emailCampaigns)
+          .set(campaignUpdateData)
+          .where(eq(emailCampaigns.id, data.campaignId));
+      }
+
+      logger.debug("Engagement recorded successfully", {
+        engagementId: engagement.id,
+        leadId: lead.id,
+        engagementType: data.engagementType,
+      });
+
+      return success<LeadEngagementResponseOutput>({
+        id: engagement.id,
+        responseEngagementType: engagement.engagementType,
+        responseCampaignId: engagement.campaignId || undefined,
+        responseMetadata: engagement.metadata || {},
+        timestamp: engagement.timestamp,
+        ipAddress: engagement.ipAddress || undefined,
+        userAgent: engagement.userAgent || undefined,
+        createdAt: engagement.timestamp,
+        responseLeadId: engagement.leadId,
+      });
+    } catch (error) {
+      logger.error("Error recording engagement", parseError(error));
+      return fail({
+        message: t("leadsErrors.leadsEngagement.post.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Export leads to CSV or Excel
+   */
+  static async exportLeads(
+    query: LeadExportRequestOutput,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<LeadExportResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      logger.debug("Exporting leads", {
+        format: query.format,
+      });
+
+      // Build where conditions (similar to listLeads)
+      const conditions: SQL[] = [];
+
+      if (query.status) {
+        conditions.push(eq(leads.status, query.status));
+      }
+
+      if (query.country) {
+        conditions.push(eq(leads.country, query.country));
+      }
+
+      if (query.language) {
+        conditions.push(eq(leads.language, query.language));
+      }
+
+      if (query.source) {
+        conditions.push(eq(leads.source, query.source));
+      }
+
+      if (query.search) {
+        const searchConditions = [
+          ilike(leads.email, `%${query.search}%`),
+          ilike(leads.businessName, `%${query.search}%`),
+        ].filter((condition): condition is SQL => condition !== undefined);
+
+        if (searchConditions.length > 0) {
+          const orCondition = or(...searchConditions);
+          if (orCondition) {
+            conditions.push(orCondition);
+          }
+        }
+      }
+
+      if (query.dateFrom) {
+        conditions.push(gte(leads.createdAt, new Date(query.dateFrom)));
+      }
+
+      if (query.dateTo) {
+        conditions.push(lte(leads.createdAt, new Date(query.dateTo)));
+      }
+
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      // Get leads data
+      const leadsData = await db
+        .select()
+        .from(leads)
+        .where(whereClause)
+        .orderBy(desc(leads.createdAt));
+
+      // Generate CSV content
+      const csvContent = LeadsRepository.generateCsvContent(
+        leadsData,
+        query.includeMetadata,
+        query.includeEngagementData,
+        t,
+      );
+
+      const dateString = new Date().toISOString().split("T")[0];
+      const DEFAULT_FILE_PREFIX = "leads_export_";
+      const CSV_EXTENSION = ".csv";
+      const EXCEL_EXTENSION = ".xlsx";
+
+      const filePrefix = DEFAULT_FILE_PREFIX;
+      const fileSuffix =
+        query.format === ExportFormat.CSV ? CSV_EXTENSION : EXCEL_EXTENSION;
+      const fileName = `${filePrefix}${dateString}${fileSuffix}`;
+      const fileContent = Buffer.from(csvContent).toString("base64");
+
+      logger.debug("Leads exported successfully", {
+        totalRecords: leadsData.length,
+        format: String(query.format),
+        fileName,
+      });
+
+      return success({
+        fileName,
+        fileContent,
+        mimeType:
+          query.format === ExportFormat.CSV ? MimeType.CSV : MimeType.XLSX,
+        totalRecords: leadsData.length,
+        exportedAt: new Date(),
+      });
+    } catch (error) {
+      logger.error("Error exporting leads", parseError(error));
+      return fail({
+        message: t("leadsErrors.leadsExport.get.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Generate CSV content from leads data
+   */
+  private static generateCsvContent(
+    leadsData: Lead[],
+    includeMetadata: boolean,
+    includeEngagementData: boolean,
+    t: LeadsT,
+  ): string {
+    const headers = [
+      t("export.headers.email"),
+      t("export.headers.businessName"),
+      t("export.headers.contactName"),
+      t("export.headers.phone"),
+      t("export.headers.website"),
+      t("export.headers.country"),
+      t("export.headers.language"),
+      t("export.headers.status"),
+      t("export.headers.source"),
+      t("export.headers.notes"),
+      t("export.headers.createdAt"),
+      t("export.headers.updatedAt"),
+      t("export.headers.ipAddress"),
+      t("export.headers.userAgent"),
+      t("export.headers.deviceType"),
+      t("export.headers.browser"),
+      t("export.headers.os"),
+      t("export.headers.referralCode"),
+    ];
+
+    if (includeEngagementData) {
+      headers.push(
+        t("export.headers.emailsSent"),
+        t("export.headers.emailsOpened"),
+        t("export.headers.emailsClicked"),
+        t("export.headers.lastEmailSent"),
+        t("export.headers.lastEngagement"),
+        t("export.headers.unsubscribedAt"),
+      );
+    }
+
+    if (includeMetadata) {
+      headers.push(t("export.headers.metadata"));
+    }
+
+    const rows = leadsData.map((lead) => {
+      const row = [
+        lead.email,
+        lead.businessName,
+        lead.phone || "",
+        lead.website || "",
+        lead.country,
+        lead.language,
+        lead.status,
+        lead.source || "",
+        lead.notes || "",
+        lead.createdAt.toISOString(),
+        lead.updatedAt.toISOString(),
+        lead.ipAddress || "",
+        lead.userAgent || "",
+        lead.deviceType || "",
+        lead.browser || "",
+        lead.os || "",
+        lead.referralCode || "",
+      ];
+
+      if (includeEngagementData) {
+        row.push(
+          lead.emailsSent.toString(),
+          lead.emailsOpened.toString(),
+          lead.emailsClicked.toString(),
+          lead.lastEmailSentAt?.toISOString() || "",
+          lead.lastEngagementAt?.toISOString() || "",
+          lead.unsubscribedAt?.toISOString() || "",
+        );
+      }
+
+      if (includeMetadata) {
+        row.push(JSON.stringify(lead.metadata || {}));
+      }
+
+      return row;
+    });
+
+    // Escape CSV values and join
+    const CSV_COMMA = ",";
+    const CSV_QUOTE = '"';
+    const CSV_NEWLINE = "\n";
+    const CSV_DOUBLE_QUOTE = '""';
+
+    const escapeCsvValue = (value: string | undefined): string => {
+      const stringValue = value || "";
+      if (
+        stringValue.includes(CSV_COMMA) ||
+        stringValue.includes(CSV_QUOTE) ||
+        stringValue.includes(CSV_NEWLINE)
+      ) {
+        const quotedValue = stringValue.replaceAll(
+          new RegExp(CSV_QUOTE, "g"),
+          CSV_DOUBLE_QUOTE,
+        );
+        return `${CSV_QUOTE}${quotedValue}${CSV_QUOTE}`;
+      }
+      return stringValue;
+    };
+
+    const csvRows = [headers.map(escapeCsvValue).join(",")];
+    rows.forEach((row) => {
+      csvRows.push(row.map((value) => escapeCsvValue(value ?? "")).join(","));
+    });
+
+    return csvRows.join("\n");
+  }
+
+  /**
+   * Batch update leads based on filter criteria
+   */
+  static async batchUpdateLeads(
+    data: BatchUpdateRequestOutput,
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<
+    ResponseType<{
+      success: boolean;
+      totalMatched: number;
+      totalProcessed: number;
+      totalUpdated: number;
+      errors: Array<{ leadId: string; error: string }>;
+      preview: Array<{
+        id: string;
+        email: string | null;
+        businessName: string;
+        currentStatus: typeof LeadStatusValue;
+        currentCampaignStage: typeof EmailCampaignStageValue | null;
+      }> | null;
+    }>
+  > {
+    try {
+      const {
+        search,
+        status,
+        currentCampaignStage,
+        source,
+        updates,
+        dryRun = false,
+        maxRecords = 1000,
+      } = data;
+
+      logger.debug("Starting batch update", {
+        filters: {
+          search,
+          status,
+          currentCampaignStage,
+          source,
+        },
+        updates: Object.keys(updates),
+        dryRun,
+        maxRecords,
+      });
+
+      // Build where conditions (same logic as listLeads)
+      const conditions: SQL[] = [];
+
+      // Handle status filters (can be array)
+      if (status && Array.isArray(status) && status.length > 0) {
+        const mappedStatuses = status
+          .map((filter: typeof LeadStatusFilterValue) =>
+            mapStatusFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
+              s !== null,
+          );
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
+          );
+        }
+      } else if (status && !Array.isArray(status)) {
+        const dbStatus = mapStatusFilter(status);
+        if (dbStatus !== null) {
+          conditions.push(eq(leads.status, dbStatus));
+        }
+      }
+
+      // Handle campaign stage filters (can be array)
+      if (
+        currentCampaignStage &&
+        Array.isArray(currentCampaignStage) &&
+        currentCampaignStage.length > 0
+      ) {
+        const mappedStages = currentCampaignStage
+          .map((filter: typeof EmailCampaignStageFilterValue) =>
+            mapCampaignStageFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
+              s !== null,
+          );
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
+          );
+        }
+      } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
+        const dbStage = mapCampaignStageFilter(currentCampaignStage);
+        if (dbStage !== null) {
+          conditions.push(eq(leads.currentCampaignStage, dbStage));
+        }
+      }
+
+      // Handle source filters (can be array)
+      if (source && Array.isArray(source) && source.length > 0) {
+        const mappedSources = source
+          .map((filter: typeof LeadSourceFilterValue) =>
+            mapSourceFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
+              s !== null,
+          );
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((s) => eq(leads.source, s)))!,
+          );
+        }
+      } else if (source && !Array.isArray(source)) {
+        const dbSource = mapSourceFilter(source);
+        if (dbSource !== null) {
+          conditions.push(eq(leads.source, dbSource));
+        }
+      }
+
+      if (search) {
+        conditions.push(
+          or(
+            ilike(leads.email, `%${search}%`),
+            ilike(leads.businessName, `%${search}%`),
+          )!,
+        );
+      }
+
+      // Build the query - Drizzle maintains type through method chaining
+      const baseQuery = db.select().from(leads);
+      const queryWithConditions =
+        conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
+
+      // Apply default ordering by createdAt DESC for batch operations
+      const queryWithOrdering = queryWithConditions.orderBy(
+        desc(leads.createdAt),
+      );
+
+      // Apply scope-based limit - batch always processes all matching records up to maxRecords
+      const finalQuery = queryWithOrdering.limit(maxRecords);
+
+      // Get matching leads
+      const matchingLeads = await finalQuery;
+
+      logger.debug("Found matching leads", { count: matchingLeads.length });
+
+      // If dry run, return preview
+      if (dryRun) {
+        const preview = matchingLeads.map((lead) => ({
+          id: lead.id,
+          email: lead.email,
+          businessName: lead.businessName,
+          currentStatus: lead.status,
+          currentCampaignStage: lead.currentCampaignStage,
+        }));
+
+        return success({
+          success: true,
+          totalMatched: matchingLeads.length,
+          totalProcessed: 0,
+          totalUpdated: 0,
+          errors: [],
+          preview,
+        });
+      }
+
+      // Perform actual updates
+      const errors: Array<{ leadId: string; error: string }> = [];
+      let totalUpdated = 0;
+
+      // Prepare update data with proper type safety
+      const updateData: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | Date
+        | null
+        | Record<string, string | number | boolean | null>
+      > = {
+        updatedAt: new Date(),
+      };
+
+      // Only include non-null values in the update
+      if (updates.status !== null && updates.status !== undefined) {
+        updateData.status = updates.status;
+      }
+      if (
+        updates.currentCampaignStage !== null &&
+        updates.currentCampaignStage !== undefined
+      ) {
+        updateData.currentCampaignStage = updates.currentCampaignStage;
+      }
+      if (updates.source !== null && updates.source !== undefined) {
+        updateData.source = updates.source;
+      }
+      if (updates.notes !== null && updates.notes !== undefined) {
+        updateData.notes = updates.notes;
+      }
+
+      // Use transaction for batch update
+      await withTransaction(logger, async (tx) => {
+        for (const lead of matchingLeads) {
+          try {
+            // If status is being updated, validate the transition
+            if (
+              updates.status &&
+              updates.status !== lead.status &&
+              !isStatusTransitionAllowed(lead.status, updates.status)
+            ) {
+              errors.push({
+                leadId: lead.id,
+                error: t("leadsErrors.batch.update.error.default"),
+              });
+              continue;
+            }
+
+            await tx.update(leads).set(updateData).where(eq(leads.id, lead.id));
+            totalUpdated++;
+
+            // Trigger campaign lifecycle transitions for status changes (fire-and-forget, outside tx)
+            if (updates.status && updates.status !== lead.status) {
+              const { campaignSchedulerService } =
+                await import("@/app/api/[locale]/leads/campaigns/emails");
+              await campaignSchedulerService.haltCampaignsForStatusChange(
+                lead.id,
+                updates.status,
+                logger,
+              );
+            }
+          } catch (error) {
+            logger.error(
+              "Error updating lead in batch",
+              parseError(error).message,
+            );
+            errors.push({
+              leadId: lead.id,
+              error: parseError(error).toString(),
+            });
+          }
+        }
+      });
+
+      logger.debug("Batch update completed", {
+        totalMatched: matchingLeads.length,
+        totalUpdated,
+        errors: errors.length,
+      });
+
+      return success({
+        success: true,
+        totalMatched: matchingLeads.length,
+        totalProcessed: matchingLeads.length,
+        totalUpdated,
+        errors,
+        preview: null,
+      });
+    } catch (error) {
+      logger.error("Error in batch update", parseError(error));
+      return fail({
+        message: t("leadsErrors.batch.update.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Batch delete leads based on filter criteria
+   */
+  static async batchDeleteLeads(
+    data: {
+      search?: string;
+      status?: typeof LeadStatusFilterValue | (typeof LeadStatusFilterValue)[];
+      currentCampaignStage?:
+        | typeof EmailCampaignStageFilterValue
+        | (typeof EmailCampaignStageFilterValue)[];
+      country?: CountryFilter;
+      language?: LanguageFilter;
+      source?: typeof LeadSourceFilterValue | (typeof LeadSourceFilterValue)[];
+      sortBy?: (typeof LeadSortFieldValue)[];
+      sortOrder?: (typeof SortOrderValue)[];
+      scope?: typeof BatchOperationScopeValue;
+      page?: number;
+      pageSize?: number;
+      confirmDelete: boolean;
+      dryRun?: boolean;
+      maxRecords?: number;
+    },
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<
+    ResponseType<{
+      success: boolean;
+      totalMatched: number;
+      totalProcessed: number;
+      totalDeleted: number;
+      errors: Array<{ leadId: string; error: string }>;
+      preview: Array<{
+        id: string;
+        email: string | null;
+        businessName: string;
+        currentStatus: typeof LeadStatusValue;
+        currentCampaignStage: typeof EmailCampaignStageValue | null;
+      }> | null;
+    }>
+  > {
+    try {
+      const {
+        search,
+        status,
+        currentCampaignStage,
+        country,
+        language,
+        source,
+        sortBy = [LeadSortField.CREATED_AT],
+        sortOrder = [SortOrder.DESC],
+        scope = BatchOperationScope.ALL_PAGES,
+        page = 1,
+        pageSize = 20,
+        confirmDelete,
+        dryRun = false,
+        maxRecords = 1000,
+      } = data;
+
+      logger.debug("Starting batch delete", {
+        filters: {
+          search,
+          status,
+          currentCampaignStage,
+          country,
+          language,
+          source,
+        },
+        scope,
+        page,
+        pageSize,
+        confirmDelete,
+        dryRun,
+        maxRecords,
+      });
+
+      // Validation: confirmDelete must be true for actual deletion
+      if (!dryRun && !confirmDelete) {
+        return fail({
+          message: t("leadsErrors.batch.update.error.validation.title"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
+      // Build the query using the same logic as list endpoint and batchUpdateLeads
+      const conditions: SQL[] = [];
+
+      // Search filter
+      if (search?.trim()) {
+        const searchTerm = `%${search.trim().toLowerCase()}%`;
+        conditions.push(
+          or(
+            ilike(leads.businessName, searchTerm),
+            ilike(leads.email, searchTerm),
+            ilike(leads.notes, searchTerm),
+          )!,
+        );
+      }
+
+      // Handle status filters (can be array)
+      if (status && Array.isArray(status) && status.length > 0) {
+        const mappedStatuses = status
+          .map((filter: typeof LeadStatusFilterValue) =>
+            mapStatusFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
+              s !== null,
+          );
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
+          );
+        }
+      } else if (status && !Array.isArray(status)) {
+        const dbStatus = mapStatusFilter(status);
+        if (dbStatus !== null) {
+          conditions.push(eq(leads.status, dbStatus));
+        }
+      }
+
+      // Handle campaign stage filters (can be array)
+      if (
+        currentCampaignStage &&
+        Array.isArray(currentCampaignStage) &&
+        currentCampaignStage.length > 0
+      ) {
+        const mappedStages = currentCampaignStage
+          .map((filter: typeof EmailCampaignStageFilterValue) =>
+            mapCampaignStageFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
+              s !== null,
+          );
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
+          );
+        }
+      } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
+        const dbStage = mapCampaignStageFilter(currentCampaignStage);
+        if (dbStage !== null) {
+          conditions.push(eq(leads.currentCampaignStage, dbStage));
+        }
+      }
+
+      // Handle source filters (can be array)
+      if (source && Array.isArray(source) && source.length > 0) {
+        const mappedSources = source
+          .map((filter: typeof LeadSourceFilterValue) =>
+            mapSourceFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
+              s !== null,
+          );
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((s) => eq(leads.source, s)))!,
+          );
+        }
+      } else if (source && !Array.isArray(source)) {
+        const dbSource = mapSourceFilter(source);
+        if (dbSource !== null) {
+          conditions.push(eq(leads.source, dbSource));
+        }
+      }
+
+      // Handle country filters (can be array)
+      if (country && Array.isArray(country) && country.length > 0) {
+        const mappedCountries = country
+          .map((filter: CountryFilter) => convertCountryFilter(filter))
+          .filter((c): c is NonNullable<Countries> => c !== null);
+        if (mappedCountries.length > 0) {
+          conditions.push(
+            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
+          );
+        }
+      } else if (country && !Array.isArray(country)) {
+        const dbCountry = convertCountryFilter(country);
+        if (dbCountry !== null) {
+          conditions.push(eq(leads.country, dbCountry));
+        }
+      }
+
+      // Handle language filters (can be array)
+      if (language && Array.isArray(language) && language.length > 0) {
+        const mappedLanguages = language
+          .map((filter: LanguageFilter) => convertLanguageFilter(filter))
+          .filter((l): l is NonNullable<Languages> => l !== null);
+        if (mappedLanguages.length > 0) {
+          conditions.push(
+            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
+          );
+        }
+      } else if (language && !Array.isArray(language)) {
+        const dbLanguage = convertLanguageFilter(language);
+        if (dbLanguage !== null) {
+          conditions.push(eq(leads.language, dbLanguage));
+        }
+      }
+
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      logger.debug("Applied filter conditions", {
+        totalConditions: conditions.length,
+        hasWhereClause: !!whereClause,
+      });
+
+      // Apply sorting
+      const sortByField = Array.isArray(sortBy)
+        ? sortBy[0]
+        : (sortBy ?? LeadSortField.CREATED_AT);
+      const sortDirection = Array.isArray(sortOrder)
+        ? sortOrder[0]
+        : (sortOrder ?? SortOrder.DESC);
+
+      let orderClause;
+      switch (sortByField) {
+        case LeadSortField.EMAIL:
+          orderClause =
+            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
+          break;
+        case LeadSortField.BUSINESS_NAME:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.businessName
+              : desc(leads.businessName);
+          break;
+        case LeadSortField.UPDATED_AT:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.updatedAt
+              : desc(leads.updatedAt);
+          break;
+        case LeadSortField.LAST_ENGAGEMENT_AT:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.lastEngagementAt
+              : desc(leads.lastEngagementAt);
+          break;
+        default:
+          orderClause =
+            sortDirection === SortOrder.ASC
+              ? leads.createdAt
+              : desc(leads.createdAt);
+      }
+
+      // Build query with Drizzle's type-safe chaining
+      const baseQuery = db
+        .select()
+        .from(leads)
+        .where(whereClause)
+        .orderBy(orderClause);
+
+      // Apply scope-based pagination or limit - Drizzle maintains type through method chaining
+      const finalQuery =
+        scope === BatchOperationScope.CURRENT_PAGE
+          ? baseQuery.limit(pageSize).offset((page - 1) * pageSize)
+          : baseQuery.limit(maxRecords);
+
+      const matchingLeads = await finalQuery;
+
+      logger.debug("Found matching leads for deletion", {
+        count: matchingLeads.length,
+        scope,
+        page,
+        pageSize,
+        maxRecords,
+        appliedLimit:
+          scope === BatchOperationScope.CURRENT_PAGE ? pageSize : maxRecords,
+      });
+
+      // If dry run, return preview
+      if (dryRun) {
+        const preview = matchingLeads.map((lead) => ({
+          id: lead.id,
+          email: lead.email,
+          businessName: lead.businessName,
+          currentStatus: lead.status,
+          currentCampaignStage: lead.currentCampaignStage,
+        }));
+
+        return success({
+          success: true,
+          totalMatched: matchingLeads.length,
+          totalProcessed: 0,
+          totalDeleted: 0,
+          errors: [],
+          preview,
+        });
+      }
+
+      // Perform actual deletion
+      let totalDeleted = 0;
+      const errors: Array<{ leadId: string; error: string }> = [];
+
+      logger.debug("Starting actual deletion", {
+        leadsToDelete: matchingLeads.length,
+        scope,
+        dryRun: false,
+      });
+
+      // Use transaction for batch delete
+      await withTransaction(logger, async (tx) => {
+        for (const lead of matchingLeads) {
+          try {
+            logger.debug("Deleting individual lead", {
+              leadId: lead.id,
+              email: lead.email,
+              businessName: lead.businessName,
+            });
+            await tx.delete(leads).where(eq(leads.id, lead.id));
+            totalDeleted++;
+          } catch (error) {
+            logger.error(
+              "Error deleting lead in batch",
+              parseError(error).message,
+            );
+            errors.push({
+              leadId: lead.id,
+              error: parseError(error).toString(),
+            });
+          }
+        }
+      });
+
+      logger.debug("Batch delete completed", {
+        totalMatched: matchingLeads.length,
+        totalDeleted,
+        errors: errors.length,
+        scope,
+        expectedDeletions:
+          scope === BatchOperationScope.CURRENT_PAGE
+            ? Math.min(pageSize, matchingLeads.length)
+            : matchingLeads.length,
+        actualDeletions: totalDeleted,
+        deletionMatch: totalDeleted === matchingLeads.length,
+      });
+
+      return success({
+        success: true,
+        totalMatched: matchingLeads.length,
+        totalProcessed: matchingLeads.length,
+        totalDeleted,
+        errors,
+        preview: null,
+      });
+    } catch (error) {
+      logger.error("Error in batch delete", parseError(error));
+      return fail({
+        message: t("leadsErrors.batch.update.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Link two leads together (for credit pool sharing)
+   * Creates a bidirectional link in the lead_lead_links table
+   */
+  static async linkLeadToLead(
+    leadId1: string,
+    leadId2: string,
+    linkReason: "track_page" | "referral" | "manual" | "test" | "ip_match",
+    logger: EndpointLogger,
+    t: LeadsT,
+  ): Promise<ResponseType<void>> {
+    try {
+      // Ensure leads are different
+      if (leadId1 === leadId2) {
+        return fail({
+          message: t("errors.cannotLinkLeadToItself"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Normalize order (always store smaller UUID first for consistency)
+      const [normalizedLead1, normalizedLead2] =
+        leadId1 < leadId2 ? [leadId1, leadId2] : [leadId2, leadId1];
+
+      await withTransaction(logger, async (tx) => {
+        await tx
+          .insert(leadLeadLinks)
+          .values({
+            leadId1: normalizedLead1,
+            leadId2: normalizedLead2,
+            linkReason,
+          })
+          .onConflictDoNothing();
+      });
+
+      logger.info("Linked leads together", {
+        leadId1: normalizedLead1,
+        leadId2: normalizedLead2,
+        linkReason,
+      });
+
+      return success();
+    } catch (error) {
+      logger.error("Failed to link leads", parseError(error));
+      return fail({
+        message: t("errors.linkFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get all leads linked to a given lead (via lead_lead_links)
+   * Returns the linked lead summaries for display in lead detail view
+   */
+  private static async getLinkedLeads(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    Array<{
+      linkedLeadId: string;
+      linkReason: string;
+      linkedAt: Date;
+      email: string | null;
+      businessName: string;
+      status: typeof LeadStatusValue;
+      ipAddress: string | null;
+      userAgent: string | null;
+      createdAt: Date;
+    }>
+  > {
+    try {
+      const links = await db
+        .select({
+          linkedLeadId: sql<string>`CASE WHEN ${leadLeadLinks.leadId1} = ${leadId} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
+          linkReason: leadLeadLinks.linkReason,
+          linkedAt: leadLeadLinks.linkedAt,
+          email: leads.email,
+          businessName: leads.businessName,
+          status: sql<typeof LeadStatusValue>`${leads.status}`,
+          ipAddress: leads.ipAddress,
+          userAgent: leads.userAgent,
+          createdAt: leads.createdAt,
+        })
+        .from(leadLeadLinks)
+        .innerJoin(
+          leads,
+          sql`${leads.id} = CASE WHEN ${leadLeadLinks.leadId1} = ${leadId} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
+        )
+        .where(
+          or(
+            eq(leadLeadLinks.leadId1, leadId),
+            eq(leadLeadLinks.leadId2, leadId),
+          ),
+        );
+
+      return links;
+    } catch (error) {
+      logger.error("Error fetching linked leads", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Get all users linked to a given lead (via user_lead_links)
+   * Returns user summaries for display in lead detail view
+   */
+  private static async getLinkedUsers(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    Array<{
+      userId: string;
+      linkReason: string;
+      linkedAt: Date;
+      email: string;
+      publicName: string;
+    }>
+  > {
+    try {
+      const links = await db
+        .select({
+          userId: userLeadLinks.userId,
+          linkReason: userLeadLinks.linkReason,
+          linkedAt: userLeadLinks.linkedAt,
+          email: users.email,
+          publicName: users.publicName,
+        })
+        .from(userLeadLinks)
+        .innerJoin(users, eq(users.id, userLeadLinks.userId))
+        .where(eq(userLeadLinks.leadId, leadId));
+
+      return links;
+    } catch (error) {
+      logger.error("Error fetching linked users", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Find anonymous leads with the same IP for IP-match linking
+   * Used by the nightly IP-match cron task
+   * Returns pairs of lead IDs that share an IP and should be linked
+   */
+  static async findLeadPairsByIp(
+    windowDays: number,
+    logger: EndpointLogger,
+  ): Promise<Array<{ leadId1: string; leadId2: string; ipAddress: string }>> {
+    try {
+      const windowStart = new Date(
+        Date.now() - windowDays * 24 * 60 * 60 * 1000,
+      );
+
+      // Find anonymous leads grouped by IP that have more than one lead
+      const pairs = await db.execute<{
+        lead_id1: string;
+        lead_id2: string;
+        ip_address: string;
+      }>(
+        sql`
+          SELECT DISTINCT
+            LEAST(l1.id::text, l2.id::text) AS lead_id1,
+            GREATEST(l1.id::text, l2.id::text) AS lead_id2,
+            l1.ip_address
+          FROM leads l1
+          JOIN leads l2 ON l1.ip_address = l2.ip_address AND l1.id != l2.id
+          WHERE l1.ip_address IS NOT NULL
+            AND l1.status = ${LeadStatus.WEBSITE_USER}
+            AND l2.status = ${LeadStatus.WEBSITE_USER}
+            AND l1.created_at > ${windowStart}
+            AND l2.created_at > ${windowStart}
+            -- Exclude already linked pairs
+            AND NOT EXISTS (
+              SELECT 1 FROM lead_lead_links lll
+              WHERE (lll.lead_id_1 = LEAST(l1.id::text, l2.id::text)::uuid
+                 AND lll.lead_id_2 = GREATEST(l1.id::text, l2.id::text)::uuid)
+            )
+          LIMIT 1000
+        `,
+      );
+
+      return pairs.rows.map((row) => ({
+        leadId1: row.lead_id1,
+        leadId2: row.lead_id2,
+        ipAddress: row.ip_address,
+      }));
+    } catch (error) {
+      logger.error("Error finding IP-match lead pairs", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Delete a single lead by ID
+   */
+  static async deleteLead(
+    id: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<never>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      const result = await db
+        .delete(leads)
+        .where(eq(leads.id, id))
+        .returning({ id: leads.id });
+      if (result.length === 0) {
+        return fail({
+          message: t("leadsErrors.leads.patch.error.not_found.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      logger.info("Lead deleted", { id });
+      return success();
+    } catch (error) {
+      logger.error("Error deleting lead", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.get.error.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+}

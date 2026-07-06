@@ -19,99 +19,64 @@ export interface ModeConfig {
   /** Prefix for setFetchCacheContext - e.g. "regular-", "direct-", "queue-", "unbottled-" */
   cachePrefix: string;
   /**
-   * When set, the AI calls remote tools via two patterns depending on tool type:
-   *
-   * **Meta-tools** (`tool-help`, `execute-tool`): always bare name + `instanceId` param.
-   *   e.g. `execute-tool(toolName='tool-help', instanceId='hermes')`
-   *   The `instanceId__tool-help` prefix form is NOT the expected pattern for meta-tools.
-   *
-   * **Pinned tools** (everything else): appear as `instanceId__toolName` in the tool list.
-   *   The AI calls them via `execute-tool(toolName='generate_image', instanceId='hermes')`
-   *   in test context (where no pinned tools are registered).
-   *
-   * Assertions verify execute-tool calls with correct instanceId in args.
-   * When not set, the AI calls tools directly by plain name (no prefix ever).
-   */
-  remoteInstanceId?: string;
-  /**
-   * Per-mode setup called after the shared beforeAll (user resolution + credits).
-   * Use this for remote connection setup, credential patching, etc.
-   */
-  setup?: (testUser: JwtPrivatePayloadType) => Promise<void>;
-  /**
-   * Per-mode teardown called in afterAll.
-   */
-  teardown?: (testUser: JwtPrivatePayloadType) => Promise<void>;
-  /**
-   * For queue mode: a real pulse function that executes pending tasks.
-   *
-   * Queue WAIT flow (per spec):
-   *   1. runTestStream → AI calls execute-tool(wait) → stream aborts → thread 'waiting'
-   *   2. Assert thread is 'waiting' + tool message is 'pending'
-   *   3. await cfg.pulse(threadId) → polls for remote task completion → fires revival
-   *      directly in-process (bypassing server cron race) → thread → 'idle'
-   *   4. Re-fetch messages → assert backfilled result + AI final response
-   *
-   * @param threadId - the thread ID for which to run revival
-   */
-  pulse?: (threadId: string) => Promise<void>;
-  /**
-   * When true, add T-SYS: assert the AI stream's system prompt came from the LOCAL
-   * instance (not the remote). The local system prompt contains the local instance
-   * ID; the AI's response to "What is your instance ID?" must match.
-   *
-   * Set this for all remote relay suites where loopLocation='server' but the
-   * system prompt should be built on the client (local) side.
-   */
-  assertSystemPromptFromLocal?: boolean;
-  /**
-   * REMOTE-folder suites: the system prompt must come from THIS remote
-   * instance — the loop, tools and prompt all live there ("as if on remote").
-   * T-SYS asserts the AI reports this instance ID instead of the local one.
-   * Mutually exclusive with assertSystemPromptFromLocal.
-   */
-  systemPromptInstanceId?: string;
-  /**
-   * Run only cheap, fast tests: skips T4 (music+video), T8 (parallel image),
-   * T9 (preCalls image injection). T2 is replaced with a tool-help call that
-   * sets the same shared state. Pure cost lever — every test that runs
-   * asserts identically in every mode.
+   * Cheap variant: media-gen steps swap to cortex/tool-help equivalents with
+   * the same observable thread shape. Every callback mode and folder
+   * assertion still runs — only the operation is cheaper.
    */
   cheapMode?: boolean;
   /**
-   * Override the root folder used for all runStream calls in this mode.
-   * When set, streams go into this root folder instead of BACKGROUND.
-   * Used by remote-chat-root suite which runs streams inside REMOTE/hermes subfolder.
+   * Queue mode: streams end in 'waiting' and a cron pulse revives them.
+   * Called with the threadId after each dispatch; the helper polls revival.
    */
-  rootFolderIdOverride?: DefaultFolderId;
+  pulse?: (threadId: string) => Promise<void>;
   /**
-   * Override the sub-folder UUID used for all runStream calls in this mode.
-   * Must be used together with rootFolderIdOverride.
-   * Set after connection setup when the remote/hermes subfolder UUID is known.
+   * Tools-remote: every tool call is wrapped as
+   * execute-tool(toolName, instanceId=<this>) so the tool executes on the
+   * remote instance. Prompt wrapping + remote-call assertions key off this.
    */
-  subFolderIdOverride?: string;
+  remoteInstanceId?: string;
   /**
-   * When true, add T-RELAY: assert the remote (hermes) wallet balance decreased
-   * after T1, proving the stream actually ran on the remote instance via relay
-   * and was NOT served locally. Use for UNBOTTLED inference-provider mode and
-   * any relay mode where the loop cost should land on the remote wallet.
+   * REMOTE-folder suites: the instance id whose system prompt + tools the AI
+   * must be running with — T-SYS asserts self-instance-id reports THIS id,
+   * no matter where the loop runs.
+   */
+  systemPromptInstanceId?: string;
+  /**
+   * Inference-provider suites: the system prompt is built on the LOCAL
+   * instance (client-owned model pipe) — T-SYS asserts the LOCAL id.
+   */
+  assertSystemPromptFromLocal?: boolean;
+  /**
+   * Inference-provider relay suites: after each stream, wait for the relayed
+   * assistant reply to arrive as message events before asserting (the caller
+   * flips idle when the relay HTTP call returns, the reply lands async).
+   * No-op for REMOTE-folder suites — their mirror wait covers it.
    */
   assertRelayRan?: boolean;
+  /** Suite root override — REMOTE for remote-folder suites. */
+  rootFolderIdOverride?: DefaultFolderId;
+  /** REMOTE-folder suites: instance subfolder id resolved by cfg.setup. */
+  subFolderIdOverride?: string;
+  /** Per-suite setup (connect to hermes, credits, folders) — runs in beforeAll. */
+  setup?: (testUser: JwtPrivatePayloadType) => Promise<void>;
+  /** Mirrored teardown — runs in afterAll. */
+  teardown?: (testUser: JwtPrivatePayloadType) => Promise<void>;
   /**
-   * Remote folder on hermes where relayed threads should land.
-   * When set alongside assertRelayRan, T-RELAY also verifies the thread exists
-   * in this folder on the hermes prod DB. Get this from beforeAll after connecting.
+   * Remote-folder LOOP-LOCAL topology: the thread lives in the caller's
+   * REMOTE/<instance>/tests/<case> folder but the LOOP runs HERE (the
+   * stream forces loopInstanceId="self"). System prompt + tools still come
+   * from the REMOTE — tool calls round-trip via execute-tool(instanceId),
+   * so self-instance-id reports the remote. The LOCAL wallet is billed.
    */
-  hermesThreadFolderId?: string;
+  forceLocalLoop?: boolean;
   /**
-   * Loop-LOCAL topology: HERMES originates each stream on ITS
-   * REMOTE/<clientId>/tests/<case> folder; the relay executes the loop HERE
-   * (the client) with the client's prompt + tools. Placement flips: caller
-   * side = hermes REMOTE/<clientId>/…, executor side = local
-   * BACKGROUND/remote/<hermesId>/…. Requires rootFolderIdOverride to stay
-   * unset locally (the local copy is the executor landing).
+   * Same-instance suite + LIVE hermes thread mirror: after every stream the
+   * thread must ALSO exist on hermes at REMOTE/<selfInstanceId>/tests/<case>
+   * (thread-sync mirroring, chunk relay, folder placement). The suite's setup
+   * must connect to hermes with threads/chat sync enabled.
    */
-  originateOnRemote?: boolean;
+  assertMirrorOnHermes?: boolean;
+
   /**
    * The transport leg the relay MUST have actually used. Asserted in T-RELAY
    * against the REMOTE CONNECTION row's attested `lastTransportUsed` —
@@ -136,5 +101,7 @@ export interface ModeConfig {
  * suites assert the remote decrease (T-RELAY) AND the local deduction.
  */
 export function deriveLoopRunsRemote(cfg: ModeConfig): boolean {
-  return cfg.rootFolderIdOverride === DefaultFolderId.REMOTE;
+  return (
+    cfg.rootFolderIdOverride === DefaultFolderId.REMOTE && !cfg.forceLocalLoop
+  );
 }

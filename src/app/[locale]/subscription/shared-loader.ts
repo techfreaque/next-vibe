@@ -63,7 +63,6 @@ export async function subscriptionLoader({
   if (npId && isAuthenticated && searchParams.payment === "success") {
     if (paymentType === "credits" || callbackToken) {
       await CreditRepository.handleNowPaymentsCreditSuccessRedirect(
-        npId,
         callbackToken,
         user.id,
         locale,
@@ -73,7 +72,7 @@ export async function subscriptionLoader({
       const { SubscriptionRepository } =
         await import("@/app/api/[locale]/subscription/repository");
       await SubscriptionRepository.handleNowPaymentsSuccessRedirect(
-        npId,
+        callbackToken,
         user.id,
         locale,
         logger,

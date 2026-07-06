@@ -1766,6 +1766,7 @@ export class SkillsRepository {
    */
   static async applyRemoteSkillCreate({
     requestData,
+    responseData,
     user,
     logger,
   }: RemoteEventHandlerProps<

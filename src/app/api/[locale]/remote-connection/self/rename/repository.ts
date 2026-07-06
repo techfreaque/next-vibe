@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -19,7 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 
-import { instanceIdentities, remoteConnections } from "../../db";
+import { instanceIdentities } from "../../db";
 import { RemoteConnectionRepository } from "../../repository";
 import type { RemoteConnectionSelfRenamePatchResponseOutput } from "./definition";
 import type { RemoteConnectionSelfRenameT } from "./i18n";
@@ -36,12 +36,7 @@ export class RemoteConnectionSelfRenameRepository {
     const [oldIdentity] = await db
       .select({ instanceId: instanceIdentities.instanceId })
       .from(instanceIdentities)
-      .where(
-        and(
-          eq(instanceIdentities.userId, user.id),
-          eq(instanceIdentities.isDefault, true),
-        ),
-      )
+      .where(eq(instanceIdentities.userId, user.id))
       .limit(1);
 
     if (!oldIdentity) {
@@ -56,12 +51,7 @@ export class RemoteConnectionSelfRenameRepository {
     const result = await db
       .update(instanceIdentities)
       .set({ instanceId: newInstanceId, updatedAt: new Date() })
-      .where(
-        and(
-          eq(instanceIdentities.userId, user.id),
-          eq(instanceIdentities.isDefault, true),
-        ),
-      )
+      .where(eq(instanceIdentities.userId, user.id))
       .returning({ id: instanceIdentities.id });
 
     if (result.length === 0) {
@@ -77,17 +67,6 @@ export class RemoteConnectionSelfRenameRepository {
       .set({ targetInstance: newInstanceId })
       .where(eq(cronTasks.targetInstance, oldInstanceId));
 
-    // Update remoteInstanceId on all our outbound rows (stores our own selfInstanceId)
-    await db
-      .update(remoteConnections)
-      .set({ remoteInstanceId: newInstanceId, updatedAt: new Date() })
-      .where(
-        and(
-          eq(remoteConnections.userId, user.id),
-          eq(remoteConnections.remoteInstanceId, oldInstanceId),
-        ),
-      );
-
     if (!propagate) {
       logger.info("Renamed self instance", {
         userId: user.id,
@@ -99,11 +78,15 @@ export class RemoteConnectionSelfRenameRepository {
 
     // Fire-and-forget: notify all connected remotes to update their local label
     // for us, via the typed remote-dispatch door (routed by instanceId — no
-    // hand-rolled URL/auth). Sends propagate:false so remotes do not call us back.
+    // hand-rolled URL/auth). The peer's connect-reverse/update finds its row by
+    // our OLD id and updates its label (row instanceId + REMOTE subfolder +
+    // task targets). It must NOT be the peer's self/rename — that would rename
+    // the peer's own identity.
     void (async (): Promise<void> => {
       const { RouteExecuteRepository } =
         await import("next-vibe/execute-tool/repository");
-      const selfRenameDef = await import("./definition");
+      const { default: reverseUpdateDef } =
+        await import("../../connect-reverse/update/definition");
       const conns = await RemoteConnectionRepository.getAllActiveConnections(
         user.id,
       );
@@ -111,8 +94,8 @@ export class RemoteConnectionSelfRenameRepository {
         try {
           const propagateResult =
             await RouteExecuteRepository.runInProcessTyped({
-              definition: selfRenameDef.default.PATCH,
-              input: { newInstanceId, propagate: false },
+              definition: reverseUpdateDef.PATCH,
+              input: { instanceId: oldInstanceId, newInstanceId },
               instanceId: conn.instanceId,
               user,
               locale,

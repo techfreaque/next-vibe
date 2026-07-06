@@ -54,55 +54,609 @@ export async function getPromptFragment(
 ): Promise<PromptFragmentModule> {
   switch (id) {
     case "autonomy-status":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "bootstrap":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "coding-agent-setting":
-      return import("@/app/api/[locale]/agent/chat/settings/system-prompt").then(({ codingAgentSettingFragment }) => ({ codingAgentSettingFragment }));
+      return import("@/app/api/[locale]/agent/chat/settings/system-prompt").then(
+        ({ codingAgentSettingFragment }) => ({ codingAgentSettingFragment }),
+      );
     case "contact":
-      return import("@/app/api/[locale]/contact/system-prompt").then(({ contactFragment }) => ({ contactFragment }));
+      return import("@/app/api/[locale]/contact/system-prompt").then(
+        ({ contactFragment }) => ({ contactFragment }),
+      );
     case "cortex":
-      return import("@/app/api/[locale]/agent/cortex/system-prompt").then(({ cortexFragment }) => ({ cortexFragment }));
+      return import("@/app/api/[locale]/agent/cortex/system-prompt").then(
+        ({ cortexFragment }) => ({ cortexFragment }),
+      );
     case "desktop":
-      return import("@/app/api/[locale]/desktop/system-prompt").then(({ desktopFragment }) => ({ desktopFragment }));
+      return import("@/app/api/[locale]/desktop/system-prompt").then(
+        ({ desktopFragment }) => ({ desktopFragment }),
+      );
     case "extra-instructions":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "favorites":
-      return import("@/app/api/[locale]/agent/skills/favorites/system-prompt").then(({ favoritesFragment }) => ({ favoritesFragment }));
+      return import("@/app/api/[locale]/agent/skills/favorites/system-prompt").then(
+        ({ favoritesFragment }) => ({ favoritesFragment }),
+      );
     case "folder-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "formatting":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "guest-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "headless-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "identity":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "language":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "media-capabilities":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "message-metadata":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "platform-overview":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "remote-instances":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }) => ({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }));
+      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+        ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }) => ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }),
+      );
     case "skill":
-      return import("@/app/api/[locale]/agent/skills/system-prompt").then(({ skillFragment }) => ({ skillFragment }));
+      return import("@/app/api/[locale]/agent/skills/system-prompt").then(
+        ({ skillFragment }) => ({ skillFragment }),
+      );
     case "ssh-connections":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }) => ({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }));
+      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+        ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }) => ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }),
+      );
     case "sub-agent-guard":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "system-context":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }) => ({ systemContextFragment, remoteInstancesFragment, sshConnectionsFragment }));
+      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+        ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }) => ({
+          systemContextFragment,
+          remoteInstancesFragment,
+          sshConnectionsFragment,
+        }),
+      );
     case "tool-execution-control":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "user-name":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }) => ({ identityFragment, platformOverviewFragment, headlessContextFragment, subAgentGuardFragment, languageFragment, folderContextFragment, messageMetadataFragment, toolExecutionControlFragment, formattingFragment, extraInstructionsFragment, userNameFragment, bootstrapFragment, guestContextFragment, mediaCapabilitiesFragment, autonomyStatusFragment }));
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+        ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }) => ({
+          identityFragment,
+          platformOverviewFragment,
+          headlessContextFragment,
+          subAgentGuardFragment,
+          languageFragment,
+          folderContextFragment,
+          messageMetadataFragment,
+          toolExecutionControlFragment,
+          formattingFragment,
+          extraInstructionsFragment,
+          userNameFragment,
+          bootstrapFragment,
+          guestContextFragment,
+          mediaCapabilitiesFragment,
+          autonomyStatusFragment,
+        }),
+      );
     case "web":
-      return import("@/app/api/[locale]/agent/search/system-prompt").then(({ webFragment }) => ({ webFragment }));
+      return import("@/app/api/[locale]/agent/search/system-prompt").then(
+        ({ webFragment }) => ({ webFragment }),
+      );
     default:
       return {};
   }

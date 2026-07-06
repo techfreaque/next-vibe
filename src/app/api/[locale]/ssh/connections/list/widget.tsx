@@ -86,13 +86,13 @@ export function ConnectionsListContainer(_props: {
         return;
       }
 
-      if (conn.connectionType === "remote" && conn.remoteInstanceId) {
+      if (conn.connectionType === "remote" && conn.instanceId) {
         // Navigate to remote connection detail
         void (async (): Promise<void> => {
           const def =
             await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
           navigate(def.default.GET, {
-            urlPathParams: { instanceId: conn.remoteInstanceId! },
+            urlPathParams: { instanceId: conn.instanceId! },
           });
         })();
         return;

@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/desktop/move-window-to-monitor")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/desktop/move-window-to-monitor/route")) },
+export const Route = createFileRoute(
+  "/api/$locale/desktop/move-window-to-monitor",
+)({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/desktop/move-window-to-monitor/route"),
+    ),
+  },
 });

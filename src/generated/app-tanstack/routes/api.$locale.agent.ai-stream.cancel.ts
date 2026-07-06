@@ -4,5 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
 export const Route = createFileRoute("/api/$locale/agent/ai-stream/cancel")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/ai-stream/cancel/route")) },
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/agent/ai-stream/cancel/route"),
+    ),
+  },
 });

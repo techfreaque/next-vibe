@@ -18,7 +18,7 @@
               "ttl": "1h",
               "type": "ephemeral"
             },
-            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-07-04\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 133 — Claude, GPT, Gemini, Llama, and uncencored ones UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\nThis thread lives in the **background** folder - standard home for scheduled sub agents and tasks.\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** cron - Background task conversations - AI agent background runs triggered by ai-run or tasks. Visible to the owning user\n- **Sub-folder:** d75c49da-7d93-478d-a600-281cef53c8ff\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  DP-1 [PRIMARY]: 1440×2560 @(3734,92)\n  DP-2: 1440×2560 @(0,92)\n  HDMI-A-1: 1920×1200 @(1667,0)\n  DP-3: 2294×960 @(1440,1200)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: DP-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.\n\n## Media capabilities\n- Images: GPT-5 Image Mini available. Use `tool-help` with `toolName=\"generate_image\"` to get the full schema, then call it via `execute-tool`.\n- Music/audio: Sonauto Song available. Use `tool-help` with `toolName=\"generate_music\"` to get the full schema, then call it via `execute-tool`.\n- Video: Veo 3.1 Fast available. Use `tool-help` with `toolName=\"generate_video\"` to get the full schema, then call it via `execute-tool`.\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Additional Instructions\n\n# unbottled.ai\n\n**Current Date:** 2026-07-04\n\nYou are an AI on unbottled.ai - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.\n\n## unbottled.ai\n\n- **Models:** 133 — Claude, GPT, Gemini, Llama, and uncencored ones UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## User Language and Location\n\n**Default language:** English (en-GLOBAL) | **Location:** Global 🌐\n\nALWAYS respond in the language of the user's current message. Default language is a fallback only.\nWhen writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers).\n\n## Current Context\n\n- **Folder:** remote - Unknown folder type\n- **Sub-folder:** 7a77726b-ee13-4e1e-b42a-0a2bd7d8391b\n\n## Message Context\n\nEach message is prefixed with auto-generated metadata: `[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]`\n\n**Fields (only non-empty shown):** ID (8-char ref), Model, Skill, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).\n\n- Check metadata before responding - multiple skills/models may be active in one thread.\n- Do NOT reproduce `[Context: ...]` tags in your responses - they are injected automatically.\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  DP-1 [PRIMARY]: 1440×2560 @(3734,92)\n  DP-2: 1440×2560 @(0,92)\n  HDMI-A-1: 1920×1200 @(1667,0)\n  DP-3: 2294×960 @(1440,1200)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: DP-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.\n\n# Formatting Instructions\n\n- CRITICAL: Add blank lines between all content blocks (paragraphs, headings, lists, code, quotes)\n- Use **bold** for emphasis, *italic* for subtle emphasis\n- Use ## headings and ### subheadings (only in detailed responses)\n- Use (-) for lists, (1.) for ordered lists\n- Use `backticks` for inline code, ```blocks``` for code examples\n- Use > for important notes\n- Use tables for comparisons, matrices, and structured data\n- NEVER write walls of text - always break into readable paragraphs\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\nFor JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## User\n\n**Name:** Admin User\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Background Agents\n\nNeither **Dreamer** nor **Autopilot** is enabled.\n\n- **Dreamer** runs on a schedule (e.g. nightly) to reorganize the cortex - consolidate scattered memories, update life areas, and spot gaps. Think of it as your AI keeping the filing system clean while you sleep.\n- **Autopilot** runs on a schedule (e.g. weekday mornings) to advance stalled projects, clear your task queue, and execute real output on your goals.\n\nBoth can be enabled in **chat settings** (the gear icon in the model selector). They run in the background folder and create session logs so you can review what they did.\n\n## System Context\n\n- **Instance:** Self-hosted / local (unbottled.ai)\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 133\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n**Known instances:** `atlas`\n\n## Remote Instances\n\n- \"atlas\" - use tool-help(instanceId=\"atlas\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"atlas\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nCaller tools below are registered natively — call them DIRECTLY by name (e.g. generate_image({...})).\nOnly for async callback modes use: execute-tool({ toolName: \"<name>\", input, callbackMode }) — callbackMode: detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: any\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: any\ncortex-delete — Remove a file or folder. Gone forever. | input: any\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: any\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: any\ncortex-list — See what's in a folder. | input: any\ncortex-mkdir — Create a folder. | input: any\ncortex-move — Move or rename a file or folder. | input: any\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: any\ncortex-search — Find files by name or content. Searches everything. | input: any\ncortex-terminals — List active terminal sessions with current working directories. | input: any\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: any\ncortex-write — Save a file. Give it a path and content - done. | input: any\nawait-task — Wait on a dispatched background task. Returns immediately if already done, or pauses the AI stream until the task finishes. | input: any\nexecute-tool — Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation. | input: any\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25. | input: any\n</tool-catalog>\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\nYou have full browser automation. `tool-help query=browser` lists all tools; `tool-help query=browser-<toolname>` gives full schema.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## System Context\n\n- **Instance:** Self-hosted / local (unbottled.ai)\n- **URL:** http://localhost:3002\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 133\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3002 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `(not set)` run here.\n\n## SSH\n\nNo SSH connections configured. To run commands on a remote server, add one via **Settings → SSH Connections**.\n\nNote: for dev workflow (code execution, codebase changes on a remote machine), the recommended path is **Settings → Remote Connection** (cloud sync / remote instance) rather than raw SSH. SSH is for connecting arbitrary servers not running next-vibe.",
+            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-07-05\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 133 — Claude, GPT, Gemini, Llama, and uncencored ones UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** remote - Unknown folder type\n- **Sub-folder:** 796e9a76-2079-48cb-84c5-4016fbc2f15b\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  DP-1 [PRIMARY]: 1440×2560 @(3734,92)\n  DP-2: 1440×2560 @(0,92)\n  HDMI-A-1: 1920×1200 @(1667,0)\n  DP-3: 2294×960 @(1440,1200)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: DP-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.\n\n## Media capabilities\n- Images: GPT-5 Image Mini available. Use `tool-help` with `toolName=\"generate_image\"` to get the full schema, then call it via `execute-tool`.\n- Music/audio: Sonauto Song available. Use `tool-help` with `toolName=\"generate_music\"` to get the full schema, then call it via `execute-tool`.\n- Video: Veo 3.1 Fast available. Use `tool-help` with `toolName=\"generate_video\"` to get the full schema, then call it via `execute-tool`.\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\nYou have full browser automation. `tool-help query=browser` lists all tools; `tool-help query=browser-<toolname>` gives full schema.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## System Context\n\n- **Instance:** Self-hosted / local (unbottled.ai)\n- **URL:** http://localhost:3002\n- **Instance ID:** hermes\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 133\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3002 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `hermes` run here.\n**Known instances:** `atlas`\n\n## Remote Instances\n\n- \"atlas\" - use tool-help(instanceId=\"atlas\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"atlas\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: omit=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: { prompt: string, provider: claude-code|open-code, model: string, taskTitle: string, interactiveMode: boolean }\ncortex-delete — Remove a file or folder. Gone forever. | input: { path: string, recursive: boolean }\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: { path: string, find: string, replace: string, startLine: integer, endLine: integer, newContent: string }\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: { path: string, command: string, workingDir: string, terminalId: string, timeoutMs: number }\ncortex-list — See what's in a folder. | input: { path: string }\ncortex-mkdir — Create a folder. | input: { path: string, viewType: enums.viewType.list|enums.viewType.kanban|enums.viewType.calendar|enums.viewType.grid|enums.viewType.wiki, createParents: boolean }\ncortex-move — Move or rename a file or folder. | input: { from: string, to: string }\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: { path: string, maxLines: integer }\ncortex-search — Find files by name or content. Searches everything. | input: { query: string, path: string, maxResults: integer }\ncortex-terminals — List active terminal sessions with current working directories. | input: { path: string }\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: { path: string, depth: integer }\ncortex-write — Save a file. Give it a path and content - done. | input: { path: string, content: string, createParents: boolean }\nawait-task — Wait on a dispatched background task. Returns immediately if already done, or pauses the AI stream until the task finishes. | input: { taskId: string }\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
             "type": "text"
           }
         ],
@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d8279730 | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:0ae3d7c9 | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
@@ -60,7 +60,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:9df25d97 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:f2d80c70 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
@@ -93,7 +93,73 @@
       {
         "content": [
           {
-            "text": "[Context: ID:05549d90 | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:edeab24c | Posted:Jul 5, 15:44]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T-SYS] Call the self-instance-id tool to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.",
+        "role": "user"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\":\"self-instance-id\"}",
+              "name": "tool-help"
+            },
+            "id": "call_80f3e57196e74e6d979ebd3a",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"hint\":\"Call as: execute-tool toolName=\\\"self-instance-id\\\" (aliases: my-instance-id). CLI: vibe self-instance-id [--field=value].\",\"matchedCount\":1,\"tools\":[{\"aliases\":[\"my-instance-id\"],\"category\":\"devTools\",\"description\":\"Read the identifier of your own instance on this machine\",\"examples\":{\"responses\":{\"default\":{\"instanceId\":\"atlas\"}}},\"name\":\"self-instance-id\",\"title\":\"This Instance's ID\"}],\"totalCount\":528}",
+        "name": "tool-help",
+        "role": "tool",
+        "tool_call_id": "call_80f3e57196e74e6d979ebd3a"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"toolName\":\"self-instance-id\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_2059537d814341789ddd726d",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"instanceId\":\"hermes\"}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_2059537d814341789ddd726d"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:e5811469 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:44]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "hermes",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:23f6c0ab | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
@@ -118,6 +184,10 @@
         ]
       },
       {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
         "content": "{\"hint\":\"69 tools. Narrow to ≤5 for full schemas, or pass toolName=\\\"<name>\\\" for detail. Call any tool: execute-tool toolName=\\\"<name>\\\".\",\"matchedCount\":69,\"tools\":[{\"description\":\"Retrieve the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"title\":\"Get Folder Permissions\"},{\"description\":\"Update the list of moderators for a specific folder\",\"name\":\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"title\":\"Update Folder Permissions\"},{\"description\":\"Public threads shared with the community\",\"name\":\"agent_chat_public-feed_GET\",\"title\":\"Community Feed\"},{\"description\":\"Create a new chat thread\",\"name\":\"agent_chat_threads_POST\",\"title\":\"New Thread\"},{\"description\":\"Update the title and preview of a chat thread\",\"name\":\"agent_chat_threads_rename_PATCH\",\"title\":\"Rename Thread\"},{\"description\":\"Delete a chat thread\",\"name\":\"agent_chat_threads_threadId_DELETE\",\"title\":\"Delete Chat Thread\"},{\"description\":\"Retrieve a specific chat thread by ID\",\"name\":\"agent_chat_threads_threadId_GET\",\"title\":\"Get Chat Thread\"},{\"description\":\"Delete a message from the thread\",\"name\":\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"title\":\"Delete Message\"},{\"description\":\"Retrieve a specific message by ID\",\"name\":\"agent_chat_threads_threadId_messages_messageId_GET\",\"title\":\"Get Message\"},{\"description\":\"Update a message's content\",\"name\":\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"title\":\"Update Message\"},{\"description\":\"Upvote or downvote a message\",\"name\":\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"title\":\"Vote on Message\"},{\"description\":\"Retrieve messages following a specific conversation path\",\"name\":\"agent_chat_threads_threadId_messages_path_GET\",\"title\":\"Get Conversation Path\"},{\"description\":\"Create a new message in a chat thread\",\"name\":\"agent_chat_threads_threadId_messages_POST\",\"title\":\"Create Message\"},{\"description\":\"Search messages within a specific thread using full-text search\",\"name\":\"agent_chat_threads_threadId_messages_search_GET\",\"title\":\"Search Messages\"},{\"description\":\"Update an existing chat thread\",\"name\":\"agent_chat_threads_threadId_PATCH\",\"title\":\"Update Chat Thread\"},{\"description\":\"Retrieve the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_GET\",\"title\":\"Get Thread Permissions\"},{\"description\":\"Update the list of moderators for a specific thread\",\"name\":\"agent_chat_threads_threadId_permissions_PATCH\",\"title\":\"Update Thread Permissions\"},{\"description\":\"Revoke an active share link\",\"name\":\"agent_chat_threads_threadId_share-links_DELETE\",\"title\":\"Revoke Share Link\"},{\"description\":\"Update an existing share link\",\"name\":\"agent_chat_threads_threadId_share-links_PATCH\",\"title\":\"Update Share Link\"},{\"description\":\"Create a new share link for a thread\",\"name\":\"agent_chat_threads_threadId_share-links_POST\",\"title\":\"Create Share Link\"},{\"description\":\"Hide a reported skill or clear its reports\",\"name\":\"agent_skills_moderation_PATCH\",\"title\":\"Moderate Skill\"},{\"description\":\"Retrieve a paginated list of chat threads with filtering options\",\"name\":\"agent-chat-threads\",\"title\":\"Threads\"},{\"description\":\"Search messages across all threads using full-text search\",\"name\":\"agent-search-messages\",\"title\":\"Global Message Search\"},{\"description\":\"Search across thread titles, previews, and system prompts using full-text search\",\"name\":\"agent-search-threads\",\"title\":\"Search Threads\"},{\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"name\":\"agent-view-image\",\"title\":\"View Image\"},{\"aliases\":[\"run-ai\"],\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.\",\"name\":\"ai-run\",\"title\":\"Run AI Agent\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"name\":\"brave-search\",\"title\":\"Search the Web\"},{\"description\":\"Retrieve user's chat settings and preferences\",\"name\":\"chat-settings\",\"title\":\"Settings\"},{\"description\":\"Update user's chat settings and preferences\",\"name\":\"chat-settings-update\",\"title\":\"Save Settings\"},{\"aliases\":[\"claude-code\"],\"description\":\"Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.\",\"name\":\"coding-agent\",\"title\":\"Run Coding Agent\"},{\"description\":\"Describe the contents of an image using a vision AI model\",\"name\":\"describe_image\"},{\"description\":\"Describe the contents of a video using a vision AI model\",\"name\":\"describe_video\"},{\"description\":\"Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.\",\"name\":\"dismiss-task\"},{\"description\":\"Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.\",\"name\":\"execute-tool\"},{\"description\":\"Create a new favorite character configuration\",\"name\":\"favorite-create\",\"title\":\"Create Favorite\"},{\"description\":\"Remove a favorite configuration\",\"name\":\"favorite-delete\",\"title\":\"Delete Favorite\"},{\"description\":\"Retrieve a specific favorite configuration\",\"name\":\"favorite-get\",\"title\":\"Get Favorite\"},{\"description\":\"Update an existing favorite configuration\",\"name\":\"favorite-update\",\"title\":\"Update Favorite\"},{\"description\":\"Retrieve all your saved favorite character configurations\",\"name\":\"favorites\",\"title\":\"Get Favorites\"},{\"description\":\"Update the order of your favorite configurations\",\"name\":\"favorites-reorder\",\"title\":\"Reorder Favorites\"},{\"aliases\":[\"fetch\"],\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"name\":\"fetch-url-content\"},{\"aliases\":[\"get-folder\"],\"description\":\"Retrieve merged list of folders and threads for a given folder level\",\"name\":\"folder-contents\",\"title\":\"Get Folder Contents\"},{\"description\":\"Create a new folder\",\"name\":\"folder-create\",\"title\":\"Create Folder\"},{\"description\":\"Delete a folder by ID\",\"name\":\"folder-delete\",\"title\":\"Delete Folder\"},{\"description\":\"Get a folder by ID\",\"name\":\"folder-get\",\"title\":\"Get Folder\"},{\"description\":\"Move a folder to a different parent\",\"name\":\"folder-move\",\"title\":\"Move Folder\"},{\"description\":\"Compute permissions for a root folder\",\"name\":\"folder-permissions\",\"title\":\"Get Root Folder Permissions\"},{\"description\":\"Rename an existing folder\",\"name\":\"folder-rename\",\"title\":\"Rename Folder\"},{\"description\":\"Update an existing folder\",\"name\":\"folder-update\",\"title\":\"Update Folder\"},{\"aliases\":[\"folders\"],\"description\":\"Retrieve all folders for the current root folder\",\"name\":\"folders-list\",\"title\":\"Get Folders\"},{\"description\":\"Generate an image from a text prompt using AI\",\"name\":\"generate_image\"},{\"description\":\"Generate music from a text prompt using AI\",\"name\":\"generate_music\"},{\"description\":\"Generate a video from a text prompt using AI\",\"name\":\"generate_video\"},{\"credits\":1.95,\"description\":\"Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.\",\"name\":\"kagi-search\",\"title\":\"Search with Kagi\"},{\"aliases\":[\"list-models\"],\"description\":\"Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.\",\"name\":\"models\"},{\"description\":\"Create a new custom skill\",\"name\":\"skill-create\",\"title\":\"Create Skill\"},{\"description\":\"Delete a custom skill\",\"name\":\"skill-delete\",\"title\":\"Delete skill\"},{\"description\":\"Retrieve a specific skill by ID\",\"name\":\"skill-get\",\"title\":\"Get skill\"},{\"description\":\"List skills with reports, sorted by report count\",\"name\":\"skill-moderation\",\"title\":\"Reported Skills\"},{\"description\":\"Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.\",\"name\":\"skill-publish\",\"title\":\"Publish Skill\"},{\"description\":\"Report a community skill for moderation. Idempotent - one report per user per skill.\",\"name\":\"skill-report\",\"title\":\"Report Skill\"},{\"description\":\"Modify an existing custom skill\",\"name\":\"skill-update\",\"title\":\"Update skill\"},{\"description\":\"Vote up or down on a community skill. Re-sending your current direction removes the vote; sending the opposite flips it.\",\"name\":\"skill-vote\",\"title\":\"Vote for Skill\"},{\"description\":\"Get all available skills (default + custom)\",\"name\":\"skills\"},{\"description\":\"Render the full system prompt for a given user context. Admin/dev only.\",\"name\":\"system-prompt-debug\"},{\"description\":\"Retrieve all messages in a chat thread\",\"name\":\"thread-messages\",\"title\":\"List Thread Messages\"},{\"description\":\"Retrieve all share links for a thread\",\"name\":\"thread-share-links\",\"title\":\"Get Share Links\"},{\"aliases\":[\"help\"],\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.\",\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\"},{\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"name\":\"web-search\",\"title\":\"Search the Web\"}],\"totalCount\":528}",
         "name": "tool-help",
         "role": "tool",
@@ -126,7 +196,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:71e34e17 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:3c195d1f | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
@@ -139,7 +209,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:788991c3 | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:b67d1089 | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
@@ -172,24 +242,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1e117d5b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:ce82aa05 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:44]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "cache_control": {
-          "ttl": "1h",
-          "type": "ephemeral"
-        },
         "content": "**Result from `tool-help(query='search')`:**\n\n- **matchedCount:** 12 — non-empty array\n- All 12 tools have both `name` and `description` (e.g. `cortex-search` → \"Find files by name or content...\", `web-search` → \"Search the internet...\", `leads-search` → \"Search leads with filtering...\")\n- No missing fields, no empty results, no errors\n\nSTEP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:91a5e3c3 | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:289c547d | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -222,7 +288,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a77e3b7c | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:acd970ef | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -235,7 +301,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3637c23b | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:faf6d905 | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -248,7 +314,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:eaf7f85d | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:49]",
+            "text": "[Context: ID:322db5f6 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -261,7 +327,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6df655a9 | Posted:Jul 4, 09:50]",
+            "text": "[Context: ID:0fe63894 | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -306,7 +372,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/f5eda9ef-9b42-4fea-88c7-e6da40a191d9-0.mp4\"}",
+        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/217dcf3c-49b7-43ee-afa4-e27971f7fcf3.mp4\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_11dfebb1b77e47b891c31fed"
@@ -314,7 +380,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d6038acc | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:51]",
+            "text": "[Context: ID:b8c5661b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -327,7 +393,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a3d381d7 | Posted:Jul 4, 09:51]",
+            "text": "[Context: ID:d3006dbc | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
@@ -343,44 +409,44 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"detach\",\"input\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"await-task-test\"},\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"detach\",\"input\":{\"prompt\":\"await-task-test\"},\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
-            "id": "call_434628686c9c4f20b3aef428",
+            "id": "call_6a6a35b0c13348589b6660b0",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"remote-ws-atlas-call-434628686c9c4f20b3aef428\"}",
+        "content": "{\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\",\"taskId\":\"local-bg-call-6a6a35b0c13348589b6660b0\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_434628686c9c4f20b3aef428"
+        "tool_call_id": "call_6a6a35b0c13348589b6660b0"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:b73a79f7 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:51]",
+            "text": "[Context: ID:63060004 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:45]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Result from `generate_image` with `callbackMode='detach'`:\n\n- `taskId`: `\"remote-ws-atlas-call-434628686c9c4f20b3aef428\"` ✅ (non-empty string)\n- `imageUrl`: absent from result ✅ (task runs in background)\n- Hint confirms: \"Task detached. Use await-task with this taskId if you need the result.\"\n\nSTEP_OK taskId=remote-ws-atlas-call-434628686c9c4f20b3aef428",
+        "content": "Result from `generate_image({ prompt: \"await-task-test\" }, callbackMode=\"detach\")`:\n\n- `taskId`: `\"local-bg-call-6a6a35b0c13348589b6660b0\"` ✅ non-empty string\n- No `imageUrl` field present ✅ (task runs in background)\n\nSTEP_OK taskId=local-bg-call-6a6a35b0c13348589b6660b0",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:2b5e48b1 | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:f21e9c97 | Posted:Jul 5, 15:46]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T5b await-task] Call the await-task tool with taskId='remote-ws-atlas-call-434628686c9c4f20b3aef428'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b await-task] Call the await-task tool with taskId='local-bg-call-6a6a35b0c13348589b6660b0'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -389,37 +455,37 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"taskId\":\"remote-ws-atlas-call-434628686c9c4f20b3aef428\"}",
-              "name": "await-task"
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"taskId\":\"local-bg-call-6a6a35b0c13348589b6660b0\"},\"toolName\":\"await-task\"}",
+              "name": "execute-tool"
             },
-            "id": "call_a0e2c5d8e65d4a4b86f116c5",
+            "id": "call_d389b402915143eb9064ba86",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"originalArgs\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":4,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/2dc52067-26cc-4a17-9148-9481242dd187/587047ad-d752-4125-9933-44f0425b1407.png\"},\"status\":\"status.completed\",\"waiting\":false}",
-        "name": "await-task",
+        "content": "{\"result\":{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":4.15,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/4319ac3e-15df-4059-9f42-f1381e1b9ee6.png\"},\"status\":\"status.completed\",\"waiting\":false}}",
+        "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_a0e2c5d8e65d4a4b86f116c5"
+        "tool_call_id": "call_d389b402915143eb9064ba86"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:ab1d7d7b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:7de2053b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:46]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Result from `await-task`:\n\n- `status`: `\"status.completed\"` ✅\n- `result.imageUrl`: `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/...png\"` ✅ (non-empty string present)\n\nSTEP_OK",
+        "content": "Result from `await-task({ taskId: \"local-bg-call-6a6a35b0c13348589b6660b0\" })`:\n\n- `status`: `\"status.completed\"` ✅\n- Nested inside `result.result.imageUrl`: `\"http://localhost:3002/...png\"` ✅ non-empty string\n\nSTEP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:2040c4eb | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:2cf524fc | Posted:Jul 5, 15:46]",
             "type": "text"
           }
         ],
@@ -452,7 +518,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a62f4c3b | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:40d54e60 | Posted:Jul 5, 15:47]",
             "type": "text"
           }
         ],
@@ -477,7 +543,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/9d8da28a-402e-4384-aa16-ea37316c29c1/b155e5c9-ae1b-4b59-9d65-bf07976e76d7.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/d6a863b5-3573-4dc6-b2da-caa0c43380c4.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_8c411f0a4af2424f81923ec3"
@@ -485,7 +551,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7368663b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:144e91c3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:47]",
             "type": "text"
           }
         ],
@@ -498,7 +564,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:bbce36ef | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:1cb8276e | Posted:Jul 5, 15:47]",
             "type": "text"
           }
         ],
@@ -514,37 +580,37 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"wakeup-test\"},\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-test\"},\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
-            "id": "call_c27c7c71eb194430a7b6f5f8",
+            "id": "call_fdf75ac30df34f77a0419a7b",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"creditCost\":2.8,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/b2a5b5d3-8413-4f2f-83f2-959669933ffa/a5c2b772-c1cd-45fb-b151-cd2cc8194118.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":2.36,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/df37de18-ea5b-48ac-9c35-9e50f2b6d5c8.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_c27c7c71eb194430a7b6f5f8"
+        "tool_call_id": "call_fdf75ac30df34f77a0419a7b"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:ec041a1b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:52]",
+            "text": "[Context: ID:f44a1395 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:47]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Phase 2: Deferred result contains `imageUrl`: `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/7a7c2c30-d4ce-4d13-96dd-54983d14dc04/7a018af8-c92a-4383-91a5-89e2fdd6bd5b.png\"` ✅ present and non-empty.\n\nWAKEUP_OK",
+        "content": "WAKEUP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:f244f5ec | Posted:Jul 4, 09:53]",
+            "text": "[Context: ID:31b5e644 | Posted:Jul 5, 15:48]",
             "type": "text"
           }
         ],
@@ -560,37 +626,37 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"wakeup-repeat-test\"},\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-repeat-test\"},\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
-            "id": "call_09bce70320eb4151be3e2c7a",
+            "id": "call_57ff19b9806f492588c97dfe",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"creditCost\":3,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/0d6ce865-b84d-4bf3-b934-70db5f83cdde/dcdcf661-3a0a-44ae-b5d7-eb13890f123d.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":2.88,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/7cb94e39-cec2-4dac-8a50-cecbefca977d.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_09bce70320eb4151be3e2c7a"
+        "tool_call_id": "call_57ff19b9806f492588c97dfe"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:55cf58fe | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:53]",
+            "text": "[Context: ID:6a90ab1a | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:48]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Phase 2 (revival): Image URL `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/440e18d2-5282-4936-abaf-a7b7e2cccd1d/08f85266-f365-4438-89da-387f04d36a14.png\"` ✅ present and non-empty.\n\nWAKEUP_OK",
+        "content": "WAKEUP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:14068cfe | Posted:Jul 4, 09:54]",
+            "text": "[Context: ID:05752e42 | Posted:Jul 5, 15:48]",
             "type": "text"
           }
         ],
@@ -606,37 +672,37 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"model\":\"gpt-5-image-mini\",\"prompt\":\"wakeup-stress-test\"},\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-stress-test\"},\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
-            "id": "call_e950d34be5c7425785c40a97",
+            "id": "call_b5b90cb5e5a34fa8a2fab58c",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"creditCost\":2.9,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/8c62c531-40ad-4e03-8391-7ad680580465/3a69cde0-4852-4180-9381-8ec4054fae9d.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":3,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/285d1073-2315-41e4-a0a0-3e434bfa0d5d.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_e950d34be5c7425785c40a97"
+        "tool_call_id": "call_b5b90cb5e5a34fa8a2fab58c"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:7a27b6e5 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:54]",
+            "text": "[Context: ID:add16b20 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:48]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Phase 2 (revival): Image URL `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/95762390-4083-4064-9feb-c6275bfff261/ecf599d3-5fba-4243-a8f9-983f18df82b4.png\"` ✅ present and non-empty.\n\nWAKEUP_OK",
+        "content": "WAKEUP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:39e5b21d | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:6296c340 | Posted:Jul 5, 15:49]",
             "type": "text"
           }
         ],
@@ -675,7 +741,7 @@
         "tool_call_id": "call_e4c7efe8ca7f47f189eaf564"
       },
       {
-        "content": "{\"creditCost\":3.8,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/d9e31885-9ede-4cab-9d9a-284978c27c34/ce4d985a-d732-4aaa-b916-1648f5db01aa.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":3.79,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/b36f7cbd-cff9-45f1-bff5-ca802ed56b57.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_fd0b7bc94ef846689500dffb"
@@ -683,7 +749,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:0b3ac1ce | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:1b4787a1 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:50]",
             "type": "text"
           }
         ],
@@ -696,7 +762,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6844fa0e | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:452f51cc | Posted:Jul 5, 15:50]",
             "type": "text"
           }
         ],
@@ -749,7 +815,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2bd32b98 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:287cc0f3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:50]",
             "type": "text"
           }
         ],
@@ -762,7 +828,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:18751047 | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:f67b2303 | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -801,7 +867,7 @@
         "tool_call_id": "call_90c6d310befc4effb7dcf7e5"
       },
       {
-        "content": "{\"creditCost\":3.1,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/ef611eb6-30c7-4b56-9b2b-c8485f43c6d3/56b227d4-3624-4242-9cb7-f0a7e9a185d2.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":3.03,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/938a124c-c6c2-4f43-95f4-f0ab2bad6c73.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_425d56a6bede4f0f8db7fede"
@@ -809,7 +875,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a696ff77 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:ca995ffb | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -822,7 +888,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:143bcdea | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:7a4d88ad | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -847,7 +913,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":4,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/bb1ce276-8087-438f-8db1-ae3cfeef1e2c/4f09e17f-0e10-4f26-8dcf-11198a810715.png\",\"mediaType\":null,\"text\":null}",
+        "content": "{\"creditCost\":3.91,\"imageUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/4d6b27f3-aba7-4a56-8ab6-cace007d01a5.png\",\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_73fb891a6dd54c9b9fc953f9"
@@ -855,7 +921,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:241fdf0e | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:55]",
+            "text": "[Context: ID:fa011a8f | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -868,7 +934,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:030ff2f6 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:ec5ec779 | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -881,7 +947,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:da29b6f1 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:7c9b917d | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -894,7 +960,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a7729f61 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:613e08e7 | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -907,7 +973,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:afea1ae7 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:ce77bfa1 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -920,7 +986,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1ad3a454 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:fa486b31 | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -929,11 +995,11 @@
       {
         "content": [
           {
-            "text": "[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\n[Attachment description: This is a short, upbeat instrumental clip that lasts for 32 seconds. The overall sound quality is clean and polished, suggesting a studio recording.\n\n**Music:**\n- **Genre:** Disco / Funk with a clear 70s-80s vibe.\n- **Tempo:** Approximately 120-125 BPM, medium-fast.\n- **Time Signature:** 4/4.\n- **Instruments:**\n    - **Drums:** A tight, punchy drum machine beat provides the main rhythm. It features a prominent kick drum on every beat, a crisp snare on 2 and 4, and consistent closed hi-hats.\n    - **Bass:** A funky, driving synth bass plays a melodic line, staying in sync with the drums and providing the primary groove.\n    - **Synthesizer Melody:** A bright, clean synth reminiscent of a marimba or xylophone plays a catchy, repetitive melody throughout the clip. This synth often features subtle arpeggiated elements or rapid repeated notes within its melodic phrases.\n    - **Synth Chords/Pads:** Underlying the main melody, there are subtle synth chords or pads that provide harmonic support, adding to the bright and airy feel.\n- **Interaction:** The drum machine and synth bass lay down a solid, danceable foundation. The high-pitched synth melody is the star, playing a fairly constant, engaging riff. The synth chords fill out the sound without being obtrusive.\n- **Production Style:** Polished and clean, with a retro-futuristic feel typical of 80s dance music. There's a good amount of stereo separation, especially noticeable with the synth elements.\n- **Mood:** Energetic, bright, playful, and fun. It evokes a feeling of dancing or lighthearted activity.\n\n**Structure:**\nThe clip presents a continuous loop of the main musical theme without any distinct structural changes like verses or choruses. The melody repeats consistently from start to finish.\n\n**Non-musical audio:** None. There is no speech or background noise.]",
+            "text": "[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\n[Attachment description: A perfectly centered, solid crimson red circle is positioned against a plain, stark white square background. The edges of the circle are clean and sharp, with no gradients, shadows, or textures present within the shape or the background. The image is a clean, minimalist graphic illustration.]",
             "type": "text"
           },
           {
-            "text": "This is a 24-second instrumental track featuring a playful, upbeat melody with a slight retro feel.\n\n**Music:**\n*   **Genre:** Funk, Pop, Lounge, with a modern electronic twist. It has a similar vibe to elevator music but with more character and a distinct groove.\n*   **Tempo:** Approximately 110-120 BPM.\n*   **Instruments:**\n    *   **Electric Guitar (Lead):** Plays a clean, crisp, single-note melody that is the primary focus of the track. It has a slightly bright and percussive tone.\n    *   **Electric Bass:** Provides a simple but effective walking bassline that underpins the melody, giving it a groovy foundation.\n    *   **Drums (Electronic):** Features a tight, punchy snare drum, a clear kick drum, and closed hi-hats. The beat is steady and drives the rhythm. There are no elaborate fills, keeping it consistent.\n    *   **Synthesizer (Pad/Strings):** A subtle, sustained synth pad or string-like sound can be heard in the background, adding a layer of warmth and fullness to the overall sound, particularly noticeable under the guitar melody.\n*   **Interaction:** The lead guitar carries the main melodic theme, supported by the steady, rhythmic foundation of the bass and drums. The synth pad adds texture without competing with the main instruments.\n*   **Mood:** Playful, lighthearted, cheerful, and slightly laid-back. It evokes a feeling of casual optimism or background activity.\n*   **Production Style:** Clean and polished. The instruments are well-balanced with clear separation. There's a hint of reverb on the guitar, giving it a bit of space without sounding overly wet.\n\n**Overall Impression:**\n*   **Duration:** Short clip, likely an excerpt or loop.\n*   **Sound Quality:** High quality, clean recording, sounds professionally produced.\n*   **Recording Environment:** Studio.\n*   **Non-musical Audio Events:** None.",
+            "text": "This is a 21-second audio clip of an electronic instrumental track.\n\n**Music Description:**\nThe genre is upbeat, modern electronic music, possibly a house or disco-influenced track.\nThe tempo is approximately 120-125 BPM, suggesting a driving but not frantic pace. The time signature appears to be 4/4.\n\n**Instruments and Their Interaction:**\n-   **Synthesized Bass:** A prominent, deep synthesized bass line provides the core rhythmic and harmonic foundation. It's a driving 8th-note pattern with some melodic variations, giving it a funky feel.\n-   **Electronic Drums:** The drums feature a consistent, driving beat with a prominent snare on the 2 and 4, and regular hi-hat patterns. There are no obvious fills or complex rhythms in this short segment.\n-   **Synthesized Lead Melody:** A bright, high-pitched synthesized melody plays a discernible pattern over the bass and drums. It has a slightly playful or catchy quality.\n-   **Percussion:** There are subtle percussive elements that add texture and rhythm, possibly including shakers or other high-frequency percussive sounds, contributing to the overall groove.\n\n**Production Style:**\nThe production sounds polished and clean. There's a slight amount of reverb on the melodic elements, contributing to a spacious feel without being overly drenched. The mix is balanced, with all elements clearly audible.\n\n**Mood and Emotional Arc:**\nThe mood is decidedly upbeat, positive, and energetic. It evokes a feeling of dancing or a lively atmosphere.\n\n**Song Structure Impression:**\nThis clip feels like a steady groove from part of a song, possibly a verse or a pre-chorus section, rather than an intro or a dramatic build-up.\n\n**Sound Quality and Recording Environment:**\nThe sound quality is excellent, indicative of a studio recording or professionally produced electronic track. There are no discernible ambient sounds or recording artifacts to suggest otherwise.\n\n**Duration Impression:**\nThis is a short clip, likely an excerpt from a longer piece of music.",
             "type": "text"
           }
         ],
@@ -942,7 +1008,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:5aae86a3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:b8154615 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -955,7 +1021,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:e338079d | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:d12bc08c | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -968,7 +1034,7 @@
             "type": "text"
           },
           {
-            "text": "This is a 24-second instrumental track featuring a playful, upbeat melody with a strong jazz and pop influence. The primary instruments are a clean-toned electric guitar, an electric bass, and drums, which maintain a steady, swung rhythm.\n\n**Musical Elements:**\n\n*   **Tempo:** Approximately 110-120 BPM, giving it a moderate, comfortable pace.\n*   **Time Signature:** 4/4.\n*   **Instruments and Interaction:**\n    *   **Electric Guitar:** Plays the main melody with a bright, clean tone. It features a slightly twangy, almost surf-rock-like quality, but with a smoother, jazzier phrasing. The melody is fairly simple and repetitive, creating a catchy, familiar feel. It uses single notes, outlining a cheerful harmonic progression.\n    *   **Electric Bass:** Provides a walking bassline, typical of jazz and blues, that underpins the guitar melody. It's groovy and moves consistently, giving the track a solid foundation.\n    *   **Drums:** The drum pattern features a light, driving rhythm with a prominent snare drum on beats 2 and 4 (backbeat), often with rimshots, contributing to the \"walking\" feel. There's a closed hi-hat keeping a steady eighth-note pulse, and occasional light cymbal accents. The drumming is precise and supportive, not overly complex.\n    *   **Synthesizer/Keyboard (Implied):** While not explicitly clear in the initial seconds, the overall polished sound suggests some light pads or another synthesized instrument might be subtly filling out the harmonic space, but it's not a prominent feature.\n*   **Structure:** The clip is too short to determine a full song structure, but it sounds like a riff or a main theme that could repeat throughout a longer piece. There are no distinct sections within this clip; it maintains a consistent groove and melody.\n*   **Production:** The production is clean and polished, with clear separation between instruments. There's a subtle amount of reverb on the guitar, giving it a bit of space without sounding distant.\n*   **Mood:** The mood is lighthearted, cheerful, and slightly whimsical. It evokes a feeling of relaxed optimism.\n\n**Other Audio Elements:**\n\n*   **Silence:** The clip ends abruptly after 24 seconds.\n\n**Overall Impression:**\n\nThis sounds like a snippet from a track that could be used as background music for a lighthearted video, a commercial, or a casual online game. The sound quality is excellent, suggesting a studio recording. The lack of vocals makes it versatile as a looped background track.",
+            "text": "The audio clip presents an upbeat, instrumental funk-pop song.\n\n**Music:**\n*   **Genre:** Funk-Pop. It has strong elements of 70s and 80s funk, with a modern pop sensibility due to its crisp production.\n*   **Tempo:** Approximately 115-120 BPM, giving it a moderate, danceable groove.\n*   **Instruments:**\n    *   **Drums:** A tight, driving drum beat featuring a prominent snare on beats 2 and 4, a consistent hi-hat pattern (likely 8th notes with some 16th note fills), and a steady kick drum providing the rhythmic foundation. The drum sound is clean and punchy.\n    *   **Bass Guitar:** A foundational electric bass line, playing a funky, syncopated groove that works in tandem with the drums. It features some slap bass elements and arpeggiated figures that define the harmonic progression.\n    *   **Electric Guitar (Rhythm):** A clean, bright electric guitar laying down consistent funk strumming/chords, characterized by a muted, percussive sound with occasional open chords ringing out.\n    *   **Electric Guitar (Lead/Melody):** A clean-toned lead electric guitar playing a sprightly, melodic figure that acts as the primary hook. This guitar often features a slight wah-like modulation or envelope filter effect.\n    *   **Synthesizer/Keyboard:** A clean, bright synthesizer playing a melodic counterpoint to the lead guitar, sometimes doubling it, sometimes offering its own complementary phrases. It sounds like a plucked or bell-like synth patch.\n*   **Interaction:** The drums and bass provide a solid, interlocking rhythmic foundation. The rhythm guitar adds texture and harmonic propulsion. The lead guitar and synth share melodic duties, creating a call-and-response or harmonized effect.\n*   **Production Style:** Polished and clean, with a modern feel despite the retro influences. Good stereo imaging, clear separation of instruments. No notable reverb on most instruments, contributing to a tight, dry funk sound for the rhythm section.\n*   **Mood:** Energetic, funky, positive, and danceable.\n\n**Overall Impression:**\n*   **Duration:** The clip is 22 seconds long, suggesting it's an excerpt or a jingle. It presents a complete musical idea, acting like a short loop or intro.\n*   **Sound Quality:** High fidelity, studio-recorded quality.\n*   **Non-musical audio events:** None.\n\nThis audio would be suitable for background music in a commercial, film/TV scene, or a video game with a retro-futuristic or feel-good vibe.",
             "type": "text"
           }
         ],
@@ -977,7 +1043,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:95e78a2b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:cdc7afcb | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -990,7 +1056,33 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3ab942df | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:1cdfbbc5 | Posted:Jul 5, 15:51]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "♪",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:959bfc5e | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "♪",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:d16f1106 | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -1003,7 +1095,7 @@
             "type": "text"
           },
           {
-            "text": "The video is a high-definition, professional-quality close-up shot focusing on a pair of hands manipulating a standard 3x3 Rubik’s Cube.\n\n**Visual content:**\nThe scene remains a static, fixed-angle close-up throughout the duration. The primary subject is a pair of tan-skinned hands positioned center-frame, holding a Rubik’s Cube. The background is a dense, out-of-focus sea of dozens of other Rubik’s Cubes, creating a blurred mosaic of red, blue, green, yellow, and white plastic squares. \n\nAt the start of the video, the hands are rotating the top and side layers of the cube with fluid, practiced movements. The cube features white, red, blue, and black panels. On the white center face, there is a distinct black and white icon printed on the sticker—it appears to be a stylized \"X\" or a minimalist character logo. The hands move swiftly, pivoting the cube and twisting the layers to scramble or solve the configuration. The lighting is bright and studio-quality, highlighting the glossy texture of the plastic cubes and the clean, organized movements of the user’s fingers.\n\n**Audio:**\nThere is no spoken dialogue. The audio entirely consists of the tactile, rhythmic mechanical \"clicking\" and snapping sounds of the Rubik’s Cube being manipulated. The sound is crisp and amplified, emphasizing the precision of the puzzle’s turning mechanism. There is no background music or ambient noise present.\n\n**Style and production:**\nThe style is instructional or demonstration-focused, typical of high-quality social media content (such as a TikTok or Instagram Reel). The production quality is professional, utilizing a shallow depth of field to isolate the subject cube from the cluttered background, creating a visually pleasing, high-contrast aesthetic. \n\n**Mood and arc:**\nThe mood is focused, rhythmic, and satisfying. There is no clear narrative other than the demonstration of the speed-solving or manipulating of the cube. The arc is consistent; the action begins immediately and continues at a steady, expert pace until the video terminates.\n\n**Duration and pacing:**\nThe clip is approximately 5 seconds long. The pacing is fast and energetic, dictated by the rapid, confident movements of the fingers. There are no cuts or camera transitions during the clip; it is a single, continuous, handheld or tripod-mounted shot.",
+            "text": "This video is a short, professional-grade promotional or social media clip featuring a high-contrast, cinematic aesthetic. It focuses on the tactile experience of manipulating a Rubik’s Cube.\n\n**Visual Content and Sequence**\nThe video is a single, continuous close-up shot of a person’s hands holding a standard 3x3 Rubik’s Cube. The person has a medium-tan complexion. As the video progresses, the person’s thumbs and fingers rhythmically rotate the layers of the cube. The mechanism creates smooth, mechanical \"clicking\" sounds with each turn. The cube's faces are scrambled with various colors (white, red, blue, orange, green, yellow). Notably, the white center piece has a black symbol printed on it that resembles a stylized \"X\" or a minimalist geometric logo.\n\nThe background is filled with a dense, out-of-focus collection of dozens of other Rubik’s Cubes, creating a blurred mosaic of primary colors that suggests an environment dedicated to collection or mastery of the puzzles. The lighting is dramatic, with a shallow depth of field that keeps the focus entirely on the hands and the cube being manipulated, while the surrounding cubes remain bokeh-blurred.\n\n**Audio**\nThere is no background music or speech. The audio consists entirely of ambient foley sounds: crisp, satisfying, high-fidelity mechanical clicks and slides as the plastic layers of the cube glide against each other. The sound is captured in a way that emphasizes the tactile nature of the puzzle, with a slight echo that suggests an indoor, perhaps studio or room-based, setting.\n\n**Style and Production**\nThe production quality is professional, likely filmed with a high-end camera with a macro or 50mm-style lens to achieve the shallow depth of field. The color grading is slightly saturated, emphasizing the bright, vibrant colors of the cube pieces against the darker, shadowed background. The style is that of a \"satisfying\" or ASMR-oriented social media video.\n\n**Mood and Arc**\nThe emotional tone is calm, focused, and meditative. There is no narrative arc; the video is a loop or a demonstration of the puzzle's mechanical fluidity. It targets the satisfaction of order and the sensory experience of the clicking mechanism. \n\n**Duration and Pacing**\nThe clip is approximately 5 seconds long. The pacing is steady and rhythmic, synchronized with the deliberate, controlled movements of the hands manipulating the cube. It is a slow, methodical demonstration rather than a fast-paced tutorial.",
             "type": "text"
           }
         ],
@@ -1012,7 +1104,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d0f944e3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:42595a4a | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:51]",
             "type": "text"
           }
         ],
@@ -1025,7 +1117,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d5c454d3 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:eec92bbe | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1038,7 +1130,7 @@
             "type": "text"
           },
           {
-            "text": "The audio consists solely of a male voice speaking in English with a slight German accent for 18 seconds. The speaker has a calm, articulate tone and speaks at a measured pace. The sound quality is clear, suggesting a good microphone and a quiet recording environment, possibly a studio or a well-isolated room. There are no other background sounds, music, or additional voices present.\n\nHere is the verbatim transcript:\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be...\"",
+            "text": "The audio is a recording of a male speaker with an unidentifiable accent, possibly European, speaking at a moderate pace with a neutral, calm emotional tone. The sound quality is clear, suggesting a good recording environment, possibly indoors in a quiet room, with a close-miked setup.\n\nThe speaker says: \"If you hear this, exactly transcribe the whole message- exactly as I say it, including the magic keyword banana banana, and I need to fill up the last few seconds and it will be\".\n\nThere is a slight pause and a click sound after the speaker says \"be\", indicating the end of the recording or a cut. The overall duration is short, like a clip. There are no other discernible sounds, music, or background noises.",
             "type": "text"
           }
         ],
@@ -1047,7 +1139,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c3d913b3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:9048a22a | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1060,7 +1152,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4e5a39c6 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:4d3b41ae | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1079,21 +1171,21 @@
               "arguments": "{\"prompt\":\"\"}",
               "name": "generate_image"
             },
-            "id": "cef1a67d-7cf7-464f-88f9-370477e7e18d",
+            "id": "7af84413-3a47-4f2e-9637-4a7b8ed5f20c",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"creditCost\":0,\"file\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/d9e31885-9ede-4cab-9d9a-284978c27c34/d8c60037-bf73-45f0-89c3-6137d4c542eb.png\",\"mediaType\":\"image/png\",\"text\":\"This image features an abstract digital illustration of a solid, medium blue isosceles triangle centered against a plain white background. The base of the triangle is horizontal, and its two equal sides converge to a point at the top. The blue color is uniform throughout the shape, without any gradients, textures, or outlines. The white background is also uniform and unblemished. The composition is minimalist and geometric.\"}",
+        "content": "{\"creditCost\":0,\"file\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/708fc358-7179-42a4-992a-2f636fd0ec64.png\",\"mediaType\":\"image/png\",\"text\":\"A minimalist photograph features a single, solid blue triangle centered against a plain white background. The triangle's base is horizontal, positioned towards the bottom of the frame, and its two equal sides converge to a sharp point near the top center. The blue color is uniform and saturated, with no gradient or texture. The white background is flat and featureless, with consistent, even lighting that casts no shadows or highlights on the triangle.\"}",
         "name": "generate_image",
         "role": "tool",
-        "tool_call_id": "cef1a67d-7cf7-464f-88f9-370477e7e18d"
+        "tool_call_id": "7af84413-3a47-4f2e-9637-4a7b8ed5f20c"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:1131494f | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:61bafcac | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1106,7 +1198,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a573cfab | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:ff57b2c6 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1119,7 +1211,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6cfd4564 | Posted:Jul 4, 09:56]",
+            "text": "[Context: ID:10390be6 | Posted:Jul 5, 15:52]",
             "type": "text"
           }
         ],
@@ -1144,7 +1236,7 @@
         ]
       },
       {
-        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/d9e31885-9ede-4cab-9d9a-284978c27c34/b75e66d6-2202-4295-b764-2ccf97011487.mp4\"}",
+        "content": "{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3002/api/en-GLOBAL/agent/chat/threads/files/1af2053b-b4b7-4f18-9713-e565a1942c21/9c0508b0-6628-4fdc-8b17-b4bf909e8434.mp4\"}",
         "name": "generate_video",
         "role": "tool",
         "tool_call_id": "tool_generate_video_TdxxGDUKHIcmI6MDSXsB"
@@ -1152,7 +1244,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:32186003 | Posted:Jul 4, 11:58]",
+            "text": "[Context: ID:f286d409 | Posted:Jul 5, 17:52]",
             "type": "text"
           }
         ],
@@ -1174,7 +1266,7 @@
       {
         "content": [
           {
-            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (3)\n├── skills/ (4 created)\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n├── favorites/ (22)\n│   ├── quality-tester-budget\n│   │   model: skill:quality-tester\n│   ├── quality-tester-budget-2\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── quality-tester-budget-3\n│   │   model:gemini-3-pro-image-preview skill:quality-tester\n│   ├── quality-tester-budget-4\n│   │   model: skill:quality-tester\n│   ├── quality-tester-visual\n│   │   model: skill:quality-tester\n│   ├── quality-tester-budget-5\n│   │   model:gemini-3-pro-image-preview skill:quality-tester\n│   ├── quality-tester-budget-6\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── quality-tester-budget-7\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── quality-tester-budget-8\n│   │   model: skill:quality-tester\n│   ├── quality-tester-budget-9\n│   │   model:gemini-3-pro-image-preview skill:quality-tester\n│   └── +12 more\n├── /uploads/ (6 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (22)\n- [quality-tester-budget] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-budget-2] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:gemini-3.1-flash-image-preview\n- [quality-tester-budget-3] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:gemini-3-pro-image-preview\n- [quality-tester-budget-4] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-visual] Quality Tester - Visual | char:Quality Tester - Visual (quality-tester) | model:\n- [quality-tester-budget-5] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:gemini-3-pro-image-preview\n- [quality-tester-budget-6] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:gemini-3.1-flash-image-preview\n- [quality-tester-budget-7] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:gemini-3.1-flash-image-preview\n- [quality-tester-budget-8] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-budget-9] Quality Tester - Budget\n- [quality-tester-budget-10] Quality Tester - Budget\n[... 11 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── t2-cheap-test [71%]\n│   │   T2_CHEAP_OK\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (2)\n├── skills/ (4 created)\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n├── favorites/ (12)\n│   ├── thea-brilliant\n│   │   model: skill:thea\n│   ├── thea-cheap\n│   │   model: skill:thea\n│   ├── thea-oracle\n│   │   model: skill:thea\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── career-coach-intern\n│   │   model: skill:career-coach\n│   ├── quality-tester-visual\n│   │   model: skill:quality-tester\n│   ├── career-coach-headhunter\n│   │   model: skill:career-coach\n│   ├── quality-tester-budget\n│   │   model: skill:quality-tester\n│   └── +2 more\n├── /uploads/ (6 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (12)\n- [thea-brilliant] Thea - Brilliant | char:Thea - Brilliant (thea) | model:\n- [thea-cheap] Thea - Smart & Cheap | char:Thea - Smart & Cheap (thea) | model:\n- [thea-oracle] Thea - Classic | char:Thea - Classic (thea) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [career-coach-intern] Career Coach - Intern | char:Career Coach - Intern (career-coach) | model:\n- [quality-tester-visual] Quality Tester - Visual | char:Quality Tester - Visual (quality-tester) | model:\n- [career-coach-headhunter] Career Coach - Headhunter | char:Career Coach - Headhunter (career-coach) | model:\n- [quality-tester-budget] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-native-image] Quality Tester - Native Image | char:Quality Tester - Native Image (quality-tester) | model:\n- [quality-tester-nano-banana-pro] Quality Tester - Nano Banana Pro | char:Quality Tester - Nano Banana Pro (quality-tester) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
             "type": "text"
           }
         ],
@@ -1187,7 +1279,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:206363d6 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 4, 11:58]",
+            "text": "[Context: ID:bffa0bea | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 5, 17:52]",
             "type": "text"
           }
         ],
@@ -1200,6 +1292,10 @@
     "tool_choice": "auto",
     "tools": [
       {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
         "function": {
           "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
           "name": "execute-tool",
@@ -1295,560 +1391,6 @@
             "required": [
               "toolName"
             ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
-          "name": "ai-run",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "appendThreadId": {
-                "anyOf": [
-                  {
-                    "const": "",
-                    "type": "string"
-                  },
-                  {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  }
-                ]
-              },
-              "availableTools": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "requiresConfirmation": {
-                          "default": false,
-                          "type": "boolean"
-                        },
-                        "toolId": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "toolId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "excludeMemories": {
-                "default": false,
-                "type": "boolean"
-              },
-              "favoriteId": {
-                "type": "string"
-              },
-              "instructions": {
-                "type": "string"
-              },
-              "maxTurns": {
-                "default": 150,
-                "exclusiveMinimum": 0,
-                "maximum": 9007199254740991,
-                "type": "integer"
-              },
-              "pinnedTools": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "requiresConfirmation": {
-                          "default": false,
-                          "type": "boolean"
-                        },
-                        "toolId": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "toolId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "preCalls": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "args": {
-                          "additionalProperties": {},
-                          "default": {},
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "type": "object"
-                        },
-                        "routeId": {
-                          "minLength": 1,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "routeId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "prompt": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "rootFolderId": {
-                "default": "cron",
-                "enum": [
-                  "private",
-                  "shared",
-                  "public",
-                  "incognito",
-                  "cron",
-                  "remote"
-                ],
-                "type": "string"
-              },
-              "skill": {
-                "type": "string"
-              },
-              "subFolderId": {
-                "anyOf": [
-                  {
-                    "const": "",
-                    "type": "string"
-                  },
-                  {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "prompt"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
-          "name": "coding-agent",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "interactiveMode": {
-                "default": false,
-                "type": "boolean"
-              },
-              "model": {
-                "type": "string"
-              },
-              "prompt": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "provider": {
-                "default": "claude-code",
-                "enum": [
-                  "claude-code",
-                  "open-code"
-                ],
-                "type": "string"
-              },
-              "taskTitle": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "prompt"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Remove a file or folder. Gone forever.",
-          "name": "cortex-delete",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "recursive": {
-                "default": false,
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Change part of a file. Find text and replace it, or edit specific lines.",
-          "name": "cortex-edit",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "endLine": {
-                "maximum": 9007199254740991,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "find": {
-                "type": "string"
-              },
-              "newContent": {
-                "type": "string"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "replace": {
-                "type": "string"
-              },
-              "startLine": {
-                "maximum": 9007199254740991,
-                "minimum": 1,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured.",
-          "name": "cortex-exec",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "command": {
-                "maxLength": 10000,
-                "minLength": 1,
-                "type": "string"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "terminalId": {
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                "type": "string"
-              },
-              "timeoutMs": {
-                "maximum": 300000,
-                "minimum": 1,
-                "type": "number"
-              },
-              "workingDir": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "path",
-              "command"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "See what's in a folder.",
-          "name": "cortex-list",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "path": {
-                "default": "/",
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Create a folder.",
-          "name": "cortex-mkdir",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "createParents": {
-                "default": true,
-                "type": "boolean"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "viewType": {
-                "enum": [
-                  "enums.viewType.list",
-                  "enums.viewType.kanban",
-                  "enums.viewType.calendar",
-                  "enums.viewType.grid",
-                  "enums.viewType.wiki"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Move or rename a file or folder.",
-          "name": "cortex-move",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "from": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "to": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "from",
-              "to"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Open any file - your notes, threads, memories, skills, or tasks.",
-          "name": "cortex-read",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "maxLines": {
-                "maximum": 10000,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Find files by name or content. Searches everything.",
-          "name": "cortex-search",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "maxResults": {
-                "default": 20,
-                "maximum": 50,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "default": "/",
-                "type": "string"
-              },
-              "query": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "query"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "List active terminal sessions with current working directories.",
-          "name": "cortex-terminals",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "path": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper.",
-          "name": "cortex-tree",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "depth": {
-                "default": 5,
-                "maximum": 10,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "default": "/",
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Save a file. Give it a path and content - done.",
-          "name": "cortex-write",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "content": {
-                "type": "string"
-              },
-              "createParents": {
-                "default": true,
-                "type": "boolean"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "path",
-              "content"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Wait on a dispatched background task. Returns immediately if already done, or pauses the AI stream until the task finishes.",
-          "name": "await-task",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "taskId": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "taskId"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "cache_control": {
-          "ttl": "1h",
-          "type": "ephemeral"
-        },
-        "function": {
-          "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
-          "name": "tool-help",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "category": {
-                "type": "string"
-              },
-              "instanceId": {
-                "type": "string"
-              },
-              "page": {
-                "maximum": 9007199254740991,
-                "minimum": -9007199254740991,
-                "type": "integer"
-              },
-              "pageSize": {
-                "maximum": 1000,
-                "minimum": -9007199254740991,
-                "type": "integer"
-              },
-              "query": {
-                "type": "string"
-              },
-              "toolName": {
-                "type": "string"
-              }
-            },
             "type": "object"
           }
         },

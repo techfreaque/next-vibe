@@ -699,10 +699,55 @@ export class ServerStartRepository {
       }
 
       logger.info(formatDatabase("Database ready", "🗄️ "));
+
+      // Auto-open all active reverse-ws connectors so cross-instance sync works
+      // after server restart without requiring the user to reconnect manually.
+      void ServerStartRepository.openReverseWsConnectors(logger);
     } catch (error) {
       const parsedError = parseError(error);
       logger.vibe(formatError("Database setup failed (continuing anyway)"));
       logger.error("Database setup error details", parsedError);
+    }
+  }
+
+  private static async openReverseWsConnectors(
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const { RemoteConnectionRepository } =
+        await import("@/app/api/[locale]/remote-connection/repository");
+      const { openConnection } = await import("next-vibe/realtime/connector");
+      const connections =
+        await RemoteConnectionRepository.getAllActiveConnectionsForSync();
+      let opened = 0;
+      for (const conn of connections) {
+        if (conn.transportMode === "reverse-ws") {
+          openConnection({
+            id: conn.id,
+            instanceId: conn.instanceId,
+            remoteUrl: conn.remoteUrl,
+            token: conn.token,
+            leadId: conn.leadId,
+            userId: conn.userId,
+            remoteUserId: conn.remoteUserId,
+            capabilitiesVersion: conn.capabilitiesVersion,
+            sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
+            syncScope: conn.syncScope,
+            syncCursors: conn.syncCursors,
+            pushCursors: null,
+          });
+          opened++;
+        }
+      }
+      if (opened > 0) {
+        logger.info(
+          `[Connector] Auto-opened ${String(opened)} reverse-ws connector(s) on startup`,
+        );
+      }
+    } catch (err) {
+      logger.warn("[Connector] Failed to auto-open reverse-ws connectors", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 

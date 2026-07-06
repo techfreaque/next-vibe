@@ -54,6 +54,10 @@ const { POST } = createEndpoint({
   ] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   aliases: ["await-task", "wait-for-task"],
+  // Awaiting an arbitrary task is unbounded by nature (media generation can
+  // run for many minutes) — cross-instance callers must keep their inline
+  // WAIT open instead of falling to the 90s default.
+  timeoutMs: 0,
 
   fields: customWidgetObject({
     render: AwaitTaskWidget,

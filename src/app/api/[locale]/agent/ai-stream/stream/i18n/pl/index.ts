@@ -228,6 +228,11 @@ export const translations: typeof enTranslations = {
       label: "Podfolder",
       description: "Opcjonalny podfolder w folderze głównym",
     },
+    loopInstanceId: {
+      label: "Działa na",
+      description:
+        "Połączona instancja, która wykonuje pętlę AI dla tego streamu. Puste = ta instancja. Zapisywane w wątku dla kolejnych tur.",
+    },
     threadId: {
       label: "ID wątku",
       description: "ID wątku (null dla nowego wątku)",

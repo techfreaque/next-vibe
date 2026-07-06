@@ -4,5 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
 export const Route = createFileRoute("/api/$locale/agent/chat/settings")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/chat/settings/route")) },
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/agent/chat/settings/route"),
+    ),
+  },
 });

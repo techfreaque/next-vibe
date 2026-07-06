@@ -46,7 +46,8 @@ interface ChannelState {
   locale: CountryLanguage;
   /**
    * Structured descriptor for endpoint (ws-*) channels. The server rebuilds and
-   * authorizes the channel from this; absent for user/ and system/ channels.
+   * authorizes the channel from this; absent for user-scoped (user/{uid}/…)
+   * channels, which are authorized by identity prefix alone.
    * Stored so reconnect re-sends it with the subscription.
    */
   descriptor?: WsChannelDescriptor;

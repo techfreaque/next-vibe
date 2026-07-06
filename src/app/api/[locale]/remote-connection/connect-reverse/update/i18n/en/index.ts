@@ -18,6 +18,10 @@ export const translations = {
       label: "Sync Scope",
       description: "Which data domains to sync over this connection",
     },
+    newInstanceId: {
+      label: "New Instance Name",
+      description: "The caller's new instance name — updates our label for it",
+    },
     errors: {
       validation: {
         title: "Validation Error",

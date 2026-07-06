@@ -215,7 +215,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   // Public cap update
   const publicCapUpdateEndpoint = useEndpoint(
     publicCapDefinitions,
-    {},
+    { create: { formOptions: { defaultValues: { capAmount: 500 } } } },
     logger,
     user,
   );
@@ -224,7 +224,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const capPostResponse = publicCapUpdateEndpoint.create?.response;
   const capPostValue =
     capPostResponse?.success === true ? capPostResponse.data : undefined;
-  const capAmount2 = capForm?.watch("capAmount") ?? 500;
+  const capAmount2 = capForm?.watch("capAmount") || 500;
 
   function setCapAmount(next: number): void {
     capForm?.setValue("capAmount", Math.max(1, next), { shouldValidate: true });
@@ -320,7 +320,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
               </Div>
             </Button>
             {isCryptoSubDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-foreground">
+              <Div className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning">
                 <Info className="h-4 w-4 mt-0.5 shrink-0" />
                 {t("buy.provider.cryptoMonthlyDisabled")}
               </Div>

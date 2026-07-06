@@ -67,8 +67,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ContentLevel,
   ModelSelectionType,
@@ -96,7 +94,9 @@ import {
   getLastBalanceReadAt,
   isIndexingCreditTx,
   pinBalance,
+  readLocalDeductionMarker,
   readRemoteDeductionMarker,
+  waitForLocalDeductionAfter,
   waitForRemoteDeductionAfter,
 } from "./helpers/balance";
 import {
@@ -251,9 +251,9 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
 // finishes well under 2 minutes; long-running media/queue cases override
 // per-test (T4 music+video, MEDIA_SETTLE cases, queue cron cycles). A hang is
 // diagnosed by WHERE it stopped, not by waiting 10 minutes for it.
-const TEST_TIMEOUT = 240_000;
+const TEST_TIMEOUT = 120_000;
 // Queue tests need extra time: WS connector + coding-agent AI inference on hermes-dev 3002 (up to 60s each)
-const QUEUE_TEST_TIMEOUT = 600_000;
+const QUEUE_TEST_TIMEOUT = 300_000;
 // Heavy media turns (image-to-video / image-to-image) send multi-MB requests and
 // the post-tool model turn runs long; on first recording the live media polling
 // also runs inside this window. The default 120s settle is too short — match the
@@ -265,12 +265,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
   // wrapper file). No global override — each context has its own cheap + full file.
   // For queue tests (cfg.pulse set), individual tests need more time for cron cycles
   const effectiveTestTimeout = cfg.pulse ? QUEUE_TEST_TIMEOUT : TEST_TIMEOUT;
+  // Media cases replay long recorded provider poll chains (each poll sleeps
+  // its real interval — a 49-poll video chain alone is ~245s) and run live
+  // generation on first record; they get the media budget, not the fail-fast
+  // default.
+  const mediaTestTimeout = 300_000;
   describe(cfg.label, () => {
     // Suite root: PRIVATE for all same-instance suites — every test thread
     // lands at PRIVATE/tests/<case>/ and NOTHING is stored anywhere else.
     // REMOTE-folder suites override with their instance folder root
     // (REMOTE/<instance>/tests/<case> on the caller; the executor mirrors to
-    // BACKGROUND/remote/<caller>/tests/<case>).
+    // REMOTE/<caller>/tests/<case>).
     const suiteRootFolderId: DefaultFolderId =
       cfg.rootFolderIdOverride ?? DefaultFolderId.PRIVATE;
 
@@ -316,7 +321,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
      */
     let overrideSubFolderId: string | undefined;
     /** Loop-local topology: the hermes-side origination folder. */
-    let hermesCaseFolderId: string | undefined;
 
     // ── Closures over testUser ─────────────────────────────────────────────────
     // These wrap the imported helpers and inject testUser so call sites don't
@@ -381,23 +385,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── Resolve native image gen favorite (Gemini 3.1 Flash Image Preview) ──
       // T11 tests native image generation where the chat model IS the image gen model.
       {
+        // The skill's native-image VARIANT carries the whole model config —
+        // never override models on a favorite (it shows up in the UI as a
+        // duplicate mislabeled variant of the skill).
         const createResult = await sendTestRequest({
           endpoint: favoriteCreateDef,
-          data: {
-            skillId: "quality-tester__budget",
-            modelSelection: {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
-            },
-            // Image-gen model lives on the favorite (real user config), so the
-            // native-image-gen tests don't need per-call overrides.
-            imageGenModelSelection: {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
-              sortBy: ModelSortField.PRICE,
-              sortDirection: ModelSortDirection.ASC,
-            },
-          },
+          data: { skillId: "quality-tester__native-image" },
           user: testUser,
         });
         expect(
@@ -421,22 +414,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── Resolve Nano Banana Pro favorite (Gemini 3 Pro Image Preview) ──
       // T11c/T11d tests: model can see images and generates images natively.
       {
+        // Same rule: the nano-banana-pro VARIANT owns the model config.
         const createResult = await sendTestRequest({
           endpoint: favoriteCreateDef,
-          data: {
-            skillId: "quality-tester__budget",
-            modelSelection: {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
-            },
-            // Image-gen model for the I2I tests lives on the favorite.
-            imageGenModelSelection: {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
-              sortBy: ModelSortField.PRICE,
-              sortDirection: ModelSortDirection.ASC,
-            },
-          },
+          data: { skillId: "quality-tester__nano-banana-pro" },
           user: testUser,
         });
         expect(
@@ -466,23 +447,35 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           sql`(${cronTasks.id} LIKE 'local-bg-%' OR ${cronTasks.id} LIKE 'local-wu-%' OR ${cronTasks.routeId} LIKE 'resume-stream%')`,
         );
 
-      // Local suites must start with no active remote connections — a
-      // leftover connection from an aborted remote suite would silently
-      // relay every stream and change costs and assertions.
+      // Local suites KEEP a live hermes connection when one exists: private
+      // threads never relay their loop, so costs/assertions are unaffected,
+      // and thread/chat sync mirrors every test thread live to the peer's
+      // REMOTE/<us>/tests/<case> — that mirroring IS a feature under test.
+      // Only favorites sync is forced off (it would LWW-overwrite the
+      // suite's quality-tester favorite mid-run).
       if (!cfg.setup) {
-        const { disconnectFromHermes } =
+        const { normalizeHermesSyncScope } =
           await import("../../testing/remote-setup");
-        await disconnectFromHermes(testUser.id);
+        await normalizeHermesSyncScope();
+      }
+
+      const testCaseName =
+        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        "regular";
+
+      // Per-mode setup (remote connections, credential patching, etc.)
+      if (cfg.setup) {
+        await cfg.setup(testUser);
       }
 
       // ── Create the per-suite folder chain: <suiteRoot> → tests → <testCaseName> ──
       // All runStream() calls land here so test threads are organized per
-      // suite. REMOTE-folder suites build their chain inside the instance
-      // folder after cfg.setup resolves it (below).
-      const testCaseName =
-        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
-        "regular";
-      if (!cfg.rootFolderIdOverride && !cfg.originateOnRemote) {
+      // suite. Runs AFTER cfg.setup: with a live peer connection the real
+      // folder endpoints emit folder-created remote events, so the chain
+      // propagates to the peer by SAME id the way production does — never
+      // seeded by the test. REMOTE-folder suites build their chain inside
+      // the instance folder instead (below).
+      if (!cfg.rootFolderIdOverride) {
         const testsParentId = await getOrCreateFolder(
           testUser,
           suiteRootFolderId,
@@ -494,27 +487,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           testCaseName,
           testsParentId,
         );
-      }
-
-      // Per-mode setup (remote connections, credential patching, etc.)
-      if (cfg.setup) {
-        await cfg.setup(testUser);
-      }
-
-      // Loop-LOCAL topology: prepare the hermes-side REMOTE/<client>/tests/<case>
-      // origination folder + pin the hermes-side transport for the relay leg.
-      if (cfg.originateOnRemote) {
-        const { prepareLoopLocalOrigination } =
-          await import("./helpers/remote");
-        const prep = await prepareLoopLocalOrigination({
-          testUser,
-          transport:
-            cfg.expectRelayTransport === "reverse-ws"
-              ? "reverse-ws"
-              : "direct-http",
-          caseName: testCaseName,
-        });
-        hermesCaseFolderId = prep.hermesCaseFolderId;
       }
 
       // REMOTE-folder modes: nest the per-suite chain inside the instance
@@ -542,8 +514,57 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       await db.execute(
         sql`DELETE FROM cron_tasks WHERE id LIKE 'local-wu-%' AND last_execution_status IN ('status.completed', 'status.failed', 'status.cancelled', 'status.stopped')`,
       );
-      // The per-suite folder persists across runs (tests → <testCaseName>):
-      // deleting it would orphan its threads into the root folder.
+
+      // ── Full after-pass cleanup, END TO END ─────────────────────────────
+      // Every thread dies through the real DELETE endpoint (thread-deleted
+      // relays by SAME id → the peer's mirror dies too), then the per-suite
+      // case folder dies through the real subfolder DELETE (folder-deleted
+      // relays for private/background origins). REMOTE-folder suites also
+      // dispatch the same-id folder delete to the executor instance — the
+      // caller's REMOTE-root folder ops are peer-local by design.
+      const cleanupFolderId = overrideSubFolderId ?? testSubFolderId;
+      if (testUser && cleanupFolderId) {
+        try {
+          const threadByIdDef = (
+            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
+          ).default;
+          const subFolderDef = (
+            await import("@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/definition")
+          ).default;
+          const { chatThreads: threadsTable } =
+            await import("@/app/api/[locale]/agent/chat/db");
+          const { eq: eqOp } = await import("drizzle-orm");
+          const rows = await db
+            .select({ id: threadsTable.id })
+            .from(threadsTable)
+            .where(eqOp(threadsTable.folderId, cleanupFolderId));
+          for (const row of rows) {
+            await sendTestRequest({
+              endpoint: threadByIdDef.DELETE,
+              urlPathParams: { threadId: row.id },
+              data: { rootFolderId: suiteRootFolderId },
+              user: testUser,
+            });
+          }
+          await sendTestRequest({
+            endpoint: subFolderDef.DELETE,
+            urlPathParams: { subFolderId: cleanupFolderId },
+            user: testUser,
+          });
+          if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
+            const { HERMES_INSTANCE_ID } =
+              await import("../../testing/remote-setup");
+            await sendTestRequest({
+              endpoint: subFolderDef.DELETE,
+              urlPathParams: { subFolderId: cleanupFolderId },
+              user: testUser,
+              instanceId: HERMES_INSTANCE_ID,
+            });
+          }
+        } catch {
+          // Cleanup is best-effort — a failed teardown must not mask results.
+        }
+      }
       if (cfg.teardown && testUser) {
         await cfg.teardown(testUser);
       }
@@ -552,160 +573,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     const runStream = makeRunStream({
       cfg,
       suiteRootFolderId,
-      getHermesCaseFolderId: () => hermesCaseFolderId,
       getMessages,
       getStreamingState,
       getTestSubFolderId: () => testSubFolderId,
       getOverrideSubFolderId: () => overrideSubFolderId,
     });
-
-    // ── T-RELAY: Relay ran on remote assertion ────────────────────────────────
-    // Proves the stream actually executed on the remote instance, not locally.
-    // Checks that the remote (hermes) wallet balance decreased after a stream
-    // and, when hermesThreadFolderId is set, that the thread exists in that
-    // folder in the hermes prod DB.
-    if (cfg.assertRelayRan) {
-      it(
-        "T-RELAY: stream must have run on hermes — remote wallet decreased and thread exists in hermes DB",
-        async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}relay-ran`);
-          await pinBalance(testUser, 10);
-
-          // DB-side ledger marker (not a balance snapshot): the remote-side
-          // deduction commits asynchronously (observed up to ~20s after the
-          // relay HTTP response under load), and the balance SUM can be masked
-          // by concurrent credit additions. A new usage-deduction row newer
-          // than the marker is append-only, offset-proof evidence the loop
-          // ran (and billed) on hermes.
-          const ledgerMarker = await readRemoteDeductionMarker();
-
-          const { result } = await runStream({
-            user: testUser,
-            prompt: `[T-RELAY] Reply with exactly: RELAY_OK`,
-            favoriteId: mainFavoriteId,
-          });
-
-          expect(
-            result.success,
-            `T-RELAY stream failed: ${!result.success ? result.message : ""}`,
-          ).toBe(true);
-          if (!result.success) {
-            // oxlint-disable-next-line restricted-syntax
-            throw new Error(result.message ?? "unexpected stream failure");
-          }
-
-          const deductions = await waitForRemoteDeductionAfter(ledgerMarker);
-          expect(
-            deductions.length,
-            `T-RELAY: no new usage deduction on hermes after marker ${String(ledgerMarker)}. ` +
-              `This means the stream ran locally (or unbilled), not on the remote relay.`,
-          ).toBeGreaterThan(0);
-
-          // Transport attestation lives on the REMOTE CONNECTION row: the
-          // transport PRIMITIVE that actually carried the dispatch stamps
-          // lastTransportUsed there (never configuration code).
-          if (cfg.expectRelayTransport) {
-            const { db: localDb } = await import("next-vibe/database");
-            const { remoteConnections: connTable } =
-              await import("@/app/api/[locale]/remote-connection/db");
-            const { and: andOp, eq: eqOp } = await import("drizzle-orm");
-            const { HERMES_INSTANCE_ID: hermesId } =
-              await import("../../testing/remote-setup");
-            const [connRow] = await localDb
-              .select({
-                lastTransportUsed: connTable.lastTransportUsed,
-                lastTransportUsedAt: connTable.lastTransportUsedAt,
-              })
-              .from(connTable)
-              .where(
-                andOp(
-                  eqOp(connTable.userId, testUser.id),
-                  eqOp(connTable.instanceId, hermesId),
-                ),
-              )
-              .limit(1);
-            expect(
-              connRow?.lastTransportUsed,
-              `T-RELAY: relay must have ACTUALLY used transport '${cfg.expectRelayTransport}' — connection attested '${String(connRow?.lastTransportUsed)}'`,
-            ).toBe(cfg.expectRelayTransport);
-            expect(
-              (connRow?.lastTransportUsedAt?.getTime() ?? 0) >
-                Date.now() - 10 * 60 * 1000,
-              "T-RELAY: transport attestation must be recent",
-            ).toBe(true);
-          }
-
-          // When a specific hermes-side folder is expected, verify the thread landed there.
-          const hermesFolder = cfg.hermesThreadFolderId;
-          if (hermesFolder && result.data.threadId) {
-            const { assertProdDbHasThread, assertProdDbHasMessages } =
-              await import("../../testing/remote-setup");
-            await assertProdDbHasThread(result.data.threadId, hermesFolder);
-            await assertProdDbHasMessages(result.data.threadId, 2);
-          }
-        },
-        effectiveTestTimeout,
-      );
-    }
-
-    // ── T-SYS: System prompt origin assertion ─────────────────────────────────
-    // Relay suites (assertSystemPromptFromLocal): the prompt is built on the
-    // LOCAL instance — the AI must report the local instance ID.
-    // REMOTE-folder suites (systemPromptInstanceId): the loop, tools and
-    // prompt all live on the remote instance — the AI must report THAT ID.
-    // Loop-LOCAL suites (originateOnRemote): mirror topology — HERMES
-    // originates with ITS OWN (local-to-hermes) prompt+tools, the loop runs
-    // here. Tools execute back on the ORIGINATOR → hermes ID expected.
-    if (cfg.assertSystemPromptFromLocal || cfg.systemPromptInstanceId) {
-      const originLabel = cfg.originateOnRemote
-        ? "ORIGINATOR (hermes)"
-        : cfg.systemPromptInstanceId
-          ? "REMOTE"
-          : "LOCAL";
-      it(
-        `T-SYS: system prompt origin - AI must report ${originLabel} instance ID`,
-        async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}sys-origin`);
-          await pinBalance(testUser, 10);
-
-          let expectedInstanceId: string | undefined = cfg.originateOnRemote
-            ? (await import("../../testing/remote-setup")).HERMES_INSTANCE_ID
-            : cfg.systemPromptInstanceId;
-          if (!expectedInstanceId) {
-            // Resolve the local instance ID from the instance_identities table.
-            // Filter by userId so multiple rows (e.g. from different users'
-            // identities) don't cause non-deterministic results.
-            const identityResult = await db.execute<{ instance_id: string }>(
-              sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} AND is_default = true LIMIT 1`,
-            );
-            expectedInstanceId = identityResult.rows[0]?.instance_id;
-          }
-          expect(
-            expectedInstanceId,
-            "T-SYS: expected instance ID must resolve",
-          ).toBeTruthy();
-
-          const { result, messages } = await runStream({
-            user: testUser,
-            prompt: `[T-SYS] Call ${toolInstr(cfg, "self-instance-id")} to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.`,
-            favoriteId: mainFavoriteId,
-          });
-
-          expect(result.success, "T-SYS stream must succeed").toBe(true);
-
-          // The final AI message must contain the expected instance ID.
-          const aiMsg = messages.findLast((m) => m.role === "assistant");
-          expect(aiMsg, "T-SYS: AI message must be present").toBeTruthy();
-          expect(
-            aiMsg?.content ?? "",
-            `T-SYS: AI response must contain ${originLabel} instance ID '${String(expectedInstanceId)}'. ` +
-              `Got: ${String((aiMsg?.content ?? "").slice(0, 200))}. ` +
-              `This proves the system prompt came from ${originLabel === "REMOTE" ? "the remote instance running the loop" : "LOCAL, not from the remote instance"}.`,
-          ).toContain(expectedInstanceId!);
-        },
-        effectiveTestTimeout,
-      );
-    }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // Main Thread: one shared thread, sequential steps
@@ -745,19 +617,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           },
           timeout,
         );
-      }
-
-      /** Skipped counterpart of `fit` — registers a visible skipped test (so the
-       *  reason shows in the run output) without running it or touching the shared
-       *  thread state. The body is handed to `it.skip`, which records it but never
-       *  invokes it. Use for cases blocked by an external/provider issue that is
-       *  documented inline, not by a defect in our own code. */
-      function fitSkip(
-        name: string,
-        fn: () => Promise<void>,
-        timeout?: number,
-      ): void {
-        it.skip(name, fn, timeout);
       }
 
       // Thread state shared across steps
@@ -819,9 +678,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // deduction committing after the relay HTTP response returns.
           const isRemoteFolderMode =
             cfg.rootFolderIdOverride === DefaultFolderId.REMOTE;
-          const remoteLedgerMarker = isRemoteFolderMode
+          const remoteLedgerMarker = loopRunsRemote
             ? await readRemoteDeductionMarker()
             : null;
+          // Loop-LOCAL topology: the loop bills HERE — marker for the
+          // local-ledger proof below.
+          const localLoopMarker =
+            isRemoteFolderMode && !loopRunsRemote
+              ? await readLocalDeductionMarker(testUser.id)
+              : null;
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -838,7 +703,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             throw new Error(result.message ?? "unexpected stream failure");
           }
 
-          if (isRemoteFolderMode) {
+          if (loopRunsRemote) {
             const remoteDeductions =
               await waitForRemoteDeductionAfter(remoteLedgerMarker);
             expect(
@@ -846,13 +711,25 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `T1 remote-folder: the loop must run ON the remote instance — no new usage deduction on hermes after marker ${String(remoteLedgerMarker)}`,
             ).toBeGreaterThan(0);
 
-            // The provider side OWNS the running thread (threadMirrorMode
-            // 'both'): the thread's messages must exist in the remote DB.
-            // A missing remote thread means the loop silently ran locally or
-            // the provider failed to persist its copy.
+            // The executor side OWNS the running thread: the thread's
+            // messages must exist in the remote DB. A missing remote thread
+            // means the loop silently ran locally or the executor failed to
+            // persist its copy.
             const { assertProdDbHasMessages: assertRemoteMessages } =
               await import("../../testing/remote-setup");
             await assertRemoteMessages(result.data.threadId!, 2);
+          } else if (isRemoteFolderMode) {
+            // Loop-LOCAL topology ("self" sentinel): the loop must bill the
+            // LOCAL wallet — a new local usage-deduction ledger row proves
+            // the stream did not silently relay to the remote.
+            const localDeductions = await waitForLocalDeductionAfter(
+              testUser.id,
+              localLoopMarker,
+            );
+            expect(
+              localDeductions.length,
+              `T1 loop-local: the loop must run HERE — no new local usage deduction after marker ${String(localLoopMarker)}`,
+            ).toBeGreaterThan(0);
           }
 
           // ── Capture IDs early so downstream tests aren't blocked ──
@@ -1000,12 +877,102 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // When the loop moved to the remote via REMOTE-folder routing, the
           // local testUser wallet must NOT drop for the turn beyond a small
           // epsilon — async indexing charges (isIndexingCreditTx) excluded.
-          if (loopRunsRemote && isRemoteFolderMode) {
+          if (loopRunsRemote) {
             await assertLocalNotBilled(testUser, before, after, beforeReadAt);
+          }
+
+          // Transport attestation (relay suites): the transport PRIMITIVE that
+          // actually carried the dispatch stamps lastTransportUsed on the
+          // connection row — never configuration code. Asserted here on the
+          // SHARED thread's own turn; no throwaway streams.
+          if (cfg.expectRelayTransport) {
+            const { remoteConnections: connTable } =
+              await import("@/app/api/[locale]/remote-connection/db");
+            const { HERMES_INSTANCE_ID: hermesId } =
+              await import("../../testing/remote-setup");
+            const [connRow] = await db
+              .select({
+                lastTransportUsed: connTable.lastTransportUsed,
+                lastTransportUsedAt: connTable.lastTransportUsedAt,
+              })
+              .from(connTable)
+              .where(
+                and(
+                  eq(connTable.userId, testUser.id),
+                  eq(connTable.instanceId, hermesId),
+                ),
+              )
+              .limit(1);
+            expect(
+              connRow?.lastTransportUsed,
+              `T1: relay must have ACTUALLY used transport '${cfg.expectRelayTransport}' — connection attested '${String(connRow?.lastTransportUsed)}'`,
+            ).toBe(cfg.expectRelayTransport);
+            expect(
+              (connRow?.lastTransportUsedAt?.getTime() ?? 0) >
+                Date.now() - 10 * 60 * 1000,
+              "T1: transport attestation must be recent",
+            ).toBe(true);
           }
         },
         effectiveTestTimeout,
       );
+
+      // ── T-SYS: system prompt origin — SAME shared thread, next turn ───────
+      // REMOTE-FOLDER suites (systemPromptInstanceId): system prompt + tools
+      // come from the REMOTE no matter where the loop runs — self-instance-id
+      // must report the remote in every topology.
+      // inference-provider suites (assertSystemPromptFromLocal): the prompt is
+      // built on the LOCAL instance (client-owned model pipe).
+      if (cfg.assertSystemPromptFromLocal || cfg.systemPromptInstanceId) {
+        const originLabel = cfg.systemPromptInstanceId ? "REMOTE" : "LOCAL";
+        fit(
+          `T-SYS: system prompt origin - AI must report ${originLabel} instance ID`,
+          async () => {
+            setFetchCacheContext(`${cfg.cachePrefix}sys-origin`);
+            await pinBalance(testUser, 10);
+
+            let expectedInstanceId: string | undefined =
+              cfg.systemPromptInstanceId;
+            if (!expectedInstanceId) {
+              const identityResult = await db.execute<{ instance_id: string }>(
+                sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} AND is_default = true LIMIT 1`,
+              );
+              expectedInstanceId = identityResult.rows[0]?.instance_id;
+            }
+            expect(
+              expectedInstanceId,
+              "T-SYS: expected instance ID must resolve",
+            ).toBeTruthy();
+
+            const { result, messages } = await runStream({
+              user: testUser,
+              prompt: `[T-SYS] Call ${toolInstr(cfg, "self-instance-id")} to read the identifier of the instance your tools execute on. Reply with ONLY the instance ID string the tool returns, nothing else.`,
+              threadId,
+              favoriteId: mainFavoriteId,
+              explicitParentMessageId: lastMainAiMsgId,
+            });
+
+            expect(result.success, "T-SYS stream must succeed").toBe(true);
+            if (!result.success) {
+              // oxlint-disable-next-line restricted-syntax
+              throw new Error(result.message ?? "unexpected stream failure");
+            }
+
+            const aiMsg = messages.findLast((m) => m.role === "assistant");
+            expect(aiMsg, "T-SYS: AI message must be present").toBeTruthy();
+            expect(
+              aiMsg?.content ?? "",
+              `T-SYS: AI response must contain ${originLabel} instance ID '${String(expectedInstanceId)}'. ` +
+                `Got: ${String((aiMsg?.content ?? "").slice(0, 200))}. ` +
+                `This proves the system prompt came from ${originLabel === "REMOTE" ? "the remote instance running the loop" : "LOCAL, not from the remote instance"}.`,
+            ).toContain(expectedInstanceId!);
+
+            lastMainAiMsgId = result.data.lastAiMessageId!;
+            await assertThreadIdle(threadId, testUser);
+          },
+          effectiveTestTimeout,
+        );
+      }
 
       // ── T1a-cat: gradual exploration — narrow a category to tool names ────
       // Step 2 of the ladder: a broad list returns categories (T1); narrowing by
@@ -1314,9 +1281,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 "T2 cheap: cortex-write parent must be assistant",
               ).toBe("assistant");
             }
-            // DB cross-check on the side that executed the tool. Relay modes
-            // delegate tools back to the local instance (toolSource=local), so
-            // the node is local there. execute-tool dispatch (remoteInstanceId)
+            // DB cross-check on the side that executed the tool.
+            // Inference-provider relays delegate tools back to the local
+            // instance, so the node is local there. execute-tool dispatch (remoteInstanceId)
             // AND REMOTE-folder suites (loop + tools run on the remote) write
             // the remote DB. Same assertion either way.
             const toolRanRemotely =
@@ -1663,6 +1630,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         const { result: musicResult, messages: musicMsgs } = await runStream({
           user: testUser,
+          // Live recording: music gen polls the provider for minutes — give
+          // the settle wait the media budget (fixture replays finish fast).
+          settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           prompt: `[T4a music-gen] Call ${toolInstrWithArgs(cfg, "generate_music", "prompt='upbeat piano melody'")}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
           threadId,
           favoriteId: mainFavoriteId,
@@ -1789,6 +1759,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
         const { result: videoResult, messages: videoMsgs } = await runStream({
           user: testUser,
+          // RECORDING-ONLY worst case: ModelsLab's poller caps at 300
+          // attempts (~7-8min on a busy queue) before the future_links
+          // fallback, plus upload + cross-instance handoff. Replays finish in
+          // seconds — this budget never bites on fixture runs.
+          settleTimeoutMs: 900_000,
           prompt: `[T4b video-gen] Call ${toolInstrWithArgs(cfg, "generate_video", "prompt='spinning cube'")}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
           threadId,
           favoriteId: mainFavoriteId,
@@ -1875,16 +1850,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const afterVideo = await getBalance(testUser);
         // Video gen: VEO_3_1 via modelslab + chat model tokens.
         // In remote mode the video gen credits are deducted on the remote instance, not locally.
-        // Loop-local (originateOnRemote): tools execute back on the ORIGINATOR
+        // Remote-folder loop-local: tools execute on the REMOTE
         // (hermes) — the media charge lands there too; only LLM tokens local.
         await assertDeductedLocal(
           testUser,
           beforeVideo,
           afterVideo,
-          cfg.remoteInstanceId || cfg.originateOnRemote ? 0 : 5,
+          cfg.remoteInstanceId ? 0 : 5,
           400,
         );
-      }, 1_200_000); // 20 min: ModelsLab's queue can hold a video job in "processing" for 15+ min on live recording (typical: music ~60s + video ~120s + two revival polls)
+      }, 1_200_000); // 20 min RECORDING-ONLY worst case: ModelsLab's queue can hold a video job in "processing" for 15+ min live. Replays finish in seconds — this cap never bites on fixture runs.
 
       // ── T5: detach dispatch - AI calls generate_image(detach), gets taskId ──
       fit(
@@ -2538,10 +2513,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             // The wakeUp revival fires async during T6a (goroutine + resume-stream).
             // With cached fixtures, should complete in seconds. Strict 30s timeout.
-            // Remote (direct-http) mode: remote image gen is a live API call (no FetchCache on
-            // remote server), so use a longer timeout to handle external provider latency.
-            // 540s = leaves headroom within the 600s test timeout for image gen on live remote APIs.
-            const WAKEUP_TIMEOUT_MS = cfg.remoteInstanceId ? 540_000 : 30_000;
+            // Remote (direct-http) mode: the round-trip crosses instances, so
+            // allow more — but stay INSIDE the test timeout so a dead revival
+            // fails with the clean assertion below, not a vitest timeout.
+            const WAKEUP_TIMEOUT_MS = cfg.remoteInstanceId ? 90_000 : 30_000;
             const WAKEUP_POLL_MS = 500;
             let messages: SlimMessage[] = [];
             const deadline = Date.now() + WAKEUP_TIMEOUT_MS;
@@ -3438,7 +3413,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
 
             // Queue mode: confirmation executed execute-tool with callbackMode='wait' override,
-            // which created a queue task (transportMode='cloud-only'). The AI responded to the
+            // which created a queue task (no open reverse-ws channel). The AI responded to the
             // pending {status: pending} result. Now call pulse to execute the generate_image task
             // and fire the WAIT revival stream so the tool message gets the real imageUrl.
             if (cfg.pulse) {
@@ -4334,87 +4309,88 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Audio passed via audioInput field (voice UI flow) → operation-handler.ts →
           // SpeechToTextRepository.transcribeAudio() → dedicated STT model (Whisper/Deepgram)
           // Result: user message has NO attachments, NO variants - content IS the transcribed text
-          // Requires OPENAI_API_KEY (Whisper). Skip gracefully if not configured.
-          if (agentEnv.OPENAI_API_KEY) {
-            setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-stt`);
-            await pinBalance(testUser, 50);
-            const beforeStt = await getBalance(testUser);
+          // The STT provider cascade (OpenAI/EdenAI/Deepgram/system provider)
+          // resolves whatever is configured; fixture replay needs no key at
+          // all. This case ALWAYS runs — no environment gates.
+          setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-stt`);
+          await pinBalance(testUser, 50);
+          const beforeStt = await getBalance(testUser);
 
-            const sttAudioFile = await loadFixture(
-              "test-music.mp3",
-              "audio/mpeg",
-            );
-            const { result: sttResult, messages: sttMsgs } = await runStream({
-              user: testUser,
-              prompt:
-                "[T10c_stt voice-stt] Describe what this voice message says. End your reply with STEP_OK if you could understand the audio content, or FAILED: <reason> if the transcription was empty or unclear.",
-              threadId,
-              favoriteId: mainFavoriteId,
-              explicitParentMessageId: lastMainAiMsgId,
-              audioInput: sttAudioFile,
-            });
-
-            expect(sttResult.success).toBe(true);
-            if (!sttResult.success) {
-              // oxlint-disable-next-line restricted-syntax
-              throw new Error(sttResult.message ?? "unexpected failure");
-            }
-            expect(sttResult.data.threadId).toBe(threadId);
-
-            const sttSorted = [...sttMsgs].toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            );
-            const sttUserMsg = sttSorted.find((m) => m.role === "user");
-
-            // STT path: the audio was transcribed BEFORE the stream started.
-            // The user message must have NO file attachments - the voice is the message text.
-            expect(
-              (sttUserMsg!.attachments ?? []).length,
-              "[T10c_stt] User message must have NO attachments - STT path turns audio into text content, not a file attachment.",
-            ).toBe(0);
-
-            // STT path: NO gap-fill variants - the STT gives clean text, no bridge needed.
-            expect(
-              (sttUserMsg!.variants ?? []).length,
-              "[T10c_stt] User message must have NO gap-fill variants - STT transcription replaces the audio, no audioVisionModel bridge needed.",
-            ).toBe(0);
-
-            // The message content must be a non-empty transcription (not the original prompt text).
-            expect(
-              sttUserMsg!.content,
-              "[T10c_stt] User message content must be the STT transcription - non-null and non-empty.",
-            ).toBeTruthy();
-            expect(
-              sttUserMsg!.content,
-              "[T10c_stt] Content must differ from the original prompt - STT replaced it with the transcription.",
-            ).not.toBe(
+          const sttAudioFile = await loadFixture(
+            "test-music.mp3",
+            "audio/mpeg",
+          );
+          const { result: sttResult, messages: sttMsgs } = await runStream({
+            user: testUser,
+            prompt:
               "[T10c_stt voice-stt] Describe what this voice message says. End your reply with STEP_OK if you could understand the audio content, or FAILED: <reason> if the transcription was empty or unclear.",
-            );
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+            audioInput: sttAudioFile,
+          });
 
-            expect(sttResult.data.lastAiMessageContent!.length).toBeGreaterThan(
-              10,
-            );
-            assertStepOk(sttResult.data.lastAiMessageContent, "T10c_stt");
-            lastMainAiMsgId = sttResult.data.lastAiMessageId!;
-
-            assertNoOrphans(
-              sttMsgs,
-              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
-              {
-                expectedLeafId: lastMainAiMsgId,
-                knownDeadEndLeaves: deadEndLeaves,
-              },
-            );
-            await assertThreadIdle(threadId, testUser);
-            await assertNoPendingTasks(threadId);
-
-            const afterStt = await getBalance(testUser);
-            await assertDeductedLocal(testUser, beforeStt, afterStt, 0, 30);
-          } else {
-            process.stdout.write(
-              "[T10c_stt] Skipping - OPENAI_API_KEY not configured in this environment\n",
-            );
+          expect(sttResult.success).toBe(true);
+          if (!sttResult.success) {
+            // oxlint-disable-next-line restricted-syntax
+            throw new Error(sttResult.message ?? "unexpected failure");
           }
+          expect(sttResult.data.threadId).toBe(threadId);
+
+          const sttSorted = [...sttMsgs].toSorted(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          );
+          const sttUserMsg = sttSorted.find((m) => m.role === "user");
+
+          // STT path: the audio was transcribed BEFORE the stream started.
+          // The user message must have NO file attachments - the voice is the message text.
+          expect(
+            (sttUserMsg!.attachments ?? []).length,
+            "[T10c_stt] User message must have NO attachments - STT path turns audio into text content, not a file attachment.",
+          ).toBe(0);
+
+          // STT path: NO gap-fill variants - the STT gives clean text, no bridge needed.
+          expect(
+            (sttUserMsg!.variants ?? []).length,
+            "[T10c_stt] User message must have NO gap-fill variants - STT transcription replaces the audio, no audioVisionModel bridge needed.",
+          ).toBe(0);
+
+          // The message content must be a non-empty transcription (not the original prompt text).
+          expect(
+            sttUserMsg!.content,
+            "[T10c_stt] User message content must be the STT transcription - non-null and non-empty.",
+          ).toBeTruthy();
+          expect(
+            sttUserMsg!.content,
+            "[T10c_stt] Content must differ from the original prompt - STT replaced it with the transcription.",
+          ).not.toBe(
+            "[T10c_stt voice-stt] Describe what this voice message says. End your reply with STEP_OK if you could understand the audio content, or FAILED: <reason> if the transcription was empty or unclear.",
+          );
+
+          // No STEP_OK contract here BY CONSTRUCTION: the STT path REPLACES
+          // the prompt text with the transcription (asserted above), so the
+          // model never sees a STEP_OK instruction — it only sees the
+          // transcribed audio and replies to THAT. The observable contract is
+          // structural: clean transcription in, substantive reply out.
+          expect(
+            sttResult.data.lastAiMessageContent!.length,
+            "[T10c_stt] AI must produce a substantive reply to the transcribed voice message.",
+          ).toBeGreaterThan(10);
+          lastMainAiMsgId = sttResult.data.lastAiMessageId!;
+
+          assertNoOrphans(
+            sttMsgs,
+            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
+            {
+              expectedLeafId: lastMainAiMsgId,
+              knownDeadEndLeaves: deadEndLeaves,
+            },
+          );
+          await assertThreadIdle(threadId, testUser);
+          await assertNoPendingTasks(threadId);
+
+          const afterStt = await getBalance(testUser);
+          await assertDeductedLocal(testUser, beforeStt, afterStt, 0, 30);
 
           // ── Part D: Video attachment ──
           setFetchCacheContext(`${cfg.cachePrefix}attachment-video`);
@@ -4936,7 +4912,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             after,
             // Loop-local: generate_video executes back on the ORIGINATOR
             // (hermes) — the media charge lands there; only LLM tokens local.
-            cfg.originateOnRemote ? 0 : 30,
+            30,
             150,
           );
         },
@@ -5233,7 +5209,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             after,
             // Loop-local: generate_image executes back on the ORIGINATOR
             // (hermes) — the media charge lands there; only LLM tokens local.
-            cfg.originateOnRemote ? 0 : 5,
+            5,
             150,
           );
         },
@@ -5314,22 +5290,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         mediaTestTimeout,
       );
 
-      // ── T11g: Native I2I via Nano Banana Pro (sees image, generates image natively) ──
-      // Gemini 3 Pro Image Preview inputs: ["text","image"], outputs: ["text","image"].
-      // With imageGenModelSelection pointing to the SAME model → imageGenIsSameAsChatModel = true
-      // → generate_image tool is REMOVED → model produces image natively.
-      // The user provides a reference image URL; the model sees it directly and generates
-      // a modified image as inline file parts (native multimodal output).
-      // SKIPPED (external provider regression, re-verified 2026-06-30): OpenRouter no
-      // longer returns inline file parts for Gemini 3.1 Flash Image Preview in a long
-      // multimodal thread — the model hallucinates a generate_image tool call (a tool
-      // that is intentionally NOT offered for native models), so no image is produced.
-      // This is a provider bug, not a defect here: native image gen is already proven
-      // by T11 (native text→image) and native image-to-image by T11e (Nano Banana Pro).
-      // Re-enable when the provider is fixed or switch this favorite to the Unbottled
-      // provider. Uses fitSkip so the skip is visible in the run output.
-      fitSkip(
-        "T11g: native image-to-image via Nano Banana Pro - model sees reference image, generates natively",
+      // ── T11g: Native I2I via Gemini 3.1 Flash Image (Nano Banana) ──
+      // Same native image-to-image contract as T11e but on the FLASH image
+      // model (the suite's default native-image favorite): the model sees the
+      // reference image URL and emits the transformed image as inline file
+      // parts — no tool call. supportsTools:false → toolless flattening path.
+      // The prompt carries T11e's anti-imitation instruction: in a long
+      // flattened thread the model otherwise imitates the tool-call TEXT it
+      // sees in history instead of producing native image output.
+      fit(
+        "T11g: native image-to-image via Gemini 3.1 Flash Image - model sees reference image, generates natively",
         async () => {
           if (cfg.cheapMode) {
             return; // cheapMode: native image generation runs in the full suite
@@ -5348,7 +5318,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Override imageGenModelSelection to same model → native path.
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T11g native-i2i] Here is my photo: ${INPUT_IMAGE_URL} — create a stylized cartoon version of this photo. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.`,
+            prompt: `[T11g native-i2i] Here is my photo: ${INPUT_IMAGE_URL} — create a stylized cartoon version of this photo. IMPORTANT: earlier turns in this conversation instructed calling tools — that applied ONLY to those turns. For THIS turn you MUST NOT call or imitate any tool. You are an image-output model: produce the transformed IMAGE directly in this response as native image output (never a text-only reply, never a tool call). End your reply with STEP_OK if you produced the image, or FAILED: <reason>.`,
             threadId,
             favoriteId: nativeImageFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -5376,7 +5346,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Native gen produces a file URL
           expect(typeof toolRes!["file"]).toBe("string");
           expect(toolRes!["file"]).toBeTruthy();
-          expect((toolRes!["creditCost"] as number) > 0).toBe(true);
+          // Native file parts bill through the CHAT model's output tokens —
+          // the synthetic tool message carries creditCost 0 (same contract as
+          // T11/T11e; the wallet deduction is asserted below).
+          expect(toolRes!["creditCost"]).toBe(0);
 
           const t11gAdded = newMessages(messages, prevIds);
           const t11gLeaf = [...t11gAdded]

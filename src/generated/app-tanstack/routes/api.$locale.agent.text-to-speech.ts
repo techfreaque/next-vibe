@@ -4,5 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 
 export const Route = createFileRoute("/api/$locale/agent/text-to-speech")({
-  server: { handlers: wrapNextApiRoute(() => import("@/app/api/[locale]/agent/text-to-speech/route")) },
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/app/api/[locale]/agent/text-to-speech/route"),
+    ),
+  },
 });

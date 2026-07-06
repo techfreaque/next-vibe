@@ -1,0 +1,14 @@
+{
+  "url": "https://api.edenai.run/v2/audio/text_to_speech",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "providers": "openai",
+    "text": "sup nigga",
+    "language": "en",
+    "option": "FEMALE"
+  }
+}

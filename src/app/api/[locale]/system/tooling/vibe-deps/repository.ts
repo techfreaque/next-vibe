@@ -743,7 +743,10 @@ function loadConfig(logger: EndpointLogger): VibeDepsConfig {
   }
   try {
     // Same convention as check.config.ts: require the TS file (Bun runs TS).
-    const required: { default?: VibeDepsConfig } = require(configPath);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const required: { default?: VibeDepsConfig } = require(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ configPath,
+    );
     const exported = required.default ?? DEFAULT_CONFIG;
     if (!Array.isArray(exported.packages)) {
       logger.error("vibe-deps: vibe-deps.config.ts malformed, using default");

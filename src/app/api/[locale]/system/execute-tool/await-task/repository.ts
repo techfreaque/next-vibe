@@ -159,6 +159,30 @@ export class AwaitTaskRepository {
           const { storePendingCallId } = await import("../handlers/remote");
           await storePendingCallId(pendToolMessageId, taskId, logger);
 
+          // Close the park race: the result event may have landed in a sibling
+          // process between the reconcile above and the anchor write — that
+          // process saw no anchor and persisted to pending_call_results. One
+          // final reconcile catches it; otherwise the park would never revive
+          // (the event already fired).
+          const settledLate = await getPendingCallReconciled(taskId);
+          if (settledLate?.result) {
+            discardPendingCall(taskId);
+            logger.debug(
+              "[AwaitTask] Result landed during park setup - returning inline",
+              { taskId, status: settledLate.result.status },
+            );
+            return success<AwaitTaskResponseOutput>({
+              status:
+                settledLate.result.status === "completed"
+                  ? CronTaskStatus.COMPLETED
+                  : CronTaskStatus.FAILED,
+              result: settledLate.result.output ?? undefined,
+              waiting: false,
+              originalToolName: pendingCall.toolName,
+              originalArgs: pendingCall.input ?? undefined,
+            });
+          }
+
           streamContext.waitingForRemoteResult = true;
           streamContext.pendingTimeoutMs = 90_000;
           logger.info(
@@ -325,6 +349,80 @@ export class AwaitTaskRepository {
       const effectiveToolMessageId =
         streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
+      // Cross-instance / headless caller with NOTHING to park: returning
+      // "pending" is useless (there is no local stream to pause and revive —
+      // the caller would just re-poll the wire). Block on the goroutine's
+      // completion SIGNAL (task-completion-waiters — event-driven, no DB
+      // polling), then do one read. The caller's inline WAIT stays open
+      // (await-task declares timeoutMs: 0). 10 min runaway-task backstop.
+      if (!effectiveThreadId || !effectiveToolMessageId) {
+        const { waitForTaskCompletion } =
+          await import("../task-completion-waiters");
+        await waitForTaskCompletion(taskId, 600_000);
+        // Single read after the signal (or after timeout — covers a
+        // completion that landed in another process before registration).
+        const [row] = await db
+          .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
+          .from(cronTasks)
+          .where(eq(cronTasks.id, taskId))
+          .limit(1);
+        const terminal =
+          !row ||
+          row.lastExecutionStatus === CronTaskStatus.COMPLETED ||
+          row.lastExecutionStatus === CronTaskStatus.FAILED ||
+          row.lastExecutionStatus === CronTaskStatus.CANCELLED;
+        if (!terminal) {
+          logger.warn(
+            "[AwaitTask] Cross-instance wait exhausted — returning pending",
+            { taskId },
+          );
+          return success<AwaitTaskResponseOutput>({
+            status: CronTaskStatus.PENDING,
+            waiting: true,
+            originalToolName,
+            originalArgs,
+          });
+        }
+        const status = row?.lastExecutionStatus ?? CronTaskStatus.COMPLETED;
+        const [execRow] = await db
+          .select({ result: cronTaskExecutions.result })
+          .from(cronTaskExecutions)
+          .where(eq(cronTaskExecutions.taskId, taskId))
+          .orderBy(desc(cronTaskExecutions.startedAt))
+          .limit(1);
+        const settledResult =
+          execRow?.result !== null && execRow?.result !== undefined
+            ? (execRow.result as WidgetData)
+            : undefined;
+        try {
+          await db
+            .delete(cronTasks)
+            .where(
+              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
+            );
+          await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+        } catch (cleanupErr) {
+          logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
+            taskId,
+            error:
+              cleanupErr instanceof Error
+                ? cleanupErr.message
+                : String(cleanupErr),
+          });
+        }
+        logger.info("[AwaitTask] Cross-instance wait settled — delivering", {
+          taskId,
+          status,
+        });
+        return success<AwaitTaskResponseOutput>({
+          status,
+          result: settledResult,
+          waiting: false,
+          originalToolName,
+          originalArgs,
+        });
+      }
+
       if (effectiveThreadId && effectiveToolMessageId) {
         const modelId = await resolveStreamModelId(streamContext, user);
 
@@ -355,42 +453,22 @@ export class AwaitTaskRepository {
         // T5b regression). We only fall through to the WAIT pause+revival below
         // for genuinely long-running tasks that don't finish within this window.
         //
-        // This also closes the original race: the detach/wakeUp goroutine may have
-        // read its completion context BEFORE our WAIT upgrade landed and flipped
-        // the task terminal with callbackMode=DETACH (firing no revival) — the
-        // poll still observes the terminal state and delivers inline.
-        // 15s covers a cheap media/tool task dispatched locally OR routed to a
-        // remote instance (direct-http relay adds round-trips). Long enough that
-        // ordinary detaches resolve inline; still bounded so a genuinely
-        // long-running task falls through to the WAIT pause + revival.
-        const INLINE_WAIT_MS = 15_000;
-        const INLINE_POLL_MS = 200;
-        const inlineDeadline = Date.now() + INLINE_WAIT_MS;
-        let afterUpgrade: { lastExecutionStatus: string | null } | undefined =
-          undefined;
-        while (Date.now() < inlineDeadline) {
-          const [row] = await db
-            .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
-            .from(cronTasks)
-            .where(eq(cronTasks.id, taskId))
-            .limit(1);
-          afterUpgrade = row;
-          if (
-            row &&
-            (row.lastExecutionStatus === CronTaskStatus.COMPLETED ||
-              row.lastExecutionStatus === CronTaskStatus.FAILED ||
-              row.lastExecutionStatus === CronTaskStatus.CANCELLED)
-          ) {
-            break;
-          }
-          // Row gone = the goroutine completed and cleaned up; treat as done.
-          if (!row) {
-            break;
-          }
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, INLINE_POLL_MS);
-          });
-        }
+        // Event-driven: block on the goroutine's completion signal
+        // (task-completion-waiters), then read the row ONCE. The single read
+        // also closes the original race: the goroutine may have flipped the
+        // task terminal with callbackMode=DETACH (firing no revival) before
+        // our WAIT upgrade landed — the read still observes the terminal
+        // state and delivers inline. 15s is long enough that ordinary
+        // detaches resolve inline; genuinely long-running tasks fall through
+        // to the WAIT pause + revival below.
+        const { waitForTaskCompletion } =
+          await import("../task-completion-waiters");
+        await waitForTaskCompletion(taskId, 15_000);
+        const [afterUpgrade] = await db
+          .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
+          .from(cronTasks)
+          .where(eq(cronTasks.id, taskId))
+          .limit(1);
         if (
           afterUpgrade &&
           (afterUpgrade.lastExecutionStatus === CronTaskStatus.COMPLETED ||

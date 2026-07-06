@@ -4,7 +4,7 @@
  * Tests that self-rename propagates correctly to connected remotes and that
  * routing continues to work after rename (folder UUID is stable):
  *
- *   RN1  — renameSelf() updates instanceIdentities + remoteConnections.remoteInstanceId locally
+ *   RN1  — renameSelf() updates instanceIdentities locally
  *   RN2  — propagation: atlas renames itself → hermes's chatFolders.name updated to new name
  *   RN3  — folder UUID is stable after rename (only name changes, UUID is the same)
  *   RN4  — after rename: starting a stream from the subfolder still routes to hermes
@@ -226,26 +226,7 @@ if (_remoteUrl) {
         await db
           .update(instanceIdentities)
           .set({ instanceId: ATLAS_INSTANCE_ID, updatedAt: new Date() })
-          .where(
-            and(
-              eq(instanceIdentities.userId, testUser.id),
-              eq(instanceIdentities.instanceId, appliedNewDevName),
-              eq(instanceIdentities.isDefault, true),
-            ),
-          );
-        // Also restore remoteConnections.remoteInstanceId
-        await db
-          .update(remoteConnections)
-          .set({
-            remoteInstanceId: ATLAS_INSTANCE_ID,
-            updatedAt: new Date(),
-          })
-          .where(
-            and(
-              eq(remoteConnections.userId, testUser.id),
-              eq(remoteConnections.remoteInstanceId, appliedNewDevName),
-            ),
-          );
+          .where(eq(instanceIdentities.userId, testUser.id));
         // Restore chatFolders if renamed but prod side not propagated
         await db
           .update(chatFolders)
@@ -287,7 +268,7 @@ if (_remoteUrl) {
 
     // ── RN1: renameSelf() updates local identity + remoteConnections ──────────
 
-    it("RN1: renameSelf() updates instanceIdentities + remoteConnections.remoteInstanceId on atlas", async () => {
+    it("RN1: renameSelf() updates instanceIdentities on atlas", async () => {
       const newName = `atlas-rn1-${randomUUID().slice(0, 8)}`;
       appliedNewDevName = newName;
 
@@ -307,12 +288,7 @@ if (_remoteUrl) {
       const [identity] = await db
         .select({ instanceId: instanceIdentities.instanceId })
         .from(instanceIdentities)
-        .where(
-          and(
-            eq(instanceIdentities.userId, testUser.id),
-            eq(instanceIdentities.isDefault, true),
-          ),
-        )
+        .where(eq(instanceIdentities.userId, testUser.id))
         .limit(1);
 
       expect(
@@ -320,45 +296,11 @@ if (_remoteUrl) {
         `RN1: instanceIdentities.instanceId must be updated to ${newName}`,
       ).toBe(newName);
 
-      // remoteConnections.remoteInstanceId must reflect new name
-      const [conn] = await db
-        .select({ remoteInstanceId: remoteConnections.remoteInstanceId })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        )
-        .limit(1);
-
-      expect(
-        conn?.remoteInstanceId,
-        `RN1: remoteConnections.remoteInstanceId must be updated to ${newName}`,
-      ).toBe(newName);
-
       // Restore for subsequent tests
       await db
         .update(instanceIdentities)
         .set({ instanceId: ATLAS_INSTANCE_ID, updatedAt: new Date() })
-        .where(
-          and(
-            eq(instanceIdentities.userId, testUser.id),
-            eq(instanceIdentities.instanceId, newName),
-          ),
-        );
-      await db
-        .update(remoteConnections)
-        .set({
-          remoteInstanceId: ATLAS_INSTANCE_ID,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.remoteInstanceId, newName),
-          ),
-        );
+        .where(eq(instanceIdentities.userId, testUser.id));
       appliedNewDevName = null;
     }, 30_000);
 
@@ -429,24 +371,7 @@ if (_remoteUrl) {
       await db
         .update(instanceIdentities)
         .set({ instanceId: ATLAS_INSTANCE_ID, updatedAt: new Date() })
-        .where(
-          and(
-            eq(instanceIdentities.userId, testUser.id),
-            eq(instanceIdentities.instanceId, newName),
-          ),
-        );
-      await db
-        .update(remoteConnections)
-        .set({
-          remoteInstanceId: ATLAS_INSTANCE_ID,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.remoteInstanceId, newName),
-          ),
-        );
+        .where(eq(instanceIdentities.userId, testUser.id));
       appliedNewDevName = null;
     }, 60_000);
 

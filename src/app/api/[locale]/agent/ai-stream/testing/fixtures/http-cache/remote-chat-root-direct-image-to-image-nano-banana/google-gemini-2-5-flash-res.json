@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1683b05fd51b71e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 05 Jul 2026 17:53:43 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783274021-Ebo6GzjO4zjAs5sVMiUv"
+  },
+  "body": {
+    "id": "gen-1783274021-Ebo6GzjO4zjAs5sVMiUv",
+    "object": "chat.completion",
+    "created": 1783274021,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio segment is a 17-second clip of upbeat electronic Latin jazz music.\n\n**Musical Description:**\n*   **Genre:** Electronic Latin Jazz / Downtempo Latin Groove.\n*   **Tempo:** Approximately 90-95 BPM, giving it a relaxed, grooving feel.\n*   **Instruments:**\n    *   **Drums:** The primary rhythmic element is a drum machine or electronic drum kit, featuring a steady kick-snare pattern with a strong backbeat and clearly audible high-hats providing a shuffling, busy eighth-note rhythm. The high-hats are quite prominent and have a slightly metallic, crisp sound.\n    *   **Bass:** A synthesized bass line plays a consistent, walking-style pattern, anchoring the harmony and providing a smooth, continuous low end. It sounds like a plucked or slap-bass synth patch.\n    *   **Keyboard/Synth (Melody):** A clean-sounding, percussive synth or electric piano plays a repeating, syncopated melody. It has a slightly muted, bell-like quality, adding a playful and melodic layer.\n    *   **Pads/Strings (Background):** Subtle, sustained synth pads or string-like sounds are present in the background, offering harmonic depth without being overtly noticeable as individual melodic lines. They contribute to a full, slightly airy soundscape.\n    *   **Percussion (Additional):** There are occasional, very subtly placed additional percussion elements, possibly shakers or a very light conga sound, adding to the Latin feel without being dominant.\n*   **Interaction:** The drums lay a solid, consistent groove. The bass provides a walking foundation. The keyboard/synth melody plays a simple, memorable riff over this, while the pads create an atmospheric background. All elements are well-balanced and contribute to a cohesive, easy-listening sound.\n*   **Song Structure:** The clip appears to be a continuous loop or a segment from a longer track, given its repetitive nature. There's no clear intro or outro within this short clip.\n*   **Production Style:** Polished and clean. There's a moderate amount of reverb on some elements, particularly the synth melody, giving it a slight sense of space. The mix is clear, allowing all instruments to be distinctly heard.\n*   **Mood:** Upbeat, relaxed, groovy, and sophisticated. It evokes a feeling of calm enjoyment or background ambiance.\n\n**Non-Musical Audio Events:**\n*   None. The audio consists solely of the music.\n\n**Sound Quality and Environment:**\n*   Studio quality recording. Clean, no apparent external noise interference.\n\n**Overall Impression:**\nA short, well-produced snippet of instrumental electronic Latin jazz, suitable for background music or as part of a lounge-style track.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 581,
+      "total_tokens": 1653,
+      "cost": 0.0022991,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022991,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0014525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -178,6 +178,11 @@ const { GET } = createEndpoint({
     // ── content-delta ────────────────────────────────────────────────────────
     // Framework appends delta.content to the matching message.
     "content-delta": {
+      // Every chunk crosses the wire: the peer's mirror thread streams in
+      // live, exactly like a thread on the same machine.
+      remoteEvent: true,
+      syncDomain: "threads" as const,
+      urlPathParamsFields: ["threadId"] as const,
       responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
     },
@@ -196,6 +201,9 @@ const { GET } = createEndpoint({
     // ── reasoning-delta ──────────────────────────────────────────────────────
     // Framework appends delta to message.content (reasoning block).
     "reasoning-delta": {
+      remoteEvent: true,
+      syncDomain: "threads" as const,
+      urlPathParamsFields: ["threadId"] as const,
       responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
     },
@@ -203,6 +211,9 @@ const { GET } = createEndpoint({
     // ── reasoning-done ───────────────────────────────────────────────────────
     // onEvent: persist final reasoning content to localStorage for incognito.
     "reasoning-done": {
+      remoteEvent: true,
+      syncDomain: "threads" as const,
+      urlPathParamsFields: ["threadId"] as const,
       responseFields: { messages: ["id", "content"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
