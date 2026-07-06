@@ -304,7 +304,7 @@ export const translations: typeof enTranslations = {
         fixtureMode: {
           title: "Fixture-Modus",
           description:
-            "HTTP-Fixture-Caching aktivieren (VIBE_FIXTURE_MODE=true). Fängt externe API-Aufrufe ab und speichert/repliziert sie aus fixtures/http-cache/. Für E2E-Tests gegen diesen Server als Remote.",
+            "HTTP-Fixture-Caching aktivieren (VIBE_FIXTURE_MODE=true). Fängt externe API-Aufrufe ab und speichert/repliziert sie aus src/generated/ai-fixtures/http-cache/. Für E2E-Tests gegen diesen Server als Remote.",
         },
         success: {
           title: "Erfolg",

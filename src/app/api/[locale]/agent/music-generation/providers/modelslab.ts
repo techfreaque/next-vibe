@@ -117,9 +117,7 @@ export async function generateMusicWithModelsLab(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, POLL_INTERVAL_MS);
-        });
+        await pollDelay(POLL_INTERVAL_MS);
 
         const pollResponse = await fetch(fetchUrl, {
           method: "POST",

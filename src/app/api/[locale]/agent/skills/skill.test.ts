@@ -13,8 +13,8 @@
  * Cleanup: test skills/favorites from PREVIOUS runs are deleted BEFORE each run (not after),
  * so you can always inspect the most recent run's data in the app.
  *
- * Cache: fixtures/http-cache/skill-creator-{test-name}/
- * Cache bust: delete fixtures/http-cache/skill-creator-{test-name}/
+ * Cache: src/generated/ai-fixtures/http-cache/skill-creator-{test-name}/
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/skill-creator-{test-name}/
  */
 
 import "server-only";

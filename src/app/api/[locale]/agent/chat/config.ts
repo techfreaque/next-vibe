@@ -395,6 +395,7 @@ export function makeHeadlessContext(
   signal?: AbortSignal,
 ): ToolExecutionContext {
   return {
+    fixtureContext,
     rootFolderId: DefaultFolderId.BACKGROUND,
     threadId: undefined,
     aiMessageId: undefined,

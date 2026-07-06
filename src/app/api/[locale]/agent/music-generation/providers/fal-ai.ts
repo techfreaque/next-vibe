@@ -104,9 +104,7 @@ export async function generateMusicWithFalAi(params: {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, POLL_INTERVAL_MS);
-      });
+      await pollDelay(POLL_INTERVAL_MS);
 
       const statusResponse = await fetch(
         `https://queue.fal.run/${providerModel}/requests/${requestId}/status`,

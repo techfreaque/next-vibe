@@ -7,7 +7,7 @@
  *
  * Works identically to fetch-cache.ts in concept:
  *   - On first run: real Agent SDK call fires, stream parts are collected and
- *     written to fixtures/claude-code/{testCase}/{model}-{index}-res.json
+ *     written to src/generated/ai-fixtures/claude-code/{testCase}/{model}-{index}-res.json
  *   - On subsequent runs: fixture is replayed as a ReadableStream of the same
  *     LanguageModelV2StreamPart events, no network required.
  *
@@ -22,7 +22,7 @@
  *     "parts": [ { "type": "stream-start", ... }, { "type": "text-delta", ... }, ... ]
  *   }
  *
- * Cache bust: delete fixtures/claude-code/{testCase}/
+ * Cache bust: delete src/generated/ai-fixtures/claude-code/{testCase}/
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";

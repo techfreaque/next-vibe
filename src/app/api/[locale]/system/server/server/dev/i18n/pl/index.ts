@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       fixtureMode: {
         title: "Tryb fixture",
         description:
-          "Włącz buforowanie HTTP fixture (VIBE_FIXTURE_MODE=true). Przechwytuje zewnętrzne wywołania API i zapisuje/odtwarza je z fixtures/http-cache/. Do testów E2E z tym serwerem jako zdalnym.",
+          "Włącz buforowanie HTTP fixture (VIBE_FIXTURE_MODE=true). Przechwytuje zewnętrzne wywołania API i zapisuje/odtwarza je z src/generated/ai-fixtures/http-cache/. Do testów E2E z tym serwerem jako zdalnym.",
       },
       success: {
         title: "Sukces",

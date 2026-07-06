@@ -107,8 +107,7 @@ const I18N_INDEX_PATTERN = /\/i18n\/index\.ts$/;
 // All generator output now lives under the single top-level src/generated/
 // (was system/generated + app-tanstack + app-native). One pattern covers them all.
 const GENERATED_PATTERN = /^src\/generated\//;
-const FIXTURES_PATTERN =
-  /^src\/app\/api\/\[locale\]\/agent\/ai-stream\/testing\/fixtures\//;
+const FIXTURES_PATTERN = /^src\/generated\/ai-fixtures\//;
 // Legacy mirror locations — still matched until app-tanstack/app-native fold into
 // src/generated/{tanstack,native}. Harmless once those dirs no longer exist.
 const APP_TANSTACK_PATTERN = /^src\/(?:generated\/tanstack|app-tanstack)\//;

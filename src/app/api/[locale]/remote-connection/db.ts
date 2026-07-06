@@ -75,6 +75,10 @@ export type ConnectionHealth = z.infer<typeof ConnectionHealthSchema>;
  */
 export const TransportModeSchema = z.enum(["reverse-ws", "direct-http"]);
 export type TransportMode = z.infer<typeof TransportModeSchema>;
+
+/** Thread mirroring policy — see remoteConnections.threadMirrorMode. */
+export const ThreadMirrorModeSchema = z.enum(["both", "off"]);
+export type ThreadMirrorMode = z.infer<typeof ThreadMirrorModeSchema>;
 export type TransportModeValue = TransportMode;
 
 /** Which data providers are synced over this connection. */
@@ -258,6 +262,21 @@ export const remoteConnections = pgTable(
      * Which data providers sync over this connection.
      */
     syncScope: jsonb("sync_scope").$type<SyncScope>(),
+
+    /**
+     * Thread mirroring policy for this connection — OVERRIDES thread-domain
+     * remote events and the relay's landing persistence:
+     *   'both' (default) — threads mirror in both directions; relay landings
+     *                      persist on the executor.
+     *   'off'            — no thread events cross; relay landings stay
+     *                      transient (no persisted executor copy).
+     * Later also settable per thread folder.
+     */
+    threadMirrorMode: text("thread_mirror_mode", {
+      enum: ["both", "off"],
+    })
+      .notNull()
+      .default("both"),
 
     // ── Connection state ────────────────────────────────────────────────────
 

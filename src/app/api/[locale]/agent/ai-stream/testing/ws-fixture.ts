@@ -7,7 +7,7 @@
  * On subsequent runs (cache hit): replays the recorded messages via a mock WS.
  *
  * Fixture file format:
- *   fixtures/ws-cache/{testCase}/{context-slug}-{index}-events.json
+ *   src/generated/ai-fixtures/ws-cache/{testCase}/{context-slug}-{index}-events.json
  *
  * The context slug is derived from the WS URL's channel param (or URL path).
  * Multiple WS connections within one test get counter suffixes.
@@ -26,8 +26,6 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { WsWireMessage } from "next-vibe/realtime/types";
-
-import { registerWsContextHook, registerWsStrictHook } from "./fetch-cache";
 
 const WS_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),

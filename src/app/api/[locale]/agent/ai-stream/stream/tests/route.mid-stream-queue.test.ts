@@ -33,7 +33,7 @@
  *   - Chain has >1 leaf (unexpected dead end)
  *   - Thread never reaches idle (stream hung or queue not processed)
  *
- * Cache bust: delete fixtures/http-cache/mq1-* and fixtures/http-cache/mq2-*
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/mq1-* and src/generated/ai-fixtures/http-cache/mq2-*
  */
 
 import "server-only";

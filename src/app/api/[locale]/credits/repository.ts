@@ -4172,5 +4172,29 @@ export class CreditRepository {
  */
 export type CreditRepositoryType = Pick<
   typeof CreditRepository,
-  keyof typeof CreditRepository
+  | "addCredits"
+  | "addEarnedCredits"
+  | "addUserCredits"
+  | "deductCreditsForFeature"
+  | "deductCreditsForModelUsage"
+  | "deductCreditsForSTT"
+  | "deductCreditsForTTS"
+  | "deductEarnedCredits"
+  | "expireCredits"
+  | "generateMessageId"
+  | "getBalance"
+  | "getCreditBalanceForUser"
+  | "getCreditIdentifierBySubscription"
+  | "getEarnedCreditsBalance"
+  | "getLeadBalance"
+  | "getLeadPool"
+  | "getLeadPoolOnly"
+  | "getOrCreateLeadByIp"
+  | "getReferralTransactions"
+  | "getTransactionHistory"
+  | "getUserPool"
+  | "handleCreditPackPurchase"
+  | "handleNowPaymentsCreditSuccessRedirect"
+  | "hasSufficientCredits"
+  | "mergePendingLeadWallets"
 >;

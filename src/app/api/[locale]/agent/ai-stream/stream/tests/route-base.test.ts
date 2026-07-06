@@ -12,7 +12,7 @@
  *   replays from fixtures on subsequent runs - same code path, no network.
  * - Claude Code fixtures (claude-code-fixture-store) for Agent SDK calls.
  *
- * Cache bust: delete fixtures/http-cache/<case>/ or fixtures/claude-code/<case>/
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/<case>/ or src/generated/ai-fixtures/claude-code/<case>/
  *
  * Thread layout (visible in UI):
  *   T1  → new thread + tool call (tool-help) - creates thread, tests parent chain + tool structure
@@ -227,7 +227,7 @@ function newMessages(
     .filter((m) => !prevIds.has(m.id));
 }
 
-/** Read a fixture file from fixtures/media/ as a File object */
+/** Read a fixture file from src/generated/ai-fixtures/media/ as a File object */
 async function loadFixture(filename: string, mimeType: string): Promise<File> {
   const { readFile } = await import("node:fs/promises");
   const { join } = await import("node:path");

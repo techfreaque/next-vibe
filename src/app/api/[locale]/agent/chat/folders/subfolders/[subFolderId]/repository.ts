@@ -191,6 +191,7 @@ export class FolderRepository {
               icon: updated.icon,
               color: updated.color,
               sortOrder: updated.sortOrder,
+              rootFolderId: updated.rootFolderId,
               updatedAt: updated.updatedAt,
             },
           ],
@@ -251,9 +252,18 @@ export class FolderRepository {
       const allFolders = await db.select().from(chatFolders);
       const descendantIds = collectDescendantIds(data.id, allFolders);
 
+      // Collect threads before deletion to emit per-folder removal events.
+      const affectedThreads =
+        descendantIds.length > 0
+          ? await db
+              .select({ id: chatThreads.id, folderId: chatThreads.folderId })
+              .from(chatThreads)
+              .where(inArray(chatThreads.folderId, descendantIds))
+          : [];
+
       // Delete all threads in this folder and all descendant folders
       // Cascade from chatThreads → chatMessages is handled by FK onDelete: "cascade"
-      if (descendantIds.length > 0) {
+      if (affectedThreads.length > 0) {
         await db
           .delete(chatThreads)
           .where(inArray(chatThreads.folderId, descendantIds));
@@ -263,15 +273,67 @@ export class FolderRepository {
 
       logger.info("Folder deleted", { folderId: data.id });
 
-      // Emit WS event so all open tabs remove the folder from the sidebar
-      // immediately. Folder CRUD SYNCS by SAME id — regular fields only.
-      const emitFolderContents = createFolderContentsEmitter(
-        logger,
-        user,
+      const { createEndpointEmitter } =
+        await import("next-vibe/realtime/emitter");
+      const { default: folderContentsDefinitions } =
+        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition");
+      const { FolderContentsRepository } =
+        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/repository");
+      const rootFolderKind = FolderContentsRepository.emitChannelForFolder(
         folder.rootFolderId,
-      );
-      emitFolderContents("folder-deleted", {
-        responseData: { items: [{ id: folder.id }] },
+      ).kind;
+
+      // Emit thread-deleted per folder so open sidebar views remove threads.
+      const threadsByFolder = new Map<string | null, string[]>();
+      for (const thread of affectedThreads) {
+        const fid = thread.folderId ?? null;
+        const list = threadsByFolder.get(fid) ?? [];
+        list.push(thread.id);
+        threadsByFolder.set(fid, list);
+      }
+      for (const [folderId, threadIds] of threadsByFolder) {
+        createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
+          urlPathParams: { rootFolderId: folder.rootFolderId },
+          requestData: { subFolderId: folderId, threadIds: undefined },
+          kindOverride: rootFolderKind,
+          fanOut: true,
+        })("thread-deleted", {
+          responseData: { items: threadIds.map((id) => ({ id })) },
+        });
+      }
+
+      // Emit folder-deleted for each descendant so nested expanded views update.
+      const folderById = new Map(allFolders.map((f) => [f.id, f]));
+      for (const descId of descendantIds) {
+        if (descId === data.id) {
+          continue; // top-level handled separately below
+        }
+        const descEntry = folderById.get(descId);
+        createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
+          urlPathParams: { rootFolderId: folder.rootFolderId },
+          requestData: {
+            subFolderId: descEntry?.parentId,
+            threadIds: undefined,
+          },
+          kindOverride: rootFolderKind,
+          fanOut: true,
+        })("folder-deleted", {
+          responseData: {
+            items: [{ id: descId, rootFolderId: folder.rootFolderId }],
+          },
+        });
+      }
+
+      // Emit folder-deleted for the top-level deleted folder.
+      createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
+        urlPathParams: { rootFolderId: folder.rootFolderId },
+        requestData: { subFolderId: folder.parentId, threadIds: undefined },
+        kindOverride: rootFolderKind,
+        fanOut: true,
+      })("folder-deleted", {
+        responseData: {
+          items: [{ id: folder.id, rootFolderId: folder.rootFolderId }],
+        },
       });
 
       return success({

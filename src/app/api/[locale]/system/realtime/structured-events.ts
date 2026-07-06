@@ -159,18 +159,17 @@ export interface EndpointEventDeclaration<
 // (EventResponsePayloads / EventRequestPayloads, read by RemoteEventHandlerProps)
 // collapse to `never`/`undefined` via distributive conditionals.
 //
-// Instead the value is a plain structural shape: the four field specs carry their
-// real constraint types; onEvent accepts the FULL output types + `any` payload
-// (so an author may reference any field at the constraint level). The actual
-// per-event payloads flow from the `const TEvents` literal createEndpoint
-// captures, read field-by-field by ComputeEventPayloads — never from this map.
+// Self-referential mapped type: `const TEvents extends EndpointEventsMap<R,Q,U,TEvents>`.
+// TypeScript resolves the circularity by evaluating the constraint per-key against
+// the inferred TEvents literal — each entry's `onEvent` payload is contextually
+// typed from that same entry's `payloadType` field.
 // ============================================================================
 
-export interface EndpointEventsMap<
-  TResponseOutput,
-  TRequestOutput,
-  TUrlVariablesOutput,
-> {
+// Upper-bound shape for TEvents. onEvent uses any for all context fields so
+// the upper bound is structurally compatible with any concrete handler.
+// The concrete contextual type (TRequestOutput etc.) comes from the `extends`
+// constraint EndpointEventsMap<R,Q,U,TEvents> in createEndpoint's generic.
+export interface EndpointEventsMapBase {
   [K: string]: {
     // oxlint-disable-next-line no-explicit-any
     readonly responseFields?: readonly any[] | Record<string, any>;
@@ -183,19 +182,79 @@ export interface EndpointEventsMap<
     readonly remoteEvent?: true;
     readonly syncDomain?: SyncDomain;
     readonly allowedRoles?: readonly UserRoleValue[];
+    readonly payloadType?: z.ZodTypeAny;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onEvent?(
+      // oxlint-disable-next-line no-explicit-any
+      ctx: EndpointEventHandlerContext<never, never, never, any>,
+    ): void | Promise<void>;
+  };
+}
+
+// Self-referential mapped constraint. Each entry's onEvent payload is narrowed
+// to `z.output<TEntry["payloadType"]>` via the TEvents[K] lookup — TypeScript
+// resolves this after inferring TEvents from the call-site literal.
+export type EndpointEventsMap<
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+  TEvents extends EndpointEventsMapBase = EndpointEventsMapBase,
+> = {
+  [K in keyof TEvents]: {
     // oxlint-disable-next-line no-explicit-any
-    readonly payloadType?: z.ZodType<any>;
+    readonly responseFields?: readonly any[] | Record<string, any>;
+    // oxlint-disable-next-line no-explicit-any
+    readonly requestFields?: readonly any[];
+    // oxlint-disable-next-line no-explicit-any
+    readonly urlPathParamsFields?: readonly any[];
+    readonly operation?: EventOperation;
+    readonly clientDelivery?: false;
+    readonly remoteEvent?: true;
+    readonly syncDomain?: SyncDomain;
+    readonly allowedRoles?: readonly UserRoleValue[];
+    readonly payloadType?: z.ZodTypeAny;
     onEvent?(
       ctx: EndpointEventHandlerContext<
         TResponseOutput,
         TRequestOutput,
         TUrlVariablesOutput,
-        // oxlint-disable-next-line no-explicit-any
-        any
+        TEvents[K] extends { payloadType?: infer S }
+          ? Exclude<S, undefined> extends z.ZodTypeAny
+            ? z.output<Exclude<S, undefined>>
+            : never
+          : never
       >,
     ): void | Promise<void>;
   };
-}
+};
+
+/**
+ * Overlays per-entry payload inference onto an events map for use as the
+ * contextual type of the `events` config field in createEndpoint. Each entry's
+ * `onEvent` payload is narrowed to `z.output<TEvents[K]["payloadType"]>` while
+ * all other fields remain structurally compatible with `EndpointEventsMap`.
+ *
+ * Used internally by ChannelConfigField — not needed at call-sites.
+ */
+export type WithPayloadCtx<
+  TEvents,
+  TResponseOutput,
+  TRequestOutput,
+  TUrlVariablesOutput,
+> = {
+  [K in keyof TEvents]: {
+    onEvent?(
+      ctx: EndpointEventHandlerContext<
+        TResponseOutput,
+        TRequestOutput,
+        TUrlVariablesOutput,
+        TEvents[K] extends { payloadType?: infer S extends z.ZodTypeAny }
+          ? z.output<S>
+          : never
+      >,
+    ): void | Promise<void>;
+  };
+};
 
 // ============================================================================
 // CHANNEL DECLARATION
@@ -652,23 +711,16 @@ export type EmitEventNamed<
 // RUNTIME HELPERS
 // ============================================================================
 
-export function eventDeclarationHasFields<
-  TResponseOutput,
-  TRequestOutput,
-  TUrlVariablesOutput,
->(
-  declaration: EndpointEventDeclaration<
-    TResponseOutput,
-    TRequestOutput,
-    TUrlVariablesOutput
-  >,
-): boolean {
+interface _AnyEventDecl {
+  // oxlint-disable-next-line no-explicit-any
+  responseFields?: readonly any[] | Record<string, any>;
+}
+
+export function eventDeclarationHasFields(declaration: _AnyEventDecl): boolean {
   if (declaration.responseFields === undefined) {
     return false;
   }
-  const fields = declaration.responseFields as
-    | readonly (keyof TResponseOutput)[]
-    | Record<string, boolean | readonly string[]>;
+  const fields = declaration.responseFields;
   if (Array.isArray(fields)) {
     return fields.length > 0;
   }

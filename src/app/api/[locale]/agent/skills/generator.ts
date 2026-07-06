@@ -137,7 +137,12 @@ function generateContent(skills: SkillEntry[], outputFile: string): string {
     })
     .join("\n");
 
-  const companionList = companions.map((s) => `  ${s.exportName},`).join("\n");
+  const companionNames = companions.map((s) => s.exportName);
+  const companionSingleLine = `export const COMPANION_SKILLS: Skill[] = [${companionNames.join(", ")}];`;
+  const companionList =
+    companionSingleLine.length <= 80
+      ? companionNames.join(", ")
+      : companions.map((s) => `  ${s.exportName},`).join("\n");
 
   const skillIdList = skills.map((s) => `  "${s.skillId}",`).join("\n");
 
@@ -157,9 +162,7 @@ ${imports}
 
 ${embeddingImports}
 
-export const COMPANION_SKILLS: Skill[] = [
-${companionList}
-];
+export const COMPANION_SKILLS: Skill[] = [${companionSingleLine.length <= 80 ? companionList : `\n${companionList}\n`}];
 
 export const DEFAULT_SKILL_IDS = [
 ${skillIdList}

@@ -20,7 +20,7 @@
  * C1/C2 temporarily patch compactTrigger=5000 on the fav and restore null after.
  * This lets the user override the fav via the UI — the test only changes compactTrigger.
  *
- * Cache bust: delete fixtures/http-cache/compacting-* to force new LLM calls.
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/compacting-* to force new LLM calls.
  */
 
 import "server-only";

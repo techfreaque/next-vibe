@@ -473,9 +473,7 @@ export class CreditRepository {
 
   static async handleNowPaymentsCreditSuccessRedirect(
     // oxlint-disable-next-line no-unused-vars
-    _npId: string,
-    // oxlint-disable-next-line no-unused-vars
-    _token: string | undefined,
+    _callbackToken: string,
     // oxlint-disable-next-line no-unused-vars
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
@@ -527,7 +525,11 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _cost: number,
     // oxlint-disable-next-line no-unused-vars
-    _model: ChatModelId,
+    _model:
+      | ChatModelId
+      | ImageVisionModelId
+      | VideoVisionModelId
+      | AudioVisionModelId,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility

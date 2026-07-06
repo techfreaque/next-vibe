@@ -40,9 +40,7 @@ async function pollPrediction(
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, POLL_INTERVAL_MS);
-    });
+    await pollDelay(POLL_INTERVAL_MS);
 
     const response = await fetch(
       `https://api.replicate.com/v1/predictions/${predictionId}`,

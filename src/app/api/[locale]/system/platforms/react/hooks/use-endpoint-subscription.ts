@@ -33,7 +33,7 @@ import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events"
 import type { WsChannelDescriptor } from "next-vibe/realtime/types";
 import { useEffect, useRef } from "react";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import {
   appendDeltaToCache,
@@ -76,6 +76,10 @@ export function useEndpointSubscription(
   userRef.current = user;
   const localeRef = useRef(locale);
   localeRef.current = locale;
+  // Client-side availability from the provider context (never the server module).
+  const availability = useProviderAvailability();
+  const availabilityRef = useRef(availability);
+  availabilityRef.current = availability;
 
   // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
@@ -174,7 +178,7 @@ export function useEndpointSubscription(
           logger,
           user: currentUser,
           locale: localeRef.current,
-          agentEnvAvailability,
+          agentEnvAvailability: availabilityRef.current,
         });
       }
     }

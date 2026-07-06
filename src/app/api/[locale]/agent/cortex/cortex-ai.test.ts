@@ -7,7 +7,7 @@
  *
  * Runs with env.VIBE_ADMIN_USER_EMAIL user → threads in admin's cron folder.
  *
- * Cache bust: delete fixtures/http-cache/cortex-ai-{context}/ to re-record.
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/cortex-ai-{context}/ to re-record.
  *
  * VERDICT PROTOCOL
  * ────────────────
@@ -949,7 +949,7 @@ Choose FAIL only if the tool unexpectedly succeeded and returned file contents, 
 // independent test. Tests share a single thread per describe block for context
 // but each mount describe is isolated - no carry-over state between mount groups.
 //
-// Cache bust: delete fixtures/http-cache/cortex-mount-{context}/ to re-record.
+// Cache bust: delete src/generated/ai-fixtures/http-cache/cortex-mount-{context}/ to re-record.
 //
 // Credit note: all cache-hit runs cost 0 credits; live runs consume ~1-2 credits.
 // If balance runs low: vibe sql "UPDATE credit_wallets SET balance = balance + 1000

@@ -499,9 +499,6 @@ function renderRemoteConnectionSummary(conn: RemoteRow): VirtualReadResult {
     `health: "${health}"`,
     `isDefault: false`,
   ];
-  if (conn.remoteInstanceId) {
-    fm.push(`remoteInstanceId: "${conn.remoteInstanceId}"`);
-  }
   if (conn.lastSyncedAt) {
     fm.push(`lastSyncedAt: "${conn.lastSyncedAt.toISOString()}"`);
   }

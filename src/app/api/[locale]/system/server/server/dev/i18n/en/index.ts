@@ -76,7 +76,7 @@ export const translations = {
       fixtureMode: {
         title: "Fixture Mode",
         description:
-          "Enable HTTP fixture caching (VIBE_FIXTURE_MODE=true). Intercepts external API calls and stores/replays them from fixtures/http-cache/. Use for E2E tests against this server as the remote.",
+          "Enable HTTP fixture caching (VIBE_FIXTURE_MODE=true). Intercepts external API calls and stores/replays them from src/generated/ai-fixtures/http-cache/. Use for E2E tests against this server as the remote.",
       },
       success: {
         title: "Success",

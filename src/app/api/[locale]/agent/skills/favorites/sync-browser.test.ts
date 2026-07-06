@@ -278,13 +278,28 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       const snapshot = await browserSnapshot(session);
 
       // Already logged in — redirected away from login page
-      if (!snapshot.includes("/en-US/user/login") || findUid(snapshot, /Dev Quick Login/i)) {
+      if (
+        !snapshot.includes("/en-US/user/login") ||
+        findUid(snapshot, /Dev Quick Login/i)
+      ) {
         // Try dev quick-login button first (fastest)
-        const quickLoginUid = findUid(snapshot, new RegExp(env.VIBE_ADMIN_USER_EMAIL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+        const quickLoginUid = findUid(
+          snapshot,
+          new RegExp(
+            env.VIBE_ADMIN_USER_EMAIL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            "i",
+          ),
+        );
         if (quickLoginUid) {
           await browserClick(session, quickLoginUid);
-          await browserWaitFor(session, ["Threads", "Chat", "Favorites", "Tools"], 15_000);
-          process.stdout.write(`[browser:${session}] quick-logged in to ${baseUrl}\n`);
+          await browserWaitFor(
+            session,
+            ["Threads", "Chat", "Favorites", "Tools"],
+            15_000,
+          );
+          process.stdout.write(
+            `[browser:${session}] quick-logged in to ${baseUrl}\n`,
+          );
           return;
         }
       }
@@ -292,22 +307,39 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       // Already authenticated (no login form visible)
       const emailUid = findUid(snapshot, /textbox.*Your Email|Your Email/i);
       if (!emailUid) {
-        process.stdout.write(`[browser:${session}] already logged in to ${baseUrl}\n`);
+        process.stdout.write(
+          `[browser:${session}] already logged in to ${baseUrl}\n`,
+        );
         return;
       }
 
-      const passwordUid = findUid(snapshot, /textbox.*Your Password|Your Password/i);
-      if (!passwordUid) {return;}
+      const passwordUid = findUid(
+        snapshot,
+        /textbox.*Your Password|Your Password/i,
+      );
+      if (!passwordUid) {
+        return;
+      }
 
       await browserFill(session, emailUid, env.VIBE_ADMIN_USER_EMAIL);
-      await browserFill(session, passwordUid, env.VIBE_ADMIN_USER_PASSWORD ?? "password123");
+      await browserFill(
+        session,
+        passwordUid,
+        env.VIBE_ADMIN_USER_PASSWORD ?? "password123",
+      );
 
       const snapshot2 = await browserSnapshot(session);
       const submitUid = findUid(snapshot2, /button "Login"/i);
-      if (!submitUid) {return;}
+      if (!submitUid) {
+        return;
+      }
 
       await browserClick(session, submitUid);
-      await browserWaitFor(session, ["Threads", "Chat", "Favorites", "Tools"], 15_000);
+      await browserWaitFor(
+        session,
+        ["Threads", "Chat", "Favorites", "Tools"],
+        15_000,
+      );
       process.stdout.write(`[browser:${session}] logged in to ${baseUrl}\n`);
     }
 
@@ -363,33 +395,12 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         addAllUid,
         `"Add All" button not found. snapshot:\n${snapshot.slice(0, 800)}`,
       ).toBeTruthy();
-      if (!addAllUid) {return;}
+      if (!addAllUid) {
+        return;
+      }
       await browserClick(ATLAS_SESSION, addAllUid);
       await sleep(1_000);
       process.stdout.write(`[atlas] ✓ clicked "Add All" for ${SKILL_ID}\n`);
-    }
-
-    /**
-     * Remove career-coach favorites via atlas browser:
-     * navigate to skill-get panel, wait for "Remove All", click it.
-     */
-    async function removeFavViaAtlasBrowser(): Promise<void> {
-      await browserNavigate(ATLAS_SESSION, ATLAS_SKILL_URL);
-      await browserWaitFor(
-        ATLAS_SESSION,
-        ["Career Coach", "Remove All"],
-        15_000,
-      );
-      const snapshot = await browserSnapshot(ATLAS_SESSION);
-      const removeAllUid = findUid(snapshot, /^.*button "Remove All".*$/m);
-      expect(
-        removeAllUid,
-        `"Remove All" button not found. snapshot:\n${snapshot.slice(0, 800)}`,
-      ).toBeTruthy();
-      if (!removeAllUid) {return;}
-      await browserClick(ATLAS_SESSION, removeAllUid);
-      await sleep(1_000);
-      process.stdout.write(`[atlas] ✓ clicked "Remove All" for ${SKILL_ID}\n`);
     }
 
     // career-coach variants that appear only inside fav cards (not in sidebar)
@@ -418,13 +429,18 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       while (Date.now() < deadline) {
         const snapshot = await browserSnapshot(HERMES_SESSION);
         if (snapshot.includes(CAREER_COACH_VARIANT)) {
-          process.stdout.write(`[${label}] ✓ ${CAREER_COACH_VARIANT} fav card appeared in hermes browser\n`);
+          process.stdout.write(
+            `[${label}] ✓ ${CAREER_COACH_VARIANT} fav card appeared in hermes browser\n`,
+          );
           return;
         }
         lastSnapshot = snapshot;
         await sleep(500);
       }
-      expect(false, `[${label}] ${CAREER_COACH_VARIANT} never appeared in hermes browser after 8s\n${lastSnapshot.slice(0, 800)}`).toBe(true);
+      expect(
+        false,
+        `[${label}] ${CAREER_COACH_VARIANT} never appeared in hermes browser after 8s\n${lastSnapshot.slice(0, 800)}`,
+      ).toBe(true);
     }
 
     /**
@@ -544,7 +560,10 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
     fit("FSB1 [direct-http]: hermes has no Headhunter card before add", async () => {
       const snapshot = await browserSnapshot(HERMES_SESSION);
-      expect(snapshot.includes(CAREER_COACH_VARIANT), `Headhunter already on hermes BEFORE add — slate not clean!\n${snapshot.slice(0, 500)}`).toBe(false);
+      expect(
+        snapshot.includes(CAREER_COACH_VARIANT),
+        `Headhunter already on hermes BEFORE add — slate not clean!\n${snapshot.slice(0, 500)}`,
+      ).toBe(false);
     });
 
     fit("FSB2 [direct-http]: add career-coach on atlas via browser UI", async () => {
@@ -571,7 +590,10 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
     fit("FSB6 [reverse-ws]: hermes has no Headhunter card before add", async () => {
       const snapshot = await browserSnapshot(HERMES_SESSION);
-      expect(snapshot.includes(CAREER_COACH_VARIANT), `Headhunter already on hermes BEFORE add — slate not clean!\n${snapshot.slice(0, 500)}`).toBe(false);
+      expect(
+        snapshot.includes(CAREER_COACH_VARIANT),
+        `Headhunter already on hermes BEFORE add — slate not clean!\n${snapshot.slice(0, 500)}`,
+      ).toBe(false);
     });
 
     fit("FSB7 [reverse-ws]: add career-coach on atlas via browser UI", async () => {

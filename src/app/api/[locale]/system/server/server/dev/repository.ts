@@ -496,17 +496,6 @@ export class DevRepository {
       );
     }
 
-    // Enable fixture mode if requested (VIBE_FIXTURE_MODE intercepts external fetch calls).
-    // Task IDs are deterministic by construction (derived from the originating
-    // toolCallId in generateTaskId), so no extra flag is needed for stable relay
-    // IDs across record/replay or across instances.
-    if (data.fixtureMode) {
-      process.env["VIBE_FIXTURE_MODE"] = "true";
-      const { installFetchCacheIfEnabled } =
-        await import("@/app/api/[locale]/agent/ai-stream/testing/fetch-cache");
-      installFetchCacheIfEnabled();
-    }
-
     // Shared abort controller: aborted by shutdown() so task runners stop cleanly
     const shutdownController = new AbortController();
 
@@ -583,11 +572,6 @@ export class DevRepository {
     DevRepository.log(
       `  ${formatConfig("Code Generators", data.skipGeneratorWatcher ? "DISABLED" : "ENABLED")} ${formatHint(data.skipGeneratorWatcher ? "(remove --skip-generator-watcher)" : "(--skip-generator-watcher)")}`,
     );
-    if (data.fixtureMode) {
-      DevRepository.log(
-        `  ${formatConfig("Fixture Mode", "ON")} ${formatHint("(VIBE_FIXTURE_MODE=true — external API calls cached to fixtures/http-cache/)")}`,
-      );
-    }
     DevRepository.log("");
     DevRepository.log(
       `  ${formatHint("💡 Edit src/app/api/[locale]/system/server/dev/definition.ts to change defaults")}`,
