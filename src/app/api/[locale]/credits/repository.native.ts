@@ -14,6 +14,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
 import type { ChatModelId } from "../agent/ai-stream/models";
+import type {
+  AudioVisionModelId,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "../agent/ai-stream/vision-models";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
 import creditsDefinitions, {
   type CreditsGetResponseOutput,

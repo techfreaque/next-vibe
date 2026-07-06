@@ -6,54 +6,47 @@
  * Fragment IDs: autonomy-status, bootstrap, coding-agent-setting, contact, cortex, desktop, extra-instructions, favorites, folder-context, formatting, guest-context, headless-context, identity, language, media-capabilities, message-metadata, platform-overview, remote-instances, skill, ssh-connections, sub-agent-guard, system-context, tool-execution-control, user-name, web
  */
 
-/* eslint-disable prettier/prettier */
-/* eslint-disable simple-import-sort/imports */
-
 import "server-only";
 
-import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-
-// Fragment objects - from each module's system-prompt.ts
 import {
-  identityFragment,
-  platformOverviewFragment,
-  headlessContextFragment,
-  subAgentGuardFragment,
-  languageFragment,
-  folderContextFragment,
-  messageMetadataFragment,
-  toolExecutionControlFragment,
-  formattingFragment,
-  extraInstructionsFragment,
-  userNameFragment,
-  bootstrapFragment,
-  guestContextFragment,
-  mediaCapabilitiesFragment,
   autonomyStatusFragment,
+  bootstrapFragment,
+  extraInstructionsFragment,
+  folderContextFragment,
+  formattingFragment,
+  guestContextFragment,
+  headlessContextFragment,
+  identityFragment,
+  languageFragment,
+  mediaCapabilitiesFragment,
+  messageMetadataFragment,
+  platformOverviewFragment,
+  subAgentGuardFragment,
+  toolExecutionControlFragment,
+  userNameFragment,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
+import { loadPromptContextData } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
+import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
-import { contactFragment } from "@/app/api/[locale]/contact/system-prompt";
+import { loadCodingAgentSettingData } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
 import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt";
-import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt";
+import { loadCortexData } from "@/app/api/[locale]/agent/cortex/system-prompt";
+import { webFragment } from "@/app/api/[locale]/agent/search/system-prompt";
+import { loadWebData } from "@/app/api/[locale]/agent/search/system-prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
+import { loadFavoritesData } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
+import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt";
+import { loadSkillData } from "@/app/api/[locale]/agent/skills/system-prompt";
+import { contactFragment } from "@/app/api/[locale]/contact/system-prompt";
+import { loadContactData } from "@/app/api/[locale]/contact/system-prompt";
+import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt";
+import { loadDesktopData } from "@/app/api/[locale]/desktop/system-prompt";
 import {
-  systemContextFragment,
   remoteInstancesFragment,
   sshConnectionsFragment,
+  systemContextFragment,
 } from "@/app/api/[locale]/remote-connection/system-prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt";
-import { webFragment } from "@/app/api/[locale]/agent/search/system-prompt";
-
-// Server loaders - from each module's system-prompt.ts
-import { loadPromptContextData } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
-import { loadCodingAgentSettingData } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
-import { loadContactData } from "@/app/api/[locale]/contact/system-prompt";
-import { loadCortexData } from "@/app/api/[locale]/agent/cortex/system-prompt";
-import { loadDesktopData } from "@/app/api/[locale]/desktop/system-prompt";
-import { loadFavoritesData } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
 import { loadRemoteInstancesData } from "@/app/api/[locale]/remote-connection/system-prompt";
-import { loadSkillData } from "@/app/api/[locale]/agent/skills/system-prompt";
-import { loadWebData } from "@/app/api/[locale]/agent/search/system-prompt";
 
 /**
  * Combined server loader - loads all fragment data in parallel, builds strings, returns results.

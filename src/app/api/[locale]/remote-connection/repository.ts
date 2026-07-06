@@ -152,36 +152,14 @@ export class RemoteConnectionRepository {
   static async upsertInstanceIdentity(params: {
     userId: string;
     instanceId: string;
-    isDefault?: boolean;
   }): Promise<void> {
-    const { userId, instanceId, isDefault = false } = params;
-
-    if (isDefault) {
-      await db
-        .update(instanceIdentities)
-        .set({ isDefault: false, updatedAt: new Date() })
-        .where(
-          and(
-            eq(instanceIdentities.userId, userId),
-            eq(instanceIdentities.isDefault, true),
-          ),
-        );
-    }
-
+    const { userId, instanceId } = params;
     await db
       .insert(instanceIdentities)
-      .values({
-        userId,
-        instanceId,
-        isDefault,
-        updatedAt: new Date(),
-      })
+      .values({ userId, instanceId, updatedAt: new Date() })
       .onConflictDoUpdate({
-        target: [instanceIdentities.userId, instanceIdentities.instanceId],
-        set: {
-          isDefault,
-          updatedAt: new Date(),
-        },
+        target: [instanceIdentities.userId],
+        set: { instanceId, updatedAt: new Date() },
       });
   }
 
@@ -193,16 +171,33 @@ export class RemoteConnectionRepository {
    * For system-level code without a user (pulse, task-sync), use
    * deriveDefaultSelfInstanceId() directly instead.
    */
+  /**
+   * ATTEST which transport leg actually carried an outbound dispatch on this
+   * connection. Called by the transport PRIMITIVES only (callToolDirect,
+   * pushRemoteEvent) — never from configuration code.
+   */
+  static async recordTransportUse(
+    userId: string,
+    instanceId: string,
+    transport: "direct-http" | "reverse-ws",
+  ): Promise<void> {
+    await db
+      .update(remoteConnections)
+      .set({ lastTransportUsed: transport, lastTransportUsedAt: new Date() })
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      )
+      .catch(() => undefined);
+  }
+
   static async getLocalInstanceId(userId: string): Promise<string> {
     const [row] = await db
       .select({ instanceId: instanceIdentities.instanceId })
       .from(instanceIdentities)
-      .where(
-        and(
-          eq(instanceIdentities.userId, userId),
-          eq(instanceIdentities.isDefault, true),
-        ),
-      )
+      .where(eq(instanceIdentities.userId, userId))
       .limit(1);
 
     return (
@@ -223,7 +218,6 @@ export class RemoteConnectionRepository {
     token: string;
     leadId: string;
     instanceId?: string;
-    remoteInstanceId?: string;
     remoteUserId?: string;
     isReverseEntry?: boolean;
     transportMode?: TransportMode;
@@ -271,13 +265,11 @@ export class RemoteConnectionRepository {
         token: encryptedToken,
         leadId,
         instanceId,
-        remoteInstanceId: remoteInstanceId ?? null,
         remoteUserId: remoteUserId ?? null,
         isActive: true,
         isReverseEntry,
         // Mirror threads on both sides by default so local and remote folders
         // both show conversation history without extra configuration.
-        threadMirrorMode: "both",
         ...(transportMode ? { transportMode } : {}),
         ...(isInferenceProvider !== undefined ? { isInferenceProvider } : {}),
         ...(syncScope ? { syncScope } : {}),
@@ -289,7 +281,6 @@ export class RemoteConnectionRepository {
           remoteUrl,
           token: encryptedToken,
           leadId,
-          remoteInstanceId: remoteInstanceId ?? null,
           // Only overwrite the stored peer userId when we actually learned one,
           // so a reconnect that omits it doesn't null out a known value.
           ...(remoteUserId ? { remoteUserId } : {}),
@@ -350,6 +341,7 @@ export class RemoteConnectionRepository {
    */
   static async getAllActiveConnectionsForSync(): Promise<
     Array<{
+      id: string;
       userId: string;
       remoteUrl: string;
       token: string;
@@ -358,10 +350,9 @@ export class RemoteConnectionRepository {
       syncCursors: Record<string, SyncCursor> | null;
       capabilitiesVersion: string | null;
       sentCapabilitiesVersion: string | null;
-      remoteInstanceId: string | null;
       remoteUserId: string | null;
       localUrl: string | null;
-      transportMode: "reverse-ws" | "direct-http" | "cloud-only";
+      transportMode: "reverse-ws" | "direct-http";
       syncScope: SyncScope | null;
       isReverseEntry: boolean;
     }>
@@ -379,6 +370,7 @@ export class RemoteConnectionRepository {
     return rows
       .filter((r): r is typeof r & { token: string } => !!r.token)
       .map((r) => ({
+        id: r.id,
         userId: r.userId,
         remoteUrl: r.remoteUrl,
         token: RemoteConnectionRepository.decryptToken(r.token),
@@ -387,7 +379,6 @@ export class RemoteConnectionRepository {
         syncCursors: r.syncCursors ?? null,
         capabilitiesVersion: r.capabilitiesVersion ?? null,
         sentCapabilitiesVersion: r.sentCapabilitiesVersion ?? null,
-        remoteInstanceId: r.remoteInstanceId ?? null,
         remoteUserId: r.remoteUserId ?? null,
         localUrl: r.localUrl ?? null,
         transportMode: r.transportMode,
@@ -405,7 +396,6 @@ export class RemoteConnectionRepository {
       token: string;
       leadId: string;
       instanceId: string;
-      remoteInstanceId: string | null;
     }>
   > {
     const rows = await db
@@ -425,7 +415,6 @@ export class RemoteConnectionRepository {
         token: RemoteConnectionRepository.decryptToken(r.token),
         leadId: r.leadId,
         instanceId: r.instanceId,
-        remoteInstanceId: r.remoteInstanceId ?? null,
       }));
   }
 
@@ -489,8 +478,7 @@ export class RemoteConnectionRepository {
     instanceId: string,
   ): Promise<{
     capabilities: RemoteToolCapability[] | null;
-    remoteInstanceId: string | null;
-    transportMode: "reverse-ws" | "direct-http" | "cloud-only";
+    transportMode: "reverse-ws" | "direct-http";
     remoteUrl: string;
     /** Local instance URL - set on cloud-side records to push tasks/memories directly. */
     localUrl: string | null;
@@ -506,7 +494,6 @@ export class RemoteConnectionRepository {
     const [row] = await db
       .select({
         capabilities: remoteConnections.capabilities,
-        remoteInstanceId: remoteConnections.remoteInstanceId,
         transportMode: remoteConnections.transportMode,
         remoteUrl: remoteConnections.remoteUrl,
         localUrl: remoteConnections.localUrl,
@@ -519,10 +506,7 @@ export class RemoteConnectionRepository {
         and(
           eq(remoteConnections.userId, userId),
           eq(remoteConnections.isActive, true),
-          or(
-            eq(remoteConnections.instanceId, instanceId),
-            eq(remoteConnections.remoteInstanceId, instanceId),
-          ),
+          eq(remoteConnections.instanceId, instanceId),
         ),
       );
 
@@ -531,7 +515,6 @@ export class RemoteConnectionRepository {
     }
     return {
       capabilities: row.capabilities,
-      remoteInstanceId: row.remoteInstanceId,
       transportMode: row.transportMode,
       remoteUrl: row.remoteUrl,
       localUrl: row.localUrl,
@@ -551,7 +534,7 @@ export class RemoteConnectionRepository {
   static async getRemoteTransportMode(
     userId: string,
     instanceId: string,
-  ): Promise<"reverse-ws" | "direct-http" | "cloud-only" | null> {
+  ): Promise<"reverse-ws" | "direct-http" | null> {
     const [row] = await db
       .select({ remoteTransportMode: remoteConnections.remoteTransportMode })
       .from(remoteConnections)
@@ -559,10 +542,7 @@ export class RemoteConnectionRepository {
         and(
           eq(remoteConnections.userId, userId),
           eq(remoteConnections.isActive, true),
-          or(
-            eq(remoteConnections.instanceId, instanceId),
-            eq(remoteConnections.remoteInstanceId, instanceId),
-          ),
+          eq(remoteConnections.instanceId, instanceId),
         ),
       );
     return row?.remoteTransportMode ?? null;
@@ -589,10 +569,7 @@ export class RemoteConnectionRepository {
       .where(
         and(
           eq(remoteConnections.isActive, true),
-          or(
-            eq(remoteConnections.instanceId, instanceId),
-            eq(remoteConnections.remoteInstanceId, instanceId),
-          ),
+          eq(remoteConnections.instanceId, instanceId),
         ),
       )
       .limit(1);

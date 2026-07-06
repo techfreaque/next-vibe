@@ -35,13 +35,25 @@ function findFiles(dir: string, pattern: string): string[] {
     .filter((p: string) => !p.includes("/i18n/"));
 }
 
+function formatCall(fnName: string, importPath: string): string {
+  const singleLine = `export default ${fnName}(() => import("${importPath}"));`;
+  if (singleLine.length <= 80) {
+    return singleLine;
+  }
+  const innerLine = `  () => import("${importPath}"),`;
+  if (innerLine.length <= 80) {
+    return `export default ${fnName}(\n  () => import("${importPath}"),\n);`;
+  }
+  return `export default ${fnName}(\n  () =>\n    import("${importPath}"),\n);`;
+}
+
 function pageContent(relativePath: string, kind: "page" | "layout"): string {
   const importPath = `@/app/[locale]${relativePath ? `/${relativePath}` : ""}/${kind}`;
   const wrapperPath = `@/app/api/[locale]/system/platforms/react-native/nextjs-compat-wrapper`;
   if (kind === "page") {
-    return `import { createPageWrapperWithImport } from "${wrapperPath}";\nexport default createPageWrapperWithImport(() => import("${importPath}"));\n`;
+    return `import { createPageWrapperWithImport } from "${wrapperPath}";\n${formatCall("createPageWrapperWithImport", importPath)}\n`;
   }
-  return `import { createLayoutWrapperWithImport } from "${wrapperPath}";\nexport default createLayoutWrapperWithImport(() => import("${importPath}"));\n`;
+  return `import { createLayoutWrapperWithImport } from "${wrapperPath}";\n${formatCall("createLayoutWrapperWithImport", importPath)}\n`;
 }
 
 export async function generate(

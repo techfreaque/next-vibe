@@ -18,8 +18,8 @@ import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
 } from "next-vibe/execute-tool/constants";
-import { detectWakeUpConfirmRace } from "next-vibe/execute-tool/handlers/completion";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { CronTaskStatus } from "next-vibe/tasks/enum";

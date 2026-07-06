@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" DROP COLUMN "remote_instance_id";

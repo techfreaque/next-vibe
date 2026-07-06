@@ -151,7 +151,7 @@ export interface TestStreamParams {
   skill?: string;
   /**
    * Root folder override. Defaults to DefaultFolderId.BACKGROUND.
-   * Loop location is a separate explicit param (loopInstanceId) — placement never routes.
+   * Loop location rides executionContext.loopLocation — placement never routes.
    */
   rootFolderId?: DefaultFolderId;
   /**
@@ -642,7 +642,7 @@ export async function runTestStream(
     skill: skillParam,
     rootFolderId: rootFolderIdOverride,
     subFolderId,
-    loopInstanceId,
+    loopLocation,
     explicitParentMessageId,
     attachments,
     audioInput,

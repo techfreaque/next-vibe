@@ -33,6 +33,8 @@ import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events"
 import type { WsChannelDescriptor } from "next-vibe/realtime/types";
 import { useEffect, useRef } from "react";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+
 import {
   appendDeltaToCache,
   applyPartialToCache,
@@ -168,10 +170,11 @@ export function useEndpointSubscription(
           // onEvent gets the EVENT's context, not the subscriber's.
           requestData: envelope.requestData ?? requestDataRef.current,
           urlPathParams: envelope.urlPathParams ?? resolvedParams,
+          payload: envelope.payload,
           logger,
-          cacheKey,
           user: currentUser,
           locale: localeRef.current,
+          agentEnvAvailability,
         });
       }
     }

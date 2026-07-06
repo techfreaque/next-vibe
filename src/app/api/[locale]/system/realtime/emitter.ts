@@ -88,6 +88,7 @@ function publishWsEvent<T extends AnyEndpointEventEnvelope>(
         error: err instanceof Error ? err.message : String(err),
         channel: msg.channel,
         event: msg.event,
+        data: JSON.stringify(msg.data),
       });
     }
   });
@@ -288,7 +289,6 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
   const [channel] = rest;
   const options: EmitterOptions = channel ?? {};
   const userId = user.isPublic ? user.leadId : user.id;
-  const userChannel = buildUserChannel(userId);
 
   // ── Channel resolved ONCE from the binding ──────────────────────────────────
   // The call site already type-checked the binding against the concrete endpoint
@@ -318,7 +318,16 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
   // For scope:"resolved" the repository passes the resolved kind via kindOverride;
   // otherwise the definition's static scope decides.
   const kind = resolveEmitKind(endpoint, erasedBinding.kindOverride);
-  const deliveryChannel = kind === "resource" ? pathChannel : userChannel;
+  const deliveryChannel =
+    kind === "resource"
+      ? pathChannel
+      : buildUserWsChannel(
+          erasedEndpoint,
+          userId,
+          boundUrlParams,
+          erasedBinding.requestData,
+          logger,
+        );
 
   // `data` is omitted for a side-effect event that declares no request/response
   // fields (e.g. `favorite-deleted`, whose only payload is the channel's
@@ -351,7 +360,11 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
         options.batcher.emit(deliveryChannel, "__event__", envelope);
       } else {
         publishWsEvent(
-          { channel: deliveryChannel, event: "__event__", data: envelope },
+          {
+            channel: deliveryChannel,
+            event: "__event__",
+            data: envelope,
+          },
           logger,
           user,
         );

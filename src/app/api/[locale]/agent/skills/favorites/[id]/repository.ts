@@ -401,9 +401,10 @@ export class SingleFavoriteRepository {
 
       let slugUpdate: string | undefined;
       if (
-        canonicalNewSkillId !== existing.skillId ||
-        newVariantId !== existing.variantId ||
-        newCustomVariantName !== existing.customVariantName
+        !relayed &&
+        (canonicalNewSkillId !== existing.skillId ||
+          newVariantId !== existing.variantId ||
+          newCustomVariantName !== existing.customVariantName)
       ) {
         const skillSlug =
           FavoritesCreateRepository.resolveSkillSlug(canonicalNewSkillId);
@@ -504,7 +505,9 @@ export class SingleFavoriteRepository {
       // the peer re-applies the edit. Suppressed when applying a relayed edit.
       if (!relayed) {
         createEndpointEmitter(favoriteByIdDefinitions.PATCH, logger, user, {
-          urlPathParams: { id: updated.slug || updated.id },
+          // Use the original favoriteId (old slug) so the peer's onRemoteEvent can
+          // find the row by slug — the peer never regenerates the slug on relay.
+          urlPathParams: { id: favoriteId },
         })("favorite-updated", {
           requestData: {
             skillId: formatSkillId(

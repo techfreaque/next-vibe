@@ -24,7 +24,8 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { invalidateUnbottledCache } from "next-vibe/execute-tool/routing";
+import { ExecuteToolRouting } from "next-vibe/execute-tool/repository/routing";
+import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -38,7 +39,6 @@ import { envClient } from "@/config/env-client";
 import registerEndpoints from "../connect-reverse/definition";
 import { remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
-import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectPostRequestInput,
   RemoteConnectPostResponseOutput,
@@ -445,6 +445,13 @@ export class RemoteConnectionConnectRepository {
     }
 
     // ── Step 5: Store locally ───────────────────────────────────────────────────
+    // Only one inference provider allowed instance-wide — clear any existing one first
+    if (data.isInferenceProvider) {
+      await db
+        .update(remoteConnections)
+        .set({ isInferenceProvider: false, updatedAt: new Date() })
+        .where(eq(remoteConnections.isInferenceProvider, true));
+    }
     const storeResult = await RemoteConnectionRepository.upsertRemoteConnection(
       {
         userId: user.id,
@@ -452,7 +459,6 @@ export class RemoteConnectionConnectRepository {
         token,
         leadId: effectiveLeadId,
         instanceId,
-        remoteInstanceId: selfInstanceId,
         remoteUserId: registerResult.remoteUserId ?? undefined,
         isInferenceProvider: data.isInferenceProvider,
         syncScope: data.syncScope
@@ -470,7 +476,7 @@ export class RemoteConnectionConnectRepository {
     }
 
     if (data.isInferenceProvider) {
-      invalidateUnbottledCache();
+      ExecuteToolRouting.invalidateUnbottledCache();
     }
 
     // ── Step 5b: Upsert local self-identity record ─────────────────────────────
@@ -480,64 +486,14 @@ export class RemoteConnectionConnectRepository {
     await RemoteConnectionRepository.upsertInstanceIdentity({
       userId: user.id,
       instanceId: selfInstanceId,
-      isDefault: true,
     });
 
-    // ── Step 6: Add default remote tools to user's favorites ─────────────────
-    // Tool config (availableTools/pinnedTools) lives in favorites, not settings.
-    // Merge remote tools into every existing favorite's availableTools.
-    try {
-      const { chatFavorites } =
-        await import("@/app/api/[locale]/agent/skills/favorites/db");
-
-      const remoteTools = DEFAULT_REMOTE_TOOL_IDS.map((id) => ({
-        toolId: `${instanceId}__${id}`,
-        requiresConfirmation: false,
-      }));
-
-      const userFavorites = await db
-        .select({
-          id: chatFavorites.id,
-          availableTools: chatFavorites.availableTools,
-        })
-        .from(chatFavorites)
-        .where(eq(chatFavorites.userId, user.id));
-
-      let updatedCount = 0;
-      for (const fav of userFavorites) {
-        const existing =
-          fav.availableTools ??
-          getDefaultToolIdsForUser(user).map((id) => ({
-            toolId: id,
-            requiresConfirmation: false,
-          }));
-        const existingIds = new Set(existing.map((tc) => tc.toolId));
-        const newTools = remoteTools.filter(
-          (tc) => !existingIds.has(tc.toolId),
-        );
-        if (newTools.length > 0) {
-          await db
-            .update(chatFavorites)
-            .set({
-              availableTools: [...existing, ...newTools],
-              updatedAt: new Date(),
-            })
-            .where(eq(chatFavorites.id, fav.id));
-          updatedCount++;
-        }
-      }
-      if (updatedCount > 0) {
-        logger.info(
-          `[CONNECT] Added remote tools to ${updatedCount.toString()} favorite(s)`,
-          { instanceId },
-        );
-      }
-    } catch (toolWriteError) {
-      // Non-fatal - connection is established, tools can be added manually
-      logger.warn("[CONNECT] Failed to write remote tools to favorites", {
-        error: String(toolWriteError),
-      });
-    }
+    // NOTE: remote tools are NEVER pinned into favorites. Remote calls go
+    // through `execute-tool({ toolName, instanceId })` — there is no
+    // per-favorite `<instance>__<tool>` entry to manage. (The old Step 6 here
+    // materialized `getDefaultToolIdsForUser` into every favorite with a null
+    // whitelist, silently freezing "all tools allowed" into a snapshot and
+    // 403-blocking everything outside it.)
 
     logger.debug(`[CONNECT] Successfully connected to ${remoteUrl}`, {
       userId: user.id,
@@ -548,39 +504,11 @@ export class RemoteConnectionConnectRepository {
     // Awaited: the subfolder must exist before the function returns so that the
     // first stream can match the routing rule immediately after connect().
     try {
-      const { chatFolders } = await import("@/app/api/[locale]/agent/chat/db");
-      const { DefaultFolderId } =
-        await import("@/app/api/[locale]/agent/chat/config");
-      const [existing] = await db
-        .select({ id: chatFolders.id })
-        .from(chatFolders)
-        .where(
-          and(
-            eq(chatFolders.userId, user.id),
-            eq(chatFolders.rootFolderId, DefaultFolderId.REMOTE),
-            eq(chatFolders.name, instanceId),
-            isNull(chatFolders.parentId),
-          ),
-        )
-        .limit(1);
-      let folderId: string;
-      if (existing) {
-        folderId = existing.id;
-      } else {
-        const [inserted] = await db
-          .insert(chatFolders)
-          .values({
-            userId: user.id,
-            rootFolderId: DefaultFolderId.REMOTE,
-            name: instanceId,
-            parentId: null,
-          })
-          .returning({ id: chatFolders.id });
-        folderId = inserted!.id;
-      }
+      const { ensureInstanceFolder } = await import("../instance-folder");
+      const folderId = await ensureInstanceFolder(user.id, instanceId);
       // No routing rule needed: REMOTE-root threads route natively to the
       // connection whose instance folder is an ancestor (resolveTarget).
-      logger.debug("[CONNECT] Created remote subfolder", {
+      logger.debug("[CONNECT] Ensured remote subfolder", {
         instanceId,
         folderId,
       });

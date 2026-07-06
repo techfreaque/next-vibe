@@ -395,7 +395,7 @@ class EnvGeneratorRepository {
         mod.importedEnvName,
         mod.importedSchemaName,
         mod.importedExamplesName,
-      ];
+      ].toSorted((a, b) => a.localeCompare(b));
       const singleLineImport = `import { ${importNames.join(", ")} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
         imports.push(
@@ -408,10 +408,13 @@ class EnvGeneratorRepository {
 
     // Generate module names for registry (including examples)
     const moduleEntries = aliasedModules
-      .map(
-        (m) =>
-          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`,
-      )
+      .map((m) => {
+        const singleLine = `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`;
+        if (singleLine.length <= 80) {
+          return singleLine;
+        }
+        return `  ${m.moduleName}: {\n    env: ${m.localEnvName},\n    schema: ${m.localSchemaName},\n    examples: ${m.localExamplesName},\n  },`;
+      })
       .join("\n");
 
     // Generate schema merge chain for server - check full single line length first
@@ -439,12 +442,11 @@ class EnvGeneratorRepository {
 
 import "server-only";
 
-import { validateEnv } from "next-vibe/env/env-util";
-import type { z } from "zod";
-
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { EnvExample, EnvRecord } from "next-vibe/env/define-env";
 import { envValidationLogger } from "next-vibe/env/env-logger";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { validateEnv } from "next-vibe/env/env-util";
+import type { z } from "zod";
 
 // Import env modules
 ${imports.join("\n")}
@@ -457,7 +459,14 @@ const platform = {
 };
 
 // Module registry for introspection
-export const envModules: Record<string, { env: EnvRecord; schema: z.ZodObject<Record<string, z.ZodTypeAny>>; examples: EnvExample[] }> = {
+export const envModules: Record<
+  string,
+  {
+    env: EnvRecord;
+    schema: z.ZodObject<Record<string, z.ZodTypeAny>>;
+    examples: EnvExample[];
+  }
+> = {
 ${moduleEntries}
 };
 
@@ -564,7 +573,7 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
         mod.importedEnvName,
         mod.importedSchemaName,
         mod.importedExamplesName,
-      ];
+      ].toSorted((a, b) => a.localeCompare(b));
       const singleLineImport = `import { ${importNames.join(", ")} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
         imports.push(
@@ -577,10 +586,13 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
 
     // Generate module names for registry (including examples)
     const moduleEntries = aliasedModules
-      .map(
-        (m) =>
-          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`,
-      )
+      .map((m) => {
+        const singleLine = `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`;
+        if (singleLine.length <= 80) {
+          return singleLine;
+        }
+        return `  ${m.moduleName}: {\n    env: ${m.localEnvName},\n    schema: ${m.localSchemaName},\n    examples: ${m.localExamplesName},\n  },`;
+      })
       .join("\n");
 
     // Generate schema merge chain for client - check full single line length first
@@ -606,11 +618,10 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { envValidationLogger } from "next-vibe/env/env-logger";
 import { validateEnv } from "next-vibe/env/env-util";
 import type { z } from "zod";
-
-import { envValidationLogger } from "next-vibe/env/env-logger";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 
 // Import client env modules
 ${imports.join("\n")}
@@ -938,7 +949,6 @@ export interface EnvKeyMeta {
 export const ENV_KEYS = ${keysTs} as const satisfies readonly EnvKeyMeta[];
 
 export type EnvKeyName = (typeof ENV_KEYS)[number]["key"];
-
 `;
 }
 

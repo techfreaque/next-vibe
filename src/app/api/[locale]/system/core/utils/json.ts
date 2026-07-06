@@ -22,7 +22,9 @@ export type WidgetData =
   | WidgetData[]
   | { [key: string]: WidgetData };
 
-export const WidgetDataSchema: z.ZodType<WidgetData> = z.lazy(() =>
+// Input typed explicitly: z.ZodType defaults Input to `unknown`, which would
+// bleed `unknown` into every endpoint's ResponseInput using this schema.
+export const WidgetDataSchema: z.ZodType<WidgetData, WidgetData> = z.lazy(() =>
   z.union([
     z.string(),
     z.number(),

@@ -537,7 +537,7 @@ export class CronTasksListRepository {
               errorType: ErrorResponseTypes.FORBIDDEN,
             });
           }
-          resolvedTargetInstance = conn.instanceId;
+          resolvedTargetInstance = data.targetInstance;
         }
       }
 

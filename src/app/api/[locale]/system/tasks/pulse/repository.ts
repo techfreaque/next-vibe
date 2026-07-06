@@ -21,7 +21,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
+import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
@@ -687,7 +687,7 @@ export class PulseHealthRepository {
               const taskToolMessageId = dbTask.wakeUpToolMessageId ?? null;
 
               if (taskToolMessageId) {
-                await handleTaskCompletion({
+                await TaskCompletion.handle({
                   toolMessageId: taskToolMessageId,
                   threadId: taskThreadId,
                   callbackMode: taskCallbackMode,

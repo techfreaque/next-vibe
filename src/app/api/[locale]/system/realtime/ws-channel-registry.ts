@@ -58,7 +58,7 @@ export const userChannelResolver: NonNullable<
  * variance we want at this type-erased registration boundary. Generic over the
  * route module so each `import("…/route")` keeps its own type.
  */
-interface RegistryRouteModule {
+export interface RegistryRouteModule {
   tools: Record<
     string,
     | { resolveChannel?: NonNullable<GenericHandlerBase["resolveChannel"]> }

@@ -3585,32 +3585,21 @@ export class CreditRepository {
    * Idempotent via providerInvoiceId.
    */
   static async handleNowPaymentsCreditSuccessRedirect(
-    npId: string,
-    token: string | undefined,
+    callbackToken: string,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
-      const invoices = token
-        ? await db
-            .select()
-            .from(paymentInvoices)
-            .where(eq(paymentInvoices.callbackToken, token))
-            .limit(1)
-        : await db
-            .select()
-            .from(paymentInvoices)
-            .where(eq(paymentInvoices.userId, userId))
-            .orderBy(paymentInvoices.createdAt)
-            .limit(1);
-
-      const invoice = invoices[0];
+      const [invoice] = await db
+        .select()
+        .from(paymentInvoices)
+        .where(eq(paymentInvoices.callbackToken, callbackToken))
+        .limit(1);
 
       if (!invoice?.metadata) {
         logger.warn("No invoice found for NOWPayments credit redirect", {
-          npId,
-          token,
+          token: callbackToken.slice(0, 8),
           userId,
         });
         return;
@@ -4176,6 +4165,11 @@ export class CreditRepository {
 }
 
 // Type for native repository type checking
+/**
+ * The cross-platform credit API — the statics BOTH the server repository and
+ * repository.native.ts implement. Shared code must only depend on these;
+ * server-only internals (wallet/pool plumbing, balance emits) stay out.
+ */
 export type CreditRepositoryType = Pick<
   typeof CreditRepository,
   keyof typeof CreditRepository

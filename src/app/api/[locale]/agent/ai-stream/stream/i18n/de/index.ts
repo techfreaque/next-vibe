@@ -232,11 +232,6 @@ export const translations: typeof enTranslations = {
       label: "Unterordner",
       description: "Optionaler Unterordner im Hauptordner",
     },
-    loopInstanceId: {
-      label: "Läuft auf",
-      description:
-        "Verbundene Instanz, die den KI-Loop für diesen Stream ausführt. Leer = diese Instanz. Wird am Thread für Folge-Turns gespeichert.",
-    },
     threadId: {
       label: "Thread-ID",
       description: "Thread-ID (null für neuen Thread)",
@@ -422,6 +417,9 @@ export const translations: typeof enTranslations = {
       threadId: "Thread-ID",
       totalTokens: "Verwendete Tokens insgesamt",
       finishReason: "Abschlussgrund",
+      lastAiMessageContent: "Inhalt der letzten KI-Nachricht",
+      lastGeneratedMediaUrl: "URL des generierten Mediums",
+      totalCreditsDeducted: "Abgezogene Credits",
     },
     errors: {
       unauthorized: {

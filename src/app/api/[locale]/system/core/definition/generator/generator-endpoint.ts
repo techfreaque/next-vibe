@@ -303,18 +303,37 @@ class EndpointGenerator {
         cases.push(`    case "${path}":
       return (await import(${ignoreComment}"${importPath}"))
         .default.${method};`);
-      } else {
+      } else if (ignoreComment) {
+        // turbopack/webpack ignore comments force the import onto its own line
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
-        await import(${ignoreComment}"${importPath}")
+        await import(
+          ${ignoreComment}"${importPath}"
+        )
+      ).default.${method};`);
+      } else {
+        // prettier/prettier is disabled in this file — emit compact form
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
+      return (
+        await import("${importPath}")
       ).default.${method};`);
       }
 
       // eslint-disable-next-line i18next/no-literal-string
-      hotPathEntries.push(
-        `  "${path}": { absPath: "${absPath}", method: "${method}" },`,
-      );
+      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
+      const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
+      const absPathLine = `    absPath: "${absPath}",`;
+      if (absPathLine.length <= 80) {
+        hotPathEntries.push(
+          `  ${hotPathKey}: {\n    absPath: "${absPath}",\n    method: "${method}",\n  },`,
+        );
+      } else {
+        hotPathEntries.push(
+          `  ${hotPathKey}: {\n    absPath:\n      "${absPath}",\n    method: "${method}",\n  },`,
+        );
+      }
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -334,7 +353,7 @@ class EndpointGenerator {
         const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
         const key = needsQuotes ? `"${alias}"` : alias;
         const singleLine = `  ${key}: "${fullPath}",`;
-        if (singleLine.length >= 80) {
+        if (singleLine.length > 80) {
           return `  ${key}:\n    "${fullPath}",`;
         }
         return singleLine;
@@ -388,7 +407,10 @@ ${cases.join("\n")}
  * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
  * without static import strings that bundlers would trace.
  */
-export const endpointHotPaths: Record<string, { absPath: string; method: string }> = {
+export const endpointHotPaths: Record<
+  string,
+  { absPath: string; method: string }
+> = {
 ${hotPathEntries.join("\n")}
 };
 `;

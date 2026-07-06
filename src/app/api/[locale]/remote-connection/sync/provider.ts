@@ -76,6 +76,28 @@ export interface SyncProvider {
     logger: EndpointLogger,
   ): Promise<SyncSerializeResult>;
 
+  /**
+   * OPTIONAL connection-establishment hook: the domain prepares whatever a
+   * live peer link needs (e.g. threads creates the REMOTE/<peer>/private +
+   * REMOTE/<peer>/background scaffold so every mirror lands under stable,
+   * pre-existing roots on BOTH sides). Called on connect AND connect-reverse.
+   */
+  onConnectionEstablished?(
+    userId: string,
+    peerInstanceId: string,
+  ): Promise<void>;
+
+  /**
+   * OPTIONAL per-event relay gate for this domain: the bridge asks the OWNING
+   * domain whether a remoteEvent tagged with this syncDomain may leave the
+   * instance (e.g. threads gate incognito/transient threads). Domain logic
+   * stays in the domain — the bridge never imports domain modules.
+   */
+  remoteEventGate?(
+    userId: string,
+    urlPathParams: Record<string, string> | undefined,
+  ): Promise<boolean>;
+
   /** Parse JSON + upsert into native table. Returns count of items synced. */
   upsertFromJson(
     json: string,
@@ -270,6 +292,33 @@ function countJsonArrayItems(json: string): number {
  * Called before any sync operation. Providers are only imported once.
  */
 let registrationPromise: Promise<void> | null = null;
+
+/**
+ * Notify every registered domain that a peer connection is live — providers
+ * prepare their per-peer state (scaffolds etc.). Failures are per-provider
+ * best-effort: one domain's hiccup must not break the connection.
+ */
+export async function notifyConnectionEstablished(
+  userId: string,
+  peerInstanceId: string,
+  logger: EndpointLogger,
+): Promise<void> {
+  await ensureProvidersRegistered();
+  for (const provider of getSyncProviders().values()) {
+    if (!provider.onConnectionEstablished) {
+      continue;
+    }
+    try {
+      await provider.onConnectionEstablished(userId, peerInstanceId);
+    } catch (error) {
+      logger.warn("[Sync] onConnectionEstablished failed", {
+        domain: provider.key,
+        peerInstanceId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+}
 
 export async function ensureProvidersRegistered(): Promise<void> {
   if (registered) {

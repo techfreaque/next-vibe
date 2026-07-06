@@ -150,10 +150,13 @@ export async function authorizeWsChannel(
   const userId = user.isPublic ? user.leadId : user.id;
 
   if (channel.startsWith("user/")) {
-    // Only the owner. A reverse-ws connector authenticates as the peer-account
-    // user, so its `user/{remoteUserId}` subscription matches here — that's how
-    // the bridge transport (a regular scope:"user" event) reaches it.
-    return channel === `user/${userId}`;
+    // User-scoped endpoint channels: `user/{uid}/ws-…`. Identity is the
+    // boundary — only the owner may join their own prefix. Everything the
+    // emitter delivers under that prefix is the owner's own data by
+    // construction, so no per-endpoint resolver runs here. (A reverse-ws
+    // connector authenticates as the peer-account user and joins the bridge
+    // endpoint's user-scoped channel exactly this way.)
+    return channel.startsWith(`user/${userId}/`);
   }
 
   if (!channel.startsWith("ws-")) {

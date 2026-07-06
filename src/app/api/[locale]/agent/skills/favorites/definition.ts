@@ -26,13 +26,18 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  ChatModelId,
+  chatModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  TtsModelId,
+  voiceModelSelectionSchema,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { parseSkillId } from "../../chat/slugify";
 import { FAVORITES_LIST_ALIAS } from "./constants";
-import { favoriteCreatedPayloadSchema } from "./event-schemas";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 
@@ -209,7 +214,7 @@ const { GET } = createEndpoint({
             }),
             tagline: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              size: "sm",
+              size: "xs",
               variant: "muted",
               schema: z.string().nullable(),
             }),
@@ -313,10 +318,134 @@ const { GET } = createEndpoint({
     description: "get.success.description" as const,
   },
 
-  // No events on the list. Each CRUD op owns its own event (create, [id] PATCH,
-  // [id] DELETE, reorder); each op's client onEvent optimistically patches THIS
-  // list cache, and the remote-flagged ones relay cross-instance via their own
-  // route onRemoteEvent. The list is a pure read endpoint.
+  // The list owns the `favorite-created` event so the favorites page's active
+  // subscription (on this GET endpoint) catches cross-instance sync events.
+  // The POST (create) endpoint is the relay origin (remoteEvent: true, syncDomain);
+  // this GET is the local-delivery receiver — no remoteEvent flag here.
+  channel: { scope: "user" } as const,
+  events: {
+    "favorite-created": {
+      operation: "merge" as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      payloadType: z.object({
+        skillId: z.string().optional(),
+        customVariantName: z.string().nullable().optional(),
+        icon: iconSchema.optional(),
+        voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
+        modelSelection: chatModelSelectionSchema.nullable().optional(),
+      }),
+      onEvent: async ({
+        payload,
+        logger,
+        locale,
+        user,
+        agentEnvAvailability,
+      }) => {
+        const [
+          { apiClient },
+          favoritesDefinition,
+          charactersDefinition,
+          skillSingleDefinition,
+          { ChatFavoritesRepositoryClient },
+        ] = await Promise.all([
+          import("next-vibe/platforms/react/hooks/store"),
+          import("./definition"),
+          import("../definition"),
+          import("../[id]/definition"),
+          import("./repository-client"),
+        ]);
+
+        const { skillId: baseSkillId, variantId } = parseSkillId(
+          payload.skillId ?? "default",
+        );
+
+        const character = apiClient.getEndpointData(
+          skillSingleDefinition.default.GET,
+          logger,
+          { urlPathParams: { id: baseSkillId } },
+        );
+        let characterName: string | null = null;
+        let characterTagline: string | null = null;
+        let characterDescription: string | null = null;
+        let characterModelSelection = payload.modelSelection ?? null;
+        if (character?.success) {
+          characterName = character.data.name ?? null;
+          characterTagline = character.data.tagline ?? null;
+          characterDescription = character.data.description ?? null;
+          const variant = variantId
+            ? character.data.variants?.find((v) => v.id === variantId)
+            : character.data.variants?.[0];
+          characterModelSelection =
+            payload.modelSelection ?? variant?.modelSelection ?? null;
+        }
+
+        const card = ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+          {
+            id: payload.id ?? "",
+            skillId: payload.skillId ?? "default",
+            customVariantName: payload.customVariantName ?? null,
+            customIcon: null,
+            voiceModelSelection: payload.voiceModelSelection ?? null,
+            modelSelection: payload.modelSelection ?? null,
+            position: 0,
+          },
+          characterModelSelection,
+          payload.icon ?? null,
+          characterName,
+          characterTagline,
+          characterDescription,
+          null,
+          payload.voiceModelSelection ?? null,
+          locale,
+          user,
+          agentEnvAvailability,
+        );
+
+        // View 1 — favorites list: append if not already present.
+        apiClient.updateEndpointData(
+          favoritesDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            if (old.data.favorites.some((f) => f.id === card.id)) {
+              return old;
+            }
+            return {
+              ...old,
+              data: { ...old.data, favorites: [...old.data.favorites, card] },
+            };
+          },
+        );
+
+        // View 2 — characters/skills list: flip addedToFav on the matching skill.
+        apiClient.updateEndpointData(
+          charactersDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                sections: old.data.sections.map((section) => ({
+                  ...section,
+                  skills: section.skills.map((char) =>
+                    parseSkillId(char.skillId).skillId === baseSkillId
+                      ? { ...char, addedToFav: true }
+                      : char,
+                  ),
+                })),
+              },
+            };
+          },
+        );
+      },
+    },
+  },
 
   examples: {
     requests: {

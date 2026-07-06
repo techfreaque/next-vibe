@@ -456,8 +456,103 @@ export class ThreadByIdRepository {
       });
       return;
     }
+    // NO payload: everything comes from regular fields + columns.
+    //  - Ownership: the receiver's OWN origin_instance_id column (NULL = ours)
+    //    + the bridge wire's sender label for brand-new mirrors.
+    //  - Placement: folderId is the SAME id on every instance (folders sync
+    //    by id) — apply it on foreign mirrors when the folder exists locally;
+    //    own threads never take placement from the wire.
+    const userId = "id" in user ? user.id : null;
+    const [existingThread] = await db
+      .select({
+        id: chatThreads.id,
+        rootFolderId: chatThreads.rootFolderId,
+        originInstanceId: chatThreads.originInstanceId,
+      })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, urlPathParams.threadId))
+      .limit(1);
+    let data: typeof parsed.data = {
+      ...parsed.data,
+      folderId: undefined,
+      rootFolderId: existingThread?.rootFolderId ?? parsed.data.rootFolderId,
+    };
+    const wireFolderExists = async (): Promise<boolean> => {
+      if (!parsed.data.folderId) {
+        return false;
+      }
+      // PUSH-ONLY convergence: no waiting. The sender ships folder-created
+      // before thread-updated on the same socket (ordered on the WS leg);
+      // when a leg reorders them, the NEXT push re-attempts placement — the
+      // sender re-sends chain + thread-updated at every turn end.
+      const [folderRow] = await db
+        .select({ id: chatFolders.id })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, parsed.data.folderId))
+        .limit(1);
+      return Boolean(folderRow);
+    };
+    if (userId && existingThread) {
+      // Ownership is the COLUMN, nothing else. A REMOTE-rooted thread with
+      // origin NULL is OUR OWN Remote-tab thread — a mirror-back from its
+      // executor must never stamp it foreign or re-place it.
+      const isForeignMirror = existingThread.originInstanceId !== null;
+      if (isForeignMirror && (await wireFolderExists())) {
+        data = { ...data, folderId: parsed.data.folderId };
+      }
+    } else if (userId && !existingThread) {
+      // Brand-new mirror: the sender IS the origin for a first-contact
+      // thread-updated. Place by the wire folderId when the (same-id) folder
+      // already synced; otherwise unplaced — folder events / pull heal it.
+      const placeable = await wireFolderExists();
+      const mirrorFolderId = placeable ? (parsed.data.folderId ?? null) : null;
+      const [createdMirror] = await db
+        .insert(chatThreads)
+        .values({
+          id: urlPathParams.threadId,
+          userId,
+          rootFolderId: DefaultFolderId.REMOTE,
+          folderId: mirrorFolderId,
+          title: parsed.data.title ?? "",
+          status: parsed.data.status ?? undefined,
+          originInstanceId: props.originInstanceId,
+        })
+        .onConflictDoNothing()
+        .returning({ id: chatThreads.id });
+      data = {
+        ...data,
+        rootFolderId: DefaultFolderId.REMOTE,
+        ...(mirrorFolderId !== null && { folderId: mirrorFolderId }),
+      };
+      if (createdMirror) {
+        // Live sidebar add: the mirror thread must appear in open UIs the
+        // moment it materializes — not only after a refresh.
+        const now = new Date();
+        createFolderContentsEmitter(
+          logger,
+          user,
+          DefaultFolderId.REMOTE,
+        )("thread-created", {
+          responseData: {
+            items: [
+              {
+                id: urlPathParams.threadId,
+                type: "thread" as const,
+                title: parsed.data.title ?? "",
+                rootFolderId: DefaultFolderId.REMOTE,
+                folderId: mirrorFolderId,
+                status: parsed.data.status ?? ThreadStatus.ACTIVE,
+                streamingState: ThreadStreamingState.IDLE,
+                createdAt: now,
+                updatedAt: now,
+              },
+            ],
+          },
+        });
+      }
+    }
     const result = await this.updateThread(
-      parsed.data,
+      data,
       urlPathParams.threadId,
       user,
       defaultLocale,

@@ -1,0 +1,3 @@
+CREATE UNIQUE INDEX "instance_identities_one_default_per_user" ON "instance_identities" USING btree ("user_id") WHERE "instance_identities"."is_default" = true;--> statement-breakpoint
+CREATE UNIQUE INDEX "remote_connections_one_inference_provider_per_user" ON "remote_connections" USING btree ("user_id") WHERE "remote_connections"."is_inference_provider" = true;--> statement-breakpoint
+CREATE UNIQUE INDEX "remote_connections_one_force_system_provider_per_user" ON "remote_connections" USING btree ("user_id") WHERE "remote_connections"."force_system_provider" = true;

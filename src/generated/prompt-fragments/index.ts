@@ -6,9 +6,6 @@
  * Fragment IDs: autonomy-status, bootstrap, coding-agent-setting, contact, cortex, desktop, extra-instructions, favorites, folder-context, formatting, guest-context, headless-context, identity, language, media-capabilities, message-metadata, platform-overview, remote-instances, skill, ssh-connections, sub-agent-guard, system-context, tool-execution-control, user-name, web
  */
 
-/* eslint-disable prettier/prettier */
-/* eslint-disable simple-import-sort/imports */
-
 import type { PromptFragmentModule } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 /**
@@ -127,19 +124,27 @@ export async function getPromptFragment(
       );
     case "coding-agent-setting":
       return import("@/app/api/[locale]/agent/chat/settings/system-prompt").then(
-        ({ codingAgentSettingFragment }) => ({ codingAgentSettingFragment }),
+        ({ codingAgentSettingFragment }) => ({
+          codingAgentSettingFragment,
+        }),
       );
     case "contact":
       return import("@/app/api/[locale]/contact/system-prompt").then(
-        ({ contactFragment }) => ({ contactFragment }),
+        ({ contactFragment }) => ({
+          contactFragment,
+        }),
       );
     case "cortex":
       return import("@/app/api/[locale]/agent/cortex/system-prompt").then(
-        ({ cortexFragment }) => ({ cortexFragment }),
+        ({ cortexFragment }) => ({
+          cortexFragment,
+        }),
       );
     case "desktop":
       return import("@/app/api/[locale]/desktop/system-prompt").then(
-        ({ desktopFragment }) => ({ desktopFragment }),
+        ({ desktopFragment }) => ({
+          desktopFragment,
+        }),
       );
     case "extra-instructions":
       return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
@@ -179,7 +184,9 @@ export async function getPromptFragment(
       );
     case "favorites":
       return import("@/app/api/[locale]/agent/skills/favorites/system-prompt").then(
-        ({ favoritesFragment }) => ({ favoritesFragment }),
+        ({ favoritesFragment }) => ({
+          favoritesFragment,
+        }),
       );
     case "folder-context":
       return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
@@ -519,7 +526,9 @@ export async function getPromptFragment(
       );
     case "skill":
       return import("@/app/api/[locale]/agent/skills/system-prompt").then(
-        ({ skillFragment }) => ({ skillFragment }),
+        ({ skillFragment }) => ({
+          skillFragment,
+        }),
       );
     case "ssh-connections":
       return import("@/app/api/[locale]/remote-connection/system-prompt").then(
@@ -655,7 +664,9 @@ export async function getPromptFragment(
       );
     case "web":
       return import("@/app/api/[locale]/agent/search/system-prompt").then(
-        ({ webFragment }) => ({ webFragment }),
+        ({ webFragment }) => ({
+          webFragment,
+        }),
       );
     default:
       return {};

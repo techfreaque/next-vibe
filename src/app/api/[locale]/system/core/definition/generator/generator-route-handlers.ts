@@ -215,6 +215,20 @@ class RouteHandlersGenerator {
         `Generated ws-channels.ts with ${channelCount} channel entries`,
       );
 
+      // remote-event-routes.ts — the bridge dispatch's force-load registry.
+      const remoteEventRoutesFile = outputFile.replace(
+        /\/handlers.ts$/,
+        "/remote-event-routes.ts",
+      );
+      const { content: reContent, routeCount: remoteEventRouteCount } =
+        await RouteHandlersGenerator.generateRemoteEventRoutesContent(
+          validRouteFiles,
+        );
+      await writeGeneratedFile(remoteEventRoutesFile, reContent, false);
+      logger.debug(
+        `Generated remote-event-routes.ts with ${remoteEventRouteCount} entries`,
+      );
+
       return {
         summary: `route handlers (${routeCount} routes, ${channelCount} channels)`,
         counts: { routes: routeCount, channels: channelCount },
@@ -509,30 +523,37 @@ class RouteHandlersGenerator {
         cases.push(`    case "${path}":
       return (await import(${ignoreComment}"${importPath}"))
         .tools.${method} as GenericHandlerBase;`);
-      } else {
-        const awaitLine = `        await import(${ignoreComment}"${importPath}")`;
-        if (awaitLine.length <= 80) {
-          // eslint-disable-next-line i18next/no-literal-string
-          cases.push(`    case "${path}":
-      return (
-        await import(${ignoreComment}"${importPath}")
-      ).tools.${method} as GenericHandlerBase;`);
-        } else {
-          // Import path too long even inside parens: break the import args
-          // eslint-disable-next-line i18next/no-literal-string
-          cases.push(`    case "${path}":
+      } else if (ignoreComment) {
+        // turbopack/webpack ignore comments force the import onto its own line
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (
         await import(
           ${ignoreComment}"${importPath}"
         )
       ).tools.${method} as GenericHandlerBase;`);
-        }
+      } else {
+        // prettier/prettier is disabled in this file — emit compact form
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
+      return (
+        await import("${importPath}")
+      ).tools.${method} as GenericHandlerBase;`);
       }
 
       // eslint-disable-next-line i18next/no-literal-string
-      hotPathEntries.push(
-        `  "${path}": { absPath: "${absPath}", method: "${method}" },`,
-      );
+      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
+      const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
+      const absPathLine = `    absPath: "${absPath}",`;
+      if (absPathLine.length <= 80) {
+        hotPathEntries.push(
+          `  ${hotPathKey}: {\n    absPath: "${absPath}",\n    method: "${method}",\n  },`,
+        );
+      } else {
+        hotPathEntries.push(
+          `  ${hotPathKey}: {\n    absPath:\n      "${absPath}",\n    method: "${method}",\n  },`,
+        );
+      }
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -576,7 +597,10 @@ ${cases.join("\n")}
  * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
  * without static import strings that bundlers would trace.
  */
-export const routeHotPaths: Record<string, { absPath: string; method: string }> = {
+export const routeHotPaths: Record<
+  string,
+  { absPath: string; method: string }
+> = {
 ${hotPathEntries.join("\n")}
 };
 `;
@@ -650,6 +674,65 @@ ${hotPathEntries.join("\n")}
             method,
             scope: defaultExport[method]?.channel?.scope,
           });
+        }
+      }
+      return methods;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Methods whose definition declares at least one `remoteEvent: true` event —
+   * these routes must be loadable BY PATH when a relayed event arrives before
+   * anything imported them in this process (see remote-event-bridge/registry).
+   */
+  private static async extractRemoteEventMethodsFromDefinition(
+    routeFile: string,
+  ): Promise<string[]> {
+    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+    try {
+      const definition = (await import(definitionPath)) as {
+        default?: Record<
+          string,
+          { events?: Record<string, { remoteEvent?: true }> }
+        >;
+      };
+      let defaultExport;
+      try {
+        defaultExport = definition.default;
+      } catch {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        defaultExport = definition.default;
+      }
+      if (!defaultExport) {
+        return [];
+      }
+      const HTTP_METHODS = [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "HEAD",
+        "OPTIONS",
+      ];
+      const methods: string[] = [];
+      for (const method of Object.keys(defaultExport)) {
+        if (!HTTP_METHODS.includes(method)) {
+          continue;
+        }
+        const events = defaultExport[method]?.events;
+        if (!events || typeof events !== "object") {
+          continue;
+        }
+        const hasRemoteEvent = Object.values(events).some(
+          (event) => event?.remoteEvent === true,
+        );
+        if (hasRemoteEvent) {
+          methods.push(method);
         }
       }
       return methods;
@@ -745,6 +828,104 @@ ${hotPathEntries.join("\n")}
   }
 
   /**
+   * Generate remote-event-routes.ts content: one entry per endpoint method
+   * that declares a `remoteEvent: true` event. The bridge dispatch force-loads
+   * the target route through THIS registry (definition imported eagerly for
+   * the canonical path, route imported lazily) instead of guessing aliases.
+   */
+  private static async generateRemoteEventRoutesContent(
+    routeFiles: string[],
+  ): Promise<{ content: string; routeCount: number }> {
+    interface RemoteEventTarget {
+      defImport: string;
+      routeImport: string;
+      method: string;
+      defAlias: string;
+    }
+    const targets: RemoteEventTarget[] = [];
+    for (const routeFile of routeFiles) {
+      const methods =
+        await RouteHandlersGenerator.extractRemoteEventMethodsFromDefinition(
+          routeFile,
+        );
+      if (methods.length === 0) {
+        continue;
+      }
+      const defImport = generateAbsoluteImportPath(routeFile, "definition");
+      const routeImport = generateAbsoluteImportPath(routeFile, "route");
+      const segments = extractNestedPath(routeFile);
+      const aliasBase = segments
+        .map((s: string) =>
+          s.replaceAll(/\[|\]/g, "").replaceAll(/[^A-Za-z0-9]/g, "_"),
+        )
+        .join("_");
+      for (const method of methods) {
+        targets.push({
+          defImport,
+          routeImport,
+          method,
+          defAlias: `${aliasBase}_${method}Def`,
+        });
+      }
+    }
+    targets.sort((a, b) => a.defAlias.localeCompare(b.defAlias));
+    const routeCount = targets.length;
+    const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT";
+    const generatorName = "generators/route-handlers";
+    const header = generateFileHeader(autoGenTitle, generatorName, {
+      "Remote-event routes found": routeCount,
+    });
+    const eagerImports = targets
+      .map((target) => `    import("${target.defImport}"),`)
+      .join("\n");
+    const eagerDestructure = targets
+      .map((target) => `    ${target.defAlias},`)
+      .join("\n");
+    const entries = targets
+      .map(
+        (target) => `    {
+      path: ${target.defAlias}.default.${target.method}.path,
+      method: "${target.method}",
+      importRoute: () => import("${target.routeImport}"),
+    },`,
+      )
+      .join("\n");
+    // eslint-disable-next-line i18next/no-literal-string
+    const content = `${header}
+
+/* eslint-disable prettier/prettier */
+
+import type { RegistryRouteModule } from "next-vibe/realtime/ws-channel-registry";
+
+export interface RemoteEventRouteEntry {
+  path: readonly string[];
+  method: string;
+  /** Loading the route module registers its onRemoteEvent handlers. */
+  importRoute: () => Promise<RegistryRouteModule>;
+}
+
+/**
+ * Every endpoint that declares a remoteEvent:true event, addressable by
+ * its canonical definition path — the bridge dispatch force-loads the target
+ * route through this registry when a relayed event arrives before anything
+ * imported the route in this process.
+ */
+export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
+  const [
+${eagerDestructure}
+  ] = await Promise.all([
+${eagerImports}
+  ]);
+
+  return [
+${entries}
+  ];
+}
+`;
+    return { content, routeCount };
+  }
+
+  /**
    * Generate ws-channels.ts content.
    *
    * For every endpoint method that declares a client-delivered event, emits an
@@ -828,13 +1009,20 @@ ${hotPathEntries.join("\n")}
       endpoint: ${target.defAlias}.default.${target.method},
       resolveChannel: userChannelResolver,
     },`
-          : `    {
+          : ((): string => {
+              const arrowLine = `        () => import("${target.routeImport}"),`;
+              const importArg =
+                arrowLine.length <= 80
+                  ? `        () => import("${target.routeImport}"),`
+                  : `        () =>\n          import("${target.routeImport}"),`;
+              return `    {
       endpoint: ${target.defAlias}.default.${target.method},
       resolveChannel: lazyResolveChannel(
-        () => import("${target.routeImport}"),
+${importArg}
         "${target.method}",
       ),
-    },`,
+    },`;
+            })(),
       )
       .join("\n");
 

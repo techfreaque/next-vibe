@@ -26,6 +26,7 @@ import type {
 import type {
   ChannelDeclaration,
   EndpointEventsMap,
+  EndpointEventsMapBase,
   EventEmitUrlPayloads,
   EventPayloads,
   EventPayloadTypes,
@@ -34,6 +35,7 @@ import type {
   EventTypes,
   EventUrlPayloads,
   HasClientDeliveredEventsOf,
+  WithPayloadCtx,
 } from "next-vibe/realtime/structured-events";
 import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
 import type {
@@ -67,7 +69,12 @@ import { FieldUsage } from "./enums";
  *     emits client events must declare where they ride).
  *   - no client-delivered events   → `channel` is forbidden (`?: never`).
  *   - abstract events map          → `channel` optional (keeps base types loose).
- * `events` itself is always optional and carries the literal via `const TEvents`.
+ * `events` is typed as `TEvents & WithPayloadCtx<TEvents,R,Q,U>`:
+ * - The `TEvents` side is a direct inference site so `const TEvents` captures the
+ *   full literal (requestFields/responseFields/payloadType all preserved concrete).
+ * - The `WithPayloadCtx` intersection overlays onEvent with a concretely-typed ctx
+ *   (requestData: TRequestOutput, responseData: TResponseOutput, etc.) eliminating
+ *   implicit-any errors in callback parameters under noImplicitAny.
  */
 type ChannelConfigField<TEvents, TChannel> =
   HasClientDeliveredEventsOf<TEvents> extends true
@@ -759,12 +766,12 @@ export function createEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  // Default = the constraint itself. A provided `events` object is assignable to
-  // it AND its literal type is captured via `const TEvents`; when `events` is
-  // omitted TEvents stays the wide default. Presence of events is decided
-  // STRUCTURALLY downstream (HasClientDeliveredEvents / HasRemoteEvents), which
-  // treat the wide default — an `any`-valued `[K: string]` index signature — as
-  // the abstract "unknown events" case, so no obligation leaks onto plain routes.
+  // TEvents captures the call-site events literal. The `events` config field is
+  // typed as EndpointEventsMap<R,Q,U,TEvents> so each entry's onEvent handler is
+  // contextually typed: requestData/responseData/urlPathParams from the endpoint's
+  // concrete output types, payload from z.output<TEvents[K]["payloadType"]>.
+  // TypeScript infers TEvents from the mapped type's fields (payloadType, requestFields
+  // etc. are all inference sites), then validates the constraint.
   const TEvents extends EndpointEventsMap<
     InferResponseOutput<TFields>,
     InferRequestOutput<TFields>,
@@ -777,11 +784,6 @@ export function createEndpoint<
   const TChannel extends ChannelDeclaration | undefined = undefined,
 >(
   config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> &
-    // `channel` is REQUIRED when `events` declares a client-delivered event, and
-    // forbidden otherwise — derived from TEvents, captured as a const literal so
-    // `scope` flows into the route's resolveChannel obligation. `events` carries
-    // its literal via `const TEvents` (use `satisfies EndpointEventDeclaration<…>`
-    // on individual events for a typed onEvent ctx).
     ChannelConfigField<TEvents, TChannel>,
 ): CreateEndpointReturnInMethod<
   TMethod,

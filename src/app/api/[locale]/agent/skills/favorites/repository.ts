@@ -654,7 +654,12 @@ export class ChatFavoritesRepository {
           .update(chatFavorites)
           .set({ position: fav.position, updatedAt: new Date() })
           .where(
-            and(eq(chatFavorites.userId, userId), eq(chatFavorites.id, fav.id)),
+            and(
+              eq(chatFavorites.userId, userId),
+              isUuid(fav.id)
+                ? eq(chatFavorites.id, fav.id)
+                : eq(chatFavorites.slug, fav.id),
+            ),
           );
       }
       createEndpointEmitter(reorderDefinitions.POST, logger, user, {
@@ -688,7 +693,7 @@ export class ChatFavoritesRepository {
           .where(
             and(
               eq(chatFavorites.userId, userId),
-              or(eq(chatFavorites.id, fav.id), eq(chatFavorites.slug, fav.id)),
+              eq(chatFavorites.slug, fav.id),
             ),
           );
       }

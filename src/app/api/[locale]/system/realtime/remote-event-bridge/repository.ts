@@ -89,6 +89,33 @@ export class RemoteEventBridgeRepository {
   static async pushRemoteEvent(params: RemoteEventRelayPayload): Promise<void> {
     const { userId, logger, syncDomain, envelope } = params;
 
+    // Domain relay gate: the OWNING domain decides whether an event tagged
+    // with its syncDomain may leave the instance (e.g. threads gate incognito
+    // and transient threads). Domain logic lives in the domain's sync
+    // provider — the bridge stays domain-agnostic.
+    if (syncDomain) {
+      const { ensureProvidersRegistered, getSyncProviders } =
+        await import("@/app/api/[locale]/remote-connection/sync/provider");
+      await ensureProvidersRegistered();
+      const provider = getSyncProviders().get(syncDomain);
+      if (provider?.remoteEventGate) {
+        const urlPathParams: Record<string, string> = {};
+        for (const [k, v] of Object.entries(envelope.urlPathParams ?? {})) {
+          if (typeof v === "string") {
+            urlPathParams[k] = v;
+          }
+        }
+        if (!(await provider.remoteEventGate(userId, urlPathParams))) {
+          logger.debug("[RemoteEventBridge] domain gate REJECTED event", {
+            syncDomain,
+            eventName: envelope.eventName,
+            userId,
+          });
+          return;
+        }
+      }
+    }
+
     // Stamp the user's CONFIGURED self-instance-id (which the user may have set
     // explicitly) — never a derived default. Peers echo-guard against it.
     const originInstanceId =
@@ -146,7 +173,7 @@ export class RemoteEventBridgeRepository {
     }
 
     if (connections.length === 0) {
-      logger.error("[RemoteEventBridge] pushRemoteEvent: no connections", {
+      logger.debug("[RemoteEventBridge] pushRemoteEvent: no connections", {
         userId,
         eventName: envelope.eventName,
       });
@@ -375,6 +402,7 @@ export class RemoteEventBridgeRepository {
         envelope,
         {
           instanceId: selfInstanceId,
+          originInstanceId: evt.originInstanceId,
           user,
           locale: defaultLocale,
           logger,

@@ -1136,6 +1136,7 @@ export class SkillsRepository {
     logger: EndpointLogger,
     t: SkillsT,
     relayed = false,
+    forcedSlug?: string,
   ): Promise<ResponseType<SkillCreateResponseOutput>> {
     try {
       const userId = user.id;
@@ -1163,46 +1164,80 @@ export class SkillsRepository {
         }
       }
 
-      // Generate a unique slug from the skill name
-      const slug = await SkillsRepository.generateUniqueSkillSlug(data.name);
+      // When relaying a remote create, use the origin's slug so slugs stay identical
+      // across instances (cross-instance deletes and updates key on slug).
+      const slug =
+        forcedSlug ??
+        (await SkillsRepository.generateUniqueSkillSlug(data.name));
 
-      const [skill] = await db
-        .insert(customSkills)
-        .values({
-          userId,
-          slug,
-          name: data.name,
-          description: data.description,
-          tagline: data.tagline,
-          icon: data.icon,
-          systemPrompt: data.systemPrompt,
-          category: data.category,
-          voiceModelSelection: SkillsRepository.normalizeTtsSelection(
-            data.voiceModelSelection ?? null,
-          ),
-          sttModelSelection: SkillsRepository.normalizeSttSelection(
-            data.sttModelSelection ?? null,
-          ),
-          imageVisionModelSelection: data.imageVisionModelSelection ?? null,
-          videoVisionModelSelection: data.videoVisionModelSelection ?? null,
-          audioVisionModelSelection: data.audioVisionModelSelection ?? null,
-          imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
-            data.imageGenModelSelection ?? null,
-          ),
-          musicGenModelSelection: data.musicGenModelSelection ?? null,
-          videoGenModelId:
-            data.videoGenModelSelection !== null &&
-            data.videoGenModelSelection !== undefined &&
-            "manualModelId" in data.videoGenModelSelection
-              ? (data.videoGenModelSelection.manualModelId ?? null)
-              : null,
-          variants: data.variants,
-          ownershipType: data.isPublic
-            ? SkillOwnershipType.PUBLIC
-            : SkillOwnershipType.USER,
-          compactTrigger: data.compactTrigger ?? null,
-        })
-        .returning();
+      const insertValues = {
+        userId,
+        slug,
+        name: data.name,
+        description: data.description,
+        tagline: data.tagline,
+        icon: data.icon,
+        systemPrompt: data.systemPrompt,
+        category: data.category,
+        voiceModelSelection: SkillsRepository.normalizeTtsSelection(
+          data.voiceModelSelection ?? null,
+        ),
+        sttModelSelection: SkillsRepository.normalizeSttSelection(
+          data.sttModelSelection ?? null,
+        ),
+        imageVisionModelSelection: data.imageVisionModelSelection ?? null,
+        videoVisionModelSelection: data.videoVisionModelSelection ?? null,
+        audioVisionModelSelection: data.audioVisionModelSelection ?? null,
+        imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
+          data.imageGenModelSelection ?? null,
+        ),
+        musicGenModelSelection: data.musicGenModelSelection ?? null,
+        videoGenModelId:
+          data.videoGenModelSelection !== null &&
+          data.videoGenModelSelection !== undefined &&
+          "manualModelId" in data.videoGenModelSelection
+            ? (data.videoGenModelSelection.manualModelId ?? null)
+            : null,
+        variants: data.variants,
+        ownershipType: data.isPublic
+          ? SkillOwnershipType.PUBLIC
+          : SkillOwnershipType.USER,
+        compactTrigger: data.compactTrigger ?? null,
+      } satisfies typeof customSkills.$inferInsert;
+
+      // When relaying, upsert so a stale same-slug row is refreshed rather than
+      // throwing a unique-constraint violation.
+      const [skill] = forcedSlug
+        ? await db
+            .insert(customSkills)
+            .values(insertValues)
+            .onConflictDoUpdate({
+              target: customSkills.slug,
+              set: {
+                name: insertValues.name,
+                description: insertValues.description,
+                tagline: insertValues.tagline,
+                icon: insertValues.icon,
+                systemPrompt: insertValues.systemPrompt,
+                category: insertValues.category,
+                voiceModelSelection: insertValues.voiceModelSelection,
+                sttModelSelection: insertValues.sttModelSelection,
+                imageVisionModelSelection:
+                  insertValues.imageVisionModelSelection,
+                videoVisionModelSelection:
+                  insertValues.videoVisionModelSelection,
+                audioVisionModelSelection:
+                  insertValues.audioVisionModelSelection,
+                imageGenModelSelection: insertValues.imageGenModelSelection,
+                musicGenModelSelection: insertValues.musicGenModelSelection,
+                videoGenModelId: insertValues.videoGenModelId,
+                variants: insertValues.variants,
+                ownershipType: insertValues.ownershipType,
+                compactTrigger: insertValues.compactTrigger,
+              },
+            })
+            .returning()
+        : await db.insert(customSkills).values(insertValues).returning();
 
       // Fire-and-forget: sync embedding for vector search
       if (skill) {
@@ -1774,7 +1809,17 @@ export class SkillsRepository {
     "skill-created"
   >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
-    const result = await this.createSkill(requestData, user, logger, t, true);
+    // Use the origin's slug so slugs stay identical across instances — cross-instance
+    // deletes/updates key on slug, so a mismatch silently fails.
+    const remoteSlug = responseData?.id;
+    const result = await this.createSkill(
+      requestData,
+      user,
+      logger,
+      t,
+      true,
+      remoteSlug,
+    );
     if (!result.success) {
       logger.error("Failed to apply remote skill create", {
         message: result.message,

@@ -9,7 +9,7 @@
 import type { ChildProcess } from "node:child_process";
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -126,10 +126,21 @@ export class DevRepository {
   private static async performHardDatabaseReset(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    isPreview: boolean,
   ): Promise<void> {
     const { exec } = await import("node:child_process");
     const { promisify } = await import("node:util");
     const execAsync = promisify(exec);
+
+    const composeFile = isPreview
+      ? DevRepository.PREVIEW_COMPOSE_FILE
+      : DevRepository.ATLAS_COMPOSE_FILE;
+    const projectName = isPreview
+      ? DevRepository.PREVIEW_PROJECT_NAME
+      : DevRepository.ATLAS_PROJECT_NAME;
+    const containerName = isPreview
+      ? `${DevRepository.projectSlug}-hermes-postgres`
+      : `${DevRepository.projectSlug}-atlas-postgres`;
 
     // 0. Close any open DB pool connections so docker compose down doesn't
     //    produce "Connection terminated unexpectedly" errors.
@@ -141,9 +152,9 @@ export class DevRepository {
     const downResult = await DockerOperationsRepository.dockerComposeDown(
       logger,
       dockerT,
-      "docker-compose-dev.yml",
+      composeFile,
       30000,
-      "atlas",
+      projectName,
     );
 
     if (!downResult.success) {
@@ -153,23 +164,23 @@ export class DevRepository {
     // 2. Force-remove the container (hardcoded container_name in compose
     //    means `docker compose down` may not clean it up properly)
     try {
-      await execAsync("docker rm -f dev-postgres", { timeout: 10000 });
-      logger.debug("Removed dev-postgres container");
+      await execAsync(`docker rm -f ${containerName}`, { timeout: 10000 });
+      logger.debug(`Removed ${containerName} container`);
     } catch {
-      logger.debug("No dev-postgres container to remove");
+      logger.debug(`No ${containerName} container to remove`);
     }
 
     // 3. Delete postgres data volume
-    await DevRepository.deletePostgresDataVolume(logger);
+    await DevRepository.deletePostgresDataVolume(logger, isPreview);
 
     // 4. Start Docker containers
     logger.debug("Starting Docker containers...");
     const upResult = await DockerOperationsRepository.dockerComposeUp(
       logger,
       dockerT,
-      "docker-compose-dev.yml",
+      composeFile,
       60000,
-      "atlas",
+      projectName,
     );
 
     if (!upResult.success) {
@@ -193,13 +204,17 @@ export class DevRepository {
    */
   private static async deletePostgresDataVolume(
     logger: EndpointLogger,
+    isPreview = false,
   ): Promise<void> {
     try {
       const { exec } = await import("node:child_process");
       const { promisify } = await import("node:util");
       const execAsync = promisify(exec);
 
-      const volumeName = "atlas_postgres_data";
+      const slug = DevRepository.projectSlug;
+      const volumeName = isPreview
+        ? `${slug}-hermes_hermes_data`
+        : `${slug}-atlas_atlas_data`;
       logger.debug(`Deleting postgres data volume: ${volumeName}...`);
 
       try {
@@ -279,6 +294,21 @@ export class DevRepository {
         }
       }
     }
+  }
+
+  private static readonly ATLAS_COMPOSE_FILE = "docker-compose-dev.yml";
+  private static readonly PREVIEW_COMPOSE_FILE = "docker-compose.preview.yml";
+
+  private static get projectSlug(): string {
+    return basename(process.env["PROJECT_ROOT"] ?? process.cwd());
+  }
+
+  private static get ATLAS_PROJECT_NAME(): string {
+    return `${DevRepository.projectSlug}-atlas`;
+  }
+
+  private static get PREVIEW_PROJECT_NAME(): string {
+    return `${DevRepository.projectSlug}-hermes`;
   }
 
   static async execute(
@@ -453,6 +483,7 @@ export class DevRepository {
       data,
       locale,
       logger,
+      isLocalDev,
     );
     if (!dbSetupSuccess) {
       // Database setup failed critically, start server anyway
@@ -572,6 +603,7 @@ export class DevRepository {
     data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    isPreview: boolean,
   ): Promise<boolean> {
     if (data.skipDbSetup) {
       logger.vibe(formatSkip("Database setup skipped"));
@@ -598,6 +630,7 @@ export class DevRepository {
         data,
         locale,
         logger,
+        isPreview,
       );
 
       if (!dbOperationSuccess) {
@@ -669,13 +702,27 @@ export class DevRepository {
     data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    isPreview: boolean,
   ): Promise<boolean> {
     try {
       if (data.dbReset || data.r) {
+        if (isPreview) {
+          logger.vibe(
+            formatError(
+              "Preview DB reset refused — resetting the preview database requires explicit user consent. Remove -r or run without --hermes to reset Atlas instead.",
+            ),
+          );
+          cleanupPidFile(DevRepository.activePidFile);
+          process.exit(1);
+        }
         // Reset includes migrations, so we pass the migration flags
         await DevRepository.resetDatabase(locale, logger, data);
       } else {
-        await DevRepository.startDatabaseWithoutReset(locale, logger);
+        await DevRepository.startDatabaseWithoutReset(
+          locale,
+          logger,
+          isPreview,
+        );
 
         // Run migrations if not skipped (only when not resetting)
         if (data.skipMigrations) {
@@ -738,12 +785,13 @@ export class DevRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     data: DevRequestOutput,
+    isPreview = false,
   ): Promise<void> {
     const startTime = Date.now();
     logger.debug(
       `🔄 ${formatActionCommand("Resetting database using:", "docker compose down && docker volume rm")}`,
     );
-    await DevRepository.performHardDatabaseReset(logger, locale);
+    await DevRepository.performHardDatabaseReset(logger, locale, isPreview);
     const duration = Date.now() - startTime;
     logger.info(`✓  Reset completed in ${formatDuration(duration)}`);
 
@@ -783,18 +831,26 @@ export class DevRepository {
   private static async startDatabaseWithoutReset(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    isPreview = false,
   ): Promise<void> {
+    const composeFile = isPreview
+      ? DevRepository.PREVIEW_COMPOSE_FILE
+      : DevRepository.ATLAS_COMPOSE_FILE;
+    const projectName = isPreview
+      ? DevRepository.PREVIEW_PROJECT_NAME
+      : DevRepository.ATLAS_PROJECT_NAME;
+
     const startTime = Date.now();
     logger.debug(
-      `🐘 ${formatActionCommand("Starting PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")}`,
+      `🐘 ${formatActionCommand("Starting PostgreSQL using:", `docker compose -f ${composeFile} up -d`)}`,
     );
     const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
     const dbStartResult = await DockerOperationsRepository.dockerComposeUp(
       logger,
       dockerT,
-      "docker-compose-dev.yml",
+      composeFile,
       60000,
-      "atlas",
+      projectName,
     );
 
     if (!dbStartResult.success) {
@@ -803,7 +859,7 @@ export class DevRepository {
       });
       logger.vibe(formatError("Database startup failed"));
       logger.vibe(
-        `   Try: ${formatCommand("docker compose -f docker-compose-dev.yml up -d")}`,
+        `   Try: ${formatCommand(`docker compose -f ${composeFile} up -d`)}`,
       );
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
       throw new Error("Failed to start database");
@@ -812,7 +868,7 @@ export class DevRepository {
     const duration = Date.now() - startTime;
     logger.info(
       formatDatabase(
-        `${formatActionCommand("Started PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")} in ${formatDuration(duration)}`,
+        `${formatActionCommand("Started PostgreSQL using:", `docker compose -f ${composeFile} up -d`)} in ${formatDuration(duration)}`,
         "🐘",
       ),
     );

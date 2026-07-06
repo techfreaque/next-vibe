@@ -180,16 +180,22 @@ function SyncScopeViewSection({
 
 // ─── View (GET) ───────────────────────────────────────────────────────────────
 
-function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
+function ViewWidget({
+  instanceId: instanceIdProp,
+}: {
+  instanceId: string;
+}): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const { push: navigate, pop, canGoBack, current } = useWidgetNavigation();
   const endpointMutations = useWidgetEndpointMutations();
 
-  const [pendingDisconnect, setPendingDisconnect] = useState(false);
-
   const status = useWidgetValue<typeof definitionsType.GET>();
+  // Navigation entry always has the correct runtime urlPathParams; fall back to prop.
+  const instanceId =
+    (current?.params.urlPathParams as { instanceId?: string } | undefined)
+      ?.instanceId ?? instanceIdProp;
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 
@@ -287,11 +293,12 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
     })();
   };
 
-  const handleDisconnectConfirm = (): void => {
-    setPendingDisconnect(false);
+  const handleDisconnect = (e: ButtonMouseEvent): void => {
+    e.stopPropagation();
     navigate(definitions.DELETE, {
       urlPathParams: { instanceId },
-      popNavigationOnSuccess: 2,
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
     });
   };
 
@@ -355,10 +362,7 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
               type="button"
               variant="destructive"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPendingDisconnect(true);
-              }}
+              onClick={handleDisconnect}
             >
               {t("widget.disconnectButton")}
             </Button>
@@ -390,10 +394,10 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
               mono
             />
           )}
-          {status.remoteInstanceId && (
+          {status.remoteTransportMode && (
             <DetailField
-              label={t("widget.connected.remoteInstance")}
-              value={status.remoteInstanceId}
+              label={t("widget.connected.remoteTransport")}
+              value={status.remoteTransportMode}
               mono
             />
           )}
@@ -505,28 +509,6 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
           </CardHeader>
         </Card>
       </SectionGroup>
-
-      {/* ── Disconnect confirmation ────────────────────────────────────── */}
-      <AlertDialog open={pendingDisconnect} onOpenChange={setPendingDisconnect}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("widget.disconnectConfirmTitle")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("widget.disconnectConfirmDescription")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("widget.disconnectConfirmCancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDisconnectConfirm}>
-              {t("widget.disconnectConfirmProceed")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </WidgetShell>
   );
 }
@@ -622,14 +604,33 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
 // ─── Delete (DELETE) ──────────────────────────────────────────────────────────
 
 function DeleteWidget(): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t } = scopedTranslation.scopedT(locale);
+  const { pop } = useWidgetNavigation();
+  const onSubmit = useWidgetOnSubmit();
   const emptyField = useMemo(() => ({}), []);
 
   return (
     <Div className="flex flex-col gap-4 px-6 py-6">
+      <Div className="flex flex-col gap-1">
+        <P className="font-semibold">{t("widget.disconnectConfirmTitle")}</P>
+        <P className="text-sm text-muted-foreground">
+          {t("widget.disconnectConfirmDescription")}
+        </P>
+      </Div>
       <FormAlertWidget field={emptyField} />
-      <Div className="flex flex-row gap-2">
-        <NavigateButtonWidget field={emptyField} />
-        <SubmitButtonWidget field={emptyField} />
+      <Div className="flex flex-row gap-2 justify-end">
+        <Button type="button" variant="outline" size="sm" onClick={() => pop()}>
+          {t("widget.disconnectConfirmCancel")}
+        </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => onSubmit?.()}
+        >
+          {t("widget.disconnectConfirmProceed")}
+        </Button>
       </Div>
     </Div>
   );
@@ -641,9 +642,6 @@ export function RemoteConnectionByIdWidget({
   field,
 }: RemoteConnectionByIdWidgetProps): JSX.Element {
   const endpoint = useWidgetEndpoint();
-  const instanceId =
-    (field as { urlPathParams?: { instanceId?: string } }).urlPathParams
-      ?.instanceId ?? "";
 
   if (endpoint.method === Methods.DELETE) {
     return <DeleteWidget />;
@@ -653,5 +651,5 @@ export function RemoteConnectionByIdWidget({
     return <EditWidget field={field} />;
   }
 
-  return <ViewWidget instanceId={instanceId} />;
+  return <ViewWidget instanceId="" />;
 }

@@ -25,6 +25,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Methods } from "next-vibe/core/definition/enums";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -34,7 +35,6 @@ import { describe, expect, it } from "vitest";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
 
 // ── Constants ────────────────────────────────────────────────────────────────

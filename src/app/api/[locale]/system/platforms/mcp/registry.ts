@@ -246,9 +246,9 @@ export class MCPRegistry {
         ? context.user.id
         : undefined;
     if (userId) {
-      const { resolveTarget } =
-        await import("@/app/api/[locale]/system/execute-tool/routing");
-      const target = await resolveTarget({
+      const { ExecuteToolRouting } =
+        await import("@/app/api/[locale]/system/execute-tool/repository/routing");
+      const target = await ExecuteToolRouting.resolveTarget({
         userId,
         locale: context.locale,
         logger,

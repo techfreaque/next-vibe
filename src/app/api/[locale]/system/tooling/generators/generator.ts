@@ -59,7 +59,7 @@ interface GeneratorEntry {
   key: string;
   run: (ctx: GeneratorContext) => Promise<GeneratorResult>;
   phase: GeneratorPhase;
-  needs: { definitionModules?: boolean; modelDefinitions?: boolean };
+  needs: { definitionModules?: boolean };
   /** gen-cache fingerprint key, or null to never cache. */
   cacheKey: GeneratorKey | null;
   /** Primary output (relative to cwd) — used for gen-cache staleness. */
@@ -199,7 +199,7 @@ export class GeneratorRunner {
       key: "ai-stream-enums",
       run: generateAiStreamEnums,
       phase: "default",
-      needs: { modelDefinitions: true },
+      needs: {},
       cacheKey: null,
       output: "src/app/api/[locale]/agent/ai-stream/vision-models.generated.ts",
       enabled: true,
@@ -284,7 +284,6 @@ export class GeneratorRunner {
       live: opts.live,
       need: {
         definitionModules: generators.some((g) => g.needs.definitionModules),
-        modelDefinitions: generators.some((g) => g.needs.modelDefinitions),
       },
     });
 

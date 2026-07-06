@@ -21,6 +21,7 @@ import React from "react";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { renderToString as fastRenderToString } from "../../cli/response/fast-ink-renderer/renderer";
+import { prewarmBuiltinWidgets } from "../../react/WidgetRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { CliRenderTree } from "./render-tree";
 
@@ -101,6 +102,10 @@ async function prewarmLazy(render: ReactLazyRef): Promise<void> {
 export async function prewarmLazyWidgets(
   endpoint: CreateApiEndpointAny,
 ): Promise<void> {
+  // Resolve the builtin widget modules this endpoint's field tree uses —
+  // the sync fast renderer cannot suspend on an unresolved React.lazy.
+  await prewarmBuiltinWidgets(endpoint);
+
   const fields = endpoint.fields;
   if (!fields || typeof fields !== "object") {
     return;

@@ -66,7 +66,7 @@ describe("createEndpointEmitter (v2 delivery)", () => {
     clearLocalBroadcast();
   });
 
-  it("EMIT-KIND-USER: a scope:user endpoint delivers on user/{id}", () => {
+  it("EMIT-KIND-USER: a scope:user endpoint delivers on its user-scoped ws-channel", () => {
     const emit = createEndpointEmitter(
       creditsDefinition.GET,
       makeLogger(),
@@ -87,7 +87,12 @@ describe("createEndpointEmitter (v2 delivery)", () => {
 
     expect(broadcastToAll).toHaveBeenCalledTimes(1);
     const [channel, event] = broadcastToAll.mock.calls[0] as [string, string];
-    expect(channel).toBe(buildUserChannel(USER_ID));
+    // Erased view: credits GET has no url params (UrlVariablesOutput is never),
+    // matching the emitter's own erasure.
+    const creditsEndpoint: CreateApiEndpointAny = creditsDefinition.GET;
+    expect(channel).toBe(
+      buildUserWsChannel(creditsEndpoint, USER_ID, {}, undefined, makeLogger()),
+    );
     expect(event).toBe("__event__");
     expect(result).toEqual({ delivered: true, relayed: false, dropped: false });
   });
@@ -115,8 +120,8 @@ describe("createEndpointEmitter (v2 delivery)", () => {
 
     expect(broadcastToAll).toHaveBeenCalledTimes(1);
     const [channel] = broadcastToAll.mock.calls[0] as [string];
-    // resource kind → the shared ws-channel (path-based), NOT the user channel.
-    expect(channel).not.toBe(buildUserChannel(USER_ID));
+    // resource kind → the shared ws-channel (path-based), NOT the user-scoped one.
+    expect(channel.startsWith("user/")).toBe(false);
     expect(channel.startsWith("ws-")).toBe(true);
     expect(result.delivered).toBe(true);
   });

@@ -107,10 +107,11 @@ export const DebugLinearMessageView = React.memo(
             userMessage: userMessage || undefined,
             subFolderId: subFolderId ?? undefined,
             skillId: selectedSkill ?? undefined,
+            threadId,
           },
         },
       }),
-      [rootFolderId, userMessage, subFolderId, selectedSkill],
+      [rootFolderId, userMessage, subFolderId, selectedSkill, threadId],
     );
 
     const debugEndpoint = useEndpoint(
@@ -132,10 +133,7 @@ export const DebugLinearMessageView = React.memo(
       };
     }, [debugEndpoint.read.data, selectedModel, selectedSkill]);
 
-    const timezone = useMemo(
-      () => Intl.DateTimeFormat().resolvedOptions().timeZone,
-      [],
-    );
+    const messageContextLines = debugEndpoint.read.data?.messageContextLines;
 
     const debugLeading = (
       <ErrorBoundary locale={locale}>
@@ -161,12 +159,8 @@ export const DebugLinearMessageView = React.memo(
                   chatShadows.sm,
                 )}
               >
-                {createMetadataSystemMessage(
-                  message,
-                  rootFolderId,
-                  timezone,
-                  logger,
-                )}
+                {messageContextLines?.[message.id] ??
+                  `[Context: ID:${message.id.slice(-8)}]`}
               </Div>
             </Div>
           )}
@@ -209,7 +203,7 @@ export const DebugLinearMessageView = React.memo(
           )}
         </>
       ),
-      [debugParts, locale, logger, rootFolderId, timezone, t],
+      [debugParts, locale, rootFolderId, messageContextLines, t],
     );
 
     const debugTrailing =

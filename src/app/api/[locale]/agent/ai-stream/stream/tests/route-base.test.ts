@@ -935,7 +935,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               cfg.systemPromptInstanceId;
             if (!expectedInstanceId) {
               const identityResult = await db.execute<{ instance_id: string }>(
-                sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} AND is_default = true LIMIT 1`,
+                sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} LIMIT 1`,
               );
               expectedInstanceId = identityResult.rows[0]?.instance_id;
             }

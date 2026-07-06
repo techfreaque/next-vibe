@@ -14,7 +14,6 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NewCronTask } from "next-vibe/tasks/cron/db";
 import {
@@ -27,6 +26,7 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode } from "../constants";
+import { TaskCompletion } from "../repository/completion";
 import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 
 export class TaskReportRepository {
@@ -77,8 +77,8 @@ export class TaskReportRepository {
     // Complete the in-memory pending call first: wakes await-task waiters
     // and yields a revival override if await-task attached one. "duplicate"
     // means the deadline (or another path) already finalized — skip revival.
-    const { completePendingCall } = await import("../pending-calls");
-    const outcome = completePendingCall(data.taskId, {
+    const { PendingCalls } = await import("../repository/pending-calls");
+    const outcome = PendingCalls.complete(data.taskId, {
       status: finalStatus === CronTaskStatus.COMPLETED ? "completed" : "failed",
       output: data.output ?? null,
     });
@@ -128,7 +128,7 @@ export class TaskReportRepository {
           : CallbackMode.WAKE_UP
         : callbackMode;
 
-      await handleTaskCompletion({
+      await TaskCompletion.handle({
         toolMessageId: revivalToolMessageId ?? "",
         threadId: revivalThreadId,
         callbackMode: revivalMode,
@@ -345,7 +345,7 @@ export class TaskReportRepository {
                   )
                 : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
-            await handleTaskCompletion({
+            await TaskCompletion.handle({
               toolMessageId: toolMessageId ?? "",
               threadId,
               callbackMode,

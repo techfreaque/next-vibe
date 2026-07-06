@@ -1308,6 +1308,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
                           voiceId={resolvedVoiceId}
+                          threadId={activeThreadId}
                         />
                       ) : (
                         <LinearMessageView
@@ -1344,6 +1345,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                           onVoteMessage={voteMessage}
                           ttsAutoplay={effectiveSettings.ttsAutoplay}
                           voiceId={resolvedVoiceId}
+                          threadId={activeThreadId}
                         />
                       )}
                     </ErrorBoundary>

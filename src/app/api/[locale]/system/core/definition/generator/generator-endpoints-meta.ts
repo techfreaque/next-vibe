@@ -540,9 +540,18 @@ export const endpointsMeta: EndpointMeta[] = ${entriesTs};
   private static renderRoleMap(map: Map<string, string[]>): string {
     const entries = [...map.entries()]
       .toSorted(([a], [b]) => a.localeCompare(b))
-      .map(
-        ([role, ids]) => `  ${JSON.stringify(role)}: ${JSON.stringify(ids)},`,
-      )
+      .map(([role, ids]) => {
+        const roleKey = JSON.stringify(role);
+        const idsInline = `[${ids.map((id) => JSON.stringify(id)).join(", ")}]`;
+        const singleLine = `  ${roleKey}: ${idsInline},`;
+        if (singleLine.length <= 80) {
+          return singleLine;
+        }
+        const idLines = ids
+          .map((id) => `    ${JSON.stringify(id)},`)
+          .join("\n");
+        return `  ${roleKey}: [\n${idLines}\n  ],`;
+      })
       .join("\n");
     return `{\n${entries}\n}`;
   }

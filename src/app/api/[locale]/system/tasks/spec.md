@@ -27,7 +27,7 @@ Some tasks are not self-contained — they dispatch work to a coding agent and w
 1. AI calls `execute` or `await-task` (under `execute-tool/`) with a task ID.
 2. The task enters RUNNING state; the AI stream pauses (TOOL_WAITING).
 3. When the coding agent finishes, it calls `complete-task` with the task ID and result payload.
-4. `task-completion-handler` (canonical in `execute-tool/handlers/`) backfills the result into the original tool message, emits a TASK_COMPLETED WebSocket event, and schedules a one-shot `resume-stream` cron task.
+4. `handleTaskCompletion` (canonical in `execute-tool/handlers/completion.ts`) backfills the result into the original tool message, emits a TASK_COMPLETED WebSocket event, and schedules a one-shot `resume-stream` cron task.
 5. The AI stream resumes with the result inline — no polling, no re-prompt.
 
 ## Module Layout
@@ -50,7 +50,7 @@ tasks/
 
 The AI-callable wait endpoint and the shared async-completion callback both live
 under `execute-tool/`, not here: `execute-tool/await-task/` (pause stream until a
-background task completes) and `execute-tool/handlers/task-completion-handler.ts`
+background task completes) and `execute-tool/handlers/completion.ts`
 (canonical completion logic, shared by the pulse, `complete-task`, and remote `/report`).
 
 Other modules **register** a system task here but are owned by their own module —

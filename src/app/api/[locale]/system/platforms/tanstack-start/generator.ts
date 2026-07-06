@@ -288,6 +288,127 @@ function emitRootRedirect(result: GenerationResult): void {
   }
 }
 
+// Format `createFileRoute("path")({...})` — break to multi-line if >80 chars.
+// bodyLines have NO leading indent; fmtRouteBlock adds the appropriate indent.
+function fmtRouteBlock(routePath: string, bodyLines: string[]): string {
+  const withOpen = `export const Route = createFileRoute("${routePath}")(`;
+  if (`${withOpen}{`.length <= 80) {
+    // Short path: `({` on same line, body at 2-space indent
+    return [
+      `${withOpen}{`,
+      ...bodyLines.map((l) => (l ? `  ${l}` : ``)),
+      `});`,
+    ].join("\n");
+  }
+  const noOpen = `export const Route = createFileRoute("${routePath}")`;
+  if (noOpen.length < 80) {
+    // Path fits alone: break as `("path")(\n  {\n    body at 4-space\n  },\n)`
+    return [
+      `${noOpen}(`,
+      `  {`,
+      ...bodyLines.map((l) => (l ? `    ${l}` : ``)),
+      `  },`,
+      `);`,
+    ].join("\n");
+  }
+  // Path itself too long: break the path arg, body at 2-space indent
+  return [
+    `export const Route = createFileRoute(`,
+    `  "${routePath}",`,
+    `)({`,
+    ...bodyLines.map((l) => (l ? `  ${l}` : ``)),
+    `});`,
+  ].join("\n");
+}
+
+// Format `await import("path")` inside a handler — break if inner line >80
+function fmtAwaitImport(importPath: string, indent: string): string {
+  const single = `${indent}const { tanstackLoader } = await import("${importPath}");`;
+  if (single.length <= 80) {
+    return single;
+  }
+  return `${indent}const { tanstackLoader } =\n${indent}  await import("${importPath}");`;
+}
+
+// Format `.inputValidator(...)` — break to multi-line if type arg is an object
+function fmtInputValidator(inputType: string): string[] {
+  const single = `  .inputValidator((data: ${inputType}) => data)`;
+  if (single.length <= 80) {
+    return [single];
+  }
+  // Object type: break it out
+  return [
+    `  .inputValidator(`,
+    `    (data: {`,
+    `      params: Record<string, string>;`,
+    `      search: Record<string, string>;`,
+    `    }) => data,`,
+    `  )`,
+  ];
+}
+
+// Returns the body indent that fmtRouteBlock will use for the given route path.
+function routeBodyIndent(routePath: string): number {
+  const withOpen = `export const Route = createFileRoute("${routePath}")(`;
+  const noOpen = `export const Route = createFileRoute("${routePath}")`;
+  if (`${withOpen}{`.length <= 80) {
+    return 2;
+  } // short path: normal `({`
+  if (noOpen.length < 80) {
+    return 4;
+  } // medium path: `(\n  {\n    body\n  },\n)`
+  return 2; // long path: broken arg, normal `({`
+}
+
+// Loader body lines (no leading indent — fmtRouteBlock adds `baseIndent` spaces)
+// Continuation lines use 2 extra spaces relative to the loader key.
+function fmtParamsLoader(baseIndent = 2): string[] {
+  const single = `loader: ({ params }) => loadData({ data: params as Record<string, string> }),`;
+  if (baseIndent + single.length <= 80) {
+    return [single];
+  }
+  return [
+    `loader: ({ params }) =>`,
+    `  loadData({ data: params as Record<string, string> }),`,
+  ];
+}
+
+function fmtSearchLoader(baseIndent = 2): string[] {
+  const single = `loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`;
+  if (baseIndent + single.length <= 80) {
+    return [single];
+  }
+  return [
+    `loader: ({ params, deps: { search } }) =>`,
+    `  loadData({ data: { params: params as Record<string, string>, search } }),`,
+  ];
+}
+
+// Format server handlers inside the route body (lines at 0-relative indent)
+// fmtRouteBlock will add 2 spaces to each, so account for that in length checks
+function fmtServerHandlers(importPath: string): string[] {
+  // Final rendered: `      () => import("...")` = 6 + content
+  const singleImportLine = `    () => import("${importPath}"),`;
+  if (2 + singleImportLine.length <= 80) {
+    return [
+      `server: {`,
+      `  handlers: wrapNextApiRoute(`,
+      singleImportLine,
+      `  ),`,
+      `},`,
+    ];
+  }
+  // Long: break `() =>` and `import("...")` onto separate lines
+  return [
+    `server: {`,
+    `  handlers: wrapNextApiRoute(`,
+    `    () =>`,
+    `      import("${importPath}"),`,
+    `  ),`,
+    `},`,
+  ];
+}
+
 function emitLayoutFile(
   dir: string,
   srcFile: string,
@@ -311,51 +432,65 @@ function emitLayoutFile(
     const hasParams = hasParamsInLoader(srcFile);
     const lines = [
       `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
-      `import type { JSX } from "react";`,
       `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
-      ...(hasParams || hasSearch
-        ? [
-            `import { createServerFn } from "@tanstack/react-start";`,
-            `import { toNextParams } from "${WRAPPER_IMPORT}";`,
-          ]
-        : [`import { createServerFn } from "@tanstack/react-start";`]),
+      `import { createServerFn } from "@tanstack/react-start";`,
+      `import type { JSX } from "react";`,
+      ``,
       `import { TanstackPage as Layout } from "${importPath}";`,
-      ``,
-      `const loadData = createServerFn({ method: "GET" })`,
-      ...(hasParams || hasSearch
-        ? [
-            `  .inputValidator((data: ${hasSearch ? "{ params: Record<string, string>; search: Record<string, string> }" : "Record<string, string>"}) => data)`,
-            `  .handler(async ({ data }) => {`,
-            `    const { tanstackLoader } = await import("${importPath}");`,
-            `    return tanstackLoader({ params: Promise.resolve(toNextParams(${hasSearch ? "data.params" : "data"}))${hasSearch ? ", searchParams: Promise.resolve(data.search)" : ""} });`,
-            `  });`,
-          ]
-        : [
-            `  .handler(async () => {`,
-            `    const { tanstackLoader } = await import("${importPath}");`,
-            `    return tanstackLoader();`,
-            `  });`,
-          ]),
-      ``,
-      `function LayoutComponent(): JSX.Element { return <Layout {...Route.useLoaderData()}><Outlet /></Layout>; }`,
-      ``,
-      `export const Route = createFileRoute("${routePath}")({`,
-      `  staleTime: ${staleTime},`,
+    ];
+    if (hasParams || hasSearch) {
+      lines.push(``, `import { toNextParams } from "${WRAPPER_IMPORT}";`);
+    }
+    if (hasParams || hasSearch) {
+      lines.push(
+        ``,
+        `const loadData = createServerFn({ method: "GET" })`,
+        ...fmtInputValidator(
+          hasSearch
+            ? "{ params: Record<string, string>; search: Record<string, string> }"
+            : "Record<string, string>",
+        ),
+        `  .handler(async ({ data }) => {`,
+        fmtAwaitImport(importPath, `    `),
+        `    return tanstackLoader({ params: Promise.resolve(toNextParams(${hasSearch ? "data.params" : "data"}))${hasSearch ? ", searchParams: Promise.resolve(data.search)" : ""} });`,
+        `  });`,
+      );
+    } else {
+      lines.push(
+        ``,
+        `const loadData = createServerFn({ method: "GET" }).handler(async () => {`,
+        fmtAwaitImport(importPath, `  `),
+        `  return tanstackLoader();`,
+        `});`,
+      );
+    }
+    const bodyIndent = routeBodyIndent(routePath);
+    const routeBodyLines = [
+      `staleTime: ${staleTime},`,
       ...(hasSearch
         ? [
-            `  validateSearch: (search: Record<string, string>) => search,`,
-            `  loaderDeps: ({ search }) => ({ search }),`,
-            `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
+            `validateSearch: (search: Record<string, string>) => search,`,
+            `loaderDeps: ({ search }) => ({ search }),`,
+            ...fmtSearchLoader(bodyIndent),
           ]
         : hasParams
-          ? [
-              `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-            ]
-          : [`  loader: () => loadData(),`]),
-      `  component: LayoutComponent,`,
-      `});`,
-      ``,
+          ? [...fmtParamsLoader(bodyIndent)]
+          : [`loader: () => loadData(),`]),
+      `component: LayoutComponent,`,
     ];
+    lines.push(
+      ``,
+      `function LayoutComponent(): JSX.Element {`,
+      `  return (`,
+      `    <Layout {...Route.useLoaderData()}>`,
+      `      <Outlet />`,
+      `    </Layout>`,
+      `  );`,
+      `}`,
+      ``,
+      fmtRouteBlock(routePath, routeBodyLines),
+      ``,
+    );
     content = lines.join("\n");
   } else if (isClientComponent) {
     content = [
@@ -405,84 +540,94 @@ function emitPageFile(
   const hasSearch = hasSearchParamsInLoader(srcFile);
   const lines = [
     `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
-    `import type { JSX } from "react";`,
     `import { createFileRoute } from "@tanstack/react-router";`,
     `import { createServerFn } from "@tanstack/react-start";`,
-    `import { toNextParams } from "${WRAPPER_IMPORT}";`,
-    `import { TanstackPage as Page } from "${importPath}";`,
   ];
+  // Type imports: alphabetical by source ("next-vibe/..." before "react")
+  if (catchAllName) {
+    lines.push(
+      `import type { CountryLanguage } from "next-vibe/core/i18n/core/config";`,
+    );
+  }
+  lines.push(`import type { JSX } from "react";`);
+  lines.push(
+    ``,
+    `import { TanstackPage as Page } from "${importPath}";`,
+    ``,
+    `import { toNextParams } from "${WRAPPER_IMPORT}";`,
+  );
   if (catchAllName) {
     const inputType = hasSearch
       ? "{ params: Record<string, string>; search: Record<string, string> }"
       : "Record<string, string>";
     const paramsExpr = hasSearch ? "data.params" : "data";
     lines.push(
-      `import type { CountryLanguage } from "next-vibe/core/i18n/core/config";`,
       ``,
       `const loadData = createServerFn({ method: "GET" })`,
-      `  .inputValidator((data: ${inputType}) => data)`,
+      ...fmtInputValidator(inputType),
       `  .handler(async ({ data }) => {`,
-      `    const { tanstackLoader } = await import("${importPath}");`,
+      fmtAwaitImport(importPath, `    `),
       `    const p = toNextParams(${paramsExpr});`,
       `    return tanstackLoader({`,
-      `      params: Promise.resolve({ ...p, ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean) } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
+      `      params: Promise.resolve({`,
+      `        ...p,`,
+      `        ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
+      `      } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
       ...(hasSearch
         ? [`      searchParams: Promise.resolve(data.search),`]
         : []),
       `    });`,
       `  });`,
-      ``,
-      `function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }`,
-      ``,
-      `export const Route = createFileRoute("${routePath}")({`,
-      `  staleTime: 0,`,
-      ...(hasSearch
-        ? [
-            `  validateSearch: (search: Record<string, string>) => search,`,
-            `  loaderDeps: ({ search }) => ({ search }),`,
-            `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
-          ]
-        : [
-            `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-          ]),
-      `  component: PageComponent,`,
-      `});`,
-      ``,
     );
   } else {
     const inputType = hasSearch
       ? "{ params: Record<string, string>; search: Record<string, string> }"
       : "Record<string, string>";
-    const handlerBody = hasSearch
-      ? `return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });`
-      : `return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`;
     lines.push(
       ``,
       `const loadData = createServerFn({ method: "GET" })`,
-      `  .inputValidator((data: ${inputType}) => data)`,
+      ...fmtInputValidator(inputType),
       `  .handler(async ({ data }) => {`,
-      `    const { tanstackLoader } = await import("${importPath}");`,
-      `    ${handlerBody}`,
-      `  });`,
-      ``,
-      `function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }`,
-      ``,
-      `export const Route = createFileRoute("${routePath}")({`,
-      `  staleTime: 0,`,
-      ...(hasSearch
-        ? [
-            `  validateSearch: (search: Record<string, string>) => search,`,
-            `  loaderDeps: ({ search }) => ({ search }),`,
-            `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
-          ]
-        : [
-            `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-          ]),
-      `  component: PageComponent,`,
-      `});`,
-      ``,
+      fmtAwaitImport(importPath, `    `),
     );
+    if (hasSearch) {
+      lines.push(
+        `    return tanstackLoader({`,
+        `      params: Promise.resolve(toNextParams(data.params)),`,
+        `      searchParams: Promise.resolve(data.search),`,
+        `    });`,
+      );
+    } else {
+      lines.push(
+        `    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`,
+      );
+    }
+    lines.push(`  });`);
   }
+
+  // Route body lines at zero indent; fmtRouteBlock adds the appropriate indent
+  const bodyIndent = routeBodyIndent(routePath);
+  const routeBodyLines = [
+    `staleTime: 0,`,
+    ...(hasSearch
+      ? [
+          `validateSearch: (search: Record<string, string>) => search,`,
+          `loaderDeps: ({ search }) => ({ search }),`,
+          ...fmtSearchLoader(bodyIndent),
+        ]
+      : [...fmtParamsLoader(bodyIndent)]),
+    `component: PageComponent,`,
+  ];
+
+  lines.push(
+    ``,
+    `function PageComponent(): JSX.Element {`,
+    `  return <Page {...Route.useLoaderData()} />;`,
+    `}`,
+    ``,
+    fmtRouteBlock(routePath, routeBodyLines),
+    ``,
+  );
   if (writeIfNotCustom(outPath, lines.join("\n"))) {
     result.created.push(relative(projectRoot(), outPath).replace(/\\/g, "/"));
   }
@@ -503,9 +648,7 @@ function emitApiFile(
     ``,
     `import { wrapNextApiRoute } from "${WRAPPER_IMPORT}";`,
     ``,
-    `export const Route = createFileRoute("${routePath}")({`,
-    `  server: { handlers: wrapNextApiRoute(() => import("${importPath}")) },`,
-    `});`,
+    fmtRouteBlock(routePath, fmtServerHandlers(importPath)),
     ``,
   ].join("\n");
   if (writeIfNotCustom(outPath, content)) {

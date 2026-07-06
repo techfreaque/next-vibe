@@ -157,23 +157,32 @@ if (_remoteUrl) {
         );
       }
 
-      // Routing for threads in REMOTE/<instanceId> is purely deterministic —
-      // execute-tool/routing step 2 traverses folder ancestors back to the
-      // REMOTE root and matches the top-level name to a connection's instanceId.
-      const { resolveTarget } =
-        await import("next-vibe/execute-tool/routing");
-      const { createEndpointLogger } =
-        await import("next-vibe/logger/server");
-      const target = await resolveTarget({
+      // Placement never routes: a thread created inside REMOTE/<instanceId>
+      // gets its loop location STAMPED ONCE at creation (loop_instance_id);
+      // routing then resolves purely from that explicit value.
+      const { ThreadsRepository } =
+        await import("@/app/api/[locale]/agent/chat/threads/repository");
+      const stampedLoop = await ThreadsRepository.deriveLoopInstanceFromFolder(
+        folder.id,
+      );
+      expect(
+        stampedLoop,
+        `CF2: creating a thread in REMOTE/${HERMES_INSTANCE_ID} must stamp loopInstanceId=${HERMES_INSTANCE_ID}`,
+      ).toBe(HERMES_INSTANCE_ID);
+
+      const { ExecuteToolRouting } = await import(
+        "next-vibe/execute-tool/repository/routing"
+      );
+      const { createEndpointLogger } = await import("next-vibe/logger/server");
+      const target = await ExecuteToolRouting.resolveTarget({
         userId: testUser.id,
-        folderId: folder.id,
-        rootFolderId: DefaultFolderId.REMOTE,
+        loopInstanceId: stampedLoop ?? undefined,
         locale: defaultLocale,
         logger: createEndpointLogger(false, defaultLocale),
       });
       expect(
         target?.instanceId,
-        `CF2: a thread in REMOTE/${HERMES_INSTANCE_ID} must resolve to the ${HERMES_INSTANCE_ID} connection via folder ancestry — no DB routing rule needed`,
+        `CF2: loopInstanceId=${HERMES_INSTANCE_ID} must resolve to the ${HERMES_INSTANCE_ID} connection`,
       ).toBe(HERMES_INSTANCE_ID);
     });
 
@@ -219,33 +228,6 @@ if (_remoteUrl) {
       ).toBeDefined();
     });
 
-    // ── CF5: local remoteInstanceId is our own identity ─────────────────
-    // remoteInstanceId stores "what we are called from the remote's perspective".
-    // On atlas, this is "atlas" (our own self-identity). The relay
-    // uses this value to tell hermes which folder to place the thread in:
-    //   relay postBody.instanceId = remoteTarget.remoteInstanceId = "atlas"
-    //   hermes resolves chatFolders(name="atlas") → correct subfolder.
-
-    it("CF5: local remoteConnections.remoteInstanceId is set to the local self-identity (atlas) for correct relay routing", async () => {
-      const [conn] = await db
-        .select({ remoteInstanceId: remoteConnections.remoteInstanceId })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        )
-        .limit(1);
-
-      expect(conn, "CF5: local remoteConnections row missing").toBeDefined();
-      expect(
-        conn?.remoteInstanceId,
-        `CF5: remoteInstanceId must be set to the local self-identity ("${ATLAS_INSTANCE_ID}"). ` +
-          `register() returns remoteInstanceId=selfInstanceId (cloud's own identity) which connect() ` +
-          `stores as the local row's remoteInstanceId so relay can tell hermes the correct folder name.`,
-      ).toBe(ATLAS_INSTANCE_ID);
-    });
 
     // ── RC1: local-to-local registration ──────────────────────────────────
     // connect() calls register() on the remote. When both instances are

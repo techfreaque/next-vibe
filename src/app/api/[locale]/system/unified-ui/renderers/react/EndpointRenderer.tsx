@@ -177,6 +177,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   const baseStack = baseNavigation.stack;
   const baseCanGoBack = baseNavigation.canGoBack;
   const baseCurrent = baseNavigation.current;
+  const baseIsPushPending = baseNavigation.isPushPending;
   const navigation = useMemo(
     () =>
       navigationOverride
@@ -187,6 +188,8 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             stack: navigationOverride.stack ?? baseStack,
             canGoBack: navigationOverride.canGoBack ?? baseCanGoBack,
             current: navigationOverride.current ?? baseCurrent,
+            isPushPending:
+              navigationOverride.isPushPending ?? baseIsPushPending,
           }
         : {
             push: basePush,
@@ -195,6 +198,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             stack: baseStack,
             canGoBack: baseCanGoBack,
             current: baseCurrent,
+            isPushPending: baseIsPushPending,
           },
     [
       navigationOverride,
@@ -204,6 +208,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       baseStack,
       baseCanGoBack,
       baseCurrent,
+      baseIsPushPending,
     ],
   );
 

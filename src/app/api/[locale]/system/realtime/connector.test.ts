@@ -844,7 +844,29 @@ if (_remoteUrl) {
           "CN7: REMOTE subfolder name must match newInstanceId",
         ).toBe(newInstanceId);
 
-        // Restore original instanceId for subsequent tests
+        // Restore hermes's SELF identity the same production way — without this
+        // hermes stays renamed on its own DB and every later suite (and re-run
+        // of this one) starts from contaminated state.
+        {
+          const { sendTestRequest } =
+            await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+          const selfRenameDef = (
+            await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+          ).default;
+          const restoreResult = await sendTestRequest({
+            endpoint: selfRenameDef.PATCH,
+            data: { newInstanceId: HERMES_INSTANCE_ID, propagate: true },
+            user: testUser,
+            instanceId: newInstanceId,
+          });
+          expect(
+            restoreResult.success,
+            `CN7: self-rename restore failed: ${restoreResult.success ? "" : restoreResult.message}`,
+          ).toBe(true);
+        }
+
+        // Restore original instanceId for subsequent tests (idempotent with the
+        // propagate above — direct DB write in case the propagate is slow).
         await db
           .update(remoteConnections)
           .set({ instanceId: HERMES_INSTANCE_ID, updatedAt: new Date() })
@@ -860,6 +882,39 @@ if (_remoteUrl) {
               eq(chatFolders.name, newInstanceId),
             ),
           );
+
+        // Settle: the rename propagates are fire-and-forget WITH retry on the
+        // sender — a late retry of the forward rename can re-apply the renamed
+        // id AFTER the direct restore above and break the next test's row
+        // lookup. Wait until the row reads HERMES_INSTANCE_ID twice in a row.
+        await pollUntil(
+          "CN7: connection row must settle on restored id",
+          async () => {
+            const read = async (): Promise<string | undefined> => {
+              const [row] = await db
+                .select({ instanceId: remoteConnections.instanceId })
+                .from(remoteConnections)
+                .where(eq(remoteConnections.id, config.id))
+                .limit(1);
+              return row?.instanceId;
+            };
+            if ((await read()) !== HERMES_INSTANCE_ID) {
+              return false;
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 750);
+            });
+            if ((await read()) !== HERMES_INSTANCE_ID) {
+              // A late propagate flipped it back — restore and keep polling.
+              await db
+                .update(remoteConnections)
+                .set({ instanceId: HERMES_INSTANCE_ID, updatedAt: new Date() })
+                .where(eq(remoteConnections.id, config.id));
+              return false;
+            }
+            return true;
+          },
+        );
 
         closeConnection(HERMES_INSTANCE_ID);
         closeConnection(newInstanceId);

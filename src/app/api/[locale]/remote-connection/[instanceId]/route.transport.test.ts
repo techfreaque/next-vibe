@@ -315,10 +315,16 @@ if (_remoteUrl && _isFixtureMode) {
       const deadline = Date.now() + 5_000;
       while (!remoteThread && Date.now() < deadline) {
         const rows = await pdb.execute<{ id: string }>(
-          sql`SELECT id FROM chat_threads
-                  WHERE user_id = ${prodUserId}
-                    AND root_folder_id = ${DefaultFolderId.REMOTE}
-                    AND folder_id = ${remoteFolderId}
+          sql`WITH RECURSIVE subtree AS (
+                    SELECT id FROM chat_folders WHERE id = ${remoteFolderId}
+                    UNION ALL
+                    SELECT f.id FROM chat_folders f
+                      JOIN subtree s ON f.parent_id = s.id
+                  )
+                  SELECT t.id FROM chat_threads t
+                  WHERE t.user_id = ${prodUserId}
+                    AND t.root_folder_id = ${DefaultFolderId.REMOTE}
+                    AND t.folder_id IN (SELECT id FROM subtree)
                   LIMIT 1`,
         );
         remoteThread = rows.rows[0];
@@ -331,9 +337,8 @@ if (_remoteUrl && _isFixtureMode) {
 
       expect(
         remoteThread,
-        `TM1: no thread found on hermes in remote/${ATLAS_INSTANCE_ID} folder (${remoteFolderId}). ` +
-          `ws-provider/stream on hermes must place the thread in that subfolder. ` +
-          `Check that hermes passes subFolderId=${remoteFolderId} when creating the thread.`,
+        `TM1: no thread found on hermes under the remote/${ATLAS_INSTANCE_ID} subtree (${remoteFolderId}). ` +
+          `ws-provider/stream on hermes must place the thread at REMOTE/${ATLAS_INSTANCE_ID}/<private|background>/….`,
       ).toBeDefined();
     }, 180_000);
 
@@ -415,76 +420,10 @@ if (_remoteUrl && _isFixtureMode) {
       ).toBe(DefaultFolderId.REMOTE);
     }, 180_000);
 
-    // ── TM2: threadMirrorMode='none' — no local write on atlas ────────
-
-    it("TM2: threadMirrorMode='none' skips local write on atlas — stream still runs on hermes", async () => {
-      setFetchCacheContext("transport-mirror-tm2");
-
-      // Set mode to 'none': atlas must NOT write the thread locally.
-      // hermes still runs the AI loop and stores the thread on its side.
-      await db
-        .update(remoteConnections)
-        .set({ threadMirrorMode: "none", updatedAt: new Date() })
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        );
-
-      try {
-        const { result } = await runTestStream({
-          user: testUser,
-          prompt: "[TM2 no-mirror-test] Reply with exactly: REMOTE_ONLY",
-          rootFolderId: DefaultFolderId.REMOTE,
-          subFolderId: localFolderId,
-          favoriteId: tmFavoriteId,
-        });
-
-        // The stream itself must succeed — hermes still runs it.
-        expect(
-          result.success,
-          `TM2 stream failed: ${!result.success ? result.message : ""}`,
-        ).toBe(true);
-        if (!result.success) {
-          return;
-        }
-
-        const threadId = result.data.threadId;
-        if (!threadId) {
-          return;
-        }
-
-        // ── Local side: thread must NOT be persisted ──────────────────────
-        // Give any async write a chance to land, then confirm absence.
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, 2_000);
-        });
-
-        const [localThread] = await db
-          .select({ id: chatThreads.id })
-          .from(chatThreads)
-          .where(eq(chatThreads.id, threadId))
-          .limit(1);
-
-        expect(
-          localThread,
-          `TM2: thread ${threadId} was written locally on atlas even though threadMirrorMode='none'. ` +
-            `The relay path must respect threadMirrorMode and skip local DB writes when set to 'none'.`,
-        ).toBeUndefined();
-      } finally {
-        // Always restore to 'both' so subsequent tests are not affected,
-        // even if runTestStream throws or an assertion fails.
-        await db
-          .update(remoteConnections)
-          .set({ threadMirrorMode: "both", updatedAt: new Date() })
-          .where(
-            and(
-              eq(remoteConnections.userId, testUser.id),
-              eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-            ),
-          );
-      }
-    }, 180_000);
+    // TM2 (threadMirrorMode='none' skips the local write) was removed: the
+    // connection-level threadMirrorMode column was write-only dead config and
+    // is gone — a remote-folder stream ALWAYS mirrors back locally (TM1), and
+    // the no-local-write path is incognito, which never relays remotely
+    // (folder restrictions forbid remote dispatch there).
   });
 }

@@ -15,6 +15,7 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { expect } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import type { SlimMessage } from "../../../testing/headless-test-runner";
 import {
@@ -126,8 +127,8 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
       ...params,
       rootFolderId: effectiveRootFolderId,
       subFolderId: effectiveSubFolderId,
-      // Remote-folder loop-local: the "self" sentinel forces the loop HERE;
-      // prompt + tools still come from the remote. Incognito stays pinned.
+      // Remote-folder loop-local: executionContext.loopLocation forces the
+      // loop HERE; prompt + tools still come from the remote.
       ...(cfg.forceLocalLoop && effectiveRootFolderId === DefaultFolderId.REMOTE
         ? { loopInstanceId: "self" }
         : {}),
@@ -156,146 +157,126 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         // budget instead of racing it with a flat cap.
         const MIRROR_WAIT_MS = params.settleTimeoutMs ?? 30_000;
         const mirrorStart = Date.now();
-        // Hold a live connection for the whole wait: getWsConnection returns
-        // null when the connector idled out, silently killing every driven
-        // pull — acquire opens it on demand and keeps it up.
-        const { acquireConnection } =
-          await import("next-vibe/realtime/connector");
-        const releaseConn = cfg.systemPromptInstanceId
-          ? await acquireConnection(cfg.systemPromptInstanceId)
-          : (): void => undefined;
-        try {
-          for (;;) {
-            const snapshot = await getMessages(tid);
-            // Three convergence conditions, all must clear:
-            //  1. No pending async tool (detach/wakeUp result not yet mirrored).
-            //  2. No dead-end compacting message — a compacting node with no
-            //     child means the owner's re-parent of the following turn has
-            //     not synced yet (the turn still points at the pre-compacting
-            //     leaf locally). Both resolve once sync applies the
-            //     owner-authoritative state.
-            //  3. This turn's assistant reply has mirrored back. The relayed
-            //     loop runs on the remote and the final assistant message arrives
-            //     via the sync/WS mirror AFTER the relay HTTP response returns —
-            //     so without this, a no-tool turn (e.g. T-SYS "reply RELAY_OK")
-            //     breaks before the reply lands and `messages` has no assistant.
-            const childIds = new Set(
-              snapshot
-                .map((m) => m.parentId)
-                .filter((id): id is string => !!id),
-            );
-            const pendingAsync = snapshot.filter((m) => {
-              if (
-                m.role !== "tool" ||
-                preStreamMessageIds.has(m.id) ||
-                (m.toolCall?.callbackMode !== "detach" &&
-                  m.toolCall?.callbackMode !== "wakeUp")
-              ) {
-                return false;
-              }
-              if (
-                m.toolCall?.status === "pending" ||
-                resolveToolResult(m) === null
-              ) {
-                return true;
-              }
-              // Detach hint: execute-tool returned {hint, taskId} but the
-              // background task hasn't backfilled a terminal result yet.
-              const res = resolveToolResult(m);
-              return (
-                typeof res?.["hint"] === "string" &&
-                res["imageUrl"] === undefined &&
-                res["audioUrl"] === undefined &&
-                res["videoUrl"] === undefined
-              );
-            });
-            const danglingCompacting = snapshot.filter(
-              (m) =>
-                m.isCompacting &&
-                !preStreamMessageIds.has(m.id) &&
-                !childIds.has(m.id),
-            );
-            // WAIT-mode tool results mirror as separate events — a snapshot
-            // taken between the final assistant and a still-in-flight
-            // tool-result reads a resultless tool row. Wait for every new tool
-            // message to carry its result.
-            const unresolvedWaitTools = snapshot.filter(
-              (m) =>
-                m.role === "tool" &&
-                !preStreamMessageIds.has(m.id) &&
-                m.toolCall?.callbackMode !== "detach" &&
-                m.toolCall?.callbackMode !== "wakeUp" &&
-                (m.toolCall?.status === "pending" ||
-                  resolveToolResult(m) === null),
-            );
-            // This turn's assistant reply must have mirrored back. The relay
-            // response names the AUTHORITATIVE final assistant — anything less
-            // (an interim think-message) converges mid-turn and the assertions
-            // read a half-mirrored thread.
-            const finalAiId = firstResult.result.success
-              ? firstResult.result.data.lastAiMessageId
-              : null;
-            const hasNewAssistantReply = finalAiId
-              ? snapshot.some(
-                  (m) => m.id === finalAiId && (m.content ?? "").trim() !== "",
-                )
-              : snapshot.some(
-                  (m) =>
-                    m.role === "assistant" &&
-                    !preStreamMessageIds.has(m.id) &&
-                    (m.content ?? "").trim() !== "",
-                );
-            // Chain chronology must hold: a lost live message-created leaves a
-            // delta-built stub with arrival-time createdAt (child older than its
-            // parent). The driven pull below heals it — wait for that.
-            const byId = new Map(snapshot.map((m) => [m.id, m]));
-            // A lost message-created leaves a PARENTLESS stub — a phantom
-            // second root chainTimeSane cannot see (no parent to compare).
-            // Only the turn's user message may be a root.
-            const noPhantomRoots = snapshot.every(
-              (m) =>
-                preStreamMessageIds.has(m.id) ||
-                m.parentId !== null ||
-                m.role === "user",
-            );
-            const chainTimeSane = snapshot.every((m) => {
-              if (!m.parentId || preStreamMessageIds.has(m.id)) {
-                return true;
-              }
-              const parent = byId.get(m.parentId);
-              if (!parent || parent.isCompacting) {
-                return true;
-              }
-              return parent.createdAt.getTime() <= m.createdAt.getTime();
-            });
+        for (;;) {
+          const snapshot = await getMessages(tid);
+          // Three convergence conditions, all must clear:
+          //  1. No pending async tool (detach/wakeUp result not yet mirrored).
+          //  2. No dead-end compacting message — a compacting node with no
+          //     child means the owner's re-parent of the following turn has
+          //     not synced yet (the turn still points at the pre-compacting
+          //     leaf locally). Both resolve once sync applies the
+          //     owner-authoritative state.
+          //  3. This turn's assistant reply has mirrored back. The relayed
+          //     loop runs on the remote and the final assistant message arrives
+          //     via the sync/WS mirror AFTER the relay HTTP response returns —
+          //     so without this, a no-tool turn (e.g. T-SYS "reply RELAY_OK")
+          //     breaks before the reply lands and `messages` has no assistant.
+          const childIds = new Set(
+            snapshot.map((m) => m.parentId).filter((id): id is string => !!id),
+          );
+          // Async originals are settled by their DEFERRED counterpart, not
+          // in place: a wakeUp ORIGINAL row stays resultless BY DESIGN (the
+          // deferred row carries the backfill) and detach NEVER backfills
+          // (result only via await-task). Treating those as pending made
+          // every turn after the first wakeUp burn the full mirror-wait
+          // timeout. Only a wakeUp original with NO deferred counterpart is
+          // genuinely still in flight.
+          const deferredFor = new Set(
+            snapshot
+              .filter((m) => m.toolCall?.isDeferred === true)
+              .map((m) => m.toolCall?.originalToolCallId)
+              .filter((id): id is string => typeof id === "string"),
+          );
+          const pendingAsync = snapshot.filter((m) => {
             if (
-              (pendingAsync.length === 0 &&
-                danglingCompacting.length === 0 &&
-                unresolvedWaitTools.length === 0 &&
-                chainTimeSane &&
-                noPhantomRoots &&
-                hasNewAssistantReply) ||
-              Date.now() - mirrorStart > MIRROR_WAIT_MS
+              m.role !== "tool" ||
+              preStreamMessageIds.has(m.id) ||
+              m.toolCall?.callbackMode !== "wakeUp" ||
+              m.toolCall?.isDeferred === true
             ) {
-              break;
+              return false;
             }
-            // Drive an explicit pull each tick — broadcastSyncNotify from the
-            // remote may have been lost if the WS dropped (e.g. HMR). Pulling
-            // guarantees the mirror converges even without a live WS push.
-            {
-              const { getWsConnection } =
-                await import("next-vibe/realtime/connector");
-              const conn = cfg.systemPromptInstanceId
-                ? getWsConnection(cfg.systemPromptInstanceId)
-                : null;
-              conn?.doPullNow();
+            const callId = m.toolCall?.toolCallId;
+            if (typeof callId === "string" && deferredFor.has(callId)) {
+              return false;
             }
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, 500);
-            });
+            return (
+              m.toolCall?.status === "pending" || resolveToolResult(m) === null
+            );
+          });
+          const danglingCompacting = snapshot.filter(
+            (m) =>
+              m.isCompacting &&
+              !preStreamMessageIds.has(m.id) &&
+              !childIds.has(m.id),
+          );
+          // WAIT-mode tool results mirror as separate events — a snapshot
+          // taken between the final assistant and a still-in-flight
+          // tool-result reads a resultless tool row. Wait for every new tool
+          // message to carry its result.
+          const unresolvedWaitTools = snapshot.filter(
+            (m) =>
+              m.role === "tool" &&
+              !preStreamMessageIds.has(m.id) &&
+              m.toolCall?.callbackMode !== "detach" &&
+              m.toolCall?.callbackMode !== "wakeUp" &&
+              (m.toolCall?.status === "pending" ||
+                resolveToolResult(m) === null),
+          );
+          // This turn's assistant reply must have mirrored back. The relay
+          // response names the AUTHORITATIVE final assistant — anything less
+          // (an interim think-message) converges mid-turn and the assertions
+          // read a half-mirrored thread.
+          const finalAiId = firstResult.result.success
+            ? firstResult.result.data.lastAiMessageId
+            : null;
+          const hasNewAssistantReply = finalAiId
+            ? snapshot.some(
+                (m) => m.id === finalAiId && (m.content ?? "").trim() !== "",
+              )
+            : snapshot.some(
+                (m) =>
+                  m.role === "assistant" &&
+                  !preStreamMessageIds.has(m.id) &&
+                  (m.content ?? "").trim() !== "",
+              );
+          // Chain chronology must hold: a lost live message-created leaves a
+          // delta-built stub with arrival-time createdAt (child older than its
+          // parent). The driven pull below heals it — wait for that.
+          const byId = new Map(snapshot.map((m) => [m.id, m]));
+          // A lost message-created leaves a PARENTLESS stub — a phantom
+          // second root chainTimeSane cannot see (no parent to compare).
+          // Only the turn's user message may be a root.
+          const noPhantomRoots = snapshot.every(
+            (m) =>
+              preStreamMessageIds.has(m.id) ||
+              m.parentId !== null ||
+              m.role === "user",
+          );
+          const chainTimeSane = snapshot.every((m) => {
+            if (!m.parentId || preStreamMessageIds.has(m.id)) {
+              return true;
+            }
+            const parent = byId.get(m.parentId);
+            if (!parent || parent.isCompacting) {
+              return true;
+            }
+            return parent.createdAt.getTime() <= m.createdAt.getTime();
+          });
+          if (
+            (pendingAsync.length === 0 &&
+              danglingCompacting.length === 0 &&
+              unresolvedWaitTools.length === 0 &&
+              chainTimeSane &&
+              noPhantomRoots &&
+              hasNewAssistantReply) ||
+            Date.now() - mirrorStart > MIRROR_WAIT_MS
+          ) {
+            break;
           }
-        } finally {
-          releaseConn();
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 500);
+          });
         }
       }
 
@@ -366,8 +347,8 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         // revival row, or an in-flight remote call. Any of them means the
         // thread is about to enter 'waiting' (or jump straight to a
         // revival) — poll the transition instead of racing it.
-        const { hasPendingCallForThread } =
-          await import("next-vibe/execute-tool/pending-calls");
+        const { PendingCalls } =
+          await import("next-vibe/execute-tool/repository/pending-calls");
         const hasPendingWork = async (): Promise<boolean> => {
           const [runningTask] = await db
             .select({ id: cronTasks.id })

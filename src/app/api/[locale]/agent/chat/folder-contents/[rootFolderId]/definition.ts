@@ -648,6 +648,11 @@ const { GET } = createEndpoint({
     },
     // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
     "folder-created": {
+      // Folder CRUD SYNCS by SAME id — the regular item fields (id, name,
+      // parentId, rootFolderId) carry everything; no extra payload. The
+      // applier gates on the item's origin root (private/background only).
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
       responseFields: {
         items: [
           "id",
@@ -657,6 +662,12 @@ const { GET } = createEndpoint({
           "icon",
           "color",
           "parentId",
+          // Renderers drop items without rootFolderId as partial-merge stubs —
+          // a created folder must arrive complete or it never shows up live.
+          "rootFolderId",
+          // Date-grouped lists need timestamps or the new folder lands in "Older".
+          "createdAt",
+          "updatedAt",
         ] as const,
       },
       operation: "merge" as const,
@@ -705,6 +716,8 @@ const { GET } = createEndpoint({
       },
     },
     "folder-updated": {
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
       responseFields: {
         items: [
           "id",
@@ -712,6 +725,7 @@ const { GET } = createEndpoint({
           "icon",
           "color",
           "sortOrder",
+          "rootFolderId",
           "updatedAt",
         ] as const,
       },
@@ -735,7 +749,9 @@ const { GET } = createEndpoint({
       },
     },
     "folder-deleted": {
-      responseFields: { items: ["id"] as const },
+      remoteEvent: true as const,
+      syncDomain: "threads" as const,
+      responseFields: { items: ["id", "rootFolderId"] as const },
       operation: "remove" as const,
       onEvent: async (ctx) => {
         if (ctx.urlPathParams.rootFolderId !== DefaultFolderId.INCOGNITO) {

@@ -23,7 +23,7 @@ import type { SttModelSelection } from "../../speech-to-text/models";
 import { SpeechToTextRepository } from "../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { FileAttachmentHandler } from "./handlers/file-attachment-handler";
+import { FileAttachmentHandler } from "./handlers/attachments";
 
 /**
  * OperationHandler - Handles operation processing and audio transcription
@@ -196,6 +196,12 @@ export class UserMessageHandler {
   }): Promise<
     ResponseType<{
       userMessageId: string | null;
+      /**
+       * The parentId the user-message ROW actually received (createUserMessage
+       * falls back to the last committed message when the requested parent was
+       * never committed). Emits and downstream chain logic must use THIS.
+       */
+      resolvedParentMessageId?: string | null;
       fileUploadPromise?: Promise<{
         success: boolean;
         userMessageId: string;
@@ -363,8 +369,10 @@ export class UserMessageHandler {
     }
 
     // Create user message in DB (server mode only - incognito stores in localStorage)
+    let resolvedParentMessageId: string | null =
+      effectiveParentMessageId || null;
     if (!isIncognito) {
-      await MessagesRepository.createUserMessage({
+      const { resolvedParentId } = await MessagesRepository.createUserMessage({
         messageId: userMessageId,
         threadId,
         rootFolderId,
@@ -377,6 +385,7 @@ export class UserMessageHandler {
         attachments:
           attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
       });
+      resolvedParentMessageId = resolvedParentId;
     }
 
     return success({

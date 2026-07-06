@@ -59,7 +59,7 @@ import { StreamStartHandler } from "./handlers/stream-start-handler";
 import type { HeadlessAiStreamResult } from "./headless";
 import { StreamLoop } from "./loop";
 import { runAutoQueueBranch } from "./queue";
-import { runRelayBranch } from "./relay";
+import { runRelayBranch } from "./relay/caller";
 import {
   emitStreamFinished,
   handleWakeUpRevivalBatch,

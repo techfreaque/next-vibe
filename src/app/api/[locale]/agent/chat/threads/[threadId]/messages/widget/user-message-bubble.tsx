@@ -62,7 +62,6 @@ function UserMessageBubbleInner({
 }: UserMessageBubbleSharedProps & { message: ChatMessage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { group } = useMessageGroupName();
-  const [showVariant, setShowVariant] = useState(false);
   const isQueued = message.metadata?.isQueued === true;
 
   const handleCancelQueued = useCallback(() => {
@@ -139,12 +138,7 @@ function UserMessageBubbleInner({
           {!message.metadata?.gapFillStatus &&
             message.metadata?.variants &&
             message.metadata.variants.length > 0 && (
-              <GapFillVariants
-                variants={message.metadata.variants}
-                showVariant={showVariant}
-                onToggle={() => setShowVariant((v) => !v)}
-                t={t}
-              />
+              <GapFillVariants variants={message.metadata.variants} t={t} />
             )}
         </Div>
 
@@ -240,6 +234,28 @@ function GapFillIcon({
   return <ImageIcon className={cn("h-3 w-3", className)} />;
 }
 
+function variantShowLabel(
+  v: VariantEntry,
+  t: GapFillT,
+): { show: string; hide: string } {
+  if (v.bridgeType === "stt" || v.modality === "audio") {
+    return {
+      show: t("gapFill.showTranscription"),
+      hide: t("gapFill.hideTranscription"),
+    };
+  }
+  if (v.modality === "video") {
+    return {
+      show: t("gapFill.showVideoDescription"),
+      hide: t("gapFill.hideVideoDescription"),
+    };
+  }
+  return {
+    show: t("gapFill.showImageDescription"),
+    hide: t("gapFill.hideImageDescription"),
+  };
+}
+
 function GapFillStatus({
   bridgeType,
   modality,
@@ -278,77 +294,77 @@ interface VariantEntry {
   bridgeType?: string | null;
 }
 
-function GapFillVariants({
-  variants,
-  showVariant,
-  onToggle,
+function GapFillVariantItem({
+  variant,
   t,
 }: {
-  variants: VariantEntry[];
-  showVariant: boolean;
-  onToggle: () => void;
+  variant: VariantEntry;
   t: GapFillT;
 }): JSX.Element {
-  const first = variants[0];
-  const label =
-    first?.bridgeType === "stt"
-      ? t("gapFill.transcription")
-      : first?.bridgeType === "vision" || first?.modality === "image"
-        ? t("gapFill.imageDescription")
-        : first?.modality === "video"
-          ? t("gapFill.videoDescription")
-          : t("gapFill.imageDescription");
+  const [open, setOpen] = useState(false);
+  const { show, hide } = variantShowLabel(variant, t);
 
   return (
     <Div className="mt-2">
       <Button
         variant="ghost"
         size="sm"
-        onClick={onToggle}
+        onClick={() => setOpen((v) => !v)}
         className="h-6 gap-1 px-1.5 py-0 text-xs text-muted-foreground hover:text-foreground rounded-md"
       >
         <GapFillIcon
-          modality={first?.modality ?? "image"}
-          bridgeType={first?.bridgeType ?? ""}
+          modality={variant.modality}
+          bridgeType={variant.bridgeType ?? ""}
           className="opacity-60"
         />
-        <Span>{showVariant ? t("gapFill.hideAnalysis") : label}</Span>
+        <Span>{open ? hide : show}</Span>
       </Button>
 
-      {showVariant && (
-        <Div className="mt-1.5 flex flex-col gap-2">
-          {variants.map((v, i) => (
-            <Div
-              key={i}
-              className="rounded-lg bg-muted/40 border border-border/30 px-3 py-2"
-            >
-              <Span className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                {v.content}
-              </Span>
-              <Div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                {v.modelId && (
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] h-4 px-1.5 font-normal"
-                  >
-                    {v.modelId}
-                  </Badge>
-                )}
-                {v.creditCost !== null &&
-                  v.creditCost !== undefined &&
-                  v.creditCost > 0 && (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] h-4 px-1.5 font-normal"
-                    >
-                      {t("gapFill.variantCost", { cost: String(v.creditCost) })}
-                    </Badge>
-                  )}
-              </Div>
-            </Div>
-          ))}
+      {open && (
+        <Div className="mt-1.5 rounded-lg bg-muted/40 border border-border/30 px-3 py-2">
+          <Span className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">
+            {variant.content}
+          </Span>
+          <Div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+            {variant.modelId && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] h-4 px-1.5 font-normal"
+              >
+                {variant.modelId}
+              </Badge>
+            )}
+            {variant.creditCost !== null &&
+              variant.creditCost !== undefined &&
+              variant.creditCost > 0 && (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] h-4 px-1.5 font-normal"
+                >
+                  {t("gapFill.variantCost", {
+                    cost: String(variant.creditCost),
+                  })}
+                </Badge>
+              )}
+          </Div>
         </Div>
       )}
+    </Div>
+  );
+}
+
+function GapFillVariants({
+  variants,
+  t,
+}: {
+  variants: VariantEntry[];
+  t: GapFillT;
+}): JSX.Element {
+  return (
+    <Div>
+      {variants.map((v, i) => (
+        <GapFillVariantItem key={i} variant={v} t={t} />
+      ))}
     </Div>
   );
 }

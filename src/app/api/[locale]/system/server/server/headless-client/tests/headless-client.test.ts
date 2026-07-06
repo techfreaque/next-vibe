@@ -106,12 +106,7 @@ beforeAll(async () => {
   const [existingDefault] = await db
     .select({ instanceId: instanceIdentities.instanceId })
     .from(instanceIdentities)
-    .where(
-      and(
-        eq(instanceIdentities.userId, user.id),
-        eq(instanceIdentities.isDefault, true),
-      ),
-    )
+    .where(and(eq(instanceIdentities.userId, user.id)))
     .limit(1);
   previousDefaultInstanceId = existingDefault?.instanceId;
 
@@ -131,14 +126,12 @@ beforeAll(async () => {
   await RemoteConnectionRepository.upsertInstanceIdentity({
     userId: user.id,
     instanceId: COMPUTER_NAME,
-    isDefault: true, // makes getLocalInstanceId() return "headless-client"
   });
 
   // Register headless-client → atlas connection with a real JWT token.
   const upsertResult = await RemoteConnectionRepository.upsertRemoteConnection({
     userId: user.id,
     instanceId: COMPUTER_NAME,
-    remoteInstanceId: COMPUTER_NAME,
     remoteUrl: ATLAS_URL,
     token: jwtToken,
     leadId: user.leadId,
@@ -155,23 +148,9 @@ beforeAll(async () => {
 
   // Connection mode:
   //   loopLocation=server  — relay to the connection (headless-client runs the AI loop)
-  //   toolSource=local     — tools + system prompt built locally (client's identity)
-  //   threadMirrorMode=cloud — thread canonical copy on cloud (atlas ws-provider side)
-  await db
-    .update(remoteConnections)
-    .set({
-      threadMirrorMode: "cloud",
-      loopLocation: "server",
-      toolSource: "local",
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(remoteConnections.userId, user.id),
-        eq(remoteConnections.instanceId, COMPUTER_NAME),
-        eq(remoteConnections.isReverseEntry, false),
-      ),
-    );
+  // Connection-level threadMirrorMode/loopLocation/toolSource were write-only
+  // dead config and are gone: loop location is a per-thread/per-stream
+  // property (loopInstanceId), tools + prompt are always client-owned.
 }, 30_000);
 
 afterAll(async () => {
@@ -204,7 +183,6 @@ afterAll(async () => {
     await RemoteConnectionRepository.upsertInstanceIdentity({
       userId: user.id,
       instanceId: previousDefaultInstanceId,
-      isDefault: true,
     });
   }
 });
@@ -235,15 +213,11 @@ async function getTestFolder(testCaseName: string): Promise<string> {
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("headless-client connection registration", () => {
-  it("registers connection with correct mode settings including remoteInstanceId", async () => {
+  it("registers connection with correct mode settings", async () => {
     const [conn] = await db
       .select({
         instanceId: remoteConnections.instanceId,
-        remoteInstanceId: remoteConnections.remoteInstanceId,
         transportMode: remoteConnections.transportMode,
-        threadMirrorMode: remoteConnections.threadMirrorMode,
-        loopLocation: remoteConnections.loopLocation,
-        toolSource: remoteConnections.toolSource,
         remoteUrl: remoteConnections.remoteUrl,
       })
       .from(remoteConnections)
@@ -258,26 +232,7 @@ describe("headless-client connection registration", () => {
 
     expect(conn, "connection row must exist").toBeDefined();
     expect(conn?.instanceId).toBe(COMPUTER_NAME);
-    // remoteInstanceId makes the relay body carry the client's identity so the
-    // ws-provider stores the thread as BACKGROUND/headless-client and the AI's
-    // system prompt contains "Instance ID: headless-client".
-    expect(
-      conn?.remoteInstanceId,
-      "remoteInstanceId must equal COMPUTER_NAME",
-    ).toBe(COMPUTER_NAME);
     expect(conn?.transportMode).toBe("reverse-ws");
-    expect(
-      conn?.loopLocation,
-      "loopLocation=server routes AI loop through relay",
-    ).toBe("server");
-    expect(
-      conn?.toolSource,
-      "toolSource=local means atlas builds system prompt with client identity",
-    ).toBe("local");
-    expect(
-      conn?.threadMirrorMode,
-      "cloud mirror: canonical thread on ws-provider side",
-    ).toBe("cloud");
     expect(conn?.remoteUrl).toBe(ATLAS_URL);
   });
 

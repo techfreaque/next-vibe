@@ -9,15 +9,30 @@ import "server-only";
  * high-frequency). On receive, threads land in the REMOTE/{instanceId}
  * subfolder so both sides share the same conversation history.
  *
- * Wire format carries the remote's `instanceId` so the receiver can resolve
- * the correct local subfolder UUID at upsert time.
+ * Wire format is an envelope: the sender's instanceId, the served threads
+ * (each carrying its origin so the receiver resolves the REMOTE/<origin>
+ * subfolder at upsert time), and — when the serve is complete — a
+ * full-presence thread-id manifest the receiver reconciles deletions against.
  */
-import { and, asc, eq, inArray, isNull, max, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNull,
+  lt,
+  max,
+  ne,
+  notInArray,
+  sql,
+} from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -58,8 +73,26 @@ const syncedMessageSchema = z.object({
 const syncedThreadSchema = z.object({
   /** Thread UUID — used as syncId */
   id: z.string().uuid(),
-  /** Remote's instanceId — receiver resolves local subfolder from this */
-  instanceId: z.string(),
+  /**
+   * The instance that OWNS this thread:
+   *   - the sender's own selfInstanceId for its local (private/background) threads
+   *   - the peer instance for mirror threads (REMOTE/<X>/… or BACKGROUND/remote/<X>/…)
+   * The receiver places foreign-origin threads under REMOTE/<origin>/<segment>
+   * and never re-places its OWN threads (origin === receiver's selfInstanceId).
+   */
+  originInstanceId: z.string(),
+
+  /** The thread's own folderId (same id on every instance; null = root level). */
+  folderId: z.string().uuid().nullable(),
+  /** The origin's root folder id — scaffold segment + own-thread restore. */
+  originRootFolderId: z.string(),
+  /**
+   * The instance the thread's LOOP runs on (sender's column, null = sender-
+   * local). The receiver compares it to its OWN id: when the receiver IS the
+   * executor, the owner's message rows are a MIRROR of the receiver's writes
+   * — never authoritative over them.
+   */
+  loopInstanceId: z.string().nullable().optional(),
   title: z.string(),
   status: z.enum(ThreadStatusDB),
   defaultModel: z.string().nullable(),
@@ -75,7 +108,117 @@ const syncedThreadSchema = z.object({
 
 type SyncedThread = z.infer<typeof syncedThreadSchema>;
 
+/**
+ * Threads wire envelope. `presentThreadIds` lists EVERY sync-eligible thread
+ * id on the sender and ships only when the serve is COMPLETE (batch under the
+ * limit) — the receiver reaps its mirrors of the sender's threads that are
+ * missing from it. Deletions have no tombstones: the thread-deleted event
+ * only reaches connected peers, so a delete during a disconnect would
+ * otherwise leave the mirror behind forever. Legacy payloads were a bare
+ * thread array — still accepted (no reconcile possible without a sender).
+ */
+const syncedThreadsEnvelopeSchema = z.object({
+  senderInstanceId: z.string().nullable(),
+  threads: z.array(syncedThreadSchema),
+  presentThreadIds: z.array(z.string().uuid()).optional(),
+  /**
+   * The sender's OWN private/background folder rows (SAME ids everywhere).
+   * The receiver upserts them under its REMOTE/<sender>/<segment> scaffold —
+   * folders exist BEFORE any thread references them, so no wire ever ships
+   * name chains and thread placement is a plain same-id folderId lookup.
+   */
+  folders: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        parentId: z.string().uuid().nullable(),
+        rootFolderId: z.string(),
+        icon: z.string().nullable().optional(),
+        color: z.string().nullable().optional(),
+      }),
+    )
+    .optional(),
+});
+
+const threadsWireSchema = z.union([
+  syncedThreadsEnvelopeSchema,
+  z.array(syncedThreadSchema).transform((threads) => ({
+    senderInstanceId: null,
+    threads,
+    presentThreadIds: undefined,
+    folders: undefined,
+  })),
+]);
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** One synced folder row — the SAME id travels to every instance. */
+export interface SyncedFolderRow {
+  id: string;
+  name: string;
+  parentId: string | null;
+  icon?: IconKey | null;
+  color?: string | null;
+}
+
+/** A thread's origin: owning instance + SAME-ID folder placement. */
+export interface ThreadOrigin {
+  originInstanceId: string;
+  folderId: string | null;
+  originRootFolderId: string;
+}
+
+/**
+ * Describe a thread's ORIGIN for the wire (sender side). Ownership comes from
+ * the COLUMN (origin_instance_id, NULL = ours) — placement is never decoded.
+ * The folder chain ships as ROWS with PRESERVED ids (root→leaf); the receiver
+ * upserts them by id under its REMOTE/<origin>/<segment> scaffold. Threads
+ * living under REMOTE/<x> (Remote-tab creations) drop the top instance folder
+ * (the receiver's scaffold replaces it) and read as private on the wire.
+ * folderById must contain every folder of the user.
+ */
+export function describeThreadOrigin(
+  thread: {
+    rootFolderId: string;
+    folderId: string | null;
+    originInstanceId: string | null;
+  },
+  selfInstanceId: string,
+): ThreadOrigin {
+  const isLegacyRemote = thread.rootFolderId === DefaultFolderId.REMOTE;
+  return {
+    originInstanceId: thread.originInstanceId ?? selfInstanceId,
+    // SAME-ID placement: the folder id is identical on every instance —
+    // receivers look it up directly (folders sync as first-class items; no
+    // wire ever ships name chains).
+    folderId: thread.folderId,
+    originRootFolderId: isLegacyRemote
+      ? DefaultFolderId.PRIVATE
+      : thread.rootFolderId,
+  };
+}
+
+const SYNC_ELIGIBILITY_TTL_MS = 30_000;
+
+/**
+ * globalThis-backed so it (a) survives vite SSR module duplication and
+ * (b) is safe under circular-import evaluation — the bridge consults
+ * eligibility while this module may still be mid-initialization.
+ */
+function getSyncEligibilityCache(): Map<
+  string,
+  { eligible: boolean; expires: number }
+> {
+  const holder = globalThis as {
+    __vibeThreadSyncEligibility?: Map<
+      string,
+      { eligible: boolean; expires: number }
+    >;
+  };
+  holder.__vibeThreadSyncEligibility ??= new Map();
+  return holder.__vibeThreadSyncEligibility;
+}
 
 /**
  * Whether a thread may leave the instance via thread sync. Pure COLUMN read:
@@ -84,46 +227,288 @@ type SyncedThread = z.infer<typeof syncedThreadSchema>;
  * Missing thread → eligible (a deletion may relay after the row is gone; the
  * peer's applier no-ops when irrelevant). Cached per thread (hot relay path).
  */
-async function resolveRemoteSubfolderId(
+export async function isThreadSyncEligible(
   userId: string,
-  instanceId: string,
+  threadId: string,
+): Promise<boolean> {
+  const now = Date.now();
+  const cache = getSyncEligibilityCache();
+  const cached = cache.get(threadId);
+  if (cached && cached.expires > now) {
+    return cached.eligible;
+  }
+  const [thread] = await db
+    .select({
+      rootFolderId: chatThreads.rootFolderId,
+      syncEligible: chatThreads.syncEligible,
+    })
+    .from(chatThreads)
+    .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)))
+    .limit(1);
+  if (!thread) {
+    return true;
+  }
+  const eligible =
+    thread.syncEligible && thread.rootFolderId !== DefaultFolderId.INCOGNITO;
+  cache.set(threadId, {
+    eligible,
+    expires: now + SYNC_ELIGIBILITY_TTL_MS,
+  });
+  return eligible;
+}
+
+/**
+ * The mirror subtree nests the ORIGIN's root under the instance folder:
+ * REMOTE/<origin>/private/… and REMOTE/<origin>/background/…. Anything that
+ * is not the background root (incl. legacy REMOTE placements) maps to
+ * "private".
+ */
+export function originRootSegment(originRootFolderId: string): string {
+  return originRootFolderId === DefaultFolderId.BACKGROUND
+    ? "background"
+    : "private";
+}
+
+/**
+ * Race-proof select-or-create of ONE folder segment. Concurrent creators
+ * (live thread-updated appliers, message-stub placement, relay landings, the
+ * pull-sync applier) previously raced select-then-insert and produced
+ * duplicate sibling folders. A transaction-scoped advisory lock keyed on the
+ * exact segment identity serializes creation without constraining user-named
+ * folders elsewhere.
+ */
+async function selectOrCreateFolderSegment(
+  userId: string,
+  rootFolderId: string,
+  name: string,
+  parentId: string | null,
+  icon?: IconKey | null,
+  color?: string | null,
 ): Promise<string | null> {
-  try {
-    const [existing] = await db
+  const lockKey = `${userId}|${rootFolderId}|${parentId ?? ""}|${name}`;
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`,
+    );
+    const [existing]: Array<{ id: string }> = await tx
       .select({ id: chatFolders.id })
       .from(chatFolders)
       .where(
         and(
           eq(chatFolders.userId, userId),
-          eq(chatFolders.rootFolderId, DefaultFolderId.REMOTE),
-          eq(chatFolders.name, instanceId),
-          isNull(chatFolders.parentId),
+          eq(
+            chatFolders.rootFolderId,
+            rootFolderId as (typeof chatFolders.$inferSelect)["rootFolderId"],
+          ),
+          eq(chatFolders.name, name),
+          parentId === null
+            ? isNull(chatFolders.parentId)
+            : eq(chatFolders.parentId, parentId),
         ),
       )
       .limit(1);
     if (existing) {
       return existing.id;
     }
+    const [created]: Array<{ id: string }> = await tx
+      .insert(chatFolders)
+      .values({
+        userId,
+        rootFolderId:
+          rootFolderId as (typeof chatFolders.$inferInsert)["rootFolderId"],
+        name,
+        parentId,
+        icon: icon ?? null,
+        color: color ?? null,
+      })
+      .returning({ id: chatFolders.id });
+    return created?.id ?? null;
+  });
+}
 
-    // Folder not found — cannot upsert threads without a valid subfolder.
-    // The connect flow is responsible for creating the folder; if it is absent
-    // it means the connection was never established from this side.
-    return null;
+/**
+ * Race-proof find-or-create of a folder NAME chain under a root. Shared by
+ * every system that materializes placement chains (mirror placement, relay
+ * executor landings). Returns the leaf folder id.
+ */
+export async function ensureFolderChain(
+  userId: string,
+  rootFolderId: string,
+  names: readonly string[],
+): Promise<string | null> {
+  try {
+    let parentId: string | null = null;
+    for (const name of names) {
+      parentId = await selectOrCreateFolderSegment(
+        userId,
+        rootFolderId,
+        name,
+        parentId,
+      );
+      if (parentId === null) {
+        return null;
+      }
+    }
+    return parentId;
   } catch {
     return null;
   }
 }
 
 /**
- * Push a single thread's current state to connected peers via its endpoint's
- * own thread-updated remoteEvent. Used after out-of-band writes to a mirrored
- * thread (detach/wakeUp backfills, revival turns) that happen AFTER the live
- * relay stream closed — the peer applies it via the threads route onRemoteEvent.
- *
- * Only pushes when the thread lives in a REMOTE/<instance> folder (a mirrored
- * thread); local-only threads never sync. Best-effort: the next connect-time
- * push-pull catches anything missed.
+ * Materialize a FOREIGN-origin folder chain with PRESERVED ids under the
+ * REMOTE/<originInstanceId>/<private|background> scaffold. Folders sync like
+ * threads/messages — SAME id on every instance; upsert-by-id makes this
+ * idempotent, re-parenting/renaming follow the origin. Returns the leaf id
+ * (identical to the origin's) or the scaffold id for an empty chain.
  */
+export async function ensureMirrorFolders(
+  userId: string,
+  originInstanceId: string,
+  originRootFolderId: string,
+  folderChain: readonly SyncedFolderRow[],
+): Promise<string | null> {
+  const scaffoldId = await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
+    originInstanceId,
+    originRootSegment(originRootFolderId),
+  ]);
+  if (scaffoldId === null) {
+    return null;
+  }
+  let leafId: string | null = scaffoldId;
+  for (const row of folderChain) {
+    // Reserved scaffold names never arrive as chain content — a wire that
+    // carries one is echoing a receiver-local scaffold (corruption signal).
+    if (row.name === "private" || row.name === "background") {
+      continue;
+    }
+    // A row that already exists OUTSIDE the REMOTE root is a LOCAL ORIGINAL —
+    // we ARE that folder's origin. Mirroring must NEVER steal or re-parent
+    // originals; the id resolves as-is.
+    const [existingRow]: Array<{
+      id: string;
+      rootFolderId: string;
+      parentId: string | null;
+    }> = await db
+      .select({
+        id: chatFolders.id,
+        rootFolderId: chatFolders.rootFolderId,
+        parentId: chatFolders.parentId,
+      })
+      .from(chatFolders)
+      .where(eq(chatFolders.id, row.id))
+      .limit(1);
+    if (existingRow && existingRow.rootFolderId !== DefaultFolderId.REMOTE) {
+      leafId = existingRow.id;
+      continue;
+    }
+    // REMOTE-rooted rows split two ways: MIRRORS live inside the scaffold
+    // subtree (REMOTE/<origin>/<private|background>/…), while Remote-tab
+    // ORIGINALS live directly under REMOTE/<instance>/… — the SAME ids ride
+    // an executor's echo of a relay landing, and re-parenting an original
+    // under the scaffold corrupts the caller's tree. Only rows whose CURRENT
+    // ancestry passes through this origin's scaffold may be re-parented.
+    if (existingRow) {
+      let insideScaffold = false;
+      let walk: string | null = existingRow.parentId;
+      for (let depth = 0; depth < 32 && walk; depth++) {
+        if (walk === scaffoldId) {
+          insideScaffold = true;
+          break;
+        }
+        const [wRow]: Array<{ parentId: string | null }> = await db
+          .select({ parentId: chatFolders.parentId })
+          .from(chatFolders)
+          .where(eq(chatFolders.id, walk))
+          .limit(1);
+        walk = wRow?.parentId ?? null;
+      }
+      if (!insideScaffold) {
+        leafId = existingRow.id;
+        continue;
+      }
+    }
+    let parentId = row.parentId ?? scaffoldId;
+    if (parentId === row.id) {
+      parentId = scaffoldId;
+    }
+    if (row.parentId) {
+      // Out-of-order tolerance: a parent that has not synced yet falls back
+      // to the scaffold; a later chain upsert re-parents it (upsert-by-id).
+      const [parentRow]: Array<{ id: string }> = await db
+        .select({ id: chatFolders.id })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, row.parentId))
+        .limit(1);
+      if (!parentRow) {
+        parentId = scaffoldId;
+      }
+    }
+    // Cycle-proofing: never re-parent a row under its own descendant.
+    let ancestor: string | null = parentId;
+    for (let depth = 0; depth < 32 && ancestor; depth++) {
+      if (ancestor === row.id) {
+        parentId = scaffoldId;
+        break;
+      }
+      const [parentRow2]: Array<{ parentId: string | null }> = await db
+        .select({ parentId: chatFolders.parentId })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, ancestor))
+        .limit(1);
+      ancestor = parentRow2?.parentId ?? null;
+    }
+    if (existingRow) {
+      const [current]: Array<{ parentId: string | null }> = await db
+        .select({ parentId: chatFolders.parentId })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, row.id))
+        .limit(1);
+      if (current && current.parentId !== parentId) {
+        // Re-parenting an existing mirror row — legitimate when the origin
+        // moved the folder, but the historical corruption vector. Loud trail.
+        // eslint-disable-next-line no-console
+        console.warn("[MirrorFolders] RE-PARENT", {
+          folderId: row.id,
+          name: row.name,
+          from: current.parentId,
+          to: parentId,
+          originInstanceId,
+          originRootFolderId,
+          stack: new Error("re-parent-trail").stack,
+        });
+      }
+    }
+    try {
+      await db
+        .insert(chatFolders)
+        .values({
+          id: row.id,
+          userId,
+          rootFolderId: DefaultFolderId.REMOTE,
+          name: row.name,
+          parentId,
+          icon: row.icon ?? null,
+          color: row.color ?? null,
+        })
+        .onConflictDoUpdate({
+          target: chatFolders.id,
+          set: {
+            name: row.name,
+            parentId,
+            updatedAt: new Date(),
+            icon: row.icon ?? null,
+            color: row.color ?? null,
+          },
+        });
+      leafId = row.id;
+    } catch {
+      return null;
+    }
+  }
+  return leafId;
+}
+
 export async function pushThreadSync(
   threadId: string,
   userId: string,
@@ -136,6 +521,8 @@ export async function pushThreadSync(
         title: chatThreads.title,
         folderId: chatThreads.folderId,
         status: chatThreads.status,
+        originInstanceId: chatThreads.originInstanceId,
+        syncEligible: chatThreads.syncEligible,
       })
       .from(chatThreads)
       .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)))
@@ -144,8 +531,8 @@ export async function pushThreadSync(
     // threads carry sync_eligible=false. Never derived from folder names.
     if (
       !thread ||
-      (thread.rootFolderId !== DefaultFolderId.REMOTE &&
-        thread.rootFolderId !== DefaultFolderId.BACKGROUND)
+      thread.rootFolderId === DefaultFolderId.INCOGNITO ||
+      !thread.syncEligible
     ) {
       return;
     }
@@ -174,6 +561,7 @@ export async function pushThreadSync(
       isPublic: false,
       roles: [],
     };
+
     createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
       urlPathParams: { threadId },
     })("thread-updated", {
@@ -196,6 +584,30 @@ export async function pushThreadSync(
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const threadsSyncProvider: SyncProvider = {
+  // Connect-time scaffold: REMOTE/<peer>/private + REMOTE/<peer>/background
+  // exist from the moment the link is live — every mirror (sync AND relay
+  // landing) hangs off these stable roots; no wire ever ships name chains.
+  async onConnectionEstablished(userId, peerInstanceId): Promise<void> {
+    await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
+      peerInstanceId,
+      "private",
+    ]);
+    await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
+      peerInstanceId,
+      "background",
+    ]);
+  },
+
+  // Thread-scoped relay gate: incognito and transient (sync_eligible=false)
+  // threads are instance-local — their events must never cross (they would
+  // materialize orphan mirror stubs on peers).
+  async remoteEventGate(userId, urlPathParams): Promise<boolean> {
+    const threadId = urlPathParams?.["threadId"];
+    if (typeof threadId !== "string" || threadId.length === 0) {
+      return true;
+    }
+    return isThreadSyncEligible(userId, threadId);
+  },
   key: "threads",
   labelKey: "threads",
 
@@ -255,6 +667,30 @@ export const threadsSyncProvider: SyncProvider = {
       // JSON.stringify). THREAD_SYNC_BATCH bounds each payload; the `>=` filter
       // re-serves the boundary thread idempotently so no thread is skipped when
       // several share the same updatedAt at the batch edge.
+      // The sender's OWN private/background folders ride every exchange —
+      // small bounded set, idempotent same-id upserts on the receiver. This
+      // (plus live folder-created events + the connect-time scaffold) is why
+      // no wire ever needs folder name chains.
+      const ownFolders = await db
+        .select({
+          id: chatFolders.id,
+          name: chatFolders.name,
+          parentId: chatFolders.parentId,
+          rootFolderId: chatFolders.rootFolderId,
+          icon: chatFolders.icon,
+          color: chatFolders.color,
+        })
+        .from(chatFolders)
+        .where(
+          and(
+            eq(chatFolders.userId, userId),
+            inArray(chatFolders.rootFolderId, [
+              DefaultFolderId.PRIVATE,
+              DefaultFolderId.BACKGROUND,
+            ]),
+          ),
+        );
+
       const THREAD_SYNC_BATCH = 200;
       const threads = await db
         .select()
@@ -275,54 +711,12 @@ export const threadsSyncProvider: SyncProvider = {
 
       const result: SyncedThread[] = [];
 
-      // Resolve instanceIds from the folder names (REMOTE/{instanceId} subfolders).
-      // For nested paths (e.g. REMOTE/hermes/tests/suite or BACKGROUND/atlas/tests/suite),
-      // we need the TOP-LEVEL subfolder name (the instanceId), not the immediate folder.
-      // Load all REMOTE+BACKGROUND folders for this user in one query and walk up the
-      // tree in memory to find the top-level (parentId IS NULL) subfolder name.
-      const threadFolderIds = new Set(
-        threads
-          .map((t) => t.folderId)
-          .filter((id): id is string => id !== null),
-      );
-      const instanceIdByFolderId = new Map<string, string>();
-      if (threadFolderIds.size > 0) {
-        const allMirrorFolders = await db
-          .select({
-            id: chatFolders.id,
-            name: chatFolders.name,
-            parentId: chatFolders.parentId,
-            rootFolderId: chatFolders.rootFolderId,
-          })
-          .from(chatFolders)
-          .where(
-            and(
-              eq(chatFolders.userId, userId),
-              inArray(chatFolders.rootFolderId, [
-                DefaultFolderId.REMOTE,
-                DefaultFolderId.BACKGROUND,
-              ]),
-            ),
-          );
-        // Build a map of id → folder for O(1) parent-walk
-        const folderById = new Map(allMirrorFolders.map((f) => [f.id, f]));
-        // For each thread's folderId, walk up to the top-level subfolder
-        for (const folderId of threadFolderIds) {
-          let folderCursor = folderById.get(folderId);
-          if (!folderCursor) {
-            continue;
-          }
-          while (folderCursor.parentId !== null) {
-            const parent = folderById.get(folderCursor.parentId);
-            if (!parent) {
-              break;
-            }
-            folderCursor = parent;
-          }
-          // folderCursor is now the top-level subfolder whose name IS the instanceId
-          instanceIdByFolderId.set(folderId, folderCursor.name);
-        }
-      }
+      // Resolve each thread's ORIGIN (owning instance + folder name chain) —
+      // the receiver places foreign-origin threads by SAME-ID folder lookup.
+      const { RemoteConnectionRepository } =
+        await import("@/app/api/[locale]/remote-connection/repository");
+      const selfInstanceId =
+        await RemoteConnectionRepository.getLocalInstanceId(userId);
 
       // Load messages for all threads in one query, grouped per thread in
       // memory. Ascending createdAt: parents precede children (parentId
@@ -351,9 +745,18 @@ export const threadsSyncProvider: SyncProvider = {
       }
 
       for (const thread of threads) {
-        const instanceId = thread.folderId
-          ? (instanceIdByFolderId.get(thread.folderId) ?? "")
-          : "";
+        // COLUMN-gated: incognito has no server rows; transient plumbing
+        // threads carry sync_eligible=false. Same rule as the live gates.
+        if (
+          thread.rootFolderId === DefaultFolderId.INCOGNITO ||
+          !thread.syncEligible
+        ) {
+          continue;
+        }
+        const origin = describeThreadOrigin(thread, selfInstanceId);
+        // Foreign-origin threads are OWNED by that instance — the receiver's
+        // copy is a mirror and applies owner-authoritatively.
+        const isForeignOrigin = origin.originInstanceId !== selfInstanceId;
 
         // Return messages changed since the cursor — by updatedAt, not just
         // createdAt, so an IN-PLACE edit (detach/wakeUp result backfill bumps
@@ -363,7 +766,7 @@ export const threadsSyncProvider: SyncProvider = {
         // receiver: serve ALL their messages so any out-of-band re-parent or
         // backfill is delivered in full — the receiver applies unconditionally
         // and idempotently, so there is nothing to miss at a cursor boundary.
-        const isOwnerAuthoritative = instanceId !== "";
+        const isOwnerAuthoritative = isForeignOrigin;
         const msgCursor = typedCursor?.messageCursors[thread.id] ?? null;
         const msgCursorTime = msgCursor ? new Date(msgCursor).getTime() : null;
         const messages = (messagesByThreadId.get(thread.id) ?? []).filter(
@@ -379,7 +782,10 @@ export const threadsSyncProvider: SyncProvider = {
 
         result.push({
           id: thread.id,
-          instanceId,
+          originInstanceId: origin.originInstanceId,
+          loopInstanceId: thread.loopInstanceId ?? null,
+          folderId: origin.folderId,
+          originRootFolderId: origin.originRootFolderId,
           title: thread.title,
           status: thread.status,
           defaultModel: thread.defaultModel ?? null,
@@ -434,8 +840,31 @@ export const threadsSyncProvider: SyncProvider = {
         }
       }
 
+      // Full-presence manifest — only when this batch COMPLETES the serve
+      // (raw batch under the limit), so a receiver never reaps against a
+      // partial view of our threads.
+      let presentThreadIds: string[] | undefined;
+      if (threads.length < THREAD_SYNC_BATCH) {
+        const presentRows = await db
+          .select({ id: chatThreads.id })
+          .from(chatThreads)
+          .where(
+            and(
+              eq(chatThreads.userId, userId),
+              eq(chatThreads.syncEligible, true),
+              ne(chatThreads.rootFolderId, DefaultFolderId.INCOGNITO),
+            ),
+          );
+        presentThreadIds = presentRows.map((r) => r.id);
+      }
+
       return {
-        json: JSON.stringify(result),
+        json: JSON.stringify({
+          senderInstanceId: selfInstanceId,
+          threads: result,
+          folders: ownFolders,
+          ...(presentThreadIds !== undefined && { presentThreadIds }),
+        }),
         cursor: { threadsCursor, messageCursors },
       };
     } catch (error) {
@@ -447,10 +876,53 @@ export const threadsSyncProvider: SyncProvider = {
   },
 
   async upsertFromJson(json, userId, logger) {
-    const remoteThreads = z.array(syncedThreadSchema).parse(JSON.parse(json));
+    const {
+      senderInstanceId,
+      threads: remoteThreads,
+      presentThreadIds,
+      folders: remoteFolders,
+    } = threadsWireSchema.parse(JSON.parse(json));
     let synced = 0;
 
-    // Cache subfolder lookups to avoid N queries for the same instanceId
+    // Placement: foreign-origin threads land at REMOTE/<origin>/<folderPath>;
+    // OWN threads (origin === our selfInstanceId) are never re-placed by a
+    // peer's echo. Cache resolved chains per origin+path.
+    const { RemoteConnectionRepository } =
+      await import("@/app/api/[locale]/remote-connection/repository");
+    const selfInstanceId =
+      await RemoteConnectionRepository.getLocalInstanceId(userId);
+
+    // The sender's OWN folders land FIRST (same ids, under our
+    // REMOTE/<sender>/<segment> scaffold) — every thread that references one
+    // of them then places with a plain same-id lookup. Never applied for our
+    // own echo (senderInstanceId === self).
+    if (
+      remoteFolders &&
+      remoteFolders.length > 0 &&
+      senderInstanceId &&
+      senderInstanceId !== selfInstanceId
+    ) {
+      const byRoot = new Map<string, typeof remoteFolders>();
+      for (const row of remoteFolders) {
+        const bucket = byRoot.get(row.rootFolderId) ?? [];
+        bucket.push(row);
+        byRoot.set(row.rootFolderId, bucket);
+      }
+      for (const [originRoot, rows] of byRoot) {
+        await ensureMirrorFolders(
+          userId,
+          senderInstanceId,
+          originRoot,
+          // Structural fields only — icon/color are wire strings, not the
+          // typed IconKey union; mirrors keep defaults.
+          rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            parentId: row.parentId,
+          })),
+        );
+      }
+    }
     const folderCache = new Map<string, string | null>();
 
     // Load existing threads and messages for the incoming ids up front
@@ -458,7 +930,11 @@ export const threadsSyncProvider: SyncProvider = {
     const existingThreadRows =
       remoteThreadIds.length > 0
         ? await db
-            .select({ id: chatThreads.id, updatedAt: chatThreads.updatedAt })
+            .select({
+              id: chatThreads.id,
+              updatedAt: chatThreads.updatedAt,
+              loopInstanceId: chatThreads.loopInstanceId,
+            })
             .from(chatThreads)
             .where(
               and(
@@ -496,27 +972,47 @@ export const threadsSyncProvider: SyncProvider = {
 
     for (const remoteThread of remoteThreads) {
       try {
-        // Resolve the local subfolder UUID for this thread's instanceId
+        // We are the MIRROR for every foreign-origin thread — the owner's copy
+        // is authoritative and it lands under REMOTE/<origin>/<folderPath>.
+        const isForeignOrigin =
+          remoteThread.originInstanceId !== selfInstanceId;
+        logger.debug("[ThreadsSync] upsert decision", {
+          threadId: remoteThread.id,
+          wireOrigin: remoteThread.originInstanceId,
+          selfInstanceId,
+          isForeignOrigin,
+          existing: existingThreadById.has(remoteThread.id),
+          wireFolderId: remoteThread.folderId,
+        });
+        // Placement is a plain SAME-ID lookup: the sender's folders landed
+        // above (and continuously via folder events + the connect scaffold)
+        // — no chains ride any wire. A not-yet-synced folder leaves the
+        // mirror unplaced for this pass; the next exchange heals it.
         let folderId: string | null = null;
-        if (remoteThread.instanceId) {
-          const cached = folderCache.get(remoteThread.instanceId);
+        if (isForeignOrigin && remoteThread.folderId) {
+          const cached = folderCache.get(remoteThread.folderId);
           if (cached !== undefined) {
             folderId = cached;
           } else {
-            folderId = await resolveRemoteSubfolderId(
-              userId,
-              remoteThread.instanceId,
-            );
-            folderCache.set(remoteThread.instanceId, folderId);
+            const [folderRow] = await db
+              .select({ id: chatFolders.id })
+              .from(chatFolders)
+              .where(
+                and(
+                  eq(chatFolders.id, remoteThread.folderId),
+                  eq(chatFolders.userId, userId),
+                ),
+              )
+              .limit(1);
+            folderId = folderRow ? remoteThread.folderId : null;
+            folderCache.set(remoteThread.folderId, folderId);
           }
         }
 
         const existing = existingThreadById.get(remoteThread.id);
 
         const remoteTime = new Date(remoteThread.updatedAt).getTime();
-        // Owner-authoritative for REMOTE-folder (mirrored) threads — see the
-        // message loop below. instanceId is set only for REMOTE-folder threads.
-        const ownerAuthoritativeThread = remoteThread.instanceId !== "";
+        const ownerAuthoritativeThread = isForeignOrigin;
 
         if (existing) {
           // Owner-authoritative for mirrored threads; else last-writer-wins
@@ -537,7 +1033,15 @@ export const threadsSyncProvider: SyncProvider = {
                 tags: remoteThread.tags,
                 pinned: remoteThread.pinned,
                 archived: remoteThread.archived,
-                ...(folderId !== null && { folderId }),
+                // Mirror placement is derived, never user-set: keep it in
+                // sync with the origin's folder chain. rootFolderId included:
+                // it HEALS a mirror row that was ever created mis-rooted (a
+                // foreign thread must always live under the REMOTE root).
+                ...(isForeignOrigin && folderId !== null && { folderId }),
+                ...(isForeignOrigin && {
+                  rootFolderId: DefaultFolderId.REMOTE,
+                  originInstanceId: remoteThread.originInstanceId,
+                }),
                 updatedAt: new Date(remoteThread.updatedAt),
               })
               .where(
@@ -554,8 +1058,15 @@ export const threadsSyncProvider: SyncProvider = {
           threadInsertRows.push({
             id: remoteThread.id,
             userId,
-            rootFolderId: DefaultFolderId.REMOTE,
+            rootFolderId: isForeignOrigin
+              ? DefaultFolderId.REMOTE
+              : (remoteThread.originRootFolderId as (typeof chatThreads.$inferInsert)["rootFolderId"]),
             folderId: folderId ?? undefined,
+            // Ownership is a COLUMN — mirrors carry their origin label, own
+            // restores stay NULL (ours). Never decoded from folders again.
+            originInstanceId: isForeignOrigin
+              ? remoteThread.originInstanceId
+              : null,
             title: remoteThread.title,
             status: remoteThread.status,
             defaultModel: remoteThread.defaultModel as ChatModelId | null,
@@ -575,7 +1086,20 @@ export const threadsSyncProvider: SyncProvider = {
         // unconditionally instead of LWW: the local mirror's updatedAt is set
         // by the live-relay processor on an independent clock and would race
         // the owner's out-of-band edits (compacting re-parent, detach backfill).
-        const ownerAuthoritative = remoteThread.instanceId !== "";
+        // Message authority is the WRITER's, not the thread owner's:
+        //  - our OWN thread whose loop runs remotely: the serving peer (the
+        //    executor) wrote the rows — ADOPT structure + creation time.
+        //  - a foreign-origin thread whose loop runs HERE (wire says WE are
+        //    the loop instance): the owner's copy mirrors OUR writes — its
+        //    echo must NEVER overwrite the executor's truth (the ping-pong
+        //    that once rewrote correct rows with stub-corrupted mirrors).
+        const loopRunsRemotely = Boolean(
+          existingThreadById.get(remoteThread.id)?.loopInstanceId,
+        );
+        const executorIsHere = remoteThread.loopInstanceId === selfInstanceId;
+        const ownerAuthoritative =
+          (isForeignOrigin && !executorIsHere) || loopRunsRemotely;
+        const skipMessageUpdates = executorIsHere;
 
         // Upsert messages — owner-authoritative for mirrored threads, else LWW.
         for (const remoteMsg of remoteThread.messages) {
@@ -586,22 +1110,40 @@ export const threadsSyncProvider: SyncProvider = {
 
             if (existingMsg) {
               if (
-                ownerAuthoritative ||
-                msgRemoteTime >= existingMsg.updatedAt.getTime()
+                !skipMessageUpdates &&
+                (ownerAuthoritative ||
+                  msgRemoteTime >= existingMsg.updatedAt.getTime())
               ) {
                 await db
                   .update(chatMessages)
                   .set({
                     content: remoteMsg.content,
-                    // Owner-authoritative threads are mirrored from a remote
-                    // relay: the local relay-processor already set the correct
-                    // parentId chain. Overwriting it with the remote's value
-                    // can corrupt the chain (e.g. hermes re-parents via a
-                    // compacting node that was filtered from the sync payload).
-                    // For LWW (non-owner-authoritative) threads there is no
-                    // relay, so the remote's parentId IS authoritative.
+                    // parentId adoption:
+                    //  - LWW threads: the remote's parentId IS authoritative.
+                    //  - writer-authoritative threads: adopt too — a lost live
+                    //    message-created leaves a parentless stub (phantom
+                    //    root) only the pull can heal — but ONLY when the
+                    //    referenced parent exists locally: the wire filters
+                    //    compacting nodes, and a dangling reference must keep
+                    //    the local (pre-compaction) chain instead of breaking
+                    //    the FK.
                     ...(!ownerAuthoritative && {
                       parentId: remoteMsg.parentId,
+                    }),
+                    ...(ownerAuthoritative &&
+                      (remoteMsg.parentId === null ||
+                        existingMessageById.has(remoteMsg.parentId)) && {
+                        parentId: remoteMsg.parentId,
+                      }),
+                    // Wire role heals a mis-roled stub (parent stubs default
+                    // to assistant until the real event names the role).
+                    role: remoteMsg.role,
+                    // Owner-authoritative mirrors HEAL createdAt: a lost live
+                    // message-created leaves a delta-built stub stamped with
+                    // local arrival time — chain chronology breaks until the
+                    // pull restores the owner's authoritative creation time.
+                    ...(ownerAuthoritative && {
+                      createdAt: new Date(remoteMsg.createdAt),
                     }),
                     sequenceId: remoteMsg.sequenceId,
                     authorId: remoteMsg.authorId,
@@ -760,6 +1302,65 @@ export const threadsSyncProvider: SyncProvider = {
             );
           }
         }
+      }
+    }
+
+    // Presence reconcile: reap our mirrors of the sender's threads that were
+    // deleted on the sender while we were disconnected. Only mirrors OF the
+    // sender (originInstanceId column) are eligible — a peer must never reap
+    // another origin's mirrors or our own threads. The 60s updatedAt grace
+    // shields a mirror born from a live relay event racing this exchange (the
+    // manifest may predate it); a genuinely deleted one reaps on the next pull.
+    if (senderInstanceId && presentThreadIds) {
+      try {
+        const staleMirrors = await db
+          .select({ id: chatThreads.id })
+          .from(chatThreads)
+          .where(
+            and(
+              eq(chatThreads.userId, userId),
+              eq(chatThreads.originInstanceId, senderInstanceId),
+              lt(chatThreads.updatedAt, new Date(Date.now() - 60_000)),
+              ...(presentThreadIds.length > 0
+                ? [notInArray(chatThreads.id, presentThreadIds)]
+                : []),
+            ),
+          );
+        if (staleMirrors.length > 0) {
+          const { ThreadByIdRepository } =
+            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/repository");
+          const user: JwtPrivatePayloadType = {
+            id: userId,
+            leadId: userId,
+            isPublic: false,
+            roles: [],
+          };
+          for (const stale of staleMirrors) {
+            // relayed=true: applying the owner's deletion — never relay back.
+            const result = await ThreadByIdRepository.deleteThread(
+              stale.id,
+              user,
+              defaultLocale,
+              logger,
+              true,
+            );
+            if (!result.success) {
+              logger.warn("[ThreadsSync] Failed to reap deleted mirror", {
+                threadId: stale.id,
+                message: result.message,
+              });
+            }
+          }
+          logger.info("[ThreadsSync] Reaped mirrors deleted on origin", {
+            origin: senderInstanceId,
+            count: staleMirrors.length,
+          });
+        }
+      } catch (error) {
+        logger.error(
+          "[ThreadsSync] Presence reconcile failed",
+          parseError(error),
+        );
       }
     }
 

@@ -260,11 +260,6 @@ export const translations = {
       label: "Subfolder",
       description: "Optional subfolder within the root folder",
     },
-    loopInstanceId: {
-      label: "Runs on",
-      description:
-        "Connected instance that runs the AI loop for this stream. Empty = this instance. Stamped on the thread for follow-up turns.",
-    },
     threadId: {
       label: "Thread ID",
       description:
@@ -448,6 +443,9 @@ export const translations = {
       threadId: "Thread ID",
       totalTokens: "Total tokens used",
       finishReason: "Completion reason",
+      lastAiMessageContent: "Final AI message content",
+      lastGeneratedMediaUrl: "Generated media URL",
+      totalCreditsDeducted: "Credits deducted",
     },
     errors: {
       unauthorized: {

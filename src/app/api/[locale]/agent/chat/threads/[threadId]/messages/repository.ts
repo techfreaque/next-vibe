@@ -260,13 +260,13 @@ export class MessagesRepository {
     }>;
     /** Extra metadata to merge into the message (e.g. isQueued, queuedSettings) */
     extraMetadata?: Partial<NonNullable<ChatMessage["metadata"]>>;
-  }): Promise<void> {
+  }): Promise<{ resolvedParentId: string | null }> {
     // Incognito threads live in client storage only — no DB row exists or should be created.
     if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
       params.logger.debug(
         "createUserMessage skipped: incognito folder (expected - no DB persistence for incognito)",
       );
-      return;
+      return { resolvedParentId: params.parentId };
     }
 
     const metadata = {
@@ -295,7 +295,7 @@ export class MessagesRepository {
           isQueued: params.extraMetadata?.isQueued ?? false,
         },
       );
-      return;
+      return { resolvedParentId: params.parentId };
     }
 
     // Verify parent exists - the client may reference an optimistic message that was never
@@ -368,6 +368,10 @@ export class MessagesRepository {
       authorName: params.authorName,
       attachmentCount: params.attachments?.length ?? 0,
     });
+    // The parent the row ACTUALLY got — callers must emit THIS, not the
+    // requested one, or mirrors rebuild a different chain (and materialize a
+    // phantom stub for a never-committed parent id).
+    return { resolvedParentId };
   }
 
   /**
@@ -1113,6 +1117,35 @@ async function upsertRemoteToolCallMetadata(
 }
 
 export class MessagesRemoteRepository {
+  /**
+   * Local re-emit channel for a relayed event. The messages channel is keyed
+   * by threadId + rootFolderId, so the re-emit must bind the mirror thread's
+   * ACTUAL root — a `requestData: {}` binding builds a different channel
+   * string and subscribed viewers (who key on rootFolderId) never match the
+   * envelope. fanOut:false — a re-emit must never relay back (echo loop).
+   */
+  private static async mirrorEmitter(
+    threadId: string,
+    logger: EndpointLogger,
+    user: JwtPayloadType,
+  ): Promise<MessagesWsEmit> {
+    const [thread] = await db
+      .select({ rootFolderId: chatThreads.rootFolderId })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    const { createMessagesEmitter } = await import("./emitter");
+    return createMessagesEmitter(
+      logger,
+      user,
+      {
+        threadId,
+        rootFolderId: thread?.rootFolderId ?? DefaultFolderId.REMOTE,
+      },
+      { fanOut: false },
+    );
+  }
+
   static async applyRemoteMessageCreated({
     responseData,
     urlPathParams,
@@ -1135,10 +1168,64 @@ export class MessagesRemoteRepository {
     if (!msgId || !msgThreadId) {
       return;
     }
-    const role = raw.role ?? ChatMessageRole.USER;
+    if (!raw.role) {
+      // NEVER fabricate a role: a role-less wire message once turned an
+      // assistant row into a phantom USER root on the mirror. Drop + trail.
+      logger.warn("[MessagesRemote] message-created without role — dropped", {
+        messageId: msgId,
+        threadId: msgThreadId,
+      });
+      return;
+    }
+    const role = raw.role;
     const content = raw.content ?? "";
     const metadata = raw.metadata ?? {};
     const updatedAt = raw.updatedAt ? new Date(raw.updatedAt) : new Date();
+    // The thread row itself may not exist yet (live mirroring of a brand-new
+    // thread: message events can beat the thread-updated event). Upsert a
+    // minimal REMOTE stub — thread-updated / pull-sync places and backfills it.
+    const [createdStub] = await db
+      .insert(chatThreads)
+      .values({
+        id: msgThreadId,
+        userId: "id" in user && typeof user.id === "string" ? user.id : null,
+        rootFolderId: DefaultFolderId.REMOTE,
+        title: "",
+        // Ownership is a COLUMN: the stub's origin is the SENDING instance
+        // (the bridge wire label) — thread-updated refines placement later.
+        originInstanceId,
+      })
+      .onConflictDoNothing()
+      .returning({ id: chatThreads.id })
+      .catch((): Array<{ id: string }> => []);
+    if (createdStub) {
+      // Brand-new mirror thread: surface it in open sidebars immediately —
+      // thread-updated later delivers title + folder placement.
+      const { createFolderContentsEmitter } =
+        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter");
+      const now = new Date();
+      createFolderContentsEmitter(
+        logger,
+        user,
+        DefaultFolderId.REMOTE,
+      )("thread-created", {
+        responseData: {
+          items: [
+            {
+              id: msgThreadId,
+              type: "thread" as const,
+              title: "",
+              rootFolderId: DefaultFolderId.REMOTE,
+              folderId: null,
+              status: ThreadStatus.ACTIVE,
+              streamingState: ThreadStreamingState.STREAMING,
+              createdAt: now,
+              updatedAt: now,
+            },
+          ],
+        },
+      });
+    }
     // Relayed events arrive as independent HTTP posts with NO ordering
     // guarantee. parent_id carries an FK — if this child applies before its
     // parent's own message-created, the write would fail and the chain break
@@ -1194,6 +1281,14 @@ export class MessagesRemoteRepository {
         set:
           role === ChatMessageRole.USER
             ? {
+                role,
+                isAI: raw.isAI ?? false,
+                content: sql`CASE WHEN ${chatMessages.content} = '' OR ${chatMessages.content} IS NULL THEN excluded.content ELSE ${chatMessages.content} END`,
+                parentId: sql`COALESCE(${chatMessages.parentId}, excluded.parent_id)`,
+                authorId: sql`COALESCE(${chatMessages.authorId}, excluded.author_id)`,
+                createdAt: raw.createdAt
+                  ? new Date(raw.createdAt)
+                  : sql`${chatMessages.createdAt}`,
                 metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(excluded.metadata)`,
                 updatedAt,
               }
@@ -1247,11 +1342,13 @@ export class MessagesRemoteRepository {
         .where(eq(chatThreads.id, msgThreadId))
         .catch(() => undefined);
     }
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("message-created", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("message-created", { responseData });
   }
 
   static async applyRemoteError({
@@ -1275,11 +1372,13 @@ export class MessagesRemoteRepository {
       })
       .where(eq(chatMessages.id, msg.id))
       .catch(() => undefined);
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("error", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("error", { responseData });
   }
 
   static async applyRemoteContentDone({
@@ -1331,11 +1430,138 @@ export class MessagesRemoteRepository {
         },
       })
       .catch(() => undefined);
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("content-done", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("content-done", { responseData });
+  }
+
+  /**
+   * Cross-instance applier for `content-delta`: append the chunk to the
+   * mirror row and re-emit locally so the peer's viewers see the message
+   * STREAM in live. Out-of-order arrivals can scramble the appended DB text;
+   * content-done later overwrites with the authoritative full content.
+   */
+  static async applyRemoteContentDelta({
+    responseData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "content-delta"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
+    const threadId = urlPathParams.threadId;
+    if (!msg?.id || !msg.content || typeof threadId !== "string") {
+      return;
+    }
+    await db
+      .insert(chatMessages)
+      .values({
+        id: msg.id,
+        threadId,
+        role: ChatMessageRole.ASSISTANT,
+        isAI: true,
+        content: msg.content,
+        metadata: {},
+      })
+      .onConflictDoUpdate({
+        target: chatMessages.id,
+        set: {
+          content: sql`${chatMessages.content} || excluded.content`,
+        },
+      })
+      .catch(() => undefined);
+    (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
+      "content-delta",
+      { responseData },
+    );
+  }
+
+  /**
+   * Cross-instance applier for `reasoning-delta`: same live-streaming path as
+   * content-delta (reasoning rides in the content field).
+   */
+  static async applyRemoteReasoningDelta({
+    responseData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "reasoning-delta"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
+    const threadId = urlPathParams.threadId;
+    if (!msg?.id || !msg.content || typeof threadId !== "string") {
+      return;
+    }
+    await db
+      .insert(chatMessages)
+      .values({
+        id: msg.id,
+        threadId,
+        role: ChatMessageRole.ASSISTANT,
+        isAI: true,
+        content: msg.content,
+        metadata: {},
+      })
+      .onConflictDoUpdate({
+        target: chatMessages.id,
+        set: {
+          content: sql`${chatMessages.content} || excluded.content`,
+        },
+      })
+      .catch(() => undefined);
+    (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
+      "reasoning-delta",
+      { responseData },
+    );
+  }
+
+  /**
+   * Cross-instance applier for `reasoning-done`: settle the reasoning block
+   * (authoritative full text replaces the appended chunks) and re-emit.
+   */
+  static async applyRemoteReasoningDone({
+    responseData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof definitions.GET,
+    "reasoning-done"
+  >): Promise<void> {
+    const msg = responseData.messages?.[0];
+    const threadId = urlPathParams.threadId;
+    if (!msg?.id || typeof threadId !== "string") {
+      return;
+    }
+    if (msg.content) {
+      await db
+        .insert(chatMessages)
+        .values({
+          id: msg.id,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          isAI: true,
+          content: msg.content,
+          metadata: {},
+        })
+        .onConflictDoUpdate({
+          target: chatMessages.id,
+          set: { content: msg.content },
+        })
+        .catch(() => undefined);
+    }
+    (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
+      "reasoning-done",
+      { responseData },
+    );
   }
 
   static async applyRemoteToolResult({
@@ -1383,11 +1609,13 @@ export class MessagesRemoteRepository {
       urlPathParams.threadId,
       taggedToolCall,
     );
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("tool-result", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("tool-result", { responseData });
   }
 
   static async applyRemoteToolResultUpdated({
@@ -1413,11 +1641,13 @@ export class MessagesRemoteRepository {
       urlPathParams.threadId,
       taggedToolCall,
     );
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("tool-result-updated", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("tool-result-updated", { responseData });
   }
 
   static async applyRemoteTokensUpdated({
@@ -1473,11 +1703,13 @@ export class MessagesRemoteRepository {
         .where(eq(chatMessages.id, msg.id))
         .catch(() => undefined);
     }
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("tokens-updated", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("tokens-updated", { responseData });
   }
 
   static async applyRemoteStreamFinished({
@@ -1499,11 +1731,13 @@ export class MessagesRemoteRepository {
           { threadId, error: err.message },
         );
       });
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("stream-finished", {
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("stream-finished", {
       responseData: { streamingState: ThreadStreamingState.IDLE },
     });
   }
@@ -1538,10 +1772,12 @@ export class MessagesRemoteRepository {
             ),
       )
       .catch(() => undefined);
-    createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams,
-      requestData: {},
-      fanOut: false,
-    })("streaming-state-changed", { responseData });
+    (
+      await MessagesRemoteRepository.mirrorEmitter(
+        urlPathParams.threadId,
+        logger,
+        user,
+      )
+    )("streaming-state-changed", { responseData });
   }
 }

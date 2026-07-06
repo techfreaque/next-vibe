@@ -420,6 +420,17 @@ export function FavoriteEditContainer({
     });
   };
 
+  const handleReport = async (): Promise<void> => {
+    if (!baseSkillId || isNoSkill) {
+      return;
+    }
+    const reportDef = await import("../../[id]/report/definition");
+    navigation.push(reportDef.default.POST, {
+      urlPathParams: { id: baseSkillId },
+      renderInModal: true,
+    });
+  };
+
   const handleSignup = (): void => {
     void (async (): Promise<void> => {
       const def =
@@ -553,6 +564,18 @@ export function FavoriteEditContainer({
             label: undefined,
           }}
         />
+        {isVotableSkill && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 text-muted-foreground hover:text-destructive"
+            onClick={() => void handleReport()}
+          >
+            <AlertTriangle className="h-4 w-4" />
+            {t("patch.reportButton.label")}
+          </Button>
+        )}
         {(form.formState.isDirty || isSubmitting) && (
           <>
             <SubmitButtonWidget<typeof definitionPatch.PATCH>

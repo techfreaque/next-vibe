@@ -644,12 +644,16 @@ export class ServerStartRepository {
           await import("next-vibe/database/utils/docker-operations/repository");
         const { t: dockerOpsT } =
           dockerOperationsScopedTranslation.scopedT(locale);
+        const { basename } = await import("node:path");
+        const projectSlug = basename(
+          process.env["PROJECT_ROOT"] ?? process.cwd(),
+        );
         const dbStartResult = await DockerOperationsRepository.dockerComposeUp(
           logger,
           dockerOpsT,
           "docker-compose.preview.yml",
           60000,
-          "vibe-preview",
+          `${projectSlug}-hermes`,
         );
 
         if (dbStartResult.success) {

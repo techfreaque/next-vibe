@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
+import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NewCronTask } from "next-vibe/tasks/cron/db";
@@ -167,7 +167,7 @@ export class CompleteTaskRepository {
       // Always resolve the actual task owner - never use the API caller's identity.
       const ownerContext = await resolveTaskOwnerUser(owner, locale, logger);
       if (ownerContext) {
-        await handleTaskCompletion({
+        await TaskCompletion.handle({
           toolMessageId,
           threadId,
           callbackMode,

@@ -20,7 +20,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
-import { handleTaskCompletion } from "next-vibe/execute-tool/handlers/completion";
+import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -376,7 +376,7 @@ export class TaskExecuteRepository {
     const taskToolMessageId = task.wakeUpToolMessageId ?? null;
 
     if (taskToolMessageId && taskUserContext) {
-      await handleTaskCompletion({
+      await TaskCompletion.handle({
         toolMessageId: taskToolMessageId,
         threadId: taskThreadId,
         callbackMode: taskCallbackMode,

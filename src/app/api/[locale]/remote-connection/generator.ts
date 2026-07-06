@@ -513,7 +513,28 @@ class RemoteCapabilitiesGenerator {
   private static renderCapabilitiesFile(
     capabilities: RemoteToolCapability[],
   ): string {
-    return JSON.stringify(capabilities, null, 2);
+    const raw = JSON.stringify(capabilities, null, 2);
+    // Prettier collapses primitive arrays onto one line when the full line fits ≤80 chars.
+    // Capture the key prefix so we can measure total line length before collapsing.
+    // Prettier collapses arrays of strings/numbers/booleans/null/empty-objects when
+    // the full line (indentation + key + collapsed array) fits ≤80 chars.
+    // Match: "key": [\n  item,\n  item\n] where each item is a JSON scalar or {}
+    const collapsed = raw.replace(
+      /^( *"[^"]+": )\[(\n\s+(?:"[^"]*"|true|false|null|-?\d+(?:\.\d+)?|{}),?\s*)+\n\s*\]/gm,
+      (match, prefix: string) => {
+        const arrayPart = match.slice((prefix as string).length);
+        const inner = arrayPart.slice(1, -1).trim();
+        const items = inner
+          .split(/,\s*\n\s*/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const inlined = `[${items.join(", ")}]`;
+        return (prefix as string).length + inlined.length <= 80
+          ? `${prefix}${inlined}`
+          : match;
+      },
+    );
+    return `${collapsed}\n`;
   }
 
   private static renderVersionFile(version: string): string {

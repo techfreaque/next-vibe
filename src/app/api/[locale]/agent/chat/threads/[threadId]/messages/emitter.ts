@@ -57,18 +57,31 @@ function messagesChannelBinding(
   };
 }
 
+/**
+ * Incognito threads NEVER leave the instance: they have no DB row, so a
+ * relayed event would materialize an orphaned mirror stub on the peer.
+ * Local WS delivery (the viewer's own UI) is unaffected.
+ */
+function messagesFanOut(
+  routing: MessagesChannelRouting,
+  requested: boolean | undefined,
+): boolean {
+  if (routing.rootFolderId === DefaultFolderId.INCOGNITO) {
+    return false;
+  }
+  return requested ?? true;
+}
+
 /** Non-batched emitter for the messages channel — for one-shot emits outside streaming. */
 export function createMessagesGetEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
   routing: MessagesChannelRouting,
 ): MessagesWsEmit {
-  return createEndpointEmitter(
-    messagesDefinitions.GET,
-    logger,
-    user,
-    messagesChannelBinding(routing),
-  );
+  return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
+    ...messagesChannelBinding(routing),
+    fanOut: messagesFanOut(routing, undefined),
+  });
 }
 
 /**
@@ -85,6 +98,6 @@ export function createMessagesEmitter(
 ): MessagesWsEmit {
   return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
     ...messagesChannelBinding(routing),
-    fanOut: options?.fanOut ?? true,
+    fanOut: messagesFanOut(routing, options?.fanOut),
   });
 }

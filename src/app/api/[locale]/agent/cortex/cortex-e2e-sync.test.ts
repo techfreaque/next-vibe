@@ -3178,8 +3178,7 @@ describe("Mount hierarchy: /tasks", () => {
       return;
     }
 
-    const { cronTasks } =
-      await import("next-vibe/tasks/cron/db");
+    const { cronTasks } = await import("next-vibe/tasks/cron/db");
     const { CronTaskPriority, TaskCategory } =
       await import("next-vibe/tasks/enum");
     await db
@@ -3203,8 +3202,7 @@ describe("Mount hierarchy: /tasks", () => {
     if (!adminUser) {
       return;
     }
-    const { cronTasks } =
-      await import("next-vibe/tasks/cron/db");
+    const { cronTasks } = await import("next-vibe/tasks/cron/db");
     await db.delete(cronTasks).where(eq(cronTasks.id, TK_TASK_ID));
   }, MOUNT_TIMEOUT);
 

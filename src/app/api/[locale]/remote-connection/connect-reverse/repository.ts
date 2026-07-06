@@ -24,13 +24,13 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { SyncScope } from "../db";
 import { instanceIdentities, remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
-import { RemoteTransport } from "../transport";
 
 /**
  * Reverse entries default to serving every sync domain. The passive side has
@@ -176,6 +176,9 @@ export class RemoteConnectionRegisterRepository {
         },
       });
 
+    // Domains prepare their per-peer state (threads mirror scaffold etc.).
+    const { notifyConnectionEstablished } = await import("../sync/provider");
+    await notifyConnectionEstablished(user.id, instanceId, logger);
     logger.info("Registered local instance on cloud", {
       userId: user.id,
       instanceId,
@@ -248,7 +251,7 @@ export class RemoteConnectionRegisterRepository {
     // resolve it immediately. Mirrors connect/repository.ts Step 6b.
     try {
       const { ensureInstanceFolder } = await import("../instance-folder");
-      const folderId = await ensureInstanceFolder(user.id, instanceId, logger);
+      const folderId = await ensureInstanceFolder(user.id, instanceId);
 
       logger.debug("[REGISTER] Ensured remote subfolder", {
         instanceId,

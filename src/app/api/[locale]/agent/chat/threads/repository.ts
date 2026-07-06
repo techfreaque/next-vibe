@@ -144,6 +144,32 @@ export class ThreadsRepository {
    * Ensure thread exists or create new one with permission checks
    * Used by AI streaming to get or create a thread before posting messages
    */
+  /**
+   * Walk a folder chain to its top-level folder name. Used exactly ONCE per
+   * thread, at creation, to stamp loop_instance_id from REMOTE/<instance>
+   * placement (Remote-tab sugar). Routing reads the COLUMN, never folders.
+   */
+  static async deriveLoopInstanceFromFolder(
+    leafFolderId: string,
+  ): Promise<string | null> {
+    let currentId: string | null = leafFolderId;
+    for (let depth = 0; depth < 32 && currentId; depth++) {
+      const [row]: Array<{ name: string; parentId: string | null }> = await db
+        .select({ name: chatFolders.name, parentId: chatFolders.parentId })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, currentId))
+        .limit(1);
+      if (!row) {
+        return null;
+      }
+      if (row.parentId === null) {
+        return row.name;
+      }
+      currentId = row.parentId;
+    }
+    return null;
+  }
+
   static async ensureThread({
     threadId,
     rootFolderId,
@@ -169,6 +195,12 @@ export class ThreadsRepository {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    /** Owning instance for a FOREIGN copy (relay executor landing). NULL/absent = ours. */
+    originInstanceId?: string | null;
+    /** Explicit loop location. Absent → derived ONCE from REMOTE/<x> placement (creation sugar). */
+    loopInstanceId?: string | null;
+    /** Transient plumbing threads (tool executions) set false — never derived from folders. */
+    syncEligible?: boolean;
   }): Promise<ResponseType<{ threadId: string; isNew: boolean }>> {
     logger.debug("ensureThread called", {
       threadId,
@@ -338,6 +370,15 @@ export class ThreadsRepository {
       }
     }
 
+    // ONE-TIME creation sugar: a thread born inside REMOTE/<instance> runs its
+    // loop there. The stamp lands in the column; placement never routes again.
+    const effectiveLoopInstanceId =
+      loopInstanceId !== undefined
+        ? loopInstanceId
+        : rootFolderId === DefaultFolderId.REMOTE && subFolderId
+          ? await ThreadsRepository.deriveLoopInstanceFromFolder(subFolderId)
+          : null;
+
     await db.insert(chatThreads).values({
       id: threadId,
       userId: userId ?? null,
@@ -345,6 +386,9 @@ export class ThreadsRepository {
       title,
       rootFolderId,
       folderId: subFolderId ?? null,
+      originInstanceId: originInstanceId ?? null,
+      loopInstanceId: effectiveLoopInstanceId,
+      syncEligible: syncEligible ?? true,
     });
 
     logger.debug("Created new thread", {
@@ -801,6 +845,14 @@ export class ThreadsRepository {
 
       const threadId = data.id ?? crypto.randomUUID();
 
+      // ONE-TIME creation sugar: Remote-tab threads stamp their loop location.
+      const loopInstanceId =
+        data.rootFolderId === DefaultFolderId.REMOTE && data.subFolderId
+          ? await ThreadsRepository.deriveLoopInstanceFromFolder(
+              data.subFolderId,
+            )
+          : null;
+
       const threadData = {
         id: threadId,
         userId: userIdentifier,
@@ -955,50 +1007,85 @@ export class ThreadsRepository {
   static async applyRemoteThreadCreate(
     props: RemoteEventHandlerProps<typeof definitions.POST, "thread-created">,
   ): Promise<void> {
-    const { user, logger } = props;
-    const parsed = definitions.POST.requestSchema.safeParse(props.requestData);
-    if (!parsed.success) {
-      logger.error("Failed to parse relayed thread-created request data", {
-        error: parsed.error.message,
-      });
+    const { user, logger, requestData, originInstanceId } = props;
+    // requestData is already gated by the bridge against the event's declared
+    // requestFields subset (id/title/rootFolderId/subFolderId).
+    if (!requestData.id) {
+      logger.error("Relayed thread-created missing thread id — dropped");
       return;
     }
-    const requestData = parsed.data;
-    const { t } = scopedTranslation.scopedT(defaultLocale);
-    const result = await this.createThread(
-      {
+    const userId = "id" in user && typeof user.id === "string" ? user.id : null;
+    if (!userId) {
+      return;
+    }
+    // Folders sync by SAME id: place immediately when the wire folder exists.
+    // PUSH-ONLY convergence: no waiting — the sender ships the chain first
+    // (ordered on the WS leg) and re-pushes placement at every turn end, so
+    // a reordered leg heals on the next thread-updated.
+    let mirrorFolderId: string | null = null;
+    if (requestData.subFolderId) {
+      const [folderRow] = await db
+        .select({ id: chatFolders.id })
+        .from(chatFolders)
+        .where(eq(chatFolders.id, requestData.subFolderId))
+        .limit(1);
+      mirrorFolderId = folderRow ? requestData.subFolderId : null;
+    }
+    await db
+      .insert(chatThreads)
+      .values({
         id: requestData.id,
-        title: requestData.title,
-        rootFolderId: requestData.rootFolderId,
-        subFolderId: null,
-        model: DEFAULT_CHAT_MODEL_ID,
-        character: undefined,
-        systemPrompt: undefined,
-      },
-      user,
-      t,
-      logger,
-      defaultLocale,
-    );
-    if (!result.success) {
-      logger.error("Failed to apply remote thread create", {
-        message: result.message,
-      });
-      return;
-    }
-    // Re-emit on the POST channel (fanOut: false) so local WS subscribers on
-    // this instance fire their onEvent and insert the thread into the list cache.
-    const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
-    createEndpointEmitter(definitions.POST, logger, user, { fanOut: false })(
-      "thread-created",
-      {
-        requestData: {
-          id: requestData.id,
-          title: requestData.title,
-          rootFolderId: requestData.rootFolderId,
+        userId,
+        rootFolderId: DefaultFolderId.REMOTE,
+        folderId: mirrorFolderId,
+        title: requestData.title ?? "",
+        originInstanceId,
+      })
+      .onConflictDoUpdate({
+        target: chatThreads.id,
+        // A message event may have raced a minimal stub in first — backfill
+        // the fields the stub lacks. The setWhere is LOAD-BEARING: a relay
+        // EXECUTOR also emits thread-created for its landing copy of the
+        // CALLER's thread — that echo must NEVER touch the caller's local
+        // original (origin NULL = ours). Only rows already stamped foreign
+        // (message stubs always stamp origin) may be backfilled.
+        set: {
+          title: requestData.title ?? "",
+          rootFolderId: DefaultFolderId.REMOTE,
+          ...(mirrorFolderId !== null && { folderId: mirrorFolderId }),
         },
+        setWhere: sql`${chatThreads.originInstanceId} IS NOT NULL`,
+      })
+      .catch((err: Error) => {
+        logger.error("Failed to apply remote thread create", {
+          message: err.message,
+        });
+      });
+    // Surface the mirror in open sidebars (REMOTE root) — local WS
+    // subscribers insert it into the folder-contents list cache.
+    const { createFolderContentsEmitter } =
+      await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter");
+    const now = new Date();
+    createFolderContentsEmitter(
+      logger,
+      user,
+      DefaultFolderId.REMOTE,
+    )("thread-created", {
+      responseData: {
+        items: [
+          {
+            id: requestData.id,
+            type: "thread" as const,
+            title: requestData.title ?? "",
+            rootFolderId: DefaultFolderId.REMOTE,
+            folderId: mirrorFolderId,
+            status: ThreadStatus.ACTIVE,
+            streamingState: ThreadStreamingState.IDLE,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
       },
-    );
+    });
   }
 }

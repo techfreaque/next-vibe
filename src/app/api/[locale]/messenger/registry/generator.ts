@@ -310,18 +310,24 @@ class EmailTemplateGenerator {
         // concrete templates can't assign to the any-typed loader type without a cast.
         const cast = " as EmailTemplateDefinitionAny";
         const singleLine = `  "${t.id}": async () => (await import("${t.importPath}"))${accessor}${cast},`;
-        // Wrap long lines (80+ chars, prettier printWidth)
-        if (singleLine.length >= 80) {
-          // Check if even the split version is too long
-          const splitLine = `    (await import("${t.importPath}"))${accessor}${cast},`;
-          if (splitLine.length > 80) {
-            // eslint-disable-next-line i18next/no-literal-string
-            return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    )${accessor}${cast},`;
-          }
-          // eslint-disable-next-line i18next/no-literal-string
-          return `  "${t.id}": async () =>\n    (await import("${t.importPath}"))${accessor}${cast},`;
+        if (singleLine.length <= 80) {
+          return singleLine;
         }
-        return singleLine;
+        if (t.exportName !== "default") {
+          const exportKey = `"${t.exportName}"`;
+          // Check if (await import("path"))[ fits in 80 chars (4-space indent)
+          const openLine = `    (await import("${t.importPath}"))[`;
+          if (openLine.length <= 80) {
+            // eslint-disable-next-line i18next/no-literal-string
+            return `  "${t.id}": async () =>\n    (await import("${t.importPath}"))[\n      ${exportKey}\n    ]${cast},`;
+          }
+          // Import path too long: wrap the await import() itself
+          // eslint-disable-next-line i18next/no-literal-string
+          return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    )[${exportKey}]${cast},`;
+        }
+        // Default export
+        // eslint-disable-next-line i18next/no-literal-string
+        return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    ).default${cast},`;
       })
       .join("\n");
 
@@ -398,12 +404,19 @@ ${descriptionStr}
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
-import type { EmailTemplateDefinitionAny, TemplateCachedMetadata, TranslatedPreviewFieldConfig } from "@/app/api/[locale]/messenger/registry/template";
+import type {
+  EmailTemplateDefinitionAny,
+  TemplateCachedMetadata,
+  TranslatedPreviewFieldConfig,
+} from "@/app/api/[locale]/messenger/registry/template";
 
 /**
  * Lazy-loaded template registry with dynamic imports
  */
-const templateLoaders: Record<string, () => Promise<EmailTemplateDefinitionAny>> = {
+const templateLoaders: Record<
+  string,
+  () => Promise<EmailTemplateDefinitionAny>
+> = {
 ${loaderEntries}
 };
 

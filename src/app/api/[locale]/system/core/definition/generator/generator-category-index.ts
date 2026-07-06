@@ -25,6 +25,7 @@ import type {
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 import {
   generateFileHeader,
+  jsonToTs,
   writeGeneratedFile,
 } from "next-vibe/tooling/generators/shared/utils";
 
@@ -91,7 +92,12 @@ function generateContent(categories: CategoryEntry[]): string {
   );
 
   const keys = categories.map((c) => c.def.key);
-  const keyUnion = keys.map((k) => `"${k}"`).join(" | ");
+  const keyUnionSingle = keys.map((k) => `"${k}"`).join(" | ");
+  // keyUnion: either " value1 | value2" (inline) or "\n  | v1\n  | v2" (expanded)
+  const keyUnion =
+    `export type CategoryKey = ${keyUnionSingle};`.length <= 80
+      ? ` ${keyUnionSingle}`
+      : `\n  | ${keys.map((k) => `"${k}"`).join("\n  | ")}`;
 
   const subKeys = new Set<string>();
   for (const c of categories) {
@@ -101,7 +107,12 @@ function generateContent(categories: CategoryEntry[]): string {
       }
     }
   }
-  const subKeyUnion = [...subKeys].map((k) => `"${k}"`).join(" | ");
+  const subKeysSorted = [...subKeys];
+  const subKeyUnionSingle = subKeysSorted.map((k) => `"${k}"`).join(" | ");
+  const subKeyUnion =
+    `export type SubCategoryKey = ${subKeyUnionSingle};`.length <= 80
+      ? ` ${subKeyUnionSingle}`
+      : `\n  | ${subKeysSorted.map((k) => `"${k}"`).join("\n  | ")}`;
 
   const registryEntries = categories
     .map((c) => {
@@ -109,7 +120,7 @@ function generateContent(categories: CategoryEntry[]): string {
         c.def;
 
       const labelRecord = typeof label === "object" ? label : {};
-      const labelsJson = JSON.stringify(labelRecord);
+      const labelsJson = jsonToTs(labelRecord, 2, "    labels: ".length);
       const labelFallback =
         typeof label === "string"
           ? label
@@ -137,9 +148,15 @@ function generateContent(categories: CategoryEntry[]): string {
                   : (subcatLabelRecord["en-US"] ??
                     subcatLabelRecord["en-GLOBAL"] ??
                     k);
-              const subcatLabelsJson = JSON.stringify(subcatLabelRecord);
-
-              return `      ${JSON.stringify(k)}: { icon: "${sv.icon}", order: ${sv.order ?? 0}, label: "${subcatLabelFallback}", labels: ${subcatLabelsJson} },`;
+              const needsQuotes = /[^a-zA-Z0-9_$]/.test(k);
+              const subcatKey = needsQuotes ? JSON.stringify(k) : k;
+              // labels indented at level 4 (8 spaces), prefix = "        labels: " = 16 chars
+              const subcatLabelsJson = jsonToTs(
+                subcatLabelRecord,
+                4,
+                "        labels: ".length,
+              );
+              return `      ${subcatKey}: {\n        icon: "${sv.icon}",\n        order: ${sv.order ?? 0},\n        label: "${subcatLabelFallback}",\n        labels: ${subcatLabelsJson},\n      },`;
             })
             .join("\n")
         : null;
@@ -160,11 +177,14 @@ function generateContent(categories: CategoryEntry[]): string {
 
 /* eslint-disable prettier/prettier */
 
-import type { CategoryDefinitionSerialized, AdminGroup } from "next-vibe/help-tool/category-types";
+import type {
+  AdminGroup,
+  CategoryDefinitionSerialized,
+} from "next-vibe/help-tool/category-types";
 
-export type CategoryKey = ${keyUnion};
+export type CategoryKey =${keyUnion};
 
-export type SubCategoryKey = ${subKeyUnion};
+export type SubCategoryKey =${subKeyUnion};
 
 export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
 ${registryEntries}

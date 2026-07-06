@@ -26,7 +26,7 @@ import type { AiT } from "next-vibe/platforms/ai/i18n";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 
-import { discardPendingCall, getPendingCall } from "../pending-calls";
+import { PendingCalls } from "../repository/pending-calls";
 import type {
   DismissTaskRequestOutput,
   DismissTaskResponseOutput,
@@ -43,7 +43,7 @@ export class DismissTaskRepository {
 
     try {
       // 1. Look up pending call to get threadId before discarding.
-      const entry = getPendingCall(callId);
+      const entry = PendingCalls.get(callId);
 
       if (!entry) {
         // Already completed or never existed — treat as success (idempotent).
@@ -74,7 +74,7 @@ export class DismissTaskRepository {
       const { threadId } = entry;
 
       // 2. Discard: cancels revival + deadline timers, removes from registry.
-      discardPendingCall(callId);
+      PendingCalls.discard(callId);
 
       logger.info("[dismiss-task] Discarded pending call", {
         callId,

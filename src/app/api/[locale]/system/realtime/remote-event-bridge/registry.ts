@@ -47,6 +47,7 @@ type AnyRemoteEventHandler = (props: {
   readonly urlPathParams: Record<string, WidgetData>;
   readonly payload: WidgetData;
   readonly instanceId: string;
+  readonly originInstanceId: string;
   readonly user: JwtPrivatePayloadType;
   readonly locale: CountryLanguage;
   readonly logger: EndpointLogger;
@@ -171,8 +172,52 @@ export async function dispatchRemoteEvent(
   envelope: AnyEndpointEventEnvelope,
   ctx: RemoteEventContext,
 ): Promise<void> {
-  const entry = registry.get(key(endpointPath, method));
+  let entry = registry.get(key(endpointPath, method));
   if (!entry) {
+    // Routes self-register their onRemoteEvent handlers when the route module
+    // loads (endpointsHandler runs at module scope) — but route modules load
+    // LAZILY per process. A relayed event can arrive before anything imported
+    // the target route in THIS process, which would silently drop the event.
+    // Force-load the route through the GENERATED remote-event registry (the
+    // canonical path→route mapping — no alias guessing), then retry.
+    //
+    // The load is retried with a short backoff: concurrent dynamic imports of
+    // a large cyclic route graph can observe a PARTIAL module namespace while
+    // another import of the same graph is mid-evaluation — a beat later the
+    // fully-evaluated module is cached and the same import succeeds.
+    const { getRemoteEventRoutes } =
+      await import("@/generated/routes/remote-event-routes");
+    const routes = await getRemoteEventRoutes();
+    const wanted = endpointPath.join("/");
+    const match = routes.find(
+      (r) => r.method === method && r.path.join("/") === wanted,
+    );
+    if (match) {
+      for (let attempt = 0; attempt < 5 && !entry; attempt++) {
+        if (attempt > 0) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 200 * attempt);
+          });
+        }
+        try {
+          await match.importRoute();
+        } catch {
+          // Partial-namespace TypeError — registration may still have run;
+          // fall through to the registry check and retry otherwise.
+        }
+        entry = registry.get(key(endpointPath, method));
+      }
+    }
+  }
+  if (!entry) {
+    ctx.logger.error(
+      "[RemoteEventRegistry] No onRemoteEvent handlers for endpoint — dropping event",
+      {
+        endpointPath: endpointPath.join("/"),
+        method,
+        eventName: envelope.eventName,
+      },
+    );
     return;
   }
   const handler = entry.handlers[envelope.eventName];
@@ -270,6 +315,7 @@ export async function dispatchRemoteEvent(
     urlPathParams: recordSchema.parse(urlGate.data),
     payload: parsedPayload,
     instanceId: ctx.instanceId,
+    originInstanceId: ctx.originInstanceId,
     user: ctx.user,
     locale: ctx.locale,
     logger: ctx.logger,

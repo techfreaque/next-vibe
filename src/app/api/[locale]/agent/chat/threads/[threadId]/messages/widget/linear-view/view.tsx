@@ -42,6 +42,7 @@ export interface LinearMessageViewProps {
   collapseState: CollapseStateStore | null;
   rootFolderId: DefaultFolderId;
   subFolderId: string | null;
+  threadId: string | null;
   onRetryMessage:
     | ((messageId: string, attachments?: File[]) => Promise<void>)
     | null;

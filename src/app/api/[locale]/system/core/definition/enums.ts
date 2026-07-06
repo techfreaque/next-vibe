@@ -71,14 +71,11 @@ export enum WidgetType {
 
   // Specialized content widgets
   CODE_OUTPUT = "code_output",
-  CREDIT_TRANSACTION_CARD = "credit_transaction_card",
-  CREDIT_TRANSACTION_LIST = "credit_transaction_list",
   PAGINATION = "pagination",
 
   // Interactive widgets
   BUTTON = "button",
   NAVIGATE_BUTTON = "navigate_button",
-  DRAG_HANDLE = "drag_handle",
 
   // Stats widgets
   STAT = "stat", // Simple stat display: number + label from field definition

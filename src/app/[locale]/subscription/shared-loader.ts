@@ -52,16 +52,18 @@ export async function subscriptionLoader({
     redirect(`/${locale}/user/login`);
   }
 
-  // Handle NOWPayments success redirect
-  const npId =
-    typeof searchParams.NP_id === "string" ? searchParams.NP_id : undefined;
-  const paymentType =
-    typeof searchParams.type === "string" ? searchParams.type : undefined;
-  const callbackToken =
-    typeof searchParams.token === "string" ? searchParams.token : undefined;
+  // Handle NOWPayments success redirect.
+  const getParam = (key: string): string | undefined =>
+    typeof searchParams[key] === "string"
+      ? (searchParams[key] as string)
+      : undefined;
 
-  if (npId && isAuthenticated && searchParams.payment === "success") {
-    if (paymentType === "credits" || callbackToken) {
+  const paymentType = getParam("type");
+  const paymentStatus = getParam("payment");
+  const callbackToken = getParam("cbtoken");
+
+  if (isAuthenticated && paymentStatus === "success" && callbackToken) {
+    if (paymentType === "credits") {
       await CreditRepository.handleNowPaymentsCreditSuccessRedirect(
         callbackToken,
         user.id,

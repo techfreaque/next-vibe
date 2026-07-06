@@ -267,17 +267,32 @@ class PromptFragmentsGenerator {
     // exports (enums, interfaces, helper consts) that may exist in the same file.
     const allPromptCases = fragments.map((f) => {
       const names = f.fragmentExportNames.join(", ");
-      const obj = f.fragmentExportNames.map((n) => `${n}`).join(", ");
-      return `    case "${f.id}":\n      return import("${f.promptImportPath}").then(({ ${names} }) => ({ ${obj} }));`;
+      const obj = f.fragmentExportNames.join(", ");
+      const singleLine = `      return import("${f.promptImportPath}").then(({ ${names} }) => ({ ${obj} }));`;
+      if (singleLine.length <= 80) {
+        return `    case "${f.id}":\n${singleLine}`;
+      }
+      // Check if destructure param fits inline: "        ({ names }) => ({"
+      const inlineParam = `        ({ ${names} }) => ({`;
+      const nameLines = f.fragmentExportNames
+        .map((n) => `          ${n},`)
+        .join("\n");
+      const objLines = f.fragmentExportNames
+        .map((n) => `          ${n},`)
+        .join("\n");
+      if (inlineParam.length <= 80) {
+        // Compact: .then(\n  ({ names }) => ({\n    name,\n  }),\n)
+        // eslint-disable-next-line i18next/no-literal-string
+        return `    case "${f.id}":\n      return import("${f.promptImportPath}").then(\n        ({ ${names} }) => ({\n${objLines}\n        }),\n      );`;
+      }
+      // eslint-disable-next-line i18next/no-literal-string
+      return `    case "${f.id}":\n      return import("${f.promptImportPath}").then(\n        ({\n${nameLines}\n        }) => ({\n${objLines}\n        }),\n      );`;
     });
 
     // Fragment IDs list
     const fragmentIdList = fragments.map((f) => `  "${f.id}",`).join("\n");
 
     return `${header}
-
-/* eslint-disable prettier/prettier */
-/* eslint-disable simple-import-sort/imports */
 
 import type { PromptFragmentModule } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
@@ -312,6 +327,59 @@ ${allPromptCases.join("\n")}
    * Exports loadAllPromptFragments(params) that loads all fragment data in parallel
    * and builds leading/trailing arrays - mirrors useAllPromptFragments on the client.
    */
+  /** Format an import statement (sorted names, single-line for 1 name) */
+  private static formatImport(
+    keyword: "import" | "import type",
+    names: string[],
+    path: string,
+  ): string {
+    const sorted = [...names].sort();
+    if (sorted.length === 1) {
+      return `${keyword} { ${sorted[0]} } from "${path}";`;
+    }
+    return `${keyword} {\n  ${sorted.join(",\n  ")},\n} from "${path}";`;
+  }
+
+  /** Strip quotes from a byId key when it's a plain identifier */
+  private static byIdKey(id: string): string {
+    return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(id) ? id : `"${id}"`;
+  }
+
+  /**
+   * Format a resolve line: `  const x =\n    cond ? val : fallback;`
+   * If the full ternary fits on the second line (≤80 chars), keep it inline there.
+   * Otherwise break the ternary to its own lines with 6-space indent.
+   */
+  private static formatResolveLine(
+    varName: string,
+    resultVar: string,
+    yesVal: string,
+    noVal: string,
+  ): string {
+    const cond = `${resultVar}.status === "fulfilled"`;
+    const ternaryInline = `    ${cond} ? ${yesVal} : ${noVal};`;
+    if (ternaryInline.length <= 80) {
+      return `  const ${varName} =\n    ${cond} ? ${yesVal} : ${noVal};`;
+    }
+    return `  const ${varName} =\n    ${cond}\n      ? ${yesVal}\n      : ${noVal};`;
+  }
+
+  /**
+   * Format a build line: `  const xBuilt = cond ? yes : null;`
+   * If the full line fits ≤80 chars, keep inline.
+   * Otherwise: `const xBuilt = cond\n    ? yes\n    : null;`
+   */
+  private static formatBuildLine(
+    builtVar: string,
+    cond: string,
+    yes: string,
+    no: string,
+  ): string {
+    const inline = `  const ${builtVar} = ${cond} ? ${yes} : ${no};`;
+    if (inline.length <= 80) return inline;
+    return `  const ${builtVar} = ${cond}\n    ? ${yes}\n    : ${no};`;
+  }
+
   static generateServerContent(fragments: FragmentEntry[]): string {
     const header = generateFileHeader(
       "AUTO-GENERATED PROMPT FRAGMENTS SERVER INDEX",
@@ -327,18 +395,12 @@ ${allPromptCases.join("\n")}
       string,
       { loaderName: string; dataVar: string }
     >();
-    // Fragment imports (prompt.ts) - deduplicated
-    const seenPrompt = new Set<string>();
-
-    const serverImports: string[] = [];
-    const fragmentImports: string[] = [];
+    // Fragment imports (prompt.ts) - deduplicated by path
+    const seenPrompt = new Map<string, string[]>();
 
     for (const f of fragments) {
       if (!seenPrompt.has(f.promptImportPath)) {
-        seenPrompt.add(f.promptImportPath);
-        fragmentImports.push(
-          `import { ${f.fragmentExportNames.join(", ")} } from "${f.promptImportPath}";`,
-        );
+        seenPrompt.set(f.promptImportPath, f.fragmentExportNames);
       }
       if (f.serverImportPath && f.serverLoaderExportName) {
         if (!seenServer.has(f.serverImportPath)) {
@@ -348,12 +410,47 @@ ${allPromptCases.join("\n")}
             loaderName: f.serverLoaderExportName,
             dataVar,
           });
-          serverImports.push(
-            `import { ${f.serverLoaderExportName} } from "${f.serverImportPath}";`,
-          );
         }
       }
     }
+
+    // Build a unified sorted import list (simple-import-sort groups all into one block)
+    const typesPath =
+      "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+    const allImports: Array<{ path: string; line: string }> = [];
+    allImports.push({
+      path: typesPath,
+      line: PromptFragmentsGenerator.formatImport(
+        "import type",
+        ["SystemPromptServerParams"],
+        typesPath,
+      ),
+    });
+    for (const [path, names] of seenPrompt) {
+      allImports.push({
+        path,
+        line: PromptFragmentsGenerator.formatImport("import", names, path),
+      });
+    }
+    for (const [path, { loaderName }] of seenServer) {
+      allImports.push({
+        path,
+        line: PromptFragmentsGenerator.formatImport(
+          "import",
+          [loaderName],
+          path,
+        ),
+      });
+    }
+    // simple-import-sort sorts by path, then by import kind (type before value)
+    allImports.sort((a, b) => {
+      if (a.path !== b.path) return a.path.localeCompare(b.path);
+      // type imports come before value imports from the same path
+      const aType = a.line.startsWith("import type");
+      const bType = b.line.startsWith("import type");
+      if (aType !== bType) return aType ? -1 : 1;
+      return 0;
+    });
 
     // Generate parallel load calls - deduplicated by server path
     const loaderCalls: string[] = [];
@@ -363,20 +460,33 @@ ${allPromptCases.join("\n")}
       loaderCalls.push(`    ${loaderName}(params),`);
     }
 
-    const destructure =
-      loaderVarNames.length > 0
-        ? `  const [${loaderVarNames.map((v) => `${v}Result`).join(", ")}] = await Promise.allSettled([\n${loaderCalls.join("\n")}\n  ]);`
-        : "";
+    // Destructure: always multi-line when > 1 var (formatter always expands)
+    let destructure = "";
+    if (loaderVarNames.length > 0) {
+      const resultVars = loaderVarNames.map((v) => `${v}Result`);
+      const singleLine = `  const [${resultVars.join(", ")}] = await Promise.allSettled([`;
+      if (singleLine.length <= 80) {
+        destructure = `  const [${resultVars.join(", ")}] = await Promise.allSettled([\n${loaderCalls.join("\n")}\n  ]);`;
+      } else {
+        const varLines = resultVars.map((v) => `    ${v},`).join("\n");
+        destructure = `  const [\n${varLines}\n  ] = await Promise.allSettled([\n${loaderCalls.join("\n")}\n  ]);`;
+      }
+    }
 
     // Resolve each data var from its Promise.allSettled result
     const resolveLines: string[] = [];
     for (const [, { dataVar }] of seenServer) {
       resolveLines.push(
-        `  const ${dataVar} = ${dataVar}Result.status === "fulfilled" ? ${dataVar}Result.value : undefined;`,
+        PromptFragmentsGenerator.formatResolveLine(
+          dataVar,
+          `${dataVar}Result`,
+          `${dataVar}Result.value`,
+          "undefined",
+        ),
       );
     }
 
-    // Build lines for each fragment that has a server loader
+    // Build lines for each fragment
     const buildLines: string[] = [];
     const builtEntries: string[] = [];
     const seenBuilt = new Set<string>();
@@ -384,40 +494,41 @@ ${allPromptCases.join("\n")}
     for (const f of fragments) {
       if (f.serverImportPath && f.serverLoaderExportName) {
         const entry = seenServer.get(f.serverImportPath);
-        if (!entry || seenBuilt.has(f.id)) {
-          continue;
-        }
+        if (!entry || seenBuilt.has(f.id)) continue;
         seenBuilt.add(f.id);
         const camel = PromptFragmentsGenerator.toCamel(f.id);
         buildLines.push(
-          `  const ${camel}Built = ${entry.dataVar} ? ${f.ownExportName}.build(${entry.dataVar}) : null;`,
+          PromptFragmentsGenerator.formatBuildLine(
+            `${camel}Built`,
+            entry.dataVar,
+            `${f.ownExportName}.build(${entry.dataVar})`,
+            "null",
+          ),
         );
-        builtEntries.push(`    "${f.id}": ${camel}Built,`);
+        builtEntries.push(
+          `    ${PromptFragmentsGenerator.byIdKey(f.id)}: ${camel}Built,`,
+        );
       }
     }
 
+    // Push lines
     const pushLines = fragments
       .filter((f) => f.serverImportPath)
       .map((f) => {
         const camel = PromptFragmentsGenerator.toCamel(f.id);
-        return `  if (${camel}Built) { ${f.placement}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: ${camel}Built }); }`;
+        const pushCall = `    ${f.placement}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: ${camel}Built });`;
+        if (pushCall.length <= 80) {
+          return `  if (${camel}Built) {\n${pushCall}\n  }`;
+        }
+        return `  if (${camel}Built) {\n    ${f.placement}.push({\n      id: "${f.id}",\n      priority: ${f.ownExportName}.priority,\n      str: ${camel}Built,\n    });\n  }`;
       })
       .join("\n");
 
     return `${header}
 
-/* eslint-disable prettier/prettier */
-/* eslint-disable simple-import-sort/imports */
-
 import "server-only";
 
-import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-
-// Fragment objects - from each module's system-prompt.ts
-${fragmentImports.join("\n")}
-
-// Server loaders - from each module's system-prompt.ts
-${serverImports.join("\n")}
+${allImports.map((i) => i.line).join("\n")}
 
 /**
  * Combined server loader - loads all fragment data in parallel, builds strings, returns results.

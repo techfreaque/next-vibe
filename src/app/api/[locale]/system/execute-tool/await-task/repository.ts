@@ -7,7 +7,7 @@
  * Already completed → returns result inline (stream continues).
  * Still running     → writes WAIT revival context onto the task row,
  *                     sets streamContext.waitingForRemoteResult=true (stream pauses),
- *                     revived via resume-stream when the task calls handleTaskCompletion.
+ *                     revived via resume-stream when the task calls TaskCompletion.handle.
  */
 
 import "server-only";
@@ -24,18 +24,20 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { AwaitTaskT } from "next-vibe/execute-tool/await-task/i18n";
-import { resolveStreamModelId } from "next-vibe/execute-tool/handlers/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
+import { CronTaskStatus, type CronTaskStatusValue } from "next-vibe/tasks/enum";
 
 import { RESUME_STREAM_ALIAS } from "@/app/api/[locale]/agent/ai-stream/resume-stream/constants";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 
 import { CallbackMode } from "../constants";
+import { TaskCompletion } from "../repository/completion";
+import { PendingCalls } from "../repository/pending-calls";
+import { RemoteDispatch } from "../repository/remote";
 import type {
   AwaitTaskRequestOutput,
   AwaitTaskResponseOutput,
@@ -54,26 +56,17 @@ export class AwaitTaskRepository {
     try {
       // ── Remote pending call (no DB task row — remote dispatch via execute-tool) ──
       // These live in the in-memory pending-calls registry, not in cronTasks.
-      const {
-        getPendingCallReconciled,
-        setPendingCallRevival,
-        discardPendingCall,
-      } = await import("../pending-calls");
-      const pendingCall = await getPendingCallReconciled(taskId);
+      const pendingCall = await PendingCalls.getReconciled(taskId);
       if (pendingCall) {
         // Suppress any wakeUp signal for the original dispatch tool message —
         // await-task is taking over delivery.
-        if (streamContext && pendingCall.toolMessageId) {
-          if (!streamContext.suppressedWakeUpToolMessageIds) {
-            streamContext.suppressedWakeUpToolMessageIds = new Set();
-          }
-          streamContext.suppressedWakeUpToolMessageIds.add(
-            pendingCall.toolMessageId,
-          );
-        }
+        AwaitTaskRepository.suppressWakeUp(
+          streamContext,
+          pendingCall.toolMessageId,
+        );
 
         if (pendingCall.result) {
-          discardPendingCall(taskId);
+          PendingCalls.discard(taskId);
           logger.debug(
             "[AwaitTask] Pending remote call already completed - returning inline",
             { taskId, status: pendingCall.result.status },
@@ -114,7 +107,7 @@ export class AwaitTaskRepository {
             (remote.data.status === CronTaskStatus.COMPLETED ||
               remote.data.status === CronTaskStatus.FAILED)
           ) {
-            discardPendingCall(taskId);
+            PendingCalls.discard(taskId);
             logger.debug(
               "[AwaitTask] Owner instance returned settled result — delivering inline",
               { taskId, instanceId: pendingCall.instanceId },
@@ -137,14 +130,17 @@ export class AwaitTaskRepository {
         const pendToolMessageId =
           streamContext.currentToolMessageId ?? streamContext.aiMessageId;
         if (pendThreadId && pendToolMessageId) {
-          const pendModelId = await resolveStreamModelId(streamContext, user);
+          const pendModelId = await TaskCompletion.resolveStreamModelId(
+            streamContext,
+            user,
+          );
 
-          setPendingCallRevival(taskId, {
+          PendingCalls.setRevival(taskId, {
             threadId: pendThreadId,
             toolMessageId: pendToolMessageId,
             callbackMode: CallbackMode.WAIT,
             leafMessageId: streamContext.leafMessageId ?? null,
-            modelId: pendModelId ?? null,
+            modelId: pendModelId,
             skillId: streamContext.skillId ?? null,
             favoriteId: streamContext.favoriteId ?? null,
             subAgentDepth: streamContext.subAgentDepth ?? 0,
@@ -156,17 +152,20 @@ export class AwaitTaskRepository {
           // that receives the result event can revive this parked thread from
           // the DB — the in-memory revival above only helps the process that
           // parked it.
-          const { storePendingCallId } = await import("../handlers/remote");
-          await storePendingCallId(pendToolMessageId, taskId, logger);
+          await RemoteDispatch.storePendingCallId(
+            pendToolMessageId,
+            taskId,
+            logger,
+          );
 
           // Close the park race: the result event may have landed in a sibling
           // process between the reconcile above and the anchor write — that
           // process saw no anchor and persisted to pending_call_results. One
           // final reconcile catches it; otherwise the park would never revive
           // (the event already fired).
-          const settledLate = await getPendingCallReconciled(taskId);
+          const settledLate = await PendingCalls.getReconciled(taskId);
           if (settledLate?.result) {
-            discardPendingCall(taskId);
+            PendingCalls.discard(taskId);
             logger.debug(
               "[AwaitTask] Result landed during park setup - returning inline",
               { taskId, status: settledLate.result.status },
@@ -259,11 +258,7 @@ export class AwaitTaskRepository {
         Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
 
       // Already terminal — return result inline.
-      if (
-        task.lastExecutionStatus === CronTaskStatus.COMPLETED ||
-        task.lastExecutionStatus === CronTaskStatus.FAILED ||
-        task.lastExecutionStatus === CronTaskStatus.CANCELLED
-      ) {
+      if (AwaitTaskRepository.isTerminal(task.lastExecutionStatus)) {
         logger.debug("[AwaitTask] Task already completed - returning result", {
           taskId,
           status: task.lastExecutionStatus,
@@ -272,16 +267,8 @@ export class AwaitTaskRepository {
         // Task execution history is the canonical result store for EVERY mode
         // (detach never backfills the tool message). Read it first; only fall
         // back to the tool-message backfill (wakeUp/wait) if history is empty.
-        let storedResult: WidgetData | undefined = undefined;
-        const [execRow] = await db
-          .select({ result: cronTaskExecutions.result })
-          .from(cronTaskExecutions)
-          .where(eq(cronTaskExecutions.taskId, taskId))
-          .orderBy(desc(cronTaskExecutions.startedAt))
-          .limit(1);
-        if (execRow?.result !== null && execRow?.result !== undefined) {
-          storedResult = execRow.result as WidgetData;
-        } else if (task.wakeUpToolMessageId) {
+        let storedResult = await AwaitTaskRepository.readStoredResult(taskId);
+        if (storedResult === undefined && task.wakeUpToolMessageId) {
           // Poll briefly: the DB row flips terminal before the tool message backfill lands.
           for (let attempt = 0; attempt < 15; attempt++) {
             const [toolMessage] = await db
@@ -306,33 +293,12 @@ export class AwaitTaskRepository {
         }
 
         // Suppress any pending wakeUp revival — we're delivering inline.
-        const originalWakeUpToolMessageId = task.wakeUpToolMessageId;
-        if (streamContext && originalWakeUpToolMessageId) {
-          if (!streamContext.suppressedWakeUpToolMessageIds) {
-            streamContext.suppressedWakeUpToolMessageIds = new Set();
-          }
-          streamContext.suppressedWakeUpToolMessageIds.add(
-            originalWakeUpToolMessageId,
-          );
-        }
+        AwaitTaskRepository.suppressWakeUp(
+          streamContext,
+          task.wakeUpToolMessageId,
+        );
 
-        // Clean up the task row and any pending resume-stream cron task.
-        try {
-          await db
-            .delete(cronTasks)
-            .where(
-              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
-            );
-          await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-        } catch (cleanupErr) {
-          logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
-            taskId,
-            error:
-              cleanupErr instanceof Error
-                ? cleanupErr.message
-                : String(cleanupErr),
-          });
-        }
+        await AwaitTaskRepository.cleanupTask(taskId, logger);
 
         return success<AwaitTaskResponseOutput>({
           status: task.lastExecutionStatus,
@@ -344,7 +310,7 @@ export class AwaitTaskRepository {
       }
 
       // Task still running — register this stream as a waiter via WAIT mode.
-      // handleTaskCompletion will backfill the tool message and schedule resume-stream.
+      // TaskCompletion.handle will backfill the tool message and schedule resume-stream.
       const effectiveThreadId = streamContext.threadId;
       const effectiveToolMessageId =
         streamContext.currentToolMessageId ?? streamContext.aiMessageId;
@@ -352,13 +318,11 @@ export class AwaitTaskRepository {
       // Cross-instance / headless caller with NOTHING to park: returning
       // "pending" is useless (there is no local stream to pause and revive —
       // the caller would just re-poll the wire). Block on the goroutine's
-      // completion SIGNAL (task-completion-waiters — event-driven, no DB
-      // polling), then do one read. The caller's inline WAIT stays open
-      // (await-task declares timeoutMs: 0). 10 min runaway-task backstop.
+      // completion SIGNAL (event-driven, no DB polling), then do one read.
+      // The caller's inline WAIT stays open (await-task declares timeoutMs: 0).
+      // 10 min runaway-task backstop.
       if (!effectiveThreadId || !effectiveToolMessageId) {
-        const { waitForTaskCompletion } =
-          await import("../task-completion-waiters");
-        await waitForTaskCompletion(taskId, 600_000);
+        await PendingCalls.waitForTaskCompletion(taskId, 600_000);
         // Single read after the signal (or after timeout — covers a
         // completion that landed in another process before registration).
         const [row] = await db
@@ -367,10 +331,7 @@ export class AwaitTaskRepository {
           .where(eq(cronTasks.id, taskId))
           .limit(1);
         const terminal =
-          !row ||
-          row.lastExecutionStatus === CronTaskStatus.COMPLETED ||
-          row.lastExecutionStatus === CronTaskStatus.FAILED ||
-          row.lastExecutionStatus === CronTaskStatus.CANCELLED;
+          !row || AwaitTaskRepository.isTerminal(row.lastExecutionStatus);
         if (!terminal) {
           logger.warn(
             "[AwaitTask] Cross-instance wait exhausted — returning pending",
@@ -384,32 +345,9 @@ export class AwaitTaskRepository {
           });
         }
         const status = row?.lastExecutionStatus ?? CronTaskStatus.COMPLETED;
-        const [execRow] = await db
-          .select({ result: cronTaskExecutions.result })
-          .from(cronTaskExecutions)
-          .where(eq(cronTaskExecutions.taskId, taskId))
-          .orderBy(desc(cronTaskExecutions.startedAt))
-          .limit(1);
         const settledResult =
-          execRow?.result !== null && execRow?.result !== undefined
-            ? (execRow.result as WidgetData)
-            : undefined;
-        try {
-          await db
-            .delete(cronTasks)
-            .where(
-              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
-            );
-          await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-        } catch (cleanupErr) {
-          logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
-            taskId,
-            error:
-              cleanupErr instanceof Error
-                ? cleanupErr.message
-                : String(cleanupErr),
-          });
-        }
+          await AwaitTaskRepository.readStoredResult(taskId);
+        await AwaitTaskRepository.cleanupTask(taskId, logger);
         logger.info("[AwaitTask] Cross-instance wait settled — delivering", {
           taskId,
           status,
@@ -423,120 +361,84 @@ export class AwaitTaskRepository {
         });
       }
 
-      if (effectiveThreadId && effectiveToolMessageId) {
-        const modelId = await resolveStreamModelId(streamContext, user);
+      const modelId = await TaskCompletion.resolveStreamModelId(
+        streamContext,
+        user,
+      );
 
-        await db
-          .update(cronTasks)
-          .set({
-            wakeUpCallbackMode: CallbackMode.WAIT,
-            wakeUpThreadId: effectiveThreadId,
-            wakeUpToolMessageId: effectiveToolMessageId,
-            wakeUpModelId: modelId ?? null,
-            wakeUpSkillId: streamContext.skillId ?? null,
-            wakeUpFavoriteId: streamContext.favoriteId ?? null,
-            wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
-            wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
-            userId: !user.isPublic ? user.id : (task.userId ?? null),
-            updatedAt: new Date(),
-          })
-          .where(eq(cronTasks.id, taskId));
+      await db
+        .update(cronTasks)
+        .set({
+          wakeUpCallbackMode: CallbackMode.WAIT,
+          wakeUpThreadId: effectiveThreadId,
+          wakeUpToolMessageId: effectiveToolMessageId,
+          wakeUpModelId: modelId,
+          wakeUpSkillId: streamContext.skillId ?? null,
+          wakeUpFavoriteId: streamContext.favoriteId ?? null,
+          wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
+          wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
+          userId: !user.isPublic ? user.id : (task.userId ?? null),
+          updatedAt: new Date(),
+        })
+        .where(eq(cronTasks.id, taskId));
 
-        // Bounded inline wait. The dispatched task usually completes within a
-        // second or two (fixture replay; or a fast tool). Delivering the result
-        // INLINE — letting the current, still-alive stream continue past the
-        // await-task call with the result injected — is the correct, race-free
-        // path: it matches the already-terminal branch above and the regular-mode
-        // behaviour. It also avoids the pause→resume-stream revival, whose revived
-        // turn would RE-ISSUE the await-task call on a now-deleted task (a
-        // duplicate, second "failed" await-task tool message — the direct-mode
-        // T5b regression). We only fall through to the WAIT pause+revival below
-        // for genuinely long-running tasks that don't finish within this window.
-        //
-        // Event-driven: block on the goroutine's completion signal
-        // (task-completion-waiters), then read the row ONCE. The single read
-        // also closes the original race: the goroutine may have flipped the
-        // task terminal with callbackMode=DETACH (firing no revival) before
-        // our WAIT upgrade landed — the read still observes the terminal
-        // state and delivers inline. 15s is long enough that ordinary
-        // detaches resolve inline; genuinely long-running tasks fall through
-        // to the WAIT pause + revival below.
-        const { waitForTaskCompletion } =
-          await import("../task-completion-waiters");
-        await waitForTaskCompletion(taskId, 15_000);
-        const [afterUpgrade] = await db
-          .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
-          .from(cronTasks)
-          .where(eq(cronTasks.id, taskId))
-          .limit(1);
-        if (
-          afterUpgrade &&
-          (afterUpgrade.lastExecutionStatus === CronTaskStatus.COMPLETED ||
-            afterUpgrade.lastExecutionStatus === CronTaskStatus.FAILED ||
-            afterUpgrade.lastExecutionStatus === CronTaskStatus.CANCELLED)
-        ) {
-          logger.info(
-            "[AwaitTask] Task completed during inline wait — delivering inline",
-            { taskId, status: afterUpgrade.lastExecutionStatus },
-          );
-          const [execRow] = await db
-            .select({ result: cronTaskExecutions.result })
-            .from(cronTaskExecutions)
-            .where(eq(cronTaskExecutions.taskId, taskId))
-            .orderBy(desc(cronTaskExecutions.startedAt))
-            .limit(1);
-          const inlineResult =
-            execRow?.result !== null && execRow?.result !== undefined
-              ? (execRow.result as WidgetData)
-              : undefined;
-          try {
-            await db
-              .delete(cronTasks)
-              .where(
-                sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
-              );
-            await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-          } catch (cleanupErr) {
-            logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
-              taskId,
-              error:
-                cleanupErr instanceof Error
-                  ? cleanupErr.message
-                  : String(cleanupErr),
-            });
-          }
-          return success<AwaitTaskResponseOutput>({
-            status: afterUpgrade.lastExecutionStatus,
-            result: inlineResult,
-            waiting: false,
-            originalToolName,
-            originalArgs,
-          });
-        }
-
-        logger.info("[AwaitTask] Registered thread as waiter on pending task", {
-          taskId,
-          threadId: effectiveThreadId,
-          toolMessageId: effectiveToolMessageId,
-        });
-
-        // Suppress any existing wakeUp revival that may have been queued.
-        const originalWakeUpMsgId = task.wakeUpToolMessageId;
-        if (originalWakeUpMsgId) {
-          if (!streamContext.suppressedWakeUpToolMessageIds) {
-            streamContext.suppressedWakeUpToolMessageIds = new Set();
-          }
-          streamContext.suppressedWakeUpToolMessageIds.add(originalWakeUpMsgId);
-        }
-
-        streamContext.waitingForRemoteResult = true;
-        streamContext.pendingTimeoutMs = 90_000;
-      } else {
-        logger.warn(
-          "[AwaitTask] No streamContext - cannot register waiter, returning pending status",
-          { taskId },
+      // Bounded inline wait. The dispatched task usually completes within a
+      // second or two (fixture replay; or a fast tool). Delivering the result
+      // INLINE — letting the current, still-alive stream continue past the
+      // await-task call with the result injected — is the correct, race-free
+      // path: it matches the already-terminal branch above and the regular-mode
+      // behaviour. It also avoids the pause→resume-stream revival, whose revived
+      // turn would RE-ISSUE the await-task call on a now-deleted task (a
+      // duplicate, second "failed" await-task tool message — the direct-mode
+      // T5b regression). We only fall through to the WAIT pause+revival below
+      // for genuinely long-running tasks that don't finish within this window.
+      //
+      // Event-driven: block on the goroutine's completion signal, then read the
+      // row ONCE. The single read also closes the original race: the goroutine
+      // may have flipped the task terminal with callbackMode=DETACH (firing no
+      // revival) before our WAIT upgrade landed — the read still observes the
+      // terminal state and delivers inline. 15s is long enough that ordinary
+      // detaches resolve inline; genuinely long-running tasks fall through to
+      // the WAIT pause + revival below.
+      await PendingCalls.waitForTaskCompletion(taskId, 15_000);
+      const [afterUpgrade] = await db
+        .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
+        .from(cronTasks)
+        .where(eq(cronTasks.id, taskId))
+        .limit(1);
+      if (
+        afterUpgrade &&
+        AwaitTaskRepository.isTerminal(afterUpgrade.lastExecutionStatus)
+      ) {
+        logger.info(
+          "[AwaitTask] Task completed during inline wait — delivering inline",
+          { taskId, status: afterUpgrade.lastExecutionStatus },
         );
+        const inlineResult = await AwaitTaskRepository.readStoredResult(taskId);
+        await AwaitTaskRepository.cleanupTask(taskId, logger);
+        return success<AwaitTaskResponseOutput>({
+          status: afterUpgrade.lastExecutionStatus,
+          result: inlineResult,
+          waiting: false,
+          originalToolName,
+          originalArgs,
+        });
       }
+
+      logger.info("[AwaitTask] Registered thread as waiter on pending task", {
+        taskId,
+        threadId: effectiveThreadId,
+        toolMessageId: effectiveToolMessageId,
+      });
+
+      // Suppress any existing wakeUp revival that may have been queued.
+      AwaitTaskRepository.suppressWakeUp(
+        streamContext,
+        task.wakeUpToolMessageId,
+      );
+
+      streamContext.waitingForRemoteResult = true;
+      streamContext.pendingTimeoutMs = 90_000;
 
       return success<AwaitTaskResponseOutput>({
         status: CronTaskStatus.PENDING,
@@ -550,6 +452,70 @@ export class AwaitTaskRepository {
       return fail({
         message: t("post.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /** Whether a task status is terminal (completed/failed/cancelled). */
+  private static isTerminal(
+    status: typeof CronTaskStatusValue | null,
+  ): status is typeof CronTaskStatusValue {
+    return (
+      status === CronTaskStatus.COMPLETED ||
+      status === CronTaskStatus.FAILED ||
+      status === CronTaskStatus.CANCELLED
+    );
+  }
+
+  /** Latest execution-history result for a task, or undefined when empty. */
+  private static async readStoredResult(
+    taskId: string,
+  ): Promise<WidgetData | undefined> {
+    const [execRow] = await db
+      .select({ result: cronTaskExecutions.result })
+      .from(cronTaskExecutions)
+      .where(eq(cronTaskExecutions.taskId, taskId))
+      .orderBy(desc(cronTaskExecutions.startedAt))
+      .limit(1);
+    return execRow?.result !== null && execRow?.result !== undefined
+      ? (execRow.result as WidgetData)
+      : undefined;
+  }
+
+  /**
+   * Suppress the pending wakeUp revival for a dispatch tool message —
+   * await-task is taking over delivery of the result.
+   */
+  private static suppressWakeUp(
+    streamContext: ToolExecutionContext,
+    toolMessageId: string | null | undefined,
+  ): void {
+    if (!streamContext || !toolMessageId) {
+      return;
+    }
+    if (!streamContext.suppressedWakeUpToolMessageIds) {
+      streamContext.suppressedWakeUpToolMessageIds = new Set();
+    }
+    streamContext.suppressedWakeUpToolMessageIds.add(toolMessageId);
+  }
+
+  /** Delete the task row and any pending resume-stream cron task (non-fatal). */
+  private static async cleanupTask(
+    taskId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      await db
+        .delete(cronTasks)
+        .where(
+          sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
+        );
+      await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+    } catch (cleanupErr) {
+      logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
+        taskId,
+        error:
+          cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr),
       });
     }
   }

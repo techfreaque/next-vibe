@@ -10,30 +10,10 @@ import type {
   FieldUsageConfig,
 } from "next-vibe/unified-ui/_shared/types";
 import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
-import ContainerWidget from "next-vibe/unified-ui/containers/container/widget";
-import AlertWidget from "next-vibe/unified-ui/display-only/alert/widget";
-import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
-import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
-import SeparatorWidget from "next-vibe/unified-ui/display-only/separator/widget";
-import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
-import TitleWidget from "next-vibe/unified-ui/display-only/title/widget";
-import BooleanFieldWidget from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import EntityPickerFieldWidget from "next-vibe/unified-ui/form-fields/entity-picker-field/widget";
-import IconFieldWidget from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import SelectFieldWidget from "next-vibe/unified-ui/form-fields/select-field/widget";
-import TextFieldWidget from "next-vibe/unified-ui/form-fields/text-field/widget";
-import TextareaFieldWidget from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import UuidFieldWidget from "next-vibe/unified-ui/form-fields/uuid-field/widget";
-import ButtonWidget from "next-vibe/unified-ui/interactive/button/widget";
-import FormAlertWidget from "next-vibe/unified-ui/interactive/form-alert/widget";
-import NavigateButtonWidget from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import SearchBarWidget from "next-vibe/unified-ui/interactive/search-bar/widget";
-import SubmitButtonWidget from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React, { type JSX, Suspense } from "react";
 import type { z } from "zod";
 
 import { WidgetErrorBoundary } from "./ErrorBoundary";
-import { resolvedCache } from "./widget-preloader";
 
 /**
  * Widget Renderer Component - Routes to appropriate widget with full type inference.
@@ -66,9 +46,339 @@ export function WidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
   );
 }
 
+// Dispatch-boundary cast used throughout — switch discriminant guarantees type safety.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyProps = React.ComponentType<any>;
+
 /**
- * Render helper - switches on field.type for discriminated union narrowing.
- * className is passed separately and widgets handle getClassName internally.
+ * Lazy registry entry. `Component` is a React.lazy wrapper (web: chunk loads
+ * on first render, inside Suspense). `resolve()` eagerly imports the module
+ * and stores it on `resolved` so subsequent renders are fully synchronous —
+ * required by the CLI/MCP fast renderer, which only takes the first render.
+ */
+interface LazyWidgetEntry {
+  Component: AnyProps;
+  resolve: () => Promise<void>;
+  resolved: AnyProps | null;
+}
+
+function lazyEntry(
+  load: () => Promise<{ default: AnyProps }>,
+): LazyWidgetEntry {
+  let pending: Promise<void> | null = null;
+  const entry: LazyWidgetEntry = {
+    Component: React.lazy(load),
+    resolve: (): Promise<void> => {
+      pending ??= load().then((mod) => {
+        entry.resolved = mod.default;
+        return undefined;
+      });
+      return pending;
+    },
+    resolved: null,
+  };
+  return entry;
+}
+
+// One entry per widget module. Exhaustive over WidgetType (minus FORM_FIELD,
+// which dispatches on FieldDataType, and CUSTOM_WIDGET, which carries its own
+// render). Modules are NOT imported here — each loads on demand.
+const widgetRegistry: Record<
+  Exclude<WidgetType, WidgetType.FORM_FIELD | WidgetType.CUSTOM_WIDGET>,
+  LazyWidgetEntry
+> = {
+  [WidgetType.TEXT]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/text/widget"),
+  ),
+  [WidgetType.DESCRIPTION]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/description/widget"),
+  ),
+  [WidgetType.METADATA]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/metadata/widget"),
+  ),
+  [WidgetType.KEY_VALUE]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/key-value/widget"),
+  ),
+  [WidgetType.BADGE]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/badge/widget"),
+  ),
+  [WidgetType.ICON]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/icon/widget"),
+  ),
+  [WidgetType.MARKDOWN]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/markdown/widget"),
+  ),
+  [WidgetType.MARKDOWN_EDITOR]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/markdown-editor/widget"),
+  ),
+  [WidgetType.TITLE]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/title/widget"),
+  ),
+  [WidgetType.LINK]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/link/widget"),
+  ),
+  [WidgetType.CODE_OUTPUT]: lazyEntry(
+    () => import("next-vibe/unified-ui/containers/code-output/widget"),
+  ),
+  [WidgetType.CODE_QUALITY_LIST]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/code-quality-list/widget"),
+  ),
+  [WidgetType.PAGINATION]: lazyEntry(
+    () => import("next-vibe/unified-ui/containers/pagination/widget"),
+  ),
+  [WidgetType.STAT]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/stat/widget"),
+  ),
+  [WidgetType.CHART]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/chart/widget"),
+  ),
+  [WidgetType.CONTAINER]: lazyEntry(
+    () => import("next-vibe/unified-ui/containers/container/widget"),
+  ),
+  [WidgetType.SEPARATOR]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/separator/widget"),
+  ),
+  [WidgetType.BUTTON]: lazyEntry(
+    () => import("next-vibe/unified-ui/interactive/button/widget"),
+  ),
+  [WidgetType.NAVIGATE_BUTTON]: lazyEntry(
+    () => import("next-vibe/unified-ui/interactive/navigate-button/widget"),
+  ),
+  [WidgetType.SUBMIT_BUTTON]: lazyEntry(
+    () => import("next-vibe/unified-ui/interactive/submit-button/widget"),
+  ),
+  [WidgetType.ALERT]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/alert/widget"),
+  ),
+  [WidgetType.FORM_ALERT]: lazyEntry(
+    () => import("next-vibe/unified-ui/interactive/form-alert/widget"),
+  ),
+  [WidgetType.STATUS_INDICATOR]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/status-indicator/widget"),
+  ),
+  [WidgetType.EMPTY_STATE]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/empty-state/widget"),
+  ),
+  [WidgetType.CODE_QUALITY_FILES]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/code-quality-files/widget"),
+  ),
+  [WidgetType.CODE_QUALITY_SUMMARY]: lazyEntry(
+    () =>
+      import("next-vibe/unified-ui/display-only/code-quality-summary/widget"),
+  ),
+  [WidgetType.AVATAR]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/avatar/widget"),
+  ),
+  [WidgetType.LOADING]: lazyEntry(
+    () => import("next-vibe/unified-ui/display-only/loading/widget"),
+  ),
+  [WidgetType.SEARCH_BAR]: lazyEntry(
+    () => import("next-vibe/unified-ui/interactive/search-bar/widget"),
+  ),
+};
+
+// One entry per FORM_FIELD fieldType that has its own widget module.
+// FieldDataTypes without an entry (array, badge, code, …) render nothing,
+// matching the previous switch's default branch.
+const formFieldRegistry: Partial<Record<FieldDataType, LazyWidgetEntry>> = {
+  [FieldDataType.BOOLEAN]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/boolean-field/widget"),
+  ),
+  [FieldDataType.COLOR]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/color-field/widget"),
+  ),
+  [FieldDataType.COUNTRY_SELECT]: lazyEntry(
+    () =>
+      import("next-vibe/unified-ui/form-fields/country-select-field/widget"),
+  ),
+  [FieldDataType.CURRENCY_SELECT]: lazyEntry(
+    () =>
+      import("next-vibe/unified-ui/form-fields/currency-select-field/widget"),
+  ),
+  [FieldDataType.DATE]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/date-field/widget"),
+  ),
+  [FieldDataType.DATE_RANGE]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/date-range-field/widget"),
+  ),
+  [FieldDataType.DATETIME]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/datetime-field/widget"),
+  ),
+  [FieldDataType.EMAIL]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/email-field/widget"),
+  ),
+  [FieldDataType.ENTITY_PICKER]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/entity-picker-field/widget"),
+  ),
+  [FieldDataType.FILE]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/file-field/widget"),
+  ),
+  [FieldDataType.FILTER_PILLS]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/filter-pills-field/widget"),
+  ),
+  [FieldDataType.ICON]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/icon-field/widget"),
+  ),
+  [FieldDataType.INT]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/int-field/widget"),
+  ),
+  [FieldDataType.JSON]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/json-field/widget"),
+  ),
+  [FieldDataType.LANGUAGE_SELECT]: lazyEntry(
+    () =>
+      import("next-vibe/unified-ui/form-fields/language-select-field/widget"),
+  ),
+  [FieldDataType.MARKDOWN_TEXTAREA]: lazyEntry(
+    () =>
+      import("next-vibe/unified-ui/form-fields/markdown-textarea-field/widget"),
+  ),
+  [FieldDataType.MULTISELECT]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/multiselect-field/widget"),
+  ),
+  [FieldDataType.NUMBER]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/number-field/widget"),
+  ),
+  [FieldDataType.PASSWORD]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/password-field/widget"),
+  ),
+  [FieldDataType.TEL]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/phone-field/widget"),
+  ),
+  [FieldDataType.RANGE_SLIDER]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/range-slider-field/widget"),
+  ),
+  [FieldDataType.SELECT]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/select-field/widget"),
+  ),
+  [FieldDataType.SLIDER]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/slider-field/widget"),
+  ),
+  [FieldDataType.TAGS]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/tags-field/widget"),
+  ),
+  [FieldDataType.TEXT]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/text-field/widget"),
+  ),
+  [FieldDataType.TEXTAREA]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/textarea-field/widget"),
+  ),
+  [FieldDataType.TEXT_ARRAY]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/text-array-field/widget"),
+  ),
+  [FieldDataType.TIME]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/time-field/widget"),
+  ),
+  [FieldDataType.TIME_RANGE]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/time-range-field/widget"),
+  ),
+  [FieldDataType.TIMEZONE]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/timezone-field/widget"),
+  ),
+  [FieldDataType.URL]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/url-field/widget"),
+  ),
+  [FieldDataType.UUID]: lazyEntry(
+    () => import("next-vibe/unified-ui/form-fields/uuid-field/widget"),
+  ),
+};
+
+function entryForField(field: {
+  type: WidgetType;
+  fieldType?: FieldDataType;
+}): LazyWidgetEntry | null {
+  if (field.type === WidgetType.FORM_FIELD) {
+    return field.fieldType
+      ? (formFieldRegistry[field.fieldType] ?? null)
+      : null;
+  }
+  if (field.type === WidgetType.CUSTOM_WIDGET) {
+    return null;
+  }
+  return widgetRegistry[field.type] ?? null;
+}
+
+/**
+ * Walk an endpoint's field tree and resolve ONLY the widget modules it uses.
+ * Must run before the synchronous CLI/MCP fast renderer, which cannot suspend —
+ * an unresolved lazy widget there produces no output.
+ */
+export function prewarmBuiltinWidgets(
+  endpoint: CreateApiEndpointAny,
+): Promise<void> {
+  const entries = new Set<LazyWidgetEntry>();
+  // oxlint-disable-next-line typescript/no-explicit-any -- dispatch-boundary: untyped field-tree walk, same pattern as scanForInlineButtons
+  collectEntries(endpoint.fields as any as FieldTreeNode, entries, new Set());
+  return Promise.all(
+    [...entries].filter((e) => !e.resolved).map((e) => e.resolve()),
+  ).then(() => undefined);
+}
+
+/** Structural view of a field-tree node — only what the walk needs. */
+interface FieldTreeNode {
+  type?: WidgetType;
+  fieldType?: FieldDataType;
+  children?: Record<string, FieldTreeNode>;
+}
+
+function collectEntries(
+  field: FieldTreeNode | null | undefined,
+  entries: Set<LazyWidgetEntry>,
+  seen: Set<FieldTreeNode>,
+): void {
+  if (!field || typeof field !== "object" || seen.has(field)) {
+    return;
+  }
+  seen.add(field);
+
+  if (typeof field.type === "string") {
+    const entry = entryForField({
+      type: field.type,
+      fieldType: field.fieldType,
+    });
+    if (entry) {
+      entries.add(entry);
+    }
+  }
+
+  if (field.children && typeof field.children === "object") {
+    for (const child of Object.values(field.children)) {
+      collectEntries(child, entries, seen);
+    }
+  }
+}
+
+/**
+ * Render a lazy widget. Once its module is resolved (prewarm or a prior
+ * load), renders synchronously — no Suspense, no flash. Otherwise the
+ * React.lazy wrapper loads the chunk on demand inside Suspense (web only).
+ */
+function w<TEndpoint extends CreateApiEndpointAny>(
+  entry: LazyWidgetEntry,
+  props: ReactWidgetProps<
+    TEndpoint,
+    FieldUsageConfig,
+    DispatchField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+    >
+  >,
+): JSX.Element {
+  const W = entry.resolved ?? entry.Component;
+  const el = (
+    <W
+      fieldName={props.fieldName}
+      field={props.field}
+      inlineButtonInfo={props.inlineButtonInfo}
+    />
+  );
+  return entry.resolved ? el : <Suspense fallback={null}>{el}</Suspense>;
+}
+
+/**
+ * Render helper - dispatches on field.type via the lazy registries.
  */
 function renderWidget<TEndpoint extends CreateApiEndpointAny>(
   props: ReactWidgetProps<
@@ -82,399 +392,33 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
     >
   >,
 ): JSX.Element {
-  // Switch statement ensures proper type checking for each widget
-  // Use props directly (not props) to preserve narrowing
-  switch (props.field.type) {
-    case WidgetType.TEXT: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const TextW = TextWidget as React.ComponentType<any>;
-      return (
-        <TextW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.DESCRIPTION:
-      return createWidget("description", props);
-    case WidgetType.METADATA:
-      return createWidget("metadata", props);
-    case WidgetType.KEY_VALUE:
-      return createWidget("key-value", props);
-    case WidgetType.BADGE: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const BadgeW = BadgeWidget as React.ComponentType<any>;
-      return (
-        <BadgeW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.ICON: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const IconW = IconWidget as React.ComponentType<any>;
-      return (
-        <IconW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.MARKDOWN:
-      return createWidget("markdown", props);
-    case WidgetType.MARKDOWN_EDITOR:
-      return createWidget("markdown-editor", props);
-    case WidgetType.TITLE: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const TitleW = TitleWidget as React.ComponentType<any>;
-      return (
-        <TitleW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.LINK:
-      return createWidget("link", props);
-    case WidgetType.CODE_OUTPUT:
-      return createWidget("code-output", props);
-    case WidgetType.CODE_QUALITY_LIST:
-      return createWidget("code-quality-list", props);
-    case WidgetType.PAGINATION:
-      return createWidget("pagination", props);
-    case WidgetType.STAT:
-      return createWidget("stat", props);
-    case WidgetType.CHART:
-      return createWidget("chart", props);
-    case WidgetType.CUSTOM_WIDGET: {
-      // Get render function from field
-      const customField = props.field as typeof props.field & {
-        // oxlint-disable-next-line typescript/no-explicit-any
-        render?: React.ComponentType<any>;
-      };
-      const CustomRender = customField.render;
-
-      if (!CustomRender) {
-        return <></>;
-      }
-
-      // Custom widgets may be React.lazy - wrap in Suspense scoped to this widget only.
-      return (
-        <Suspense fallback={null}>
-          <CustomRender
-            fieldName={props.fieldName}
-            field={props.field}
-            inlineButtonInfo={props.inlineButtonInfo}
-          />
-        </Suspense>
-      );
-    }
-    case WidgetType.CONTAINER: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const ContainerW = ContainerWidget as React.ComponentType<any>;
-      return (
-        <ContainerW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.SEPARATOR: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const SeparatorW = SeparatorWidget as React.ComponentType<any>;
-      return (
-        <SeparatorW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.BUTTON: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const ButtonW = ButtonWidget as React.ComponentType<any>;
-      return (
-        <ButtonW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.NAVIGATE_BUTTON: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const NavigateButtonW = NavigateButtonWidget as React.ComponentType<any>;
-      return (
-        <NavigateButtonW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.SUBMIT_BUTTON: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const SubmitButtonW = SubmitButtonWidget as React.ComponentType<any>;
-      return (
-        <SubmitButtonW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.ALERT: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const AlertW = AlertWidget as React.ComponentType<any>;
-      return (
-        <AlertW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.FORM_ALERT: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const FormAlertW = FormAlertWidget as React.ComponentType<any>;
-      return (
-        <FormAlertW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-    case WidgetType.STATUS_INDICATOR:
-      return createWidget("status-indicator", props);
-    case WidgetType.EMPTY_STATE:
-      return createWidget("empty-state", props);
-    case WidgetType.CODE_QUALITY_FILES:
-      return createWidget("code-quality-files", props);
-    case WidgetType.CODE_QUALITY_SUMMARY:
-      return createWidget("code-quality-summary", props);
-    case WidgetType.AVATAR:
-      return createWidget("avatar", props);
-    case WidgetType.LOADING:
-      return createWidget("loading", props);
-    case WidgetType.SEARCH_BAR: {
-      // Dispatch-boundary cast: switch discriminant guarantees type safety.
-      // oxlint-disable-next-line typescript/no-explicit-any
-      const SearchBarW = SearchBarWidget as React.ComponentType<any>;
-      return (
-        <SearchBarW
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
-      );
-    }
-
-    case WidgetType.FORM_FIELD: {
-      // TypeScript cannot narrow fieldType through the large FormFieldWidgetConfig union
-      // Extract it and assert the type since we know all FORM_FIELD widgets have this property
-      const fieldType = props.field.fieldType as FieldDataType;
-
-      switch (fieldType) {
-        case FieldDataType.BOOLEAN: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const BooleanW = BooleanFieldWidget as React.ComponentType<any>;
-          return (
-            <BooleanW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.COLOR:
-          return createWidget("color", props);
-        case FieldDataType.COUNTRY_SELECT:
-          return createWidget("country-select", props);
-        case FieldDataType.CURRENCY_SELECT:
-          return createWidget("currency-select", props);
-        case FieldDataType.DATE:
-          return createWidget("date", props);
-        case FieldDataType.DATE_RANGE:
-          return createWidget("date-range", props);
-        case FieldDataType.DATETIME:
-          return createWidget("datetime", props);
-        case FieldDataType.EMAIL:
-          return createWidget("email", props);
-        case FieldDataType.ENTITY_PICKER: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          const EntityPickerW = EntityPickerFieldWidget as React.ComponentType<
-            typeof props
-          >;
-          return (
-            <EntityPickerW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.FILE:
-          return createWidget("file", props);
-        case FieldDataType.FILTER_PILLS:
-          return createWidget("filter-pills", props);
-        case FieldDataType.ICON: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const IconFieldW = IconFieldWidget as React.ComponentType<any>;
-          return (
-            <IconFieldW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.INT:
-          return createWidget("int", props);
-        case FieldDataType.JSON:
-          return createWidget("json", props);
-        case FieldDataType.LANGUAGE_SELECT:
-          return createWidget("language-select", props);
-        case FieldDataType.MULTISELECT:
-          return createWidget("multiselect", props);
-        case FieldDataType.NUMBER:
-          return createWidget("number", props);
-        case FieldDataType.PASSWORD:
-          return createWidget("password", props);
-        case FieldDataType.TEL:
-          return createWidget("tel", props);
-        case FieldDataType.RANGE_SLIDER:
-          return createWidget("range-slider", props);
-
-        case FieldDataType.SELECT: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const SelectW = SelectFieldWidget as React.ComponentType<any>;
-          return (
-            <SelectW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.SLIDER:
-          return createWidget("slider", props);
-        case FieldDataType.TAGS:
-          return createWidget("tags", props);
-        case FieldDataType.MARKDOWN_TEXTAREA:
-          return createWidget("markdown-textarea", props);
-
-        case FieldDataType.TEXTAREA: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const TextareaW = TextareaFieldWidget as React.ComponentType<any>;
-          return (
-            <TextareaW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.TEXT_ARRAY:
-          return createWidget("text-array", props);
-        case FieldDataType.TEXT: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const TextFieldW = TextFieldWidget as React.ComponentType<any>;
-          return (
-            <TextFieldW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-        case FieldDataType.TIME:
-          return createWidget("time", props);
-        case FieldDataType.TIME_RANGE:
-          return createWidget("time-range", props);
-        case FieldDataType.TIMEZONE:
-          return createWidget("timezone", props);
-        case FieldDataType.URL:
-          return createWidget("url", props);
-        case FieldDataType.UUID: {
-          // Dispatch-boundary cast: switch discriminant guarantees type safety.
-          // oxlint-disable-next-line typescript/no-explicit-any
-          const UuidW = UuidFieldWidget as React.ComponentType<any>;
-          return (
-            <UuidW
-              fieldName={props.fieldName}
-              field={props.field}
-              inlineButtonInfo={props.inlineButtonInfo}
-            />
-          );
-        }
-
-        default:
-          return <></>;
-      }
-    }
-
-    default: {
-      // oxlint-disable-next-line no-unused-vars
-      const _exhaustiveCheck: never = props.field;
+  if (props.field.type === WidgetType.CUSTOM_WIDGET) {
+    const customField = props.field as typeof props.field & {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render?: React.ComponentType<any>;
+    };
+    const CustomRender = customField.render;
+    if (!CustomRender) {
       return <></>;
     }
+    return (
+      <Suspense fallback={null}>
+        <CustomRender
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      </Suspense>
+    );
   }
-}
 
-/**
- * Render a widget from the eager-import cache (lives in widget-preloader.ts,
- * outside "use client" so Vite does not strip it).
- * Renders synchronously if the chunk is resolved - no Suspense, no SSR
- * streaming boundary, no flash.
- */
-function createWidget<TEndpoint extends CreateApiEndpointAny>(
-  key: string,
-  props: ReactWidgetProps<
-    TEndpoint,
-    FieldUsageConfig,
-    DispatchField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
-    >
-  >,
-): JSX.Element {
-  // resolvedCache is imported from widget-preloader (no "use client" - not stripped)
-  const Widget = resolvedCache.get(key);
-  if (!Widget) {
+  const entry = entryForField(
+    props.field as { type: WidgetType; fieldType?: FieldDataType },
+  );
+  if (!entry) {
     return <></>;
   }
-  return (
-    <Widget
-      fieldName={props.fieldName}
-      field={props.field}
-      inlineButtonInfo={props.inlineButtonInfo}
-    />
-  );
+  return w(entry, props);
 }
 
 WidgetRenderer.displayName = "WidgetRenderer";

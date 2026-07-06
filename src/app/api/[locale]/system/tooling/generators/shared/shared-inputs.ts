@@ -14,7 +14,6 @@
 import "server-only";
 
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { LiveIndex } from "next-vibe/tooling/generators/shared/live-index";
 import { findFilesRecursively } from "next-vibe/tooling/generators/shared/utils";
@@ -29,9 +28,6 @@ import { findFilesRecursively } from "next-vibe/tooling/generators/shared/utils"
  * the import failed (logged, skipped downstream).
  */
 type DefinitionDefault = ApiSection | null;
-
-/** Parsed model definitions, shared by the ai-stream enum generators. */
-type ModelDefinitions = WidgetData;
 
 /** File lists, scanned once. Empty arrays when a category has no files. */
 interface GeneratorFileLists {
@@ -52,8 +48,6 @@ interface GeneratorFileLists {
 interface GeneratorComputed {
   /** Each definition.ts imported once: absolute POSIX path → parsed `.default`. */
   definitionModules: Map<string, DefinitionDefault>;
-  /** Parsed model definitions (vision + media-gen enum generators). */
-  modelDefinitions: ModelDefinitions;
 }
 
 /** The context passed to every generator function. */
@@ -182,7 +176,7 @@ interface BuildContextOptions {
    * Which computed artifacts to eagerly build. `definitionModules` is parsed only
    * when requested (the endpoint generators need it; a task-only dirty run does not).
    */
-  need?: { definitionModules?: boolean; modelDefinitions?: boolean };
+  need?: { definitionModules?: boolean };
 }
 
 /**
@@ -214,18 +208,11 @@ export async function buildGeneratorContext(
     }
   }
 
-  let modelDefinitions: ModelDefinitions = null;
-  if (opts.need?.modelDefinitions) {
-    const mod = await import(`@/app/api/[locale]/agent/models/models`);
-    modelDefinitions = mod.MODEL_DEFINITIONS ?? null;
-  }
-
   return {
     logger: opts.logger,
     files,
     computed: {
       definitionModules,
-      modelDefinitions,
     },
     force: opts.force,
   };

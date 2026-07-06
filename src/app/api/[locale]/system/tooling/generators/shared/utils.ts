@@ -377,11 +377,23 @@ export function jsonToTs(
     // Try inline for all arrays - renderInline returns null for values that
     // can't be represented inline (e.g. nested objects that are too deep).
     // +1 for the trailing comma that the parent object will append
-    const inlineParts = value.map(renderInline);
-    if (inlineParts.every((p) => p !== null)) {
-      const inline = `[${inlineParts.join(", ")}]`;
-      if (prefixCols + inline.length + 1 <= PRINT_WIDTH) {
-        return inline;
+    // Prettier rule: multi-element arrays containing objects/arrays are always
+    // expanded, even if they fit on one line. Single-element is fine inline.
+    const hasMultipleComplexItems =
+      value.length > 1 &&
+      value.some(
+        (v) =>
+          v !== null &&
+          typeof v === "object" &&
+          (Array.isArray(v) || Object.keys(v).length > 0),
+      );
+    if (!hasMultipleComplexItems) {
+      const inlineParts = value.map(renderInline);
+      if (inlineParts.every((p) => p !== null)) {
+        const inline = `[${inlineParts.join(", ")}]`;
+        if (prefixCols + inline.length + 1 <= PRINT_WIDTH) {
+          return inline;
+        }
       }
     }
 

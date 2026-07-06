@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ADD COLUMN "thread_mirror_mode" text DEFAULT 'both' NOT NULL;

@@ -17,14 +17,14 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { invalidateUnbottledCache } from "next-vibe/execute-tool/routing";
+import { ExecuteToolRouting } from "next-vibe/execute-tool/repository/routing";
+import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
-import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectionByIdDeleteResponseOutput,
   RemoteConnectionByIdGetResponseOutput,
@@ -62,9 +62,9 @@ export class RemoteConnectionInstanceRepository {
         isActive: null,
         lastSyncedAt: null,
         wsConnectedAt: null,
-        remoteInstanceId: null,
         capabilitiesVersion: null,
         transportMode: null,
+        remoteTransportMode: null,
         isInferenceProvider: null,
         forceSystemProvider: null,
         syncScope: null,
@@ -77,9 +77,9 @@ export class RemoteConnectionInstanceRepository {
       isActive: row.isActive,
       lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
       wsConnectedAt: row.wsConnectedAt?.toISOString() ?? null,
-      remoteInstanceId: row.remoteInstanceId ?? null,
       capabilitiesVersion: row.capabilitiesVersion ?? null,
       transportMode: row.transportMode ?? null,
+      remoteTransportMode: row.remoteTransportMode ?? null,
       isInferenceProvider: row.isInferenceProvider,
       forceSystemProvider: row.forceSystemProvider,
       syncScope: row.syncScope ?? null,
@@ -145,7 +145,14 @@ export class RemoteConnectionInstanceRepository {
       await db
         .update(remoteConnections)
         .set({ forceSystemProvider: false, updatedAt: new Date() })
-        .where(eq(remoteConnections.userId, user.id));
+        .where(eq(remoteConnections.forceSystemProvider, true));
+    }
+    // If enabling isInferenceProvider: clear it on all connections instance-wide first
+    if (isInferenceProvider === true) {
+      await db
+        .update(remoteConnections)
+        .set({ isInferenceProvider: false, updatedAt: new Date() })
+        .where(eq(remoteConnections.isInferenceProvider, true));
     }
 
     // ── Reauth: refresh token from remote ────────────────────────────────────
@@ -212,7 +219,7 @@ export class RemoteConnectionInstanceRepository {
       isInferenceProvider !== undefined ||
       forceSystemProvider !== undefined
     ) {
-      invalidateUnbottledCache();
+      ExecuteToolRouting.invalidateUnbottledCache();
     }
 
     logger.info("Updated remote connection settings", {
@@ -283,11 +290,12 @@ export class RemoteConnectionInstanceRepository {
         user.id,
         targetInstanceId,
       )) ?? row.remoteTransportMode;
-    if (reconnectNow === true) {
-      const { restartConnection } =
-        await import("next-vibe/realtime/connector");
-      await restartConnection(targetInstanceId);
-    } else if (effectiveRemoteMode === "reverse-ws") {
+    const effectiveOwnMode = transportMode ?? row.transportMode;
+    if (
+      reconnectNow === true ||
+      effectiveRemoteMode === "reverse-ws" ||
+      effectiveOwnMode === "reverse-ws"
+    ) {
       const { restartConnection } =
         await import("next-vibe/realtime/connector");
       await restartConnection(targetInstanceId);
@@ -336,7 +344,7 @@ export class RemoteConnectionInstanceRepository {
         ),
       );
 
-    invalidateUnbottledCache();
+    ExecuteToolRouting.invalidateUnbottledCache();
 
     logger.info("Disconnected remote connection locally", {
       userId: user.id,
@@ -352,47 +360,13 @@ export class RemoteConnectionInstanceRepository {
         });
       });
 
-    // Soft-archive the remote subfolder: rename to "${instanceId} (disconnected)"
-    void (async (): Promise<void> => {
-      try {
-        const { chatFolders } =
-          await import("@/app/api/[locale]/agent/chat/db");
-        const { DefaultFolderId } =
-          await import("@/app/api/[locale]/agent/chat/config");
-        await db
-          .update(chatFolders)
-          .set({
-            name: `${instanceId} (disconnected)`,
-            updatedAt: new Date(),
-          })
-          .where(
-            and(
-              eq(chatFolders.userId, user.id),
-              eq(chatFolders.rootFolderId, DefaultFolderId.REMOTE),
-              eq(chatFolders.name, instanceId),
-              isNull(chatFolders.parentId),
-            ),
-          );
-      } catch (folderErr) {
-        logger.warn("[DISCONNECT] Failed to archive remote subfolder", {
-          instanceId,
-          error:
-            folderErr instanceof Error ? folderErr.message : String(folderErr),
-        });
-      }
-    })();
+    // The REMOTE/<instanceId> folder and its mirrored threads stay untouched —
+    // "disconnected" is the absence of the remoteConnections row, and a
+    // reconnect converges on the same folder (find-or-create by name).
 
     // Fire-and-forget: notify remote to remove its record of us
     if (row.token && row.remoteUrl) {
       const plainToken = RemoteConnectionRepository.decryptToken(row.token);
-      const selfId = row.remoteInstanceId;
-      if (!selfId) {
-        logger.warn(
-          "No remoteInstanceId — skipping remote disconnect notification",
-          { instanceId },
-        );
-        return success({ disconnected: true });
-      }
       // Bounded retries (background): a missed DELETE leaves an orphaned
       // reverse entry on the remote holding a token that no longer rotates.
       void (async (): Promise<void> => {
@@ -405,7 +379,7 @@ export class RemoteConnectionInstanceRepository {
           }
           const res = await RemoteTransport.callRaw({
             remoteUrl: row.remoteUrl,
-            apiPath: `${locale}/user/remote-connection/${selfId}`,
+            apiPath: `${locale}/user/remote-connection/${instanceId}`,
             method: Methods.DELETE,
             token: plainToken,
             leadId: row.leadId ?? undefined,

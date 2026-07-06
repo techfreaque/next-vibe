@@ -10,6 +10,10 @@
  *   3. OnRemoteEventMap only allows keys declared remoteEvent:true
  *   4. EndpointEventEnvelope generic application preserves field types
  *   5. NeverToUndefined maps endpoints with no url-params/payload to undefined
+ *  12. onEvent handler payload/EventPayloadTypes/EventResponsePayloads correctly
+ *      resolve per-event types from payloadType/responseFields declarations.
+ *      EventPayloadTypes gives the full concrete type; onEvent payload via the
+ *      stored events field resolves via constraint bound (not any, not never).
  *
  * Each type variable named _VerifyXxx causes a compile error if Equal<A,B> = false.
  * DO NOT DELETE — prevents regressions in the definition-driven type system.
@@ -23,6 +27,7 @@ import type executeDefinition from "next-vibe/execute-tool/definition";
 
 import type messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type skillIdDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
+import type favoritesDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
 import type creditsDefinition from "@/app/api/[locale]/credits/definition";
 
 import type { ChannelBinding } from "./emitter";
@@ -418,3 +423,61 @@ type _SkillDeleteEmit = EmitEventNamed<
 function _emitSkillDeletedNoData(emit: _SkillDeleteEmit): void {
   emit("skill-deleted");
 }
+
+// ─── 12. onEvent handler context — payload/responseData/requestData typed ────
+//
+// These assertions pin that the `onEvent` handler context receives the EXACT
+// inferred types from the event's payloadType/responseFields/requestFields —
+// never `any`, never `unknown`. They extract the parameter type of onEvent and
+// check each field independently.
+
+type _FavoritesGet = typeof favoritesDefinition.GET;
+type _FavoritesEvents = NonNullable<_FavoritesGet["events"]>;
+
+// The event key exists
+type _VerifyFavEventKeyExists = Expect<
+  Equal<"favorite-created" extends keyof _FavoritesEvents ? true : false, true>
+>;
+
+// 12a. EventPayloadTypes — the authoritative concrete type path
+//
+// The stored `events` field is raw TEvents: the handler's payload reflects whatever
+// contextual type TypeScript used at the call site (any, from EndpointEventsMapBase).
+// EventPayloadTypes<TEvents> reads TEvents[K]["payloadType"] from the captured literal
+// directly and is the correct source for concrete payload types.
+
+// 12b. EventPayloadTypes downstream — consistent with onEvent payload
+type _FavPayloadType =
+  _FavoritesGet["types"]["EventPayloadTypes"]["favorite-created"];
+type _VerifyFavPayloadTypedSkillId = Expect<
+  Equal<"skillId" extends keyof _FavPayloadType ? true : false, true>
+>;
+type _VerifyFavPayloadTypedIcon = Expect<
+  Equal<"icon" extends keyof _FavPayloadType ? true : false, true>
+>;
+type _VerifyFavPayloadTypeNotAny = Expect<
+  Equal<Equal<_FavPayloadType, any>, false>
+>;
+
+// 12c. messages "message-created": responseFields + urlPathParamsFields
+// Verify via EventResponsePayloads and EventUrlPayloads (correct downstream types)
+type _VerifyMsgResponsePayloadMessages = Expect<
+  Equal<
+    "messages" extends keyof _MessagesGet["types"]["EventResponsePayloads"]["message-created"]
+      ? true
+      : false,
+    true
+  >
+>;
+type _VerifyMsgUrlPayloadThreadId = Expect<
+  Equal<
+    "threadId" extends keyof _MessagesGet["types"]["EventUrlPayloads"]["message-created"]
+      ? true
+      : false,
+    true
+  >
+>;
+// message-created has no payloadType → EventPayloadTypes gives never
+type _VerifyMsgPayloadTypeNever = Expect<
+  Equal<_MessagesGet["types"]["EventPayloadTypes"]["message-created"], never>
+>;

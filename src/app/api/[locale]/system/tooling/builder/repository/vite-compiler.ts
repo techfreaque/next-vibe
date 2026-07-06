@@ -1699,7 +1699,7 @@ class ViteCompiler {
                   if (closeRef?.fn) {
                     await closeRef.fn();
                   } else {
-                  await srv.close();
+                    await srv.close();
                   }
                 } catch {
                   /* ignore close errors */
@@ -1882,7 +1882,13 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           // Definition files call lazyWidget() and those dynamic imports are
           // pre-compiled here so Suspense boundaries resolve fast on first load.
           warmup: {
-            ssrFiles: [`${srcDirectory}/router.tsx`],
+            ssrFiles: [
+              `${srcDirectory}/router.tsx`,
+              ...new Bun.Glob("src/app/api/**/definition.ts").scanSync({
+                cwd: ROOT_DIR,
+                absolute: true,
+              }),
+            ],
           },
         } as InlineConfig["server"],
         // Use a TanStack-specific cache dir so it doesn't conflict with

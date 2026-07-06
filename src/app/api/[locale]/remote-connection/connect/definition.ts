@@ -110,8 +110,13 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "post.syncScope.label" as const,
         description: "post.syncScope.description" as const,
-        schema: SyncScopeSchema.optional(),
-        hidden: true,
+        schema: SyncScopeSchema.default({
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: true,
+        }),
       }),
       formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
@@ -215,6 +220,7 @@ const { POST } = createEndpoint({
                 lastSyncedAt: new Date().toISOString(),
                 hasToken: true,
                 healthStatus: "healthy",
+                isReverseEntry: false,
               };
             const exists = prev.data.connections.some(
               (c) => c.instanceId === instanceId,

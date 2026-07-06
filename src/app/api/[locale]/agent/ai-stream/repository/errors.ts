@@ -25,7 +25,7 @@ import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repos
 import { calculateCreditCost } from "../../models/models";
 import { type ChatModelId, getChatModelById } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
-import type { AiStreamT } from "../stream/i18n";
+import type { AiStreamT, AiStreamTranslationKey } from "../stream/i18n";
 import {
   AbortReason,
   isStreamAbort,
@@ -34,11 +34,10 @@ import {
 } from "./core/constants";
 import { buildSseMessageRow } from "./core/db-writer/sse-row";
 import { estimateTokensFromContext } from "./core/infra";
+import type { MessageDbWriter } from "./core/message-db-writer";
 import type { StreamContext } from "./core/stream";
 import { clearStreamingState } from "./core/stream";
 import { serializeError } from "./error-utils";
-import { StreamErrorHandler } from "./handlers/stream-error-handler";
-import { TimeoutErrorHandler } from "./handlers/timeout-error-handler";
 
 /**
  * ErrorRouter — the one no-dbWriter error-emit path.
@@ -601,5 +600,177 @@ export class AbortErrorHandler {
     ctx.cleanup();
 
     return { wasHandled: true };
+  }
+}
+
+// ============================================================================
+// STREAM ERROR HANDLER (merged from handlers/stream-error-handler.ts)
+// ============================================================================
+
+export class StreamErrorHandler {
+  /**
+   * Handle stream error and emit error events
+   */
+  static async handleStreamError(params: {
+    error: Error | JSONValue;
+    threadId: string;
+    user: JwtPayloadType;
+    lastParentId: string | null;
+    lastSequenceId: string | null;
+    dbWriter: MessageDbWriter;
+    logger: EndpointLogger;
+    t: AiStreamT;
+  }): Promise<void> {
+    const {
+      error,
+      threadId,
+      user,
+      lastParentId,
+      lastSequenceId,
+      dbWriter,
+      logger,
+      t,
+    } = params;
+
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName =
+      error instanceof Error ? error.constructor.name : typeof error;
+
+    logger.error("Stream error", {
+      error: errorMessage,
+      errorType: errorName,
+      threadId,
+      userId: user.isPublic ? null : user.id,
+      leadId: user.leadId,
+      stack: errorStack,
+    });
+
+    let translationKey: AiStreamTranslationKey;
+    let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
+    let skipDb = false;
+
+    if (
+      errorName === "AI_MissingToolResultsError" ||
+      errorMessage.toLowerCase().includes("missing tool results")
+    ) {
+      translationKey = "errors.pendingToolCall";
+      errorType = ErrorResponseTypes.BAD_REQUEST;
+    } else if (errorMessage.toLowerCase().includes("rate limit")) {
+      translationKey = "errors.rateLimitExceeded";
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("insufficient") &&
+      errorMessage.toLowerCase().includes("credit")
+    ) {
+      translationKey = "errors.insufficientCredits";
+      errorType = ErrorResponseTypes.PAYMENT_REQUIRED;
+      skipDb = true;
+    } else if (
+      errorMessage.toLowerCase().includes("no output") ||
+      errorMessage.toLowerCase().includes("no response") ||
+      errorName === "AI_NoOutputGeneratedError"
+    ) {
+      translationKey = "errors.noResponse";
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("model") &&
+      (errorMessage.toLowerCase().includes("not found") ||
+        errorMessage.toLowerCase().includes("unavailable"))
+    ) {
+      translationKey = "errors.modelUnavailable";
+      errorType = ErrorResponseTypes.NOT_FOUND;
+    } else if (
+      errorMessage.toLowerCase().includes("connection") ||
+      errorMessage.toLowerCase().includes("network") ||
+      errorMessage.toLowerCase().includes("fetch failed") ||
+      errorMessage.toLowerCase().includes("econnrefused")
+    ) {
+      translationKey = "errors.connectionFailed";
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("invalid") ||
+      errorMessage.toLowerCase().includes("malformed") ||
+      errorMessage.toLowerCase().includes("bad request")
+    ) {
+      translationKey = "errors.invalidRequest";
+      errorType = ErrorResponseTypes.BAD_REQUEST;
+    } else {
+      translationKey = "errors.streamError";
+      errorType = ErrorResponseTypes.UNKNOWN_ERROR;
+    }
+
+    const structuredError = fail({
+      message: t(translationKey),
+      errorType,
+    });
+
+    // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
+    await dbWriter.emitErrorMessage({
+      threadId,
+      errorType: StreamErrorType.STREAM_ERROR,
+      error: structuredError,
+      parentId: lastParentId,
+      sequenceId: lastSequenceId,
+      user,
+      skipDb,
+    });
+  }
+}
+
+// ============================================================================
+// TIMEOUT ERROR HANDLER (merged from handlers/timeout-error-handler.ts)
+// ============================================================================
+
+export class TimeoutErrorHandler {
+  /**
+   * Handle stream timeout error
+   */
+  static async handleTimeout(params: {
+    maxDuration: number;
+    model: string;
+    threadId: string;
+    user: JwtPayloadType;
+    lastParentId: string | null;
+    lastSequenceId: string | null;
+    dbWriter: MessageDbWriter;
+    logger: EndpointLogger;
+    t: AiStreamT;
+  }): Promise<void> {
+    const {
+      maxDuration,
+      model,
+      threadId,
+      user,
+      lastParentId,
+      lastSequenceId,
+      dbWriter,
+      logger,
+      t,
+    } = params;
+
+    logger.error("[AI Stream] Stream timed out", {
+      message: "Stream timeout",
+      maxDuration: `${maxDuration} seconds`,
+      model,
+      threadId,
+      userId: user.isPublic ? null : user.id,
+      hasContent: !!lastSequenceId,
+    });
+
+    const timeoutError = fail({
+      message: t("errors.timeout", { maxDuration: maxDuration.toString() }),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+
+    // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
+    await dbWriter.emitErrorMessage({
+      threadId,
+      errorType: StreamErrorType.TIMEOUT_ERROR,
+      error: timeoutError,
+      parentId: lastParentId,
+      sequenceId: lastSequenceId,
+      user,
+    });
   }
 }

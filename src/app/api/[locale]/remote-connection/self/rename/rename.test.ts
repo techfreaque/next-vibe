@@ -421,17 +421,25 @@ if (_remoteUrl) {
         return;
       }
 
-      // hermes must have a thread in remote/atlas subfolder
+      // hermes must have a thread under the remote/atlas SUBTREE — the
+      // placement-is-data model puts foreign threads at
+      // REMOTE/<origin>/<private|background>/<chain>, not the top-level folder.
       const pdb = getProdDb();
 
       const remoteThread = await pollUntil(
         "RN4: hermes must have a thread in remote/atlas folder after routing",
         async () => {
           const rows = await pdb.execute<{ id: string }>(
-            sql`SELECT id FROM chat_threads
-                    WHERE user_id = ${prodUserId}
-                      AND root_folder_id = ${DefaultFolderId.REMOTE}
-                      AND folder_id = ${remoteFolderId}
+            sql`WITH RECURSIVE subtree AS (
+                      SELECT id FROM chat_folders WHERE id = ${remoteFolderId}
+                      UNION ALL
+                      SELECT f.id FROM chat_folders f
+                        JOIN subtree s ON f.parent_id = s.id
+                    )
+                    SELECT t.id FROM chat_threads t
+                    WHERE t.user_id = ${prodUserId}
+                      AND t.root_folder_id = ${DefaultFolderId.REMOTE}
+                      AND t.folder_id IN (SELECT id FROM subtree)
                     LIMIT 1`,
           );
           return rows.rows[0] ?? false;
@@ -518,7 +526,7 @@ if (_remoteUrl) {
       const pdb = getProdDb();
       await pdb.execute(
         sql`UPDATE instance_identities SET instance_id = ${HERMES_INSTANCE_ID}, updated_at = NOW()
-            WHERE instance_id = ${newHermesName} AND is_default = true`,
+            WHERE instance_id = ${newHermesName}`,
       );
       await pdb.execute(
         sql`UPDATE remote_connections SET instance_id = ${HERMES_INSTANCE_ID}, updated_at = NOW()

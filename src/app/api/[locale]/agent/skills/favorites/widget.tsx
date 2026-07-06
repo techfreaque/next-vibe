@@ -280,9 +280,11 @@ const FullCard = React.memo(function FullCard({
           fieldName={arrayFieldPath(FAVORITES_FIELD, index, "icon")}
         />
       </Div>
-      <Div className="flex-1 min-w-0">
+      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <Div className="flex items-center gap-2 flex-wrap">
-          <Span className={cn("font-bold", isActive && "text-primary")}>
+          <Span
+            className={cn("text-base font-bold", isActive && "text-primary")}
+          >
             <TextWidget
               field={withValue(
                 fieldChildren.favorites.child.children.name,
@@ -382,6 +384,12 @@ const FullCard = React.memo(function FullCard({
             />
           )}
           <EditFavoriteButton item={item} navigate={navigate} />
+          <DeleteVariantButton
+            item={item}
+            logger={logger}
+            user={user}
+            locale={locale}
+          />
         </Div>
       )}
     </Div>
@@ -416,6 +424,8 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   locale: CountryLanguage;
   isTouch: boolean;
   isPickerMode: boolean;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const variantLabel = getVariantLabel(item, locale);
   const {
@@ -574,6 +584,13 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
               </Button>
             )}
             <EditFavoriteButton item={item} navigate={navigate} size="sm" />
+            <DeleteVariantButton
+              item={item}
+              logger={logger}
+              user={user}
+              locale={locale}
+              size="sm"
+            />
           </Div>
         )}
       </Div>
@@ -726,15 +743,18 @@ const SortableGroup = React.memo(function SortableGroup({
           >
             <Icon icon={group.icon} className="h-6 w-6" />
           </Div>
-          <Div className="flex-1 min-w-0">
+          <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
             <Div className="flex items-center gap-2 flex-wrap">
               <Span
-                className={cn("font-bold", singleIsActive && "text-primary")}
+                className={cn(
+                  "text-base font-bold",
+                  singleIsActive && "text-primary",
+                )}
               >
                 {group.name}
               </Span>
               {group.tagline ? (
-                <Span className="text-sm text-muted-foreground">
+                <Span className="text-xs text-muted-foreground">
                   {group.tagline}
                 </Span>
               ) : null}
@@ -782,18 +802,9 @@ const SortableGroup = React.memo(function SortableGroup({
                 user={user}
                 locale={locale}
               />
-              {/* Voting moved into the favorite edit view (inline up/down). */}
-              {group.skillId !== NO_SKILL_ID &&
-                !DEFAULT_SKILLS.some((s) => s.id === group.skillId) && (
-                  <FavoriteReportButton
-                    skillId={group.skillId}
-                    navigate={navigate}
-                  />
-                )}
-              <DeleteGroupButton
-                group={group}
-                logger={logger}
-                user={user}
+              <ViewSkillButton
+                skillId={group.skillId}
+                navigate={navigate}
                 locale={locale}
               />
             </Div>
@@ -831,6 +842,8 @@ const SortableGroup = React.memo(function SortableGroup({
                       locale={locale}
                       isTouch={isTouch}
                       isPickerMode={isPickerMode}
+                      logger={logger}
+                      user={user}
                     />
                   );
                 })}
@@ -1353,21 +1366,27 @@ function AddVariantButton({
   );
 }
 
-function DeleteGroupButton({
-  group,
+function DeleteVariantButton({
+  item,
   logger,
   user,
   locale,
   size,
 }: {
-  group: SkillGroup;
+  item: FavoriteCard;
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
   locale: CountryLanguage;
+  size?: "sm";
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
   const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
+  const isSmall = size === "sm";
+  const iconSize = isSmall ? "h-3 w-3" : "h-4 w-4";
+  const btnClass = isSmall
+    ? "h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+    : "text-muted-foreground hover:text-destructive";
 
   const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -1375,20 +1394,14 @@ function DeleteGroupButton({
 
     try {
       const favoriteDetailDefinitions = await import("./[id]/definition");
-      const ids = group.items.map((item) => item.id);
-
-      await Promise.all(
-        ids.map((id) =>
-          apiClient.mutate(
-            favoriteDetailDefinitions.default.DELETE,
-            logger,
-            user,
-            undefined,
-            { id },
-            locale,
-            availability,
-          ),
-        ),
+      await apiClient.mutate(
+        favoriteDetailDefinitions.default.DELETE,
+        logger,
+        user,
+        undefined,
+        { id: item.id },
+        locale,
+        availability,
       );
 
       apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
@@ -1399,9 +1412,7 @@ function DeleteGroupButton({
           success: true,
           data: {
             ...oldData.data,
-            favorites: oldData.data.favorites.filter(
-              (f) => !ids.includes(f.id),
-            ),
+            favorites: oldData.data.favorites.filter((f) => f.id !== item.id),
           },
         };
       });
@@ -1417,28 +1428,26 @@ function DeleteGroupButton({
           type="button"
           variant="ghost"
           size="sm"
-          className="text-destructive hover:text-destructive"
+          className={btnClass}
           onClick={(e) => e.stopPropagation()}
           disabled={isLoading}
         >
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className={cn(iconSize, "animate-spin")} />
           ) : (
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className={iconSize} />
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-56 p-3"
+        className="w-48 p-3"
         side="top"
         align="end"
         onInteractOutside={(e) => e.stopPropagation()}
       >
-        <Div className="flex flex-col gap-2">
-          <Span className="text-sm font-medium">
-            {t("get.deleteGroup.confirm", { count: group.items.length })}
-          </Span>
-          <Div className="flex gap-2 justify-end">
+        <Div className="flex flex-col gap-3">
+          <Span className="text-sm font-medium">{t("get.deleteVariant")}</Span>
+          <Div className="flex gap-2">
             <PopoverClose asChild>
               <Button
                 type="button"
@@ -1456,7 +1465,7 @@ function DeleteGroupButton({
                 size="sm"
                 onClick={handleConfirm}
               >
-                {t("get.deleteGroup.action")}
+                {t("get.deleteVariantAction")}
               </Button>
             </PopoverClose>
           </Div>
@@ -1466,21 +1475,28 @@ function DeleteGroupButton({
   );
 }
 
-function FavoriteReportButton({
+function ViewSkillButton({
   skillId,
   navigate,
   locale,
 }: {
   skillId: string;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  locale: CountryLanguage;
 }): React.JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+
+  if (skillId === NO_SKILL_ID) {
+    return <></>;
+  }
+
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const reportDef = await import("../[id]/report/definition");
-      navigate(reportDef.default.POST, {
-        urlPathParams: { id: skillId },
-        renderInModal: true,
+      const { skillId: baseSkillId } = parseSkillId(skillId);
+      const skillDetailDef = await import("../[id]/definition");
+      navigate(skillDetailDef.default.GET, {
+        urlPathParams: { id: baseSkillId },
       });
     })();
   };
@@ -1490,10 +1506,11 @@ function FavoriteReportButton({
       type="button"
       variant="ghost"
       size="sm"
-      className="h-10 w-10 p-0 inline-flex items-center justify-center text-muted-foreground hover:text-destructive"
+      className="text-muted-foreground hover:text-foreground"
       onClick={handleClick}
+      title={t("get.viewSkill")}
     >
-      <AlertTriangle className="h-4 w-4" />
+      <Eye className="h-4 w-4" />
     </Button>
   );
 }

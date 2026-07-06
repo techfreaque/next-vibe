@@ -92,17 +92,17 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().nullable(),
       }),
-      remoteInstanceId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().nullable(),
-      }),
       capabilitiesVersion: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
       }),
       transportMode: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      remoteTransportMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
@@ -182,9 +182,9 @@ const { GET } = createEndpoint({
         isActive: true,
         lastSyncedAt: "2026-03-01T12:00:00.000Z",
         wsConnectedAt: "2026-03-01T11:00:00.000Z",
-        remoteInstanceId: "atlas",
         capabilitiesVersion: "abc123",
         transportMode: "reverse-ws",
+        remoteTransportMode: "direct-http",
         isInferenceProvider: false,
         forceSystemProvider: false,
         syncScope: {
@@ -201,9 +201,9 @@ const { GET } = createEndpoint({
         isActive: null,
         lastSyncedAt: null,
         wsConnectedAt: null,
-        remoteInstanceId: null,
         capabilitiesVersion: null,
         transportMode: null,
+        remoteTransportMode: null,
         isInferenceProvider: null,
         forceSystemProvider: null,
         syncScope: null,
@@ -237,7 +237,11 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "patch.newInstanceId.label" as const,
         description: "patch.newInstanceId.description" as const,
-        schema: z.string().min(1).max(32).optional(),
+        schema: z
+          .string()
+          .optional()
+          .transform((v) => (v === "" ? undefined : v))
+          .pipe(z.string().min(1).max(32).optional()),
       }),
       // ── Reauth ──────────────────────────────────────────────────────────
       email: requestField(scopedTranslation, {
@@ -245,14 +249,22 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.EMAIL,
         label: "patch.email.label" as const,
         description: "patch.email.description" as const,
-        schema: z.string().email().optional(),
+        schema: z
+          .string()
+          .optional()
+          .transform((v) => (v === "" ? undefined : v))
+          .pipe(z.string().email().optional()),
       }),
       password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "patch.password.label" as const,
         description: "patch.password.description" as const,
-        schema: z.string().min(1).optional(),
+        schema: z
+          .string()
+          .optional()
+          .transform((v) => (v === "" ? undefined : v))
+          .pipe(z.string().min(1).optional()),
       }),
       // ── Transport ───────────────────────────────────────────────────────
       transportMode: requestField(scopedTranslation, {
@@ -268,10 +280,6 @@ const { PATCH } = createEndpoint({
           {
             value: "direct-http",
             label: "patch.transportMode.options.directHttp" as const,
-          },
-          {
-            value: "cloud-only",
-            label: "patch.transportMode.options.cloudOnly" as const,
           },
         ],
         schema: TransportModeSchema.optional(),
@@ -453,6 +461,36 @@ const { DELETE } = createEndpoint({
   successTypes: {
     title: "delete.success.title" as const,
     description: "delete.success.description" as const,
+  },
+
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("next-vibe/platforms/react/hooks/store");
+        const listDefinition =
+          await import("@/app/api/[locale]/remote-connection/list/definition");
+        const instanceId = data.pathParams.instanceId;
+        apiClient.updateEndpointData(
+          listDefinition.GET,
+          data.logger,
+          (prev) => {
+            if (!prev?.success) {
+              return undefined;
+            }
+            return {
+              success: true,
+              data: {
+                ...prev.data,
+                connections: prev.data.connections.filter(
+                  (c) => c.instanceId !== instanceId,
+                ),
+              },
+            };
+          },
+        );
+      },
+    },
   },
 
   examples: {
