@@ -884,13 +884,7 @@
             "properties": {
               "callbackMode": {
                 "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
                 "type": "string"
               },
               "callerFavoriteId": {
@@ -933,9 +927,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "toolName"
-            ],
+            "required": ["toolName"],
             "type": "object"
           }
         },
@@ -974,9 +966,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1015,9 +1005,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1045,9 +1033,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "routeId"
-                      ],
+                      "required": ["routeId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1090,9 +1076,7 @@
                 ]
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },
@@ -1118,19 +1102,14 @@
               },
               "provider": {
                 "default": "claude-code",
-                "enum": [
-                  "claude-code",
-                  "open-code"
-                ],
+                "enum": ["claude-code", "open-code"],
                 "type": "string"
               },
               "taskTitle": {
                 "type": "string"
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },
@@ -1152,9 +1131,7 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1191,9 +1168,7 @@
                 "type": "integer"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1229,10 +1204,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path",
-              "command"
-            ],
+            "required": ["path", "command"],
             "type": "object"
           }
         },
@@ -1281,9 +1253,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1305,10 +1275,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "from",
-              "to"
-            ],
+            "required": ["from", "to"],
             "type": "object"
           }
         },
@@ -1331,9 +1298,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1361,9 +1326,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "query"
-            ],
+            "required": ["query"],
             "type": "object"
           }
         },
@@ -1427,10 +1390,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path",
-              "content"
-            ],
+            "required": ["path", "content"],
             "type": "object"
           }
         },
@@ -1448,9 +1408,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "taskId"
-            ],
+            "required": ["taskId"],
             "type": "object"
           }
         },

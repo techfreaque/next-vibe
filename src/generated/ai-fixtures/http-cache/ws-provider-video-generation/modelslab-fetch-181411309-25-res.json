@@ -1,0 +1,32 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/video/fetch/181411309",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a152bb42caf1dcdf-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 03 Jul 2026 03:16:28 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=wYClyr4%2BtQxAYmp3aWMU0L5CU%2FYqLiBMbhsqfDufy2FfvmWewv2zgw4PAGiIqMtZKB3WN4QU%2Biyrre3c3gbdXpET9ubZMl0hsJwRXZ0GFcKN7pMp2o3edRb9Kk1L5w8%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "51ca2b4b1be8d2cc0dbb5bebbc3936cf",
+    "x-request-time": "1.358",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "message": "Try Again",
+    "output": "",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise"
+  }
+}

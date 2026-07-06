@@ -934,13 +934,7 @@
             "properties": {
               "callbackMode": {
                 "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
                 "type": "string"
               },
               "callerFavoriteId": {
@@ -983,9 +977,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "toolName"
-            ],
+            "required": ["toolName"],
             "type": "object"
           }
         },

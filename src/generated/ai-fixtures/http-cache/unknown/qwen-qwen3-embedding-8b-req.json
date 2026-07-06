@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t-relay--reply-with-exactly-----213afa0a-ed80-499f-b946-edac0b9ce52c.md\n\n# [T-RELAY] Reply with exactly:...\nFolder: cron\nPreview: <think>The user is asking me to reply with exactly: RELAY_OK. This is a simple relay test. I should just output exactly…",
+    "encoding_format": "float"
+  }
+}

@@ -956,10 +956,7 @@
         "role": "user"
       }
     ],
-    "modalities": [
-      "text",
-      "image"
-    ],
+    "modalities": ["text", "image"],
     "model": "google/gemini-3-pro-image-preview",
     "stream": true,
     "temperature": 0.7

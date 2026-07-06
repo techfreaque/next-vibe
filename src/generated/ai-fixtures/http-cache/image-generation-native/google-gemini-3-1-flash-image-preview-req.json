@@ -1167,10 +1167,7 @@
         "role": "system"
       }
     ],
-    "modalities": [
-      "text",
-      "image"
-    ],
+    "modalities": ["text", "image"],
     "model": "google/gemini-3.1-flash-image-preview",
     "stream": true,
     "temperature": 0.7

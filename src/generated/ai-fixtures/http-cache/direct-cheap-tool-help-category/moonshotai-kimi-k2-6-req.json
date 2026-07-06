@@ -199,13 +199,7 @@
             "properties": {
               "callbackMode": {
                 "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
                 "type": "string"
               },
               "input": {
@@ -226,9 +220,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "toolName"
-            ],
+            "required": ["toolName"],
             "type": "object"
           }
         },
