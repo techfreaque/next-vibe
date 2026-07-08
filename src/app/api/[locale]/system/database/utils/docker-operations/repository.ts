@@ -30,7 +30,9 @@ export class DockerOperationsRepository {
   private static readonly DOCKER_CMD_FLAG_DETACH = "-d";
   private static readonly HIDDEN_DOCKER_LOG_PATTERNS = [
     // Match raw Docker output: Container {name} {action}
-    /^\s*Container\s+[\w-]+\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
+    /^\s*Container\s+[\w.-]+\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
+    // Match raw Docker output: Image {name} Building/Built/Pulling/Pulled/...
+    /^\s*Image\s+[\w./-]+\s+(Building|Built|Pulling|Pulled|Pushing|Pushed|Tagging|Tagged)\s*(\[[\d.]+s\])?\s*$/,
     // Match raw Docker output: Network {any}_default {action}
     /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
     // Match raw Docker output: Volume {any} {action}

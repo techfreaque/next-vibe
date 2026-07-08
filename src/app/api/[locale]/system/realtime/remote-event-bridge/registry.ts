@@ -242,10 +242,6 @@ export async function dispatchRemoteEvent(
       | undefined
   )?.[envelope.eventName];
 
-  // Validate each envelope field against the event declaration's schemas (the
-  // correctness gate: invalid/extra fields are stripped, missing optional fields
-  // default to {}). On failure: log + drop. The gated value is then normalised to
-  // a typed WidgetData record for the handler — the wire data is serialisable.
   const responseGate = buildFieldSchema(
     endpoint.responseSchema,
     eventDecl?.responseFields as
@@ -282,7 +278,6 @@ export async function dispatchRemoteEvent(
 
   let parsedPayload: WidgetData = undefined;
   if (eventDecl?.payloadType) {
-    // The event's payloadType is the correctness gate; drop on validation failure.
     const gate = eventDecl.payloadType.safeParse(envelope.payload);
     if (!gate.success) {
       ctx.logger.warn(

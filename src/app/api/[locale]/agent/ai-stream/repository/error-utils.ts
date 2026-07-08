@@ -11,10 +11,3 @@ import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 export function serializeError(error: ErrorResponseType): string {
   return JSON.stringify(error);
 }
-
-/**
- * Deserialize JSON string back to ErrorResponseType
- */
-export function deserializeError(serialized: string): ErrorResponseType {
-  return JSON.parse(serialized) as ErrorResponseType;
-}

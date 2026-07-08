@@ -15,12 +15,14 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import {
   ApiProvider,
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
 
+import type { ToolExecutionContext } from "../chat/config";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -32,6 +34,7 @@ import {
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
 import { getMusicGenModelById } from "./models";
+import { generateMusicWithFalAi } from "./providers/fal-ai";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
 import { generateMusicWithReplicate } from "./providers/replicate";
 import { generateMusicWithUnbottled } from "./providers/unbottled";
@@ -46,9 +49,7 @@ export class MusicGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: MusicGenerationT,
-    streamContext?: {
-      threadId?: string;
-    },
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -117,6 +118,10 @@ export class MusicGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
+    // One fixture-aware fetch per generation - carries the repeat counter for
+    // poll loops, so it must not be recreated per call.
+    const fetchImpl = createFixtureFetch(streamContext, logger);
+
     let generationResult: ResponseType<{
       audioUrl: string;
       creditCost?: number;
@@ -131,6 +136,19 @@ export class MusicGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
+        });
+        break;
+
+      case ApiProvider.FAL_AI:
+        generationResult = await generateMusicWithFalAi({
+          providerModel: audioModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+          fetchImpl,
         });
         break;
 
@@ -142,6 +160,7 @@ export class MusicGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -152,6 +171,7 @@ export class MusicGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
+          streamContext,
         });
         break;
 
@@ -185,8 +205,7 @@ export class MusicGenerationRepository {
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const arrayBuf = await fetch(audioUrl).then((r) => r.arrayBuffer());
+        const arrayBuf = await fetchImpl(audioUrl).then((r) => r.arrayBuffer());
         const audioBuffer = Buffer.from(new Uint8Array(arrayBuf));
         const uploadResult = await storage.uploadFile(audioBuffer, {
           filename: `generated-audio-${Date.now()}.mp3`,
@@ -227,6 +246,36 @@ export class MusicGenerationRepository {
       creditCost: finalCreditCost,
       durationSeconds: finalDurationSeconds,
     });
+
+    const toolMessageId = streamContext?.currentToolMessageId;
+    if (toolMessageId && !user.isPublic) {
+      const month = new Date().toISOString().slice(0, 7);
+      const slug = `${data.prompt
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60)}-${toolMessageId}`;
+      void Promise.all([
+        import("@/app/api/[locale]/agent/cortex/mounts/gens"),
+        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+      ])
+        .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
+          const path = `/gens/audio/${month}/${slug}.md`;
+          return readGenPath(user.id, path)
+            .then(
+              (result) =>
+                result &&
+                syncVirtualNodeToEmbedding(
+                  user.id,
+                  path,
+                  result.content,
+                  streamContext,
+                ),
+            )
+            .catch(() => undefined);
+        })
+        .catch(() => undefined);
+    }
 
     return success({
       audioUrl,

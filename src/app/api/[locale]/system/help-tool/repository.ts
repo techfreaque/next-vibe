@@ -251,10 +251,14 @@ export class HelpRepository {
       const requestDataSchema = generateSchemaForUsage(
         endpoint.fields,
         FieldUsage.RequestData,
+        undefined,
+        schemaPlatform,
       ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
       const urlPathParamsSchema = generateSchemaForUsage(
         endpoint.fields,
         FieldUsage.RequestUrlParams,
+        undefined,
+        schemaPlatform,
       ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
       const combinedShape: Record<string, z.ZodTypeAny> = {};
       if (requestDataSchema instanceof z.ZodObject) {

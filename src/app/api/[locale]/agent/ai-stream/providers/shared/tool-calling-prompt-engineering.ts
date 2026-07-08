@@ -13,8 +13,8 @@ import {
 } from "../../../cortex/constants";
 import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
 import FETCH_URL_DEFINITION from "../../../fetch-url-content/definition";
-import { WEB_SEARCH_ALIAS } from "../../../search/web-search/constants";
-import SEARCH_DEFINITION from "../../../search/web-search/definition";
+import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
+import SEARCH_DEFINITION from "../../../web-search/definition";
 
 /**
  * OpenAI API Types

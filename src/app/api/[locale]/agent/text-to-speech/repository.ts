@@ -1,4 +1,3 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 /**
  * Text-to-Speech Repository
  * Routes TTS requests to the correct provider based on the voice model's ApiProvider.
@@ -18,6 +17,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -27,9 +27,12 @@ import {
   TTS_COST_PER_CHARACTER,
   TTS_MINIMUM_BALANCE,
 } from "../../products/repository-client";
+import type { ToolExecutionContext } from "../chat/config";
 import { agentEnv } from "../env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
-import { getInstanceAvailability } from "../env-availability";
+import {
+  getInstanceAvailability,
+  PROVIDER_SETUP_INSTRUCTIONS,
+} from "../env-availability";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
@@ -67,8 +70,9 @@ export class TextToSpeechRepository {
     audioResourceUrl: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
-    const audioResponse = await fetch(audioResourceUrl);
+    const audioResponse = await fetchImpl(audioResourceUrl);
     if (!audioResponse.ok) {
       logger.error("Failed to fetch audio file", {
         status: audioResponse.status,
@@ -108,6 +112,7 @@ export class TextToSpeechRepository {
     language: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.OPENAI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
@@ -122,7 +127,7 @@ export class TextToSpeechRepository {
       language,
     });
 
-    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+    const response = await fetchImpl("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: {
         // eslint-disable-next-line i18next/no-literal-string
@@ -168,6 +173,7 @@ export class TextToSpeechRepository {
     language: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.EDEN_AI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.voice;
@@ -183,7 +189,7 @@ export class TextToSpeechRepository {
       language,
     });
 
-    const response = await fetch(
+    const response = await fetchImpl(
       "https://api.edenai.run/v2/audio/text_to_speech",
       {
         method: "POST",
@@ -242,6 +248,7 @@ export class TextToSpeechRepository {
       audioResourceUrl,
       logger,
       t,
+      fetchImpl,
     );
   }
 
@@ -254,6 +261,7 @@ export class TextToSpeechRepository {
     providerModel: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.ELEVENLABS_API_KEY) {
       return fail({
@@ -270,7 +278,7 @@ export class TextToSpeechRepository {
       voiceId: providerModel,
     });
 
-    const response = await fetch(
+    const response = await fetchImpl(
       `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
       {
         method: "POST",
@@ -314,6 +322,8 @@ export class TextToSpeechRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: TextToSpeechT,
+    /** Fixture chain of the calling stream — provider calls bind it. */
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // voiceId is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.voiceId) {
@@ -386,6 +396,10 @@ export class TextToSpeechRepository {
       creditsNeeded,
     });
 
+    // One fixture-aware fetch per conversion - carries the repeat counter, so
+    // it must not be recreated per call.
+    const fetchImpl = createFixtureFetch(streamContext, logger);
+
     try {
       let audioResult: ResponseType<string>;
 
@@ -397,6 +411,7 @@ export class TextToSpeechRepository {
             language,
             logger,
             t,
+            fetchImpl,
           );
           break;
 
@@ -410,6 +425,7 @@ export class TextToSpeechRepository {
             language,
             logger,
             t,
+            fetchImpl,
           );
           break;
         }
@@ -420,6 +436,7 @@ export class TextToSpeechRepository {
             modelOption.providerModel,
             logger,
             t,
+            fetchImpl,
           );
           break;
 

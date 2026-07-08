@@ -19,10 +19,7 @@ import { getFullPath } from "next-vibe/core/core-utils/path";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type {
-  ContentResponse,
-  ResponseType,
-} from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,

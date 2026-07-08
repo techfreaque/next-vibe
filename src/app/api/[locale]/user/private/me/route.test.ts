@@ -16,12 +16,18 @@ describe("GET /user/private/me", () => {
 
   it("returns full profile for authenticated admin user", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.GET,
       user: adminUser,
     });
 
-    expect(res.success, `GET /me failed: ${String(res.success === false && res.message)}`).toBe(true);
-    if (!res.success) {return;}
+    expect(
+      res.success,
+      `GET /me failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+    if (!res.success) {
+      return;
+    }
 
     expect(res.data.isPublic).toBe(false);
     expect(res.data.id).toMatch(/^[0-9a-f-]{36}$/);
@@ -40,6 +46,7 @@ describe("GET /user/private/me", () => {
 
   it("rejects unauthenticated request with AUTH_ERROR or FORBIDDEN", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.GET,
       user: {
         isPublic: true,
@@ -74,6 +81,7 @@ describe("POST /user/private/me — update profile", () => {
     const newPublicName = `TestAdmin-${Date.now()}`;
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -83,17 +91,27 @@ describe("POST /user/private/me — update profile", () => {
       user: adminUser,
     });
 
-    expect(res.success, `POST /me failed: ${String(res.success === false && res.message)}`).toBe(true);
-    if (!res.success) {return;}
+    expect(
+      res.success,
+      `POST /me failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+    if (!res.success) {
+      return;
+    }
 
     expect(res.data.response.success).toBe(true);
     expect(res.data.response.publicName).toBe(newPublicName);
     expect(res.data.response.id).toBe(adminUser.id);
-    expect(res.data.response.changesSummary.totalChanges).toBeGreaterThanOrEqual(1);
-    expect(res.data.response.changesSummary.changedFields).toContain("publicName");
+    expect(
+      res.data.response.changesSummary.totalChanges,
+    ).toBeGreaterThanOrEqual(1);
+    expect(res.data.response.changesSummary.changedFields).toContain(
+      "publicName",
+    );
 
     // Restore original name so other tests aren't affected
     await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -106,6 +124,7 @@ describe("POST /user/private/me — update profile", () => {
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -116,12 +135,17 @@ describe("POST /user/private/me — update profile", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -132,12 +156,17 @@ describe("POST /user/private/me — update profile", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("unauthenticated request is rejected", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -153,7 +182,9 @@ describe("POST /user/private/me — update profile", () => {
 
     // POST /me allows PUBLIC role — it will fail due to missing/invalid user data
     expect(res.success).toBe(false);
-    if (res.success) {return;}
+    if (res.success) {
+      return;
+    }
     const code = res.errorType?.errorCode;
     expect([
       ErrorResponseTypes.AUTH_ERROR.errorCode,
@@ -172,6 +203,7 @@ describe("DELETE /user/private/me — account deletion", () => {
 
   it("unauthenticated user cannot delete an account", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: meEndpoints.DELETE,
       user: {
         isPublic: true,
@@ -181,7 +213,9 @@ describe("DELETE /user/private/me — account deletion", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
+    if (res.success) {
+      return;
+    }
     const code = res.errorType?.errorCode;
     expect([
       ErrorResponseTypes.AUTH_ERROR.errorCode,

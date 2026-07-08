@@ -18,33 +18,23 @@ import "server-only";
 import type {
   FilePart,
   ImagePart,
-  LanguageModel,
   ModelMessage,
+  TextPart,
   ToolResultPart,
 } from "ai";
-import { generateText as aiGenerateText } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { ModelOptionTokenBased } from "@/app/api/[locale]/agent/models/models";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 
 import type { ChatMessage } from "../../../chat/db";
-import type { ChatModelId, ChatModelOption } from "../../models";
-import type {
-  AudioVisionModelId,
-  ImageVisionModelId,
-  VideoVisionModelId,
-} from "../../vision-models";
-import { ProviderFactory } from "../core/infra";
+import type { ChatModelOption } from "../../models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import {
   type BridgeContext,
@@ -197,16 +187,55 @@ async function runBridgeCall(params: {
   } = params;
 
   try {
-    const result = await aiGenerateText({
-      model: provider.chat(model.providerModel) as LanguageModel,
-      abortSignal,
-      messages: [
-        {
-          role: "user" as const,
-          content: [contentPart, { type: "text" as const, text: promptText }],
-        },
-      ],
-    });
+    // Bridge calls are auxiliary (a description, not the turn itself) and
+    // upload large inline payloads (base64 video/audio) — a hung provider
+    // connection must never stall the whole stream for the 15-min stream
+    // budget. Bound each attempt and retry once; a second timeout falls
+    // through to the caller's "could not be processed" placeholder.
+    const BRIDGE_ATTEMPT_TIMEOUT_MS = 150_000;
+    let result: Awaited<ReturnType<typeof aiGenerateText>> | undefined;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        result = await aiGenerateText({
+          model: provider.chat(model.providerModel) as LanguageModel,
+          abortSignal: AbortSignal.any([
+            abortSignal,
+            AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS),
+          ]),
+          messages: [
+            {
+              role: "user" as const,
+              content: [
+                contentPart,
+                { type: "text" as const, text: promptText },
+              ],
+            },
+          ],
+        });
+        break;
+      } catch (attemptErr) {
+        // Parent stream cancelled → stop immediately; per-attempt timeout →
+        // retry once, then give up (caller substitutes the placeholder text).
+        const attemptMsg =
+          attemptErr instanceof Error ? attemptErr.message : String(attemptErr);
+        if (abortSignal.aborted || attempt === 1) {
+          logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
+            error: attemptMsg,
+            modality,
+            bridgeType,
+            aborted: abortSignal.aborted,
+          });
+          return null;
+        }
+        logger.warn(
+          `[GapFill] ${errorLabel} bridge attempt timed out - retrying once`,
+          { modality, error: attemptMsg },
+        );
+      }
+    }
+    if (!result) {
+      return null;
+    }
 
     const output = result.text.trim();
     const creditCost = calculateCreditCost(
@@ -276,6 +305,8 @@ export class GapFillExecutor {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<ModelMessage[]> {
     const {
       messages,
@@ -375,9 +406,16 @@ export class GapFillExecutor {
                 user,
                 locale,
                 availability,
+                fixtureContext: params.fixtureContext,
               });
               return variantText
-                ? { type: "text" as const, text: variantText }
+                ? {
+                    type: "text" as const,
+                    // Explicit framing: without it the description is
+                    // indistinguishable from the user's own prose and models
+                    // refuse to treat it as the attachment.
+                    text: `[image attachment - system-injected vision description (you cannot see the raw file)]:\n${variantText}`,
+                  }
                 : {
                     type: "text" as const,
                     text: `[image attachment: could not be processed - no vision bridge model configured. Inform the user they can add one in favorite settings.]`,
@@ -405,9 +443,13 @@ export class GapFillExecutor {
                 user,
                 locale,
                 availability,
+                fixtureContext: params.fixtureContext,
               });
               return variantText
-                ? { type: "text" as const, text: variantText }
+                ? {
+                    type: "text" as const,
+                    text: `[${modality} attachment - system-injected ${modality === "video" ? "vision" : "audio"} description (you cannot see the raw file)]:\n${variantText}`,
+                  }
                 : {
                     type: "text" as const,
                     text: `[${modality} attachment: could not be processed - no ${modality === "video" ? "video vision" : "STT"} bridge model configured. Inform the user they can add one in favorite settings.]`,
@@ -541,6 +583,7 @@ export class GapFillExecutor {
               user,
               locale,
               availability,
+              fixtureContext: params.fixtureContext,
             });
 
             if (!description) {
@@ -572,6 +615,8 @@ export class GapFillExecutor {
     abortSignal: AbortSignal;
     logger: EndpointLogger;
     user: JwtPayloadType;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
     locale: CountryLanguage;
     availability: AgentEnvAvailability;
   }): Promise<string | null> {
@@ -622,6 +667,7 @@ export class GapFillExecutor {
         modality,
         bridgeType,
         availability,
+        fixtureContext: params.fixtureContext,
       });
     }
 
@@ -639,6 +685,7 @@ export class GapFillExecutor {
         modality,
         bridgeType,
         availability,
+        fixtureContext: params.fixtureContext,
       });
     }
 
@@ -654,6 +701,7 @@ export class GapFillExecutor {
       modality,
       bridgeType,
       availability,
+      fixtureContext: params.fixtureContext,
     });
   }
 
@@ -669,6 +717,8 @@ export class GapFillExecutor {
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<string | null> {
     const {
       part,
@@ -704,7 +754,11 @@ export class GapFillExecutor {
     return runBridgeCall({
       model: visionModel,
       modelId: visionModel.id,
-      provider: ProviderFactory.getProviderForModel(visionModel, logger),
+      provider: ProviderFactory.getProviderForModel(
+        visionModel,
+        logger,
+        params.fixtureContext,
+      ),
       contentPart: {
         type: "image" as const,
         image: part.image,
@@ -736,6 +790,8 @@ export class GapFillExecutor {
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<string | null> {
     const {
       part,
@@ -776,7 +832,11 @@ export class GapFillExecutor {
     return runBridgeCall({
       model: audioVisionModel,
       modelId: audioVisionModel.id,
-      provider: ProviderFactory.getProviderForModel(audioVisionModel, logger),
+      provider: ProviderFactory.getProviderForModel(
+        audioVisionModel,
+        logger,
+        params.fixtureContext,
+      ),
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.audio,
       abortSignal: params.abortSignal,
@@ -792,8 +852,10 @@ export class GapFillExecutor {
   }
 
   /**
-   * Bridge a raw video file part to a text description via the video vision model.
-   * Used when a user uploads a video file and the active model can't see video.
+   * Bridge one unsupported attachment part to a text description and wrap it in
+   * an explicitly-framed text part (so the model treats it as the attachment,
+   * not the user's own prose). Falls back to a "could not be processed" notice
+   * when no bridge model is configured. Shared by the image and file branches.
    */
   private static async bridgeVideoFilePart(params: {
     part: FilePart;
@@ -807,6 +869,8 @@ export class GapFillExecutor {
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<string | null> {
     const {
       part,
@@ -842,7 +906,11 @@ export class GapFillExecutor {
     return runBridgeCall({
       model: videoVisionModel,
       modelId: videoVisionModel.id,
-      provider: ProviderFactory.getProviderForModel(videoVisionModel, logger),
+      provider: ProviderFactory.getProviderForModel(
+        videoVisionModel,
+        logger,
+        params.fixtureContext,
+      ),
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.video,
       abortSignal: params.abortSignal,
@@ -872,6 +940,8 @@ export class GapFillExecutor {
     user: JwtPayloadType;
     locale: CountryLanguage;
     availability: AgentEnvAvailability;
+    /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<string | null> {
     const {
       mediaUrl,
@@ -915,6 +985,7 @@ export class GapFillExecutor {
     const visionProvider = ProviderFactory.getProviderForModel(
       visionModel,
       logger,
+      params.fixtureContext,
     );
 
     const promptText =

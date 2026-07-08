@@ -140,6 +140,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F1: Create favorite with default skill ──────────────────────────────
   fit("F1: create favorite returns slug-based id", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteCreateEndpoint.POST,
       data: {
         skillId: "thea",
@@ -168,6 +169,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F2: GET favorite by slug ────────────────────────────────────────────
   fit("F2: get favorite by slug returns full config", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteSingleEndpoint.GET,
       urlPathParams: { id: createdFavSlug1 },
       user: adminUser,
@@ -186,6 +188,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F3: List favorites - created favorite appears ───────────────────────
   fit("F3: list favorites includes created favorite with slug IDs", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoritesListEndpoint.GET,
       data: {},
       user: adminUser,
@@ -210,6 +213,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F4: Create second favorite ──────────────────────────────────────────
   fit("F4: create second favorite returns different slug", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteCreateEndpoint.POST,
       data: {
         skillId: "thea",
@@ -240,6 +244,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F5: Reorder favorites ──────────────────────────────────────────────
   fit("F5: reorder favorites updates positions", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteReorderEndpoint.POST,
       data: {
         positions: [
@@ -260,6 +265,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F6: List after reorder - verify order ──────────────────────────────
   fit("F6: list after reorder reflects new positions", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoritesListEndpoint.GET,
       data: {},
       user: adminUser,
@@ -284,6 +290,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F7: Update favorite ────────────────────────────────────────────────
   fit("F7: update favorite changes model selection", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteSingleEndpoint.PATCH,
       urlPathParams: { id: createdFavSlug1 },
       data: {
@@ -308,6 +315,7 @@ describe("Favorites CRUD Integration", () => {
   fit("F8: get after update reflects changes", async () => {
     // Re-discover slug via list since PATCH may have changed it
     const listResponse = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoritesListEndpoint.GET,
       data: {},
       user: adminUser,
@@ -341,6 +349,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F9: Delete first favorite ──────────────────────────────────────────
   fit("F9: delete favorite succeeds", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteSingleEndpoint.DELETE,
       urlPathParams: { id: createdFavSlug1 },
       user: adminUser,
@@ -358,6 +367,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F10: GET deleted favorite → not found ──────────────────────────────
   fit("F10: get deleted favorite returns not found", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteSingleEndpoint.GET,
       urlPathParams: { id: createdFavSlug1 },
       user: adminUser,
@@ -372,6 +382,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F11: Delete second favorite ────────────────────────────────────────
   fit("F11: delete second favorite succeeds", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoriteSingleEndpoint.DELETE,
       urlPathParams: { id: createdFavSlug2 },
       user: adminUser,
@@ -383,6 +394,7 @@ describe("Favorites CRUD Integration", () => {
   // ── F12: List after deletion - both gone ───────────────────────────────
   fit("F12: list after deletion shows no test favorites", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: favoritesListEndpoint.GET,
       data: {},
       user: adminUser,

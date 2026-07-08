@@ -17,6 +17,7 @@ export const { POST, tools } = endpointsHandler({
         logger,
         t,
         streamContext.favoriteId,
+        streamContext,
       ),
   },
 });

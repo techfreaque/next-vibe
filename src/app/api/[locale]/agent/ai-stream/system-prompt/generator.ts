@@ -333,7 +333,7 @@ ${allPromptCases.join("\n")}
     names: string[],
     path: string,
   ): string {
-    const sorted = [...names].sort();
+    const sorted = [...names].toSorted();
     if (sorted.length === 1) {
       return `${keyword} { ${sorted[0]} } from "${path}";`;
     }
@@ -376,7 +376,9 @@ ${allPromptCases.join("\n")}
     no: string,
   ): string {
     const inline = `  const ${builtVar} = ${cond} ? ${yes} : ${no};`;
-    if (inline.length <= 80) return inline;
+    if (inline.length <= 80) {
+      return inline;
+    }
     return `  const ${builtVar} = ${cond}\n    ? ${yes}\n    : ${no};`;
   }
 
@@ -415,8 +417,7 @@ ${allPromptCases.join("\n")}
     }
 
     // Build a unified sorted import list (simple-import-sort groups all into one block)
-    const typesPath =
-      "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+    const typesPath = "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
     const allImports: Array<{ path: string; line: string }> = [];
     allImports.push({
       path: typesPath,
@@ -444,11 +445,15 @@ ${allPromptCases.join("\n")}
     }
     // simple-import-sort sorts by path, then by import kind (type before value)
     allImports.sort((a, b) => {
-      if (a.path !== b.path) return a.path.localeCompare(b.path);
+      if (a.path !== b.path) {
+        return a.path.localeCompare(b.path);
+      }
       // type imports come before value imports from the same path
       const aType = a.line.startsWith("import type");
       const bType = b.line.startsWith("import type");
-      if (aType !== bType) return aType ? -1 : 1;
+      if (aType !== bType) {
+        return aType ? -1 : 1;
+      }
       return 0;
     });
 
@@ -494,7 +499,9 @@ ${allPromptCases.join("\n")}
     for (const f of fragments) {
       if (f.serverImportPath && f.serverLoaderExportName) {
         const entry = seenServer.get(f.serverImportPath);
-        if (!entry || seenBuilt.has(f.id)) continue;
+        if (!entry || seenBuilt.has(f.id)) {
+          continue;
+        }
         seenBuilt.add(f.id);
         const camel = PromptFragmentsGenerator.toCamel(f.id);
         buildLines.push(

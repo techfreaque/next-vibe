@@ -8,6 +8,7 @@ import "server-only";
  */
 import { db } from "next-vibe/database";
 
+import type { ToolExecutionContext } from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import {
@@ -40,6 +41,9 @@ export async function syncVirtualNodeToEmbedding(
   userId: string,
   path: string,
   content: string,
+  /** Fixture chain of the triggering execution — binds the embedding call so
+   *  it records/replays like every other AI/media call. Required explicit. */
+  streamContext: ToolExecutionContext,
 ): Promise<void> {
   // /ssh and /favorites are never embedded (live/volatile/sensitive).
   if (!isEmbeddableMount(path) && !isNativePath(path)) {
@@ -80,7 +84,7 @@ export async function syncVirtualNodeToEmbedding(
   }
 
   // queueEmbedding takes content directly — no need for the column.
-  queueEmbedding(row.id, path, content);
+  queueEmbedding(row.id, path, content, { streamContext });
 }
 
 /**

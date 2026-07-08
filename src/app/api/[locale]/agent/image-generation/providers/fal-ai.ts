@@ -37,9 +37,19 @@ export async function generateWithFalAi(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, locale, signal, inputMediaUrl } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    size,
+    logger,
+    locale,
+    signal,
+    inputMediaUrl,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.FAL_AI_API_KEY) {
@@ -63,8 +73,7 @@ export async function generateWithFalAi(params: {
   });
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const submitResponse = await fetch(
+    const submitResponse = await fetchImpl(
       `https://queue.fal.run/${providerModel}`,
       {
         method: "POST",
@@ -98,6 +107,7 @@ export async function generateWithFalAi(params: {
     const requestId = queueResult.request_id;
     logger.debug("[Fal.ai] Request queued, polling", { requestId });
 
+    let lastResponse: Response = submitResponse;
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
         return fail({
@@ -105,16 +115,16 @@ export async function generateWithFalAi(params: {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      await pollDelay(POLL_INTERVAL_MS);
+      await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-      const statusResponse = await fetch(
+      const statusResponse = await fetchImpl(
         `https://queue.fal.run/${providerModel}/requests/${requestId}/status`,
         {
           // eslint-disable-next-line i18next/no-literal-string
           headers: { Authorization: `Key ${agentEnv.FAL_AI_API_KEY}` },
         },
       );
+      lastResponse = statusResponse;
       if (!statusResponse.ok) {
         continue;
       }
@@ -122,8 +132,7 @@ export async function generateWithFalAi(params: {
       const statusData = (await statusResponse.json()) as FalAiStatusResponse;
 
       if (statusData.status === "COMPLETED") {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const resultResponse = await fetch(
+        const resultResponse = await fetchImpl(
           `https://queue.fal.run/${providerModel}/requests/${requestId}`,
           {
             // eslint-disable-next-line i18next/no-literal-string

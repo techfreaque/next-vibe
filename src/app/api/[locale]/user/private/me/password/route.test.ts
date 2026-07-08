@@ -20,6 +20,7 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects wrong current password with UNAUTHORIZED", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -34,13 +35,18 @@ describe("POST /user/private/me/password", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
+    if (res.success) {
+      return;
+    }
     // Repository returns VALIDATION_ERROR for wrong current password (field-level error)
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects new password shorter than 8 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -55,12 +61,17 @@ describe("POST /user/private/me/password", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects current password shorter than 8 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -75,12 +86,17 @@ describe("POST /user/private/me/password", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects unauthenticated user with FORBIDDEN", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -99,12 +115,17 @@ describe("POST /user/private/me/password", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.FORBIDDEN.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.FORBIDDEN.errorCode,
+    );
   });
 
   it("rejects invalid 2FA code format (not 6 chars) with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -120,7 +141,11 @@ describe("POST /user/private/me/password", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 });

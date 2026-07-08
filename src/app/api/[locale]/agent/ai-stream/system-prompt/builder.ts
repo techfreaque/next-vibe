@@ -26,6 +26,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { loadAllPromptFragments } from "@/generated/prompt-fragments/server";
 
@@ -92,6 +93,8 @@ export interface SystemPromptResult {
 }
 
 export interface SystemPromptParams {
+  /** Fixture chain of the stream — cortex vector-search embeddings bind it. */
+  fixtureContext: FixtureContext | undefined;
   skillId: string | null | undefined;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -152,6 +155,7 @@ export async function buildSystemPrompt(
   });
 
   const serverParams: SystemPromptServerParams = {
+    fixtureContext: params.fixtureContext,
     user,
     logger,
     locale,
@@ -169,6 +173,7 @@ export async function buildSystemPrompt(
     lastUserMessage,
     memoryLimit: memoryLimit ?? null,
     mediaCapabilities,
+    threadId: params.threadId ?? null,
   };
 
   const { leading, trailing } = await loadAllPromptFragments(serverParams);

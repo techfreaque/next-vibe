@@ -21,6 +21,46 @@ function isSettledWithResult(m: SlimMessage): boolean {
   return m.toolCall?.result !== null && m.toolCall?.result !== undefined;
 }
 
+/** A tool CALL message — deferred rows are wakeUp result-delivery artifacts,
+ *  never the call itself (see findToolMsg). */
+function isCall(m: SlimMessage): boolean {
+  return m.role === "tool" && m.toolCall?.isDeferred !== true;
+}
+
+/**
+ * Does this tool message target `toolName` — in ANY of the wire forms the
+ * model can produce? Direct (`toolCall.toolName === name`), instance-prefixed
+ * (`atlas__name`), execute-tool wrapped (`args.toolName === name`), or the
+ * nested callback-mode envelope (`args.toolName === "execute-tool"` with
+ * `args.input.toolName === name`). Includes deferred rows — callers that
+ * need only the CALL should combine with their own isDeferred filter (or use
+ * findToolMsg, which excludes them).
+ */
+export function isToolMsgFor(m: SlimMessage, toolName: string): boolean {
+  if (m.role !== "tool") {
+    return false;
+  }
+  const matches = (candidate: WidgetData | undefined): boolean =>
+    typeof candidate === "string" &&
+    (candidate === toolName || candidate.endsWith(`__${toolName}`));
+  if (matches(m.toolCall?.toolName)) {
+    return true;
+  }
+  if (m.toolCall?.toolName !== "execute-tool") {
+    return false;
+  }
+  const args = toolResultRecord(m.toolCall.args);
+  if (matches(args?.["toolName"])) {
+    return true;
+  }
+  const rawTop = String(args?.["toolName"] ?? "");
+  if (rawTop !== "" && rawTop !== "execute-tool") {
+    return false;
+  }
+  const inner = toolResultRecord(args?.["input"]);
+  return matches(inner?.["toolName"]);
+}
+
 /**
  * Find a tool message by its logical tool name, handling execute-tool wrapping.
  * Local: finds message where toolCall.toolName === toolName.
@@ -70,31 +110,34 @@ export function findToolMsg(
   // model may first attempt the tool NATIVELY (not in the receiver catalog →
   // failed dead-end message) and then self-correct via the execute-tool
   // wrapper — the wrapper carries the real result.
+  // Deferred messages NEVER match: findToolMsg resolves the tool CALL; a
+  // deferred row is a wakeUp result-delivery artifact. Matching it made the
+  // inline-vs-deferred discrimination race the revival batch (the deferred —
+  // settled with result — appeared mid-poll and looked like inline delivery,
+  // so the test skipped the revival wait and branched the chain).
   if (cfg.remoteInstanceId) {
     return (
       messages.findLast(
-        (m) => m.role === "tool" && wrapsTool(m) && isSettledWithResult(m),
-      ) ?? messages.findLast((m) => m.role === "tool" && wrapsTool(m))
+        (m) => isCall(m) && wrapsTool(m) && isSettledWithResult(m),
+      ) ?? messages.findLast((m) => isCall(m) && wrapsTool(m))
     );
   }
   return (
     // Settled direct match (last occurrence)
     messages.findLast(
       (m) =>
-        m.role === "tool" &&
+        isCall(m) &&
         matchesName(m.toolCall?.toolName) &&
         isSettledWithResult(m),
     ) ??
     // Settled execute-tool wrapper (e.g. UNBOTTLED/hermes, native fallback)
     messages.findLast(
-      (m) => m.role === "tool" && wrapsTool(m) && isSettledWithResult(m),
+      (m) => isCall(m) && wrapsTool(m) && isSettledWithResult(m),
     ) ??
     // Any direct match, then any wrapper (nothing settled — let the caller's
     // assertion report the unsettled state)
-    messages.findLast(
-      (m) => m.role === "tool" && matchesName(m.toolCall?.toolName),
-    ) ??
-    messages.findLast((m) => m.role === "tool" && wrapsTool(m))
+    messages.findLast((m) => isCall(m) && matchesName(m.toolCall?.toolName)) ??
+    messages.findLast((m) => isCall(m) && wrapsTool(m))
   );
 }
 
@@ -235,7 +278,14 @@ export function assertToolMessageComplete(
     const isExecuteTool = msg.toolCall?.toolName === "execute-tool";
     if (isExecuteTool) {
       const args = toolResultRecord(msg.toolCall?.args);
-      const wrappedName = args?.["toolName"];
+      let wrappedName = args?.["toolName"];
+      // Callback-mode dispatch nests one level deeper: execute-tool({
+      // toolName: "execute-tool", input: { toolName: <real tool>, ... },
+      // callbackMode }) — same either-level matching as findToolMsg.
+      if (wrappedName === "execute-tool") {
+        const inner = toolResultRecord(args?.["input"]);
+        wrappedName = inner?.["toolName"] ?? wrappedName;
+      }
       // Instance-prefixed variants ("atlas__tool-help") route to the same
       // tool — accept both forms (see findToolMsg).
       const nameOk =

@@ -18,6 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import type { SpeechToTextT } from "@/app/api/[locale]/agent/speech-to-text/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
@@ -204,6 +205,7 @@ export class SttHotkeyRepository {
         locale,
         logger,
         null,
+        rootlessStreamContext(),
       );
 
       if (!result.success) {

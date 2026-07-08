@@ -494,24 +494,6 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
 
-    // Fixture-mode servers scope external-call recordings per test context.
-    // Relay callers send their context so both sides record/replay the same
-    // per-context sequences.
-    if (process.env["VIBE_FIXTURE_MODE"] === "true" && request) {
-      const { installFetchCache, setFetchCacheContext } =
-        await import("@/app/api/[locale]/agent/ai-stream/testing/fetch-cache");
-      // The fetch PATCH must live in THIS (SSR/route-handler) module graph — it is
-      // where the relayed AI loop's model/media calls go out. The dev server only
-      // installs it in the CLI startup graph, so the SSR graph's global.fetch is
-      // otherwise unpatched and the relayed loop runs LIVE (non-deterministic, no
-      // fixtures). installFetchCache is per-graph idempotent.
-      installFetchCache();
-      const fixtureContext = request.headers.get("x-vibe-fixture-context");
-      if (fixtureContext) {
-        setFetchCacheContext(fixtureContext);
-      }
-    }
-
     // 1. Authenticate user - call authRepository directly if user not provided
     let user: InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     if (providedUser) {

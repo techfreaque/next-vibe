@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -28,7 +28,9 @@ import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 import type { CronTaskResponseType as CronTaskResponse } from "next-vibe/tasks/cron/tasks/definition";
 import type { TasksT } from "next-vibe/tasks/i18n";
 import { scopedTranslation } from "next-vibe/tasks/i18n";
+import type { z } from "zod";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { calculateNextExecutionTime } from "../cron-formatter";

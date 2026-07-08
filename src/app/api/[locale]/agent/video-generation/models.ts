@@ -109,7 +109,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -154,7 +154,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -271,7 +271,9 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    // image: ModelsLab img2video accepts init_image for veo-3.1 (verified);
+    // the -fast variant rejects it ("init_image is invalid").
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -357,7 +359,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -482,7 +484,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -609,7 +611,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -687,7 +689,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -728,7 +730,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -988,7 +990,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-02 from video-gen-deterministic
+    inputs: ["text", "image"], // image: I2V model by definition (generator only probes text2video)
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {

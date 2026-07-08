@@ -9,7 +9,10 @@ import { createHash } from "node:crypto";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+
+import type { ToolExecutionContext } from "../../chat/config";
 
 /** Embedding model dimension */
 export const EMBEDDING_DIMENSIONS = 3072;
@@ -39,6 +42,8 @@ interface EmbeddingResponse {
  */
 export async function generateEmbedding(
   text: string,
+  /** Fixture chain of the calling stream — undefined callers hit live fetch. */
+  streamContext: ToolExecutionContext,
 ): Promise<number[] | null> {
   const apiKey = agentEnv.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -50,13 +55,17 @@ export async function generateEmbedding(
     return null;
   }
 
+  // One fixture-aware fetch per embedding call - carries the repeat counter
+  // across chunked requests, so it must not be recreated per chunk.
+  const fetchImpl = createFixtureFetch(streamContext);
+
   // Max tokens per embedding request (~8k tokens ≈ 32k chars)
   const maxCharsPerChunk = 32000;
 
   try {
     // Short text - single call
     if (trimmed.length <= maxCharsPerChunk) {
-      return callEmbeddingApi(apiKey, trimmed);
+      return callEmbeddingApi(apiKey, trimmed, fetchImpl);
     }
 
     // Long text - chunk and average
@@ -66,7 +75,7 @@ export async function generateEmbedding(
     }
 
     const embeddings = await Promise.all(
-      chunks.map((chunk) => callEmbeddingApi(apiKey, chunk)),
+      chunks.map((chunk) => callEmbeddingApi(apiKey, chunk, fetchImpl)),
     );
 
     // Filter out any failed chunks
@@ -108,9 +117,9 @@ export async function generateEmbedding(
 async function callEmbeddingApi(
   apiKey: string,
   text: string,
+  fetchImpl: typeof globalThis.fetch,
 ): Promise<number[] | null> {
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-  const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  const response = await fetchImpl("https://openrouter.ai/api/v1/embeddings", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

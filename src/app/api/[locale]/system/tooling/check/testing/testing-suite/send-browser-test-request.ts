@@ -18,6 +18,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { ATLAS_PID_FILE, readPidFilePort } from "next-vibe/server/server/pid";
 import { scopedTranslation } from "next-vibe/tooling/check/i18n";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import {
   cdpNavigatePage,
   getSessionCDPTargetId,
@@ -135,7 +136,12 @@ export async function sendBrowserTestRequest<
       type SendArgs = Parameters<typeof sendTestRequest<TDef>>[0];
       // The conditional intersection type on sendTestRequest can't be narrowed for
       // generic TDef — double-cast is the established pattern (see browser-tools.test.ts)
-      const args = { endpoint: def, data: input, user: testUser };
+      const args = {
+        endpoint: def,
+        data: input,
+        user: testUser,
+        streamContext: rootlessStreamContext(),
+      };
       return sendTestRequest(
         args as Parameters<typeof sendTestRequest>[0] as SendArgs,
       );

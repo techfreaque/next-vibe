@@ -1,4 +1,3 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -29,10 +28,13 @@ async function pollPrediction(
   predictionId: string,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  fetchImpl: typeof globalThis.fetch,
+  submitResponse: Response,
   signal?: AbortSignal,
 ): Promise<ResponseType<{ imageUrl: string }>> {
   const { t } = scopedTranslation.scopedT(locale);
 
+  let lastResponse: Response = submitResponse;
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
     if (signal?.aborted) {
       return fail({
@@ -40,15 +42,16 @@ async function pollPrediction(
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
-    await pollDelay(POLL_INTERVAL_MS);
+    await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
-    const response = await fetch(
+    const response = await fetchImpl(
       `https://api.replicate.com/v1/predictions/${predictionId}`,
       {
         // eslint-disable-next-line i18next/no-literal-string
         headers: { Authorization: `Token ${agentEnv.REPLICATE_API_TOKEN}` },
       },
     );
+    lastResponse = response;
     if (!response.ok) {
       return fail({
         message: t("post.errors.pollFailed", {
@@ -98,9 +101,19 @@ export async function generateWithReplicate(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, locale, signal, inputMediaUrl } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    size,
+    logger,
+    locale,
+    signal,
+    inputMediaUrl,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.REPLICATE_API_TOKEN) {
@@ -128,7 +141,7 @@ export async function generateWithReplicate(params: {
   });
 
   try {
-    const response = await fetch(
+    const response = await fetchImpl(
       `https://api.replicate.com/v1/models/${providerModel}/predictions`,
       {
         method: "POST",
@@ -165,7 +178,14 @@ export async function generateWithReplicate(params: {
     logger.debug("[Replicate] Prediction created, polling", {
       predictionId: prediction.id,
     });
-    return pollPrediction(prediction.id, logger, locale, signal);
+    return pollPrediction(
+      prediction.id,
+      logger,
+      locale,
+      fetchImpl,
+      response,
+      signal,
+    );
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Replicate] Request failed", { error: errorMessage });

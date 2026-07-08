@@ -300,6 +300,40 @@ const { PATCH } = createEndpoint({
         description: "patch.forceSystemProvider.description" as const,
         schema: z.boolean().optional(),
       }),
+      threadMirrorMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.threadMirrorMode.label" as const,
+        description: "patch.threadMirrorMode.description" as const,
+        options: [
+          {
+            value: "both",
+            label: "patch.threadMirrorMode.options.both" as const,
+          },
+          {
+            value: "off",
+            label: "patch.threadMirrorMode.options.off" as const,
+          },
+        ],
+        schema: z.enum(["both", "off"]).optional(),
+      }),
+      loopLocation: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.loopLocation.label" as const,
+        description: "patch.loopLocation.description" as const,
+        options: [
+          {
+            value: "target",
+            label: "patch.loopLocation.options.target" as const,
+          },
+          {
+            value: "caller",
+            label: "patch.loopLocation.options.caller" as const,
+          },
+        ],
+        schema: z.enum(["target", "caller"]).optional(),
+      }),
       // ── Sync scope ──────────────────────────────────────────────────────
       syncScope: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

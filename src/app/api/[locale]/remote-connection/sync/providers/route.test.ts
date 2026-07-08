@@ -27,11 +27,14 @@ describe("Remote Connection sync/providers", () => {
 
   it("SP1: GET returns providers array", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
     });
 
     expect(result.success, "SP1: expected success").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     expect(
       Array.isArray(result.data.providers),
       "SP1: providers must be array",
@@ -42,6 +45,7 @@ describe("Remote Connection sync/providers", () => {
 
   it("SP2: GET is admin-only", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
       user: customerUser,
     });
@@ -53,11 +57,14 @@ describe("Remote Connection sync/providers", () => {
 
   it("SP3: provider list includes core sync domains", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
     });
 
     expect(result.success, "SP3: expected success").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
 
     const keys = result.data.providers.map((p) => p.key);
     expect(keys, "SP3: must include memories").toContain("memories");

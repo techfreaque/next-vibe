@@ -17,7 +17,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { pollDelay } from "@/app/api/[locale]/agent/shared/poll-delay";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { CreditRepository } from "../../credits/repository";
@@ -27,6 +29,7 @@ import {
   STT_COST_PER_SECOND,
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
+import type { ToolExecutionContext } from "../chat/config";
 import { agentEnv } from "../env";
 import {
   buildMissingKeyMessage,
@@ -89,6 +92,7 @@ export class SpeechToTextRepository {
     language: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{
       text: string;
@@ -114,6 +118,7 @@ export class SpeechToTextRepository {
           language,
           logger,
           t,
+          fetchImpl,
         );
       case ApiProvider.EDEN_AI_STT:
         return SpeechToTextRepository.transcribeWithEdenAI(
@@ -122,6 +127,7 @@ export class SpeechToTextRepository {
           language,
           logger,
           t,
+          fetchImpl,
         );
       case ApiProvider.DEEPGRAM:
         return SpeechToTextRepository.transcribeWithDeepgram(
@@ -130,6 +136,7 @@ export class SpeechToTextRepository {
           language,
           logger,
           t,
+          fetchImpl,
         );
       default:
         logger.error("[STT] Unsupported STT provider", {
@@ -155,6 +162,8 @@ export class SpeechToTextRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     sttModelSelection: SttModelSelection | SttModelId | null,
+    /** Fixture chain of the calling stream — provider calls bind it. */
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = getLanguageFromLocale(locale);
@@ -232,6 +241,10 @@ export class SpeechToTextRepository {
       });
     }
 
+    // One fixture-aware fetch per transcription - carries the repeat counter
+    // for poll loops, so it must not be recreated per call.
+    const fetchImpl = createFixtureFetch(streamContext, logger);
+
     try {
       // Fan out chunks up to CHUNK_CONCURRENCY in parallel, preserve order
       const results: Array<
@@ -253,6 +266,7 @@ export class SpeechToTextRepository {
             language,
             logger,
             t,
+            fetchImpl,
           );
           if (!results[i].success) {
             return;
@@ -412,6 +426,7 @@ export class SpeechToTextRepository {
     language: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{
       text: string;
@@ -461,8 +476,7 @@ export class SpeechToTextRepository {
       fileSize: file.size,
     });
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const response = await fetch(
+    const response = await fetchImpl(
       "https://api.openai.com/v1/audio/transcriptions",
       {
         method: "POST",
@@ -519,6 +533,7 @@ export class SpeechToTextRepository {
     language: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{
       text: string;
@@ -586,6 +601,7 @@ export class SpeechToTextRepository {
       language,
       logger,
       t,
+      fetchImpl,
     );
   }
 
@@ -601,6 +617,7 @@ export class SpeechToTextRepository {
     language: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{
       text: string;
@@ -622,8 +639,7 @@ export class SpeechToTextRepository {
       language,
     });
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const response = await fetch(
+    const response = await fetchImpl(
       "https://api.edenai.run/v2/audio/speech_to_text_async",
       {
         method: "POST",
@@ -670,6 +686,8 @@ export class SpeechToTextRepository {
       edenProvider,
       logger,
       t,
+      fetchImpl,
+      response,
     );
   }
 
@@ -682,6 +700,7 @@ export class SpeechToTextRepository {
     language: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{
       text: string;
@@ -713,8 +732,7 @@ export class SpeechToTextRepository {
     url.searchParams.set("model", providerModel);
     url.searchParams.set("language", language);
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const response = await fetch(url.toString(), {
+    const response = await fetchImpl(url.toString(), {
       method: "POST",
       headers: {
         // eslint-disable-next-line i18next/no-literal-string
@@ -767,6 +785,8 @@ export class SpeechToTextRepository {
     provider: string,
     logger: EndpointLogger,
     t: SpeechToTextT,
+    fetchImpl: typeof globalThis.fetch,
+    submitResponse: Response,
   ): Promise<
     ResponseType<{
       text: string;
@@ -776,15 +796,13 @@ export class SpeechToTextRepository {
     }>
   > {
     let attempts = 0;
+    let lastResponse: Response = submitResponse;
 
     while (attempts < this.MAX_POLLING_ATTEMPTS) {
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), this.POLLING_INTERVAL_MS);
-      });
+      await pollDelay(this.POLLING_INTERVAL_MS, lastResponse);
 
       try {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const response = await fetch(
+        const response = await fetchImpl(
           `https://api.edenai.run/v2/audio/speech_to_text_async/${publicId}`,
           {
             headers: {
@@ -796,6 +814,7 @@ export class SpeechToTextRepository {
             ),
           },
         );
+        lastResponse = response;
 
         if (!response.ok) {
           logger.error("[STT] Failed to poll transcription results", {

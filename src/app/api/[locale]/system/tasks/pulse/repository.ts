@@ -17,11 +17,8 @@ import {
   isStreamingResponse,
   success,
 } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
-import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
@@ -45,10 +42,10 @@ import { isCronTaskDue } from "../cron-formatter";
 import {
   CronTaskStatus,
   type CronTaskStatusValue,
+  getPriorityWeight,
   PulseExecutionStatus,
   PulseHealthStatus,
 } from "../enum";
-import { getPriorityWeight } from "../enum";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -485,6 +482,9 @@ export class PulseHealthRepository {
                       platform: Platform.CRON,
                       cronTaskId: dbTask.id,
                       streamContext: {
+                        // Cron tasks never carry the context explicitly — a
+                        // revival adopts the THREAD anchor at stream setup.
+                        fixtureContext: undefined,
                         rootFolderId: DefaultFolderId.BACKGROUND,
                         threadId: undefined,
                         aiMessageId: undefined,

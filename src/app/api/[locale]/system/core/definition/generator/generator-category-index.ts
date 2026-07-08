@@ -55,7 +55,10 @@ async function extractCategories(
         continue;
       }
 
-      const mod = (await import(catFile)) as Record<string, CategoryDefinition>;
+      const mod = (await import(
+        /* @vite-ignore */
+        catFile
+      )) as Record<string, CategoryDefinition>;
       const def = mod["category"];
 
       if (!def?.key || !def.group || !def.icon) {

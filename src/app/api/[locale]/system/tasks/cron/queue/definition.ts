@@ -13,6 +13,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/cron/queue/i18n";
 import {

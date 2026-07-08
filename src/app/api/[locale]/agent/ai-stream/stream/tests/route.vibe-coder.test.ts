@@ -23,9 +23,6 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { eq } from "drizzle-orm";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -44,7 +41,7 @@ import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { env } from "@/config/env";
 
 import { ChatModelId } from "../../models";
-import { setFetchCacheContext } from "../../testing/fetch-cache";
+import { seedCaseThread } from "../../testing/fixture-seed";
 import {
   getOrCreateFolder,
   resolveUser,
@@ -84,15 +81,15 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
     }
     testUser = resolved;
 
-    // ── Create BACKGROUND/tests/vibe-coder subfolder ──
+    // ── Create PRIVATE/tests/vibe-coder subfolder ──
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     vibeCoderFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "vibe-coder",
       testsParentId,
     );
@@ -178,17 +175,18 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC1: Thea uses ai-run with vibe-coder skill ──────────────────────────
   it("VC1: when codingAgent=next-vibe-coder, Thea delegates coding tasks via ai-run(skill=vibe-coder)", async () => {
-    setFetchCacheContext("vibe-coder-vc1");
+    const fixtureCtx: FixtureContext = { name: "vibe-coder-vc1" };
 
     const { result, messages } = await runTestStream({
       user: testUser,
       prompt: `[VC1 vibe-coder-delegation] You need to do a small coding task: find out the name of the current working directory on this system. Delegate this task using the correct tool for coding work. End with STEP_OK once the result is back, or FAILED: <reason> if you didn't use the correct delegation tool or something went wrong.`,
       favoriteId: VIBE_CODER_FAVORITE_ID,
-      rootFolderId: DefaultFolderId.BACKGROUND,
+      rootFolderId: DefaultFolderId.PRIVATE,
       subFolderId: vibeCoderFolderId,
       // Two-level agent chain (Thea → ai-run sub-agent incl. a 30s shell-exec
       // window) legitimately takes 2-4 min on a live first recording.
       settleTimeoutMs: 240_000,
+      fixtureContext: fixtureCtx,
     });
 
     expect(
@@ -274,14 +272,15 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC2: vibe-coder skill has SSH awareness ───────────────────────────────
   it("VC2: vibe-coder skill has ssh-exec available and provides SSH guidance when no connections exist", async () => {
-    setFetchCacheContext("vibe-coder-vc2");
+    const fixtureCtx: FixtureContext = { name: "vibe-coder-vc2" };
 
     const { result, messages } = await runTestStream({
       user: testUser,
       prompt: `[VC2 ssh-awareness] Using the vibe-coder skill directly: check what SSH connections are available using the appropriate tool. If there are no SSH connections, explain what the user needs to do and what the difference is between SSH connections and remote instances. End with STEP_OK if you found the answer (even if no connections exist), or FAILED: <reason> if you couldn't determine the SSH connection status.`,
       favoriteId: VIBE_CODER_FAVORITE_ID,
-      rootFolderId: DefaultFolderId.BACKGROUND,
+      rootFolderId: DefaultFolderId.PRIVATE,
       subFolderId: vibeCoderFolderId,
+      fixtureContext: fixtureCtx,
     });
 
     expect(

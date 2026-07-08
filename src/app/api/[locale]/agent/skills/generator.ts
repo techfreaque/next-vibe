@@ -242,6 +242,10 @@ async function generateSkillEmbeddings(
 
   const { computeEmbeddingHash, generateEmbedding } =
     await import("@/app/api/[locale]/agent/cortex/embeddings/service");
+  // Build-time skill embedding generation — no stream; thread-less root runs live.
+  const { rootlessStreamContext } =
+    await import("@/app/api/[locale]/agent/chat/config");
+  const rootCtx = rootlessStreamContext();
 
   const skillFiles = ctx.files.skill;
 
@@ -326,7 +330,7 @@ async function generateSkillEmbeddings(
     }
 
     const textToEmbed = `${path}\n\n${content}`;
-    const embedding = await generateEmbedding(textToEmbed);
+    const embedding = await generateEmbedding(textToEmbed, rootCtx);
 
     if (!embedding) {
       logger.warn(`  skipped (API unavailable): ${skillId}`);

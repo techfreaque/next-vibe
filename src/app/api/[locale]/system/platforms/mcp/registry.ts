@@ -191,7 +191,7 @@ export class MCPRegistry {
         user: context.user,
         locale: context.locale,
         logger,
-        streamContext: makeHeadlessContext(context.signal),
+        streamContext: makeHeadlessContext(context.signal, undefined),
         platform: Platform.MCP,
       });
       if (!result.success) {
@@ -235,7 +235,7 @@ export class MCPRegistry {
       });
     }
 
-    const streamContext = makeHeadlessContext(context.signal);
+    const streamContext = makeHeadlessContext(context.signal, undefined);
 
     // Remote routing: check if a remote connection's routing rules match this request.
     // Same logic as CLI remote leg — if a target is found, route through runInProcess
@@ -247,7 +247,7 @@ export class MCPRegistry {
         : undefined;
     if (userId) {
       const { ExecuteToolRouting } =
-        await import("@/app/api/[locale]/system/execute-tool/repository/routing");
+        await import("@/app/api/[locale]/remote-connection/routing");
       const target = await ExecuteToolRouting.resolveTarget({
         userId,
         locale: context.locale,

@@ -174,6 +174,9 @@ const { POST } = createEndpoint({
                 availability,
               );
 
+            if (oldData.data.favorites.some((f) => f.id === newFavorite.id)) {
+              return oldData;
+            }
             return {
               success: true,
               data: {

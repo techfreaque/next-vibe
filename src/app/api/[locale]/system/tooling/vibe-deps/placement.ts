@@ -144,6 +144,27 @@ export function dirContains(dir: string, file: string): boolean {
 }
 
 /**
+ * Endpoint subfolder names that are structurally part of their parent endpoint
+ * directory. `repository/`, `widget/`, and `hooks/` are split-out subfolders of
+ * the same endpoint — a file used only from `<endpoint>/repository` is logically
+ * used only from `<endpoint>`, not from a separate sub-domain.
+ */
+const ENDPOINT_SUBFOLDERS = new Set(["repository", "widget", "hooks"]);
+
+/**
+ * Normalize a directory path so that endpoint subfolders collapse to their
+ * parent. `a/b/repository` → `a/b`, `a/b/widget` → `a/b`, `a/b/other` → `a/b/other`.
+ * Applied before colocate containment checks so that a file sitting at
+ * `<endpoint>/db.ts` is not flagged for relocation into `<endpoint>/repository/`.
+ */
+export function endpointDir(dir: string): string {
+  const lastSeg = dir.slice(dir.lastIndexOf("/") + 1);
+  return ENDPOINT_SUBFOLDERS.has(lastSeg)
+    ? dir.slice(0, dir.lastIndexOf("/"))
+    : dir;
+}
+
+/**
  * Deepest directory that contains ALL of `files`. Empty string when they share
  * no common prefix (only "src" or nothing).
  */
@@ -325,7 +346,7 @@ export function placementOf(
   // file used only by one domain is a coupling smell, but the fix is to decouple
   // the domain, not to drag framework code into it — so it stays in-place here
   // and surfaces via cross-domain instead.
-  const shared = commonDir(usable);
+  const shared = endpointDir(commonDir(usable));
   if (shared && shared !== "src") {
     const wouldLeaveSystem = isInSystem(key) && !isInSystem(`${shared}/x`);
     if (dirContains(shared, key)) {
@@ -359,8 +380,40 @@ export function placementOf(
   //   • all system/<area> sub-areas collapse to "system" (siblings, not separate domains)
   //   • a definition used only within remote-connection/* stays in-place
   // Only when importers span 2+ distinct parent domains is promote warranted.
+  //
+  // Two system/-only suppressions (outside system/ these are still real smells):
+  //   • definition.ts files: cross-domain definition imports are normal — endpoints
+  //     reference each other's definitions for types and validation schemas.
+  //   • *_ALIAS constants: intentionally-exported alias constants are designed to be
+  //     shared across domains without being promoted to a framework primitive.
   const fileParentDomain = parentDomainOf(key);
   const parentDomainSpread = importerParentDomains.size;
+
+  // Within system/, certain core files are legitimately imported from anywhere:
+  //   • definition.ts — endpoints reference each other's definitions for types/schemas
+  //   • platform.ts   — core runtime enum used by every endpoint handler
+  // This suppression is structural (no content read needed), so it lives here.
+  // _ALIAS constants suppression is content-based and lives in repository.ts.
+  // (The execute-tool repository's runInProcess exemption is SYMBOL-level, not
+  // file-level — it filters the importer set in buildNeedsMove/buildConsumer
+  // coupling before the domain count, so it can't live in this path-only check.)
+  if (isInSystem(key)) {
+    const base = key.slice(key.lastIndexOf("/") + 1).replace(/\.(ts|tsx)$/, "");
+    const isDefinition =
+      base === "definition" || base.startsWith("definition.");
+    const isPlatform = base === "platform" || base.startsWith("platform.");
+    if (isDefinition || isPlatform) {
+      return {
+        kind: "in-place",
+        suggestedDir: fileDir,
+        note: "core system file — cross-domain imports are expected",
+        domainSpread,
+        alreadyVibe: true,
+        importerDomainList,
+        usableImporters: sortedUsable,
+      };
+    }
+  }
 
   if (parentDomainSpread > 1) {
     const alreadyVibe = isInSystem(key);

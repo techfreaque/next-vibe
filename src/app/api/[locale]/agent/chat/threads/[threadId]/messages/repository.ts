@@ -27,7 +27,7 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/infra";
+import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/tree-walk";
 
 import { DefaultFolderId } from "../../../config";
 import {
@@ -710,7 +710,8 @@ export class MessagesRepository {
         .where(eq(chatMessages.threadId, data.threadId))
         .orderBy(chatMessages.createdAt);
 
-      // Get pending/running background tasks for this thread
+      // Get pending/running background tasks for this thread.
+      // Revival context lives in the parked resume-stream task's taskInput (not typed columns).
       const rawBackgroundTasks = await db
         .select({
           id: cronTasks.id,

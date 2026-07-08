@@ -77,7 +77,6 @@ Auth: `PUBLIC` + all authenticated roles + `MCP_VISIBLE`. The **target** route's
 The mode controls timing and revival — never UI or transport. The same mode means
 the same thing on every transport.
 
-
 | Mode      | Returns                              | Loop        | Failure                                       |
 | --------- | ------------------------------------ | ----------- | --------------------------------------------- |
 | `wait`    | result inline                        | continues   | `fail()` inline; AI sees the error            |
@@ -85,7 +84,6 @@ the same thing on every transport.
 | `detach`  | `{taskId, status:"pending"}`         | continues   | failure recorded in task history (await-task) |
 | `wakeUp`  | `{taskId, status:"pending"}`         | continues   | revival fires with the error                  |
 | `approve` | blocks on user confirmation (10 min) | stops batch | timeout → cancelled                           |
-
 
 **Detach never backfills.** The dispatch tool message permanently keeps
 `{taskId}`; the result (or failure) lives ONLY in task execution history and is
@@ -108,15 +106,13 @@ mechanics — not the semantics.
 Tool has no `instanceId`. Routed through `repository.ts` → the appropriate local
 handler in `handlers/local.ts`.
 
-
 | Mode              | Handler              | Mechanism                                                 |
 | ----------------- | -------------------- | --------------------------------------------------------- |
 | `wait`/`endLoop`  | `handleLocalExecute` | Inline via `RouteExecutionExecutor.executeGenericHandler` |
 | `detach`/`wakeUp` | `handleLocalAsync`   | ONE shared flow: task row RUNNING + goroutine, `{taskId}` |
 | `approve`         | `handleLocalExecute` | Confirmation gate, returns placeholder ends the ai loop   |
 
-
-**Local async lifecycle (`handleLocalAsync`, identical for both modes):**
+**Local async lifecycle (`LocalExecution.executeAsync`, identical for both modes):**
 
 1. Insert `cronTasks` row with `lastExecutionStatus=RUNNING` (cron pulse never
   claims it). On the receiver side of a remote dispatch the row ID IS the
@@ -142,12 +138,10 @@ handler in `handlers/local.ts`.
 
 `instanceId` resolves to a `remote_connections` row with `transportMode=direct-http`.
 
-
 | Mode              | Mechanism                                                         |
 | ----------------- | ----------------------------------------------------------------- |
 | `wait`/`endLoop`  | Blocking HTTP POST (`callToolDirect`), result returned inline     |
 | `detach`/`wakeUp` | `tool-execute-request` event over the bridge (same as reverse-ws) |
-
 
 For `wait`/`endLoop`, `callToolDirect` POSTs the tool to the peer's execute-tool
 endpoint and the response IS the result. On network/HTTP failure →
@@ -161,12 +155,10 @@ Async modes ride the event path below; only the wire leg differs.
 All non-inline remote calls dispatch as `tool-execute-request` events over the
 remote-event-bridge; the bridge picks the wire leg per connection.
 
-
 | Mode              | Stream behavior                                                  |
 | ----------------- | ---------------------------------------------------------------- |
 | `wait`/`endLoop`  | Result returns inline at WS speed; stream never enters `waiting` |
 | `detach`/`wakeUp` | Fire-and-forget; revival fires when result event arrives         |
-
 
 **Requester (`handlers/remote.ts` → `emitToolRequest`):**
 
@@ -188,7 +180,7 @@ remote-event-bridge; the bridge picks the wire leg per connection.
   safe revival + dismiss-task). Detach stores none — its no-revival contract
    survives requester restarts.
 
-**Receiver (`repository.ts` → `handleIncomingToolRequest`):**
+**Receiver (`repository/index.ts` → `handleIncomingToolRequest`):**
 
 - `wait`/`endLoop`: runs the tool inline (local WAIT) and emits the result.
 - `detach`/`wakeUp`: the receiver OWNS the work as a REAL local async task —
@@ -230,12 +222,10 @@ explicit `fail`, never a hang).
 
 ## Wire Events (server-only)
 
-
 | Event                  | Direction       | Payload                                                                         |
 | ---------------------- | --------------- | ------------------------------------------------------------------------------- |
 | `tool-execute-request` | caller → remote | `{callId, toolName, args, wakeUp* revival context, userId, locale}`             |
 | `tool-execute-result`  | remote → caller | `{callId, status, output?, error?, durationMs, startedAt, executedByInstance?}` |
-
 
 Both are declared on the definition with `serverEvent: true, clientDelivery: false`. They relay through the remote-event-bridge like any cross-instance event —
 wire envelope, channel (the bridge endpoint's user-scoped channel, subscribed
@@ -370,7 +360,6 @@ delegating to the cloud.
 
 ## File Map
 
-
 | File / Dir               | Role                                                                                                                                                                                                                                                                                                                 |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `definition.ts`          | Request/response fields (incl. wire `status`), callback-mode enum, wire-event declarations                                                                                                                                                                                                                           |
@@ -387,7 +376,6 @@ delegating to the cloud.
 | `await-task/`            | Waiter registration; intercept completed/pending task; WAIT revival attachment                                                                                                                                                                                                                                       |
 | `complete/`              | `/report` endpoint; result delivery from remote (direct-http only)                                                                                                                                                                                                                                                   |
 | `dismiss-task/`          | Cancel pending WAKE_UP task; transition thread to idle                                                                                                                                                                                                                                                               |
-
 
 ---
 

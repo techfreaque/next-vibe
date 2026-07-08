@@ -12,7 +12,6 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Environment } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/server/server/dev/i18n";
 import {
@@ -21,8 +20,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { envClient } from "@/config/env-client";
 
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { DEV_ALIASES } from "./constants";
@@ -154,16 +151,6 @@ const { POST } = createEndpoint({
         label: "post.fields.profile.title",
         description: "post.fields.profile.description",
         schema: z.boolean().default(false),
-      }),
-
-      fixtureMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.fixtureMode.title",
-        description: "post.fields.fixtureMode.description",
-        schema: z
-          .boolean()
-          .default(envClient.NODE_ENV === Environment.DEVELOPMENT),
       }),
 
       framework: requestField(scopedTranslation, {

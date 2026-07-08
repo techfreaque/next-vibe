@@ -30,7 +30,9 @@ import {
 } from "@/app/api/[locale]/agent/skills/enum";
 
 import { cortexNodes } from "../db";
-import listEndpoint, { type CortexListResponseOutput } from "../list/definition";
+import listEndpoint, {
+  type CortexListResponseOutput,
+} from "../list/definition";
 import mkdirEndpoint from "../mkdir/definition";
 import writeEndpoint from "../write/definition";
 
@@ -123,6 +125,7 @@ async function deleteTestFixtures(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -136,6 +139,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Create a directory via the real MKDIR endpoint; fails the test if it does not stick. */
 async function mkdir(path: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: mkdirEndpoint.POST,
     data: { path, createParents: true },
     user,
@@ -150,6 +154,7 @@ function listDir(
   path: string,
 ): Promise<ResponseType<CortexListResponseOutput>> {
   return sendTestRequest({
+    streamContext: undefined,
     endpoint: listEndpoint.GET,
     data: { path },
     user,

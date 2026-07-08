@@ -442,6 +442,11 @@ export const translations: typeof enTranslations = {
         title: "Netzwerkfehler",
         description: "Netzwerkfehler beim Streaming aufgetreten",
       },
+      serviceUnavailable: {
+        title: "Remote-Instanz nicht erreichbar",
+        description:
+          "Die verbundene Instanz, von der dieser Thread abhängt, war nicht erreichbar",
+      },
       forbidden: {
         title: "Verboten",
         description: "Zugriff auf KI-Streaming ist verboten",
@@ -558,12 +563,6 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Ein unerwarteter Fehler ist aufgetreten: {{error}}. Bitte versuchen Sie es erneut.",
   },
-  wakeUp: {
-    revivalPrompt:
-      "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
-    revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
-  },
   info: {
     streamInterrupted:
       "Generierung wurde gestoppt. Teilantwort wurde gespeichert.",
@@ -574,98 +573,8 @@ export const translations: typeof enTranslations = {
         "Modell und Charakter sind erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
       favoriteNotFound:
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
-    },
-  },
-  resumeStream: {
-    post: {
-      title: "KI-Stream fortsetzen",
-      titleShort: "Stream fortsetzen",
-      description:
-        "Setzt einen bestehenden Thread fort, indem ein headless KI-Schritt ausgeführt wird. Wird nach dem Abschluss eines asynchronen Remote-Tasks verwendet.",
-      fields: {
-        threadId: {
-          title: "Thread-ID",
-          description: "UUID des fortzusetzenden Threads.",
-        },
-        favoriteId: {
-          title: "Favoriten-ID",
-          description:
-            "UUID eines gespeicherten Favoriten zum Laden von Modell und Charakter.",
-        },
-        modelId: {
-          title: "Modell-ID",
-          description: "KI-Modell für den fortgesetzten Schritt.",
-        },
-        skillId: {
-          title: "Charakter-ID",
-          description: "Charakter/Persona für den fortgesetzten Schritt.",
-        },
-        callbackMode: {
-          title: "Callback-Modus",
-          description:
-            "Callback-Modus des ursprünglichen Tool-Aufrufs (wait oder wakeUp).",
-        },
-        wakeUpToolMessageId: {
-          title: "WakeUp-Tool-Nachrichten-ID",
-          description:
-            "ID der ursprünglichen Tool-Aufruf-Nachricht mit dem Ergebnis.",
-        },
-        wakeUpTaskId: {
-          title: "WakeUp-Aufgaben-ID",
-          description: "ID der auslösenden Remote-Cron-Aufgabe.",
-        },
-        resumeTaskId: {
-          title: "Resume-Aufgaben-ID",
-          description: "ID dieser Resume-Stream-Cron-Aufgabe.",
-        },
-        resumed: {
-          title: "Fortgesetzt",
-          description: "Ob der Thread erfolgreich fortgesetzt wurde.",
-        },
-        lastAiMessageId: {
-          title: "Letzte KI-Nachrichten-ID",
-          description: "UUID der letzten generierten Assistentennachricht.",
-        },
-      },
-      errors: {
-        validation: {
-          title: "Validierungsfehler",
-          description: "Ungültige Parameter",
-        },
-        unauthorized: {
-          title: "Nicht autorisiert",
-          description: "Authentifizierung erforderlich",
-        },
-        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
-        notFound: {
-          title: "Nicht gefunden",
-          description: "Thread oder Modell nicht gefunden",
-        },
-        internal: {
-          title: "Serverfehler",
-          description: "Interner Fehler beim Fortsetzen des Streams",
-        },
-        network: {
-          title: "Netzwerkfehler",
-          description: "Netzwerkfehler aufgetreten",
-        },
-        unknown: {
-          title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist aufgetreten",
-        },
-        unsaved: {
-          title: "Nicht gespeicherte Änderungen",
-          description: "Konflikt bei nicht gespeicherten Änderungen",
-        },
-        conflict: {
-          title: "Konflikt",
-          description: "Ein Konflikt ist aufgetreten",
-        },
-      },
-      success: {
-        title: "Stream fortgesetzt",
-        description: "Der KI-Thread wurde erfolgreich fortgesetzt",
-      },
+      ambiguousModel:
+        "Entweder ein explizites Modell ODER einen Favoriten/Charakter angeben - nicht beides",
     },
   },
   providers: {

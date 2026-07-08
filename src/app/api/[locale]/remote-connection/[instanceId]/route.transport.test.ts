@@ -21,9 +21,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../agent/ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -34,7 +31,7 @@ import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import { env } from "@/config/env";
 
-import { setFetchCacheContext } from "../../agent/ai-stream/testing/fetch-cache";
+import type { FixtureContext } from "../../agent/ai-stream/testing/fetch-cache";
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {
   ATLAS_INSTANCE_ID,
@@ -248,7 +245,7 @@ if (_remoteUrl && _isFixtureMode) {
     // ── TM1: threadMirrorMode='both' — thread on initiating side AND remote ──
 
     it("TM1: stream from remote/hermes folder stores thread locally (remote/hermes) AND on hermes (remote/atlas)", async () => {
-      setFetchCacheContext("transport-mirror-tm1");
+      const fixtureCtx: FixtureContext = { name: "transport-mirror-tm1" };
 
       // threadMirrorMode='both' is the default set by connect().
       // Stream from remote/hermes → resolveTarget() matches folderId routing rule
@@ -260,6 +257,7 @@ if (_remoteUrl && _isFixtureMode) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId: tmFavoriteId,
+        streamContext: fixtureCtx,
       });
 
       expect(
@@ -353,7 +351,7 @@ if (_remoteUrl && _isFixtureMode) {
     // mirrored thread reaches a terminal (idle) streaming state on atlas.
 
     it("TM3: atlas → hermes stream mirrors thread to atlas and reaches idle", async () => {
-      setFetchCacheContext("transport-mirror-tm3");
+      const fixtureCtx: FixtureContext = { name: "transport-mirror-tm3" };
 
       const { result } = await runTestStream({
         user: testUser,
@@ -361,6 +359,7 @@ if (_remoteUrl && _isFixtureMode) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId: tmFavoriteId,
+        streamContext: fixtureCtx,
       });
 
       expect(

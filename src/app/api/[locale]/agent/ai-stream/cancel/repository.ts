@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -23,6 +23,7 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
+import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/execute-tool/revival/definition";
 
 import {
   clearStreamingState,
@@ -114,7 +115,7 @@ export class cancelRepository {
       }
 
       // Mark as aborting before sending abort signal - gives frontend immediate feedback
-      await setStreamingStateAborting(threadId);
+      await setStreamingStateAborting(threadId, logger, user);
 
       // Cancel the stream via the registry
       const wasActive = StreamRegistry.cancel(threadId);
@@ -223,7 +224,7 @@ export class cancelRepository {
         }
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.
-        await clearStreamingState(threadId, logger, user);
+        await clearStreamingState(threadId, logger, user, undefined);
         createMessagesEmitter(logger, user, {
           threadId,
           rootFolderId: thread.rootFolderId,

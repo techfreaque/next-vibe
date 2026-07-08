@@ -12,7 +12,13 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      ThreadRenameRepository.renameThread(data, user, locale, logger),
+    handler: ({ data, user, locale, logger, streamContext }) =>
+      ThreadRenameRepository.renameThread(
+        data,
+        user,
+        locale,
+        logger,
+        streamContext,
+      ),
   },
 });

@@ -278,6 +278,21 @@ export const remoteConnections = pgTable(
       .notNull()
       .default("both"),
 
+    /**
+     * Where a REMOTE/<instance> thread's AI loop runs for this connection —
+     * consulted ONCE at thread creation to stamp chat_threads.loop_instance_id
+     * (placement never routes afterwards):
+     *   'target' (default) — the loop runs on the connected instance.
+     *   'caller'           — the loop stays local; tools still execute
+     *                        remotely via execute-tool.
+     * Later also settable per thread folder.
+     */
+    loopLocation: text("loop_location", {
+      enum: ["target", "caller"],
+    })
+      .notNull()
+      .default("target"),
+
     // ── Connection state ────────────────────────────────────────────────────
 
     // Whether this connection is active

@@ -16,7 +16,7 @@ export const { tools } = endpointsHandler({
     handler: async ({ data, logger, locale }) =>
       (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ /* @vite-ignore */ "./repository"
         )
       ).GenerateAllRepository.generateAll(data, logger, locale),
   },

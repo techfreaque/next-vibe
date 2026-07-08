@@ -166,6 +166,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         endpoint: definition,
         data: input as CreateApiEndpointAny["types"]["RequestOutput"],
         user: atlasUser,
+        streamContext: undefined,
       });
       if (!result.success) {
         return {
@@ -355,6 +356,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
       ).default;
       const list = await sendTestRequest({
+        streamContext: undefined,
         endpoint: favListDef.GET,
         data: {},
         user: atlasUser,
@@ -374,6 +376,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       await Promise.allSettled(
         toDelete.map((f: { id: string }) =>
           sendTestRequest({
+            streamContext: undefined,
             endpoint: favDelDef.DELETE,
             urlPathParams: { id: f.id },
             user: atlasUser,
@@ -455,6 +458,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
       ).default;
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: connByIdDef.PATCH,
         data: { transportMode: mode },
         urlPathParams: { instanceId: "hermes" },
@@ -467,6 +471,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
       // Verify both sides updated
       const status = await sendTestRequest({
+        streamContext: undefined,
         endpoint: connByIdDef.GET,
         urlPathParams: { instanceId: "hermes" },
         user: atlasUser,
@@ -499,6 +504,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
       ).default;
       const patchResult = await sendTestRequest({
+        streamContext: undefined,
         endpoint: connByIdDef.PATCH,
         data: {
           syncScope: {

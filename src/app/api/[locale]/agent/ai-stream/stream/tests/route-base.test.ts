@@ -8,8 +8,9 @@
  *   (incognito, credits, error handling, certain callback modes).
  * - After every step: assertThreadIdle + assertNoPendingTasks + credit check.
  * - Per-step credit pinning so billing regressions are caught immediately.
- * - HTTP cache (installFetchCache) intercepts outbound fetch() on first run,
- *   replays from fixtures on subsequent runs - same code path, no network.
+ * - HTTP fixtures: each case seeds a fixtures-table row (setCaseFixture)
+ *   that runStream threads into the stream; external calls record on first
+ *   run and replay from fixtures afterwards - same code path, no network.
  * - Claude Code fixtures (claude-code-fixture-store) for Agent SDK calls.
  *
  * Cache bust: delete src/generated/ai-fixtures/http-cache/<case>/ or src/generated/ai-fixtures/claude-code/<case>/
@@ -23,7 +24,8 @@
  *   T2  → image generation (gpt-5-image-mini via quality-tester skill, inline wait mode)
  *   T3  → retry + branch from T1 AI → two sibling forks: RETRY_RESPONSE + BRANCH_RESPONSE
  *   T4  → music gen (from retry branch) + video gen (from fork branch)
- *   T5  → detach dispatch: AI calls generate_image(detach), gets taskId
+ *   T5  → detach dispatch: AI calls the callback tool (generate_image, or
+ *         cortex-write in cheap suites) with detach, gets taskId
  *   T5b → await-task: AI calls await-task with T5 taskId, gets imageUrl
  *   T5a → endLoop: tool-help(endLoop) executes inline, stream stops after 1 call
  *   T5d → wait callback mode: original tool message backfilled in-place, no deferred
@@ -51,11 +53,7 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-// Install HTTP fetch interceptor before any other imports touch fetch
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
-import { and, eq, like, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -65,8 +63,12 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import {
   ContentLevel,
   ModelSelectionType,
@@ -78,7 +80,7 @@ import { ContactSubject } from "@/app/api/[locale]/contact/enum";
 import { env } from "@/config/env";
 
 import { ChatModelId } from "../../models";
-import { setFetchCacheContext } from "../../testing/fetch-cache";
+import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
   fetchThreadTitle,
@@ -107,7 +109,7 @@ import {
   walkChain,
 } from "./helpers/chain";
 import type { ModeConfig } from "./helpers/config";
-import { deriveLoopRunsRemote } from "./helpers/config";
+import { deriveLoopRunsRemote, deriveUsesRemote } from "./helpers/config";
 import {
   createQualityTesterFavorite,
   ensureVisualFavorite,
@@ -116,6 +118,7 @@ import {
   assertNoMetaToolPrefix,
   assertToolMessageComplete,
   findToolMsg,
+  isToolMsgFor,
   resolveToolResult,
 } from "./helpers/messages";
 import { assertStepOk, toolInstr, toolInstrWithArgs } from "./helpers/prompts";
@@ -235,8 +238,13 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
     import.meta.dirname,
     "..",
     "..",
-    "testing",
-    "fixtures",
+    "..",
+    "..",
+    "..",
+    "..",
+    "..",
+    "generated",
+    "ai-fixtures",
     "media",
     filename,
   );
@@ -335,6 +343,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
       ).default;
       const result = await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: msgsDef.GET,
         data: { rootFolderId: suiteRootFolderId },
         urlPathParams: { threadId: tid },
@@ -346,6 +355,36 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       const state = result.data?.["streamingState"];
       return typeof state === "string" ? state : undefined;
     }
+
+    /**
+     * Delete every thread inside a suite folder through the REAL DELETE
+     * endpoint (thread-deleted relays by SAME id → peer mirrors die too).
+     * Used by afterAll (teardown) AND beforeAll (pre-clean): a bailed run
+     * skips afterAll, and leftover threads change the cortex tree's thread
+     * COUNTS in the system prompt — making the first LLM request of the next
+     * run unique and defeating fixture replay for the whole run.
+     */
+    const deleteThreadsInFolder = async (folderId: string): Promise<void> => {
+      const threadByIdDef = (
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
+      ).default;
+      const { chatThreads: threadsTable } =
+        await import("@/app/api/[locale]/agent/chat/db");
+      const { eq: eqOp } = await import("drizzle-orm");
+      const rows = await db
+        .select({ id: threadsTable.id })
+        .from(threadsTable)
+        .where(eqOp(threadsTable.folderId, folderId));
+      for (const row of rows) {
+        await sendTestRequest({
+          fixtureContext: undefined,
+          endpoint: threadByIdDef.DELETE,
+          urlPathParams: { threadId: row.id },
+          data: { rootFolderId: suiteRootFolderId },
+          user: testUser,
+        });
+      }
+    };
 
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -389,6 +428,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         // never override models on a favorite (it shows up in the UI as a
         // duplicate mislabeled variant of the skill).
         const createResult = await sendTestRequest({
+          fixtureContext: undefined,
           endpoint: favoriteCreateDef,
           data: { skillId: "quality-tester__native-image" },
           user: testUser,
@@ -416,6 +456,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       {
         // Same rule: the nano-banana-pro VARIANT owns the model config.
         const createResult = await sendTestRequest({
+          fixtureContext: undefined,
           endpoint: favoriteCreateDef,
           data: { skillId: "quality-tester__nano-banana-pro" },
           user: testUser,
@@ -525,28 +566,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       const cleanupFolderId = overrideSubFolderId ?? testSubFolderId;
       if (testUser && cleanupFolderId) {
         try {
-          const threadByIdDef = (
-            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
-          ).default;
           const subFolderDef = (
             await import("@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/definition")
           ).default;
-          const { chatThreads: threadsTable } =
-            await import("@/app/api/[locale]/agent/chat/db");
-          const { eq: eqOp } = await import("drizzle-orm");
-          const rows = await db
-            .select({ id: threadsTable.id })
-            .from(threadsTable)
-            .where(eqOp(threadsTable.folderId, cleanupFolderId));
-          for (const row of rows) {
-            await sendTestRequest({
-              endpoint: threadByIdDef.DELETE,
-              urlPathParams: { threadId: row.id },
-              data: { rootFolderId: suiteRootFolderId },
-              user: testUser,
-            });
-          }
+          await deleteThreadsInFolder(cleanupFolderId);
           await sendTestRequest({
+            fixtureContext: undefined,
             endpoint: subFolderDef.DELETE,
             urlPathParams: { subFolderId: cleanupFolderId },
             user: testUser,
@@ -555,6 +580,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const { HERMES_INSTANCE_ID } =
               await import("../../testing/remote-setup");
             await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: subFolderDef.DELETE,
               urlPathParams: { subFolderId: cleanupFolderId },
               user: testUser,
@@ -570,6 +596,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       }
     });
 
+    // Per-case fixture context (suite-closure state, like testSubFolderId).
+    // Each case sets its FULL context name; runStream passes it explicitly
+    // into the chain and the thread anchors it for later turns/revivals.
+    let caseFixture: FixtureContext | undefined;
+    const setCaseFixture = (name: string): void => {
+      caseFixture = {
+        name,
+        ...(cfg.fixtureStrict ? { strict: true } : {}),
+        ...(cfg.fixtureInterceptLocalhostPorts
+          ? { interceptLocalhostPorts: cfg.fixtureInterceptLocalhostPorts }
+          : {}),
+      };
+    };
+
     const runStream = makeRunStream({
       cfg,
       suiteRootFolderId,
@@ -577,7 +617,67 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       getStreamingState,
       getTestSubFolderId: () => testSubFolderId,
       getOverrideSubFolderId: () => overrideSubFolderId,
+      getCaseFixture: () => caseFixture,
     });
+
+    // ── Callback-mode dispatch spec ─────────────────────────────────────────
+    // Callback-mode cases (T5*, T6*) dispatch ONE async-capable tool. Cheap
+    // suites use cortex-write (cheap, REAL DB write — and it still creates a
+    // REAL task row under detach/wakeUp because execute-tool's async modes
+    // always do); full suites use generate_image (real media task). Prompts
+    // interpolate the name/args/result wording, assertions match cbTool.name
+    // and check cbTool.resultKey — with cheapMode falsy, prompts and
+    // assertions are byte-identical to the original generate_image versions.
+    const cbTool = cfg.cheapMode
+      ? {
+          name: "cortex-write",
+          resultInstr: "the result has a non-empty responsePath",
+          resultNoun: "a responsePath",
+          resultKey: "responsePath",
+        }
+      : {
+          name: "generate_image",
+          resultInstr: "the result has a non-empty imageUrl",
+          resultNoun: "an imageUrl",
+          resultKey: "imageUrl",
+        };
+    /** Args for the callback dispatch. The case slug (e.g. 'wakeup-test') is
+     *  the image prompt in full mode; in cheap mode it keys a distinct cortex
+     *  path + content per case so fixture contexts and cortex nodes never
+     *  collide across cases. */
+    const cbArgs = (caseSlug: string): string =>
+      cfg.cheapMode
+        ? `path='/memories/cb-${caseSlug}' and content='${caseSlug}-payload'`
+        : `prompt='${caseSlug}'`;
+    /** Per-case fixture context for callback cases. Cheap mode records
+     *  different prompts/results than full, so it gets its own context name
+     *  (same pattern as T2's cortex-roundtrip fork). */
+    const cbFixture = (name: string): string =>
+      cfg.cheapMode ? `${name}-cortex` : name;
+    /** Tool-message matcher for cbTool — direct, wrapped, or nested envelope. */
+    const isCbToolMsg = (m: SlimMessage): boolean =>
+      isToolMsgFor(m, cbTool.name);
+    /** The result key holds a non-empty string (finished real output). */
+    const cbResultOk = (res: Record<string, WidgetData> | null): boolean =>
+      typeof res?.[cbTool.resultKey] === "string" &&
+      res[cbTool.resultKey] !== "";
+
+    // T7 approve-gate target: full gates generate_image itself (real media
+    // task executes on approval); cheap gates cortex-write (cheap, real DB
+    // write) — it can NOT be tool-help, which must stay ungated because it is
+    // the parallel partner call in T7a.
+    const approveTool = cfg.cheapMode
+      ? {
+          name: "cortex-write",
+          argsInstr:
+            "path='/memories/t7-approve-test' and content='T7_APPROVE_OK'",
+          resultKey: "responsePath",
+        }
+      : {
+          name: "generate_image",
+          argsInstr: "prompt='approve-test'",
+          resultKey: "imageUrl",
+        };
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // Main Thread: one shared thread, sequential steps
@@ -664,7 +764,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T1: new thread + tool call - thread creation, parent chain, tool-help result, metadata",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}tool-call`);
+          setCaseFixture(`${cfg.cachePrefix}tool-call`);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
           // Bounds the T1 ledger-audit window for the LOCAL-NOT-BILLED guard.
@@ -928,7 +1028,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         fit(
           `T-SYS: system prompt origin - AI must report ${originLabel} instance ID`,
           async () => {
-            setFetchCacheContext(`${cfg.cachePrefix}sys-origin`);
+            setCaseFixture(`${cfg.cachePrefix}sys-origin`);
             await pinBalance(testUser, 10);
 
             let expectedInstanceId: string | undefined =
@@ -974,13 +1074,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         );
       }
 
+      // TEMPORARY DEBUG: stop the suite right after T1 (bail-fast fixture iteration).
+      if (cfg.stopAfterFirstCase) {
+        fit("TEMP stop-after-first-case", () => {
+          // oxlint-disable-next-line restricted-syntax -- temporary bail marker
+          throw new Error(
+            "stopAfterFirstCase: T1 done - bailing intentionally",
+          );
+        });
+      }
+
       // ── T1a-cat: gradual exploration — narrow a category to tool names ────
       // Step 2 of the ladder: a broad list returns categories (T1); narrowing by
       // category returns the tools in it (names + descriptions, no full schema).
       fit(
         "T1a-cat: tool-help category narrowing - categories drill down to tool names",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}tool-help-category`);
+          setCaseFixture(`${cfg.cachePrefix}tool-help-category`);
           await pinBalance(testUser, 10);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -1051,7 +1161,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T1a-query: tool-help keyword search - many matches return the names list (no schemas)",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}tool-help-query`);
+          setCaseFixture(`${cfg.cachePrefix}tool-help-query`);
           await pinBalance(testUser, 10);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -1122,7 +1232,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T1b: tool-help detail mode - single tool schema lookup with parameters",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}tool-help-detail`);
+          setCaseFixture(`${cfg.cachePrefix}tool-help-detail`);
           await pinBalance(testUser, 10);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -1204,7 +1314,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const cacheCtx = cfg.cheapMode
             ? `${cfg.cachePrefix}cortex-mem-write`
             : `${cfg.cachePrefix}image-generation`;
-          setFetchCacheContext(cacheCtx);
+          setCaseFixture(cacheCtx);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -1408,7 +1518,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // We add t2UserMsgId as well since it's on the abandoned branch.
 
           // ── Fork 1: Retry (UI flow: operation="retry", parentMessageId=t2BranchParentId) ──
-          setFetchCacheContext(`${cfg.cachePrefix}retry`);
+          setCaseFixture(`${cfg.cachePrefix}retry`);
           await pinBalance(testUser, 40);
           const beforeRetry = await getBalance(testUser);
           const prevIdsRetry = new Set(
@@ -1449,20 +1559,31 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const retryAi = retryMsgs.find((m) => m.id === branchRetryAiMsgId);
           expect(retryAi?.content).toContain("RETRY");
           assertStepOk(retryAi?.content, "T3a");
-          // retryAi must point directly at retryUser
+          // retryAi must descend from retryUser with only assistant/tool
+          // steps between (the model may detour through a tool call before
+          // answering — that doesn't change the branch structure under test).
+          const chainToUser = walkChain(retryMsgs, retryAi!.id);
+          const retryUserIdx = chainToUser.indexOf(retryUser!.id);
           expect(
-            retryAi!.parentId,
-            `T3a: retryAi.parentId must be retryUser.id=${retryUser!.id}`,
-          ).toBe(retryUser!.id);
+            retryUserIdx,
+            `T3a: retryAi's ancestor chain must contain retryUser.id=${retryUser!.id}`,
+          ).toBeGreaterThanOrEqual(0);
+          const byIdRetry = new Map(retryMsgs.map((m) => [m.id, m]));
+          for (const midId of chainToUser.slice(retryUserIdx + 1, -1)) {
+            const mid = byIdRetry.get(midId);
+            expect(
+              mid?.role === "assistant" || mid?.role === "tool",
+              `T3a: only assistant/tool steps allowed between retryUser and retryAi - got ${mid?.role} (${midId})`,
+            ).toBe(true);
+          }
 
-          // Exact chain: [t1UserMsgId, ..., branchParentId, retryUser.id, retryAi.id]
-          const retryChain = walkChain(retryMsgs, retryAi!.id);
+          // Exact chain: [t1UserMsgId, ..., branchParentId, retryUser.id, ..., retryAi.id]
+          const retryChain = chainToUser;
           expect(retryChain.length).toBeGreaterThanOrEqual(4);
           expect(retryChain[0]).toBe(t1UserMsgId);
           expect(retryChain[retryChain.length - 1]).toBe(branchRetryAiMsgId);
-          expect(retryChain[retryChain.length - 2]).toBe(retryUser!.id);
           expect(
-            retryChain[retryChain.length - 3],
+            retryChain[retryUserIdx - 1],
             `T3a: the message immediately before retryUser must be branchParentId=${branchParentId}. ` +
               `This is t2BranchParentId = the AI message before T2, same parent as T2's user message.`,
           ).toBe(branchParentId);
@@ -1496,7 +1617,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // The UI's branchMessage hook uses: parentMessageId = userMsg.parentId, operation = "edit"
           // So we pass branchParentId (= t2BranchParentId = t2UserMsg.parentId) with operation="edit".
           // This creates branchUser as a SIBLING of t2UserMsgId under branchParentId (same as retryUser).
-          setFetchCacheContext(`${cfg.cachePrefix}branch`);
+          setCaseFixture(`${cfg.cachePrefix}branch`);
           await pinBalance(testUser, 40);
           const beforeBranch = await getBalance(testUser);
 
@@ -1555,21 +1676,30 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(branchAi?.content).toContain("BRANCH");
           assertStepOk(branchAi?.content, "T3b");
 
-          // branchAi must point directly at branchUser
-          expect(
-            branchAi!.parentId,
-            `T3b: branchAi.parentId must be branchUser.id=${branchUser!.id}`,
-          ).toBe(branchUser!.id);
-
-          // Exact branch chain: [t1UserMsgId, ..., branchParentId, branchUser.id, branchAi.id]
-          // branchParentId must be immediately before branchUser
+          // branchAi must descend from branchUser (assistant/tool steps only
+          // between — the model may detour through a tool call first).
           const branchChain = walkChain(branchMsgs, branchAi!.id);
+          const branchUserIdx = branchChain.indexOf(branchUser!.id);
+          expect(
+            branchUserIdx,
+            `T3b: branchAi's ancestor chain must contain branchUser.id=${branchUser!.id}`,
+          ).toBeGreaterThanOrEqual(0);
+          const byIdBranch = new Map(branchMsgs.map((m) => [m.id, m]));
+          for (const midId of branchChain.slice(branchUserIdx + 1, -1)) {
+            const mid = byIdBranch.get(midId);
+            expect(
+              mid?.role === "assistant" || mid?.role === "tool",
+              `T3b: only assistant/tool steps allowed between branchUser and branchAi - got ${mid?.role} (${midId})`,
+            ).toBe(true);
+          }
+
+          // Exact branch chain: [t1UserMsgId, ..., branchParentId, branchUser.id, ..., branchAi.id]
+          // branchParentId must be immediately before branchUser
           expect(branchChain.length).toBeGreaterThanOrEqual(4);
           expect(branchChain[0]).toBe(t1UserMsgId);
           expect(branchChain[branchChain.length - 1]).toBe(branchForkAiMsgId);
-          expect(branchChain[branchChain.length - 2]).toBe(branchUser!.id);
           expect(
-            branchChain[branchChain.length - 3],
+            branchChain[branchUserIdx - 1],
             `T3b: the message immediately before branchUser must be branchParentId=${branchParentId}. ` +
               `Both retry and fork branches must share the same branch point. ` +
               `If wrong, the branch won't appear in the UI.`,
@@ -1621,7 +1751,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         }
         // music (~60s) + video (~120s) + revival polling (180s budget) → 6 min
         // ── Part A: Music gen from retry branch ──
-        setFetchCacheContext(`${cfg.cachePrefix}music-generation`);
+        setCaseFixture(`${cfg.cachePrefix}music-generation`);
         await pinBalance(testUser, 50);
         const beforeMusic = await getBalance(testUser);
         const prevIdsMusic = new Set(
@@ -1655,13 +1785,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         ).toBe(branchRetryAiMsgId);
 
         // Tool message - find the successful one (AI may retry on duration mismatch)
-        const musicToolMsgs = musicAdded.filter(
-          (m) =>
-            m.role === "tool" &&
-            (m.toolCall?.toolName === "generate_music" ||
-              (m.toolCall?.toolName === "execute-tool" &&
-                toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                  "generate_music")),
+        const musicToolMsgs = musicAdded.filter((m) =>
+          isToolMsgFor(m, "generate_music"),
         );
         expect(musicToolMsgs.length).toBeGreaterThanOrEqual(1);
         const musicToolMsg = musicToolMsgs.find(
@@ -1749,7 +1874,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         await assertDeductedLocal(testUser, beforeMusic, afterMusic, 0, 15);
 
         // ── Part B: Video gen from fork branch ──
-        setFetchCacheContext(`${cfg.cachePrefix}video-generation`);
+        setCaseFixture(`${cfg.cachePrefix}video-generation`);
         // VEO_3_1 costs ~48 cr/sec * 5 sec * 1.3 markup = ~312 cr minimum
         await pinBalance(testUser, 400);
         const beforeVideo = await getBalance(testUser);
@@ -1861,11 +1986,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         );
       }, 1_200_000); // 20 min RECORDING-ONLY worst case: ModelsLab's queue can hold a video job in "processing" for 15+ min live. Replays finish in seconds — this cap never bites on fixture runs.
 
-      // ── T5: detach dispatch - AI calls generate_image(detach), gets taskId ──
+      // ── T5: detach dispatch - AI calls cbTool(detach), gets taskId ──
       fit(
-        "T5: detach dispatch - AI calls generate_image with detach, gets taskId back",
+        `T5: detach dispatch - AI calls ${cbTool.name} with detach, gets taskId back`,
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}callback-wait-step1`);
+          setCaseFixture(cbFixture(`${cfg.cachePrefix}callback-wait-step1`));
           await pinBalance(testUser, 20);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -1873,7 +1998,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='await-task-test' and callbackMode='detach'")}. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("await-task-test")} and callbackMode='detach'`)}. Check that the immediate result has a taskId string and does NOT have ${cbTool.resultNoun} (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -1888,21 +2013,21 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const added = newMessages(messages, prevIds);
 
-          const genImgMsg = findToolMsg(added, "generate_image", cfg);
+          const genImgMsg = findToolMsg(added, cbTool.name, cfg);
           expect(
             genImgMsg,
-            "[T5] generate_image tool message not found",
+            `[T5] ${cbTool.name} tool message not found`,
           ).toBeDefined();
 
           const genImgRes = resolveToolResult(genImgMsg);
           expect(
             genImgRes,
-            "[T5] generate_image result is null",
+            `[T5] ${cbTool.name} result is null`,
           ).not.toBeNull();
           // DETACH semantics: the dispatch returns ONLY { taskId } — fire-and-forget.
           // It NEVER backfills the dispatch tool message with the result. The finished
           // task is kept in task history; the result is retrieved later via await-task
-          // (T5b), which then cleans the task up. So here: taskId present, imageUrl ABSENT.
+          // (T5b), which then cleans the task up. So here: taskId present, result ABSENT.
           const t5ToolCall = genImgMsg!.toolCall;
           const t5TaskIdRaw = t5ToolCall?.remoteTaskId ?? genImgRes!["taskId"];
           expect(
@@ -1910,8 +2035,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             `[T5] taskId missing (remoteTaskId or result.taskId): ${JSON.stringify({ remoteTaskId: t5ToolCall?.remoteTaskId, result: genImgRes })}`,
           ).toBe("string");
           expect(
-            genImgRes!["imageUrl"],
-            `[T5] detach must NOT backfill imageUrl — result is { taskId } only: ${JSON.stringify(genImgRes)}`,
+            genImgRes![cbTool.resultKey],
+            `[T5] detach must NOT backfill ${cbTool.resultKey} — result is { taskId } only: ${JSON.stringify(genImgRes)}`,
           ).toBeUndefined();
 
           // Save for T5b. taskIds are deterministic in fixture mode, so the
@@ -1940,11 +2065,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
       // ── T5b: await-task - AI calls await-task with taskId from T5 ──
       fit(
-        "T5b: await-task - AI calls await-task with detach taskId, gets imageUrl",
+        `T5b: await-task - AI calls await-task with detach taskId, gets ${cbTool.resultKey}`,
         async () => {
           // taskId from T5 is deterministic (fixture mode), so the value the AI
           // echoes here is stable across record/replay — no fixture patching.
-          setFetchCacheContext(`${cfg.cachePrefix}callback-wait-step2`);
+          setCaseFixture(cbFixture(`${cfg.cachePrefix}callback-wait-step2`));
           await pinBalance(testUser, 20);
           const beforeWait = await getBalance(testUser);
           const prevIds = new Set(
@@ -1961,7 +2086,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             : `the await-task tool with taskId='${t5DetachTaskId}'`;
           let { result: waitResult, messages: waitMsgs } = await runStream({
             user: testUser,
-            prompt: `[T5b await-task] Call ${waitForTaskInstr}. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T5b await-task] Call ${waitForTaskInstr}. Check that the result contains ${cbTool.resultNoun} string (either directly or nested in a result field). End your reply with STEP_OK if ${cbTool.resultKey} is present, or FAILED: <reason> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -1985,13 +2110,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Per spec (wait, same-sequence path): if no user message arrived while waiting,
           // the original await-task tool message is backfilled in-place with the real result.
           // No deferred message is created. Only 1 await-task tool message must exist.
-          const allWftMsgs = waitAdded.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "await-task" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "await-task")),
+          const allWftMsgs = waitAdded.filter((m) =>
+            isToolMsgFor(m, "await-task"),
           );
           expect(
             allWftMsgs.length,
@@ -2013,22 +2133,22 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const wftRes = resolveToolResult(waitForTaskMsg);
           expect(wftRes, "[T5b] await-task result is null").not.toBeNull();
           // Two paths depending on race:
-          // (A) task pending when called → backfilled with raw image result: { imageUrl, ... }
-          // (B) task already done → returns { status, result: { imageUrl }, waiting }
-          const imageUrlDirect =
-            typeof wftRes!["imageUrl"] === "string"
-              ? wftRes!["imageUrl"]
+          // (A) task pending when called → backfilled with the raw tool result: { <resultKey>, ... }
+          // (B) task already done → returns { status, result: { <resultKey> }, waiting }
+          const resultKeyDirect =
+            typeof wftRes![cbTool.resultKey] === "string"
+              ? wftRes![cbTool.resultKey]
               : undefined;
-          const innerResult = imageUrlDirect
+          const innerResult = resultKeyDirect
             ? wftRes
             : toolResultRecord(wftRes!["result"]);
           expect(
             innerResult,
-            `[T5b] Cannot find imageUrl: ${JSON.stringify(wftRes)}`,
+            `[T5b] Cannot find ${cbTool.resultKey}: ${JSON.stringify(wftRes)}`,
           ).not.toBeNull();
           expect(
-            typeof innerResult!["imageUrl"],
-            `[T5b] imageUrl not a string, got: ${JSON.stringify(innerResult)}`,
+            typeof innerResult![cbTool.resultKey],
+            `[T5b] ${cbTool.resultKey} not a string, got: ${JSON.stringify(innerResult)}`,
           ).toBe("string");
 
           const waitLastAi = waitMsgs.find(
@@ -2060,7 +2180,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T5a: endLoop - tool-help(endLoop) executes inline, stream stops after 1 call",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}callback-end-loop`);
+          setCaseFixture(`${cfg.cachePrefix}callback-end-loop`);
           await pinBalance(testUser, 20);
           const prevIdsEndLoop = new Set(
             (await getMessages(threadId)).map((m) => m.id),
@@ -2087,13 +2207,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Per spec: endLoop ALWAYS backfills in-place regardless of transport.
           // No deferred message is ever created for endLoop - the original message
           // is updated with status="completed" and the real result directly.
-          const toolHelpMsgs = endLoopAdded.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "tool-help" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "tool-help")),
+          const toolHelpMsgs = endLoopAdded.filter((m) =>
+            isToolMsgFor(m, "tool-help"),
           );
           expect(
             toolHelpMsgs.length,
@@ -2161,7 +2276,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T5d: wait callback mode - original tool message backfilled in-place, no deferred created, AI gets result",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}callback-wait-inline`);
+          setCaseFixture(cbFixture(`${cfg.cachePrefix}callback-wait-inline`));
           await pinBalance(testUser, 20);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -2170,7 +2285,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result } = await runStream({
             user: testUser,
-            prompt: `[T5d wait-inline] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wait-inline-test' and callbackMode='wait'")}. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.`,
+            prompt: `[T5d wait-inline] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wait-inline-test")} and callbackMode='wait'`)}. Check that the result has ${cbTool.resultNoun} (not a taskId). End your reply with STEP_OK if ${cbTool.resultKey} is present and non-empty, or FAILED: <reason> if anything is wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -2210,18 +2325,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const allMessages = await getMessages(threadId);
           const added = newMessages(allMessages, prevIds);
 
-          // ── At least 1 generate_image tool message (model may retry on validation errors) ──
-          const imgToolMsgs = added.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "generate_image" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "generate_image")),
-          );
+          // ── At least 1 cbTool tool message (model may retry on validation errors) ──
+          const imgToolMsgs = added.filter((m) => isCbToolMsg(m));
           expect(
             imgToolMsgs.length,
-            "T5d: expected at least 1 generate_image tool message",
+            `T5d: expected at least 1 ${cbTool.name} tool message`,
           ).toBeGreaterThanOrEqual(1);
 
           // Use the last one (final retry with actual result)
@@ -2240,12 +2348,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             "T5d: backfilled result must not be null",
           ).not.toBeNull();
           expect(
-            typeof imgRes!["imageUrl"],
-            `T5d: imageUrl not a string. Result: ${JSON.stringify(imgRes)}`,
+            typeof imgRes![cbTool.resultKey],
+            `T5d: ${cbTool.resultKey} not a string. Result: ${JSON.stringify(imgRes)}`,
           ).toBe("string");
           expect(
-            imgRes!["imageUrl"],
-            "T5d: imageUrl must be non-empty",
+            imgRes![cbTool.resultKey],
+            `T5d: ${cbTool.resultKey} must be non-empty`,
           ).toBeTruthy();
 
           // ── No DEFERRED tool messages should have been created (wait = backfill in-place) ──
@@ -2278,9 +2386,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          // Image gen + at least one AI turn; kimi sometimes needs an extra
-          // round trip (same allowance as T1).
-          await assertDeductedLocal(testUser, before, after, 0.4, 50);
+          // Full: image gen + at least one AI turn; kimi sometimes needs an
+          // extra round trip (same allowance as T1). Cheap: cortex-write is
+          // ~free — only the AI turns bill (same floor as T2).
+          await assertDeductedLocal(
+            testUser,
+            before,
+            after,
+            cfg.cheapMode ? 0.05 : 0.4,
+            50,
+          );
         },
         effectiveTestTimeout,
       );
@@ -2293,7 +2408,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         let wakeupInitialMsgIds: Set<string>;
 
         fit(
-          "T6a: wakeUp phase1 - image dispatched async, AI gets taskId, stream ends naturally",
+          `T6a: wakeUp phase1 - ${cbTool.name} dispatched async, AI gets taskId, stream ends naturally`,
           async () => {
             // Clean up stale wakeUp tasks from previous test runs before recording.
             // Without this, the revival stream sees dozens of stale tasks in the system
@@ -2303,7 +2418,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await db.execute(
               sql`DELETE FROM cron_tasks WHERE id LIKE 'local-wu-%' AND last_execution_status IN ('status.completed', 'status.failed', 'status.cancelled', 'status.stopped')`,
             );
-            setFetchCacheContext(`${cfg.cachePrefix}callback-wakeup-phase1`);
+            setCaseFixture(
+              cbFixture(`${cfg.cachePrefix}callback-wakeup-phase1`),
+            );
             await pinBalance(testUser, 20);
             const before = await getBalance(testUser);
             wakeupMsgIds = new Set(
@@ -2313,7 +2430,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an "imageUrl" field OR a rendered markdown image link ![...](https://...) — either counts. In phase 2, confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
+              prompt: cfg.cheapMode
+                ? `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-test")} and callbackMode='wakeUp'`)}. The write runs asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO responsePath — end your reply with STEP_OK, or FAILED: <reason> if there is a responsePath already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the tool's real output): seeing a non-empty responsePath in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. In phase 2, confirm the deferred result contains a non-empty responsePath, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO responsePath appears.`
+                : `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-test")} and callbackMode='wakeUp'`)}. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an "imageUrl" field OR a rendered markdown image link ![...](https://...) — either counts. In phase 2, confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -2333,17 +2452,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const addedNonDeferred = added.filter(
               (m) => m.toolCall?.isDeferred !== true,
             );
-            const toolMsg = findToolMsg(
-              addedNonDeferred,
-              "generate_image",
-              cfg,
-            );
+            const toolMsg = findToolMsg(addedNonDeferred, cbTool.name, cfg);
             expect(toolMsg).toBeDefined();
             if (toolMsg) {
               // wakeUp phase1: tool dispatched async - status is "pending" in remote, undefined in local
               assertToolMessageComplete(
                 toolMsg,
-                "generate_image",
+                cbTool.name,
                 "T6a",
                 cfg,
                 "pending",
@@ -2355,10 +2470,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // picked up by the live loop — the original message already holds
             // the image. A slower task delivers via revival (deferred child).
             const phase1Res = resolveToolResult(toolMsg);
-            t6aInlineDelivery =
-              typeof phase1Res?.["imageUrl"] === "string" &&
-              phase1Res["imageUrl"] !== "";
-            if (t6aInlineDelivery) {
+            t6aInlineDelivery = cbResultOk(phase1Res);
+            if (t6aInlineDelivery && !cfg.cheapMode) {
               expect(
                 String(phase1Res!["imageUrl"]),
                 "T6a inline delivery: imageUrl must be a real URL",
@@ -2435,13 +2548,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ) {
               const currentMsgs = await getMessages(threadId);
               const deferredExists = currentMsgs.some(
-                (m) =>
-                  m.role === "tool" &&
-                  m.toolCall?.isDeferred === true &&
-                  (m.toolCall.toolName === "generate_image" ||
-                    (m.toolCall.toolName === "execute-tool" &&
-                      toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                        "generate_image")),
+                (m) => m.toolCall?.isDeferred === true && isCbToolMsg(m),
               );
               const threadState = await getStreamingState(threadId);
               if (deferredExists && threadState === "idle") {
@@ -2491,10 +2598,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 "T6b inline: original wakeUp tool message must exist",
               ).toBeDefined();
               const inlineRes = resolveToolResult(originalMsg);
-              expect(
-                String(inlineRes?.["imageUrl"] ?? ""),
-                "T6b inline: original message must hold the final imageUrl",
-              ).toMatch(/^https?:\/\/.+/);
+              if (cfg.cheapMode) {
+                expect(
+                  cbResultOk(inlineRes),
+                  `T6b inline: original message must hold the final ${cbTool.resultKey}. Result: ${JSON.stringify(inlineRes)}`,
+                ).toBe(true);
+              } else {
+                expect(
+                  String(inlineRes?.["imageUrl"] ?? ""),
+                  "T6b inline: original message must hold the final imageUrl",
+                ).toMatch(/^https?:\/\/.+/);
+              }
               expect(
                 originalMsg!.toolCall?.isDeferred,
                 "T6b inline: original message must not be deferred",
@@ -2528,15 +2642,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 (m) =>
                   m.role === "tool" &&
                   m.toolCall?.isDeferred === true &&
-                  resolveToolResult(m)?.["imageUrl"] !== undefined &&
-                  (cfg.remoteInstanceId
-                    ? m.toolCall.toolName === "execute-tool" &&
-                      toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                        "generate_image"
-                    : m.toolCall.toolName === "generate_image" ||
-                      (m.toolCall.toolName === "execute-tool" &&
-                        toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                          "generate_image")),
+                  resolveToolResult(m)?.[cbTool.resultKey] !== undefined &&
+                  isCbToolMsg(m),
               );
               if (deferredTool) {
                 // Walk the chain from deferredTool to find the leaf non-compacting
@@ -2580,21 +2687,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               });
             }
 
-            // ── Per spec: exactly 2 generate_image tool messages - original + deferred ──
+            // ── Per spec: exactly 2 cbTool tool messages - original + deferred ──
             // No more, no less. A 3rd message = premature revival fired with {status:"pending"}.
             // Scope to T6 branch only (messages added since the count captured before T6a).
             const t6BranchMsgs = newMessages(messages, wakeupInitialMsgIds);
-            const allGenImgToolMsgs = t6BranchMsgs.filter(
-              (m) =>
-                m.role === "tool" &&
-                (m.toolCall?.toolName === "generate_image" ||
-                  (m.toolCall?.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                      "generate_image")),
+            const allGenImgToolMsgs = t6BranchMsgs.filter((m) =>
+              isCbToolMsg(m),
             );
             expect(
               allGenImgToolMsgs.length,
-              `T6b: expected exactly 2 generate_image tool messages (original + deferred). Got ${String(allGenImgToolMsgs.length)}: ${allGenImgToolMsgs.map((m) => `${m.id}(isDeferred=${String(m.toolCall?.isDeferred)},result=${JSON.stringify(resolveToolResult(m))?.slice(0, 80)})`).join(", ")}`,
+              `T6b: expected exactly 2 ${cbTool.name} tool messages (original + deferred). Got ${String(allGenImgToolMsgs.length)}: ${allGenImgToolMsgs.map((m) => `${m.id}(isDeferred=${String(m.toolCall?.isDeferred)},result=${JSON.stringify(resolveToolResult(m))?.slice(0, 80)})`).join(", ")}`,
             ).toBe(2);
 
             const originalToolMsg = allGenImgToolMsgs.find(
@@ -2605,23 +2707,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             );
             expect(
               originalToolMsg,
-              "T6b: original (non-deferred) generate_image tool message not found",
+              `T6b: original (non-deferred) ${cbTool.name} tool message not found`,
             ).toBeDefined();
             expect(
               deferredToolMsg,
-              "T6b: deferred generate_image tool message not found",
+              `T6b: deferred ${cbTool.name} tool message not found`,
             ).toBeDefined();
 
-            // ── Deferred tool message: written by resume-stream with real imageUrl ──
+            // ── Deferred tool message: written by resume-stream with the real result ──
             expect(
               deferredTool,
-              "T6b: no deferred tool message with imageUrl found",
+              `T6b: no deferred tool message with ${cbTool.resultKey} found`,
             ).toBeDefined();
             if (deferredTool) {
               // Use resolveToolResult to handle execute-tool wrapper (remote mode)
               const deferredRes = resolveToolResult(deferredTool);
-              expect(typeof deferredRes!["imageUrl"]).toBe("string");
-              expect(deferredRes!["imageUrl"]).toBeTruthy();
+              expect(typeof deferredRes![cbTool.resultKey]).toBe("string");
+              expect(deferredRes![cbTool.resultKey]).toBeTruthy();
 
               // Deferred message must be marked isDeferred=true.
               expect(
@@ -2639,7 +2741,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // ── Original tool message from phase1 must NOT be modified ──
             // Per spec: wakeUp original message is never updated after creation.
             // The result lives in the deferred message only.
-            // Original content: {taskId, status:"pending"} shape - never has imageUrl.
+            // Original content: {taskId, status:"pending"} shape - never has the result.
             const originalToolInDb = messages.find(
               (m) => m.id === wakeupToolMsgId,
             );
@@ -2649,10 +2751,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBeDefined();
             if (originalToolInDb) {
               const origRes = resolveToolResult(originalToolInDb);
-              // Original should NOT have imageUrl - that's in the deferred message.
+              // Original should NOT have the result - that's in the deferred message.
               expect(
-                origRes?.["imageUrl"],
-                "T6b: wakeUp original tool message must NOT have imageUrl - result goes to deferred",
+                origRes?.[cbTool.resultKey],
+                `T6b: wakeUp original tool message must NOT have ${cbTool.resultKey} - result goes to deferred`,
               ).toBeUndefined();
               // Original must NOT be marked isDeferred.
               expect(
@@ -2728,10 +2830,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── T6c: wakeUp repeat - second full E2E wakeUp on same thread ──────
       // Verifies no stale state from T6a/T6b causes issues.
       fit(
-        "T6c: wakeUp repeat - second generate_image(wakeUp) on same thread",
+        `T6c: wakeUp repeat - second ${cbTool.name}(wakeUp) on same thread`,
         async () => {
-          setFetchCacheContext(
-            `${cfg.cachePrefix}callback-wakeup-phase1-repeat`,
+          setCaseFixture(
+            cbFixture(`${cfg.cachePrefix}callback-wakeup-phase1-repeat`),
           );
           await pinBalance(testUser, 20);
           const t6cInitialIds = new Set(
@@ -2740,7 +2842,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages: phase1Msgs } = await runStream({
             user: testUser,
-            prompt: `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-repeat-test' and callbackMode='wakeUp'")}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
+            prompt: cfg.cheapMode
+              ? `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-repeat-test")} and callbackMode='wakeUp'`)}. Two valid outcomes: (a) DEFERRED - you get a taskId and no responsePath yet → end with STEP_OK; OR (b) INLINE - a fast task returns the result immediately (a non-empty responsePath) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor a responsePath. If you got a taskId (deferred), you will be revived when the write is done - on revival confirm the deferred result contains a non-empty responsePath and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no responsePath appears.`
+              : `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-repeat-test")} and callbackMode='wakeUp'`)}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -2754,10 +2858,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Re-fetch + pull: the tool message mirrors after runStream's snapshot.
           let added = newMessages(phase1Msgs, t6cInitialIds);
-          let toolMsg = findToolMsg(added, "generate_image", cfg);
+          let toolMsg = findToolMsg(added, cbTool.name, cfg);
           for (let i = 0; i < 20 && !toolMsg; i++) {
             added = newMessages(await getMessages(threadId), t6cInitialIds);
-            toolMsg = findToolMsg(added, "generate_image", cfg);
+            toolMsg = findToolMsg(added, cbTool.name, cfg);
             if (toolMsg) {
               break;
             }
@@ -2767,13 +2871,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(
             toolMsg,
-            "T6c: generate_image tool message not found",
+            `T6c: ${cbTool.name} tool message not found`,
           ).toBeDefined();
-          // Delivery shape: deferred (taskId, pending) or inline (image now).
+          // Delivery shape: deferred (taskId, pending) or inline (result now).
           const t6cPhase1Res = resolveToolResult(toolMsg);
-          const t6cInline =
-            typeof t6cPhase1Res?.["imageUrl"] === "string" &&
-            t6cPhase1Res["imageUrl"] !== "";
+          const t6cInline = cbResultOk(t6cPhase1Res);
 
           const lastAi = await awaitFinalAssistant(
             threadId,
@@ -2788,10 +2890,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // original message already holds the image. The wakeUp contract (tool
           // never blocks) still held; skip the deferred-revival assertions.
           if (t6cInline) {
-            expect(
-              String(t6cPhase1Res!["imageUrl"]),
-              "T6c inline: imageUrl must be a real URL",
-            ).toMatch(/^https?:\/\/.+/);
+            if (!cfg.cheapMode) {
+              expect(
+                String(t6cPhase1Res!["imageUrl"]),
+                "T6c inline: imageUrl must be a real URL",
+              ).toMatch(/^https?:\/\/.+/);
+            }
             await assertThreadIdle(threadId, testUser);
             return;
           }
@@ -2812,13 +2916,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             messages = await getMessages(threadId);
             const t6cMsgs = newMessages(messages, t6cInitialIds);
             deferredTool = t6cMsgs.find(
-              (m) =>
-                m.role === "tool" &&
-                m.toolCall?.isDeferred === true &&
-                (m.toolCall.toolName === "generate_image" ||
-                  (m.toolCall.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                      "generate_image")),
+              (m) => m.toolCall?.isDeferred === true && isCbToolMsg(m),
             );
             if (deferredTool) {
               revivalAi = messages.find(
@@ -2846,16 +2944,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             });
           }
 
-          // ── Each generate_image wakeUp call must produce original + deferred ──
+          // ── Each cbTool wakeUp call must produce original + deferred ──
           const t6cBranchMsgs = newMessages(messages, t6cInitialIds);
-          const allGenImgToolMsgs = t6cBranchMsgs.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "generate_image" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "generate_image")),
-          );
+          const allGenImgToolMsgs = t6cBranchMsgs.filter((m) => isCbToolMsg(m));
           const originals = allGenImgToolMsgs.filter(
             (m) => !m.toolCall?.isDeferred,
           );
@@ -2864,7 +2955,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           );
           expect(
             originals.length,
-            `T6c: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
+            `T6c: expected at least 1 original ${cbTool.name} tool msg. Got ${String(originals.length)}`,
           ).toBeGreaterThanOrEqual(1);
           expect(
             deferreds.length,
@@ -2942,10 +3033,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── T6d: wakeUp stress - third consecutive wakeUp on same thread ────
       // Full E2E again. Verifies no accumulated stale state after two prior wakeUps.
       fit(
-        "T6d: wakeUp stress - third consecutive generate_image(wakeUp)",
+        `T6d: wakeUp stress - third consecutive ${cbTool.name}(wakeUp)`,
         async () => {
-          setFetchCacheContext(
-            `${cfg.cachePrefix}callback-wakeup-phase1-stress`,
+          setCaseFixture(
+            cbFixture(`${cfg.cachePrefix}callback-wakeup-phase1-stress`),
           );
           await pinBalance(testUser, 20);
           const t6dInitialIds = new Set(
@@ -2954,7 +3045,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages: phase1Msgs } = await runStream({
             user: testUser,
-            prompt: `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-stress-test' and callbackMode='wakeUp'")}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
+            prompt: cfg.cheapMode
+              ? `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-stress-test")} and callbackMode='wakeUp'`)}. Two valid outcomes: (a) DEFERRED - you get a taskId and no responsePath yet → end with STEP_OK; OR (b) INLINE - a fast task returns the result immediately (a non-empty responsePath) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor a responsePath. If you got a taskId (deferred), you will be revived when the write is done - on revival confirm the deferred result contains a non-empty responsePath and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no responsePath appears.`
+              : `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-stress-test")} and callbackMode='wakeUp'`)}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -2970,10 +3063,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // runStream's snapshot in REMOTE-folder mode. Poll briefly so
           // findToolMsg sees the converged state, not the pre-sync snapshot.
           let added = newMessages(phase1Msgs, t6dInitialIds);
-          let toolMsg = findToolMsg(added, "generate_image", cfg);
+          let toolMsg = findToolMsg(added, cbTool.name, cfg);
           for (let i = 0; i < 20 && !toolMsg; i++) {
             added = newMessages(await getMessages(threadId), t6dInitialIds);
-            toolMsg = findToolMsg(added, "generate_image", cfg);
+            toolMsg = findToolMsg(added, cbTool.name, cfg);
             if (toolMsg) {
               break;
             }
@@ -2983,13 +3076,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(
             toolMsg,
-            "T6d: generate_image tool message not found",
+            `T6d: ${cbTool.name} tool message not found`,
           ).toBeDefined();
-          // Delivery shape: deferred (taskId, pending) or inline (image now).
+          // Delivery shape: deferred (taskId, pending) or inline (result now).
           const t6dPhase1Res = resolveToolResult(toolMsg);
-          const t6dInline =
-            typeof t6dPhase1Res?.["imageUrl"] === "string" &&
-            t6dPhase1Res["imageUrl"] !== "";
+          const t6dInline = cbResultOk(t6dPhase1Res);
 
           const lastAi = await awaitFinalAssistant(
             threadId,
@@ -3000,12 +3091,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           assertWakeUpPhase1Ok(lastAi?.content, "T6d");
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          // Inline delivery: original message holds the image, no deferred turn.
+          // Inline delivery: original message holds the result, no deferred turn.
           if (t6dInline) {
-            expect(
-              String(t6dPhase1Res!["imageUrl"]),
-              "T6d inline: imageUrl must be a real URL",
-            ).toMatch(/^https?:\/\/.+/);
+            if (!cfg.cheapMode) {
+              expect(
+                String(t6dPhase1Res!["imageUrl"]),
+                "T6d inline: imageUrl must be a real URL",
+              ).toMatch(/^https?:\/\/.+/);
+            }
             await assertThreadIdle(threadId, testUser);
             // Walk to the actual leaf (chain-walk, no timestamps).
             {
@@ -3049,13 +3142,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             messages = await getMessages(threadId);
             const t6dMsgs = newMessages(messages, t6dInitialIds);
             deferredTool = t6dMsgs.find(
-              (m) =>
-                m.role === "tool" &&
-                m.toolCall?.isDeferred === true &&
-                (m.toolCall.toolName === "generate_image" ||
-                  (m.toolCall.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                      "generate_image")),
+              (m) => m.toolCall?.isDeferred === true && isCbToolMsg(m),
             );
             if (deferredTool) {
               revivalAi = messages.find(
@@ -3083,17 +3170,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             });
           }
 
-          // ── Each generate_image wakeUp call must produce original + deferred ──
-          // Model may call generate_image multiple times → N originals + N deferred = 2N total.
+          // ── Each cbTool wakeUp call must produce original + deferred ──
+          // Model may call cbTool multiple times → N originals + N deferred = 2N total.
           const t6dBranchMsgs = newMessages(messages, t6dInitialIds);
-          const allGenImgToolMsgs = t6dBranchMsgs.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "generate_image" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "generate_image")),
-          );
+          const allGenImgToolMsgs = t6dBranchMsgs.filter((m) => isCbToolMsg(m));
           const originals = allGenImgToolMsgs.filter(
             (m) => !m.toolCall?.isDeferred,
           );
@@ -3102,7 +3182,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           );
           expect(
             originals.length,
-            `T6d: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
+            `T6d: expected at least 1 original ${cbTool.name} tool msg. Got ${String(originals.length)}`,
           ).toBeGreaterThanOrEqual(1);
           expect(
             deferreds.length,
@@ -3132,7 +3212,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
           }
 
-          // Walk to the actual leaf — model may have called generate_image multiple times,
+          // Walk to the actual leaf — model may have called the callback tool multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
           // Walk DOWN from runStream's lastAiMessageId via child links (no timestamps).
           messages = await getMessages(threadId);
@@ -3184,9 +3264,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         let approveToolParentId: string | null;
 
         fit(
-          "T7a: approve phase1 - parallel tools: tool-help runs, generate_image awaits confirmation, no assistant message after",
+          `T7a: approve phase1 - parallel tools: tool-help runs, ${approveTool.name} awaits confirmation, no assistant message after`,
           async () => {
-            setFetchCacheContext(`${cfg.cachePrefix}callback-approve-phase1`);
+            setCaseFixture(
+              cbFixture(`${cfg.cachePrefix}callback-approve-phase1`),
+            );
             await pinBalance(testUser, 10);
             const before = await getBalance(testUser);
             const prevIds = new Set(
@@ -3194,8 +3276,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             );
 
             // The confirmation gate lives ON the favorite (what a real user
-            // configures), not as a per-call override. PATCH generate_image to
-            // requiresConfirmation=true on the main favorite for this phase.
+            // configures), not as a per-call override. PATCH the approve tool
+            // to requiresConfirmation=true on the main favorite for this phase.
             // The PATCH requires modelSelection, so read the current one first
             // and send it back unchanged (faithful client flow).
             const favByIdDefT7 = (
@@ -3203,9 +3285,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).default;
             // The gate applies to the TARGET tool uniformly — locally AND on
             // remote dispatch (guards.applyConfirmationGate runs in both
-            // paths), so every cell gates generate_image itself.
-            const confirmToolId = "generate_image";
+            // paths), so every cell gates the approve tool itself.
+            const confirmToolId = approveTool.name;
             const t7FavGet = await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDefT7.GET,
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -3214,6 +3297,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               ? t7FavGet.data.modelSelection
               : null;
             await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDefT7.PATCH,
               data: {
                 modelSelection: t7ModelSelection,
@@ -3225,11 +3309,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               user: testUser,
             });
 
-            // Prompt: call BOTH tool-help AND generate_image in same parallel step.
-            // generate_image requires confirmation → placeholder only, stream aborts before AI response.
+            // Prompt: call BOTH tool-help AND the approve tool in same parallel step.
+            // The approve tool requires confirmation → placeholder only, stream aborts before AI response.
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[T7a approve-phase1] In a single response, call BOTH at the same time: (1) ${toolInstr(cfg, "tool-help")} to list available tools, and (2) ${toolInstrWithArgs(cfg, "generate_image", "prompt='approve-test'")}. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.`,
+              prompt: `[T7a approve-phase1] In a single response, call BOTH at the same time: (1) ${toolInstr(cfg, "tool-help")} to list available tools, and (2) ${toolInstrWithArgs(cfg, approveTool.name, approveTool.argsInstr)}. The ${approveTool.name} tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -3243,24 +3327,24 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             const added = newMessages(messages, prevIds);
 
-            // ── generate_image tool message - has waiting_for_confirmation placeholder ──
+            // ── Approve tool message - has waiting_for_confirmation placeholder ──
             const approveToolMsg =
-              findToolMsg(added, "generate_image", cfg) ??
+              findToolMsg(added, approveTool.name, cfg) ??
               added.find(
                 (m) =>
                   m.role === "tool" &&
-                  m.toolCall?.toolName === "generate_image",
+                  m.toolCall?.toolName === approveTool.name,
               );
             expect(
               approveToolMsg,
-              "T7a: generate_image tool message not found",
+              `T7a: ${approveTool.name} tool message not found`,
             ).toBeDefined();
             if (approveToolMsg) {
               // APPROVE mode: tool awaits user confirmation, result is a placeholder (waiting_for_confirmation).
               // The execute-tool task itself completes (returns placeholder), so status is "completed".
               assertToolMessageComplete(
                 approveToolMsg,
-                "generate_image",
+                approveTool.name,
                 "T7a",
                 cfg,
                 "completed",
@@ -3270,17 +3354,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             approveToolParentId = approveToolMsg!.parentId;
 
             const toolRes = resolveToolResult(approveToolMsg);
-            // Must NOT have executed - no imageUrl, must have waiting_for_confirmation
+            // Must NOT have executed - no result, must have waiting_for_confirmation
             expect(
-              toolRes?.["imageUrl"],
-              "T7a: imageUrl present - tool executed without approval (requiresConfirmation=true was ignored)",
+              toolRes?.[approveTool.resultKey],
+              `T7a: ${approveTool.resultKey} present - tool executed without approval (requiresConfirmation=true was ignored)`,
             ).toBeUndefined();
             expect(
               toolRes?.["status"],
               "T7a: expected waiting_for_confirmation status",
             ).toBe("waiting_for_confirmation");
 
-            // ── tool-help ran (parallel to generate_image) - has real result ──
+            // ── tool-help ran (parallel to the approve tool) - has real result ──
             const toolHelpMsg = findToolMsg(added, "tool-help", cfg);
             expect(
               toolHelpMsg,
@@ -3356,7 +3440,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "T7b needs T7a approveToolParentId",
             ).toBeTruthy();
 
-            setFetchCacheContext(`${cfg.cachePrefix}callback-approve-phase2`);
+            setCaseFixture(
+              cbFixture(`${cfg.cachePrefix}callback-approve-phase2`),
+            );
             await pinBalance(testUser, 50);
             const before = await getBalance(testUser);
 
@@ -3389,11 +3475,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
             ).default;
             const t7bFavGet = await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDefT7b.GET,
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
             });
             await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDefT7b.PATCH,
               data: {
                 modelSelection: t7bFavGet.success
@@ -3414,8 +3502,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             // Queue mode: confirmation executed execute-tool with callbackMode='wait' override,
             // which created a queue task (no open reverse-ws channel). The AI responded to the
-            // pending {status: pending} result. Now call pulse to execute the generate_image task
-            // and fire the WAIT revival stream so the tool message gets the real imageUrl.
+            // pending {status: pending} result. Now call pulse to execute the approved task
+            // and fire the WAIT revival stream so the tool message gets the real result.
             if (cfg.pulse) {
               // Revival is awaited inside cfg.pulse → WsProviderConnector executes on hermes →
               // POSTs /report → handleTaskCompletion → ResumeStreamRepository.resume (sequential).
@@ -3442,7 +3530,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             );
             expect(
               toolMsg,
-              `T7b: generate_image tool message not found by approveToolMsgId=${approveToolMsgId}. All msg IDs: [${allToolMsgIds.join(", ")}]. approveToolMsgInList role=${approveToolMsgInList?.role}`,
+              `T7b: ${approveTool.name} tool message not found by approveToolMsgId=${approveToolMsgId}. All msg IDs: [${allToolMsgIds.join(", ")}]. approveToolMsgInList role=${approveToolMsgInList?.role}`,
             ).toBeDefined();
 
             const toolRes = resolveToolResult(toolMsg);
@@ -3452,12 +3540,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               `T7b: tool result is null. toolCall=${JSON.stringify(toolMsg?.toolCall).slice(0, 200)}`,
             ).not.toBeNull();
             expect(
-              typeof toolRes!["imageUrl"],
-              `T7b: imageUrl not a string. Full toolRes=${JSON.stringify(rawResult).slice(0, 300)}`,
+              typeof toolRes![approveTool.resultKey],
+              `T7b: ${approveTool.resultKey} not a string. Full toolRes=${JSON.stringify(rawResult).slice(0, 300)}`,
             ).toBe("string");
             expect(
-              toolRes!["imageUrl"],
-              "T7b: imageUrl should be truthy",
+              toolRes![approveTool.resultKey],
+              `T7b: ${approveTool.resultKey} should be truthy`,
             ).toBeTruthy();
 
             // ── Same-sequence: original backfilled in-place (no deferred) ──
@@ -3470,7 +3558,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBeFalsy();
 
             // ── Approved tool message was backfilled in-place, not duplicated ──
-            // The model may call generate_image again as a NEW tool invocation after
+            // The model may call the approve tool again as a NEW tool invocation after
             // seeing the confirmed result — that's legitimate. What must NOT happen:
             // the approve flow creating a deferred COPY of the original tool message.
             // In a shared thread with many accumulated messages, other earlier tool calls
@@ -3508,13 +3596,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "T7b: AI should have responded after confirmation",
             ).toBeTruthy();
 
-            // ── creditCost > 0 - image was actually generated ──
-            expect(
-              toolRes!["creditCost"] as number,
-              "T7b: creditCost should be > 0 after approval execution",
-            ).toBeGreaterThan(0);
+            // ── creditCost > 0 - image was actually generated (full mode only:
+            // cortex-write carries no creditCost field — the responsePath
+            // presence above already proves the write executed) ──
+            if (!cfg.cheapMode) {
+              expect(
+                toolRes!["creditCost"] as number,
+                "T7b: creditCost should be > 0 after approval execution",
+              ).toBeGreaterThan(0);
+            }
 
-            // The model may call additional tools (e.g. generate_image with endLoop)
+            // The model may call additional tools (e.g. the approve tool with endLoop)
             // after the AI text response. The endLoop tool creates a dead-end tool message
             // with no follow-up AI response. Find the actual chain leaf for tracking.
             const t7bNewMsgs = newMessages(messages, prevMessageIds);
@@ -3536,11 +3628,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await assertNoPendingTasks(threadId);
 
             const after = await getBalance(testUser);
-            // Model may call generate_image again after seeing the approved result
-            // (e.g. kimi-k2-6 calls it with endLoop), doubling the image cost.
-            // Confirmed image gen + AI turn; kimi sometimes needs extra
-            // round trips (same allowance as T1).
-            await assertDeductedLocal(testUser, before, after, 0.47, 50);
+            // Full: model may call generate_image again after seeing the
+            // approved result (e.g. kimi-k2-6 calls it with endLoop), doubling
+            // the image cost. Confirmed image gen + AI turn; kimi sometimes
+            // needs extra round trips (same allowance as T1). Cheap:
+            // cortex-write is ~free — only the AI turns bill (T2 floor).
+            await assertDeductedLocal(
+              testUser,
+              before,
+              after,
+              cfg.cheapMode ? 0.05 : 0.47,
+              50,
+            );
           },
           effectiveTestTimeout,
         );
@@ -3557,7 +3656,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         fit(
           "CF1: contact-form phase1 — AI calls tool, stops for confirmation, no DB record, no assistant after",
           async () => {
-            setFetchCacheContext(`${cfg.cachePrefix}contact-form-phase1`);
+            setCaseFixture(`${cfg.cachePrefix}contact-form-phase1`);
             const streamStart = Date.now();
             const prevIds = new Set(
               (await getMessages(threadId)).map((m) => m.id),
@@ -3606,14 +3705,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               if (m.role !== "tool") {
                 return false;
               }
-              if (m.toolCall?.toolName === "contact-form") {
-                return true;
-              }
-              return (
-                m.toolCall?.toolName === "execute-tool" &&
-                toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                  "contact-form"
-              );
+              return isToolMsgFor(m, "contact-form");
             });
             expect(
               cfCalls.length,
@@ -3675,7 +3767,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             expect(cfToolMsgId, "CF2 needs CF1 cfToolMsgId").toBeTruthy();
             expect(cfToolParentId, "CF2 needs CF1 cfToolParentId").toBeTruthy();
 
-            setFetchCacheContext(`${cfg.cachePrefix}contact-form-phase2`);
+            setCaseFixture(`${cfg.cachePrefix}contact-form-phase2`);
             const confirmStart = Date.now();
 
             const prevMessages = await getMessages(threadId);
@@ -3853,7 +3945,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: media generation is the expensive path
           }
-          setFetchCacheContext(`${cfg.cachePrefix}parallel-tools`);
+          setCaseFixture(`${cfg.cachePrefix}parallel-tools`);
           await pinBalance(testUser, 20);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -4012,7 +4104,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: media generation is the expensive path
           }
-          setFetchCacheContext(`${cfg.cachePrefix}precalls-injection`);
+          setCaseFixture(`${cfg.cachePrefix}precalls-injection`);
           await pinBalance(testUser, 20);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -4110,7 +4202,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T10: file attachments - image, multi, voice, video all stored in metadata with correct mime types",
         async () => {
           // ── Part A: Single image attachment ──
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-image`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-image`);
           await pinBalance(testUser, 50);
           const beforeImg = await getBalance(testUser);
           const prevIdsImg = new Set(
@@ -4170,7 +4262,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertDeductedLocal(testUser, beforeImg, afterImg, 0, 30);
 
           // ── Part B: Multi-attachment (image + music) ──
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-multi`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-multi`);
           await pinBalance(testUser, 50);
           const beforeMulti = await getBalance(testUser);
 
@@ -4239,7 +4331,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Music file passed as attachment → gap-fill.bridgeStt() → audioVisionModel (Gemini Flash)
           // Verifies audio vision bridge, NOT STT. STT is only for the voice widget (audioInput).
           // Result: user message has attachments + gap-fill variant (text description of music)
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-voice`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-voice`);
           await pinBalance(testUser, 50);
           const beforeVoice = await getBalance(testUser);
 
@@ -4312,7 +4404,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // The STT provider cascade (OpenAI/EdenAI/Deepgram/system provider)
           // resolves whatever is configured; fixture replay needs no key at
           // all. This case ALWAYS runs — no environment gates.
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-stt`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-voice-stt`);
           await pinBalance(testUser, 50);
           const beforeStt = await getBalance(testUser);
 
@@ -4393,7 +4485,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertDeductedLocal(testUser, beforeStt, afterStt, 0, 30);
 
           // ── Part D: Video attachment ──
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-video`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-video`);
           await pinBalance(testUser, 50);
           const beforeVideo = await getBalance(testUser);
 
@@ -4446,7 +4538,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Attaching a WAV file triggers GapFillExecutor.bridgeStt() → audioVisionModel (Gemini Flash).
           // The gap-fill produces a text transcription/description stored as a variant.
           // The main model then receives the text description instead of the raw file.
-          setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-wav`);
+          setCaseFixture(`${cfg.cachePrefix}attachment-voice-wav`);
           await pinBalance(testUser, 50);
           const beforeWav = await getBalance(testUser);
 
@@ -4514,7 +4606,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const afterWav = await getBalance(testUser);
           await assertDeductedLocal(testUser, beforeWav, afterWav, 0, 30);
         },
-        effectiveTestTimeout,
+        mediaTestTimeout, // four attachment turns + bridge model calls — recording needs the media budget
       );
 
       // ── T11: Native multimodal (Gemini 3.1 Flash Image Preview) ──────────────
@@ -4524,7 +4616,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: native image generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-generation-native`);
+          setCaseFixture(`${cfg.cachePrefix}image-generation-native`);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -4653,9 +4745,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: native image generation runs in the full suite
           }
-          setFetchCacheContext(
-            `${cfg.cachePrefix}image-generation-native-gap-fill`,
-          );
+          setCaseFixture(`${cfg.cachePrefix}image-generation-native-gap-fill`);
           await pinBalance(testUser, 30);
           const before = await getBalance(testUser);
 
@@ -4732,7 +4822,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: real video generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-video-nano-banana`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-video-nano-banana`);
           // I2V models (wan-2-6-i2v etc.) cost ~10 cr/sec × 5 sec × 1.3 markup = ~65 cr
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
@@ -4816,7 +4906,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeductedLocal(testUser, before, after, 30, 150);
+          // i2v resolution substitutes the cheapest image-capable model
+          // (~3cr/s -> ~15cr for 5s); the lower bound still proves a real
+          // video charge beyond token cost.
+          await assertDeductedLocal(testUser, before, after, 10, 150);
         },
         mediaTestTimeout,
       );
@@ -4831,7 +4924,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: real video generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-video-kimi`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-video-kimi`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -4933,7 +5026,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: real image generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-image-nano-banana`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-image-nano-banana`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -5072,7 +5165,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: real image generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-image-kimi`);
           await pinBalance(testUser, 200);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -5136,13 +5229,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // with the off-path siblings as dead-end leaves. The leaf is the post-tool
           // AI text under the last tool message (or that tool message itself).
           const t11fAdded = newMessages(messages, prevIds);
-          const t11fToolMsgs = t11fAdded.filter(
-            (m) =>
-              m.role === "tool" &&
-              (m.toolCall?.toolName === "generate_image" ||
-                (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
-                    "generate_image")),
+          const t11fToolMsgs = t11fAdded.filter((m) =>
+            isToolMsgFor(m, "generate_image"),
           );
           const lastT11fToolMsg = t11fToolMsgs[t11fToolMsgs.length - 1];
           const t11fPostToolAi = lastT11fToolMsg
@@ -5229,7 +5317,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: depends on T11f media output (full suite only)
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi-verify`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-image-kimi-verify`);
           await pinBalance(testUser, 30);
           const before = await getBalance(testUser);
 
@@ -5304,7 +5392,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           if (cfg.cheapMode) {
             return; // cheapMode: native image generation runs in the full suite
           }
-          setFetchCacheContext(`${cfg.cachePrefix}image-to-image-native`);
+          setCaseFixture(`${cfg.cachePrefix}image-to-image-native`);
           await pinBalance(testUser, 50);
           const before = await getBalance(testUser);
           const prevIds = new Set(
@@ -5378,7 +5466,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T12: invalid explicitParentMessageId - handled gracefully, no orphans",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}invalid-parent`);
+          setCaseFixture(`${cfg.cachePrefix}invalid-parent`);
           await pinBalance(testUser, 20);
           const before = await getBalance(testUser);
 
@@ -5604,7 +5692,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "C1: credit deduction - balance decreases, totalCreditsDeducted matches",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}credit-deduction`);
+          setCaseFixture(`${cfg.cachePrefix}credit-deduction`);
           await pinBalance(testUser, 50);
           // getBalance drains in-flight async first, so this timestamp cleanly
           // bounds the start of THIS stream's ledger entries.
@@ -5730,7 +5818,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "C2: incognito - no messages persisted, credits still deducted",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}incognito-mode`);
+          setCaseFixture(`${cfg.cachePrefix}incognito-mode`);
           await pinBalance(testUser, 50);
           const beforeIncognito = await getBalance(testUser);
 
@@ -5783,7 +5871,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "C3: insufficient credits - returns 403 when balance is zero",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}insufficient-credits`);
+          setCaseFixture(`${cfg.cachePrefix}insufficient-credits`);
 
           const wallets = await db.execute<{
             id: string;
@@ -5860,6 +5948,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           ),
         ]);
         const favsResult = await sendTestRequest({
+          fixtureContext: undefined,
           endpoint: favsDef,
           data: { pageSize: 500 },
           user: testUser,
@@ -5877,6 +5966,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           favoriteId = String(existingKimi["id"]);
         } else {
           const r = await sendTestRequest({
+            fixtureContext: undefined,
             endpoint: favoriteCreateDef,
             data: { skillId: "quality-tester__budget" },
             user: testUser,
@@ -5895,6 +5985,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           budgetFavoriteId = String(existingVisual["id"]);
         } else {
           const r = await sendTestRequest({
+            fixtureContext: undefined,
             endpoint: favoriteCreateDef,
             data: { skillId: "quality-tester__visual" },
             user: testUser,
@@ -5930,6 +6021,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             favId: string,
           ): Promise<{ model: string | undefined; skill: string }> => {
             const getRes = await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDef.GET,
               urlPathParams: { id: favId },
               user: testUser,
@@ -5977,6 +6069,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             modelSelection: PatchModelSelection,
           ): Promise<void> => {
             const r = await sendTestRequest({
+              fixtureContext: undefined,
               endpoint: favByIdDef.PATCH,
               data: { modelSelection },
               urlPathParams: { id: favId },
@@ -6010,6 +6103,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // ── Part C: Media model selections persisted (via favorites GET) ──
           const favGetResult = await sendTestRequest({
+            fixtureContext: undefined,
             endpoint: favByIdDef.GET,
             urlPathParams: { id: favoriteId },
             user: testUser,

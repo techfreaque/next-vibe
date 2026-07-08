@@ -40,8 +40,11 @@ export async function generateWithOpenAI(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, quality, logger, locale } = params;
+  const { providerModel, prompt, size, quality, logger, locale, fetchImpl } =
+    params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENAI_API_KEY) {
@@ -61,8 +64,7 @@ export async function generateWithOpenAI(params: {
   });
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const response = await fetch(
+    const response = await fetchImpl(
       "https://api.openai.com/v1/images/generations",
       {
         method: "POST",

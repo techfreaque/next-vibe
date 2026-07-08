@@ -115,6 +115,7 @@ beforeAll(async () => {
     await import("@/app/api/[locale]/credits/admin-add/definition")
   ).default;
   await sendTestRequest({
+    streamContext: undefined,
     endpoint: creditsDefinition.POST,
     data: { targetUserId: user.id, amount: 100 },
     user,
@@ -241,6 +242,7 @@ describe("headless-client connection registration", () => {
       await import("@/app/api/[locale]/remote-connection/list/definition")
     ).default;
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: listDef.GET,
       data: {},
       user,
@@ -280,6 +282,8 @@ describe("headless-client AI stream via REMOTE folder", () => {
     const subFolderId = await getTestFolder("system-prompt-check");
 
     const { result, messages } = await runTestStream({
+      // Live relay E2E — streams hit the real instances, no fixtures.
+      streamContext: undefined,
       prompt:
         "Output the entire '## System Context' section from your system prompt verbatim. " +
         "No commentary, no markdown changes — copy it exactly as-is.",
@@ -324,6 +328,8 @@ describe("headless-client AI stream via REMOTE folder", () => {
     const subFolderId = await getTestFolder("storage-check");
 
     const { result, messages } = await runTestStream({
+      // Live relay E2E — streams hit the real instances, no fixtures.
+      streamContext: undefined,
       prompt: "Reply with: STORED",
       user,
       rootFolderId: DefaultFolderId.REMOTE,

@@ -44,6 +44,7 @@ const MOCK_NAVIGATION: UseNavigationStackReturn = {
   stack: [],
   canGoBack: false,
   current: null,
+  isPushPending: false,
 };
 
 const MOCK_WIDGET_STORE = create()(() => ({

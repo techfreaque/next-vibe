@@ -7,53 +7,47 @@
  * DB throttle strategy: debounce content updates within THROTTLE_MS window so
  * rapid deltas don't hammer the DB. flush() / flushAll() cancel the timer and
  * write immediately - always called before stream ends or on error. The
- * debounce map + low-level DB writes live in the ThrottleEngine class below -
- * a genuinely distinct mechanism the writer delegates to.
+ * debounce map + low-level DB writes live in the ThrottleEngine class in
+ * db-writer/throttle-engine.ts - a genuinely distinct mechanism the writer
+ * delegates to.
  *
- * Method groups are organized under section banners (text / tools / media /
- * compacting / credits / notifications / embedding sync / throttle).
+ * This class is a thin facade: method bodies live in the db-writer/ modules
+ * (text / tools / media / compacting / credits / notifications / embedding
+ * sync / throttle), each taking the DbWriterState view of this instance.
  */
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type {
-  AudioVisionModelId,
-  ImageVisionModelId,
-  VideoVisionModelId,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 
-import {
-  chatMessages,
-  type MessageMetadata,
-  type ToolCall,
-} from "../../../chat/db";
-import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
+import type { MessageMetadata, ToolCall } from "../../../chat/db";
+import type { ThreadStreamingState } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
-import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import { serializeError } from "../error-utils";
+import * as compactingWrites from "./db-writer/compacting";
+import {
+  deductAndEmitCredits,
+  type DeductAndEmitCreditsParams,
+} from "./db-writer/credits";
 import {
   syncThreadEmbedding,
-  syncToolResultEmbedding,
   syncUploadEmbedding,
 } from "./db-writer/embedding-sync";
-import {
-  type EmitThreadTitleFn,
-  type PendingWrite,
-  THROTTLE_MS,
-} from "./db-writer/shared";
-import { buildSseMessageRow } from "./db-writer/sse-row";
+import * as mediaWrites from "./db-writer/media";
+import * as notificationWrites from "./db-writer/notifications";
+import type { EmitThreadTitleFn, WriterDeps } from "./db-writer/shared";
+import * as textWrites from "./db-writer/text";
+import { ThrottleEngine } from "./db-writer/throttle-engine";
+import * as toolWrites from "./db-writer/tools";
 import type { MessageVariant } from "./modality-resolver";
 
 export type { EmitThreadTitleFn } from "./db-writer/shared";
@@ -1606,7 +1600,7 @@ export class MessageDbWriter {
   // ─── embedding sync ────────────────────────────────────────────────────────
 
   /**
-   * Sync a tool result (web search, gen) to cortex_nodes for vector search.
+   * Sync file uploads to cortex_nodes for vector search.
    */
   syncToolResultEmbedding(
     userId: string,

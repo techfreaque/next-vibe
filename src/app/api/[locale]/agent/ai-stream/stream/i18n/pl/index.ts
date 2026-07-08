@@ -435,6 +435,11 @@ export const translations: typeof enTranslations = {
         title: "Błąd sieci",
         description: "Wystąpił błąd sieci podczas strumieniowania",
       },
+      serviceUnavailable: {
+        title: "Zdalna instancja niedostępna",
+        description:
+          "Połączona instancja, od której zależy ten wątek, była nieosiągalna",
+      },
       forbidden: {
         title: "Zabronione",
         description: "Dostęp do strumieniowania AI jest zabroniony",
@@ -550,12 +555,6 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Wystąpił nieoczekiwany błąd: {{error}}. Spróbuj ponownie.",
   },
-  wakeUp: {
-    revivalPrompt:
-      "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
-    revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
-  },
   info: {
     streamInterrupted:
       "Generowanie zostało zatrzymane. Częściowa odpowiedź została zapisana.",
@@ -566,92 +565,8 @@ export const translations: typeof enTranslations = {
         "Model i charakter są wymagane - podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
       favoriteNotFound:
         "Ulubiony nie znaleziony lub nie należy do tego użytkownika",
-    },
-  },
-  resumeStream: {
-    post: {
-      title: "Wznów strumień AI",
-      titleShort: "Wznów strumień",
-      description:
-        "Kontynuuje istniejący wątek przez uruchomienie bezgłowego kroku AI. Używane po zakończeniu asynchronicznego zadania zdalnego.",
-      fields: {
-        threadId: {
-          title: "ID wątku",
-          description: "UUID istniejącego wątku do kontynuowania.",
-        },
-        favoriteId: {
-          title: "ID ulubionego",
-          description:
-            "UUID zapisanego ulubionego do załadowania modelu i postaci.",
-        },
-        modelId: {
-          title: "ID modelu",
-          description: "Model AI dla wznowionego kroku.",
-        },
-        skillId: {
-          title: "ID postaci",
-          description: "Postać/persona dla wznowionego kroku.",
-        },
-        callbackMode: {
-          title: "Tryb callback",
-          description:
-            "Tryb callback oryginalnego wywołania narzędzia (wait lub wakeUp).",
-        },
-        wakeUpToolMessageId: {
-          title: "ID wiadomości narzędzia wakeUp",
-          description: "ID oryginalnej wiadomości narzędzia z wynikiem.",
-        },
-        wakeUpTaskId: {
-          title: "ID zadania wakeUp",
-          description: "ID zdalnego zadania cron, usuwane po wznowieniu.",
-        },
-        resumeTaskId: {
-          title: "ID zadania resume",
-          description:
-            "ID tego zadania resume-stream cron, usuwane po wznowieniu.",
-        },
-        resumed: {
-          title: "Wznowiony",
-          description: "Czy wątek został pomyślnie kontynuowany.",
-        },
-        lastAiMessageId: {
-          title: "ID ostatniej wiadomości AI",
-          description: "UUID ostatniej wygenerowanej wiadomości asystenta.",
-        },
-      },
-      errors: {
-        validation: {
-          title: "Błąd walidacji",
-          description: "Nieprawidłowe parametry",
-        },
-        unauthorized: {
-          title: "Brak autoryzacji",
-          description: "Wymagane uwierzytelnienie",
-        },
-        forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
-        notFound: {
-          title: "Nie znaleziono",
-          description: "Wątek lub model nie znaleziony",
-        },
-        internal: {
-          title: "Błąd serwera",
-          description: "Wewnętrzny błąd podczas wznawiania strumienia",
-        },
-        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
-        unknown: {
-          title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd",
-        },
-        unsaved: {
-          title: "Niezapisane zmiany",
-          description: "Konflikt niezapisanych zmian",
-        },
-        conflict: { title: "Konflikt", description: "Wystąpił konflikt" },
-      },
-      success: {
-        title: "Strumień wznowiony",
-        description: "Wątek AI został pomyślnie kontynuowany",
-      },
+      ambiguousModel:
+        "Podaj ALBO jawny model, ALBO ulubiony/charakter - nie oba naraz",
     },
   },
   providers: {

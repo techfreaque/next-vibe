@@ -21,6 +21,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
+import {
+  makeHeadlessContext,
+  type ToolExecutionContext,
+} from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import {
@@ -47,6 +51,7 @@ export class CortexWriteRepository {
     logger,
     t,
     relayed = false,
+    streamContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -56,6 +61,8 @@ export class CortexWriteRepository {
     createParents?: boolean;
     logger: EndpointLogger;
     t: CortexWriteT;
+    /** Fixture chain of the calling execution — the embedding call binds it. */
+    streamContext: ToolExecutionContext;
     /**
      * True when invoked from a cross-instance applier (the write was already
      * performed on the origin and relayed here). Suppresses the `node-written`
@@ -94,7 +101,7 @@ export class CortexWriteRepository {
       try {
         const { resolveVirtualWrite } = await import("../mounts/resolver");
         const result = await resolveVirtualWrite(
-          { userId, user, locale, logger },
+          { userId, user, locale, logger, streamContext },
           path,
           content,
           mountPrefix,
@@ -193,6 +200,7 @@ export class CortexWriteRepository {
           locale,
           logger,
           feature: CortexCreditFeature.WRITE,
+          streamContext,
         });
       }
 
@@ -248,6 +256,9 @@ export class CortexWriteRepository {
       logger,
       t,
       relayed: true,
+      // Relayed applier — no fixture chain crosses instances; an explicit
+      // thread-less context routes embeddings live.
+      streamContext: makeHeadlessContext(undefined, undefined),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex write", {

@@ -97,6 +97,11 @@ export async function generate(
 
   const { computeEmbeddingHash, generateEmbedding } =
     await import("@/app/api/[locale]/agent/cortex/embeddings/service");
+  // Seed generation is a standalone build step with NO stream — an explicit
+  // thread-less headless context routes its embeddings live (never a fixture).
+  const { makeHeadlessContext } =
+    await import("@/app/api/[locale]/agent/chat/config");
+  const rootCtx = makeHeadlessContext(undefined, undefined);
   const { getAllTemplates } =
     await import("@/app/api/[locale]/agent/cortex/seeds/templates");
   const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
@@ -150,7 +155,7 @@ export async function generate(
       }
 
       const textToEmbed = `${item.path}\n\n${item.content}`;
-      const embedding = await generateEmbedding(textToEmbed);
+      const embedding = await generateEmbedding(textToEmbed, rootCtx);
       if (!embedding) {
         logger.warn(`  skipped (API unavailable): ${item.id}`);
         skipped++;
@@ -182,7 +187,7 @@ export async function generate(
       }
 
       const textToEmbed = `${item.path}\n\n${item.content}`;
-      const embedding = await generateEmbedding(textToEmbed);
+      const embedding = await generateEmbedding(textToEmbed, rootCtx);
       if (!embedding) {
         logger.warn(`  skipped (API unavailable): ${item.id}`);
         skipped++;

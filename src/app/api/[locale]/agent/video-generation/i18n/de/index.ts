@@ -119,6 +119,8 @@ export const translations: typeof enTranslations = {
         "Credits für Videogenerierung konnten nicht abgezogen werden",
       inputMediaRequired:
         "Dieses Modell benötigt eine Bild-URL. Füge einen Bildlink ein, der animiert werden soll.",
+      imageInputUnsupported:
+        "Das Videomodell {{model}} hat das Eingabebild abgelehnt - es unterstützt vermutlich kein Image-to-Video. Rufe generate_video OHNE model-Parameter erneut auf (das Standardmodell animiert Bilder) oder lass das Bild weg.",
     },
     success: {
       title: "Video generiert",

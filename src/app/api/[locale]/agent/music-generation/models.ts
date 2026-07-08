@@ -36,6 +36,7 @@ export enum MusicGenModelId {
   MUSICGEN_STEREO = "musicgen-stereo",
   MUSIC_GEN = "music-gen",
   ELEVENLABS_MUSIC = "elevenlabs-music",
+  CASSETTE_MUSIC = "cassette-music",
   SONAUTO_SONG = "sonauto-song",
   LYRIA_3 = "lyria-3",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
@@ -120,6 +121,35 @@ export const musicGenModelDefinitions: Record<
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [MusicGenModelId.CASSETTE_MUSIC]: {
+    name: "CassetteAI Music",
+    by: "cassetteAi",
+    description: "chat.models.descriptions.cassetteMusic",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    inputs: ["text"],
+    outputs: ["audio"],
+    providers: [
+      {
+        id: MusicGenModelId.CASSETTE_MUSIC,
+        apiProvider: ApiProvider.FAL_AI,
+        providerModel: "cassetteai/music-generator",
+        creditCostPerClip: 12, // estimate — verify via model-prices sync
+        defaultDurationSeconds: 30,
+        supportedDurations: ALL_DURATIONS,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
       streaming: false,

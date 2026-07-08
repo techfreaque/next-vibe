@@ -446,6 +446,8 @@ export class AiStreamRunRepository {
         subAgentDepth: parentDepth + 1,
         preCalls: headlessPreCalls.length > 0 ? headlessPreCalls : undefined,
         excludeMemories: excludeMemories ?? false,
+        // Sub-agent streams continue the parent's fixture chain.
+        fixtureContext: streamContext.fixtureContext,
         user,
         locale,
         logger,

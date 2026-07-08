@@ -43,7 +43,6 @@ import type {
   PendingCallEntry,
   PendingCallInfo,
   PendingCallResult,
-  PendingCallRevival,
   TaskCompletionSignal,
 } from "./types";
 

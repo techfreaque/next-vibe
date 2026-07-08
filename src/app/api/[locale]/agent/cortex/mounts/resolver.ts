@@ -8,6 +8,8 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
  */
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "../../chat/config";
+
 export interface VirtualReadResult {
   content: string;
   nodeType: "file" | "dir";
@@ -28,6 +30,9 @@ export interface MountWriteContext {
   user: JwtPrivatePayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  /** Fixture chain of the triggering execution — binds embedding-sync calls
+   *  so they record/replay. Required explicit (undefined outside tests). */
+  streamContext: ToolExecutionContext;
 }
 
 export interface VirtualWriteResult {

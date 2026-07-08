@@ -148,6 +148,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         platform: Platform.NEXT_API,
         request, // Pass NextRequest for auth context
         streamContext: {
+          // Live web request — never under fixtures.
           rootFolderId: DefaultFolderId.PRIVATE,
           threadId: undefined,
           aiMessageId: undefined,

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { z } from "zod";

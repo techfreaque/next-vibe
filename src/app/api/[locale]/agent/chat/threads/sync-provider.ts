@@ -330,6 +330,7 @@ async function selectOrCreateFolderSegment(
  * Race-proof find-or-create of a folder NAME chain under a root. Shared by
  * every system that materializes placement chains (mirror placement, relay
  * executor landings). Returns the leaf folder id.
+ * `pinnedLeaf` pins only the final segment (e.g. scaffold private/background).
  */
 export async function ensureFolderChain(
   userId: string,
@@ -587,6 +588,7 @@ export const threadsSyncProvider: SyncProvider = {
   // Connect-time scaffold: REMOTE/<peer>/private + REMOTE/<peer>/background
   // exist from the moment the link is live — every mirror (sync AND relay
   // landing) hangs off these stable roots; no wire ever ships name chains.
+  // Both are pinned so they stay anchored at the top of the REMOTE subfolder.
   async onConnectionEstablished(userId, peerInstanceId): Promise<void> {
     await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
       peerInstanceId,

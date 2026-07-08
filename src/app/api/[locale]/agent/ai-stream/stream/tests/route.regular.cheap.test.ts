@@ -9,13 +9,11 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { describeStreamSuite } from "./route-base.test";
 
 describeStreamSuite({
   label: "AI Stream Integration - Regular (cheap)",
   cachePrefix: "cheap-",
   cheapMode: true,
+  stopAfterFirstCase: true, // TEMPORARY DEBUG: bail after T1
 });

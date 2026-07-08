@@ -16,6 +16,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+
 import type { DefaultFolderId } from "../../chat/config";
 import type { ChatMessageRole } from "../../chat/enum";
 import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
@@ -26,7 +28,7 @@ import type { AiStreamT } from "../stream/i18n";
 import { FileAttachmentHandler } from "./handlers/attachments";
 
 /**
- * OperationHandler - Handles operation processing and audio transcription
+ * Process operation and handle audio transcription if present.
  */
 export class OperationHandler {
   /**
@@ -39,6 +41,8 @@ export class OperationHandler {
     locale: CountryLanguage;
     logger: EndpointLogger;
     sttModelSelection: SttModelSelection | null;
+    /** Fixture chain of the calling stream — the STT call binds it. */
+    fixtureContext: FixtureContext | undefined;
   }): Promise<
     ResponseType<{
       threadId: string;
@@ -53,7 +57,15 @@ export class OperationHandler {
       } | null;
     }>
   > {
-    const { operation, data, user, locale, logger, sttModelSelection } = params;
+    const {
+      operation,
+      data,
+      user,
+      locale,
+      logger,
+      sttModelSelection,
+      fixtureContext,
+    } = params;
 
     let voiceTranscription: {
       wasTranscribed: boolean;
@@ -88,6 +100,7 @@ export class OperationHandler {
               locale,
               logger,
               sttModelSelection,
+              fixtureContext,
             );
 
           if (!transcriptionResult.success) {
@@ -173,7 +186,7 @@ export class OperationHandler {
   }
 }
 /**
- * UserMessageHandler - Handles user message creation in setup
+ * Create user message with optional file attachments.
  */
 export class UserMessageHandler {
   /**
@@ -380,7 +393,6 @@ export class UserMessageHandler {
         content: effectiveContent,
         parentId: effectiveParentMessageId || null,
         userId,
-        authorName,
         logger,
         attachments:
           attachmentMetadata.length > 0 ? attachmentMetadata : undefined,

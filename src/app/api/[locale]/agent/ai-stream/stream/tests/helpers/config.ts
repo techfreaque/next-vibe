@@ -16,14 +16,25 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 export interface ModeConfig {
   /** Human-readable label used in describe() title */
   label: string;
-  /** Prefix for setFetchCacheContext - e.g. "regular-", "direct-", "queue-", "unbottled-" */
+  /** Cache prefix = ONE fixture folder for the whole test file (e.g. "cheap-",
+   *  "direct-cheap-"). Replay is ordinal-driven within this folder. */
   cachePrefix: string;
+  /**
+   * Suite-wide FixtureContext options merged into every case's context by
+   * route-base's setCaseFixture: strict = throw on any uncached external
+   * call; interceptLocalhostPorts = treat these localhost ports as external
+   * (remote-mode suites whose "provider" is a localhost server).
+   */
+  fixtureStrict?: boolean;
+  fixtureInterceptLocalhostPorts?: number[];
   /**
    * Cheap variant: media-gen steps swap to cortex/tool-help equivalents with
    * the same observable thread shape. Every callback mode and folder
    * assertion still runs — only the operation is cheaper.
    */
   cheapMode?: boolean;
+  /** TEMPORARY DEBUG: throw right after T1 so fixture-replay iteration is fast. */
+  stopAfterFirstCase?: boolean;
   /**
    * Queue mode: streams end in 'waiting' and a cron pulse revives them.
    * Called with the threadId after each dispatch; the helper polls revival.

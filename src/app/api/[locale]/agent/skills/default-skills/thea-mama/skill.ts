@@ -5,7 +5,7 @@ import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
 
 import { AI_RUN_ALIAS } from "@/app/api/[locale]/agent/ai-stream/run/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/web-search/constants";
+import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/web-search/constants";
 
 import {
   CORTEX_DELETE_ALIAS,

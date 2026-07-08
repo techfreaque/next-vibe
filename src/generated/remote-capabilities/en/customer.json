@@ -772,9 +772,9 @@
                         },
                         "valueType": {
                           "def": {
-                            "type": "unknown"
+                            "type": "lazy"
                           },
-                          "type": "unknown"
+                          "type": "lazy"
                         }
                       },
                       "type": "record",
@@ -789,9 +789,9 @@
                       },
                       "valueType": {
                         "def": {
-                          "type": "unknown"
+                          "type": "lazy"
                         },
-                        "type": "unknown"
+                        "type": "lazy"
                       }
                     },
                     "defaultValue": {}
@@ -12606,9 +12606,9 @@
               },
               "valueType": {
                 "def": {
-                  "type": "any"
+                  "type": "lazy"
                 },
-                "type": "any"
+                "type": "lazy"
               }
             },
             "type": "record",
@@ -12623,9 +12623,9 @@
             },
             "valueType": {
               "def": {
-                "type": "any"
+                "type": "lazy"
               },
-              "type": "any"
+              "type": "lazy"
             }
           },
           "usage": {
@@ -26090,26 +26090,20 @@
           "columns": 12,
           "schema": {
             "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string",
-                  "checks": [{}, {}]
-                },
-                "type": "string",
-                "format": null,
-                "minLength": 1,
-                "maxLength": 255
-              }
+              "type": "string",
+              "checks": [{}, {}]
             },
-            "type": "optional"
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": 255
           },
           "usage": {
             "request": "data"
           },
           "schemaType": "primitive"
         },
-        "preview": {
+        "description": {
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Preview",
@@ -31913,6 +31907,10 @@
               "label": "models.names.ELEVENLABS_MUSIC"
             },
             {
+              "value": "cassette-music",
+              "label": "models.names.CASSETTE_MUSIC"
+            },
+            {
               "value": "sonauto-song",
               "label": "models.names.SONAUTO_SONG"
             },
@@ -31931,6 +31929,7 @@
                     "MUSICGEN_STEREO": "musicgen-stereo",
                     "MUSIC_GEN": "music-gen",
                     "ELEVENLABS_MUSIC": "elevenlabs-music",
+                    "CASSETTE_MUSIC": "cassette-music",
                     "SONAUTO_SONG": "sonauto-song",
                     "LYRIA_3": "lyria-3"
                   }
@@ -31940,6 +31939,7 @@
                   "MUSICGEN_STEREO": "musicgen-stereo",
                   "MUSIC_GEN": "music-gen",
                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                  "CASSETTE_MUSIC": "cassette-music",
                   "SONAUTO_SONG": "sonauto-song",
                   "LYRIA_3": "lyria-3"
                 },
@@ -31947,6 +31947,7 @@
                   "musicgen-stereo",
                   "music-gen",
                   "elevenlabs-music",
+                  "cassette-music",
                   "sonauto-song",
                   "lyria-3"
                 ]
@@ -32170,868 +32171,6 @@
     "tags": ["Music", "Generation", "AI"],
     "aliases": ["generate_music"],
     "credits": 0
-  },
-  {
-    "toolName": "brave-search",
-    "title": "Search the Web",
-    "titleShort": "Brave Search",
-    "description": "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
-    "fields": {
-      "usage": {
-        "request": "data",
-        "response": true
-      },
-      "children": {
-        "query": {
-          "type": "search_bar",
-          "fieldName": "query",
-          "label": "Search Query",
-          "description": "Clear and specific search query. Use keywords rather than questions.",
-          "placeholder": "Enter your search query...",
-          "submitText": "get.submitButton.label",
-          "submitLoadingText": "get.submitButton.loadingText",
-          "submitIcon": "search",
-          "size": "xl",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}, {}]
-            },
-            "type": "string",
-            "format": null,
-            "minLength": 1,
-            "maxLength": 400
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "maxResults": {
-          "type": "form_field",
-          "fieldType": "number",
-          "label": "Max Results",
-          "description": "Number of results to return (1-10)",
-          "columns": 4,
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "optional",
-                  "innerType": {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": [{}, {}]
-                    },
-                    "type": "number",
-                    "minValue": 1,
-                    "maxValue": 10,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                },
-                "type": "optional"
-              },
-              "defaultValue": 5
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "includeNews": {
-          "type": "form_field",
-          "fieldType": "boolean",
-          "label": "Include News",
-          "description": "Include news results for current events",
-          "columns": 4,
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "optional",
-                  "innerType": {
-                    "def": {
-                      "type": "boolean"
-                    },
-                    "type": "boolean"
-                  }
-                },
-                "type": "optional"
-              },
-              "defaultValue": false
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "freshness": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Freshness",
-          "description": "Filter results by how recent they are",
-          "options": [
-            {
-              "value": "past_day",
-              "label": "get.fields.freshness.options.day"
-            },
-            {
-              "value": "past_week",
-              "label": "get.fields.freshness.options.week"
-            },
-            {
-              "value": "past_month",
-              "label": "get.fields.freshness.options.month"
-            },
-            {
-              "value": "past_year",
-              "label": "get.fields.freshness.options.year"
-            }
-          ],
-          "columns": 4,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "past_day": "past_day",
-                    "past_week": "past_week",
-                    "past_month": "past_month",
-                    "past_year": "past_year"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "past_day": "past_day",
-                  "past_week": "past_week",
-                  "past_month": "past_month",
-                  "past_year": "past_year"
-                },
-                "options": ["past_day", "past_week", "past_month", "past_year"]
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "backButton": {
-          "schemaType": "widget",
-          "usage": {
-            "request": "data"
-          },
-          "type": "navigate_button",
-          "label": "Back",
-          "icon": "arrow-left",
-          "variant": "outline",
-          "prefillFromGet": false,
-          "renderInModal": false
-        },
-        "results": {
-          "type": "container",
-          "layoutType": "stacked",
-          "child": {
-            "type": "container",
-            "linkable": true,
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
-            },
-            "children": {
-              "title": {
-                "type": "text",
-                "label": "Results",
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "url": {
-                "type": "link",
-                "href": "/{url}",
-                "text": "get.response.results.item.url",
-                "external": true,
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "snippet": {
-                "type": "text",
-                "label": "Snippet",
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "age": {
-                "type": "text",
-                "label": "Age",
-                "schema": {
-                  "def": {
-                    "type": "optional",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "optional"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "source": {
-                "type": "text",
-                "label": "Source",
-                "schema": {
-                  "def": {
-                    "type": "optional",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "optional"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
-          },
-          "schemaType": "array",
-          "usage": {
-            "response": true
-          }
-        }
-      },
-      "type": "custom-widget",
-      "schemaType": "object"
-    },
-    "executionMode": "via-execute-route",
-    "isAsync": true,
-    "instanceId": "local",
-    "category": "ai",
-    "tags": ["Search", "Web", "Internet"],
-    "aliases": ["brave-search"],
-    "credits": 0.65
-  },
-  {
-    "toolName": "kagi-search",
-    "title": "Search with Kagi",
-    "titleShort": "Kagi Search",
-    "description": "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
-    "fields": {
-      "usage": {
-        "request": "data",
-        "response": true
-      },
-      "children": {
-        "query": {
-          "type": "search_bar",
-          "fieldName": "query",
-          "label": "Search Query",
-          "description": "Clear and specific search query or question.",
-          "placeholder": "Enter your search query...",
-          "submitText": "get.submitButton.label",
-          "submitLoadingText": "get.submitButton.loadingText",
-          "submitIcon": "search",
-          "size": "xl",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}, {}]
-            },
-            "type": "string",
-            "format": null,
-            "minLength": 1,
-            "maxLength": 400
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "backButton": {
-          "schemaType": "widget",
-          "usage": {
-            "request": "data"
-          },
-          "type": "navigate_button",
-          "label": "Back",
-          "icon": "arrow-left",
-          "variant": "outline",
-          "prefillFromGet": false,
-          "renderInModal": false
-        },
-        "output": {
-          "type": "markdown",
-          "label": "Answer",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string"
-                },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "references": {
-          "type": "container",
-          "layoutType": "stacked",
-          "child": {
-            "type": "container",
-            "linkable": true,
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
-            },
-            "children": {
-              "title": {
-                "type": "text",
-                "label": "References",
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "url": {
-                "type": "link",
-                "href": "/{url}",
-                "text": "get.response.references.item.url",
-                "external": true,
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "snippet": {
-                "type": "text",
-                "label": "Snippet",
-                "schema": {
-                  "def": {
-                    "type": "optional",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "optional"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
-          },
-          "schemaType": "array",
-          "usage": {
-            "response": true
-          }
-        }
-      },
-      "type": "custom-widget",
-      "schemaType": "object"
-    },
-    "executionMode": "via-execute-route",
-    "isAsync": true,
-    "instanceId": "local",
-    "category": "ai",
-    "tags": ["Search", "Web", "AI"],
-    "aliases": ["kagi-search"],
-    "credits": 1.95
-  },
-  {
-    "toolName": "web-search",
-    "title": "Search the Web",
-    "titleShort": "Web Search",
-    "description": "Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.",
-    "fields": {
-      "usage": {
-        "request": "data",
-        "response": true
-      },
-      "children": {
-        "query": {
-          "type": "search_bar",
-          "fieldName": "query",
-          "label": "Search Query",
-          "description": "Clear and specific search query. Use keywords rather than questions.",
-          "placeholder": "Enter your search query...",
-          "submitText": "get.submitButton.label",
-          "submitLoadingText": "get.submitButton.loadingText",
-          "submitIcon": "search",
-          "size": "xl",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}, {}]
-            },
-            "type": "string",
-            "format": null,
-            "minLength": 1,
-            "maxLength": 400
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "provider": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Search Provider",
-          "description": "Which search engine to use. Auto picks your default or the cheapest available.",
-          "options": [
-            {
-              "value": "enums.provider.BRAVE",
-              "label": "get.fields.provider.options.brave"
-            },
-            {
-              "value": "enums.provider.KAGI",
-              "label": "get.fields.provider.options.kagi"
-            }
-          ],
-          "columns": 4,
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "optional",
-                  "innerType": {
-                    "def": {
-                      "type": "enum",
-                      "entries": {
-                        "enums.provider.AUTO": "enums.provider.AUTO",
-                        "enums.provider.BRAVE": "enums.provider.BRAVE",
-                        "enums.provider.KAGI": "enums.provider.KAGI"
-                      }
-                    },
-                    "type": "enum",
-                    "enum": {
-                      "enums.provider.AUTO": "enums.provider.AUTO",
-                      "enums.provider.BRAVE": "enums.provider.BRAVE",
-                      "enums.provider.KAGI": "enums.provider.KAGI"
-                    },
-                    "options": [
-                      "enums.provider.AUTO",
-                      "enums.provider.BRAVE",
-                      "enums.provider.KAGI"
-                    ]
-                  }
-                },
-                "type": "optional"
-              },
-              "defaultValue": "enums.provider.BRAVE"
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "maxResults": {
-          "type": "form_field",
-          "fieldType": "number",
-          "label": "Max Results",
-          "description": "Number of results to return (1-10). Brave only.",
-          "columns": 3,
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "optional",
-                  "innerType": {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": [{}, {}]
-                    },
-                    "type": "number",
-                    "minValue": 1,
-                    "maxValue": 10,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                },
-                "type": "optional"
-              },
-              "defaultValue": 5
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "includeNews": {
-          "type": "form_field",
-          "fieldType": "boolean",
-          "label": "Include News",
-          "description": "Include news results for current events. Brave only.",
-          "columns": 2,
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "optional",
-                  "innerType": {
-                    "def": {
-                      "type": "boolean"
-                    },
-                    "type": "boolean"
-                  }
-                },
-                "type": "optional"
-              },
-              "defaultValue": false
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "freshness": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Freshness",
-          "description": "Filter results by how recent they are. Brave only.",
-          "options": [
-            {
-              "value": "past_day",
-              "label": "get.fields.freshness.options.day"
-            },
-            {
-              "value": "past_week",
-              "label": "get.fields.freshness.options.week"
-            },
-            {
-              "value": "past_month",
-              "label": "get.fields.freshness.options.month"
-            },
-            {
-              "value": "past_year",
-              "label": "get.fields.freshness.options.year"
-            }
-          ],
-          "columns": 3,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "past_day": "past_day",
-                    "past_week": "past_week",
-                    "past_month": "past_month",
-                    "past_year": "past_year"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "past_day": "past_day",
-                  "past_week": "past_week",
-                  "past_month": "past_month",
-                  "past_year": "past_year"
-                },
-                "options": ["past_day", "past_week", "past_month", "past_year"]
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "backButton": {
-          "schemaType": "widget",
-          "usage": {
-            "request": "data"
-          },
-          "type": "navigate_button",
-          "label": "Back",
-          "icon": "arrow-left",
-          "variant": "outline",
-          "prefillFromGet": false,
-          "renderInModal": false
-        },
-        "usedProvider": {
-          "type": "text",
-          "label": "Provider",
-          "schema": {
-            "def": {
-              "type": "string"
-            },
-            "type": "string",
-            "format": null,
-            "minLength": null,
-            "maxLength": null
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "output": {
-          "type": "markdown",
-          "label": "AI Answer",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string"
-                },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "results": {
-          "type": "container",
-          "layoutType": "stacked",
-          "child": {
-            "type": "container",
-            "linkable": true,
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
-            },
-            "children": {
-              "title": {
-                "type": "text",
-                "label": "Search Result",
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "url": {
-                "type": "link",
-                "href": "/{url}",
-                "text": "get.response.results.item.url",
-                "external": true,
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "snippet": {
-                "type": "text",
-                "label": "Snippet",
-                "schema": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "age": {
-                "type": "text",
-                "label": "Age",
-                "schema": {
-                  "def": {
-                    "type": "optional",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "optional"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "source": {
-                "type": "text",
-                "label": "Source",
-                "schema": {
-                  "def": {
-                    "type": "optional",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "optional"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
-          },
-          "schemaType": "array",
-          "usage": {
-            "response": true
-          }
-        }
-      },
-      "type": "custom-widget",
-      "schemaType": "object"
-    },
-    "executionMode": "via-execute-route",
-    "isAsync": true,
-    "instanceId": "local",
-    "category": "ai",
-    "tags": ["Search", "Web", "Internet"],
-    "aliases": ["web-search"],
-    "credits": 0.65
   },
   {
     "toolName": "skill-get",
@@ -36913,6 +36052,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             }
@@ -36922,6 +36062,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           },
@@ -36929,6 +36070,7 @@
                                             "musicgen-stereo",
                                             "music-gen",
                                             "elevenlabs-music",
+                                            "cassette-music",
                                             "sonauto-song",
                                             "lyria-3"
                                           ]
@@ -37596,6 +36738,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           }
@@ -37605,6 +36748,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         },
@@ -37612,6 +36756,7 @@
                                           "musicgen-stereo",
                                           "music-gen",
                                           "elevenlabs-music",
+                                          "cassette-music",
                                           "sonauto-song",
                                           "lyria-3"
                                         ]
@@ -50241,6 +49386,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           }
@@ -50250,6 +49396,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         },
@@ -50257,6 +49404,7 @@
                                           "musicgen-stereo",
                                           "music-gen",
                                           "elevenlabs-music",
+                                          "cassette-music",
                                           "sonauto-song",
                                           "lyria-3"
                                         ]
@@ -50922,6 +50070,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         }
@@ -50931,6 +50080,7 @@
                                         "MUSICGEN_STEREO": "musicgen-stereo",
                                         "MUSIC_GEN": "music-gen",
                                         "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                        "CASSETTE_MUSIC": "cassette-music",
                                         "SONAUTO_SONG": "sonauto-song",
                                         "LYRIA_3": "lyria-3"
                                       },
@@ -50938,6 +50088,7 @@
                                         "musicgen-stereo",
                                         "music-gen",
                                         "elevenlabs-music",
+                                        "cassette-music",
                                         "sonauto-song",
                                         "lyria-3"
                                       ]
@@ -64231,6 +63382,7 @@
                                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                                   "MUSIC_GEN": "music-gen",
                                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                  "CASSETTE_MUSIC": "cassette-music",
                                                   "SONAUTO_SONG": "sonauto-song",
                                                   "LYRIA_3": "lyria-3"
                                                 }
@@ -64240,6 +63392,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               },
@@ -64247,6 +63400,7 @@
                                                 "musicgen-stereo",
                                                 "music-gen",
                                                 "elevenlabs-music",
+                                                "cassette-music",
                                                 "sonauto-song",
                                                 "lyria-3"
                                               ]
@@ -64914,6 +64068,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               }
@@ -64923,6 +64078,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             },
@@ -64930,6 +64086,7 @@
                                               "musicgen-stereo",
                                               "music-gen",
                                               "elevenlabs-music",
+                                              "cassette-music",
                                               "sonauto-song",
                                               "lyria-3"
                                             ]
@@ -77561,6 +76718,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               }
@@ -77570,6 +76728,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             },
@@ -77577,6 +76736,7 @@
                                               "musicgen-stereo",
                                               "music-gen",
                                               "elevenlabs-music",
+                                              "cassette-music",
                                               "sonauto-song",
                                               "lyria-3"
                                             ]
@@ -78244,6 +77404,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             }
@@ -78253,6 +77414,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           },
@@ -78260,6 +77422,7 @@
                                             "musicgen-stereo",
                                             "music-gen",
                                             "elevenlabs-music",
+                                            "cassette-music",
                                             "sonauto-song",
                                             "lyria-3"
                                           ]
@@ -98059,6 +97222,7 @@
                                     "MUSICGEN_STEREO": "musicgen-stereo",
                                     "MUSIC_GEN": "music-gen",
                                     "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                    "CASSETTE_MUSIC": "cassette-music",
                                     "SONAUTO_SONG": "sonauto-song",
                                     "LYRIA_3": "lyria-3"
                                   }
@@ -98068,6 +97232,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 },
@@ -98075,6 +97240,7 @@
                                   "musicgen-stereo",
                                   "music-gen",
                                   "elevenlabs-music",
+                                  "cassette-music",
                                   "sonauto-song",
                                   "lyria-3"
                                 ]
@@ -98738,6 +97904,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 }
@@ -98747,6 +97914,7 @@
                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                 "MUSIC_GEN": "music-gen",
                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                "CASSETTE_MUSIC": "cassette-music",
                                 "SONAUTO_SONG": "sonauto-song",
                                 "LYRIA_3": "lyria-3"
                               },
@@ -98754,6 +97922,7 @@
                                 "musicgen-stereo",
                                 "music-gen",
                                 "elevenlabs-music",
+                                "cassette-music",
                                 "sonauto-song",
                                 "lyria-3"
                               ]
@@ -104277,6 +103446,7 @@
                                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                                   "MUSIC_GEN": "music-gen",
                                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                  "CASSETTE_MUSIC": "cassette-music",
                                                   "SONAUTO_SONG": "sonauto-song",
                                                   "LYRIA_3": "lyria-3"
                                                 }
@@ -104286,6 +103456,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               },
@@ -104293,6 +103464,7 @@
                                                 "musicgen-stereo",
                                                 "music-gen",
                                                 "elevenlabs-music",
+                                                "cassette-music",
                                                 "sonauto-song",
                                                 "lyria-3"
                                               ]
@@ -104960,6 +104132,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               }
@@ -104969,6 +104142,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             },
@@ -104976,6 +104150,7 @@
                                               "musicgen-stereo",
                                               "music-gen",
                                               "elevenlabs-music",
+                                              "cassette-music",
                                               "sonauto-song",
                                               "lyria-3"
                                             ]
@@ -117607,6 +116782,7 @@
                                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                                 "MUSIC_GEN": "music-gen",
                                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                                "CASSETTE_MUSIC": "cassette-music",
                                                 "SONAUTO_SONG": "sonauto-song",
                                                 "LYRIA_3": "lyria-3"
                                               }
@@ -117616,6 +116792,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             },
@@ -117623,6 +116800,7 @@
                                               "musicgen-stereo",
                                               "music-gen",
                                               "elevenlabs-music",
+                                              "cassette-music",
                                               "sonauto-song",
                                               "lyria-3"
                                             ]
@@ -118290,6 +117468,7 @@
                                               "MUSICGEN_STEREO": "musicgen-stereo",
                                               "MUSIC_GEN": "music-gen",
                                               "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                              "CASSETTE_MUSIC": "cassette-music",
                                               "SONAUTO_SONG": "sonauto-song",
                                               "LYRIA_3": "lyria-3"
                                             }
@@ -118299,6 +117478,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           },
@@ -118306,6 +117486,7 @@
                                             "musicgen-stereo",
                                             "music-gen",
                                             "elevenlabs-music",
+                                            "cassette-music",
                                             "sonauto-song",
                                             "lyria-3"
                                           ]
@@ -128207,7 +127388,7 @@
           "variant": "muted",
           "label": "Choose from {{count}} models with fine-tuned control over intelligence, content, and cost",
           "contentParams": {
-            "count": 133
+            "count": 134
           },
           "usage": {
             "response": true
@@ -142587,6 +141768,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           }
@@ -142596,6 +141778,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         },
@@ -142603,6 +141786,7 @@
                                           "musicgen-stereo",
                                           "music-gen",
                                           "elevenlabs-music",
+                                          "cassette-music",
                                           "sonauto-song",
                                           "lyria-3"
                                         ]
@@ -143268,6 +142452,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         }
@@ -143277,6 +142462,7 @@
                                         "MUSICGEN_STEREO": "musicgen-stereo",
                                         "MUSIC_GEN": "music-gen",
                                         "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                        "CASSETTE_MUSIC": "cassette-music",
                                         "SONAUTO_SONG": "sonauto-song",
                                         "LYRIA_3": "lyria-3"
                                       },
@@ -143284,6 +142470,7 @@
                                         "musicgen-stereo",
                                         "music-gen",
                                         "elevenlabs-music",
+                                        "cassette-music",
                                         "sonauto-song",
                                         "lyria-3"
                                       ]
@@ -156502,6 +155689,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           }
@@ -156511,6 +155699,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         },
@@ -156518,6 +155707,7 @@
                                           "musicgen-stereo",
                                           "music-gen",
                                           "elevenlabs-music",
+                                          "cassette-music",
                                           "sonauto-song",
                                           "lyria-3"
                                         ]
@@ -157183,6 +156373,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         }
@@ -157192,6 +156383,7 @@
                                         "MUSICGEN_STEREO": "musicgen-stereo",
                                         "MUSIC_GEN": "music-gen",
                                         "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                        "CASSETTE_MUSIC": "cassette-music",
                                         "SONAUTO_SONG": "sonauto-song",
                                         "LYRIA_3": "lyria-3"
                                       },
@@ -157199,6 +156391,7 @@
                                         "musicgen-stereo",
                                         "music-gen",
                                         "elevenlabs-music",
+                                        "cassette-music",
                                         "sonauto-song",
                                         "lyria-3"
                                       ]
@@ -170204,6 +169397,7 @@
                                             "MUSICGEN_STEREO": "musicgen-stereo",
                                             "MUSIC_GEN": "music-gen",
                                             "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                            "CASSETTE_MUSIC": "cassette-music",
                                             "SONAUTO_SONG": "sonauto-song",
                                             "LYRIA_3": "lyria-3"
                                           }
@@ -170213,6 +169407,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         },
@@ -170220,6 +169415,7 @@
                                           "musicgen-stereo",
                                           "music-gen",
                                           "elevenlabs-music",
+                                          "cassette-music",
                                           "sonauto-song",
                                           "lyria-3"
                                         ]
@@ -170885,6 +170081,7 @@
                                           "MUSICGEN_STEREO": "musicgen-stereo",
                                           "MUSIC_GEN": "music-gen",
                                           "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                          "CASSETTE_MUSIC": "cassette-music",
                                           "SONAUTO_SONG": "sonauto-song",
                                           "LYRIA_3": "lyria-3"
                                         }
@@ -170894,6 +170091,7 @@
                                         "MUSICGEN_STEREO": "musicgen-stereo",
                                         "MUSIC_GEN": "music-gen",
                                         "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                        "CASSETTE_MUSIC": "cassette-music",
                                         "SONAUTO_SONG": "sonauto-song",
                                         "LYRIA_3": "lyria-3"
                                       },
@@ -170901,6 +170099,7 @@
                                         "musicgen-stereo",
                                         "music-gen",
                                         "elevenlabs-music",
+                                        "cassette-music",
                                         "sonauto-song",
                                         "lyria-3"
                                       ]
@@ -188376,6 +187575,7 @@
                                     "MUSICGEN_STEREO": "musicgen-stereo",
                                     "MUSIC_GEN": "music-gen",
                                     "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                    "CASSETTE_MUSIC": "cassette-music",
                                     "SONAUTO_SONG": "sonauto-song",
                                     "LYRIA_3": "lyria-3"
                                   }
@@ -188385,6 +187585,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 },
@@ -188392,6 +187593,7 @@
                                   "musicgen-stereo",
                                   "music-gen",
                                   "elevenlabs-music",
+                                  "cassette-music",
                                   "sonauto-song",
                                   "lyria-3"
                                 ]
@@ -189055,6 +188257,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 }
@@ -189064,6 +188267,7 @@
                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                 "MUSIC_GEN": "music-gen",
                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                "CASSETTE_MUSIC": "cassette-music",
                                 "SONAUTO_SONG": "sonauto-song",
                                 "LYRIA_3": "lyria-3"
                               },
@@ -189071,6 +188275,7 @@
                                 "musicgen-stereo",
                                 "music-gen",
                                 "elevenlabs-music",
+                                "cassette-music",
                                 "sonauto-song",
                                 "lyria-3"
                               ]
@@ -208390,6 +207595,7 @@
                                     "MUSICGEN_STEREO": "musicgen-stereo",
                                     "MUSIC_GEN": "music-gen",
                                     "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                    "CASSETTE_MUSIC": "cassette-music",
                                     "SONAUTO_SONG": "sonauto-song",
                                     "LYRIA_3": "lyria-3"
                                   }
@@ -208399,6 +207605,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 },
@@ -208406,6 +207613,7 @@
                                   "musicgen-stereo",
                                   "music-gen",
                                   "elevenlabs-music",
+                                  "cassette-music",
                                   "sonauto-song",
                                   "lyria-3"
                                 ]
@@ -209069,6 +208277,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 }
@@ -209078,6 +208287,7 @@
                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                 "MUSIC_GEN": "music-gen",
                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                "CASSETTE_MUSIC": "cassette-music",
                                 "SONAUTO_SONG": "sonauto-song",
                                 "LYRIA_3": "lyria-3"
                               },
@@ -209085,6 +208295,7 @@
                                 "musicgen-stereo",
                                 "music-gen",
                                 "elevenlabs-music",
+                                "cassette-music",
                                 "sonauto-song",
                                 "lyria-3"
                               ]
@@ -224476,6 +223687,7 @@
                                     "MUSICGEN_STEREO": "musicgen-stereo",
                                     "MUSIC_GEN": "music-gen",
                                     "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                    "CASSETTE_MUSIC": "cassette-music",
                                     "SONAUTO_SONG": "sonauto-song",
                                     "LYRIA_3": "lyria-3"
                                   }
@@ -224485,6 +223697,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 },
@@ -224492,6 +223705,7 @@
                                   "musicgen-stereo",
                                   "music-gen",
                                   "elevenlabs-music",
+                                  "cassette-music",
                                   "sonauto-song",
                                   "lyria-3"
                                 ]
@@ -225155,6 +224369,7 @@
                                   "MUSICGEN_STEREO": "musicgen-stereo",
                                   "MUSIC_GEN": "music-gen",
                                   "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                  "CASSETTE_MUSIC": "cassette-music",
                                   "SONAUTO_SONG": "sonauto-song",
                                   "LYRIA_3": "lyria-3"
                                 }
@@ -225164,6 +224379,7 @@
                                 "MUSICGEN_STEREO": "musicgen-stereo",
                                 "MUSIC_GEN": "music-gen",
                                 "ELEVENLABS_MUSIC": "elevenlabs-music",
+                                "CASSETTE_MUSIC": "cassette-music",
                                 "SONAUTO_SONG": "sonauto-song",
                                 "LYRIA_3": "lyria-3"
                               },
@@ -225171,6 +224387,7 @@
                                 "musicgen-stereo",
                                 "music-gen",
                                 "elevenlabs-music",
+                                "cassette-music",
                                 "sonauto-song",
                                 "lyria-3"
                               ]
@@ -230986,6 +230203,868 @@
     "tags": ["Vision", "AI"],
     "aliases": ["agent-view-image"],
     "credits": 0
+  },
+  {
+    "toolName": "brave-search",
+    "title": "Search the Web",
+    "titleShort": "Brave Search",
+    "description": "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "query": {
+          "type": "search_bar",
+          "fieldName": "query",
+          "label": "Search Query",
+          "description": "Clear and specific search query. Use keywords rather than questions.",
+          "placeholder": "Enter your search query...",
+          "submitText": "get.submitButton.label",
+          "submitLoadingText": "get.submitButton.loadingText",
+          "submitIcon": "search",
+          "size": "xl",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": 400
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "maxResults": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Max Results",
+          "description": "Number of results to return (1-10)",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": [{}, {}]
+                    },
+                    "type": "number",
+                    "minValue": 1,
+                    "maxValue": 10,
+                    "isInt": false,
+                    "isFinite": true,
+                    "format": null
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": 5
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "includeNews": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Include News",
+          "description": "Include news results for current events",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": false
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "freshness": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Freshness",
+          "description": "Filter results by how recent they are",
+          "options": [
+            {
+              "value": "past_day",
+              "label": "get.fields.freshness.options.day"
+            },
+            {
+              "value": "past_week",
+              "label": "get.fields.freshness.options.week"
+            },
+            {
+              "value": "past_month",
+              "label": "get.fields.freshness.options.month"
+            },
+            {
+              "value": "past_year",
+              "label": "get.fields.freshness.options.year"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "past_day": "past_day",
+                    "past_week": "past_week",
+                    "past_month": "past_month",
+                    "past_year": "past_year"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "past_day": "past_day",
+                  "past_week": "past_week",
+                  "past_month": "past_month",
+                  "past_year": "past_year"
+                },
+                "options": ["past_day", "past_week", "past_month", "past_year"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Back",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "results": {
+          "type": "container",
+          "layoutType": "stacked",
+          "child": {
+            "type": "container",
+            "linkable": true,
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "title": {
+                "type": "text",
+                "label": "Results",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "url": {
+                "type": "link",
+                "href": "/{url}",
+                "text": "get.response.results.item.url",
+                "external": true,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "snippet": {
+                "type": "text",
+                "label": "Snippet",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "age": {
+                "type": "text",
+                "label": "Age",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "source": {
+                "type": "text",
+                "label": "Source",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Search", "Web", "Internet"],
+    "aliases": ["brave-search"],
+    "credits": 0.65
+  },
+  {
+    "toolName": "web-search",
+    "title": "Search the Web",
+    "titleShort": "Web Search",
+    "description": "Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "query": {
+          "type": "search_bar",
+          "fieldName": "query",
+          "label": "Search Query",
+          "description": "Clear and specific search query. Use keywords rather than questions.",
+          "placeholder": "Enter your search query...",
+          "submitText": "get.submitButton.label",
+          "submitLoadingText": "get.submitButton.loadingText",
+          "submitIcon": "search",
+          "size": "xl",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": 400
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "provider": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Search Provider",
+          "description": "Which search engine to use. Auto picks your default or the cheapest available.",
+          "options": [
+            {
+              "value": "enums.provider.BRAVE",
+              "label": "get.fields.provider.options.brave"
+            },
+            {
+              "value": "enums.provider.KAGI",
+              "label": "get.fields.provider.options.kagi"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.provider.AUTO": "enums.provider.AUTO",
+                        "enums.provider.BRAVE": "enums.provider.BRAVE",
+                        "enums.provider.KAGI": "enums.provider.KAGI"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.provider.AUTO": "enums.provider.AUTO",
+                      "enums.provider.BRAVE": "enums.provider.BRAVE",
+                      "enums.provider.KAGI": "enums.provider.KAGI"
+                    },
+                    "options": [
+                      "enums.provider.AUTO",
+                      "enums.provider.BRAVE",
+                      "enums.provider.KAGI"
+                    ]
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": "enums.provider.BRAVE"
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "maxResults": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Max Results",
+          "description": "Number of results to return (1-10). Brave only.",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": [{}, {}]
+                    },
+                    "type": "number",
+                    "minValue": 1,
+                    "maxValue": 10,
+                    "isInt": false,
+                    "isFinite": true,
+                    "format": null
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": 5
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "includeNews": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Include News",
+          "description": "Include news results for current events. Brave only.",
+          "columns": 2,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": false
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "freshness": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Freshness",
+          "description": "Filter results by how recent they are. Brave only.",
+          "options": [
+            {
+              "value": "past_day",
+              "label": "get.fields.freshness.options.day"
+            },
+            {
+              "value": "past_week",
+              "label": "get.fields.freshness.options.week"
+            },
+            {
+              "value": "past_month",
+              "label": "get.fields.freshness.options.month"
+            },
+            {
+              "value": "past_year",
+              "label": "get.fields.freshness.options.year"
+            }
+          ],
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "past_day": "past_day",
+                    "past_week": "past_week",
+                    "past_month": "past_month",
+                    "past_year": "past_year"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "past_day": "past_day",
+                  "past_week": "past_week",
+                  "past_month": "past_month",
+                  "past_year": "past_year"
+                },
+                "options": ["past_day", "past_week", "past_month", "past_year"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Back",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "usedProvider": {
+          "type": "text",
+          "label": "Provider",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string",
+            "format": null,
+            "minLength": null,
+            "maxLength": null
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "output": {
+          "type": "markdown",
+          "label": "AI Answer",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "results": {
+          "type": "container",
+          "layoutType": "stacked",
+          "child": {
+            "type": "container",
+            "linkable": true,
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "title": {
+                "type": "text",
+                "label": "Search Result",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "url": {
+                "type": "link",
+                "href": "/{url}",
+                "text": "get.response.results.item.url",
+                "external": true,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "snippet": {
+                "type": "text",
+                "label": "Snippet",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "age": {
+                "type": "text",
+                "label": "Age",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "source": {
+                "type": "text",
+                "label": "Source",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Search", "Web", "Internet"],
+    "aliases": ["web-search"],
+    "credits": 0.65
+  },
+  {
+    "toolName": "kagi-search",
+    "title": "Search with Kagi",
+    "titleShort": "Kagi Search",
+    "description": "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "query": {
+          "type": "search_bar",
+          "fieldName": "query",
+          "label": "Search Query",
+          "description": "Clear and specific search query or question.",
+          "placeholder": "Enter your search query...",
+          "submitText": "get.submitButton.label",
+          "submitLoadingText": "get.submitButton.loadingText",
+          "submitIcon": "search",
+          "size": "xl",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": 400
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Back",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "output": {
+          "type": "markdown",
+          "label": "Answer",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "references": {
+          "type": "container",
+          "layoutType": "stacked",
+          "child": {
+            "type": "container",
+            "linkable": true,
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "title": {
+                "type": "text",
+                "label": "References",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "url": {
+                "type": "link",
+                "href": "/{url}",
+                "text": "get.response.references.item.url",
+                "external": true,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "snippet": {
+                "type": "text",
+                "label": "Snippet",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Search", "Web", "AI"],
+    "aliases": ["kagi-search"],
+    "credits": 1.95
   },
   {
     "toolName": "companies_companyId_get_GET",
@@ -249734,6 +249813,177 @@
     "credits": 0
   },
   {
+    "toolName": "cancel",
+    "title": "Cancel Tool Call",
+    "titleShort": "Cancel Tool",
+    "description": "Interrupt a single in-flight tool call by its callId while it is still running. The call stops and returns an error as its result; the turn and any sibling parallel tool calls keep running.",
+    "fields": {
+      "type": "container",
+      "layoutType": "grid",
+      "columns": 12,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "callId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": null
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "delivered": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["tools"],
+    "aliases": ["cancel"],
+    "credits": 0
+  },
+  {
+    "toolName": "detach",
+    "title": "Detach Tool Call",
+    "titleShort": "Detach Call",
+    "description": "Upgrade a still-running tool call to detached by its callId: it keeps running in the background, its result is discarded, and the turn is unblocked now. Use resume-when-done instead if you need the result.",
+    "fields": {
+      "type": "container",
+      "layoutType": "grid",
+      "columns": 12,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "callId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": null
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "delivered": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["tools"],
+    "aliases": ["detach"],
+    "credits": 0
+  },
+  {
+    "toolName": "resume-when-done",
+    "title": "Move Tool Call to Background",
+    "titleShort": "Background Tool",
+    "description": "Let a still-running tool call finish in the background by its callId. The turn ends and the thread revives with the result when the work completes.",
+    "fields": {
+      "type": "container",
+      "layoutType": "grid",
+      "columns": 12,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "callId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}]
+            },
+            "type": "string",
+            "format": null,
+            "minLength": 1,
+            "maxLength": null
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "delivered": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["tools"],
+    "aliases": ["resume-when-done"],
+    "credits": 0
+  },
+  {
     "toolName": "execute-tool",
     "title": "Execute Tool",
     "titleShort": "Execute Tool",
@@ -250017,63 +250267,6 @@
     "category": "ai",
     "tags": ["tools"],
     "aliases": ["execute-tool"],
-    "credits": 0
-  },
-  {
-    "toolName": "dismiss-task",
-    "title": "Dismiss Task",
-    "titleShort": "Dismiss",
-    "description": "Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.",
-    "fields": {
-      "type": "container",
-      "layoutType": "grid",
-      "columns": 12,
-      "usage": {
-        "request": "data",
-        "response": true
-      },
-      "children": {
-        "callId": {
-          "type": "form_field",
-          "fieldType": "text",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}]
-            },
-            "type": "string",
-            "format": null,
-            "minLength": 1,
-            "maxLength": null
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "dismissed": {
-          "type": "text",
-          "schema": {
-            "def": {
-              "type": "boolean"
-            },
-            "type": "boolean"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        }
-      },
-      "schemaType": "object"
-    },
-    "executionMode": "via-execute-route",
-    "isAsync": true,
-    "instanceId": "local",
-    "category": "ai",
-    "tags": ["tools"],
-    "aliases": ["dismiss-task"],
     "credits": 0
   },
   {
@@ -252198,33 +252391,13 @@
       "layoutType": "grid",
       "columns": 12,
       "usage": {
-        "request": "data",
-        "response": true
+        "request": "data"
       },
       "children": {
         "eventName": {
           "type": "form_field",
           "fieldType": "text",
-          "columns": 6,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}]
-            },
-            "type": "string",
-            "format": null,
-            "minLength": 1,
-            "maxLength": null
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "leadId": {
-          "type": "form_field",
-          "fieldType": "text",
-          "columns": 6,
+          "columns": 12,
           "schema": {
             "def": {
               "type": "string",
@@ -252291,6 +252464,21 @@
                     }
                   },
                   "type": "optional"
+                },
+                "targetLeadId": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },
@@ -252298,87 +252486,6 @@
           },
           "usage": {
             "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "received": {
-          "type": "text",
-          "schema": {
-            "def": {
-              "type": "boolean"
-            },
-            "type": "boolean"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "originInstanceId": {
-          "type": "text",
-          "hidden": true,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string"
-                },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "syncDomain": {
-          "type": "text",
-          "hidden": true,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string"
-                },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "envelope": {
-          "type": "text",
-          "hidden": true,
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "custom",
-                  "check": "custom",
-                  "abort": true
-                },
-                "type": "custom"
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "response": true
           },
           "schemaType": "primitive"
         }

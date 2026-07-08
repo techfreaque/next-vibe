@@ -73,11 +73,6 @@ export const translations = {
         description:
           "Enable profiling: sets NEXT_TURBOPACK_TRACING=1 (trace file at .next/dev/trace-turbopack) and NEXT_CPU_PROF=1 (writes .cpuprofile on exit)",
       },
-      fixtureMode: {
-        title: "Fixture Mode",
-        description:
-          "Enable HTTP fixture caching (VIBE_FIXTURE_MODE=true). Intercepts external API calls and stores/replays them from src/generated/ai-fixtures/http-cache/. Use for E2E tests against this server as the remote.",
-      },
       success: {
         title: "Success",
       },

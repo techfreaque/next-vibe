@@ -10,7 +10,7 @@ import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { SearchProviderValue } from "@/app/api/[locale]/agent/search/enum";
+import type { SearchProviderValue } from "@/app/api/[locale]/agent/web-search/enum";
 
 import type { ViewModeValue } from "../enum";
 

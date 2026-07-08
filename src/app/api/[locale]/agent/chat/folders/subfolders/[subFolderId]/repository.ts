@@ -256,7 +256,12 @@ export class FolderRepository {
       const affectedThreads =
         descendantIds.length > 0
           ? await db
-              .select({ id: chatThreads.id, folderId: chatThreads.folderId })
+              .select({
+                id: chatThreads.id,
+                folderId: chatThreads.folderId,
+                rootFolderId: chatThreads.rootFolderId,
+                userId: chatThreads.userId,
+              })
               .from(chatThreads)
               .where(inArray(chatThreads.folderId, descendantIds))
           : [];
@@ -300,6 +305,36 @@ export class FolderRepository {
         })("thread-deleted", {
           responseData: { items: threadIds.map((id) => ({ id })) },
         });
+      }
+
+      // Emit thread-deleted on the threads endpoint (cross-instance relay + sidebar
+      // root cache) and kick off cortex cleanup for each deleted thread.
+      if (affectedThreads.length > 0) {
+        const { default: threadsByIdDefinitions } =
+          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+        const { removeVirtualNodesByEntityId } =
+          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+        for (const thread of affectedThreads) {
+          if (thread.rootFolderId) {
+            createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
+              urlPathParams: { threadId: thread.id },
+            })("thread-deleted", {
+              requestData: { rootFolderId: thread.rootFolderId },
+            });
+          }
+          if (thread.userId) {
+            void removeVirtualNodesByEntityId(
+              thread.userId,
+              "/threads",
+              thread.id,
+            ).catch((err: Error) =>
+              logger.warn("[folder-delete] cortex cleanup failed", {
+                threadId: thread.id,
+                error: err.message,
+              }),
+            );
+          }
+        }
       }
 
       // Emit folder-deleted for each descendant so nested expanded views update.

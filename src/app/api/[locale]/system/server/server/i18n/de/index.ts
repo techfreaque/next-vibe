@@ -301,11 +301,6 @@ export const translations: typeof enTranslations = {
           description:
             "Profiling aktivieren: setzt NEXT_TURBOPACK_TRACING=1 (Trace-Datei unter .next/dev/trace-turbopack) und NEXT_CPU_PROF=1 (schreibt .cpuprofile beim Beenden)",
         },
-        fixtureMode: {
-          title: "Fixture-Modus",
-          description:
-            "HTTP-Fixture-Caching aktivieren (VIBE_FIXTURE_MODE=true). Fängt externe API-Aufrufe ab und speichert/repliziert sie aus src/generated/ai-fixtures/http-cache/. Für E2E-Tests gegen diesen Server als Remote.",
-        },
         success: {
           title: "Erfolg",
         },

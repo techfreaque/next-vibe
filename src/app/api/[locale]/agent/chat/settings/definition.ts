@@ -21,7 +21,7 @@ import {
 import { z } from "zod";
 
 import { ChatModelId, ChatModelIdOptions } from "../../ai-stream/models";
-import { SearchProviderDB, SearchProviderOptions } from "../../search/enum";
+import { SearchProviderDB, SearchProviderOptions } from "../../web-search/enum";
 import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
 import {
   CHAT_SETTINGS_GET_ALIAS,

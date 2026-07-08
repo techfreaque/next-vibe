@@ -33,10 +33,10 @@ import {
   StreamErrorType,
 } from "./core/constants";
 import { buildSseMessageRow } from "./core/db-writer/sse-row";
-import { estimateTokensFromContext } from "./core/infra";
 import type { MessageDbWriter } from "./core/message-db-writer";
 import type { StreamContext } from "./core/stream";
 import { clearStreamingState } from "./core/stream";
+import { estimateTokensFromContext } from "./core/token-estimator";
 import { serializeError } from "./error-utils";
 
 /**
@@ -285,7 +285,7 @@ export class StreamErrorCatchHandler {
         },
       );
     } finally {
-      await clearStreamingState(threadId, logger, user);
+      await clearStreamingState(threadId, logger, user, ctx.streamRunId);
       ctx.cleanup();
     }
   }
@@ -595,7 +595,7 @@ export class AbortErrorHandler {
     // pending work (cron rows + pending-calls registry with cross-process
     // reconciliation) and decides waiting vs idle. A blind set here would
     // leave the thread stuck in 'waiting' forever.
-    await clearStreamingState(threadId, logger, user);
+    await clearStreamingState(threadId, logger, user, ctx.streamRunId);
 
     ctx.cleanup();
 

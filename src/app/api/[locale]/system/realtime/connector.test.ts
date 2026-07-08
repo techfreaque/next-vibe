@@ -161,6 +161,7 @@ async function patchHermesAtlasConnection(
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
   const result = await sendTestRequest({
+    streamContext: undefined,
     endpoint: connByIdDef.PATCH,
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
     data: { ...patch, reconnectNow: true },
@@ -779,6 +780,7 @@ if (_remoteUrl) {
             await import("@/app/api/[locale]/remote-connection/self/rename/definition")
           ).default;
           const renameResult = await sendTestRequest({
+            streamContext: undefined,
             endpoint: selfRenameDef.PATCH,
             data: { newInstanceId, propagate: true },
             user: testUser,
@@ -854,6 +856,7 @@ if (_remoteUrl) {
             await import("@/app/api/[locale]/remote-connection/self/rename/definition")
           ).default;
           const restoreResult = await sendTestRequest({
+            streamContext: undefined,
             endpoint: selfRenameDef.PATCH,
             data: { newInstanceId: HERMES_INSTANCE_ID, propagate: true },
             user: testUser,
@@ -962,6 +965,7 @@ if (_remoteUrl) {
             await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
           ).default;
           const patchResult = await sendTestRequest({
+            streamContext: undefined,
             endpoint: connByIdDef.PATCH,
             urlPathParams: { instanceId: HERMES_INSTANCE_ID },
             data: {

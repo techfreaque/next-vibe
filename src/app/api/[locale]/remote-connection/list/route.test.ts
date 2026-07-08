@@ -27,12 +27,15 @@ describe("Remote Connection list", () => {
 
   it("RL1: GET returns success with connections array", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
       data: {},
     });
 
     expect(result.success, "RL1: expected success").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     expect(
       Array.isArray(result.data.connections),
       "RL1: connections must be an array",
@@ -43,6 +46,7 @@ describe("Remote Connection list", () => {
 
   it("RL2: GET is admin-only", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
       data: {},
       user: customerUser,
@@ -55,12 +59,15 @@ describe("Remote Connection list", () => {
 
   it("RL3: GET activeOnly=true returns success (array may be empty)", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.GET,
       data: { activeOnly: true },
     });
 
     expect(result.success, "RL3: expected success with activeOnly").toBe(true);
-    if (!result.success) {return;}
+    if (!result.success) {
+      return;
+    }
     expect(
       Array.isArray(result.data.connections),
       "RL3: connections must be array",

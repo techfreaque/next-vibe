@@ -14,7 +14,11 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { expect } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import type { SlimMessage } from "../../../testing/headless-test-runner";
@@ -64,6 +68,13 @@ export interface RunStreamDeps {
   cfg: ModeConfig;
   /** Suite root: BACKGROUND unless the mode overrides with an instance folder root. */
   suiteRootFolderId: DefaultFolderId;
+  /**
+   * Per-case fixture context, set by each test case before its first stream
+   * (suite-closure state, same pattern as getTestSubFolderId). runStream
+   * passes it EXPLICITLY into runTestStream → streamContext → the whole
+   * chain; the thread anchors it for later turns and revivals.
+   */
+  getCaseFixture: () => FixtureContext | undefined;
   /** Thread messages, testUser-bound. */
   getMessages: (tid: string) => Promise<SlimMessage[]>;
   /** Current streamingState for a thread via the messages endpoint. */
@@ -74,9 +85,18 @@ export interface RunStreamDeps {
   getOverrideSubFolderId: () => string | undefined;
 }
 
-export type RunStreamParams = Parameters<typeof runTestStream>[0] & {
+export type RunStreamParams = Omit<
+  Parameters<typeof runTestStream>[0],
+  "fixtureContext"
+> & {
   /** Set ONLY for tests that exercise tool error paths. */
   allowToolErrors?: boolean;
+  /**
+   * Optional here (and ONLY here): makeRunStream explicitly injects
+   * deps.getCaseFixture() — that injection IS the conscious explicit pass
+   * required by runTestStream's own signature. Set to override per call.
+   */
+  fixtureContext?: FixtureContext;
 };
 
 export type RunStreamFn = (
@@ -123,15 +143,67 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           : effectiveRootFolderId === suiteRootFolderId
             ? deps.getTestSubFolderId()
             : undefined;
+    // Settle BEFORE sending on an existing thread. Two hazards from the
+    // previous case, both real product timing, both fatal to a linear chain:
+    //   1. 'streaming' still held (late wakeUp revival) → this send would be
+    //      AUTO-QUEUED and the case would read messages before its turn ran.
+    //   2. idle but with a PENDING wakeUp task → the deferred result inserts
+    //      under the same parent this send resolves → branch violation.
+    // So: drain pending wakeUp tasks first (their revival flips the thread
+    // through streaming and back), then require idle. Generous window —
+    // revivals take a full model turn.
+    if (params.threadId) {
+      const settleDeadline = Date.now() + 120_000;
+      for (;;) {
+        const pending = await db
+          .select({ id: cronTasks.id, status: cronTasks.lastExecutionStatus })
+          .from(cronTasks)
+          .where(
+            and(
+              eq(cronTasks.wakeUpThreadId, params.threadId),
+              eq(cronTasks.enabled, true),
+            ),
+          );
+        const active = pending.filter(
+          (p) =>
+            !["completed", "cancelled", "failed", "stopped"].includes(
+              p.status ?? "",
+            ),
+        );
+        if (active.length === 0 || Date.now() > settleDeadline) {
+          break;
+        }
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 500);
+        });
+      }
+      // Idle must be STABLE: a just-terminal wakeUp task fires its revival
+      // stream a beat later (terminal → revival → streaming → idle). Two
+      // consecutive idle reads with a gap close that window.
+      await waitForThreadIdle(
+        params.threadId,
+        params.user,
+        60_000,
+        effectiveRootFolderId,
+      );
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 1_500);
+      });
+      await waitForThreadIdle(
+        params.threadId,
+        params.user,
+        60_000,
+        effectiveRootFolderId,
+      );
+    }
     const firstResult = await runTestStream({
+      fixtureContext: deps.getCaseFixture(),
       ...params,
       rootFolderId: effectiveRootFolderId,
       subFolderId: effectiveSubFolderId,
-      // Remote-folder loop-local: executionContext.loopLocation forces the
-      // loop HERE; prompt + tools still come from the remote.
-      ...(cfg.forceLocalLoop && effectiveRootFolderId === DefaultFolderId.REMOTE
-        ? { loopInstanceId: "self" }
-        : {}),
+      // Remote-folder loop-local topology is a CONNECTION setting
+      // (remoteConnections.loopLocation = 'caller'), configured by the suite
+      // setup — nothing rides the stream request.
     });
 
     // Waiting-state handling — two flavors:
@@ -377,7 +449,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           if (resumeRow) {
             return true;
           }
-          return hasPendingCallForThread(tid);
+          return PendingCalls.hasForThread(tid);
         };
         // The caller's stream has returned — a 'streaming' state on the
         // thread now belongs to a revival claim and counts as pending work.
@@ -452,9 +524,9 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           // pending-call entries against the backfilled tool message and
           // fires any attached await-task revival.
           if (cfg.remoteInstanceId && revivalState === "waiting") {
-            const { hasPendingCallForThread: reconcileTick } =
-              await import("next-vibe/execute-tool/pending-calls");
-            await reconcileTick(tid);
+            const { PendingCalls: reconcileRegistry } =
+              await import("next-vibe/execute-tool/repository/pending-calls");
+            await reconcileRegistry.hasForThread(tid);
           }
           // If thread went back to 'waiting' (AI retried after failure), pulse again.
           if (
@@ -664,6 +736,15 @@ async function assertCasePlacement(
     cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") || "regular";
   const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
     await import("../../../testing/remote-setup");
+  // The ORIGIN's title is the parity anchor: it must derive from the first
+  // user message (test prompts always start with "[T"), and every mirror
+  // must carry it VERBATIM.
+  const [localThreadRow] = await db
+    .select({ title: chatThreads.title })
+    .from(chatThreads)
+    .where(eq(chatThreads.id, threadId))
+    .limit(1);
+  const localTitle = localThreadRow?.title ?? "";
   if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
     if (effectiveRootFolderId !== DefaultFolderId.REMOTE) {
       return; // explicit non-default root (e.g. incognito case) — exempt
@@ -677,6 +758,7 @@ async function assertCasePlacement(
       threadId,
       rootFolderId: DefaultFolderId.REMOTE,
       nameChain: [HERMES_INSTANCE_ID, "tests", testCaseName],
+      expectedTitlePrefix: "[T",
     });
     if (cfg.forceLocalLoop) {
       // Loop-LOCAL topology: the "self" sentinel keeps the loop here — no
@@ -689,6 +771,7 @@ async function assertCasePlacement(
       threadId,
       rootFolderId: DefaultFolderId.REMOTE,
       nameChain: [SELF_INSTANCE_ID, "private", "tests", testCaseName],
+      expectedTitle: localTitle,
     });
     return;
   }
@@ -698,6 +781,9 @@ async function assertCasePlacement(
   if (effectiveRootFolderId !== suiteRootFolderId) {
     return; // per-call override (incognito etc.) — exempt
   }
+  // No title assertion: threadId pins identity, and the AI may legitimately
+  // rename the thread mid-suite (the rename system-prompt fragment instructs
+  // exactly that) — the placement under test is the FOLDER chain.
   await assertThreadPlacement({
     db: "local",
     threadId,
@@ -718,6 +804,7 @@ async function assertCasePlacement(
           threadId,
           rootFolderId: DefaultFolderId.REMOTE,
           nameChain: [SELF_INSTANCE_ID, "private", "tests", testCaseName],
+          expectedTitle: localTitle,
         });
         // Placement alone is not the contract: every local message must have
         // mirrored with the same role + parent (the user message included).

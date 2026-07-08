@@ -24,9 +24,6 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import { and, eq, like, sql } from "drizzle-orm";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -35,14 +32,14 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 
-import {
-  patchFetchCacheFixtures,
-  setFetchCacheContext,
-} from "../../ai-stream/testing/fetch-cache";
+import { seedCaseThread } from "../../ai-stream/testing/fixture-seed";
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -56,7 +53,7 @@ import {
 export interface CodingAgentModeConfig {
   /** Human-readable label for describe() title */
   label: string;
-  /** Prefix for setFetchCacheContext - e.g. "ca-direct-", "ca-queue-" */
+  /** Prefix for fixture thread names - e.g. "ca-direct-", "ca-queue-" */
   cachePrefix: string;
   /** Remote instanceId (always "hermes" for both direct and queue) */
   remoteInstanceId: string;
@@ -77,7 +74,6 @@ export interface CodingAgentModeConfig {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
 
 /** Build the prompt text to call coding-agent via execute-tool with a callbackMode */
 function agentInstr(
@@ -289,117 +285,6 @@ async function waitForThreadIdle(
   }
 }
 
-/**
- * Patch wakeUp fixtures: the AI's LLM response hardcodes the task ID from the
- * recording run. On each replay, a new task ID is created by execute-tool.
- * This reads the dispatch message to get the current live task ID, then
- * replaces any old `remote-hermes-*` ID in the fixture directory so
- * await-task can find the real task on subsequent replays.
- *
- * Must be called immediately after runStream() returns (before pulse),
- * when the dispatch message is already in the DB but the task is still pending.
- */
-async function patchWakeUpFixture(
-  contextName: string,
-  threadId: string,
-  user: JwtPrivatePayloadType,
-): Promise<void> {
-  const msgs = await fetchThreadMessages(threadId, user);
-  const dispatchMsg = msgs.findLast(
-    (m) =>
-      m.role === "tool" &&
-      m.toolCall?.toolName === "execute-tool" &&
-      m.toolCall?.isDeferred !== true &&
-      toolResultRecord(m.toolCall.args)?.["toolName"] === "coding-agent",
-  );
-  const liveTaskId = toolResultRecord(dispatchMsg?.toolCall?.result)?.[
-    "taskId"
-  ];
-  if (typeof liveTaskId !== "string" || !liveTaskId.startsWith("remote-")) {
-    return;
-  }
-
-  // Read fixture files to find the previously-recorded wakeUp task ID.
-  // The task ID lives in the LLM request file (call 2) as part of the conversation
-  // history - specifically as the execute-tool result the AI received. We want the
-  // LAST remote-hermes-* ID in that file, which is the wakeUp task's taskId
-  // (earlier IDs belong to prior CA steps like DETACH).
-  const { existsSync, readdirSync, readFileSync } = await import("node:fs");
-  const { join } = await import("node:path");
-  const { HTTP_CACHE_DIR } =
-    await import("../../ai-stream/testing/fetch-cache");
-  // patchFetchCacheFixtures slugifies the context name the same way: lowercase, non-alnum → "-"
-  const slug = contextName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  const dir = join(HTTP_CACHE_DIR, slug);
-  if (!existsSync(dir)) {
-    return;
-  }
-
-  // The wakeUp task ID is the LAST remote-hermes-* occurrence in the req-2 file
-  // (the second LLM call request includes the full conversation up to that point).
-  const req2 = join(dir, "moonshotai-kimi-k2-5-2-req.json");
-  const targetFile = existsSync(req2)
-    ? req2
-    : readdirSync(dir).find((f: string) => f.endsWith("-req.json"))
-      ? join(
-          dir,
-          readdirSync(dir)
-            .filter((f: string) => f.endsWith("-req.json"))
-            .at(-1)!,
-        )
-      : null;
-
-  if (!targetFile) {
-    return;
-  }
-
-  // Parse the request JSON and find the task ID from the last execute-tool result
-  // in the conversation messages. That's the wakeUp task ID the AI will use.
-  // Fixture format: { url, method, headers, body: { messages: [...] } }
-  let oldId: string | undefined;
-  try {
-    const fixture = JSON.parse(readFileSync(targetFile, "utf-8")) as {
-      body?: {
-        messages?: {
-          role: string;
-          name?: string;
-          content?: string | { type?: string; text?: string }[];
-        }[];
-      };
-    };
-    const messages = [...(fixture.body?.messages ?? [])].toReversed();
-    for (const msg of messages) {
-      // Tool results come as role="tool" with content being a JSON string
-      const contentStr =
-        typeof msg.content === "string"
-          ? msg.content
-          : Array.isArray(msg.content)
-            ? msg.content
-                .map((c) => (typeof c === "object" && c.text ? c.text : ""))
-                .join("")
-            : "";
-      if (msg.role === "tool" && contentStr.includes("taskId")) {
-        const m = contentStr.match(/remote-(?:direct-|ws-)?hermes-[\w.:+-]+/);
-        if (m) {
-          oldId = m[0];
-          break;
-        }
-      }
-    }
-  } catch {
-    // Fallback: find the last remote-hermes-* ID in the raw file text
-    const content = readFileSync(targetFile, "utf-8");
-    const allIds = [
-      ...content.matchAll(/remote-(?:direct-|ws-)?hermes-[\w.:+-]+/g),
-    ].map((m) => m[0]);
-    oldId = allIds.findLast((id) => id !== liveTaskId);
-  }
-
-  if (oldId && oldId !== liveTaskId) {
-    patchFetchCacheFixtures(contextName, oldId, liveTaskId);
-  }
-}
-
 // ── Suite ─────────────────────────────────────────────────────────────────────
 
 export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
@@ -593,10 +478,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA1: batch WAIT - coding-agent output backfilled in original tool message",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca1-batch-wait`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca1-batch-wait`,
+          };
 
           const { result, messages } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             favoriteId: mainFavoriteId,
             prompt: `[CA1] Call ${agentInstr(cfg, "echo hello-ca1", false, "wait")}. After the tool returns, verify the result has an 'output' string containing "hello-ca1". Reply with STEP_OK and quote the exact output value.`,
           });
@@ -709,10 +597,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA2: batch END_LOOP - result backfilled, no deferred child, no revival",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca2-batch-endloop`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca2-batch-endloop`,
+          };
 
           const { result, messages } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA2] Call ${agentInstr(cfg, "echo hello-ca2-endloop", false, "endLoop")}. Stream stops after the tool call. Confirm you received output containing "hello-ca2-endloop". Reply with STEP_OK.`,
@@ -787,10 +678,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA3: batch DETACH - taskId returned immediately, result NOT injected into thread",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca3-batch-detach`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca3-batch-detach`,
+          };
 
           const { result, messages } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA3] Call ${agentInstr(cfg, "echo hello-ca3-detach", false, "detach")}. The tool must return a taskId immediately without waiting. Confirm you received a taskId string. Reply with STEP_OK and include the taskId value.`,
@@ -872,11 +766,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA4: batch WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
-          const wakeUpContext = `${cfg.cachePrefix}ca4-batch-wakeup`;
-          setFetchCacheContext(wakeUpContext);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca4-batch-wakeup`,
+          };
 
           const { result } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA4] Call ${agentInstr(cfg, "echo hello-ca4-wakeup", false, "wakeUp")} ONCE. After the tool returns a taskId, call the await-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca4-wakeup" then reply STEP_OK quoting the exact output value.`,
@@ -886,11 +782,6 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           if (!result.success) {
             return;
           }
-
-          // Patch fixture: the AI's LLM response (fixture) hardcodes the task ID
-          // from the recording run. On replay, a new task ID is created. Patching
-          // the fixture with the current run's ID keeps it valid for subsequent replays.
-          await patchWakeUpFixture(wakeUpContext, threadId, testUser);
 
           // pulse: execute the pending wakeUp task + await-task dependency
           if (cfg.pulse) {
@@ -1044,10 +935,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA5: interactive WAIT - escalates, stream waits, complete-task → backfill + revival",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca5-interactive-wait`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca5-interactive-wait`,
+          };
 
           const { result } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             favoriteId: mainFavoriteId,
             prompt: `[CA5] Call ${agentInstr(cfg, "echo hello-ca5-wait", true, "wait")}. The tool escalates to a background task. After revival verify the result output contains "hello-ca5-wait". Reply with STEP_OK and quote the exact output.`,
           });
@@ -1137,10 +1031,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA6: interactive END_LOOP - escalates, stream stops, result backfilled, no deferred",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca6-interactive-endloop`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca6-interactive-endloop`,
+          };
 
           const { result, messages } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA6] Call ${agentInstr(cfg, "echo hello-ca6-endloop", true, "endLoop")}. Stream stops after execution. Confirm output contains "hello-ca6-endloop". Reply with STEP_OK.`,
@@ -1222,10 +1119,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA7: interactive DETACH - taskId returned immediately, no result injection",
         async () => {
-          setFetchCacheContext(`${cfg.cachePrefix}ca7-interactive-detach`);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca7-interactive-detach`,
+          };
 
           const { result, messages } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA7] Call ${agentInstr(cfg, "echo hello-ca7-detach", true, "detach")}. Must return taskId immediately. Confirm you got a taskId string. Reply with STEP_OK including the taskId.`,
@@ -1314,11 +1214,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA8: interactive WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
-          const wakeUpContext = `${cfg.cachePrefix}ca8-interactive-wakeup`;
-          setFetchCacheContext(wakeUpContext);
+          const fixtureCtx: FixtureContext = {
+            name: `${cfg.cachePrefix}ca8-interactive-wakeup`,
+          };
 
           const { result } = await runStream({
             user: testUser,
+            fixtureContext: fixtureCtx,
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA8] Call ${agentInstr(cfg, "echo hello-ca8-wakeup", true, "wakeUp")} ONCE. After the tool returns a taskId, call await-task ONCE with that taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca8-wakeup" then reply STEP_OK quoting the exact output value.`,
@@ -1328,9 +1230,6 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           if (!result.success) {
             return;
           }
-
-          // Patch fixture: same wakeUp task ID instability as CA4
-          await patchWakeUpFixture(wakeUpContext, threadId, testUser);
 
           if (cfg.pulse) {
             await cfg.pulse(threadId);

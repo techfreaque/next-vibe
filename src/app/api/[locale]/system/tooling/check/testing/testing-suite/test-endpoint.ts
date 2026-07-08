@@ -26,6 +26,8 @@ import type {
 import { beforeAll, describe, expect, it } from "vitest";
 import type { z } from "zod";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
+
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
@@ -115,6 +117,7 @@ export function testEndpoint<
             typeof sendTestRequest
           >[0]["urlPathParams"],
           user,
+          streamContext: rootlessStreamContext(),
         });
       },
     };

@@ -42,7 +42,12 @@ interface OpenAIRequestBody {
 /**
  * Create a FreedomGPT provider with tool calling support via prompt engineering
  */
-export function createFreedomGPT(logger: EndpointLogger): {
+export function createFreedomGPT(
+  logger: EndpointLogger,
+  // Explicit fetch — the fixture engine binds record/replay per execution
+  // chain (createFixtureFetch); plain live fetch otherwise. Never global.
+  fetchImpl: typeof globalThis.fetch,
+): {
   chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   const apiKey = agentEnv.FREEDOMGPT_API_KEY;
@@ -86,8 +91,7 @@ export function createFreedomGPT(logger: EndpointLogger): {
     };
 
     // Make the actual request
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
-    const response = await fetch(input, modifiedInit);
+    const response = await fetchImpl(input, modifiedInit);
 
     if (!response.ok) {
       const errorText = await response.text();

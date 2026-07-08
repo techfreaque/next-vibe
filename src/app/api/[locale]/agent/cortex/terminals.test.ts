@@ -32,6 +32,7 @@ describe("Cortex Terminals E2E", () => {
 
   it("lists all terminals with a valid shape when no path filter is given", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: terminalsEndpoint.GET,
       data: {},
       user,
@@ -55,6 +56,7 @@ describe("Cortex Terminals E2E", () => {
 
   it("filters by a connection path and returns an empty list with total 0", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: terminalsEndpoint.GET,
       data: { path: "/ssh/local-machine" },
       user,
@@ -75,6 +77,7 @@ describe("Cortex Terminals E2E", () => {
 
   it("returns an empty list for an /ssh path with no sessions", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: terminalsEndpoint.GET,
       data: { path: "/ssh/no-sessions-here-xyz" },
       user,
@@ -96,6 +99,7 @@ describe("Cortex Terminals E2E", () => {
     // A path that does not match /ssh/<slug> parses to a null slug, which means
     // "list everything". With an empty pool that is still { terminals: [], 0 }.
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: terminalsEndpoint.GET,
       data: { path: "/documents/whatever" },
       user,

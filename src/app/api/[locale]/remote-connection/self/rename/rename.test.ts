@@ -39,10 +39,7 @@ import {
 } from "@/app/api/[locale]/remote-connection/db";
 import { env } from "@/config/env";
 
-import {
-  installFetchCache,
-  setFetchCacheContext,
-} from "../../../agent/ai-stream/testing/fetch-cache";
+import type { FixtureContext } from "../../../agent/ai-stream/testing/fetch-cache";
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";
 import {
   ATLAS_INSTANCE_ID,
@@ -59,8 +56,6 @@ import {
   unregisterDevFromHermes,
 } from "../../../agent/ai-stream/testing/remote-setup";
 import selfRenameDefinitions from "./definition";
-
-installFetchCache();
 
 // ── Skip guard ─────────────────────────────────────────────────────────────────
 
@@ -274,6 +269,7 @@ if (_remoteUrl) {
 
       // Call the local self-rename endpoint via the typed executor (propagate=false: local only)
       const rn1Resp = await sendTestRequest({
+        streamContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newName, propagate: false },
         user: testUser,
@@ -312,6 +308,7 @@ if (_remoteUrl) {
 
       // Call the local self-rename endpoint via the typed executor (propagate=true: fires PATCH to hermes)
       const rn2Resp = await sendTestRequest({
+        streamContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newName, propagate: true },
         user: testUser,
@@ -401,7 +398,7 @@ if (_remoteUrl) {
     // ── RN4: stream from remote/hermes folder routes to hermes after rename ───
 
     it("RN4: stream from remote/hermes subfolder routes AI to hermes — prod DB receives messages", async () => {
-      setFetchCacheContext("rename-rn4-");
+      const fixtureCtx: FixtureContext = { name: "rename-rn4-" };
 
       // Run a stream from the localFolderId (remote/hermes subfolder).
       // REMOTE-folder routing is deterministic — folder ancestry resolves to hermes.
@@ -411,6 +408,7 @@ if (_remoteUrl) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId,
+        streamContext: fixtureCtx,
       });
 
       expect(
@@ -466,6 +464,7 @@ if (_remoteUrl) {
       //
       // We call hermes's rename endpoint via sendTestRequest with instanceId routing.
       const rn5Resp = await sendTestRequest({
+        streamContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newHermesName, propagate: true },
         user: testUser,

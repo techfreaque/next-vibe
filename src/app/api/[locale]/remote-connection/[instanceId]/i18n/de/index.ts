@@ -148,6 +148,24 @@ export const translations: typeof enTranslations = {
       description:
         "Admin-Override: Alle KI-Streams durch diese Verbindung leiten, unabhängig von Kosten oder Benutzerregeln. Nur eine Verbindung gleichzeitig.",
     },
+    threadMirrorMode: {
+      label: "Thread-Spiegelung",
+      description:
+        "Ob Threads zwischen dieser und der verbundenen Instanz synchronisiert werden. 'both' spiegelt in beide Richtungen; 'off' belässt jeden Thread dort, wo er erstellt wurde.",
+      options: {
+        both: "In beide Richtungen spiegeln",
+        off: "Keine Spiegelung",
+      },
+    },
+    loopLocation: {
+      label: "Loop-Standort",
+      description:
+        "Wo der KI-Loop eines Remote-Threads läuft. 'target' führt ihn auf der verbundenen Instanz aus (Standard); 'caller' hält den Loop hier, Tools laufen weiterhin remote.",
+      options: {
+        target: "Auf der verbundenen Instanz",
+        caller: "Auf dieser Instanz",
+      },
+    },
     syncScope: {
       label: "Sync-Umfang",
       description:

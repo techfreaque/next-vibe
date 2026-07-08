@@ -18,18 +18,25 @@ describe("POST /user/private/logout", () => {
 
   it("logs out authenticated user and returns a message", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       user: adminUser,
     });
 
-    expect(res.success, `Logout failed: ${String(res.success === false && res.message)}`).toBe(true);
-    if (!res.success) {return;}
+    expect(
+      res.success,
+      `Logout failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+    if (!res.success) {
+      return;
+    }
     expect(res.data.message).toBeTypeOf("string");
     expect(res.data.message.length).toBeGreaterThan(0);
   });
 
   it("rejects unauthenticated (public) user with FORBIDDEN", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       user: {
         isPublic: true,
@@ -39,17 +46,37 @@ describe("POST /user/private/logout", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.FORBIDDEN.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.FORBIDDEN.errorCode,
+    );
   });
 
   it("calling logout twice in a row both succeed (idempotent session clearing)", async () => {
-    const first = await sendTestRequest({ endpoint, user: adminUser });
-    expect(first.success, `First logout failed: ${String(first.success === false && first.message)}`).toBe(true);
+    const first = await sendTestRequest({
+      streamContext: undefined,
+      endpoint,
+      user: adminUser,
+    });
+    expect(
+      first.success,
+      `First logout failed: ${String(first.success === false && first.message)}`,
+    ).toBe(true);
 
-    const second = await sendTestRequest({ endpoint, user: adminUser });
-    expect(second.success, `Second logout failed: ${String(second.success === false && second.message)}`).toBe(true);
-    if (!second.success) {return;}
+    const second = await sendTestRequest({
+      streamContext: undefined,
+      endpoint,
+      user: adminUser,
+    });
+    expect(
+      second.success,
+      `Second logout failed: ${String(second.success === false && second.message)}`,
+    ).toBe(true);
+    if (!second.success) {
+      return;
+    }
     expect(second.data.message).toBeTypeOf("string");
   });
 });

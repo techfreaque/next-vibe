@@ -13,6 +13,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 /**
  * Standard params passed to every server-side fragment data loader.
@@ -41,10 +42,14 @@ export interface SystemPromptServerParams {
   extraInstructions?: string;
   /** Last user message content - used for vector search context injection */
   lastUserMessage?: string;
+  /** Active thread ID — passed to fragments that need thread context (e.g. rename) */
+  threadId?: string | null;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
   /** Resolved media generation capabilities for the current request */
   mediaCapabilities?: MediaCapabilitiesParams;
+  /** Fixture chain of the stream — cortex vector-search embeddings bind it. */
+  fixtureContext: FixtureContext | undefined;
 }
 
 /** Resolved media generation model info passed from stream-setup to the system prompt fragment. */

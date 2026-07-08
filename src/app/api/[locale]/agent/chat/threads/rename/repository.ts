@@ -19,6 +19,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+
 import { chatFolders, chatThreads } from "../../db";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
 import { canUpdateThread } from "../../permissions/permissions";

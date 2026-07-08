@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ADD COLUMN "loop_location" text DEFAULT 'target' NOT NULL;

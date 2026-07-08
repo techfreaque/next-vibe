@@ -159,9 +159,12 @@ export async function urlToFile(
   url: string,
   filename: string,
   mimeType: string,
+  /** Fixture-aware fetch when called inside a stream; defaults to live fetch. */
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<File | null> {
   try {
-    const response = await fetch(url);
+    const response = await fetchImpl(url);
     if (!response.ok) {
       return null;
     }

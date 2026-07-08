@@ -24,8 +24,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { ExecuteToolRouting } from "next-vibe/execute-tool/repository/routing";
-import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -39,6 +37,8 @@ import { envClient } from "@/config/env-client";
 import registerEndpoints from "../connect-reverse/definition";
 import { remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { ExecuteToolRouting } from "../routing";
+import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectPostRequestInput,
   RemoteConnectPostResponseOutput,

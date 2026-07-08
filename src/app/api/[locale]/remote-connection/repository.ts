@@ -294,6 +294,11 @@ export class RemoteConnectionRepository {
       });
 
     logger.debug("Stored remote connection", { userId, remoteUrl, instanceId });
+    // Domains prepare their per-peer state (e.g. the threads mirror scaffold)
+    // the moment the link exists — mirrors land under stable roots, no wire
+    // ever ships folder chains.
+    const { notifyConnectionEstablished } = await import("./sync/provider");
+    await notifyConnectionEstablished(userId, instanceId, logger);
     return success({ remoteUrl, isConnected: true });
   }
 

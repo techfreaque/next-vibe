@@ -1,4 +1,3 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -37,6 +36,8 @@ export async function generateMusicWithModelsLab(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ audioUrl: string }>> {
   const {
     providerModel,
@@ -46,6 +47,7 @@ export async function generateMusicWithModelsLab(params: {
     locale,
     signal,
     inputMediaUrl,
+    fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -63,7 +65,7 @@ export async function generateMusicWithModelsLab(params: {
   });
 
   try {
-    const submitResponse = await fetch(
+    const submitResponse = await fetchImpl(
       "https://modelslab.com/api/v7/voice/music-gen",
       {
         method: "POST",
@@ -110,6 +112,7 @@ export async function generateMusicWithModelsLab(params: {
         eta: result.eta,
       });
 
+      let lastResponse: Response = submitResponse;
       for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
         if (signal?.aborted) {
           return fail({
@@ -117,13 +120,14 @@ export async function generateMusicWithModelsLab(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        await pollDelay(POLL_INTERVAL_MS);
+        await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
-        const pollResponse = await fetch(fetchUrl, {
+        const pollResponse = await fetchImpl(fetchUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: agentEnv.MODELSLAB_API_KEY }),
         });
+        lastResponse = pollResponse;
 
         if (!pollResponse.ok) {
           logger.debug("[ModelsLab Music] Poll request failed, retrying", {

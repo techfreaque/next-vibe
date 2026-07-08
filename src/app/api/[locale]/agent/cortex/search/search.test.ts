@@ -190,6 +190,7 @@ async function deleteVirtualFixtures(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fail the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -223,6 +224,7 @@ describe("Cortex Search E2E", () => {
       await writeFile(path, content);
 
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: SENTINEL, path: `${TEST_PREFIX}`, maxResults: 20 },
         user,
@@ -255,6 +257,7 @@ describe("Cortex Search E2E", () => {
       await writeFile(pathB, `Subdir B also holds the ${token} here.`);
 
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: token, path: `${TEST_PREFIX}/scope-a`, maxResults: 20 },
         user,
@@ -282,6 +285,7 @@ describe("Cortex Search E2E", () => {
       // nonsense keyword alone is NOT enough: when embeddings exist, the vector
       // branch returns nearest-neighbor rows regardless of keyword relevance.)
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: {
           query: "anything-goes-here",
@@ -309,6 +313,7 @@ describe("Cortex Search E2E", () => {
       // A SQL LIKE wildcard in a path segment makes isValidPath() reject after
       // normalization, before any search runs.
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: SENTINEL, path: "/documents/wild%card", maxResults: 20 },
         user,
@@ -335,6 +340,7 @@ describe("Cortex Search E2E", () => {
       );
 
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: token, path: `${TEST_PREFIX}/rank`, maxResults: 20 },
         user,
@@ -369,6 +375,7 @@ describe("Cortex Search E2E", () => {
       }
 
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: token, path: `${TEST_PREFIX}/cap`, maxResults: 2 },
         user,
@@ -394,6 +401,7 @@ describe("Cortex Search E2E", () => {
       await writeFile(path, content);
 
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: token, path: `${TEST_PREFIX}/excerpt`, maxResults: 20 },
         user,
@@ -536,6 +544,7 @@ describe("Cortex Search E2E", () => {
       // beforeAll materialized + embedded a /threads index row whose path and
       // embedding text carry the unique token, so a token search must return it.
       const res = await sendTestRequest({
+        streamContext: undefined,
         endpoint: searchEndpoint.GET,
         data: { query: THREAD_TOKEN, path: "/threads", maxResults: 10 },
         user,

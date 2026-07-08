@@ -13,7 +13,6 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 
 import type { AiStreamPostRequestOutput } from "../definition";
 import type { StartStreamFn } from "./shared";

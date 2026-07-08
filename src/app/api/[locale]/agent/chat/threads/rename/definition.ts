@@ -47,7 +47,7 @@ const { PATCH } = createEndpoint({
     children: {
       // === REQUEST FIELDS ===
       // threadId is provided by CLI/MCP/web callers.
-      // For the AI platform it is hidden and auto-filled from streamContext.threadId.
+      // For the AI platform it is hidden and auto-filled from streamContext.
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,

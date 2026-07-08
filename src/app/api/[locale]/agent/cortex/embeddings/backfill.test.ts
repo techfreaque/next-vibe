@@ -49,6 +49,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("runs backfill as admin and returns the numeric count shape", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user,
@@ -73,6 +74,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("is idempotent — a second run still returns a valid count shape", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user,
@@ -95,6 +97,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("rejects a public (non-admin) caller", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user: publicUser,

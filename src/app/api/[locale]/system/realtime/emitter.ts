@@ -36,6 +36,7 @@ import type {
   EmitDataRuntime,
   EmitEventNamed,
   EmitResult,
+  EndpointEmitter,
 } from "./structured-events";
 import type { WsWireMessage } from "./types";
 

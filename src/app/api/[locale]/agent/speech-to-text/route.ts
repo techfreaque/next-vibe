@@ -14,13 +14,14 @@ import { SpeechToTextRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
+    handler: ({ data, user, locale, logger, streamContext }) =>
       SpeechToTextRepository.transcribeAudio(
         data.fileUpload.files,
         user,
         locale,
         logger,
         data.modelId,
+        streamContext,
       ),
   },
 });

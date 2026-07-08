@@ -395,6 +395,7 @@ export function startWebSocketServer(
             user,
             channels: new Set(channel ? [channel] : []),
             connectedAt: Date.now(),
+            connectorInstanceId,
           } satisfies WsConnectionData,
         });
 
@@ -528,6 +529,7 @@ export function startWebSocketServer(
     broadcastToAll: broadcastLocalToAll,
     broadcastBatch: broadcastLocalBatch,
     getChannelSize,
+    closeConnectorSocket,
   });
 
   return {

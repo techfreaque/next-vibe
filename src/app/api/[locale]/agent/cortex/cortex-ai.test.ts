@@ -28,9 +28,6 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import { and, eq, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -41,14 +38,18 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import { seedCaseThread } from "@/app/api/[locale]/agent/ai-stream/testing/fixture-seed";
 import {
   getOrCreateFolder,
   runTestStream,
   type SlimMessage,
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import {
@@ -354,12 +355,12 @@ describe("Cortex AI Integration", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-ai",
       testsParentId,
     );
@@ -409,11 +410,12 @@ describe("Cortex AI Integration", () => {
 
   // ── C1: Write via AI ───────────────────────────────────────────────────────
   fit("C1: AI writes a file via cortex-write", async () => {
-    setFetchCacheContext("cortex-ai-write");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-write" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n${INITIAL_CONTENT}\n\nAfter writing, confirm what you did.${VERDICT_INSTRUCTION}`,
     });
 
@@ -480,12 +482,13 @@ describe("Cortex AI Integration", () => {
 
   // ── C2: Read via AI ────────────────────────────────────────────────────────
   fit("C2: AI reads the file via cortex-read", async () => {
-    setFetchCacheContext("cortex-ai-read");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it - quote the exact content you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -537,12 +540,13 @@ describe("Cortex AI Integration", () => {
 
   // ── C3: Edit via AI ───────────────────────────────────────────────────────
   fit("C3: AI edits the file via cortex-edit", async () => {
-    setFetchCacheContext("cortex-ai-edit");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-edit" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-edit to replace the word "${ORIGINAL_WORD}" with "${EDITED_CONTENT_FRAGMENT}" in /documents/ai-test/notes.md. Report exactly how many replacements were made.${VERDICT_INSTRUCTION}`,
     });
 
@@ -591,12 +595,13 @@ describe("Cortex AI Integration", () => {
 
   // ── C3.5: Verify edit via read ─────────────────────────────────────────────
   fit("C3.5: AI reads back file and confirms edit took effect", async () => {
-    setFetchCacheContext("cortex-ai-verify-edit");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-verify-edit" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-read to read /documents/ai-test/notes.md again. Confirm that the word "${EDITED_CONTENT_FRAGMENT}" appears in the content and that "${ORIGINAL_WORD}" no longer appears. Quote the relevant line.${VERDICT_INSTRUCTION}`,
     });
 
@@ -641,12 +646,13 @@ describe("Cortex AI Integration", () => {
 
   // ── C4: Tree via AI ───────────────────────────────────────────────────────
   fit("C4: AI shows directory tree via cortex-tree", async () => {
-    setFetchCacheContext("cortex-ai-tree");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-tree" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use the cortex-tree tool (not cortex-list) to display the directory tree starting at /documents/ai-test/. I need the tree view specifically. Tell me exactly what files and directories you see.${VERDICT_INSTRUCTION}`,
     });
 
@@ -692,12 +698,13 @@ describe("Cortex AI Integration", () => {
 
   // ── C5: Context awareness ─────────────────────────────────────────────────
   fit("C5: AI remembers workspace context from conversation", async () => {
-    setFetchCacheContext("cortex-ai-context");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-context" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Without using any tools, answer from memory:
 1. What is the exact path of the file you created?
 2. What is the title of that file (the # heading)?
@@ -757,12 +764,13 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C6: Move via AI ────────────────────────────────────────────────────────
   fit("C6: AI moves the file via cortex-move", async () => {
-    setFetchCacheContext("cortex-ai-move");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-move" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-move to rename /documents/ai-test/notes.md to /documents/ai-test/renamed-notes.md. Confirm the move succeeded and both the source and destination paths.${VERDICT_INSTRUCTION}`,
     });
 
@@ -813,12 +821,13 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C7: Delete via AI ─────────────────────────────────────────────────────
   fit("C7: AI deletes the test directory via cortex-delete", async () => {
-    setFetchCacheContext("cortex-ai-delete");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-delete" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-delete to delete /documents/ai-test/ recursively. Confirm what was deleted and how many nodes were removed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -870,12 +879,13 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C8: Post-delete verification ──────────────────────────────────────────
   fit("C8: AI confirms deleted path returns NOT_FOUND", async () => {
-    setFetchCacheContext("cortex-ai-post-delete");
+    const fixtureCtx: FixtureContext = { name: "cortex-ai-post-delete" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.
 
 ---
@@ -998,14 +1008,15 @@ describe("Cortex Mount: /threads", () => {
     }
 
     // Ensure fixture thread exists in DB so M2's cached fixture can read it via cortex-read.
-    // The fixture has the AI reading /threads/cron/...-93595f50-807e-4d65-9c70-d0338e08e1b7.md
-    // rootFolderId must be "cron" (DefaultFolderId.BACKGROUND) to match virtual path /threads/cron/
+    // The fixture has the AI reading /threads/private/...-93595f50-807e-4d65-9c70-d0338e08e1b7.md
+    // rootFolderId "private" matches the virtual path /threads/private/ — test
+    // threads never live in the background root.
     await db
       .insert(chatThreads)
       .values({
         id: "93595f50-807e-4d65-9c70-d0338e08e1b7",
         userId: testUser.id,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         title: "Use cortex-list to list the directory at...",
         folderId: null,
         updatedAt: new Date(),
@@ -1013,7 +1024,7 @@ describe("Cortex Mount: /threads", () => {
       })
       .onConflictDoUpdate({
         target: chatThreads.id,
-        set: { rootFolderId: DefaultFolderId.BACKGROUND },
+        set: { rootFolderId: DefaultFolderId.PRIVATE },
       });
 
     // Ensure fixture thread has at least one message so cortex-read returns a conversation body
@@ -1032,12 +1043,12 @@ describe("Cortex Mount: /threads", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-mount-threads",
       testsParentId,
     );
@@ -1069,11 +1080,12 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M1: List /threads root ──────────────────────────────────────────────────
   fit("M1: AI lists /threads root via cortex-list", async () => {
-    setFetchCacheContext("cortex-mount-threads-list");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-threads-list" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-list to list the directory at /threads. Tell me what root folders you see (private, cron, shared, public, or similar). List every entry name you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1120,13 +1132,14 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M2: Read a thread as markdown ──────────────────────────────────────────
   fit("M2: AI reads a thread file from /threads via cortex-read", async () => {
-    setFetchCacheContext("cortex-mount-threads-read");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-threads-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      prompt: `Use cortex-list on /threads/cron to find a thread file (it will end in .md). Then use cortex-read to read it. Confirm the file has frontmatter with threadId and a conversation body. Quote the threadId from the frontmatter.${VERDICT_INSTRUCTION}`,
+      streamContext: fixtureCtx,
+      prompt: `Use cortex-list on /threads/private to find a thread file (it will end in .md). Then use cortex-read to read it. Confirm the file has frontmatter with threadId and a conversation body. Quote the threadId from the frontmatter.${VERDICT_INSTRUCTION}`,
     });
 
     expect(result.success, "M2: stream failed").toBe(true);
@@ -1167,12 +1180,15 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M3: /threads is read-only ───────────────────────────────────────────────
   fit("M3: AI cannot write to /threads (read-only mount)", async () => {
-    setFetchCacheContext("cortex-mount-threads-readonly");
+    const fixtureCtx: FixtureContext = {
+      name: "cortex-mount-threads-readonly",
+    };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Try to use cortex-write to create a file at /threads/test-file.md with content "test". Report exactly what error you get. Do not retry.
 
 ---
@@ -1315,12 +1331,12 @@ describe("Cortex Mount: /skills", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-mount-skills",
       testsParentId,
     );
@@ -1365,11 +1381,12 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S1: List /skills ─────────────────────────────────────────────────────
   fit("S1: AI lists /skills and finds the test skill", async () => {
-    setFetchCacheContext("cortex-mount-skills-list");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-list" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-list to list /skills. Tell me how many skills you see and confirm one is named "${testSkillSlug}.md".${VERDICT_INSTRUCTION}`,
     });
 
@@ -1421,12 +1438,13 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S2: Read the test skill file ─────────────────────────────────────────
   fit("S2: AI reads the test skill and sees system prompt in frontmatter", async () => {
-    setFetchCacheContext("cortex-mount-skills-read");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-read to read /skills/${testSkillSlug}.md. Confirm the file has a YAML frontmatter header with skillId and a system prompt body. Quote the first sentence of the system prompt.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1466,12 +1484,13 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S3: /skills tree via cortex-tree ────────────────────────────────────
   fit("S3: AI gets /skills tree and finds .md files", async () => {
-    setFetchCacheContext("cortex-mount-skills-tree");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-tree" };
     // Fresh thread - force the AI to actually call cortex-tree rather than reuse S1 context
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Call cortex-tree with path=/skills and depth=2. You MUST call the tool - do not rely on any prior context. Report the exact tree output and count how many .md files are listed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1541,12 +1560,12 @@ describe("Cortex Mount: /tasks", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-mount-tasks",
       testsParentId,
     );
@@ -1556,11 +1575,12 @@ describe("Cortex Mount: /tasks", () => {
   it(
     "T1: AI lists /tasks and reads a task file",
     async () => {
-      setFetchCacheContext("cortex-mount-tasks-list");
+      const fixtureCtx: FixtureContext = { name: "cortex-mount-tasks-list" };
       const { result, messages } = await runTestStream({
         user: testUser,
         favoriteId: mainFavoriteId,
         subFolderId: testSubFolderId,
+        streamContext: fixtureCtx,
         prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
       });
 
@@ -1654,12 +1674,12 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-mount-searches",
       testsParentId,
     );
@@ -1707,11 +1727,12 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR1: Write a searchable document ────────────────────────────────────
   fit("SR1: AI writes a uniquely searchable document", async () => {
-    setFetchCacheContext("cortex-mount-search-write");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-write" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-write to create /documents/search-test/quantum-flux.md with this content:\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\n\nConfirm the file was created.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1751,12 +1772,13 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR2: cortex-search finds the document ────────────────────────────────
   fit("SR2: AI searches for the document via cortex-search", async () => {
-    setFetchCacheContext("cortex-mount-search-query");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-query" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-search to search for "quantum flux resonance". Report how many results you find, the path of the first result, and its relevance score. The file should be in /documents/search-test/.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1837,12 +1859,13 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR3: cortex-search scoped to path ────────────────────────────────────
   fit("SR3: AI searches within a specific path prefix", async () => {
-    setFetchCacheContext("cortex-mount-search-scoped");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-scoped" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-search to search for "quantum" but limit the search to the path /documents/search-test/. Report how many results are found and confirm they are all within that path.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1889,12 +1912,13 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR4: /searches mount reflects recent searches ────────────────────────
   fit("SR4: AI lists /searches to see search history", async () => {
-    setFetchCacheContext("cortex-mount-searches-list");
+    const fixtureCtx: FixtureContext = { name: "cortex-mount-searches-list" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-list on /searches to see the search history. If there are month folders, list one. Report how the searches are organized and how many entries you see at the top level.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1970,12 +1994,12 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "cortex-documents",
       testsParentId,
     );
@@ -2023,11 +2047,12 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E1: List root / ──────────────────────────────────────────────────────
   fit("E1: AI lists root / and sees all mount points", async () => {
-    setFetchCacheContext("cortex-edge-root-list");
+    const fixtureCtx: FixtureContext = { name: "cortex-edge-root-list" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-list on the root path "/" to see all available mounts and directories. List every entry you see and identify which are virtual mounts vs native storage.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2069,12 +2094,13 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E2: mkdir + nested write ─────────────────────────────────────────────
   fit("E2: AI creates nested directory structure via mkdir then write", async () => {
-    setFetchCacheContext("cortex-edge-mkdir-nested");
+    const fixtureCtx: FixtureContext = { name: "cortex-edge-mkdir-nested" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-mkdir to create /documents/edge-test/deep/nested/. Then use cortex-write to create /documents/edge-test/deep/nested/leaf.md with content "# Leaf Node\n\nDeep file." Confirm both operations succeeded.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2111,12 +2137,13 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E3: Overwrite (upsert) ───────────────────────────────────────────────
   fit("E3: AI overwrites an existing file (created=false on second write)", async () => {
-    setFetchCacheContext("cortex-edge-overwrite");
+    const fixtureCtx: FixtureContext = { name: "cortex-edge-overwrite" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-write to create /documents/edge-test/overwrite-me.md with content "Version 1". Then immediately use cortex-write again on the same path with content "Version 2". Report what 'created' was for each write - first should be true, second should be false.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2157,12 +2184,13 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E4: Path traversal rejection ─────────────────────────────────────────
   fit("E4: AI cannot traverse paths with .. (security check)", async () => {
-    setFetchCacheContext("cortex-edge-traversal");
+    const fixtureCtx: FixtureContext = { name: "cortex-edge-traversal" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Try to use cortex-read on the path "/documents/../etc/passwd". Report what error you receive. Do not retry.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2201,12 +2229,13 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E5: Cleanup via recursive delete ─────────────────────────────────────
   fit("E5: AI deletes entire edge-test directory tree recursively", async () => {
-    setFetchCacheContext("cortex-edge-cleanup");
+    const fixtureCtx: FixtureContext = { name: "cortex-edge-cleanup" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
+      streamContext: fixtureCtx,
       prompt: `Use cortex-delete to recursively delete /documents/edge-test/. Confirm how many nodes were deleted.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2333,10 +2362,11 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2407,10 +2437,11 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2472,10 +2503,11 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: true, // <-- key flag
@@ -2505,10 +2537,11 @@ describe("Cortex System Prompt Injection", () => {
 
       // Query something that should match our test-inserted skills.md
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2572,10 +2605,11 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2640,10 +2674,11 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
+        streamContext: undefined,
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         skillId: null,
         isIncognito: false,

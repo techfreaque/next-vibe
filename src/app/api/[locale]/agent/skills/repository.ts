@@ -48,6 +48,7 @@ import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speec
 import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 
+import { rootlessStreamContext } from "../chat/config";
 import {
   ensureUniqueSlug,
   generateSlug,
@@ -109,6 +110,7 @@ export class SkillsRepository {
   private static getSkillReferenceIds(
     skillId: string,
     skillSlug: string | null,
+    streamContext: ToolExecutionContext,
   ): string[] {
     if (!skillSlug || skillSlug === skillId) {
       return [skillId];
@@ -1257,6 +1259,9 @@ export class SkillsRepository {
             userId,
             `/skills/${skill.id}.md`,
             embeddingContent,
+            // Skill CRUD endpoint — no stream/fixture context (runs live even in
+            // tests, in setup, outside any recorded case).
+            streamContext,
           );
         })().catch(() => {
           // Best-effort embedding sync
@@ -1561,6 +1566,7 @@ export class SkillsRepository {
           userId,
           `/skills/${updated.id}.md`,
           embeddingContent,
+          undefined,
         );
       })().catch(() => {
         // Best-effort embedding sync
@@ -1610,6 +1616,7 @@ export class SkillsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SkillDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {

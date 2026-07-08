@@ -374,15 +374,6 @@ const FullCard = React.memo(function FullCard({
               <Zap className="h-4 w-4" />
             </Button>
           )}
-          {item.skillId !== NO_SKILL_ID && (
-            <AddVariantButton
-              skillId={item.skillId}
-              navigate={navigate}
-              logger={logger}
-              user={user}
-              locale={locale}
-            />
-          )}
           <EditFavoriteButton item={item} navigate={navigate} />
           <DeleteVariantButton
             item={item}
@@ -795,9 +786,8 @@ const SortableGroup = React.memo(function SortableGroup({
               >
                 <Icon icon="grip" className="h-4 w-4" />
               </Div>
-              <AddVariantButton
-                skillId={group.skillId}
-                navigate={navigate}
+              <DeleteGroupButton
+                group={group}
                 logger={logger}
                 user={user}
                 locale={locale}
@@ -847,6 +837,15 @@ const SortableGroup = React.memo(function SortableGroup({
                     />
                   );
                 })}
+                {!isPickerMode && !isModelOnly && (
+                  <AddVariantRow
+                    skillId={group.skillId}
+                    navigate={navigate}
+                    logger={logger}
+                    user={user}
+                    locale={locale}
+                  />
+                )}
               </Div>
             </SortableContext>
           </DndContext>
@@ -1253,119 +1252,6 @@ export function FavoritesListContainer({
 /**
  * Edit Favorite Button - navigates to edit favorite
  */
-/**
- * Add Variant Button - navigates to create favorite form with character data
- * Allows adding another variant of the same character from the favorites list
- */
-function AddVariantButton({
-  skillId,
-  navigate,
-  logger,
-  user,
-  locale,
-  size,
-}: {
-  skillId: string;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
-  locale: CountryLanguage;
-  size?: "sm";
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
-  const { t } = scopedTranslation.scopedT(locale);
-
-  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const characterSingleDefinitions = await import("../[id]/definition");
-      const createFavoriteDefinitions = await import("./create/definition");
-      const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
-
-      // Fetch character data from cache or API
-      const cachedData = apiClient.getEndpointData(
-        characterSingleDefinitions.default.GET,
-        logger,
-        {
-          urlPathParams: { id: baseSkillId },
-        },
-      );
-
-      if (cachedData?.success) {
-        const cachedVariants = cachedData.data.variants;
-        const cachedVariant =
-          (variantId ? cachedVariants.find((v) => v.id === variantId) : null) ??
-          cachedVariants.find((v) => v.isDefault) ??
-          cachedVariants[0];
-        navigate(createFavoriteDefinitions.default.POST, {
-          data: {
-            skillId,
-            icon: cachedData.data.icon ?? undefined,
-            voiceModelSelection: cachedVariant?.voiceModelSelection ?? null,
-            modelSelection: null,
-          },
-          popNavigationOnSuccess: 1,
-        });
-        return;
-      }
-
-      const characterResponse = await apiClient.fetch(
-        characterSingleDefinitions.default.GET,
-        logger,
-        user,
-        undefined,
-        { id: baseSkillId },
-        locale,
-        availability,
-      );
-      if (!characterResponse.success) {
-        return;
-      }
-
-      const responseVariants = characterResponse.data.variants;
-      const responseVariant =
-        (variantId ? responseVariants.find((v) => v.id === variantId) : null) ??
-        responseVariants.find((v) => v.isDefault) ??
-        responseVariants[0];
-      navigate(createFavoriteDefinitions.default.POST, {
-        data: {
-          skillId,
-          icon: characterResponse.data.icon ?? undefined,
-          voiceModelSelection: responseVariant?.voiceModelSelection ?? null,
-          modelSelection: null,
-        },
-        popNavigationOnSuccess: 1,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const isSmall = size === "sm";
-  const iconSize = isSmall ? "h-3 w-3" : "h-4 w-4";
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className={isSmall ? "h-7 w-7 p-0" : undefined}
-      onClick={handleClick}
-      disabled={isLoading}
-      title={t("get.addVariant")}
-    >
-      {isLoading ? (
-        <Loader2 className={cn(iconSize, "animate-spin")} />
-      ) : (
-        <Plus className={iconSize} />
-      )}
-    </Button>
-  );
-}
-
 function DeleteVariantButton({
   item,
   logger,
@@ -1472,6 +1358,221 @@ function DeleteVariantButton({
         </Div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function DeleteGroupButton({
+  group,
+  logger,
+  user,
+  locale,
+}: {
+  group: SkillGroup;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const favoriteDetailDefinitions = await import("./[id]/definition");
+      await Promise.all(
+        group.items.map((item) =>
+          apiClient.mutate(
+            favoriteDetailDefinitions.default.DELETE,
+            logger,
+            user,
+            undefined,
+            { id: item.id },
+            locale,
+            availability,
+          ),
+        ),
+      );
+
+      const idsToRemove = new Set(group.items.map((item) => item.id));
+      apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
+        if (!oldData?.success) {
+          return oldData;
+        }
+        return {
+          success: true,
+          data: {
+            ...oldData.data,
+            favorites: oldData.data.favorites.filter(
+              (f) => !idsToRemove.has(f.id),
+            ),
+          },
+        };
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-destructive"
+          onClick={(e) => e.stopPropagation()}
+          disabled={isLoading}
+          title={t("get.deleteGroup.trigger")}
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-52 p-3"
+        side="top"
+        align="end"
+        onInteractOutside={(e) => e.stopPropagation()}
+      >
+        <Div className="flex flex-col gap-3">
+          <Span className="text-sm font-medium">
+            {t("get.deleteGroup.confirm", {
+              count: String(group.items.length),
+            })}
+          </Span>
+          <Div className="flex gap-2">
+            <PopoverClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t("get.deleteGroup.cancel")}
+              </Button>
+            </PopoverClose>
+            <PopoverClose asChild>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={handleConfirm}
+              >
+                {t("get.deleteGroup.action")}
+              </Button>
+            </PopoverClose>
+          </Div>
+        </Div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function AddVariantRow({
+  skillId,
+  navigate,
+  logger,
+  user,
+  locale,
+}: {
+  skillId: string;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const characterSingleDefinitions = await import("../[id]/definition");
+      const createFavoriteDefinitions = await import("./create/definition");
+      const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
+
+      const cachedData = apiClient.getEndpointData(
+        characterSingleDefinitions.default.GET,
+        logger,
+        { urlPathParams: { id: baseSkillId } },
+      );
+
+      if (cachedData?.success) {
+        const cachedVariants = cachedData.data.variants;
+        const cachedVariant =
+          (variantId ? cachedVariants.find((v) => v.id === variantId) : null) ??
+          cachedVariants.find((v) => v.isDefault) ??
+          cachedVariants[0];
+        navigate(createFavoriteDefinitions.default.POST, {
+          data: {
+            skillId,
+            icon: cachedData.data.icon ?? undefined,
+            voiceModelSelection: cachedVariant?.voiceModelSelection ?? null,
+            modelSelection: null,
+          },
+          popNavigationOnSuccess: 1,
+        });
+        return;
+      }
+
+      const characterResponse = await apiClient.fetch(
+        characterSingleDefinitions.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: baseSkillId },
+        locale,
+        availability,
+      );
+      if (!characterResponse.success) {
+        return;
+      }
+
+      const responseVariants = characterResponse.data.variants;
+      const responseVariant =
+        (variantId ? responseVariants.find((v) => v.id === variantId) : null) ??
+        responseVariants.find((v) => v.isDefault) ??
+        responseVariants[0];
+      navigate(createFavoriteDefinitions.default.POST, {
+        data: {
+          skillId,
+          icon: characterResponse.data.icon ?? undefined,
+          voiceModelSelection: responseVariant?.voiceModelSelection ?? null,
+          modelSelection: null,
+        },
+        popNavigationOnSuccess: 1,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground h-8 px-2 mt-0.5"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <Loader2 className="h-3 w-3 animate-spin" />
+      ) : (
+        <Plus className="h-3 w-3" />
+      )}
+      <Span className="text-xs">{t("get.addVariant")}</Span>
+    </Button>
   );
 }
 

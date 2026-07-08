@@ -632,6 +632,8 @@ export const translations: typeof enTranslations = {
       seedream45:
         "Seedream 4.5 - ByteDances neuestes Bildgenerierungsmodell mit umfassenden Verbesserungen bei Bearbeitungskonsistenz, Porträtverfeinerung und Mehrbildkomposition",
       sdxl: "Stable Diffusion XL - Stability AIs hochwertiges Open-Source-Bildgenerierungsmodell",
+      cassetteMusic:
+        "CassetteAI Music - schnelle Text-zu-Musik-Generierung über Fal.ai mit Clips bis zu drei Minuten Länge",
       musicgenStereo:
         "MusicGen Stereo - Metas Open-Source-Stereo-Musikgenerierungsmodell via Replicate",
       stableAudio:

@@ -28,6 +28,7 @@ import type {
 import type { SDKPartialAssistantMessage } from "@anthropic-ai/claude-agent-sdk";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "../../chat/config";
 import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";
 import { logProviderRequest } from "./shared/debug-file-logger";
@@ -41,7 +42,9 @@ import { logProviderRequest } from "./shared/debug-file-logger";
  */
 export function createClaudeCode(
   logger: EndpointLogger,
-  toolExecutors?: AgentToolExecutorRegistry,
+  toolExecutors: AgentToolExecutorRegistry | undefined,
+  /** Fixture record/replay context of the execution chain (tests only). */
+  streamContext: ToolExecutionContext,
 ): {
   chat: (modelId: string) => LanguageModelV2;
   /** Registry for tool executors - populate with registerTools() before streaming */
@@ -51,7 +54,12 @@ export function createClaudeCode(
   return {
     toolExecutors: registry,
     chat: (modelId: string): LanguageModelV2 => {
-      return new AnthropicAgentLanguageModel(modelId, logger, registry);
+      return new AnthropicAgentLanguageModel(
+        modelId,
+        logger,
+        registry,
+        streamContext,
+      );
     },
   };
 }
@@ -75,15 +83,18 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
   private readonly logger: EndpointLogger;
   private readonly toolExecutors: AgentToolExecutorRegistry;
+  private readonly streamContext: ToolExecutionContext;
 
   constructor(
     modelId: string,
     logger: EndpointLogger,
     toolExecutors: AgentToolExecutorRegistry,
+    streamContext: ToolExecutionContext,
   ) {
     this.modelId = modelId;
     this.logger = logger;
     this.toolExecutors = toolExecutors;
+    this.streamContext = streamContext;
   }
 
   /**
@@ -273,10 +284,11 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
     const modelId = this.modelId;
 
-    // Wrap the real Agent SDK stream with fixture-based replay in test mode.
-    // In test mode:  first run writes fixture, subsequent runs replay it.
-    // In production: producer runs directly, no caching overhead.
-    const stream = await withClaudeCodeFixture(modelId, userPrompt, () =>
+    // Wrap the real Agent SDK stream with fixture-based replay when the
+    // execution chain carries a fixture context (tests). Otherwise the
+    // producer runs directly, no caching overhead.
+    const streamContext = this.streamContext;
+    const stream = await withClaudeCodeFixture(streamContext, modelId, () =>
       Promise.resolve(
         // Create a ReadableStream that maps Agent SDK events to LanguageModelV2StreamPart
         new ReadableStream<LanguageModelV2StreamPart>({
@@ -487,7 +499,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                   },
                   finishReason: "other",
                   providerMetadata: {
-                    "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
+                    "claude-code": {
+                      cacheWriteTokens: totalCacheWriteTokens,
+                    },
                   },
                 });
               } else {

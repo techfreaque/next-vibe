@@ -6,12 +6,20 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
+import { and, eq, or } from "drizzle-orm";
+import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { CallbackMode } from "next-vibe/execute-tool/constants";
+import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
@@ -19,9 +27,14 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 
-import type { DefaultFolderId, ToolExecutionContext } from "../../chat/config";
-import type { ToolCall } from "../../chat/db";
-import { ThreadStatus, ThreadStreamingState } from "../../chat/enum";
+import type { ToolExecutionContext } from "../../chat/config";
+import { DefaultFolderId, makeHeadlessContext } from "../../chat/config";
+import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
+import {
+  ChatMessageRole,
+  ThreadStatus,
+  ThreadStreamingState,
+} from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
 import {
   createMessagesEmitter,
@@ -33,32 +46,47 @@ import {
 } from "../../chat/threads/emitter";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "../../skills/favorites/db";
+import { SkillsRepository } from "../../skills/repository";
+import { stripThinkTags } from "../../text-to-speech/content-processing";
 import type { VideoGenModelSelection } from "../../video-generation/models";
+import type {
+  AiStreamRunPostRequestOutput,
+  AiStreamRunPostResponseOutput,
+} from "../run/definition";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { buildSystemPrompt } from "../system-prompt/builder";
-import { CompactingHandler } from "./compacting";
-import { MessageContextBuilder } from "./context";
-import { findLatestThreadMessage } from "./core/infra";
+import { CompactingHandler } from "./compacting/pre-stream";
+import { rebuildWithCompactedHistory } from "./context/history";
+import {
+  shouldTriggerCompacting,
+  truncateToContextWindow,
+} from "./context/token-budget";
+import { resolveModelSkill } from "./core/modality-resolver";
 import {
   clearStreamingState,
   QueueRegistry,
   setStreamingStateWaiting,
 } from "./core/stream";
+import { findLatestThreadMessage, walkToLeafMessage } from "./core/tree-walk";
 import {
   emitSetupError,
   emitStreamCreationError,
   StreamErrorCatchHandler,
-} from "./errors";
+} from "./errors/errors";
 import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
-import type { HeadlessAiStreamResult } from "./headless";
-import { StreamLoop } from "./loop";
-import { runAutoQueueBranch } from "./queue";
+import { runAutoQueueBranch } from "./intake/queue";
+import { StreamLoop } from "./loop/loop";
 import { runRelayBranch } from "./relay/caller";
 import {
   emitStreamFinished,
@@ -745,7 +773,7 @@ export class AiStreamRepository {
           // - Non-compacting: user message emitted here with original parentId
           // - Compacting: CompactingHandler emits it with parentId = compactingMessageId
           // NEVER for confirmation turns: no user-message ROW is created for
-          // them (UserMessageHandler skips) — emitting one materializes an
+          // them (createUserMessageWithAttachments skips) — emitting one materializes an
           // empty phantom user leaf on every mirror.
           if (
             userMessageId &&

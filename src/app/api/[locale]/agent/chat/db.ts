@@ -54,7 +54,6 @@ import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/reposito
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
-import type { TtsModelId } from "../text-to-speech/models";
 import type { DefaultFolderId } from "./config";
 import {
   ChatMessageRoleDB,
@@ -63,17 +62,9 @@ import {
   ThreadStreamingStateDB,
 } from "./enum";
 
-/**
- * Thread metadata structure
- */
-interface ThreadMetadata {
-  topP?: number;
-  frequencyPenalty?: number;
-  presencePenalty?: number;
-  customSettings?: {
-    key: string;
-    value: string | number | boolean;
-  }[];
+/** The durable (jsonb-safe) subset of ToolExecutionContext stored per thread. */
+export interface PersistedStreamContext {
+  fixtureContext?: FixtureContext;
 }
 
 export interface ToolCall {
@@ -122,10 +113,18 @@ export interface ToolCall {
    * pending-calls registry key for remote dispatches: written up front by an
    * inline WAIT (restart/cross-process anchor), by the WAIT→wakeUp
    * auto-upgrade, by wakeUp dispatches and by await-task parks — so
-   * dismiss-task can cancel the revival and a result event landing in any
+   * detach can cancel the revival and a result event landing in any
    * process can find the waiter.
    */
   pendingCallId?: string;
+  /**
+   * True while the pendingCallId anchor belongs to a LIVE inline WAIT (the
+   * stream is blocked in awaitPendingCallResult, not parked). A sibling
+   * process receiving the result must only persist the durable handoff row —
+   * never fire a wakeUp revival (double delivery). Flipped to false when the
+   * call parks (WAIT auto-upgrade / await-task).
+   */
+  pendingCallInline?: boolean;
 }
 
 /**
@@ -426,7 +425,11 @@ export const chatThreads = pgTable(
     archived: boolean("archived").default(false).notNull(),
     tags: jsonb("tags").$type<string[]>().default([]),
     preview: text("preview"), // First user message preview
-    metadata: jsonb("metadata").$type<ThreadMetadata>().default({}),
+    // Carries the fixture record/replay context (tests only) — anchored on
+    // the THREAD so every stream on it (later turns, wakeUp revivals in any
+    // process, the receiver-side loop of a relayed thread) continues the same
+    // context. Streams adopt it at setup when the request chain carries none.
+    streamContext: jsonb("stream_context").$type<PersistedStreamContext>(),
 
     // Permission roles - 5-Role Model for Threads
     // null = inherit from parent folder
@@ -459,6 +462,27 @@ export const chatThreads = pgTable(
       .$type<ThreadStreamingState>()
       .default(ThreadStreamingState.IDLE)
       .notNull(),
+    // Owner of the current 'streaming' claim — one ID per stream execution.
+    // A finishing stream may only clear streamingState when this still matches
+    // its own run ID; a stale finalizer (late revival, superseded turn) must
+    // never clobber the successor stream's claim. NULL = no owner (idle, or a
+    // reconciler cleared it).
+    streamingRunId: text("streaming_run_id"),
+
+    // ── Cross-instance identity (placement is DATA — it replicates verbatim; ──
+    // ── these columns carry ownership/routing, never the folder path)       ──
+    // Owning instance as THIS instance names it (remote_connections.instance_id).
+    // NULL = this instance originated the thread. Placement (rootFolderId +
+    // folder-name chain) is origin-authoritative and identical on every copy.
+    originInstanceId: text("origin_instance_id"),
+    // Where this thread's AI loop runs by default (a connection's instance_id).
+    // NULL = locally. Per-stream request field overrides; the column persists
+    // the choice for follow-up turns.
+    loopInstanceId: text("loop_instance_id"),
+    // Whether this thread may leave the instance via thread sync at all.
+    // Transient plumbing threads (tool executions, cron runs) set false —
+    // an explicit flag, never derived from folder names.
+    syncEligible: boolean("sync_eligible").default(true).notNull(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -479,6 +503,12 @@ export const chatThreads = pgTable(
       table.rootFolderId,
     ),
     folderIdIdx: index("chat_threads_folder_id_idx").on(table.folderId),
+    originInstanceIdIdx: index("chat_threads_origin_instance_id_idx").on(
+      table.originInstanceId,
+    ),
+    loopInstanceIdIdx: index("chat_threads_loop_instance_id_idx").on(
+      table.loopInstanceId,
+    ),
     statusIdx: index("chat_threads_status_idx").on(table.status),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),

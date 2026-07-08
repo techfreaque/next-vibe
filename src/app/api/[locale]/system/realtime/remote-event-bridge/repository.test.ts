@@ -2,7 +2,7 @@
 /**
  * Remote Event Bridge Repository — unit tests
  *
- * REB-REPO-RECEIVE-* : receive() HTTP entry — eventName routing + received:true
+ * REB-REPO-RECEIVE-* : receive() HTTP entry — eventName routing + success
  * REB-REPO-HANDLE-*  : handleRemoteEvent() — guards, echo-drop, dispatch
  *
  * dispatchRemoteEvent and RemoteConnectionRepository.getLocalInstanceId are
@@ -25,14 +25,11 @@ import type { RemoteEventBridgeRepository as RemoteEventBridgeRepositoryType } f
 const dispatchRemoteEvent = vi.fn(async (): Promise<void> => undefined);
 const getLocalInstanceId = vi.fn(async (): Promise<string> => "self-instance");
 
-vi.mock(
-  "./registry",
-  () => ({
-    dispatchRemoteEvent: (...args: unknown[]): Promise<void> =>
-      dispatchRemoteEvent(...(args as [])),
-    registerRemoteEventHandlers: (): void => undefined,
-  }),
-);
+vi.mock("./registry", () => ({
+  dispatchRemoteEvent: (...args: unknown[]): Promise<void> =>
+    dispatchRemoteEvent(...(args as [])),
+  registerRemoteEventHandlers: (): void => undefined,
+}));
 
 vi.mock("@/app/api/[locale]/remote-connection/repository", () => ({
   RemoteConnectionRepository: {
@@ -86,11 +83,10 @@ describe("RemoteEventBridgeRepository", () => {
 
   // ── receive() ───────────────────────────────────────────────────────────
 
-  it("REB-REPO-RECEIVE-EVENT: known eventName dispatches and returns received:true", async () => {
+  it("REB-REPO-RECEIVE-EVENT: known eventName dispatches and returns success", async () => {
     const result = await RemoteEventBridgeRepository.receive(
       {
         eventName: "remote-event",
-        leadId: USER_ID,
         payload: {
           originInstanceId: "hermes",
           syncDomain: "cache",
@@ -101,26 +97,19 @@ describe("RemoteEventBridgeRepository", () => {
       makeLogger(),
     );
     expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.received).toBe(true);
-    }
     expect(dispatchRemoteEvent).toHaveBeenCalledTimes(1);
   });
 
-  it("REB-REPO-RECEIVE-UNKNOWN: unknown eventName ignored, still received:true, no dispatch", async () => {
+  it("REB-REPO-RECEIVE-UNKNOWN: unknown eventName ignored gracefully, no dispatch", async () => {
     const result = await RemoteEventBridgeRepository.receive(
       {
         eventName: "totally-unknown-event",
-        leadId: USER_ID,
         payload: {},
       },
       user,
       makeLogger(),
     );
     expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.received).toBe(true);
-    }
     expect(dispatchRemoteEvent).not.toHaveBeenCalled();
   });
 

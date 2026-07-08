@@ -12,6 +12,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { errorResponseSchema } from "next-vibe/core/route/response.schema";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/cron/history/i18n";
 import { CronTaskPriorityDB, CronTaskStatusDB } from "next-vibe/tasks/enum";

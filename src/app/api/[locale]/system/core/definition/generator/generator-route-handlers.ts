@@ -498,8 +498,15 @@ class RouteHandlersGenerator {
     const cases: string[] = [];
     // Also build the hot-paths map: toolName -> { absPath, method }
     const hotPathEntries: string[] = [];
+    // One canonical path per unique module — enough to warm every import.
+    const prewarmSeen = new Set<string>();
+    const prewarmPaths: string[] = [];
     for (const path of allPaths) {
       const { importPath, absPath, method } = pathMap[path];
+      if (!prewarmSeen.has(importPath)) {
+        prewarmSeen.add(importPath);
+        prewarmPaths.push(path);
+      }
       // Add turbopack/webpack ignore hints for routes that scan the filesystem
       const ignoreComment = needsTurbopackIgnore(importPath)
         ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
@@ -572,6 +579,21 @@ import type { GenericHandlerBase } from "next-vibe/core/route/handler";
 /* eslint-disable prettier/prettier */
 
 /**
+ * Single-flight queue for the lazy route imports below. Route modules pull
+ * in huge cyclic graphs (route -> repository -> definition -> widgets);
+ * CONCURRENT dynamic imports of two such graphs can deadlock the Vite SSR
+ * module runner in dev (both imports pend forever — observed as remote tool
+ * dispatches hanging on the receiving instance). Serializing removes the
+ * concurrency the deadlock needs; warm cache hits resolve on the next
+ * microtask.
+ */
+let routeImportQueue: Promise<GenericHandlerBase | null | undefined> =
+  Promise.resolve(undefined);
+
+/** Resolved handler cache — repeat lookups skip the queue entirely. */
+const routeHandlerCache = new Map<string, GenericHandlerBase | null>();
+
+/**
  * Dynamically import route handler by path.
  * @param path - The route path (e.g., "core/agent/chat/threads")
  * @returns The route module or null if not found
@@ -579,11 +601,55 @@ import type { GenericHandlerBase } from "next-vibe/core/route/handler";
 export async function getRouteHandler(
   path: string,
 ): Promise<GenericHandlerBase | null> {
+  const cached = routeHandlerCache.get(path);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const run = routeImportQueue.then(async () => {
+    const again = routeHandlerCache.get(path);
+    if (again !== undefined) {
+      return again;
+    }
+    const loaded = await importRouteHandler(path);
+    routeHandlerCache.set(path, loaded);
+    return loaded;
+  });
+  // Chain regardless of outcome so one failed import never blocks the queue.
+  routeImportQueue = run.catch(() => undefined);
+  return run;
+}
+
+async function importRouteHandler(
+  path: string,
+): Promise<GenericHandlerBase | null> {
   switch (path) {
 ${cases.join("\n")}
     default:
       return null;
   }
+}
+
+/**
+ * DEV prewarm: sequentially warm every route module in the background when
+ * this registry first loads. Cold Vite SSR loads of large cyclic route
+ * graphs are slow and, when triggered concurrently by a remote tool
+ * dispatch, can deadlock the module runner — observed as remote tool calls
+ * hanging forever on the receiving dev instance. With the queue above, the
+ * first real lookup lines up behind the warm-up instead. One canonical path
+ * per unique module. No-op in production and in the browser.
+ */
+const ROUTE_PREWARM_PATHS: string[] = [
+${prewarmPaths.map((pp) => `  ${JSON.stringify(pp)},`).join("\n")}
+];
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "development"
+) {
+  void (async (): Promise<void> => {
+    for (const p of ROUTE_PREWARM_PATHS) {
+      await getRouteHandler(p).catch(() => undefined);
+    }
+  })();
 }
 `;
 

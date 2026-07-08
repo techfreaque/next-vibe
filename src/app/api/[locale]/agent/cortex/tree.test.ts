@@ -42,6 +42,7 @@ async function cleanup(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -55,6 +56,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Create a directory via the real MKDIR endpoint; fails the test if it does not stick. */
 async function mkdir(path: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: mkdirEndpoint.POST,
     data: { path, createParents: true },
     user,
@@ -70,6 +72,7 @@ function getTree(
   depth: number,
 ): Promise<ResponseType<CortexTreeResponseOutput>> {
   return sendTestRequest({
+    streamContext: undefined,
     endpoint: treeEndpoint.GET,
     data: { path, depth },
     user,
@@ -210,6 +213,7 @@ describe("Cortex Tree E2E", () => {
 
     // Cross-check entry counts against the live LIST result.
     const listRes = await sendTestRequest({
+      streamContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: "/skills" },
       user,
@@ -265,6 +269,7 @@ describe("Cortex Tree E2E", () => {
     }
 
     const listRes = await sendTestRequest({
+      streamContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: base },
       user,

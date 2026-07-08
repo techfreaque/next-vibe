@@ -22,11 +22,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/realtime/remote-event-bridge/i18n";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
 import type { AnyEndpointEventEnvelope } from "../structured-events";
@@ -56,7 +52,6 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true } as const,
     children: {
-      // ── Request fields ─────────────────────────────────────────────────────
       eventName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -119,7 +114,7 @@ const { POST } = createEndpoint({
   // is delivered locally to the subscribed connector, not re-relayed.
   //
   // The relay payload (originInstanceId/syncDomain/envelope) rides the event's own
-  // responseData, gated per connection by its syncScope (see
+  // requestData.payload, gated per connection by its syncScope (see
   // repository.pushRemoteEvent).
   channel: { scope: "user" } as const,
   events: {

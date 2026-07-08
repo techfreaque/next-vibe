@@ -21,9 +21,7 @@ import { loadEnvironment } from "next-vibe/platforms/cli/runtime/environment";
 
 loadEnvironment();
 
-// The test suite runs against fetch-cache fixtures — i.e. in fixture mode. Mark it
-// so the codepaths that key off fixture mode behave consistently with the dev
-// server's fixture mode. In particular generateTaskId omits its random tail here,
-// keeping task IDs fully reproducible on replay (it still derives the id from the
-// replay-stable toolCallId; the flag only drops the prod-uniqueness suffix).
-process.env["VIBE_FIXTURE_MODE"] = "true";
+// No fixture-mode env flag exists anymore: fixture record/replay activates
+// solely when a `fixtures` table row exists for the stream's threadId (seeded
+// by the harness per case, on every instance). The engine reads/bumps it by
+// threadId — the streamContext carried down the chain only supplies that id.

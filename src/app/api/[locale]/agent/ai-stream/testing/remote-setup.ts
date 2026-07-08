@@ -25,17 +25,20 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Methods } from "next-vibe/core/definition/enums";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
-import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
+
+import * as fixtureSchema from "./fixtures.db";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -108,11 +111,11 @@ export async function isServerRunning(
 }
 
 /**
- * Resolve the remote URL: only checks port 3002 (vibe --hermes dev --fixture-mode).
+ * Resolve the remote URL: only checks port 3002 (vibe --hermes dev).
  * Returns null if the server is not running.
  *
  * To run remote integration tests, start the local dev server in fixture mode:
- *   vibe --hermes dev --fixture-mode
+ *   vibe --hermes dev
  */
 export async function resolveRemoteUrl(): Promise<string | null> {
   if (await isServerRunning(LOCAL_DEV_URL, HERMES_DEV_PID_FILE_PATH)) {
@@ -385,6 +388,7 @@ export async function ensureRemoteUserCredits(
     );
   }
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: adminAddDefinitions.POST,
     data: { targetUserId: userId, amount: minCredits },
     user: adminUser,
@@ -418,6 +422,13 @@ function sleep(ms: number): Promise<void> {
 export async function connectToHermes(
   user: JwtPrivatePayloadType,
   remoteUrl: string = LOCAL_DEV_URL,
+  options?: {
+    /**
+     * Where REMOTE/<hermes> threads run their loop for this connection —
+     * 'caller' = the loop-local topology suites (loop here, tools remote).
+     */
+    loopLocation?: "target" | "caller";
+  },
 ): Promise<void> {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
@@ -436,11 +447,22 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/connect/definition")
   ).default;
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: connectDef.POST,
     data: {
       remoteUrl,
       email: env.VIBE_ADMIN_USER_EMAIL,
       password: env.VIBE_ADMIN_USER_PASSWORD,
+      // Full mirror scope except favorites: live favorite sync would
+      // LWW-overwrite the suite's quality-tester favorite mid-run.
+      syncScope: {
+        memories: true,
+        documents: true,
+        skills: true,
+        favorites: false,
+        threads: true,
+        chat: true,
+      },
     },
     user,
   });
@@ -465,9 +487,11 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
   const patchResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: connByIdDef.PATCH,
     data: {
       transportMode: "direct-http",
+      ...(options?.loopLocation ? { loopLocation: options.loopLocation } : {}),
       syncScope: {
         // Favorites sync would LWW-overwrite the test's freshly-created
         // quality-tester favorite (null whitelist) with the hermes user's
@@ -577,9 +601,10 @@ export async function connectToHermes(
 export async function connectToHermesLocalAi(
   user: JwtPrivatePayloadType,
   remoteUrl: string = LOCAL_DEV_URL,
+  options?: { loopLocation?: "target" | "caller" },
 ): Promise<void> {
   // Full connect flow (registers both sides, syncs capabilities + pre-cleans internally).
-  await connectToHermes(user, remoteUrl);
+  await connectToHermes(user, remoteUrl, options);
 
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
@@ -594,6 +619,7 @@ export async function connectToHermesLocalAi(
   // hermes's own transportMode — it stays direct-http so the result returns to
   // atlas over http (the bridge's back leg). One call; the mirror does the rest.
   const localPatch = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: connByIdDef.PATCH,
     data: { transportMode: "reverse-ws" },
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
@@ -629,6 +655,7 @@ async function waitForHermesConnectorReady(
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const res = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: connByIdDef.GET,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user,
@@ -680,6 +707,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
     await import("@/app/api/[locale]/remote-connection/list/definition")
   ).default;
   const listResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -693,6 +721,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: conn.instanceId },
         user: adminUser,
@@ -719,6 +748,7 @@ export async function normalizeHermesSyncScope(): Promise<void> {
     await import("@/app/api/[locale]/remote-connection/list/definition")
   ).default;
   const listResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -732,6 +762,7 @@ export async function normalizeHermesSyncScope(): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: connByIdDef.PATCH,
         data: {
           syncScope: {
@@ -777,6 +808,7 @@ export async function unregisterDevFromHermes(
   ).default;
   try {
     const listResult = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: listDef.GET,
       data: {},
       user: adminUser,
@@ -789,6 +821,7 @@ export async function unregisterDevFromHermes(
       : [{ instanceId: ATLAS_INSTANCE_ID }];
     for (const row of atlasRows) {
       await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: row.instanceId },
         user: adminUser,
@@ -798,6 +831,7 @@ export async function unregisterDevFromHermes(
   } catch {
     // Best-effort: at minimum delete the canonical atlas row via the endpoint.
     await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: connByIdDef.DELETE,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user: adminUser,
@@ -866,6 +900,7 @@ export async function restoreAtlasIdentity(): Promise<void> {
     );
   }
   await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: selfRenameDef.PATCH,
     data: { newInstanceId: ATLAS_INSTANCE_ID, propagate: false },
     user: adminUser,
@@ -898,6 +933,7 @@ async function triggerHermesReconnect(): Promise<void> {
     );
   }
   const resp = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: connByIdDef.PATCH,
     data: { reconnectNow: true },
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
@@ -1101,7 +1137,8 @@ export async function triggerHermesPull(
 /**
  * Returns true if the given pid file exists and contains a PORT:<n> line,
  * which means the server is running. By convention, hermes-dev (port 3002)
- * is always started with --fixture-mode for integration tests.
+ * needs no fixture flag — record/replay activates per execution via the
+ * explicit FixtureContext carried on the chain.
  * Use this to gate recording-only operations without log grepping.
  */
 export function readFixtureMode(pidFile: string): boolean {
@@ -1192,8 +1229,18 @@ export async function assertThreadPlacement(params: {
   threadId: string;
   rootFolderId: string;
   nameChain: ReadonlyArray<string>;
+  /** Exact expected thread title (mirror parity: pass the origin's title). */
+  expectedTitle?: string;
+  /** Expected title PREFIX (origin side: the first user message's head). */
+  expectedTitlePrefix?: string;
 }): Promise<void> {
-  const { threadId, rootFolderId, nameChain } = params;
+  const {
+    threadId,
+    rootFolderId,
+    nameChain,
+    expectedTitle,
+    expectedTitlePrefix,
+  } = params;
   const { expect: expectBun } = await import("bun:test");
   const runQuery =
     params.db === "hermes"
@@ -1212,7 +1259,7 @@ export async function assertThreadPlacement(params: {
           return res.rows;
         };
   const threadRows = await runQuery(
-    sql`SELECT root_folder_id, folder_id FROM chat_threads WHERE id = ${threadId} LIMIT 1`,
+    sql`SELECT root_folder_id, folder_id, title FROM chat_threads WHERE id = ${threadId} LIMIT 1`,
   );
   expectBun(
     threadRows.length,
@@ -1222,16 +1269,39 @@ export async function assertThreadPlacement(params: {
     threadRows[0]?.["root_folder_id"],
     `[assertThreadPlacement:${params.db}] thread ${threadId} root mismatch`,
   ).toBe(rootFolderId);
-  // Walk the chain upward from the thread's folder and collect names.
+  // Title: mirrors must carry the ORIGIN's title verbatim; origin threads
+  // must be titled from their first user message (never empty, never "New
+  // Chat" defaults for test prompts).
+  const title = threadRows[0]?.["title"] ?? "";
+  if (expectedTitle !== undefined) {
+    expectBun(
+      title,
+      `[assertThreadPlacement:${params.db}] thread ${threadId} title mismatch`,
+    ).toBe(expectedTitle);
+  }
+  if (expectedTitlePrefix !== undefined) {
+    expectBun(
+      title.startsWith(expectedTitlePrefix),
+      `[assertThreadPlacement:${params.db}] thread ${threadId} title must start with '${expectedTitlePrefix}' — got '${title}'`,
+    ).toBe(true);
+  }
+  // Walk the chain upward from the thread's folder: names must match the
+  // EXPECTED chain root→leaf and every folder row must live under the SAME
+  // root as the thread (a mis-rooted parent is placement corruption even
+  // when the names line up).
   const walked: string[] = [];
   let currentId: string | null = threadRows[0]?.["folder_id"] ?? null;
   for (let depth = 0; depth < 16 && currentId; depth++) {
     const rows = await runQuery(
-      sql`SELECT name, parent_id FROM chat_folders WHERE id = ${currentId} LIMIT 1`,
+      sql`SELECT name, parent_id, root_folder_id FROM chat_folders WHERE id = ${currentId} LIMIT 1`,
     );
     if (rows.length === 0) {
       break;
     }
+    expectBun(
+      rows[0]?.["root_folder_id"],
+      `[assertThreadPlacement:${params.db}] folder '${rows[0]?.["name"] ?? currentId}' in the chain has root '${String(rows[0]?.["root_folder_id"])}' — expected the thread's root '${rootFolderId}'`,
+    ).toBe(rootFolderId);
     walked.unshift(rows[0]?.["name"] ?? "<unnamed>");
     currentId = rows[0]?.["parent_id"] ?? null;
   }

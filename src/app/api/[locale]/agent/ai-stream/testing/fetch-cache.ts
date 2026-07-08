@@ -1,21 +1,30 @@
 /**
  * HTTP Fetch Cache - SSE-aware, named-file design
  *
- * Intercepts global.fetch for external HTTP calls in tests.
+ * Record/replay for external HTTP calls, keyed by an EXPLICIT fixture context
+ * and matched by REQUEST CONTENT — zero global or process state. Every call
+ * site that talks to an external service (AI providers, media generation, TTS/
+ * STT, embeddings) receives the context down the execution chain
+ * (ToolExecutionContext.fixtureContext) and binds it once via
+ * `createFixtureFetch(context)`.
+ *
  * Caches every call as two files:
- *   fixtures/http-cache/{testCase}/{model}-req.json  - full request (url, headers, body)
- *   fixtures/http-cache/{testCase}/{model}-res.json  - full response (human-readable)
+ *   src/generated/ai-fixtures/http-cache/{cachePrefix}/{N}-{instance}-{model}-req.json
+ *   src/generated/ai-fixtures/http-cache/{cachePrefix}/{N}-{instance}-{model}-res.json
+ * where {N} is a zero-padded ORDINAL from the run's single counter (stored on
+ * the counter thread's stream_context, atomically bumped per call). Match is
+ * ORDER-driven, not content-hashed: the Nth external call replays file N. One
+ * folder per test file; {instance} (atlas/hermes) disambiguates cross-instance
+ * calls.
  *
  * Response file formats:
  *   SSE streams  → { type: "sse",    events: ["data: {...}", "data: [DONE]"], ... }
  *   JSON/binary  → { type: "json",   body: <parsed object>, ... }
  *   Other text   → { type: "text",   body: "...", ... }
  *
- * Multiple calls to the same model within one test get counter suffixes:
- *   {model}-req.json, {model}-2-req.json, {model}-3-req.json, ...
- *
  * On cache hit, the stored data is replayed as a ReadableStream so the AI SDK
- * receives exactly the same wire bytes as on the live run.
+ * receives exactly the same wire bytes as on the live run, plus the
+ * x-vibe-fixture-replay marker header.
  *
  * Only external URLs are intercepted (http/https with non-localhost host).
  * Internal calls (DB, WS, localhost) pass through unmodified.
@@ -23,18 +32,10 @@
  * SSE streams are captured via TransformStream: live bytes flow to caller
  * immediately; cache file is written in flush() once the stream closes.
  *
- * Set context before each test: setFetchCacheContext("test-case-name")
- * Cache bust: delete fixtures/http-cache/{testCase}/
+ * Cache bust: delete src/generated/ai-fixtures/http-cache/{testCase}/
  */
 
-import { AsyncLocalStorage } from "node:async_hooks";
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -43,467 +44,60 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 
 import { createEndpointLogger } from "../../../system/logger/server";
 import type { EndpointLogger } from "../../../system/logger/types";
-import { setClaudeCodeFixtureContext } from "./claude-code-fixture-store";
-
-// Optional WS fixture context sync - registered by ws-fixture.ts via registerWsContextHook()
-let wsContextHook: ((testCase: string) => void) | null = null;
-
-/** Register a hook to sync WS fixture context when setFetchCacheContext is called. */
-export function registerWsContextHook(hook: (testCase: string) => void): void {
-  wsContextHook = hook;
-}
 
 export const HTTP_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
-  "fixtures",
+  "..",
+  "..",
+  "..",
+  "..",
+  "..",
+  "..",
+  "generated",
+  "ai-fixtures",
   "http-cache",
 );
+
+/**
+ * TEMPORARY DEBUG SWITCH: when true, any fixture-cache MISS (a live fetch
+ * about to happen inside a fixture context) and any AI/media call WITHOUT a
+ * fixture context during a bun test run CRASH loudly instead of silently
+ * going live. Flip to false to allow a recording pass.
+ */
+export const CRASH_ON_FIXTURE_MISS = true;
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
 /**
- * Shared across ALL module instances of this file. The dev server loads two
- * copies (the CLI graph installs the global fetch patch, the Vite SSR graph
- * serves route handlers that set the context) - module-local state would
- * split context/counters between instances and recordings would land in the
- * wrong context directory.
+ * The ONE value that flows the execution chain (ToolExecutionContext.
+ * fixtureContext, the tool-execute-request wire payload, revival records).
+ * There is no process or global replay state anywhere: fixture matching is
+ * ordinal-addressed (see bumpFixtureCounter): the run's single counter, stored
+ * on the counter thread's stream_context, orders the recordings.
  */
-interface FetchCacheSharedState {
-  currentTestCase: string;
-  strictMode: boolean;
-  callCounters: Map<string, number>;
-  inflightCount: number;
-  installed: boolean;
-  /** placeholder → realValue patches applied to fixture content before serving */
-  fixturePatchMap: Map<string, string>;
-}
-const sharedState: FetchCacheSharedState = ((): FetchCacheSharedState => {
-  const g = globalThis as { __vibeFetchCacheState?: FetchCacheSharedState };
-  g.__vibeFetchCacheState ??= {
-    currentTestCase: "unknown",
-    strictMode: false,
-    callCounters: new Map<string, number>(),
-    inflightCount: 0,
-    installed: false,
-    fixturePatchMap: new Map<string, string>(),
-  };
-  return g.__vibeFetchCacheState;
-})();
-
-/**
- * Async-scoped context OVERRIDE. The global context is process-wide and gets
- * re-applied by every incoming request's x-vibe-fixture-context header — a
- * background flow (e.g. a wakeUp revival stream) that needs its own fixture
- * namespace would lose that race. runWithFetchCacheContext scopes the override
- * to the async execution tree, immune to concurrent requests. Shared across
- * BOTH module graph copies (same reason as sharedState) — the SSR graph sets
- * the scope, the CLI graph's fetch patch must resolve it.
- */
-const contextScope: AsyncLocalStorage<string> =
-  ((): AsyncLocalStorage<string> => {
-    const g = globalThis as {
-      __vibeFetchCacheScope?: AsyncLocalStorage<string>;
-    };
-    g.__vibeFetchCacheScope ??= new AsyncLocalStorage<string>();
-    return g.__vibeFetchCacheScope;
-  })();
-
-/** The effective fixture context: async-scoped override, else the global. */
-function resolveContext(): string {
-  return contextScope.getStore() ?? sharedState.currentTestCase;
-}
-
-/** Current fixture context — relay calls forward it to fixture-mode servers. */
-export function getFetchCacheContext(): string {
-  return resolveContext();
+export interface FixtureContext {
+  /** Fixture directory name (= test file cache prefix). One folder per file;
+   *  stable across runs so recordings are reused. */
+  name: string;
+  /**
+   * Throw on cache miss instead of fetching live — proves a run is fully
+   * fixture-driven with zero network access. Travels the chain like `name`,
+   * so a strict test is strict on the receiving instance too.
+   */
+  strict?: boolean;
+  /**
+   * Localhost ports treated as external (intercepted) — for remote-mode tests
+   * where the "remote" provider is a localhost server.
+   */
+  interceptLocalhostPorts?: number[];
 }
 
 /**
- * Run `fn` with an async-scoped fixture context. All external fetches inside
- * the async tree record/replay under `testCase`, regardless of what concurrent
- * requests set as the process-global context.
+ * Marker header on replayed responses. Poll loops read it (see
+ * agent/shared/poll-delay.ts) to collapse their sleeps — a replayed 49-poll
+ * recording must not sleep real wall-clock time.
  */
-export function runWithFetchCacheContext<T>(
-  testCase: string,
-  fn: () => Promise<T>,
-): Promise<T> {
-  return contextScope.run(slugify(testCase), fn);
-}
-
-/**
- * Register a placeholder→realValue patch applied to fixture content at serve time.
- * Use when a fixture contains a dynamic value (e.g. taskId) baked in from a previous
- * run. Call normalizeFetchCacheFixtures first to replace the old value with a placeholder,
- * then call this after the real value is known so it's substituted before the fixture
- * is served to the AI SDK.
- *
- * Patches are applied in order, persist for the current test, and are cleared by
- * setFetchCacheContext on the next test.
- */
-export function registerFixturePatch(
-  placeholder: string,
-  realValue: string,
-): void {
-  sharedState.fixturePatchMap.set(placeholder, realValue);
-}
-
-/** Clear all registered fixture patches (called automatically by setFetchCacheContext). */
-export function clearFixturePatches(): void {
-  sharedState.fixturePatchMap.clear();
-}
-
-/** Call this at the top of each test to scope cache files to that test. */
-export function setFetchCacheContext(testCase: string): void {
-  const slug = slugify(testCase);
-  // Idempotent on unchanged context: the relay forwards the context header on
-  // EVERY bridge POST (tool-execute-request, mirror events), so a receiver
-  // re-applies the same context many times DURING one relayed loop. Clearing
-  // the call counters each time would rewind order-matched replay to index 1
-  // for every model call — the loop replays the same recorded turn forever.
-  // Counters must stay monotonic within a context; a context CHANGE (the next
-  // test case) still resets them.
-  if (sharedState.currentTestCase === slug) {
-    return;
-  }
-  if (process.env["VIBE_FIXTURE_MODE"] === "true") {
-    // Context SWITCHES rewind order-matched replay — when a relayed loop sees
-    // its counters reset mid-stream, this trace names the culprit. Debug-only:
-    // routine switches (server boot, each test case) are not noteworthy.
-    createEndpointLogger(false, defaultLocale).debug(
-      "[FetchCache] context switch",
-      {
-        from: sharedState.currentTestCase ?? "<none>",
-        to: slug,
-        stack: new Error("ctx-switch").stack ?? "",
-      },
-    );
-  }
-  sharedState.currentTestCase = slug;
-  sharedState.callCounters.clear();
-  sharedState.fixturePatchMap.clear();
-  // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
-  setClaudeCodeFixtureContext(testCase);
-  // Keep WS fixture store in sync (registered by ws-fixture.ts when installed)
-  wsContextHook?.(testCase);
-}
-
-/**
- * When strict mode is enabled, any external fetch that has no cached fixture
- * will throw instead of making a real network request. Use this to prove
- * that a test suite runs entirely from fixtures with zero network access.
- */
-let wsStrictHook: ((strict: boolean) => void) | null = null;
-
-/** Register a hook to sync WS strict mode when setFetchCacheStrictMode is called. */
-export function registerWsStrictHook(hook: (strict: boolean) => void): void {
-  wsStrictHook = hook;
-}
-
-export function setFetchCacheStrictMode(strict: boolean): void {
-  sharedState.strictMode = strict;
-  wsStrictHook?.(strict);
-}
-
-/**
- * Patch SSE streaming response files where a dynamic value (e.g. taskId) is
- * split across multiple `tool_calls[].function.arguments` chunks.
- *
- * Strategy: collect all argument chunks from SSE events in order, concatenate
- * them, do the string replacement, then redistribute the new characters back
- * into the same chunk boundaries (same number of chunks, each chunk gets the
- * same character count as before, overflow/underflow is absorbed by the last
- * chunk).
- *
- * Returns the patched file content string, or null if oldStr wasn't found
- * in the concatenated arguments.
- */
-function patchSseToolCallArguments(
-  fileContent: string,
-  oldStr: string,
-  newStr: string,
-): string | null {
-  const parsed = JSON.parse(fileContent) as ResFile & {
-    events: string[];
-  };
-  if (parsed.type !== "sse" || !Array.isArray(parsed.events)) {
-    return null;
-  }
-
-  // For each tool_call index, collect argument chunks with their event indices
-  interface ChunkInfo {
-    eventIdx: number;
-    toolIdx: number;
-    text: string;
-  }
-  const toolChunks = new Map<number, ChunkInfo[]>();
-
-  for (let i = 0; i < parsed.events.length; i++) {
-    const evt = parsed.events[i]!;
-    const dataPrefix = "data: ";
-    if (typeof evt !== "string" || !evt.startsWith(dataPrefix)) {
-      continue;
-    }
-    const jsonStr = evt.slice(dataPrefix.length);
-    if (jsonStr === "[DONE]") {
-      continue;
-    }
-
-    let data: {
-      choices?: Array<{
-        delta?: {
-          tool_calls?: Array<{
-            index: number;
-            function?: { arguments?: string };
-          }>;
-        };
-      }>;
-    };
-    try {
-      data = JSON.parse(jsonStr) as typeof data;
-    } catch {
-      continue;
-    }
-
-    const tcs = data.choices?.[0]?.delta?.tool_calls;
-    if (!tcs) {
-      continue;
-    }
-
-    for (const tc of tcs) {
-      const args = tc.function?.arguments;
-      if (args === undefined) {
-        continue;
-      }
-      const idx = tc.index;
-      if (!toolChunks.has(idx)) {
-        toolChunks.set(idx, []);
-      }
-      toolChunks.get(idx)!.push({ eventIdx: i, toolIdx: idx, text: args });
-    }
-  }
-
-  // For each tool_call index, check if concatenated args contain oldStr
-  let anyPatched = false;
-  for (const [toolIdx, chunks] of toolChunks) {
-    const fullArgs = chunks.map((c) => c.text).join("");
-    if (!fullArgs.includes(oldStr)) {
-      continue;
-    }
-
-    const patchedArgs = fullArgs.replaceAll(oldStr, newStr);
-    anyPatched = true;
-
-    // Redistribute patchedArgs back into same chunk boundaries
-    let offset = 0;
-    for (let ci = 0; ci < chunks.length; ci++) {
-      const chunk = chunks[ci]!;
-      const isLast = ci === chunks.length - 1;
-      const chunkLen = isLast ? patchedArgs.length - offset : chunk.text.length;
-      const newText = patchedArgs.slice(offset, offset + chunkLen);
-      offset += chunkLen;
-
-      // Update the event in-place
-      const evt = parsed.events[chunk.eventIdx]!;
-      const jsonStr = (evt as string).slice("data: ".length);
-      interface SseChunkData {
-        choices: Array<{
-          delta: {
-            tool_calls: Array<{
-              index: number;
-              function?: { arguments?: string };
-            }>;
-          };
-        }>;
-      }
-      const data = JSON.parse(jsonStr) as SseChunkData;
-      const tc = data.choices[0]!.delta.tool_calls.find(
-        (t) => t.index === toolIdx,
-      );
-      if (tc?.function) {
-        tc.function.arguments = newText;
-      }
-      parsed.events[chunk.eventIdx] = `data: ${JSON.stringify(data)}`;
-    }
-  }
-
-  if (!anyPatched) {
-    return null;
-  }
-  return JSON.stringify(parsed, null, 2);
-}
-
-/**
- * Patch all fixture files in a named context directory, replacing every
- * occurrence of `oldStr` with `newStr`. Use this to update dynamic values
- * (e.g. taskIds) in recorded fixtures before replaying them in a subsequent
- * test step that depends on a value produced by the previous step.
- *
- * Call with the TARGET context name (not necessarily the current context).
- * Safe to call when the directory doesn't exist yet (no-op).
- */
-/**
- * Normalize fixture files by replacing all occurrences of strings matching `pattern`
- * with `placeholder`. Handles both plain JSON files and SSE response files.
- *
- * Use this at the start of a test that creates a live ID (e.g. taskId), to reset stale
- * IDs left by a previous failed run that didn't reach its end-of-test normalization step.
- *
- * Example:
- *   normalizeFetchCacheFixtures("callback-wait-step2", /local-bg-\d+-\w+/g, "T5B_TASK_ID_PLACEHOLDER")
- */
-export function normalizeFetchCacheFixtures(
-  contextName: string,
-  pattern: RegExp,
-  placeholder: string,
-): void {
-  const dir = cacheDir(slugify(contextName));
-  if (!existsSync(dir)) {
-    return;
-  }
-  const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
-  for (const file of files) {
-    const fp = join(dir, file);
-    if (!existsSync(fp)) {
-      continue;
-    }
-    const content = readFileSync(fp, "utf-8");
-
-    // Determine file type before deciding how to match
-    let parsedType: string | undefined;
-    try {
-      parsedType = (JSON.parse(content) as { type?: string }).type;
-    } catch {
-      parsedType = undefined;
-    }
-
-    if (parsedType !== "sse") {
-      // Plain files (req files, non-SSE responses): quick content check + direct replace
-      pattern.lastIndex = 0;
-      if (!pattern.test(content)) {
-        pattern.lastIndex = 0;
-        continue;
-      }
-      pattern.lastIndex = 0;
-      writeFileSync(fp, content.replace(pattern, placeholder), "utf-8");
-      continue;
-    }
-
-    // SSE res files: the value may be split across argument chunks so a plain
-    // regex on `content` won't find it. Reconstruct full tool argument strings
-    // from the parsed events, apply the pattern there, then use
-    // patchSseToolCallArguments for each discovered match.
-    const globalPattern = pattern.global
-      ? pattern
-      : new RegExp(pattern.source, `${pattern.flags}g`);
-
-    // Reconstruct concatenated tool args from SSE events
-    const sseMatches = new Set<string>();
-    try {
-      const parsed = JSON.parse(content) as { type: string; events?: string[] };
-      if (Array.isArray(parsed.events)) {
-        const toolArgs = new Map<number, string>();
-        for (const evt of parsed.events) {
-          if (typeof evt !== "string" || !evt.startsWith("data: ")) {
-            continue;
-          }
-          const raw = evt.slice(6);
-          if (raw === "[DONE]") {
-            continue;
-          }
-          try {
-            const d = JSON.parse(raw) as {
-              choices?: Array<{
-                delta?: {
-                  tool_calls?: Array<{
-                    index: number;
-                    function?: { arguments?: string };
-                  }>;
-                };
-              }>;
-            };
-            for (const tc of d.choices?.[0]?.delta?.tool_calls ?? []) {
-              const args = tc.function?.arguments;
-              if (args !== undefined) {
-                toolArgs.set(tc.index, (toolArgs.get(tc.index) ?? "") + args);
-              }
-            }
-          } catch {
-            // ignore
-          }
-        }
-        for (const full of toolArgs.values()) {
-          globalPattern.lastIndex = 0;
-          for (const m of full.matchAll(globalPattern)) {
-            sseMatches.add(m[0]);
-          }
-        }
-      }
-    } catch {
-      // ignore parse errors
-    }
-
-    // Also search plain content (catches non-fragmented occurrences)
-    globalPattern.lastIndex = 0;
-    for (const m of content.matchAll(globalPattern)) {
-      sseMatches.add(m[0]);
-    }
-
-    let current = content;
-    for (const match of sseMatches) {
-      if (match === placeholder) {
-        continue;
-      }
-      const result = patchSseToolCallArguments(current, match, placeholder);
-      if (result !== null) {
-        current = result;
-      } else {
-        // Not in tool args - try plain replace (e.g. in text content)
-        globalPattern.lastIndex = 0;
-        const replaced = current.replace(globalPattern, placeholder);
-        if (replaced !== current) {
-          current = replaced;
-        }
-      }
-    }
-    if (current !== content) {
-      writeFileSync(fp, current, "utf-8");
-    }
-  }
-}
-
-export function patchFetchCacheFixtures(
-  contextName: string,
-  oldStr: string,
-  newStr: string,
-): void {
-  const dir = cacheDir(slugify(contextName));
-  if (!existsSync(dir)) {
-    return;
-  }
-  const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
-  for (const file of files) {
-    const fp = join(dir, file);
-    if (!existsSync(fp)) {
-      continue; // may have been deleted by SSE cleanup in a previous iteration
-    }
-    const content = readFileSync(fp, "utf-8");
-    if (content.includes(oldStr)) {
-      // Contiguous match (req files, non-SSE responses)
-      writeFileSync(fp, content.replaceAll(oldStr, newStr), "utf-8");
-    } else if (
-      file.endsWith("-res.json") &&
-      content.includes('"type": "sse"')
-    ) {
-      // SSE streaming responses: the value may be split across argument chunks.
-      // Reconstruct tool_calls arguments from SSE events, do the replacement,
-      // then re-split into the same chunk pattern.
-      const patched = patchSseToolCallArguments(content, oldStr, newStr);
-      if (patched !== null) {
-        writeFileSync(fp, patched, "utf-8");
-      }
-    }
-  }
-}
+export const FIXTURE_REPLAY_HEADER = "x-vibe-fixture-replay";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -594,7 +188,7 @@ function deriveModelName(url: string, bodyStr: string): string {
 }
 
 /** Returns true for external URLs we should intercept */
-function isExternal(url: string): boolean {
+function isExternal(url: string, interceptPorts?: number[]): boolean {
   try {
     const u = new URL(url);
     if (u.protocol !== "http:" && u.protocol !== "https:") {
@@ -609,66 +203,98 @@ function isExternal(url: string): boolean {
     ) {
       return true;
     }
-    // Also intercept specific localhost ports opted-in via addLocalhostPort()
+    // Also intercept specific localhost ports opted-in via the context
+    // (remote-mode tests where the "remote" provider is a localhost server).
+    if (!interceptPorts?.length) {
+      return false;
+    }
     const port = parseInt(
       u.port || (u.protocol === "https:" ? "443" : "80"),
       10,
     );
-    return localhostPorts.has(port);
+    return interceptPorts.includes(port);
   } catch {
     return false;
   }
 }
 
-/** Localhost ports that should also be intercepted (opt-in for remote server calls) */
-const localhostPorts = new Set<number>();
-
 /**
- * Opt-in a specific localhost port for fetch caching.
- * Use this in remote-mode tests where the "remote" server is localhost:PORT.
- * Example: addLocalhostPort(3001) intercepts calls to localhost:3001.
- * Call clearLocalhostPorts() in test teardown.
+ * Content-addressed fixture key: sha256 of method + url + normalized body
+ * (JSON bodies are key-sorted first). The same request maps to the same
+ * fixture file in ANY process or instance — replay needs no shared ordering
+ * state at all. Only literally-identical repeats (poll loops, SDK retries)
+ * are disambiguated, by a per-fetch-instance repeat counter (see
+ * createFixtureFetch) that lives and dies with one execution chain.
  */
-export function addLocalhostPort(port: number): void {
-  localhostPorts.add(port);
-}
-
-/** Remove all opted-in localhost ports */
-export function clearLocalhostPorts(): void {
-  localhostPorts.clear();
-}
-
-function nextCallIndex(testCase: string, modelName: string): number {
-  // Keyed per context so an async-scoped override (revival namespace) keeps
-  // its own call ordering without consuming the base context's counter.
-  const key = `${testCase}:${modelName}`;
-  const n = (sharedState.callCounters.get(key) ?? 0) + 1;
-  sharedState.callCounters.set(key, n);
-  return n;
-}
-
-/** Count of external fetch calls currently in-flight (started but not resolved). */
-
-/**
- * Wait until all in-flight external fetch calls have resolved.
- * Use this between tests to prevent fire-and-forget goroutines from one test
- * polluting the call counters of the next test.
- */
-export async function waitForInflightFetches(
-  maxWaitMs = 10_000,
-): Promise<void> {
-  const start = Date.now();
-  const deadline = start + maxWaitMs;
-  // Poll until no more in-flight calls. inflightCount is mutated by the
-  // global fetch interceptor (not inside the loop body), so we read it via
-  // a getter to satisfy the loop-condition linter rule.
-  const getInflight = (): number => sharedState.inflightCount;
-  while (getInflight() > 0 && Date.now() < deadline) {
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50);
-    });
+function requestHash(url: string, method: string, bodyStr: string): string {
+  let normBody = bodyStr;
+  if (bodyStr) {
+    try {
+      normBody = JSON.stringify(
+        sortJsonKeys(JSON.parse(bodyStr) as WidgetData),
+      );
+    } catch {
+      normBody = bodyStr;
+    }
   }
+  return createHash("sha256")
+    .update(`${method} ${url}\n${normalizeVolatile(normBody)}`)
+    .digest("hex")
+    .slice(0, 8);
+}
+
+/**
+ * File stem = `<ordinal>-<instance>-<model>`. The ordinal (zero-padded so files
+ * sort in call order) is the authoritative match key; instance (atlas/hermes)
+ * disambiguates which dev server made the call in cross-instance runs; model is
+ * human-readable context.
+ */
+function normalizeVolatile(text: string): string {
+  return (
+    text
+      // UUIDs
+      .replace(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+        "<uuid>",
+      )
+      // ISO dates/timestamps (2026-07-07T01:17:05.888Z / 2026-07-07 01:17)
+      .replace(
+        /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?/g,
+        "<ts>",
+      )
+      // Prose dates with clock ("Jul 7, 01:17" / "Jul 7, 2026")
+      .replace(
+        /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(, \d{4})?(,? \d{2}:\d{2}(:\d{2})?)?/g,
+        "<date>",
+      )
+      // Bare dates without a time part ("Current Date: 2026-07-07") — the ISO
+      // rule above only matches datetime. Without this, every midnight
+      // invalidates every recording.
+      .replace(/\b\d{4}-\d{2}-\d{2}\b/g, "<d>")
+      // Bare clock times
+      .replace(/\b\d{2}:\d{2}:\d{2}\b/g, "<time>")
+      // Provider-generated tool-call ids ("call_af1fadecef28..."). NOT caught
+      // by the hex rule below: "_" is a word character, so \b never matches
+      // between "call_" and the hex tail.
+      .replace(/call_[a-zA-Z0-9]+/g, "<callid>")
+      // Long hex ids (message/context/task fragments, >=8 hex chars)
+      .replace(/\b[0-9a-f]{8,}\b/gi, "<hex>")
+  );
+}
+
+/** Recursively sort object keys so hashing is insensitive to key order. */
+function sortJsonKeys(value: WidgetData): WidgetData {
+  if (Array.isArray(value)) {
+    return value.map(sortJsonKeys);
+  }
+  if (value !== null && typeof value === "object" && !(value instanceof Date)) {
+    const out: Record<string, WidgetData> = {};
+    for (const key of Object.keys(value).toSorted()) {
+      out[key] = sortJsonKeys(value[key]);
+    }
+    return out;
+  }
+  return value;
 }
 
 function cacheDir(testCase: string): string {
@@ -780,68 +406,14 @@ function sseEventsToTickingStream(
 
 // ── Cache hit replay ───────────────────────────────────────────────────────────
 
-function applyFixturePatches(cached: ResFile): ResFile {
-  if (sharedState.fixturePatchMap.size === 0) {
-    return cached;
-  }
-  if (cached.type === "sse") {
-    let events = cached.events;
-    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
-      // Fast path: skip if placeholder not present anywhere in events
-      const hasPlaceholder = events.some((e) => e.includes(placeholder));
-      if (!hasPlaceholder) {
-        continue;
-      }
-      // For SSE tool_call arguments, the placeholder may be split across chunks.
-      // Reconstruct args, patch, re-split using patchSseToolCallArguments.
-      const rawContent = events.join("\n");
-      if (rawContent.includes(placeholder)) {
-        // Try SSE-aware patch first (handles split args)
-        const patchedContent = patchSseToolCallArguments(
-          JSON.stringify({
-            type: "sse",
-            events,
-            url: cached.url,
-            status: cached.status,
-            headers: cached.headers,
-          }),
-          placeholder,
-          realValue,
-        );
-        if (patchedContent !== null) {
-          const parsed = JSON.parse(patchedContent) as { events: string[] };
-          events = parsed.events;
-          continue;
-        }
-        // Fallback: plain string replace (for non-argument occurrences)
-        events = events.map((e) => e.replaceAll(placeholder, realValue));
-      }
-    }
-    return { ...cached, events };
-  }
-  if (cached.type === "json") {
-    let jsonStr = JSON.stringify(cached.body);
-    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
-      if (jsonStr.includes(placeholder)) {
-        jsonStr = jsonStr.replaceAll(placeholder, realValue);
-      }
-    }
-    return { ...cached, body: JSON.parse(jsonStr) as WidgetData };
-  }
-  if (cached.type === "text") {
-    let body = cached.body;
-    for (const [placeholder, realValue] of sharedState.fixturePatchMap) {
-      if (body.includes(placeholder)) {
-        body = body.replaceAll(placeholder, realValue);
-      }
-    }
-    return { ...cached, body };
-  }
-  return cached;
-}
-
 function replayFromCache(cached: ResFile): Response {
-  const patched = applyFixturePatches(cached);
+  const patched = cached;
+  // Replayed responses carry the marker header so consumers (poll loops) can
+  // tell replay from live in-band — no global flag.
+  const replayHeaders = {
+    ...patched.headers,
+    [FIXTURE_REPLAY_HEADER]: "true",
+  };
   // SSE responses use a pull-based ticking stream to simulate async delivery.
   // This prevents the fixture-replay burst from letting a later LLM step (F3/F4)
   // set waitingForRemoteResult before the for-await loop processes earlier
@@ -849,7 +421,7 @@ function replayFromCache(cached: ResFile): Response {
   if (patched.type === "sse") {
     return new Response(sseEventsToTickingStream(patched.events), {
       status: patched.status,
-      headers: patched.headers,
+      headers: replayHeaders,
     });
   }
   let bytes: Uint8Array;
@@ -862,7 +434,7 @@ function replayFromCache(cached: ResFile): Response {
   }
   return new Response(bytesToStream(bytes), {
     status: patched.status,
-    headers: patched.headers,
+    headers: replayHeaders,
   });
 }
 
@@ -916,225 +488,343 @@ function buildResFile(
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
-// PER-MODULE-INSTANCE install guard. The dev server loads two module graphs (CLI
-// + Vite SSR) — each has its OWN `global.fetch`. The fetch PATCH must be applied
-// in EVERY graph (especially the SSR graph, where route handlers AND the relayed
-// AI loop run), or that graph's model/media calls go out unpatched → live, never
-// recorded → relayed remote loops run non-deterministically. The shared
-// `installed` flag (on globalThis) is NOT usable for this: it would let the second
-// graph skip patching its own fetch. So gate patching on this module-local flag.
-// Context + counters stay on the GLOBAL sharedState so both graphs agree on them.
-let installedInThisGraph = false;
-
-export function installFetchCache(
-  logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
-): void {
-  if (installedInThisGraph) {
-    return;
-  }
-  installedInThisGraph = true;
-  sharedState.installed = true;
-  mkdirSync(HTTP_CACHE_DIR, { recursive: true });
-
-  const originalFetch = global.fetch;
-
-  global.fetch = (async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ): Promise<Response> => {
-    const url =
-      typeof input === "string"
-        ? input
-        : input instanceof URL
-          ? input.toString()
-          : input.url;
-
-    // Pass through non-external calls (localhost, DB, WS, etc.)
-    if (!isExternal(url)) {
-      return originalFetch(input, init);
-    }
-
-    // Pass through relay control-plane calls — these are side-effectful and must
-    // always reach the live server:
-    //   ai-stream/stream (with tools+instanceId) — starts a remote AI loop, returns a fresh responseThreadId
-    //   ws/broadcast                              — delivers tool results to the remote AI loop
-    //   system/execute-tool                       — the EVENT-protocol transport: every
-    //                                               tool-execute-request/result rides a
-    //                                               bridge POST to the peer's execute-tool
-    //                                               endpoint; replaying one from fixtures
-    //                                               means the relay never reaches the peer.
-    // Caching any would break the relay: stale responseThreadId → dead WS channel;
-    // cached broadcast/bridge POST → dispatch or result never delivered → remote hang.
-    if (
-      url.includes("/agent/ai-stream/stream") ||
-      url.includes("/ws/broadcast") ||
-      url.includes("/system/execute-tool")
-    ) {
-      return originalFetch(input, init);
-    }
-
-    sharedState.inflightCount++;
-    try {
-      let bodyStr = "";
-      if (init?.body) {
-        bodyStr =
-          typeof init.body === "string"
-            ? init.body
-            : init.body instanceof URLSearchParams
-              ? init.body.toString()
-              : JSON.stringify(init.body);
-      }
-
-      const modelName = deriveModelName(url, bodyStr);
-      const effectiveTestCase = resolveContext();
-      const testCaseDir = cacheDir(effectiveTestCase);
-      const callIndex = nextCallIndex(effectiveTestCase, modelName);
-      const stem = fileStem(modelName, callIndex);
-      const rp = join(testCaseDir, `${stem}-res.json`);
-
-      // ── Cache hit ────────────────────────────────────────────────────────────
-      if (existsSync(rp)) {
-        // Poll loops collapse their sleeps after a replayed response
-        // (agent/shared/poll-delay.ts) — replays must not sleep real time.
-        (
-          globalThis as { __vibeFetchCacheLastHit?: boolean }
-        ).__vibeFetchCacheLastHit = true;
-        // eslint-disable-next-line no-console
-        logger.debug("[FetchCache] HIT", {
-          rp: rp.split("/").slice(-3).join("/"),
-          model: modelName,
-          index: callIndex,
-        });
-        const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
-        // SSE responses use sseEventsToTickingStream (pull-based, one event per
-        // macrotask tick) - see replayFromCache. Non-SSE responses still need one
-        // yield so the caller's await-fetch itself is truly async.
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, 0);
-        });
-        return replayFromCache(cached);
-      }
-      // eslint-disable-next-line no-console
-      logger.debug("[FetchCache] MISS", {
-        rp: rp.split("/").slice(-3).join("/"),
-        model: modelName,
-        index: callIndex,
-      });
-
-      // ── Cache miss ────────────────────────────────────────────────────────────
-      if (sharedState.strictMode) {
-        // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
-        throw new Error(
-          // eslint-disable-next-line i18next/no-literal-string
-          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${effectiveTestCase})`,
-        );
-      }
-
-      // Use a 5-minute timeout for all live fetch calls.
-      // 30s was too short for LLM SSE streaming responses (compacting kimi calls can
-      // take 60-90s for long thread histories). Non-SSE (embedding) calls complete in
-      // seconds once the response headers arrive. SSE body consumption is bounded by
-      // the AI SDK's stream iteration, not by the AbortSignal on the fetch itself.
-      // 5 minutes is a safe upper bound that prevents indefinite hangs while allowing
-      // legitimate long-running LLM responses.
-      const real = await originalFetch(input, {
-        ...init,
-        signal: AbortSignal.timeout(300_000),
-      });
-      const responseHeaders = headersToRecord(real.headers);
-
-      mkdirSync(testCaseDir, { recursive: true });
-
-      // Write req file (full body, human-readable)
-      const reqEntry: ReqFile = {
-        url,
-        method: init?.method ?? "GET",
-        headers: sanitiseRequestHeaders(init?.headers),
-        body: parseBodyForStorage(bodyStr),
-      };
-      writeFileSync(
-        join(testCaseDir, `${stem}-req.json`),
-        JSON.stringify(reqEntry, null, 2),
-        "utf-8",
-      );
-
-      // Only treat true SSE responses as streaming. chunked transfer-encoding
-      // with non-SSE content types (e.g. application/json from embedding APIs)
-      // should be buffered directly.
-      const isStream = (responseHeaders["content-type"] ?? "").includes(
-        "event-stream",
-      );
-
-      if (isStream && real.body) {
-        // TransformStream: pass chunks through to caller AND collect them.
-        // Cache is written in flush() - after the caller has fully consumed the
-        // stream - so the file is always complete before the test ends.
-        // Also written in cancel() so endLoop (which aborts early) still persists.
-        const chunks: Uint8Array[] = [];
-        let written = false;
-        const writeCache = (): void => {
-          if (written) {
-            return;
-          }
-          written = true;
-          const total = chunks.reduce((n, c) => n + c.length, 0);
-          const merged = new Uint8Array(total);
-          let offset = 0;
-          for (const c of chunks) {
-            merged.set(c, offset);
-            offset += c.length;
-          }
-          const resEntry = buildResFile(
-            url,
-            real.status,
-            responseHeaders,
-            merged,
-          );
-          writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
-        };
-        const transform = new TransformStream<Uint8Array, Uint8Array>({
-          transform(chunk, controller): void {
-            chunks.push(chunk);
-            controller.enqueue(chunk);
-          },
-          flush(): void {
-            writeCache();
-          },
-        });
-
-        return new Response(real.body.pipeThrough(transform), {
-          status: real.status,
-          headers: responseHeaders,
-        });
-      }
-
-      // Non-streaming: buffer the full body.
-      // AbortSignal.timeout(300s) above ensures this won't hang indefinitely.
-      const buffer = await real.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      const resEntry = buildResFile(url, real.status, responseHeaders, bytes);
-      writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
-
-      return new Response(bytesToStream(bytes), {
-        status: real.status,
-        headers: responseHeaders,
-      });
-    } finally {
-      sharedState.inflightCount--;
-    }
-  }) as typeof globalThis.fetch;
+/**
+ * True for calls the record/replay engine must NEVER intercept — relay
+ * control-plane calls are side-effectful and must always reach the live server:
+ *   ai-stream/stream (with tools+instanceId) — starts a remote AI loop, returns a fresh responseThreadId
+ *   ws/broadcast                              — delivers tool results to the remote AI loop
+ *   system/execute-tool                       — the EVENT-protocol transport: every
+ *                                               tool-execute-request/result rides a
+ *                                               bridge POST to the peer's execute-tool
+ *                                               endpoint; replaying one from fixtures
+ *                                               means the relay never reaches the peer.
+ * Caching any would break the relay: stale responseThreadId → dead WS channel;
+ * cached broadcast/bridge POST → dispatch or result never delivered → remote hang.
+ */
+function isPassthroughUrl(url: string, interceptPorts?: number[]): boolean {
+  return (
+    !isExternal(url, interceptPorts) ||
+    url.includes("/agent/ai-stream/stream") ||
+    url.includes("/ws/broadcast") ||
+    url.includes("/system/execute-tool")
+  );
 }
 
 /**
- * Install the fetch cache only when VIBE_FIXTURE_MODE=true.
- * Called by the dev server repository when starting with --fixture-mode.
- * Also sets the initial context to "server-default" so every intercepted
- * call gets stored under a predictable name.
+ * Record/replay fetch for ONE explicit fixture context and ONE execution
+ * chain. The per-call ordinal comes from the run's single counter (atomic
+ * read-and-bump on the counter thread's stream_context), so the Nth external
+ * call of the whole run maps to file N — order-driven, no content hashing.
  */
-export function installFetchCacheIfEnabled(): void {
-  if (process.env["VIBE_FIXTURE_MODE"] !== "true") {
-    return;
+async function engineFetch(
+  fixtureContext: FixtureContext,
+  repeats: Map<string, number>,
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  logger: EndpointLogger,
+): Promise<Response> {
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- the record/replay engine's live leg
+  const originalFetch = fetch;
+  const url =
+    typeof input === "string"
+      ? input
+      : input instanceof URL
+        ? input.toString()
+        : input.url;
+
+  if (isPassthroughUrl(url, fixtureContext.interceptLocalhostPorts)) {
+    return originalFetch(input, init);
   }
-  installFetchCache();
-  setFetchCacheContext("server-default");
+
+  const dir = slugify(fixtureContext.name);
+
+  {
+    let bodyStr = "";
+    if (init?.body) {
+      bodyStr =
+        typeof init.body === "string"
+          ? init.body
+          : init.body instanceof URLSearchParams
+            ? init.body.toString()
+            : JSON.stringify(init.body);
+    }
+
+    const modelName = deriveModelName(url, bodyStr);
+    const hash = requestHash(url, init?.method ?? "GET", bodyStr);
+    const testCaseDir = cacheDir(dir);
+    const repeatKey = `${modelName}-${hash}`;
+    const repeatIndex = (repeats.get(repeatKey) ?? 0) + 1;
+    repeats.set(repeatKey, repeatIndex);
+    const stem = fileStem(repeatKey, repeatIndex);
+    const rp = join(testCaseDir, `${stem}-res.json`);
+
+    // ── Cache hit ────────────────────────────────────────────────────────────
+    if (existsSync(rp)) {
+      logger.debug("[FetchCache] HIT", {
+        rp: rp.split("/").slice(-3).join("/"),
+        model: modelName,
+        index: repeatIndex,
+      });
+      const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
+      // SSE responses use sseEventsToTickingStream (pull-based, one event per
+      // macrotask tick) - see replayFromCache. Non-SSE responses still need one
+      // yield so the caller's await-fetch itself is truly async.
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      return replayFromCache(cached);
+    }
+    logger.debug("[FetchCache] MISS", {
+      rp: rp.split("/").slice(-3).join("/"),
+      model: modelName,
+      index: repeatIndex,
+    });
+
+    // ── Cache miss ────────────────────────────────────────────────────────────
+    if (CRASH_ON_FIXTURE_MISS) {
+      // oxlint-disable-next-line restricted-syntax -- temporary debug crash on any uncached fetch
+      throw new Error(
+        // eslint-disable-next-line i18next/no-literal-string
+        `[FetchCache CRASH_ON_FIXTURE_MISS] cache miss for ${init?.method ?? "GET"} ${url}\n  context: ${dir}\n  expected: ${stem}-res.json`,
+      );
+    }
+    if (fixtureContext.strict) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
+      throw new Error(
+        // eslint-disable-next-line i18next/no-literal-string
+        `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${dir}, expected: ${stem}-res.json)`,
+      );
+    }
+
+    // Live-fetch watchdog + stall retry: 5-minute TOTAL budget (long LLM/
+    // compacting streams are legitimate) plus a 45s IDLE budget until the
+    // FIRST body chunk and 30s between subsequent chunks — provider
+    // connections occasionally open and then stall without ever sending a
+    // token; without the idle abort such a recording burns the whole test
+    // timeout as a silent hang (observed repeatedly: empty assistant row,
+    // thread stuck streaming). Pre-first-chunk stalls are retried once on a
+    // fresh connection (nothing was delivered, so a retry is transparent);
+    // mid-stream stalls can only abort — the caller already consumed chunks.
+    let watchdog = makeLiveFetchWatchdog();
+    let real: Response;
+    let firstChunk: Uint8Array | undefined;
+    let bodyReader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    let isStreamResponse = false;
+    let bufferedBody: Uint8Array | undefined;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        real = await originalFetch(input, {
+          ...init,
+          signal: watchdog.signal,
+        });
+        isStreamResponse = (real.headers.get("content-type") ?? "").includes(
+          "event-stream",
+        );
+        if (isStreamResponse && real.body) {
+          // Read the first chunk under the watchdog: a connection that opens
+          // and never sends is indistinguishable from a slow model otherwise.
+          bodyReader = real.body.getReader();
+          watchdog.touchIdle(45_000);
+          const first = await bodyReader.read();
+          firstChunk = first.done ? undefined : first.value;
+        } else {
+          // Non-streaming (JSON/binary): buffer INSIDE the retry loop — a
+          // body that stalls after headers is just as retryable as one that
+          // never sends headers (nothing reached the caller yet).
+          bufferedBody = new Uint8Array(await real.arrayBuffer());
+          watchdog.clear();
+        }
+        break;
+      } catch (liveErr) {
+        watchdog.clear();
+        const msg = liveErr instanceof Error ? liveErr.message : "";
+        const isStall =
+          /idle timeout/.test(msg) ||
+          (liveErr instanceof Error &&
+            liveErr.name === "AbortError" &&
+            /idle timeout/.test(String(liveErr.cause ?? "")));
+        if (attempt === 0 && isStall) {
+          logger.warn(
+            "[FetchCache] live fetch stalled before first chunk - retrying once",
+            { url },
+          );
+          watchdog = makeLiveFetchWatchdog();
+          continue;
+        }
+        // oxlint-disable-next-line restricted-syntax -- rethrow: fetch contract is throw-on-network-error
+        throw liveErr;
+      }
+    }
+    watchdog.touchIdle(30_000);
+    const responseHeaders = headersToRecord(real.headers);
+
+    mkdirSync(testCaseDir, { recursive: true });
+
+    // Write req file (full body, human-readable)
+    const reqEntry: ReqFile = {
+      url,
+      method: init?.method ?? "GET",
+      headers: sanitiseRequestHeaders(init?.headers),
+      body: parseBodyForStorage(bodyStr),
+    };
+    writeFileSync(
+      join(testCaseDir, `${stem}-req.json`),
+      JSON.stringify(reqEntry, null, 2),
+      "utf-8",
+    );
+
+    // Only treat true SSE responses as streaming. chunked transfer-encoding
+    // with non-SSE content types (e.g. application/json from embedding APIs)
+    // should be buffered directly.
+    if (isStreamResponse && bodyReader) {
+      // TransformStream: pass chunks through to caller AND collect them.
+      // Cache is written in flush() - after the caller has fully consumed the
+      // stream - so the file is always complete before the test ends.
+      // Also written in cancel() so endLoop (which aborts early) still persists.
+      const chunks: Uint8Array[] = [];
+      let written = false;
+      const writeCache = (): void => {
+        if (written) {
+          return;
+        }
+        written = true;
+        const total = chunks.reduce((n, c) => n + c.length, 0);
+        const merged = new Uint8Array(total);
+        let offset = 0;
+        for (const c of chunks) {
+          merged.set(c, offset);
+          offset += c.length;
+        }
+        const resEntry = buildResFile(
+          url,
+          real.status,
+          responseHeaders,
+          merged,
+        );
+        writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
+      };
+      // Pump the reader (first chunk already read) through to the caller,
+      // recording every chunk. The watchdog aborts the underlying fetch on a
+      // mid-stream stall, which errors this stream and unblocks the consumer.
+      const reader = bodyReader;
+      const initialChunk = firstChunk;
+      const wd = watchdog;
+      const outStream = new ReadableStream<Uint8Array>({
+        async start(controller): Promise<void> {
+          try {
+            if (initialChunk) {
+              chunks.push(initialChunk);
+              controller.enqueue(initialChunk);
+            }
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                break;
+              }
+              wd.touchIdle(30_000);
+              chunks.push(value);
+              controller.enqueue(value);
+            }
+            wd.clear();
+            writeCache();
+            controller.close();
+          } catch (pumpErr) {
+            wd.clear();
+            controller.error(pumpErr);
+          }
+        },
+        cancel(reason): void {
+          wd.clear();
+          void reader.cancel(reason);
+        },
+      });
+
+      return new Response(outStream, {
+        status: real.status,
+        headers: responseHeaders,
+      });
+    }
+
+    // Non-streaming: body already buffered inside the retry loop.
+    watchdog.clear();
+    const bytes = bufferedBody ?? new Uint8Array(0);
+    const resEntry = buildResFile(url, real.status, responseHeaders, bytes);
+    writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
+
+    return new Response(bytesToStream(bytes), {
+      status: real.status,
+      headers: responseHeaders,
+    });
+  }
+}
+
+/**
+ * Watchdog for LIVE recording fetches: 5-min total budget + idle budget
+ * (45s to first body chunk, 30s between chunks — callers touchIdle()).
+ * See the cache-miss branch for the stall/retry rationale.
+ */
+function makeLiveFetchWatchdog(): {
+  signal: AbortSignal;
+  touchIdle: (ms: number) => void;
+  clear: () => void;
+} {
+  const ctl = new AbortController();
+  const totalTimer = setTimeout(() => {
+    ctl.abort(new Error("fixture live-fetch total timeout (300s)"));
+  }, 300_000);
+  let idleTimer = setTimeout(() => {
+    ctl.abort(new Error("fixture live-fetch idle timeout"));
+  }, 45_000);
+  return {
+    signal: ctl.signal,
+    touchIdle: (ms: number): void => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        ctl.abort(new Error("fixture live-fetch idle timeout"));
+      }, ms);
+    },
+    clear: (): void => {
+      clearTimeout(totalTimer);
+      clearTimeout(idleTimer);
+    },
+  };
+}
+
+/**
+ * Bind a fixture context into a standalone fetch implementation — THE entry
+ * into the fixture engine. AI providers receive it via their `fetch` option;
+ * media-gen/TTS/STT/embedding call sites create one per execution from
+ * `streamContext.fixtureContext` and use it for their external calls.
+ *
+ * Each instance carries its own repeat counter for literally-identical
+ * requests (poll loops, SDK retries), scoped to the execution chain that
+ * created it. Without a context this is the plain live fetch — the presence
+ * of an explicit fixtureContext on the chain IS the switch; there is no env
+ * flag and no mode.
+ */
+export function createFixtureFetch(
+  fixtureContext: FixtureContext | undefined,
+  logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
+): typeof globalThis.fetch {
+  if (!fixtureContext) {
+    if (CRASH_ON_FIXTURE_MISS && process.env.NODE_ENV === "test") {
+      // oxlint-disable-next-line restricted-syntax -- temporary debug crash: AI/media call without fixture context in a test run
+      throw new Error(
+        // eslint-disable-next-line i18next/no-literal-string
+        "[FetchCache CRASH_ON_FIXTURE_MISS] createFixtureFetch called WITHOUT a fixtureContext during a test run - this AI/media call would go live",
+      );
+    }
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live fetch for AI/media call sites outside fixture mode
+    return fetch;
+  }
+  const repeats = new Map<string, number>();
+  // Bun's fetch type carries a `preconnect` member — satisfy it by borrowing
+  // the real one (a pure DNS/TLS warm-up; irrelevant to record/replay).
+  const bound = Object.assign(
+    (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
+      engineFetch(fixtureContext, repeats, input, init, logger),
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- borrowing the live fetch's preconnect
+    { preconnect: fetch.preconnect.bind(fetch) },
+  );
+  return bound;
 }

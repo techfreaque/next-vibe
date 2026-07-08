@@ -5,8 +5,8 @@
 import { Methods } from "next-vibe/core/definition/enums";
 import { endpointsHandler } from "next-vibe/core/route/multi";
 
+import { ResumeStreamRepository } from "../repository/resume";
 import { endpoints } from "./definition";
-import { ResumeStreamRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,

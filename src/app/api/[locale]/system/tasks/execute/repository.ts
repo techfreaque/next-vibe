@@ -17,10 +17,7 @@ import {
   isStreamingResponse,
   success,
 } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
-import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
-import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -245,7 +242,11 @@ export class TaskExecuteRepository {
             logger,
             platform: Platform.CRON,
             cronTaskId: task.id,
-            streamContext: makeHeadlessContext(taskAbortController.signal),
+            // no user context — UTC (dates not user-facing here)
+            streamContext: makeHeadlessContext(
+              taskAbortController.signal,
+              undefined,
+            ),
           }),
           new Promise<never>((...[, reject]) => {
             setTimeout(() => reject(new Error("TASK_TIMEOUT")), timeoutMs);

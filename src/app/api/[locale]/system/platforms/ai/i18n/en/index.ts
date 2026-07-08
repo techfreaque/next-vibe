@@ -129,6 +129,124 @@ export const translations = {
       },
     },
   },
+  cancelTool: {
+    post: {
+      title: "Cancel Tool Call",
+      titleShort: "Cancel Tool",
+      description:
+        "Interrupt a single in-flight tool call by its callId while it is still running. The call stops and returns an error as its result; the turn and any sibling parallel tool calls keep running.",
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "callId is required",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: { title: "Forbidden", description: "Access denied" },
+        notFound: {
+          title: "Not Found",
+          description: "No in-flight call for this callId",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to cancel the tool call",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error while cancelling",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+      },
+      success: {
+        title: "Tool Call Cancelled",
+        description: "The running tool call was interrupted.",
+      },
+    },
+  },
+  detachCall: {
+    post: {
+      title: "Detach Tool Call",
+      titleShort: "Detach Call",
+      description:
+        "Upgrade a still-running tool call to detached by its callId: it keeps running in the background, its result is discarded, and the turn is unblocked now. Use resume-when-done instead if you need the result.",
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "callId is required",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: { title: "Forbidden", description: "Access denied" },
+        notFound: {
+          title: "Not Found",
+          description: "No in-flight call for this callId",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to detach the tool call",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error while detaching",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+      },
+      success: {
+        title: "Tool Call Detached",
+        description:
+          "The call continues in the background; its result is discarded.",
+      },
+    },
+  },
+  resumeWhenDone: {
+    post: {
+      title: "Move Tool Call to Background",
+      titleShort: "Background Tool",
+      description:
+        "Let a still-running tool call finish in the background by its callId. The turn ends and the thread revives with the result when the work completes.",
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "callId is required",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: { title: "Forbidden", description: "Access denied" },
+        notFound: {
+          title: "Not Found",
+          description: "No in-flight call for this callId",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to background the tool call",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error while backgrounding",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+      },
+      success: {
+        title: "Tool Call Backgrounded",
+        description: "The tool call continues in the background.",
+      },
+    },
+  },
   tools: {
     // Translations moved to system/help/get - see system/help/i18n/en/index.ts
     get: {

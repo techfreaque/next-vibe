@@ -188,6 +188,7 @@ export const translations = {
         cancel: "Cancel",
         deny: "Deny",
         runInBackground: "Run in background",
+        resumeWhenDone: "Resume when done",
       },
       creditsUsed_one: "{{cost}} credit",
       creditsUsed_other: "{{cost}} credits",

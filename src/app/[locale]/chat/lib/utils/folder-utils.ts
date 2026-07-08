@@ -7,9 +7,9 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { scopedTranslation as chatScopedTranslation } from "@/app/[locale]/chat/i18n";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   DEFAULT_FOLDER_CONFIGS,
+  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/db";
@@ -23,51 +23,88 @@ export function isDefaultFolder(folderId: string): folderId is DefaultFolderId {
 }
 
 /**
- * Get the icon for a folder
- * For default folders, use the icon from DEFAULT_FOLDER_CONFIGS
- * For custom folders, use the stored icon or fallback to "folder"
+ * Scaffold sub-folders under REMOTE/<peer>/ use the names "private" and
+ * "background" — they mirror the local root folders but have UUID ids.
+ * Map by name to the matching DefaultFolderId config so they share the same
+ * icon, color, and translation key as their local counterparts.
+ */
+const SCAFFOLD_NAME_TO_DEFAULT: Readonly<
+  Partial<Record<string, DefaultFolderId>>
+> = {
+  private: DefaultFolderId.PRIVATE,
+  background: DefaultFolderId.BACKGROUND,
+};
+
+function getScaffoldConfig(
+  name: string | null | undefined,
+): (typeof DEFAULT_FOLDER_CONFIGS)[DefaultFolderId] | null {
+  if (!name) {
+    return null;
+  }
+  const defaultId = SCAFFOLD_NAME_TO_DEFAULT[name];
+  return defaultId !== undefined ? DEFAULT_FOLDER_CONFIGS[defaultId] : null;
+}
+
+/**
+ * Get the icon for a folder.
+ * Default folders → config icon. Scaffold mirrors ("private"/"background" by
+ * name) → same icon as their local root. Custom folders → stored icon or "folder".
  */
 export function getFolderIcon(
   folderId: string,
   customIcon?: IconKey | null,
+  folderName?: string | null,
 ): IconKey {
   if (isDefaultFolder(folderId)) {
     return DEFAULT_FOLDER_CONFIGS[folderId].icon;
+  }
+  const scaffold = getScaffoldConfig(folderName);
+  if (scaffold) {
+    return scaffold.icon;
   }
   return customIcon || "folder";
 }
 
 /**
- * Get the color for a folder
- * For default folders, use the color from DEFAULT_FOLDER_CONFIGS
- * For custom folders, return the custom color or null
+ * Get the color for a folder.
+ * Default folders → config color. Scaffold mirrors → same color as their local
+ * root. Custom folders → stored color or null.
  */
 export function getFolderColor(
   folderId: string,
   customColor?: string | null,
+  folderName?: string | null,
 ): string | null {
   if (isDefaultFolder(folderId)) {
     return DEFAULT_FOLDER_CONFIGS[folderId].color;
+  }
+  const scaffold = getScaffoldConfig(folderName);
+  if (scaffold) {
+    return scaffold.color;
   }
   return customColor || null;
 }
 
 /**
- * Get the display name for a folder
- * For default folders, always use the translation key from DEFAULT_FOLDER_CONFIGS
- * For custom folders, use the stored name
+ * Get the display name for a folder.
+ * Default folders → translation key from config. Scaffold mirrors
+ * ("private"/"background" by name) → same translation as their local root,
+ * resolved at render time from the locale. Custom folders → stored name.
  */
 export function getFolderDisplayName(
-  folder: ChatFolder,
+  folder: Pick<ChatFolder, "id" | "name">,
   locale: CountryLanguage,
 ): string {
   const { t } = chatScopedTranslation.scopedT(locale);
 
-  // For default folders, always use the translation key from config
   if (isDefaultFolder(folder.id)) {
     return t(DEFAULT_FOLDER_CONFIGS[folder.id].translationKey);
   }
 
-  // For custom folders, use the stored name
+  const scaffold = getScaffoldConfig(folder.name);
+  if (scaffold) {
+    return t(scaffold.translationKey);
+  }
+
   return folder.name;
 }

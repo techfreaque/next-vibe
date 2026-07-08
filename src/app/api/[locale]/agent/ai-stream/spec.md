@@ -46,7 +46,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 **User sees**: tool executing. Stream pauses, then continues with the result. Seamless.
 
-**AI sees**: result returned inline, loop continues — always.
+**AI sees**: result inline, loop continues — always.
 
 | Transport                | Stream behavior                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------- |
@@ -55,7 +55,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 | **Remote queue**         | Stream aborts → `waiting`. Task executes remotely. On completion: see lifecycle below. |
 | **Escalated (>timeout)** | Same as remote queue path.                                                             |
 
-**Tool message lifecycle — escalated path:**
+**Escalated path — tool message lifecycle:**
 
 - At call time: tool message created, `status: "pending"` (UI shows executing)
 - While waiting: message stays `pending`, thread stays `waiting`
@@ -68,9 +68,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `detach`
 
-**User sees**: tool dispatched, stream continues immediately. Result bubble updates in background when done.
-
-**AI sees**: `{ taskId, status: "pending", hint: "use await-task(taskId) if you need the result" }` — always.
+**AI sees**: `{ taskId, status: "pending", hint: "use await-task(taskId) if you need the result" }`.
 
 | Transport         | Stream behavior                                                       |
 | ----------------- | --------------------------------------------------------------------- |
@@ -84,9 +82,9 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `wakeUp`
 
-**User sees**: tool dispatched, stream continues immediately. When result arrives, a new AI turn starts automatically.
+**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call await-task" }`.
 
-**AI sees**: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call await-task" }` — always.
+**Tool message lifecycle:**
 
 | Transport         | Stream behavior                                                                                              |
 | ----------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -110,7 +108,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `endLoop`
 
-**User sees**: tool executing, then stream ends.
+**Confirm + wait result lifecycle** — same as wait escalated path:
 
 | Transport         | Stream behavior                                                                                                                                                 |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -124,7 +122,9 @@ Thread stays `waiting` (stop button visible) until the remote task completes - e
 
 ### `approve`
 
-**User sees**: confirmation dialog for this tool. Other tools in the same batch proceed normally.
+**Route**: `POST /api/{locale}/agent/ai-stream/resume-stream`  
+**Alias**: `resume-stream`  
+**Handler**: `ResumeStreamRepository.resume()` in `repository/resume.ts`
 
 **AI sees**: tool blocked; other parallel tools execute normally. Loop stops after batch.
 
@@ -204,9 +204,12 @@ When waiting for a remote result (task-queue path, `wait-for-task`, escalated to
 
 **Default: 90s.** Covers a full tool execution window.
 
-**Per-tool override**: `streamTimeoutMs: 0` in endpoint definition for long-running interactive tools.
+**Default: 90s.**  
+**Per-tool override**: `streamTimeoutMs: 0` for long-running interactive tools.
 
-**`reverse-ws` and `direct-http` `wait` mode**: no timer — the connection itself is the timeout.
+**Remote `wait` mode**: the executor's inline window (the tool's `timeoutMs`, default 90s) is the timer — on expiry the call auto-upgrades to `wakeUp` and the thread parks; the executor's 15-minute deadline backstop guarantees an outcome.
+
+**Revival claim**: `resume-stream` claims a thread atomically (`idle|waiting → streaming`). A stuck claim — for WAIT revivals exactly as for wakeUp — polls the same 180s backoff window before force-resetting the thread state.
 
 ---
 

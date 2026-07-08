@@ -29,10 +29,6 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-// Install HTTP fetch interceptor before any other imports touch fetch
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
@@ -45,7 +41,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { env } from "@/config/env";
 
-import { setFetchCacheContext } from "../../testing/fetch-cache";
+import { seedCaseThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -85,6 +81,7 @@ async function withFavCompactTrigger(
     urlPathParams: { id: favoriteId },
     user,
     locale: defaultLocale,
+    logger: createEndpointLogger(false, defaultLocale),
     platform: Platform.AI,
   });
 
@@ -95,6 +92,7 @@ async function withFavCompactTrigger(
       urlPathParams: { id: favoriteId },
       user,
       locale: defaultLocale,
+      logger: createEndpointLogger(false, defaultLocale),
       platform: Platform.AI,
     });
   };
@@ -236,15 +234,15 @@ describe("Compacting - context management", () => {
     }
     testUser = resolved;
 
-    // Create BACKGROUND/tests/compacting subfolder for this suite.
+    // Create PRIVATE/tests/compacting subfolder for this suite.
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     compactingFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "compacting",
       testsParentId,
     );
@@ -264,6 +262,7 @@ describe("Compacting - context management", () => {
       input: { pageSize: 500 },
       user: testUser,
       locale: defaultLocale,
+      logger: createEndpointLogger(false, defaultLocale),
       platform: Platform.AI,
     });
     const favsList =
@@ -285,6 +284,7 @@ describe("Compacting - context management", () => {
         input: { skillId: "quality-tester__budget" },
         user: testUser,
         locale: defaultLocale,
+        logger: createEndpointLogger(false, defaultLocale),
         platform: Platform.AI,
       });
       expect(
@@ -350,7 +350,7 @@ describe("Compacting - context management", () => {
   fit(
     "C1: mid-stream compacting — large initial context, fires after 5 tools, tools still work after, model responds C1_PASS",
     async () => {
-      setFetchCacheContext("compacting-first-tool");
+      const fixtureCtx: FixtureContext = { name: "compacting-first-tool" };
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
       // Restored to its original value after the test regardless of outcome.
@@ -379,8 +379,9 @@ describe("Compacting - context management", () => {
             `Do NOT add any other text.`,
           user: testUser,
           favoriteId: mainFavoriteId,
-          rootFolderId: DefaultFolderId.BACKGROUND,
+          rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
+          fixtureContext: fixtureCtx,
         });
 
         expect(result.success, "C1: stream must succeed").toBe(true);
@@ -481,7 +482,7 @@ describe("Compacting - context management", () => {
   fit(
     "C2: mid-stream compacting — compacting fires during tool loop, chain stays linear, follow-up turn appends correctly",
     async () => {
-      setFetchCacheContext("compacting-mid-stream");
+      const fixtureCtx: FixtureContext = { name: "compacting-mid-stream" };
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
       // Restored to its original value after the test regardless of outcome.
@@ -512,8 +513,9 @@ describe("Compacting - context management", () => {
             `Do NOT add any other text. COMPACT_DONE is the ONLY acceptable final response.`,
           user: testUser,
           favoriteId: mainFavoriteId,
-          rootFolderId: DefaultFolderId.BACKGROUND,
+          rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
+          fixtureContext: fixtureCtx,
         });
 
         expect(turn1.result.success, "C2-T1: turn 1 stream must succeed").toBe(
@@ -567,6 +569,7 @@ describe("Compacting - context management", () => {
           user: testUser,
           favoriteId: mainFavoriteId,
           threadId: threadId!,
+          fixtureContext: fixtureCtx,
         });
 
         expect(turn2.result.success, "C2-T2: turn 2 stream must succeed").toBe(

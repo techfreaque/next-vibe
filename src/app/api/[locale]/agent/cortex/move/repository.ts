@@ -18,6 +18,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
+import {
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import {
@@ -44,6 +48,7 @@ export class CortexMoveRepository {
     logger,
     t,
     relayed = false,
+    streamContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -58,6 +63,8 @@ export class CortexMoveRepository {
      * emit so the event is not relayed back, preventing an infinite ping-pong.
      */
     relayed?: boolean;
+    /** Fixture chain of the calling execution — the embedding call binds it. */
+    streamContext: ToolExecutionContext;
   }): Promise<
     ResponseType<{
       responseFrom: string;
@@ -95,7 +102,7 @@ export class CortexMoveRepository {
       try {
         const { resolveVirtualMove } = await import("../mounts/resolver");
         const result = await resolveVirtualMove(
-          { userId, user, locale, logger },
+          { userId, user, locale, logger, streamContext },
           from,
           to,
           fromMount,
@@ -196,6 +203,7 @@ export class CortexMoveRepository {
             locale,
             logger,
             feature: CortexCreditFeature.EMBEDDING,
+            streamContext,
           });
         }
       } catch {
@@ -252,6 +260,9 @@ export class CortexMoveRepository {
       logger,
       t,
       relayed: true,
+      // Relayed applier — no fixture chain crosses instances; an explicit
+      // thread-less context routes embeddings live.
+      streamContext: rootlessStreamContext(),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex move", {

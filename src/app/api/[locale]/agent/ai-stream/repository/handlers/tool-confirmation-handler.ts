@@ -5,24 +5,15 @@
 import "server-only";
 
 import { and, eq, gt, ne } from "drizzle-orm";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
-  type ErrorResponseType,
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import {
-  CallbackMode,
-  EXECUTE_TOOL_ALIAS,
-} from "next-vibe/execute-tool/constants";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
-import { TaskCompletion } from "next-vibe/execute-tool/repository/completion";
+import { ConfirmedExecution } from "next-vibe/execute-tool/repository/confirmed";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import { db } from "../../../../system/database";
 import type { ToolExecutionContext } from "../../../chat/config";
@@ -32,7 +23,7 @@ import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
-import { walkToLeafMessage } from "../core/infra";
+import { walkToLeafMessage } from "../core/tree-walk";
 
 export class ToolConfirmationHandler {
   /**
@@ -241,7 +232,7 @@ export class ToolConfirmationHandler {
         const pendingTaskId =
           typeof toolResult.taskId === "string" ? toolResult.taskId : undefined;
 
-        const raceResult = await detectWakeUpConfirmRace({
+        const raceResult = await TaskCompletion.detectWakeUpConfirmRace({
           toolMessage,
           toolCall,
           toolMessageId: toolConfirmation.messageId,
@@ -262,11 +253,6 @@ export class ToolConfirmationHandler {
         }
         // Case A: fall through to the deferred insertion path below.
       }
-
-      // Non-wakeUp pending: remote task (queue path).
-      // The execution returned {status:'pending'} immediately - the remote task was just created.
-      // Per spec: no polling. The /report path → handleTaskCompletion → resume-stream handles revival.
-      // Store the pending result as-is; the stream will be revived with the real result when done.
 
       const confirmedToolCallBase: Omit<ToolCall, "isDeferred"> = {
         ...toolCall,
@@ -607,5 +593,114 @@ export class ToolConfirmationHandler {
     });
 
     return deferredId;
+  }
+}
+
+// ============================================================================
+// CONFIRMATION PRE-PROCESSING (merged from tool-confirmation-processor.ts)
+// ============================================================================
+
+export class ToolConfirmationProcessor {
+  /**
+   * Process all tool confirmations and collect results
+   */
+  static async processAll(params: {
+    toolConfirmations: Array<{ messageId: string; confirmed: boolean }>;
+    messageHistory: ChatMessage[] | undefined;
+    isIncognito: boolean;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    t: AiStreamT;
+    streamContext: ToolExecutionContext;
+  }): Promise<
+    ResponseType<
+      Array<{
+        messageId: string;
+        sequenceId: string;
+        toolCall: ToolCall;
+      }>
+    >
+  > {
+    const {
+      toolConfirmations,
+      messageHistory,
+      isIncognito,
+      locale,
+      logger,
+      user,
+      t,
+    } = params;
+
+    logger.debug("[Setup] Processing tool confirmations", {
+      count: toolConfirmations.length,
+      messageIds: toolConfirmations.map((tc) => tc.messageId),
+    });
+
+    const results: Array<{
+      messageId: string;
+      sequenceId: string;
+      toolCall: ToolCall;
+    }> = [];
+
+    // Process all confirmations and collect results
+    for (const toolConfirmation of toolConfirmations) {
+      const confirmResult =
+        await ToolConfirmationHandler.handleToolConfirmation({
+          toolConfirmation,
+          messageHistory,
+          isIncognito,
+          locale,
+          logger,
+          user,
+          t,
+          streamContext: params.streamContext,
+        });
+
+      if (!confirmResult.success) {
+        return confirmResult;
+      }
+
+      // wakeUpPending=true means the goroutine is still running - resume-stream handles
+      // the deferred insertion and revival. Still include the updated tool message so
+      // the AI can reason about it (sees wakeUp pending state, responds naturally).
+      // The tool message has waitingForConfirmation=false and callbackMode=wakeUp so
+      // the context convert stage emits the standard wakeUp placeholder result for the AI.
+      if (confirmResult.data.wakeUpPending) {
+        logger.debug(
+          "[Setup] wakeUpPending tool - including in confirm stream so AI can reason",
+          {
+            messageId: confirmResult.data.toolMessageId,
+          },
+        );
+        // Fall through to the standard result-push below - same path as non-wakeUp.
+      }
+
+      // toolMessageId is either the original (updated in-place) or a new deferred row.
+      const toolMessageId = confirmResult.data.toolMessageId;
+      const updatedMessage = await db.query.chatMessages.findFirst({
+        where: eq(chatMessages.id, toolMessageId),
+      });
+
+      if (updatedMessage?.metadata?.toolCall) {
+        results.push({
+          messageId: toolMessageId,
+          sequenceId: updatedMessage.sequenceId ?? crypto.randomUUID(),
+          toolCall: updatedMessage.metadata.toolCall,
+        });
+      }
+    }
+
+    logger.debug(
+      "[Setup] All tools executed - continuing with AI stream to process results",
+      {
+        resultsCount: results.length,
+      },
+    );
+
+    return {
+      success: true,
+      data: results,
+    };
   }
 }

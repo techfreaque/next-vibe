@@ -1,52 +1,46 @@
 /**
  * Claude Code Fixture Store
  *
- * Provides deterministic test replay for the Claude Code provider, which uses
- * the Agent SDK's query() and does NOT go through global.fetch - so the HTTP
- * fetch cache cannot intercept it.
+ * Deterministic test replay for the Claude Code provider, which uses the
+ * Agent SDK's query() and does NOT go through fetch — so the HTTP fixture
+ * engine cannot intercept it.
  *
- * Works identically to fetch-cache.ts in concept:
- *   - On first run: real Agent SDK call fires, stream parts are collected and
- *     written to src/generated/ai-fixtures/claude-code/{testCase}/{model}-{index}-res.json
- *   - On subsequent runs: fixture is replayed as a ReadableStream of the same
- *     LanguageModelV2StreamPart events, no network required.
+ * Uses the SAME fixture engine as the HTTP path (fetch-cache.ts): the run's
+ * single ordinal counter in the fixtures table, the SAME cache folder
+ * (the run's prefix), and the SAME `<NNNN>-<instance>-<model>` file stem. The
+ * Nth external call of the run — HTTP or Agent-SDK — maps to file N; matching
+ * is order-driven, never content-hashed.
  *
- * Context must be set before each test via setFetchCacheContext() from fetch-cache.ts.
- * The two stores share the same context variable so both are scoped to the same
- * test case automatically.
+ *   - Thread has a fixture prefix + fixture exists → replayed as a
+ *     ReadableStream of the recorded LanguageModelV2StreamPart events.
+ *   - Thread has a fixture prefix + no fixture     → real Agent SDK call, parts
+ *     collected and written on stream end (unless STRICT).
+ *   - Thread has no fixture prefix                 → producer runs directly.
  *
- * Fixture format:
- *   {
- *     "modelId": "claude-haiku-4-5",
- *     "userPrompt": "...",
- *     "parts": [ { "type": "stream-start", ... }, { "type": "text-delta", ... }, ... ]
- *   }
- *
- * Cache bust: delete src/generated/ai-fixtures/claude-code/{testCase}/
+ * Fixture file (same folder + stem as HTTP fixtures, distinct `parts` type):
+ *   src/generated/ai-fixtures/http-cache/{prefix}/{NNNN}-{instance}-{model}-res.json
+ *   { "type": "parts", "modelId": "...", "parts": [ ... ] }
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
 
+import { FIXTURE_STRICT, type FixtureContext } from "./fetch-cache";
+
 const CLAUDE_CODE_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
-  "fixtures",
+  "..",
+  "..",
+  "..",
+  "..",
+  "..",
+  "..",
+  "generated",
+  "ai-fixtures",
   "claude-code",
 );
-
-// ── Shared context (set by fetch-cache.ts setFetchCacheContext) ───────────────
-
-let currentTestCase = "unknown";
-const callCounters = new Map<string, number>();
-
-/** Called by fetch-cache.ts setFetchCacheContext - keeps both stores in sync */
-export function setClaudeCodeFixtureContext(testCase: string): void {
-  currentTestCase = slugify(testCase);
-  callCounters.clear();
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -66,51 +60,53 @@ function slugify(s: string): string {
     .slice(0, 60);
 }
 
-function nextCallIndex(modelId: string): number {
-  const key = slugify(modelId);
-  const n = (callCounters.get(key) ?? 0) + 1;
-  callCounters.set(key, n);
-  return n;
-}
-
-function fixturePath(modelId: string, index: number): string {
-  const stem = index === 1 ? slugify(modelId) : `${slugify(modelId)}-${index}`;
-  return join(CLAUDE_CODE_CACHE_DIR, currentTestCase, `${stem}-res.json`);
+function fixturePath(
+  contextName: string,
+  modelId: string,
+  userPrompt: string,
+): string {
+  const hash = createHash("sha256")
+    .update(`${modelId}\n${userPrompt}`)
+    .digest("hex")
+    .slice(0, 8);
+  return join(
+    CLAUDE_CODE_CACHE_DIR,
+    slugify(contextName),
+    `${slugify(modelId)}-${hash}-res.json`,
+  );
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
-/** True when running in test environment */
-export function isTestMode(): boolean {
-  return process.env.NODE_ENV === "test";
-}
-
 /**
- * Wrap a real stream-producing function with fixture replay.
- *
- * In test mode:
- *   - Cache hit  → return replayed ReadableStream from fixture
- *   - Cache miss → run producer, collect parts, write fixture, return stream
- * In non-test mode: run producer directly, no caching.
+ * Wrap a real stream-producing function with fixture replay, routed through the
+ * SAME ordinal engine as the HTTP fetch cache. Without a fixture prefix on the
+ * stream's thread the producer runs directly.
  */
 export async function withClaudeCodeFixture(
+  fixtureContext: FixtureContext | undefined,
   modelId: string,
   userPrompt: string,
   producer: () => Promise<ReadableStream<LanguageModelV2StreamPart>>,
 ): Promise<ReadableStream<LanguageModelV2StreamPart>> {
-  if (!isTestMode()) {
+  if (!fixtureContext) {
     return producer();
   }
 
-  mkdirSync(CLAUDE_CODE_CACHE_DIR, { recursive: true });
-
-  const index = nextCallIndex(modelId);
-  const fp = fixturePath(modelId, index);
+  const fp = fixturePath(fixtureContext.name, modelId, userPrompt);
 
   // ── Cache hit ────────────────────────────────────────────────────────────
   if (existsSync(fp)) {
     const fixture = JSON.parse(readFileSync(fp, "utf-8")) as FixtureFile;
     return replayFixture(fixture.parts);
+  }
+
+  if (fixtureContext.strict) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached agent call
+    throw new Error(
+      // eslint-disable-next-line i18next/no-literal-string
+      `[ClaudeCodeFixture STRICT] No fixture for ${modelId} (context: ${fixtureContext.name}, expected: ${fp})`,
+    );
   }
 
   // ── Cache miss - real call ───────────────────────────────────────────────

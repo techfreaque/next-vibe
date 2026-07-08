@@ -34,7 +34,12 @@ import {
  * @param logger - Endpoint logger for debugging
  * @returns Provider object with chat() method
  */
-export function createVeniceAI(logger: EndpointLogger): {
+export function createVeniceAI(
+  logger: EndpointLogger,
+  // Explicit fetch — the fixture engine binds record/replay per execution
+  // chain (createFixtureFetch); plain live fetch otherwise. Never global.
+  fetchImpl: typeof globalThis.fetch,
+): {
   chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   const apiKey = agentEnv.VENICE_AI_API_KEY;
@@ -89,8 +94,7 @@ export function createVeniceAI(logger: EndpointLogger): {
     };
 
     // Make the actual request to Venice.ai API
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
-    const response = await fetch(input, modifiedInit);
+    const response = await fetchImpl(input, modifiedInit);
 
     if (!response.ok) {
       const errorBody = await response.text();

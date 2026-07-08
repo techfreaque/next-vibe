@@ -132,6 +132,125 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  cancelTool: {
+    post: {
+      title: "Tool-Aufruf abbrechen",
+      titleShort: "Tool abbrechen",
+      description:
+        "Bricht einen laufenden Tool-Aufruf per callId sofort ab. Der Aufruf stoppt und liefert einen Fehler als Ergebnis; der Zug und parallele Tool-Aufrufe laufen weiter.",
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "callId ist erforderlich",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Kein laufender Aufruf für diese callId",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Tool-Aufruf konnte nicht abgebrochen werden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler beim Abbrechen",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Tool-Aufruf abgebrochen",
+        description: "Der laufende Tool-Aufruf wurde unterbrochen.",
+      },
+    },
+  },
+  detachCall: {
+    post: {
+      title: "Tool-Aufruf abkoppeln",
+      titleShort: "Aufruf abkoppeln",
+      description:
+        "Stuft einen laufenden Tool-Aufruf per callId auf abgekoppelt hoch: er läuft im Hintergrund weiter, sein Ergebnis wird verworfen, der Zug wird sofort entsperrt. Nutze resume-when-done, wenn du das Ergebnis brauchst.",
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "callId ist erforderlich",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Kein laufender Aufruf für diese callId",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Tool-Aufruf konnte nicht abgekoppelt werden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler beim Abkoppeln",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Tool-Aufruf abgekoppelt",
+        description:
+          "Der Aufruf läuft im Hintergrund weiter; sein Ergebnis wird verworfen.",
+      },
+    },
+  },
+  resumeWhenDone: {
+    post: {
+      title: "Tool-Aufruf in den Hintergrund",
+      titleShort: "Tool in Hintergrund",
+      description:
+        "Lässt einen laufenden Tool-Aufruf per callId im Hintergrund weiterlaufen. Der Zug endet, der Thread erwacht mit dem Ergebnis, sobald die Arbeit fertig ist.",
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "callId ist erforderlich",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Kein laufender Aufruf für diese callId",
+        },
+        server: {
+          title: "Serverfehler",
+          description:
+            "Tool-Aufruf konnte nicht in den Hintergrund verschoben werden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler beim Verschieben",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Tool-Aufruf im Hintergrund",
+        description: "Der Tool-Aufruf läuft im Hintergrund weiter.",
+      },
+    },
+  },
   tools: {
     get: {
       title: "Tool-Hilfe - Verfügbare Tools entdecken",

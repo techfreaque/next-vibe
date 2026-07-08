@@ -61,6 +61,7 @@ interface TsConfig {
       | boolean
       | undefined;
   };
+  files?: string[];
   include?: string[];
   exclude?: string[];
 }
@@ -102,11 +103,53 @@ function findTsgo(startDir: string): string {
  * Run TypeScript type checking Repository
  */
 export class TypecheckRepository {
-  /** Wildcard include patterns to remove (we specify explicit files instead) */
-  private static readonly WILDCARD_INCLUDE_PATTERNS: readonly string[] = [
-    "**/*.ts",
-    "**/*.tsx",
+  /**
+   * next-env.d.ts imports .next-prod/types/routes.d.ts, which is a generated
+   * file that references every route in the project → loads the entire source
+   * tree when included. Strip it from targeted temp tsconfigs.
+   */
+  private static readonly HEAVY_DECLARATION_FILES: readonly string[] = [
+    "next-env.d.ts",
   ];
+
+  /**
+   * Returns true for any include pattern that would pull in TypeScript source
+   * files — either a glob sweep (e.g. "src/**\/*.ts") or an exact .ts/.tsx
+   * filename (e.g. "check.config.ts") — or known heavy .d.ts files that
+   * transitively import the entire project (e.g. next-env.d.ts → routes.d.ts).
+   * We strip these from the temp tsconfig include list and put only the
+   * requested targets in "files" instead.
+   *
+   * Kept: patterns ending in "*.d.ts" (ambient declaration globs — cheap)
+   *       and exact .d.ts filenames that are NOT in the heavy list.
+   */
+  private static isSweepingSourcePattern(pattern: string): boolean {
+    const normalized = pattern.replace(/\\/g, "/");
+    const basename = normalized.split("/").at(-1) ?? normalized;
+
+    // Known heavy declaration files that expand to the whole project
+    if (TypecheckRepository.HEAVY_DECLARATION_FILES.includes(basename)) {
+      return true;
+    }
+    // Declaration glob patterns are safe to keep (e.g. "types/**/*.d.ts")
+    if (normalized.endsWith("*.d.ts")) {
+      return false;
+    }
+    // Exact .d.ts filenames are safe (ambient type declarations, no impl)
+    if (normalized.endsWith(".d.ts")) {
+      return false;
+    }
+    // Glob patterns that end in *.ts or *.tsx sweep source files
+    if (normalized.endsWith("*.ts") || normalized.endsWith("*.tsx")) {
+      return true;
+    }
+    // Exact filenames ending in .ts or .tsx (e.g. "check.config.ts") also
+    // pull in their full transitive dep graph — strip them too.
+    if (normalized.endsWith(".ts") || normalized.endsWith(".tsx")) {
+      return true;
+    }
+    return false;
+  }
 
   /** TypeScript configuration Zod schema for runtime validation */
   private static readonly TsConfigSchema = z.object({
@@ -457,9 +500,22 @@ export class TypecheckRepository {
   }
 
   /**
+   * Determine whether a filesToCheck entry is an exact file path or a glob.
+   * Globs contain "*" or "?" characters; exact paths do not.
+   */
+  private static isGlobPattern(path: string): boolean {
+    return path.includes("*") || path.includes("?");
+  }
+
+  /**
    * Create a temporary tsconfig.json for specific files.
    * Preserves compiler options and path mappings from main tsconfig
    * but limits files to improve performance.
+   *
+   * Key optimisation: source-sweeping patterns (src/**\/*.ts etc.) are stripped
+   * from the base "include" list. Exact-path targets go into "files" (which tsgo
+   * loads in isolation), while glob/folder targets stay in "include". This means
+   * checking a leaf file no longer loads the entire project.
    */
   private static createTempTsConfig(
     filesToCheck: string[],
@@ -485,23 +541,21 @@ export class TypecheckRepository {
       parsedJsonResult.data,
     ) as TsConfig;
 
-    // Filter out wildcard patterns and adjust paths for temp config location
-    const generalFilesToInclude = (mainTsConfig.include || []).filter(
-      (includePattern) =>
-        TypecheckRepository.WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
-          ? undefined
-          : includePattern,
+    // Strip source-sweeping patterns only when we have explicit targets.
+    // When filesToCheck is empty (full-project NO_PATH case), we must keep
+    // src/**/*.ts etc. — stripping them would leave nothing to check.
+    const hasExplicitTargets = filesToCheck.length > 0;
+    const declarationOnlyIncludes = (mainTsConfig.include ?? []).filter((p) =>
+      hasExplicitTargets
+        ? !TypecheckRepository.isSweepingSourcePattern(p)
+        : true,
     );
-    const adjustedGeneralIncludes = TypecheckRepository.adjustIncludePatterns(
-      generalFilesToInclude,
-      prefix,
-    );
+    const adjustedDeclarationIncludes =
+      TypecheckRepository.adjustIncludePatterns(
+        declarationOnlyIncludes,
+        prefix,
+      );
 
-    // Adjust paths for temp config location
-    const adjustedFiles = TypecheckRepository.adjustFilePaths(
-      filesToCheck,
-      prefix,
-    );
     const adjustedPaths = TypecheckRepository.adjustPathMappings(
       mainTsConfig.compilerOptions?.paths,
       prefix,
@@ -529,6 +583,24 @@ export class TypecheckRepository {
       adjustedTypeRoots.push(nodeModulesRoot);
     }
 
+    // Split targets: exact file paths → "files" array (tsgo only loads those);
+    // globs/folder patterns → "include" array (required for wildcards).
+    const exactFiles = filesToCheck.filter(
+      (p) => !TypecheckRepository.isGlobPattern(p),
+    );
+    const globIncludes = filesToCheck.filter((p) =>
+      TypecheckRepository.isGlobPattern(p),
+    );
+
+    const adjustedExactFiles = TypecheckRepository.adjustFilePaths(
+      exactFiles,
+      prefix,
+    );
+    const adjustedGlobIncludes = TypecheckRepository.adjustIncludePatterns(
+      globIncludes,
+      prefix,
+    );
+
     // Create temporary tsconfig
     const tempTsConfig: TsConfig = {
       ...mainTsConfig,
@@ -537,13 +609,24 @@ export class TypecheckRepository {
         rootDir: prefix.slice(0, -1), // Remove trailing slash for rootDir (e.g., "../..")
         baseUrl: undefined, // Remove baseUrl as tsgo doesn't support it
         typeRoots: adjustedTypeRoots,
+        // Drop explicit "types" list when we have exact-file targets. The list (e.g.
+        // ["bun-types"]) forces tsgo to look up named packages in typeRoots, but
+        // node_modules is excluded so it fails. Without "types", tsgo auto-discovers
+        // ambient declarations from typeRoots — bun-types is still found that way.
+        ...(adjustedExactFiles.length > 0 && { types: undefined }),
         paths: {
           ...adjustedPaths,
 
           "*": [`${prefix}*`], // Replace baseUrl functionality for tsgo compatibility (resolve from project root)
         },
       },
-      include: [...adjustedGeneralIncludes, ...adjustedFiles],
+      // "files" pins exact paths; tsgo won't expand them to the whole project.
+      // Only set when there are exact paths to avoid an empty "files: []" which
+      // tsgo treats as "no files at all".
+      ...(adjustedExactFiles.length > 0 && {
+        files: adjustedExactFiles,
+      }),
+      include: [...adjustedDeclarationIncludes, ...adjustedGlobIncludes],
       exclude: adjustedExcludes,
     };
 

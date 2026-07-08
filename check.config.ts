@@ -118,6 +118,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "next-env.d.ts",
   "nativewind-env.d.ts",
   "**/fixtures/**",
+  "src/generated/ai-fixtures/**",
   // Glob patterns
   "**/test-files/**",
 ]);

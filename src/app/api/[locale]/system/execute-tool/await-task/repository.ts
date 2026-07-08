@@ -30,9 +30,9 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus, type CronTaskStatusValue } from "next-vibe/tasks/enum";
 
-import { RESUME_STREAM_ALIAS } from "@/app/api/[locale]/agent/ai-stream/resume-stream/constants";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/execute-tool/revival/definition";
 
 import { CallbackMode } from "../constants";
 import { TaskCompletion } from "../repository/completion";
@@ -147,11 +147,8 @@ export class AwaitTaskRepository {
             userId: user.id ?? "",
           });
 
-          // Restart/cross-process safety (same pattern as the wakeUp park):
-          // persist the callId on the await-task tool message so ANY process
-          // that receives the result event can revive this parked thread from
-          // the DB — the in-memory revival above only helps the process that
-          // parked it.
+          // Persist callId on the await-task tool message so ANY process that
+          // receives the result event can enable+fire the parked task.
           await RemoteDispatch.storePendingCallId(
             pendToolMessageId,
             taskId,

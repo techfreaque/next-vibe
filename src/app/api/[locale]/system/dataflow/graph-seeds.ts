@@ -11,10 +11,10 @@ import type {
   GraphConfig,
   GraphSeedEntry,
 } from "next-vibe/dataflow/graph/types";
+import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 import { ERROR_LOGS_ERRORS_ALIAS } from "next-vibe/logger/error-monitor/data-sources/error-logs-errors/constants";
 import { ERROR_LOGS_TOTAL_ALIAS } from "next-vibe/logger/error-monitor/data-sources/error-logs-total/constants";
 import { ERROR_LOGS_WARNINGS_ALIAS } from "next-vibe/logger/error-monitor/data-sources/error-logs-warnings/constants";
-import { COMPLETE_TASK_ALIAS } from "next-vibe/tasks/complete-task/constants";
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "next-vibe/tasks/data-sources/cron-executions-failed/constants";
 import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "next-vibe/tasks/data-sources/cron-executions-succeeded/constants";
 import { CRON_EXECUTIONS_TOTAL_ALIAS } from "next-vibe/tasks/data-sources/cron-executions-total/constants";

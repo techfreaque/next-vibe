@@ -132,6 +132,123 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  cancelTool: {
+    post: {
+      title: "Anuluj wywołanie narzędzia",
+      titleShort: "Anuluj narzędzie",
+      description:
+        "Przerywa trwające wywołanie narzędzia po callId. Wywołanie zatrzymuje się i zwraca błąd jako wynik; tura i równoległe wywołania narzędzi działają dalej.",
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "callId jest wymagane",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Brak trwającego wywołania dla tego callId",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się anulować wywołania narzędzia",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Błąd sieci podczas anulowania",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+      },
+      success: {
+        title: "Wywołanie narzędzia anulowane",
+        description: "Trwające wywołanie narzędzia zostało przerwane.",
+      },
+    },
+  },
+  detachCall: {
+    post: {
+      title: "Odłącz wywołanie narzędzia",
+      titleShort: "Odłącz wywołanie",
+      description:
+        "Podnosi trwające wywołanie narzędzia po callId do odłączonego: działa dalej w tle, jego wynik jest odrzucany, a tura zostaje natychmiast odblokowana. Użyj resume-when-done, jeśli potrzebujesz wyniku.",
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "callId jest wymagane",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Brak trwającego wywołania dla tego callId",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się odłączyć wywołania narzędzia",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Błąd sieci podczas odłączania",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+      },
+      success: {
+        title: "Wywołanie narzędzia odłączone",
+        description: "Wywołanie działa dalej w tle; jego wynik jest odrzucany.",
+      },
+    },
+  },
+  resumeWhenDone: {
+    post: {
+      title: "Przenieś wywołanie narzędzia w tło",
+      titleShort: "Narzędzie w tle",
+      description:
+        "Pozwala trwającemu wywołaniu narzędzia dokończyć w tle po callId. Tura się kończy, a wątek budzi się z wynikiem po zakończeniu pracy.",
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "callId jest wymagane",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Brak trwającego wywołania dla tego callId",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się przenieść wywołania w tło",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Błąd sieci podczas przenoszenia",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+      },
+      success: {
+        title: "Wywołanie narzędzia w tle",
+        description: "Wywołanie narzędzia działa dalej w tle.",
+      },
+    },
+  },
   tools: {
     get: {
       title: "Pomoc narzędzi - odkryj dostępne narzędzia AI",

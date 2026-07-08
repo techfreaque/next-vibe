@@ -12,9 +12,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import {
   connectToHermes,
   disconnectFromHermes,

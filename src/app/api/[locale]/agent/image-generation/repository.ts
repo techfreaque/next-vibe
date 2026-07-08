@@ -15,6 +15,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import {
@@ -26,10 +27,17 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 
+import { DEFAULT_CHAT_MODEL_ID } from "../ai-stream/constants";
 import { chatModelOptionsIndex } from "../ai-stream/models";
-import { runHeadlessAiStream } from "../ai-stream/repository/headless";
+import { AiStreamRepository } from "../ai-stream/repository";
+import type { AiStreamPostRequestOutput } from "../ai-stream/stream/definition";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
-import { DefaultFolderId } from "../chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  type ToolExecutionContext,
+} from "../chat/config";
+import { ChatMessageRole } from "../chat/enum";
 import { getEnvAvailability } from "../env-availability";
 import {
   checkMediaBalance,
@@ -49,13 +57,6 @@ import { generateWithOpenAI } from "./providers/openai";
 import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
 import { generateImageWithUnbottled } from "./providers/unbottled";
-
-export interface ImageGenerationMediaGenStreamContext {
-  threadId?: string;
-  aiMessageId?: string;
-  abortSignal: AbortSignal;
-  subAgentDepth: number;
-}
 
 /**
  * Calculate image generation credit cost with option-aware pricing.
@@ -98,7 +99,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: ImageGenerationMediaGenStreamContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -217,6 +218,10 @@ export class ImageGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
+    // One fixture-aware fetch per generation - carries the repeat counter for
+    // poll loops, so it must not be recreated per call.
+    const fetchImpl = createFixtureFetch(streamContext, logger);
+
     let generationResult: ResponseType<{
       imageUrl: string;
       creditCost?: number;
@@ -230,6 +235,7 @@ export class ImageGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -241,6 +247,7 @@ export class ImageGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -252,6 +259,7 @@ export class ImageGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -264,6 +272,7 @@ export class ImageGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -275,6 +284,7 @@ export class ImageGenerationRepository {
           inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -285,6 +295,12 @@ export class ImageGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
+          // The media-gen context is a narrowed shape — rebuild a headless
+          // context carrying its abort wiring + fixture chain for dispatch.
+          streamContext: makeHeadlessContext(
+            streamContext.abortSignal,
+            streamContext.threadId,
+          ),
         });
         break;
 
@@ -311,11 +327,11 @@ export class ImageGenerationRepository {
     let { imageUrl } = generationResult.data;
 
     // Upload to our storage so the URL is persistent and access-controlled
-    if (streamContext.threadId) {
+    const scThreadId = streamContext.threadId;
+    if (scThreadId) {
       try {
         const storage = getStorageAdapter();
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const imgRes = await fetch(imageUrl);
+        const imgRes = await fetchImpl(imageUrl);
         if (!imgRes.ok) {
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
           throw new Error(`Image fetch failed: ${String(imgRes.status)}`);
@@ -335,7 +351,7 @@ export class ImageGenerationRepository {
         const uploadResult = await storage.uploadFile(imageBuffer, {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
-          threadId: streamContext.threadId,
+          threadId: scThreadId,
           userId: user.id,
         });
         imageUrl = uploadResult.url;
@@ -373,6 +389,36 @@ export class ImageGenerationRepository {
       creditCost: finalCreditCost,
     });
 
+    const toolMessageId = streamContext.currentToolMessageId;
+    if (toolMessageId && !user.isPublic) {
+      const month = new Date().toISOString().slice(0, 7);
+      const slug = `${data.prompt
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60)}-${toolMessageId}`;
+      void Promise.all([
+        import("@/app/api/[locale]/agent/cortex/mounts/gens"),
+        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+      ])
+        .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
+          const path = `/gens/images/${month}/${slug}.md`;
+          return readGenPath(user.id, path)
+            .then(
+              (result) =>
+                result &&
+                syncVirtualNodeToEmbedding(
+                  user.id,
+                  path,
+                  result.content,
+                  streamContext,
+                ),
+            )
+            .catch(() => undefined);
+        })
+        .catch(() => undefined);
+    }
+
     return success({ imageUrl, creditCost: finalCreditCost });
   }
 
@@ -388,7 +434,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: ImageGenerationMediaGenStreamContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     logger.debug("[ImageGen] Using headless AI runner for token-based model", {
       model: data.model,
@@ -451,7 +497,8 @@ export class ImageGenerationRepository {
 
     // Re-upload from ephemeral storage to the real thread's storage so the
     // file-serving route can find it (it checks thread ownership in DB).
-    if (streamContext.threadId) {
+    const scThreadId = streamContext.threadId;
+    if (scThreadId) {
       try {
         const storage = getStorageAdapter();
         // The ephemeral URL points to our file-serving API which requires DB thread lookup.
@@ -469,8 +516,10 @@ export class ImageGenerationRepository {
         }
         if (!imageBuffer) {
           // Fallback to HTTP fetch for external URLs
-          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-          const arrayBuf = await fetch(imageUrl).then((r) => r.arrayBuffer());
+          const fetchImpl = createFixtureFetch(streamContext, logger);
+          const arrayBuf = await fetchImpl(imageUrl).then((r) =>
+            r.arrayBuffer(),
+          );
           imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
         }
         const ext = imageUrl.includes("webp")
@@ -481,7 +530,7 @@ export class ImageGenerationRepository {
         const uploadResult = await storage.uploadFile(imageBuffer, {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
-          threadId: streamContext.threadId,
+          threadId: scThreadId,
           userId: user.id,
         });
         imageUrl = uploadResult.url;

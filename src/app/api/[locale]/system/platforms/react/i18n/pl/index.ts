@@ -190,6 +190,7 @@ export const translations: typeof enTranslations = {
         cancel: "Anuluj",
         deny: "Odmów",
         runInBackground: "Uruchom w tle",
+        resumeWhenDone: "Wznów po zakończeniu",
       },
       creditsUsed_one: "{{cost}} kredyt",
       creditsUsed_other: "{{cost}} kredytów",

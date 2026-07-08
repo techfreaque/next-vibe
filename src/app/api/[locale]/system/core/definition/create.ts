@@ -76,12 +76,21 @@ import { FieldUsage } from "./enums";
  *   (requestData: TRequestOutput, responseData: TResponseOutput, etc.) eliminating
  *   implicit-any errors in callback parameters under noImplicitAny.
  */
-type ChannelConfigField<TEvents, TChannel> =
+type ChannelConfigField<TResponse, TRequest, TUrl, TEvents, TChannel> =
   HasClientDeliveredEventsOf<TEvents> extends true
-    ? { channel: TChannel; events?: TEvents }
+    ? {
+        channel: TChannel;
+        events?: TEvents & WithPayloadCtx<TEvents, TResponse, TRequest, TUrl>;
+      }
     : HasClientDeliveredEventsOf<TEvents> extends boolean
-      ? { channel?: TChannel; events?: TEvents }
-      : { channel?: never; events?: TEvents };
+      ? {
+          channel?: TChannel;
+          events?: TEvents & WithPayloadCtx<TEvents, TResponse, TRequest, TUrl>;
+        }
+      : {
+          channel?: never;
+          events?: TEvents & WithPayloadCtx<TEvents, TResponse, TRequest, TUrl>;
+        };
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }
@@ -775,16 +784,19 @@ export function createEndpoint<
   const TEvents extends EndpointEventsMap<
     InferResponseOutput<TFields>,
     InferRequestOutput<TFields>,
-    InferUrlVariablesOutput<TFields>
-  > = EndpointEventsMap<
-    InferResponseOutput<TFields>,
-    InferRequestOutput<TFields>,
-    InferUrlVariablesOutput<TFields>
-  >,
+    InferUrlVariablesOutput<TFields>,
+    TEvents
+  > = EndpointEventsMapBase,
   const TChannel extends ChannelDeclaration | undefined = undefined,
 >(
   config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> &
-    ChannelConfigField<TEvents, TChannel>,
+    ChannelConfigField<
+      InferResponseOutput<TFields>,
+      InferRequestOutput<TFields>,
+      InferUrlVariablesOutput<TFields>,
+      TEvents,
+      TChannel
+    >,
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,

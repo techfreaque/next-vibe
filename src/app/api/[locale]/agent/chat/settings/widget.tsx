@@ -77,11 +77,6 @@ import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/c
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import {
-  SearchProvider,
-  SearchProviderOptions,
-} from "@/app/api/[locale]/agent/search/enum";
-import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/skills/favorites/create/hooks";
@@ -90,6 +85,11 @@ import favoritesEndpoint from "@/app/api/[locale]/agent/skills/favorites/definit
 import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/skills/favorites/favorite-select-context";
 import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
+import {
+  SearchProvider,
+  SearchProviderOptions,
+} from "@/app/api/[locale]/agent/web-search/enum";
+import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/web-search/i18n";
 
 import { DefaultFolderId } from "../config";
 import { parseSkillId } from "../slugify";

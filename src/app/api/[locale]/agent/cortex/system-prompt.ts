@@ -15,6 +15,7 @@ import type {
 import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/favorites-formatter";
 
 import { parseError } from "../../system/core/utils/parse-error";
+import type { ToolExecutionContext } from "../chat/config";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
   CORTEX_EXEC_ALIAS,
@@ -317,10 +318,11 @@ function renderFileEntryLines(entry: CortexFileEntry): string[] {
 // ─── Budget (chars, ~4 chars/token) ──────────────────────────────────────────
 
 const CHAR_BUDGET = {
-  memories: 16000,
-  documents: 12000,
+  memories: 12000,
+  documents: 8000,
+  memoriesAndDocuments: 20000,
   threads: 12000,
-  skills: 8000,
+  skills: 12000,
   tasks: 4000,
 } as const;
 
@@ -341,6 +343,7 @@ export async function loadCortexData(
     locale,
     headless,
     rootFolderId,
+    streamContext,
   } = params;
 
   const { country } = getLanguageAndCountryFromLocale(locale);
@@ -392,6 +395,7 @@ export async function loadCortexData(
     const allRelevant = lastUserMessage
       ? await vectorSearch({
           userId,
+          streamContext,
           query: lastUserMessage,
           limit: 40,
           threshold: 0.4,
@@ -407,9 +411,16 @@ export async function loadCortexData(
     const docRelevant = allRelevant.filter((n) =>
       n.path.startsWith("/documents"),
     );
+    // Exclude the CURRENT thread: listing the conversation you are inside as a
+    // "related thread" is self-reference noise — and whether it appears at all
+    // depends on the async embedding sync racing this turn, which makes the
+    // prompt nondeterministic for the same conversation state.
+    const currentThreadId = params.threadId;
     const threadRelevant = allRelevant.filter(
       (n) =>
-        /^\/threads\/(private|shared|public)\//.test(n.path) && n.score >= 0.65,
+        /^\/threads\/(private|shared|public)\//.test(n.path) &&
+        n.score >= 0.65 &&
+        (!currentThreadId || !n.path.includes(currentThreadId)),
     );
     const skillRelevant = allRelevant.filter(
       (n) => n.path.startsWith("/skills") && n.score >= 0.7,
@@ -448,21 +459,31 @@ export async function loadCortexData(
     const genCount = counts.gens ?? 0;
     const taskCount = tasks.totalCount;
 
-    // 3. Build unified tree
+    // 3. Build unified tree — memories and documents share a 20k pool (12k/8k split when both full)
+    const memoriesDir = buildMemoriesDir(
+      memCtx,
+      memRelevant,
+      CHAR_BUDGET.memories,
+      localeRoots.memories,
+    );
+    const memoriesUsed = memoriesDir.children.reduce(
+      (sum, c) => sum + (c.kind === "file" ? c.excerpt.length + 30 : 0),
+      0,
+    );
+    const docBudget = Math.min(
+      CHAR_BUDGET.memoriesAndDocuments - memoriesUsed,
+      CHAR_BUDGET.documents,
+    );
+    const documentsDir = buildDocumentsDir(
+      docRelevant,
+      docTree,
+      Math.max(0, docBudget),
+      localeRoots.documents,
+      counts.documents ?? 0,
+    );
     const tree: CortexEntry[] = [
-      buildMemoriesDir(
-        memCtx,
-        memRelevant,
-        CHAR_BUDGET.memories,
-        localeRoots.memories,
-      ),
-      buildDocumentsDir(
-        docRelevant,
-        docTree,
-        CHAR_BUDGET.documents,
-        localeRoots.documents,
-        counts.documents ?? 0,
-      ),
+      memoriesDir,
+      documentsDir,
       buildThreadsDir(threadPinned, threadRelevant, counts.threads),
       buildSkillsDir(
         skillsFaved,
@@ -604,6 +625,8 @@ interface RelevantNode {
 }
 
 interface VectorSearchOpts {
+  /** Fixture chain of the stream — the query embedding binds it. */
+  streamContext: ToolExecutionContext;
   userId: string;
   query: string;
   pathPrefix?: string;
@@ -634,7 +657,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
 
   try {
     const { generateEmbedding } = await import("./embeddings/service");
-    const queryEmbedding = await generateEmbedding(query);
+    const queryEmbedding = await generateEmbedding(query, opts.streamContext);
     if (!queryEmbedding) {
       return [];
     }
@@ -1638,7 +1661,12 @@ export async function loadRawEmbeddingScores(
 > {
   try {
     const { generateEmbedding } = await import("./embeddings/service");
-    const queryEmbedding = await generateEmbedding(userMessage);
+    // Debug endpoint (no stream) — explicit thread-less context routes live.
+    const { makeHeadlessContext } = await import("../chat/config");
+    const queryEmbedding = await generateEmbedding(
+      userMessage,
+      makeHeadlessContext(undefined, undefined),
+    );
     if (!queryEmbedding) {
       return { scores: [], embeddingGenerated: false };
     }

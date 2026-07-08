@@ -15,9 +15,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import {

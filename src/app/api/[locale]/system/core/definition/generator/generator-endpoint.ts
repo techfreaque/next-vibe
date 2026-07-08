@@ -278,8 +278,15 @@ class EndpointGenerator {
     // Generate static-import cases (bundler-traceable) and hot-paths map entries
     const cases: string[] = [];
     const hotPathEntries: string[] = [];
+    // One canonical path per unique module — enough to warm every import.
+    const prewarmSeen = new Set<string>();
+    const prewarmPaths: string[] = [];
     for (const path of allPaths) {
       const { importPath, absPath, method } = pathMap[path];
+      if (!prewarmSeen.has(importPath)) {
+        prewarmSeen.add(importPath);
+        prewarmPaths.push(path);
+      }
       // Add turbopack/webpack ignore hints for routes that scan the filesystem
       const ignoreComment = needsTurbopackIgnore(importPath)
         ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
@@ -382,6 +389,20 @@ ${aliasMapEntries}
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 
 /**
+ * Single-flight queue for the lazy definition imports below. Definition
+ * modules form large cyclic graphs; CONCURRENT dynamic imports of two cyclic
+ * graphs can deadlock the Vite SSR module runner in dev (both imports pend
+ * forever — observed as remote tool dispatches hanging on the receiver).
+ * Serializing the imports removes the concurrency the deadlock needs; warm
+ * cache hits still resolve on the next microtask.
+ */
+let endpointImportQueue: Promise<CreateApiEndpointAny | null | undefined> =
+  Promise.resolve(undefined);
+
+/** Resolved definitions cache — repeat lookups skip the queue entirely. */
+const endpointCache = new Map<string, CreateApiEndpointAny | null>();
+
+/**
  * Dynamically import endpoint definition by path.
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
@@ -389,11 +410,56 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 export async function getEndpoint(
   path: string,
 ): Promise<CreateApiEndpointAny | null> {
+  const cached = endpointCache.get(path);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const run = endpointImportQueue.then(async () => {
+    const again = endpointCache.get(path);
+    if (again !== undefined) {
+      return again;
+    }
+    const loaded = await importEndpoint(path);
+    endpointCache.set(path, loaded);
+    return loaded;
+  });
+  // Chain regardless of outcome so one failed import never blocks the queue.
+  endpointImportQueue = run.catch(() => undefined);
+  return run;
+}
+
+async function importEndpoint(
+  path: string,
+): Promise<CreateApiEndpointAny | null> {
   switch (path) {
 ${cases.join("\n")}
     default:
       return null;
   }
+}
+
+/**
+ * DEV prewarm: sequentially warm every definition module in the background
+ * when this registry first loads server-side. Cold Vite SSR loads of large
+ * cyclic definition graphs are slow and, when triggered concurrently by a
+ * remote tool dispatch, can deadlock the module runner — observed as remote
+ * tool calls hanging forever on the receiving dev instance. With the queue
+ * above, the first real lookup simply lines up behind the warm-up instead.
+ * One canonical path per unique module. No-op in production (bundled chunks
+ * load in milliseconds) and in the browser.
+ */
+const ENDPOINT_PREWARM_PATHS: string[] = [
+${prewarmPaths.map((pp) => `  ${JSON.stringify(pp)},`).join("\n")}
+];
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "development"
+) {
+  void (async (): Promise<void> => {
+    for (const p of ENDPOINT_PREWARM_PATHS) {
+      await getEndpoint(p).catch(() => undefined);
+    }
+  })();
 }
 `;
 

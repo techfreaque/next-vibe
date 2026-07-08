@@ -149,7 +149,9 @@ export class ThreadsRepository {
    * thread, at creation, to stamp loop_instance_id from REMOTE/<instance>
    * placement (Remote-tab sugar). Routing reads the COLUMN, never folders.
    */
-  static async deriveLoopInstanceFromFolder(
+  /** Pure placement walk: the ROOT folder's name (= the instance a
+   *  REMOTE/<instance> chain belongs to), independent of loop routing. */
+  static async deriveFolderRootInstanceName(
     leafFolderId: string,
   ): Promise<string | null> {
     let currentId: string | null = leafFolderId;
@@ -168,6 +170,39 @@ export class ThreadsRepository {
       currentId = row.parentId;
     }
     return null;
+  }
+
+  static async deriveLoopInstanceFromFolder(
+    leafFolderId: string,
+    /** Thread owner — resolves the connection's loopLocation setting. */
+    userId?: string,
+  ): Promise<string | null> {
+    const instanceName =
+      await ThreadsRepository.deriveFolderRootInstanceName(leafFolderId);
+    if (!instanceName) {
+      return null;
+    }
+    // The connection's loopLocation setting decides where the loop runs:
+    // 'caller' keeps it on THIS instance (loop_instance_id stays NULL);
+    // 'target' (default) stamps the connected instance.
+    if (userId) {
+      const { remoteConnections } =
+        await import("@/app/api/[locale]/remote-connection/db");
+      const [conn] = await db
+        .select({ loopLocation: remoteConnections.loopLocation })
+        .from(remoteConnections)
+        .where(
+          and(
+            eq(remoteConnections.userId, userId),
+            eq(remoteConnections.instanceId, instanceName),
+          ),
+        )
+        .limit(1);
+      if (conn?.loopLocation === "caller") {
+        return null;
+      }
+    }
+    return instanceName;
   }
 
   static async ensureThread({
@@ -201,7 +236,12 @@ export class ThreadsRepository {
     loopInstanceId?: string | null;
     /** Transient plumbing threads (tool executions) set false — never derived from folders. */
     syncEligible?: boolean;
-  }): Promise<ResponseType<{ threadId: string; isNew: boolean }>> {
+  }): Promise<
+    ResponseType<{
+      threadId: string;
+      isNew: boolean;
+    }>
+  > {
     logger.debug("ensureThread called", {
       threadId,
       rootFolderId,
@@ -213,6 +253,7 @@ export class ThreadsRepository {
 
     if (isIncognito) {
       logger.debug("Thread ID provided for incognito", { threadId });
+      // Incognito threads have no DB row — the chain's context is all there is.
       return success({ threadId, isNew: true });
     }
 
@@ -236,6 +277,9 @@ export class ThreadsRepository {
         return verifyResult;
       }
 
+      // Existing thread: fixture bookkeeping lives in the separate `fixtures`
+      // table (keyed by threadId), independent of the thread row — nothing to
+      // carry back here.
       return success({ threadId: verifyResult.data, isNew: false });
     }
 
@@ -376,7 +420,10 @@ export class ThreadsRepository {
       loopInstanceId !== undefined
         ? loopInstanceId
         : rootFolderId === DefaultFolderId.REMOTE && subFolderId
-          ? await ThreadsRepository.deriveLoopInstanceFromFolder(subFolderId)
+          ? await ThreadsRepository.deriveLoopInstanceFromFolder(
+              subFolderId,
+              userId,
+            )
           : null;
 
     await db.insert(chatThreads).values({
@@ -389,6 +436,10 @@ export class ThreadsRepository {
       originInstanceId: originInstanceId ?? null,
       loopInstanceId: effectiveLoopInstanceId,
       syncEligible: syncEligible ?? true,
+      // Thread creation is fixture-agnostic: record/replay bookkeeping lives in
+      // the dedicated `fixtures` table (keyed by threadId), written by the test
+      // harness up front on every instance. A fresh thread with a provided id
+      // is created exactly as any other — the engine reads fixtures by that id.
     });
 
     logger.debug("Created new thread", {
@@ -850,6 +901,7 @@ export class ThreadsRepository {
         data.rootFolderId === DefaultFolderId.REMOTE && data.subFolderId
           ? await ThreadsRepository.deriveLoopInstanceFromFolder(
               data.subFolderId,
+              user.isPublic ? undefined : user.id,
             )
           : null;
 

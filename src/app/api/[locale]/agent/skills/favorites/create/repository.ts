@@ -419,6 +419,7 @@ export class FavoritesCreateRepository {
         })("favorite-created", {
           responseData: { id: favorite.slug },
           payload: {
+            id: favorite.slug,
             skillId: mergedSkillId,
             customVariantName: favorite.customVariantName ?? null,
             icon: data.icon,

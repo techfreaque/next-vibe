@@ -298,7 +298,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
         locale,
         logger,
         platform: platform,
-        streamContext: makeHeadlessContext(),
+        streamContext: makeHeadlessContext(undefined, undefined),
       });
       setSaveMsg("Saved \u2713");
       setEdits({});
@@ -670,7 +670,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
         locale,
         logger,
         platform: platform,
-        streamContext: makeHeadlessContext(),
+        streamContext: makeHeadlessContext(undefined, undefined),
       });
       setSaveMsg("Saved ✓");
     } catch {
@@ -982,7 +982,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
           locale,
           logger,
           platform: platform as Platform,
-          streamContext: makeHeadlessContext(),
+          streamContext: makeHeadlessContext(undefined, undefined),
         });
         if (result.success) {
           const value = result.data;

@@ -94,7 +94,6 @@ import {
 } from "@/app/api/[locale]/agent/chat/enum";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
-import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
 import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
 import foldersDefinition from "../../folders/[rootFolderId]/definition";

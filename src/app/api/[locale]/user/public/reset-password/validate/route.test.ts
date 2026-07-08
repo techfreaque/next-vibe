@@ -1,11 +1,11 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import resetPasswordValidateEndpoints from "./definition";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import resetPasswordValidateEndpoints from "./definition";
 
 const endpoint = resetPasswordValidateEndpoints.GET;
 
@@ -24,6 +24,7 @@ describe("GET /user/public/reset-password/validate", () => {
 
   it("rejects a non-JWT token (NOT_FOUND or VALIDATION_ERROR)", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         tokenInput: {
@@ -46,6 +47,7 @@ describe("GET /user/public/reset-password/validate", () => {
 
   it("rejects empty token with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         tokenInput: {
@@ -57,7 +59,9 @@ describe("GET /user/public/reset-password/validate", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects expired or unknown JWT token (NOT_FOUND or TOKEN_EXPIRED or VALIDATION_ERROR)", async () => {
@@ -66,6 +70,7 @@ describe("GET /user/public/reset-password/validate", () => {
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         tokenInput: {
@@ -77,10 +82,12 @@ describe("GET /user/public/reset-password/validate", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect([
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-      ErrorResponseTypes.NOT_FOUND.errorCode,
-      ErrorResponseTypes.TOKEN_EXPIRED_ERROR?.errorCode,
-    ].filter(Boolean)).toContain(res.errorType?.errorCode);
+    expect(
+      [
+        ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+        ErrorResponseTypes.NOT_FOUND.errorCode,
+        ErrorResponseTypes.TOKEN_EXPIRED_ERROR?.errorCode,
+      ].filter(Boolean),
+    ).toContain(res.errorType?.errorCode);
   });
 });

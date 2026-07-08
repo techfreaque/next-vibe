@@ -15,6 +15,8 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation } from "next-vibe/tooling/check/i18n";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+
 /**
  * Call the API handler directly via the vibe runtime executor
  * Uses RouteExecutionExecutor which is the same infrastructure used by CLI, MCP, and AI tools
@@ -25,10 +27,19 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
   urlPathParams,
   user,
   instanceId,
+  streamContext,
 }: {
   endpoint: TEndpoint;
   user?: JwtPayloadType;
   instanceId?: string;
+  /**
+   * The execution's stream context — carries the fixture chain (threadId) so
+   * the whole chain (AI providers, media tools, remote dispatch) records and
+   * replays under the test case's thread. Explicit, never ambient. Non-AI
+   * setup callers pass an explicit thread-less makeHeadlessContext(u, u).
+   * Pass undefined for pure validation/auth tests that don't touch AI infra.
+   */
+  streamContext: ToolExecutionContext;
 } & (TEndpoint["types"]["RequestOutput"] extends never
   ? { data?: never }
   : { data: TEndpoint["types"]["RequestOutput"] }) &
@@ -62,7 +73,11 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     const { RouteExecuteRepository } =
       await import("next-vibe/execute-tool/repository");
 
-    // Execute using the shared route execution infrastructure
+    // Execute using the shared route execution infrastructure. The caller's
+    // streamContext (fixture chain, threadId) rides straight through — the
+    // whole AI/media/remote chain records and replays under it. Non-AI setup
+    // callers pass an explicit thread-less root (makeHeadlessContext(u,u)),
+    // which routes any incidental external call live.
     const result = await RouteExecuteRepository.runInProcessTyped({
       definition: endpoint,
       instanceId,
@@ -72,6 +87,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
       locale: defaultLocale,
       logger,
       platform: Platform.NEXT_API,
+      streamContext,
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);

@@ -13,8 +13,7 @@ export async function pollDelay(
   ms: number,
   lastResponse?: Response,
 ): Promise<void> {
-  const replayed =
-    lastResponse?.headers.get(FIXTURE_REPLAY_HEADER) === "true";
+  const replayed = lastResponse?.headers.get(FIXTURE_REPLAY_HEADER) === "true";
   const effective = replayed ? 10 : ms;
   await new Promise<void>((resolve) => {
     setTimeout(resolve, effective);

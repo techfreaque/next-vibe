@@ -9,6 +9,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -20,7 +21,7 @@ import { StreamContext } from "../core/stream";
 import {
   createStreamingTTSHandler,
   type StreamingTTSHandler,
-} from "../streaming-tts";
+} from "../core/streaming-tts";
 import { FileUploadEventHandler } from "./attachments";
 import { InitialEventsHandler } from "./initial-events-handler";
 
@@ -42,6 +43,18 @@ export class StreamStartHandler {
     locale: CountryLanguage;
     wsEmit: MessagesWsEmit;
     emitTitle: EmitThreadTitleFn;
+    /** Ownership token for the stream's 'streaming' claim (ToolExecutionContext.streamRunId). */
+    streamRunId: string | undefined;
+    /**
+     * Branch LEAF below the last confirmed tool (walkToLeafMessage). With
+     * parallel tools the confirmed message is not necessarily the branch tip —
+     * a sibling tool that ran without confirmation chains after it, and
+     * parenting the phase-2 AI response at the confirmed message would branch
+     * the chain. Wins over lastConfirmedTool.messageId when provided.
+     */
+    confirmationParentLeafId: string | undefined;
+    /** Fixture chain of the stream — bound onto the dbWriter for embedding-sync. */
+    fixtureContext: FixtureContext | undefined;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): StreamContext {
@@ -55,6 +68,9 @@ export class StreamStartHandler {
       locale,
       wsEmit,
       emitTitle,
+      streamRunId,
+      confirmationParentLeafId,
+      streamContext,
       sequenceIdOverride,
     } = params;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -77,7 +93,10 @@ export class StreamStartHandler {
     // We want AI response to be after the last deferred result, not alongside it.
     // Fall back to effectiveParentMessageId / userMessageId if no confirmations.
     const initialParentForContext =
-      lastConfirmedTool?.messageId ?? initialAiParentId ?? null;
+      confirmationParentLeafId ??
+      lastConfirmedTool?.messageId ??
+      initialAiParentId ??
+      null;
 
     const ctx = new StreamContext({
       sequenceId,
@@ -89,6 +108,8 @@ export class StreamStartHandler {
       locale,
       wsEmit,
       emitTitle,
+      streamRunId,
+      streamContext,
     });
 
     // Update last known values for error handling (accessible in catch blocks)
@@ -150,6 +171,12 @@ export class StreamStartHandler {
     wsEmit: MessagesWsEmit;
     emitTitle: EmitThreadTitleFn;
     availability: AgentEnvAvailability;
+    /** The stream's fixture chain — TTS provider calls bind record/replay to it. */
+    fixtureContext: FixtureContext | undefined;
+    /** Ownership token for the stream's 'streaming' claim (ToolExecutionContext.streamRunId). */
+    streamRunId: string | undefined;
+    /** Branch leaf below the last confirmed tool — see initializeContext. */
+    confirmationParentLeafId: string | undefined;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): {
@@ -175,6 +202,9 @@ export class StreamStartHandler {
       emitTitle,
       sequenceIdOverride,
       availability,
+      streamContext,
+      streamRunId,
+      confirmationParentLeafId,
     } = params;
 
     // Initialize stream context (creates MessageDbWriter with controller + encoder)
@@ -188,6 +218,9 @@ export class StreamStartHandler {
       locale,
       wsEmit,
       emitTitle,
+      streamRunId,
+      confirmationParentLeafId,
+      streamContext,
       sequenceIdOverride,
     });
 
@@ -246,6 +279,7 @@ export class StreamStartHandler {
         user,
         enabled: true,
         availability,
+        streamContext,
       });
       ttsHandler.setThreadId(threadId);
       logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {
@@ -269,6 +303,7 @@ export class StreamStartHandler {
       fileUploadPromise,
       userMessageId,
       userId: user.isPublic ? undefined : user.id,
+      threadId,
       dbWriter: ctx.dbWriter,
       logger,
     });

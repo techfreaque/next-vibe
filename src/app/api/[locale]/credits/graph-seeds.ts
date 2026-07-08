@@ -12,7 +12,7 @@ import type {
   GraphConfig,
   GraphSeedEntry,
 } from "next-vibe/dataflow/graph/types";
-import { COMPLETE_TASK_ALIAS } from "next-vibe/tasks/complete-task/constants";
+import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";

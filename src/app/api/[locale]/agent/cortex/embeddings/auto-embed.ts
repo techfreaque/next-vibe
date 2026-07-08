@@ -13,6 +13,11 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import {
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
+
 import { cortexNodes } from "../db";
 import type { CortexCreditFeatureValue } from "../enum";
 import { CortexCreditFeature } from "../enum";
@@ -28,12 +33,14 @@ export interface EmbedOptions {
   billCredits?: boolean;
   /** User context for credit deduction */
   user?: JwtPayloadType;
-  /** Locale for credit translation strings */
-  locale: CountryLanguage;
-  /** Logger for credit deduction */
-  logger: EndpointLogger;
+  /** Locale for credit translation strings (only needed when billCredits) */
+  locale?: CountryLanguage;
+  /** Logger for credit deduction (only needed when billCredits) */
+  logger?: EndpointLogger;
   /** Feature name for usage history */
   feature?: CortexCreditFeatureValue;
+  /** Fixture chain of the triggering execution — binds the embedding call. */
+  streamContext: ToolExecutionContext;
 }
 
 /**
@@ -106,7 +113,13 @@ async function embedNode(
       return; // Content unchanged - skip
     }
 
-    const embedding = await generateEmbedding(textToEmbed);
+    // Production callers always pass a streamContext (required in EmbedOptions);
+    // the only option-less callers are standalone tests/maintenance with no
+    // stream, which route live via an explicit thread-less root.
+    const embedding = await generateEmbedding(
+      textToEmbed,
+      options?.streamContext ?? rootlessStreamContext(),
+    );
 
     if (!embedding) {
       return; // API key missing or call failed - skip silently

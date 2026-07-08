@@ -18,9 +18,11 @@
 
 import "server-only";
 
+import { desc, lt, sql as sqlFn } from "drizzle-orm";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type {
   GenericHandlerBase,
   RemoteEventHandlerProps,
@@ -33,18 +35,23 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
+import { dbUserIdToOwner } from "next-vibe/tasks/cron/db";
+import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
 
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 
 import type { CallbackModeValue } from "../constants";
-import { CallbackMode } from "../constants";
+import { CallbackMode, CallbackModeDB } from "../constants";
+import { pendingCallResults } from "../db";
 import executeDefinition, {
   type RouteExecuteRequestOutput,
   type RouteExecuteResponseOutput,
@@ -455,7 +462,8 @@ export class RouteExecuteRepository {
       }) as ResponseType<TDef["types"]["ResponseOutput"]>;
     }
 
-    const { ExecuteToolRouting } = await import("./routing");
+    const { ExecuteToolRouting } =
+      await import("@/app/api/[locale]/remote-connection/routing");
     const inferenceTarget = await ExecuteToolRouting.resolveInferenceProvider({
       userId: user.id,
       logger,
@@ -521,11 +529,6 @@ export class RouteExecuteRepository {
     }
     RouteExecuteRepository.inFlightIncomingCalls.add(roundtrip.callId);
 
-    const { resolveTaskOwnerUser } =
-      await import("next-vibe/tasks/cron/resolve-task-user");
-    const { dbUserIdToOwner } = await import("next-vibe/tasks/cron/db");
-    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-
     const owner = dbUserIdToOwner(localUserId);
     const taskUserCtx = await resolveTaskOwnerUser(
       owner,
@@ -546,13 +549,17 @@ export class RouteExecuteRepository {
     const abortController = new AbortController();
     const callbackMode = requestData.callbackMode ?? CallbackMode.WAIT;
 
-    // detach/wakeUp: the RECEIVER owns the work as a REAL local async task —
-    // same executor, same task row, same goroutine as a local dispatch. The
-    // task-row ID is the requester's callId (remoteDispatchCallId) so ONE
-    // identity names the work on both instances, and the receiver's task
-    // history is the durable result store (await-task finds it after the
-    // requester's in-memory tombstone expires — parity with local detach).
-    // The onAsyncTaskSettled hook relays the settled outcome back as the
+    // ONE receiver context for every mode. Caller identity + fixture context
+    // ride the roundtrip payload (the event's payloadType) — never the public
+    // request schema — and continue down THIS execution chain.
+    //
+    // detach/wakeUp additions: the RECEIVER owns the work as a REAL local
+    // async task — same executor, same task row, same goroutine as a local
+    // dispatch. The task-row ID is the requester's callId
+    // (remoteDispatchCallId) so ONE identity names the work on both instances,
+    // and the receiver's task history is the durable result store (await-task
+    // finds it after the requester's in-memory tombstone expires — parity with
+    // local detach). onAsyncTaskSettled relays the settled outcome back as the
     // tool-execute-result event; the requester's parked semantics (revival /
     // fire-and-forget) live on ITS side, driven by that event.
     if (
@@ -727,9 +734,6 @@ export class RouteExecuteRepository {
       //     PendingCalls.awaitResult DB-poll fallback resolves it. Also makes
       //     WAIT survive a requester restart.
       //  2. Parked-thread revival from the tool message (wakeUp semantics).
-      const { db } = await import("next-vibe/database");
-      const { pendingCallResults } = await import("../db");
-      const { lt } = await import("drizzle-orm");
       await db
         .insert(pendingCallResults)
         .values({ callId: taskId, status, output })
@@ -841,9 +845,6 @@ export class RouteExecuteRepository {
     output: Record<string, WidgetData> | null,
     logger: EndpointLogger,
   ): Promise<void> {
-    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
-    const { db } = await import("next-vibe/database");
-    const { desc, sql: sqlFn } = await import("drizzle-orm");
     // Deterministic callIds (fixture mode strips the random tail) recur across
     // streams, so several historical tool messages can carry this pendingCallId.
     // Newest-first + skip already-settled messages targets the CURRENTLY parked
@@ -876,10 +877,6 @@ export class RouteExecuteRepository {
       return;
     }
 
-    const { dbUserIdToOwner } = await import("next-vibe/tasks/cron/db");
-    const { resolveTaskOwnerUser } =
-      await import("next-vibe/tasks/cron/resolve-task-user");
-    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
     const ownerCtx = await resolveTaskOwnerUser(
       dbUserIdToOwner(msg.authorId),
       defaultLocale,

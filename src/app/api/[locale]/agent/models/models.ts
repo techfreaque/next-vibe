@@ -636,6 +636,11 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "ModelsLab",
     icon: "music",
   },
+  cassetteAi: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "CassetteAI",
+    icon: "music",
+  },
   byteplus: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "BytePlus",

@@ -47,6 +47,8 @@ const VIBE_SENSE_ABORT_CONTROLLER = new AbortController();
 
 const VIBE_SENSE_STREAM_CONTEXT = makeHeadlessContext(
   VIBE_SENSE_ABORT_CONTROLLER.signal,
+  // Vibe-sense runs live — never under fixtures.
+  undefined,
 );
 
 // ─── Execution Context ────────────────────────────────────────────────────────

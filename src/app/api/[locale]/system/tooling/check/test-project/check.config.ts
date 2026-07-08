@@ -22,7 +22,7 @@ import type {
 // Vibe Check Defaults
 // --------------------------------------------------------
 const vibeCheck: CheckConfig["vibeCheck"] = {
-  fix: true,
+  fix: false,
   skipEslint: false,
   skipOxlint: false,
   skipTypecheck: false,
@@ -108,7 +108,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "build",
   "test-files",
   "test-project",
-   "public/vibe-frame/**",
+  "public/vibe-frame/**",
   // Files
   ".DS_Store",
   "thumbs.db",
@@ -132,6 +132,10 @@ const typecheck = {
   cachePath: ".tmp/typecheck-cache",
   useTsgo: features.tsgo,
   nonExtensiveIgnorePatterns: nonExtensivePatterns,
+  // Keep a warm tsgo LSP daemon instead of cold-spawning tsgo on every check.
+  // First run pays the cold-start cost; subsequent runs return in ~1-3s.
+  // Requires useTsgo: true. Daemon socket at .tmp/tsgo-lsp.sock.
+  useLspDaemon: true,
 };
 
 // --------------------------------------------------------
@@ -385,7 +389,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
             "error",
             {
-              excludedPaths: ["/src/packages/next-vibe/ui/web/"],
+              excludedPaths: ["/system/ui/"],
               excludedFilePatterns: [
                 "/email.tsx",
                 ".email.tsx",
@@ -678,7 +682,7 @@ const oxlint: CheckConfig["oxlint"] = {
     {
       // vibe ui platform wrappers legitimately use native HTML elements
       // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
-      files: ["**/next-vibe/ui/web/**"],
+      files: ["**/system/ui/**"],
       rules: {
         "nextjs/no-head-element": "off",
       },

@@ -468,6 +468,11 @@ export const translations = {
         title: "Network Error",
         description: "Network error occurred while streaming",
       },
+      serviceUnavailable: {
+        title: "Remote instance unavailable",
+        description:
+          "The connected instance this thread depends on could not be reached",
+      },
       forbidden: {
         title: "Forbidden",
         description: "Access to AI streaming is forbidden",
@@ -522,12 +527,6 @@ export const translations = {
   error: {
     title: "Stream Error",
   },
-  wakeUp: {
-    revivalPrompt:
-      "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
-    revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
-  },
   info: {
     streamInterrupted:
       "Generation was stopped. Partial response has been saved.",
@@ -573,106 +572,8 @@ export const translations = {
       missingModelOrSkill:
         "model and skill are required - pass them directly or provide a favoriteId with a resolvable model selection",
       favoriteNotFound: "Favorite not found or does not belong to this user",
-    },
-  },
-  resumeStream: {
-    post: {
-      title: "Resume AI Stream",
-      titleShort: "Resume Stream",
-      description:
-        "Continue an existing thread by running a headless AI turn. Used after an async remote task completes (callbackMode=wait or wakeUp). Pass favoriteId to load model+skill in one shot, or set modelId+skillId explicitly.",
-      fields: {
-        threadId: {
-          title: "Thread ID",
-          description: "UUID of the existing thread to continue.",
-        },
-        favoriteId: {
-          title: "Favorite ID",
-          description:
-            "UUID of a saved favorite to load model and skill from. Overrides modelId/skillId when both are set.",
-        },
-        modelId: {
-          title: "Model ID",
-          description:
-            "AI model to use for the resumed turn. Optional when favoriteId is provided.",
-        },
-        skillId: {
-          title: "Skill ID",
-          description:
-            "Skill/persona for the resumed turn. Optional when favoriteId is provided.",
-        },
-        callbackMode: {
-          title: "Callback Mode",
-          description:
-            "Callback mode from the originating tool call (wait or wakeUp). Determines resume behavior.",
-        },
-        wakeUpToolMessageId: {
-          title: "WakeUp Tool Message ID",
-          description:
-            "ID of the original tool call message with the backfilled result.",
-        },
-        wakeUpTaskId: {
-          title: "WakeUp Task ID",
-          description:
-            "ID of the originating remote cron task, deleted after revival.",
-        },
-        resumeTaskId: {
-          title: "Resume Task ID",
-          description:
-            "ID of this resume-stream cron task itself, deleted after revival.",
-        },
-        resumed: {
-          title: "Resumed",
-          description: "Whether the thread was successfully continued.",
-        },
-        lastAiMessageId: {
-          title: "Last AI Message ID",
-          description:
-            "UUID of the final assistant message generated. Null if no message was produced.",
-        },
-      },
-      errors: {
-        validation: {
-          title: "Validation Error",
-          description: "Invalid parameters - threadId must be a valid UUID",
-        },
-        unauthorized: {
-          title: "Unauthorized",
-          description: "Authentication required",
-        },
-        forbidden: {
-          title: "Forbidden",
-          description: "Access denied",
-        },
-        notFound: {
-          title: "Not Found",
-          description: "Thread or model not found",
-        },
-        internal: {
-          title: "Server Error",
-          description: "Internal error during stream resume",
-        },
-        network: {
-          title: "Network Error",
-          description: "Network error occurred",
-        },
-        unknown: {
-          title: "Unknown Error",
-          description: "An unexpected error occurred",
-        },
-        unsaved: {
-          title: "Unsaved Changes",
-          description: "Unsaved changes conflict",
-        },
-        conflict: {
-          title: "Conflict",
-          description: "Conflict occurred",
-        },
-      },
-      success: {
-        title: "Stream Resumed",
-        description: "The AI thread was successfully continued",
-      },
+      ambiguousModel:
+        "Provide EITHER an explicit model or a favorite/skill - not both",
     },
   },
   providers: {

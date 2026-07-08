@@ -892,9 +892,11 @@ export class ResumeStreamRepository {
 
             // Atomic revival claim: flip isStreaming false→true.
             // WAIT mode: the original stream is dead (it aborted when escalateToTask ran).
-            // If thread is still 'streaming' it means a previous revival attempt failed
-            // without resetting state. Wait briefly for any concurrent revival to finish,
-            // then force-reset if still stuck.
+            // If the thread is still 'streaming' the blocker may be a LIVE turn
+            // in another process (long media/tool round), not just a failed
+            // revival — so back off politely with the SAME window the wakeUp
+            // path uses (a full in-flight AI turn), and force-reset only after
+            // that window proves the state is truly stuck.
             if (!(await claimRevival(effectiveThreadId))) {
               logger.debug(
                 "[ResumeStream] WAIT - initial claim failed, waiting 4s then retrying",

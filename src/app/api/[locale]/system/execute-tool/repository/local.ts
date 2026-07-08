@@ -24,7 +24,7 @@
 
 import "server-only";
 
-import { and, eq, sql as drizzleSql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -36,6 +36,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
 import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
 import {
@@ -45,6 +46,7 @@ import {
   TaskOutputMode,
 } from "next-vibe/tasks/enum";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
@@ -58,6 +60,8 @@ import type {
   RouteExecuteResponseOutput,
 } from "../definition";
 import { TaskCompletion } from "./completion";
+import type { ControlAction } from "./control-signals";
+import { ControlSignals } from "./control-signals";
 import { RouteExecutionExecutor } from "./core";
 import { ExecuteToolGuards } from "./guards";
 import { PendingCalls } from "./pending-calls";
@@ -76,7 +80,7 @@ export class LocalExecution {
    * In production the toolCallId is only unique WITHIN one AI turn (a per-turn
    * counter), so a short random tail is appended to guarantee a globally-unique
    * cronTasks primary key across threads. On a fixture-driven execution
-   * (the dispatch carries a fixtureContext) that tail is dropped so the id
+   * (the dispatch carries a streamContext) that tail is dropped so the id
    * stays fully reproducible on replay and identical across instances.
    *
    * When no toolCallId is present (a task not originating from an AI tool call)
@@ -131,14 +135,16 @@ export class LocalExecution {
 
     logger.debug("[RouteExecute] Executing route", { toolName });
 
-    // Resolve tool whitelist + denylist from favorite → skill → null cascade.
+    // Resolve tool whitelist + denylist from favorite → skill → user default pinned cascade.
     // Uses the streamContext's favoriteId/skillId (set by the AI loop that called us),
-    // or undefined for headless/cron callers (→ all tools allowed, only folder blocks apply).
+    // or undefined for headless/cron callers (→ user default pinned, only folder blocks apply).
     const userId = !user.isPublic && "id" in user ? user.id : undefined;
     const permissions = await ExecuteToolGuards.resolveToolPermissions({
       favoriteId: streamContext.favoriteId,
       skillId: streamContext.skillId,
       userId,
+      isAdmin,
+      isCustomer,
       rootFolderId: streamContext.rootFolderId,
     });
 
@@ -408,7 +414,7 @@ export class LocalExecution {
             // — force the row terminal and fire the WAITER's revival instead.
             const claimed = await LocalExecution.markTaskCompleted(
               taskId,
-              mode,
+              logger,
             );
             if (!claimed) {
               await LocalExecution.markTaskCompleted(taskId);
@@ -430,10 +436,6 @@ export class LocalExecution {
 
             if (targetToolMessageId && targetThreadId && !user.isPublic) {
               const ownerUser: JwtPrivatePayloadType = user;
-              // TaskCompletion.handle applies the mode's policy:
-              //   DETACH  → no backfill, TASK_COMPLETED emit, thread reconcile.
-              //   WAKE_UP → revival scheduled (deferred insert via resume-stream).
-              //   WAIT    → backfill in-place + revival (await-task waiter).
               await TaskCompletion.handle({
                 toolMessageId: targetToolMessageId,
                 threadId: targetThreadId,
@@ -555,9 +557,6 @@ export class LocalExecution {
       await db.insert(cronTaskExecutions).values({
         taskId,
         taskName: toolName,
-        // History is append-only: the timestamp tail keeps executionId unique
-        // when the SAME deterministic taskId re-runs (fixture-mode ids have no
-        // random tail, so every replay of a turn reuses the task id).
         executionId: `${triggeredBy}-${taskId}-${startedAt.getTime()}`,
         status: finalStatus,
         priority: CronTaskPriority.HIGH,

@@ -96,6 +96,7 @@ async function deleteTestSkill(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
+    streamContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -126,6 +127,7 @@ describe("Cortex Read E2E", () => {
     await writeFile(path, content);
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -156,6 +158,7 @@ describe("Cortex Read E2E", () => {
 
     // Sanity: full read is not truncated and carries every line.
     const fullRes = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -171,6 +174,7 @@ describe("Cortex Read E2E", () => {
     expect(fullRes.data.content.split("\n")).toHaveLength(50);
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path, maxLines: 5 },
       user,
@@ -197,6 +201,7 @@ describe("Cortex Read E2E", () => {
 
     const dirPath = `${TEST_PREFIX}/dir-probe`;
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path: dirPath },
       user,
@@ -214,6 +219,7 @@ describe("Cortex Read E2E", () => {
 
   it("returns NOT_FOUND for a never-written document path", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path: `${TEST_PREFIX}/does-not-exist-xyz.md` },
       user,
@@ -229,6 +235,7 @@ describe("Cortex Read E2E", () => {
 
   it("reads a virtual-mount /skills file resolved live from source", async () => {
     const listRes = await sendTestRequest({
+      streamContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: "/skills" },
       user,
@@ -255,6 +262,7 @@ describe("Cortex Read E2E", () => {
     }
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path: fileEntry.entryPath },
       user,
@@ -279,6 +287,7 @@ describe("Cortex Read E2E", () => {
     // /threads is a virtual mount that is NOT write-through. Reading the mount
     // root renders a directory listing with readonly=true and nodeType=dir.
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path: "/threads" },
       user,
@@ -304,6 +313,7 @@ describe("Cortex Read E2E", () => {
     await writeFile(path, content);
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,

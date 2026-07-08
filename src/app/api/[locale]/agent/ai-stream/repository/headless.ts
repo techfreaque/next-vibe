@@ -31,17 +31,7 @@ import type { ChatModelId } from "../models";
 import { getBestChatModel } from "../models";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
-import { AiStreamRepository } from "./index";
-
-/** A pre-fetched tool call result to inject into the thread before the AI runs */
-export interface HeadlessPreCall {
-  routeId: string;
-  args: Record<string, WidgetData>;
-  result: WidgetData;
-  success: boolean;
-  error?: string;
-  executionTimeMs?: number;
-}
+import type { HeadlessPreCall } from "./setup";
 
 export interface HeadlessAiStreamParams {
   /**
@@ -109,6 +99,10 @@ export interface HeadlessAiStreamParams {
   };
   /** Sub-agent nesting depth (0 = top-level, incremented by ai-run) */
   subAgentDepth: number;
+  /** ws-provider RECEIVER loop (relay/inference-provider) — confirmation gates apply despite headless. */
+  relayReceiver?: boolean;
+  /** Transient plumbing thread (async tool executions): excluded from thread sync. */
+  syncEligible?: boolean;
   /** File attachments to include with the user message (images, audio, PDFs, video) */
   attachments?: File[];
   /**
@@ -167,86 +161,6 @@ export interface HeadlessAiStreamResult {
   pinnedToolCount: number;
 }
 
-export async function resolveFavorite(
-  favoriteId: string,
-  userId: string,
-  user: JwtPayloadType,
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<{
-  model: ChatModelId;
-  skill: string;
-  favoriteConfig: FavoriteConfig;
-} | null> {
-  const favoriteIdCondition = isUuid(favoriteId)
-    ? eq(chatFavorites.id, favoriteId)
-    : eq(chatFavorites.slug, favoriteId);
-  const [favorite] = await db
-    .select(FAVORITE_CONFIG_COLUMNS)
-    .from(chatFavorites)
-    .where(and(favoriteIdCondition, eq(chatFavorites.userId, userId)))
-    .limit(1);
-
-  if (!favorite) {
-    logger.error("[Headless AI] Favorite not found", { favoriteId, userId });
-    return null;
-  }
-
-  const skill = favorite.skillId || NO_SKILL_ID;
-  const availability = await getInstanceAvailability();
-
-  const sel = favorite.modelSelection;
-
-  if (sel && isManualSelection(sel) && "manualModelId" in sel) {
-    return {
-      model: sel.manualModelId,
-      skill,
-      favoriteConfig: favorite,
-    };
-  }
-  if (sel && isFiltersSelection(sel)) {
-    const best = getBestChatModel(sel, user, availability);
-    if (best) {
-      return { model: best.id, skill, favoriteConfig: favorite };
-    }
-  }
-
-  if (skill !== NO_SKILL_ID) {
-    const { SkillsRepository } = await import("../../skills/repository");
-    const skillResult = await SkillsRepository.getSkillById(
-      { id: skill },
-      user,
-      logger,
-      locale,
-    );
-    if (skillResult.success) {
-      const variants = skillResult.data.variants;
-      const { variantId: favoriteVariantId } = parseSkillId(favorite.skillId);
-      const variant = variants
-        ? favoriteVariantId
-          ? variants.find((v) => v.id === favoriteVariantId)
-          : (variants.find((v) => v.isDefault) ?? variants[0])
-        : null;
-      const varSel = variant?.modelSelection;
-      if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = getBestChatModel(varSel, user, availability);
-        if (best) {
-          return { model: best.id, skill, favoriteConfig: favorite };
-        }
-      }
-    }
-  }
-
-  logger.warn(
-    "[Headless AI] Favorite has no resolvable model - pass model explicitly",
-    {
-      favoriteId,
-      skillId: skill,
-    },
-  );
-  return null;
-}
-
 export async function runHeadlessAiStream(
   params: HeadlessAiStreamParams,
 ): Promise<ResponseType<HeadlessAiStreamResult>> {
@@ -257,23 +171,12 @@ export async function runHeadlessAiStream(
     prompt,
     favoriteConfig: favoriteConfigOverride,
     threadId: existingThreadId,
-    subFolderId,
-    rootFolderId: rootFolderIdOverride,
-    preCalls,
-    excludeMemories,
+    rootFolderId,
     wakeUpRevival,
-    operationOverride,
-    explicitParentMessageId,
-    sequenceIdOverride,
-    mediaModelOverrides,
-    attachments: headlessAttachments,
-    audioInput,
-    toolConfirmations: headlessToolConfirmations,
     user,
     locale,
     logger,
     t: aiStreamT,
-    abortSignal: parentAbortSignal,
   } = params;
 
   const headlessAvailability = await getInstanceAvailability();
@@ -285,29 +188,26 @@ export async function runHeadlessAiStream(
     let resolvedFavoriteConfig: FavoriteConfig | null =
       favoriteConfigOverride ?? null;
 
-    if (favoriteId) {
-      const userId = "id" in user ? (user.id as string) : undefined;
-      if (userId) {
-        const resolved = await resolveFavorite(
-          favoriteId,
-          userId,
-          user,
-          logger,
-          locale,
-        );
-        if (!resolved) {
-          return fail({
-            message: aiStreamT("headless.errors.favoriteNotFound"),
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
-        }
-        // Explicit params override favorite values
-        model = modelOverride ?? resolved.model;
-        skill = skillOverride ?? resolved.skill;
-        // Use resolved favorite config if caller didn't provide one
-        if (!resolvedFavoriteConfig) {
-          resolvedFavoriteConfig = resolved.favoriteConfig;
-        }
+    if (favoriteId && !user.isPublic && user.id) {
+      const resolved = await resolveFavorite(
+        favoriteId,
+        user.id,
+        user,
+        logger,
+        locale,
+      );
+      if (!resolved) {
+        return fail({
+          message: aiStreamT("headless.errors.favoriteNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      // Explicit params override favorite values
+      model = modelOverride ?? resolved.model;
+      skill = skillOverride ?? resolved.skill;
+      // Use resolved favorite config if caller didn't provide one
+      if (!resolvedFavoriteConfig) {
+        resolvedFavoriteConfig = resolved.favoriteConfig;
       }
     }
 
@@ -348,192 +248,37 @@ export async function runHeadlessAiStream(
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
-    const rootFolderId = rootFolderIdOverride;
-    const effectiveThreadId = existingThreadId ?? crypto.randomUUID();
+
     const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
-
-    // Notify caller of the thread ID before the AI stream starts.
-    // ai-run uses this to emit a partial tool result so the parent UI
-    // can start rendering sub-thread messages in real-time.
-    if (params.onThreadCreated) {
-      await params.onThreadCreated(effectiveThreadId);
-    }
-
-    // ── Pre-call injection ─────────────────────────────────────────────────
-    // Write pre-call results as proper tool messages in the thread so the AI
-    // sees them in context and they render correctly in the UI.
-    // Only write to DB for persistent threads (not incognito).
-    const userMessageId = crypto.randomUUID();
-    let parentMessageIdForAi: string | null = null;
-
-    if (preCalls && preCalls.length > 0 && !isIncognito) {
-      // Ensure the thread exists first
-      const userId = user.isPublic ? undefined : user.id;
-      const ensureResult = await ThreadsRepository.ensureThread({
-        threadId: effectiveThreadId,
-        rootFolderId,
-        subFolderId: subFolderId ?? null,
-        userId,
-        leadId: undefined,
-        content: prompt,
-        isIncognito: false,
-        logger,
-        user,
-        locale,
-      });
-      if (!ensureResult.success) {
-        return ensureResult;
-      }
-
-      // For append mode, find the current last message so user msg chains correctly
-      let preCallUserParentId: string | null = null;
-      if (existingThreadId) {
-        const [lastMsg] = await db
-          .select({ id: chatMessages.id })
-          .from(chatMessages)
-          .where(eq(chatMessages.threadId, existingThreadId))
-          .orderBy(desc(chatMessages.createdAt))
-          .limit(1);
-        preCallUserParentId = lastMsg?.id ?? null;
-      }
-
-      // Write the user message first
-      await db.insert(chatMessages).values({
-        id: userMessageId,
-        threadId: effectiveThreadId,
-        role: ChatMessageRole.USER,
-        content: prompt,
-        parentId: preCallUserParentId,
-        authorId: userId ?? null,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        skill: null,
-        metadata: {},
-      });
-
-      // All pre-call messages share a sequenceId so they render as one grouped bubble
-      const preCallSequenceId = crypto.randomUUID();
-
-      // Write a synthetic assistant message that "called" the tools
-      const syntheticAssistantId = crypto.randomUUID();
-      await db.insert(chatMessages).values({
-        id: syntheticAssistantId,
-        threadId: effectiveThreadId,
-        role: ChatMessageRole.ASSISTANT,
-        content: null,
-        parentId: userMessageId,
-        authorId: userId ?? null,
-        sequenceId: preCallSequenceId,
-        isAI: true,
-        model,
-        skill: skill,
-        metadata: {},
-      });
-
-      // Write each pre-call as a TOOL message
-      let lastToolMessageId = syntheticAssistantId;
-      for (const preCall of preCalls) {
-        const toolMessageId = crypto.randomUUID();
-        await db.insert(chatMessages).values({
-          id: toolMessageId,
-          threadId: effectiveThreadId,
-          role: ChatMessageRole.TOOL,
-          content: null,
-          parentId: lastToolMessageId,
-          authorId: userId ?? null,
-          sequenceId: preCallSequenceId,
-          isAI: true,
-          model,
-          skill: skill,
-          metadata: {
-            toolCall: {
-              toolCallId: `precall_${toolMessageId}`,
-              toolName: preCall.routeId,
-              args: preCall.args,
-              result: preCall.result,
-              executionTime: preCall.executionTimeMs,
-            },
-          } as MessageMetadata,
-        });
-        lastToolMessageId = toolMessageId;
-      }
-
-      parentMessageIdForAi = lastToolMessageId;
-    }
-
-    // For "append" mode with no preCalls, determine the parent message for history.
-    // explicitParentMessageId takes priority - critical for WAIT mode resume where
-    // the tool message with its backfilled result must be the history root, not
-    // whatever message was created most recently by timestamp.
-    if (existingThreadId && !parentMessageIdForAi) {
-      if (explicitParentMessageId) {
-        parentMessageIdForAi = explicitParentMessageId;
-      } else {
-        const [lastMsg] = await db
-          .select({ id: chatMessages.id })
-          .from(chatMessages)
-          .where(eq(chatMessages.threadId, existingThreadId))
-          .orderBy(desc(chatMessages.createdAt))
-          .limit(1);
-
-        if (lastMsg) {
-          parentMessageIdForAi = lastMsg.id;
-        }
-      }
-    }
-
-    // wakeUpRevival uses "wakeup-resume" - same as answer-as-ai but without
-    // CONTINUE_CONVERSATION_PROMPT. The AI sees the deferred tool result as
-    // the last message and responds naturally.
-    const operation =
-      operationOverride ??
-      (wakeUpRevival && parentMessageIdForAi
-        ? "wakeup-resume"
-        : parentMessageIdForAi
-          ? "answer-as-ai"
-          : "send");
-
-    logger.debug("[Headless] operation resolved", {
-      operation,
-      wakeUpRevival,
-      parentMessageIdForAi,
-      existingThreadId,
-    });
-
-    // When preCalls are used, the user message was already written manually above.
-    // Override to "answer-as-ai" so stream-setup doesn't re-insert the same userMessageId.
-    const effectiveOperation =
-      preCalls && preCalls.length > 0 && parentMessageIdForAi
-        ? "answer-as-ai"
-        : operation;
 
     // ── Synthetic request data — the headless intake phase inside
     // createAiStream derives operation/parent/userMessageId and injects
     // preCalls; this adapter only supplies the raw ingredients.
     const syntheticData: AiStreamPostRequestOutput = {
-      operation: effectiveOperation,
+      operation: "send", // placeholder - headlessIntake derives the real one
       rootFolderId,
-      subFolderId: subFolderId ?? null,
-      threadId: effectiveThreadId,
-      userMessageId:
-        effectiveOperation !== "answer-as-ai" ? userMessageId : null,
-      parentMessageId: parentMessageIdForAi,
+      subFolderId: params.subFolderId ?? null,
+      threadId: existingThreadId ?? crypto.randomUUID(),
+      userMessageId: null, // headlessIntake assigns one when the operation needs it
+      parentMessageId: params.explicitParentMessageId ?? null,
       content: prompt,
       role: ChatMessageRole.USER,
       model,
-      skill: skill,
+      skill,
       favoriteConfig: resolvedFavoriteConfig,
-      toolConfirmations: headlessToolConfirmations ?? null,
-      messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
+      toolConfirmations: params.toolConfirmations ?? null,
+      messageHistory: [],
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
-      audioInput: { file: audioInput ?? null },
+      audioInput: { file: params.audioInput ?? null },
       resumeToken: null,
       timezone: "UTC",
-      attachments: headlessAttachments ?? null,
+      attachments: params.attachments ?? null,
       executionContext: { mode: "local" as const },
     };
 
+    // Lazy import: headless → index → loop → revival → headless is a module
+    // cycle; a static import here TDZ-crashes SSR after partial HMR invalidation
+    const { AiStreamRepository } = await import("./index");
     const result = await AiStreamRepository.createAiStream({
       data: syntheticData,
       locale,
@@ -542,46 +287,41 @@ export async function runHeadlessAiStream(
       request: undefined,
       t: aiStreamT,
       headless: true,
+      relayReceiver: params.relayReceiver,
+      syncEligible: params.syncEligible,
+      headlessIntake: {
+        preCalls: params.preCalls,
+        operationOverride: params.operationOverride,
+      },
+      onThreadCreated: params.onThreadCreated,
       isRevival: wakeUpRevival === true,
-      extraInstructions: headlessInstructions,
-      excludeMemories,
+      extraInstructions: params.headlessInstructions,
+      excludeMemories: params.excludeMemories,
       favoriteIdOverride: favoriteId,
-      sequenceIdOverride,
+      sequenceIdOverride: params.sequenceIdOverride,
       subAgentDepth: params.subAgentDepth,
-      mediaModelOverrides,
-      parentAbortSignal,
+      mediaModelOverrides: params.mediaModelOverrides,
+      parentAbortSignal: params.abortSignal,
+      maxToolCalls: params.maxTurns,
     });
 
     if (!result.success) {
       return result;
     }
 
-    const {
-      threadId,
-      lastAiMessageId,
-      lastAiMessageContent,
-      lastGeneratedMediaUrl,
-      totalCreditsDeducted,
-      pinnedToolCount,
-    } = result.data;
-
     logger.debug("[Headless AI] Execution complete", {
       model,
-      threadId,
-      lastAiMessageId,
+      threadId: result.data.threadId,
+      lastAiMessageId: result.data.lastAiMessageId,
       isIncognito,
-      pinnedToolCount,
+      pinnedToolCount: result.data.pinnedToolCount,
     });
 
     return {
       success: true,
       data: {
-        lastAiMessageId,
-        lastAiMessageContent,
-        lastGeneratedMediaUrl,
-        totalCreditsDeducted,
-        pinnedToolCount,
-        threadId: isIncognito ? undefined : threadId,
+        ...result.data,
+        threadId: isIncognito ? undefined : result.data.threadId,
       },
     };
   } catch (error) {

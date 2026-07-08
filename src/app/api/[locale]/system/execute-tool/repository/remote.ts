@@ -28,6 +28,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import type { FixtureContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 

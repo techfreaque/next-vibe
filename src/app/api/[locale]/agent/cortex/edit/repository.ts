@@ -22,6 +22,11 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
+import {
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
+
 import type { EndpointLogger } from "../../../system/logger/types";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
@@ -53,6 +58,7 @@ export class CortexEditRepository {
     logger,
     t,
     relayed = false,
+    streamContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -71,6 +77,8 @@ export class CortexEditRepository {
      * emit so the event is not relayed back, preventing an infinite ping-pong.
      */
     relayed?: boolean;
+    /** Fixture chain of the calling execution — the embedding call binds it. */
+    streamContext: ToolExecutionContext;
   }): Promise<
     ResponseType<{
       responsePath: string;
@@ -102,6 +110,7 @@ export class CortexEditRepository {
         newContent,
         logger,
         t,
+        streamContext,
       });
     }
 
@@ -198,6 +207,7 @@ export class CortexEditRepository {
         locale,
         logger,
         feature: CortexCreditFeature.EDIT,
+        streamContext,
       });
     }
 
@@ -237,6 +247,7 @@ export class CortexEditRepository {
     newContent,
     logger,
     t,
+    streamContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -249,6 +260,7 @@ export class CortexEditRepository {
     newContent?: string;
     logger: EndpointLogger;
     t: CortexEditT;
+    streamContext: ToolExecutionContext;
   }): Promise<
     ResponseType<{
       responsePath: string;
@@ -327,7 +339,7 @@ export class CortexEditRepository {
 
     // Write back via virtual mount
     const writeResult = await resolveVirtualWrite(
-      { userId, user, locale, logger },
+      { userId, user, locale, logger, streamContext },
       path,
       content,
       mountPrefix,
@@ -377,6 +389,9 @@ export class CortexEditRepository {
       logger,
       t,
       relayed: true,
+      // Relayed applier — no fixture chain crosses instances; an explicit
+      // thread-less context routes embeddings live.
+      streamContext: rootlessStreamContext(),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex edit", {

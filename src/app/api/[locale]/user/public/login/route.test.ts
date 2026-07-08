@@ -1,12 +1,12 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import loginEndpoints from "./definition";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { env } from "@/config/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import loginEndpoints from "./definition";
 
 const endpoint = loginEndpoints.POST;
 
@@ -25,6 +25,7 @@ describe("POST /user/public/login", () => {
 
   it("succeeds with correct credentials and returns token + leadId", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: env.VIBE_ADMIN_USER_EMAIL,
@@ -34,7 +35,10 @@ describe("POST /user/public/login", () => {
       user: publicUser(),
     });
 
-    expect(res.success, `Login failed: ${String(res.success === false && res.message)}`).toBe(true);
+    expect(
+      res.success,
+      `Login failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
     if (!res.success) return;
 
     expect(res.data.message).toBeTypeOf("string");
@@ -47,6 +51,7 @@ describe("POST /user/public/login", () => {
 
   it("rejects wrong password with UNAUTHORIZED", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: env.VIBE_ADMIN_USER_EMAIL,
@@ -58,11 +63,14 @@ describe("POST /user/public/login", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.UNAUTHORIZED.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.UNAUTHORIZED.errorCode,
+    );
   });
 
   it("rejects non-existent email with UNAUTHORIZED (not user-enumeration)", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: "nobody-at-all-does-not-exist@example.com",
@@ -75,11 +83,14 @@ describe("POST /user/public/login", () => {
     expect(res.success).toBe(false);
     if (res.success) return;
     // Must return UNAUTHORIZED (not NOT_FOUND) to prevent user enumeration
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.UNAUTHORIZED.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.UNAUTHORIZED.errorCode,
+    );
   });
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: "not-an-email",
@@ -91,11 +102,14 @@ describe("POST /user/public/login", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects empty password with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: env.VIBE_ADMIN_USER_EMAIL,
@@ -107,11 +121,14 @@ describe("POST /user/public/login", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rememberMe=false still returns a valid token", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: env.VIBE_ADMIN_USER_EMAIL,
@@ -129,6 +146,7 @@ describe("POST /user/public/login", () => {
 
   it("email is case-insensitive (uppercase email matches lowercase stored)", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint,
       data: {
         email: env.VIBE_ADMIN_USER_EMAIL.toUpperCase(),

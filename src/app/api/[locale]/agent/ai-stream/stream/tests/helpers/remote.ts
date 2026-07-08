@@ -19,7 +19,10 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { expect } from "vitest";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  type DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 
 /** Setup/teardown pair produced by the factories, plus getters for state resolved during setup. */
 export interface RemoteSuiteHooks {
@@ -44,6 +47,12 @@ export interface RemoteSetupOptions {
   createRemoteFolder?: boolean;
   /** Remote credit floor (default 20000). */
   credits?: number;
+  /**
+   * Connection loopLocation setting: 'caller' = loop-local topology (loop
+   * runs here, tools execute remotely). Stamped on the connection at connect;
+   * REMOTE/<hermes> threads created afterwards keep loop_instance_id NULL.
+   */
+  loopLocation?: "target" | "caller";
   /**
    * How to top up remote credits: "remote-endpoint" (default) goes through the
    * remote admin-add endpoint with a real admin token; "prod-db" writes packs
@@ -75,12 +84,15 @@ function makeRemoteSetup(
       // Idempotent: clean up any leftover connection from a previous failed
       // run, then establish the transport-appropriate connection E2E (login
       // on the remote, register this instance, sync capabilities).
+      const connectOptions = options.loopLocation
+        ? { loopLocation: options.loopLocation }
+        : undefined;
       if (transport === "direct-http") {
         await remoteSetup.disconnectFromHermes(testUser.id);
-        await remoteSetup.connectToHermes(testUser, url);
+        await remoteSetup.connectToHermes(testUser, url, connectOptions);
       } else {
         await remoteSetup.disconnectFromHermesLocalAi(testUser, url);
-        await remoteSetup.connectToHermesLocalAi(testUser, url);
+        await remoteSetup.connectToHermesLocalAi(testUser, url, connectOptions);
       }
 
       if (options.afterConnect) {
@@ -279,6 +291,7 @@ export async function getOrCreateRemoteFolderChain(params: {
   let parentId: string | null = null;
   for (const name of params.names) {
     const listResult = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: listDef.GET,
       urlPathParams: { rootFolderId: params.rootFolderId },
       user: params.user,
@@ -301,6 +314,7 @@ export async function getOrCreateRemoteFolderChain(params: {
     }
     const createResult: ResponseType<Record<string, WidgetData>> =
       await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: createDef.POST,
         data: { name, parentId: parentId ?? undefined },
         urlPathParams: { rootFolderId: params.rootFolderId },

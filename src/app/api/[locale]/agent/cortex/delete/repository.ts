@@ -18,6 +18,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
+import { rootlessStreamContext } from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import {
@@ -83,7 +84,14 @@ export class CortexDeleteRepository {
       try {
         const { resolveVirtualDelete } = await import("../mounts/resolver");
         const result = await resolveVirtualDelete(
-          { userId, user, locale, logger },
+          // Delete removes the node — no embedding call, so no fixture chain.
+          {
+            userId,
+            user,
+            locale,
+            logger,
+            streamContext: rootlessStreamContext(),
+          },
           path,
           mountPrefix,
         );

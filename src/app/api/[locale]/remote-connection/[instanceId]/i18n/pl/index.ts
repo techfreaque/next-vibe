@@ -145,6 +145,24 @@ export const translations: typeof enTranslations = {
       description:
         "Nadpisanie administratora: kieruj wszystkie strumienie AI przez to połączenie, pomijając koszt i reguły użytkowników. Tylko jedno naraz.",
     },
+    threadMirrorMode: {
+      label: "Kopiowanie wątków",
+      description:
+        "Czy wątki synchronizują się między tą instancją a połączoną. 'both' kopiuje w obu kierunkach; 'off' zostawia każdy wątek tam, gdzie powstał.",
+      options: {
+        both: "Kopiuj w obu kierunkach",
+        off: "Bez kopiowania",
+      },
+    },
+    loopLocation: {
+      label: "Lokalizacja pętli",
+      description:
+        "Gdzie działa pętla AI zdalnego wątku. 'target' uruchamia ją na połączonej instancji (domyślnie); 'caller' trzyma pętlę tutaj, a narzędzia dalej działają zdalnie.",
+      options: {
+        target: "Na połączonej instancji",
+        caller: "Na tej instancji",
+      },
+    },
     syncScope: {
       label: "Zakres synchronizacji",
       description:

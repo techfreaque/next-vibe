@@ -20,6 +20,7 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: {
@@ -30,8 +31,12 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects non-image file type (PDF) with VALIDATION_ERROR", async () => {
@@ -40,6 +45,7 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: {
@@ -50,14 +56,19 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects unauthenticated user with FORBIDDEN", async () => {
     const file = new File(["data"], "avatar.jpg", { type: "image/jpeg" });
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: { file },
@@ -70,8 +81,12 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.FORBIDDEN.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.FORBIDDEN.errorCode,
+    );
   });
 
   it("accepts valid JPEG file and returns response shape", async () => {
@@ -96,6 +111,7 @@ describe("POST /user/private/me/avatar", () => {
     const file = new File([jpegBytes], "avatar.jpg", { type: "image/jpeg" });
 
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: { file },
@@ -127,6 +143,7 @@ describe("DELETE /user/private/me/avatar", () => {
 
   it("rejects unauthenticated user with FORBIDDEN", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.DELETE,
       user: {
         isPublic: true,
@@ -136,18 +153,28 @@ describe("DELETE /user/private/me/avatar", () => {
     });
 
     expect(res.success).toBe(false);
-    if (res.success) {return;}
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.FORBIDDEN.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.FORBIDDEN.errorCode,
+    );
   });
 
   it("deletes avatar (or no-ops if no avatar) and returns a message", async () => {
     const res = await sendTestRequest({
+      streamContext: undefined,
       endpoint: avatarEndpoints.DELETE,
       user: adminUser,
     });
 
-    expect(res.success, `DELETE avatar failed: ${String(res.success === false && res.message)}`).toBe(true);
-    if (!res.success) {return;}
+    expect(
+      res.success,
+      `DELETE avatar failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+    if (!res.success) {
+      return;
+    }
     expect(res.data.success).toBe(true);
     expect(res.data.message).toBeTypeOf("string");
     expect(res.data.message.length).toBeGreaterThan(0);

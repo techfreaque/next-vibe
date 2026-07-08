@@ -12,7 +12,7 @@ import {
   CORTEX_WRITE_ALIAS,
 } from "@/app/api/[locale]/agent/cortex/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/web-search/constants";
+import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/web-search/constants";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

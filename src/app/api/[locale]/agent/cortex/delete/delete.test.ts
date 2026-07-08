@@ -95,6 +95,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // Create via the real WRITE endpoint.
       const write = await sendTestRequest({
+        streamContext: undefined,
         endpoint: writeEndpoint.POST,
         data: { path, content: "# single file\n\nbody", createParents: true },
         user,
@@ -108,6 +109,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // Delete via the real DELETE endpoint, non-recursive.
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path, recursive: false },
         user,
@@ -147,6 +149,7 @@ describe("Cortex DELETE — E2E", () => {
       // Write nested files (createParents synthesizes intermediate dirs).
       for (const filePath of files) {
         const write = await sendTestRequest({
+          streamContext: undefined,
           endpoint: writeEndpoint.POST,
           data: {
             path: filePath,
@@ -177,6 +180,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // Recursive delete of the whole subtree.
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path: treeRoot, recursive: true },
         user,
@@ -212,6 +216,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // Materialize a directory via the real MKDIR endpoint.
       const mk = await sendTestRequest({
+        streamContext: undefined,
         endpoint: mkdirEndpoint.POST,
         data: { path: dirPath, createParents: true },
         user,
@@ -219,6 +224,7 @@ describe("Cortex DELETE — E2E", () => {
       expect(mk.success, `mkdir failed: ${mk.message}`).toBe(true);
 
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path: dirPath, recursive: false },
         user,
@@ -241,6 +247,7 @@ describe("Cortex DELETE — E2E", () => {
     "returns NOT_FOUND when deleting a non-existent writable path",
     async () => {
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: {
           path: `${PREFIX}/does-not-exist-${Date.now()}.md`,
@@ -262,6 +269,7 @@ describe("Cortex DELETE — E2E", () => {
     "forbids deleting the /documents root (FORBIDDEN)",
     async () => {
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path: "/documents", recursive: true },
         user,
@@ -279,6 +287,7 @@ describe("Cortex DELETE — E2E", () => {
     "forbids deleting the /memories root (FORBIDDEN)",
     async () => {
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path: "/memories", recursive: true },
         user,
@@ -300,6 +309,7 @@ describe("Cortex DELETE — E2E", () => {
       const path = `${PREFIX}/observe.md`;
 
       const write = await sendTestRequest({
+        streamContext: undefined,
         endpoint: writeEndpoint.POST,
         data: { path, content: "# observe", createParents: true },
         user,
@@ -308,6 +318,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // Sanity: READ finds it before delete.
       const readBefore = await sendTestRequest({
+        streamContext: undefined,
         endpoint: readEndpoint.GET,
         data: { path },
         user,
@@ -318,6 +329,7 @@ describe("Cortex DELETE — E2E", () => {
       ).toBe(true);
 
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path, recursive: false },
         user,
@@ -330,6 +342,7 @@ describe("Cortex DELETE — E2E", () => {
 
       // But READ no longer resolves it — the deleted file is invisible.
       const readAfter = await sendTestRequest({
+        streamContext: undefined,
         endpoint: readEndpoint.GET,
         data: { path },
         user,
@@ -344,12 +357,14 @@ describe("Cortex DELETE — E2E", () => {
 
       // Re-writing the same path revives it (clears the tombstone).
       const rewrite = await sendTestRequest({
+        streamContext: undefined,
         endpoint: writeEndpoint.POST,
         data: { path, content: "# revived", createParents: true },
         user,
       });
       expect(rewrite.success, `rewrite failed: ${rewrite.message}`).toBe(true);
       const readRevived = await sendTestRequest({
+        streamContext: undefined,
         endpoint: readEndpoint.GET,
         data: { path },
         user,
@@ -371,12 +386,14 @@ describe("Cortex DELETE — E2E", () => {
       const siblingPath = `${dirPath}/sibling.md`;
 
       const write = await sendTestRequest({
+        streamContext: undefined,
         endpoint: writeEndpoint.POST,
         data: { path: childPath, content: "# child", createParents: true },
         user,
       });
       expect(write.success, `write failed: ${write.message}`).toBe(true);
       const writeSibling = await sendTestRequest({
+        streamContext: undefined,
         endpoint: writeEndpoint.POST,
         data: { path: siblingPath, content: "# sibling", createParents: true },
         user,
@@ -387,6 +404,7 @@ describe("Cortex DELETE — E2E", () => {
       ).toBe(true);
 
       const del = await sendTestRequest({
+        streamContext: undefined,
         endpoint: deleteEndpoint.DELETE,
         data: { path: childPath, recursive: false },
         user,
@@ -394,6 +412,7 @@ describe("Cortex DELETE — E2E", () => {
       expect(del.success, `delete failed: ${del.message}`).toBe(true);
 
       const list = await sendTestRequest({
+        streamContext: undefined,
         endpoint: listEndpoint.GET,
         data: { path: dirPath },
         user,

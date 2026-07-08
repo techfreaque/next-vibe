@@ -10,12 +10,12 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { fail, success } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { NewCronTask } from "next-vibe/tasks/cron/db";
+import type { CronTaskRow } from "next-vibe/tasks/cron/db";
 import {
   cronTaskExecutions,
   cronTasks,
@@ -166,11 +166,22 @@ export class TaskReportRepository {
 
   static async processReport(
     data: ReportRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
     abortSignal: AbortSignal,
   ): Promise<ResponseType<ReportResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
+
+    // AI-caller path: Claude Code / MCP calls complete-task with only taskId + response.
+    // Normalize to the standard report shape before processing.
+    if (!data.status && data.response) {
+      data = {
+        ...data,
+        status: CronTaskStatus.COMPLETED,
+        output: data.response,
+      };
+    }
 
     const [task] = await db
       .select()
@@ -207,6 +218,29 @@ export class TaskReportRepository {
         message: t("taskReport.post.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
+    }
+
+    // Ownership check for direct AI-caller path (no wakeUpContext on wire).
+    // Remote reports from other instances are trusted (validated by allowedRoles).
+    if (!data.wakeUpContext) {
+      const taskOwner = dbUserIdToOwner(task.userId);
+      if (taskOwner.type === "user" && taskOwner.userId !== user.id) {
+        return fail({
+          message: t("taskReport.post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+    }
+
+    // Idempotency: already completed → return success without re-firing revival.
+    if (
+      task.lastExecutionStatus === CronTaskStatus.COMPLETED &&
+      !data.wakeUpContext
+    ) {
+      logger.info("[complete] Task already completed - skipping duplicate", {
+        taskId: data.taskId,
+      });
+      return success({ processed: true });
     }
 
     const now = new Date();

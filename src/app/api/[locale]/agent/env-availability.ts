@@ -180,9 +180,10 @@ export function getEnvAvailability(): AgentEnvAvailability {
  * Server-side only (async, reads the executor's routing state).
  */
 export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
-  const { getInstanceInferenceState } =
-    await import("@/app/api/[locale]/system/execute-tool/routing");
-  const { hasSystem, forceSystem } = await getInstanceInferenceState();
+  const { ExecuteToolRouting } =
+    await import("@/app/api/[locale]/remote-connection/routing");
+  const { hasSystem, forceSystem } =
+    await ExecuteToolRouting.getInstanceInferenceState();
   return {
     ...agentEnvAvailability,
     unbottledSystem: hasSystem,

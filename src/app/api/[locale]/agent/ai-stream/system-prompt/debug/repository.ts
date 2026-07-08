@@ -17,7 +17,10 @@ import {
   buildSystemPrompt,
   createMetadataSystemMessage,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  type DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { loadRawEmbeddingScores } from "@/app/api/[locale]/agent/cortex/system-prompt";
 
@@ -48,6 +51,7 @@ export async function buildDebugSystemPrompt({
     const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
+          fixtureContext: undefined,
           skillId: skillId ?? null,
           user,
           logger,

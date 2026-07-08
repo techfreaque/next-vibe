@@ -27,7 +27,6 @@ import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import bridgeDefinition from "next-vibe/realtime/remote-event-bridge/definition";
@@ -44,6 +43,7 @@ import {
 } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 import type { SyncResponseOutput } from "@/app/api/[locale]/remote-connection/sync/definition";
+import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
 
 import { buildUserWsChannel } from "./channel";
@@ -502,9 +502,8 @@ class WsConnection {
    * enabled that domain. (Direct-http peers are gated at the sender instead.)
    */
   private async handleRemoteEvent(data: WsWireMessage["data"]): Promise<void> {
-    // The bridge transport event carries the relayed event in its responseData
-    // (the bridge endpoint's responseFields: originInstanceId, syncDomain,
-    // envelope) — read it there, like any endpoint event's payload.
+    // The bridge transport event carries the relayed event in its requestData.payload
+    // (the bridge endpoint's requestFields: payload) — read it there.
     const parsed = z
       .object({
         originInstanceId: z.string(),

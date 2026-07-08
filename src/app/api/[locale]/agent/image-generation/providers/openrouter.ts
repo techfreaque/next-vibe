@@ -30,8 +30,11 @@ export async function generateWithOpenRouter(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, logger, locale, inputMediaUrl } = params;
+  const { providerModel, prompt, logger, locale, inputMediaUrl, fetchImpl } =
+    params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENROUTER_API_KEY) {
@@ -47,8 +50,7 @@ export async function generateWithOpenRouter(params: {
   });
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const response = await fetch(
+    const response = await fetchImpl(
       "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",

@@ -4,7 +4,15 @@
  */
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
@@ -13,9 +21,9 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/constants";
 import {
   type ChatModelId,
-  type ChatModelOption,
   getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import {
   type AudioVisionModelId,
   type AudioVisionModelOption,
@@ -27,23 +35,27 @@ import {
   type VideoVisionModelId,
   type VideoVisionModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import {
-  getBestImageGenModel,
-  type ImageGenModelOption,
-  type ImageGenModelSelection,
-} from "@/app/api/[locale]/agent/image-generation/models";
+  type AgentEnvAvailability,
+  getInstanceAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import {
-  getBestMusicGenModel,
-  type MusicGenModelOption,
-  type MusicGenModelSelection,
-} from "@/app/api/[locale]/agent/music-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { SkillVariant } from "@/app/api/[locale]/agent/skills/config";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import type { ChatFavorite } from "@/app/api/[locale]/agent/skills/favorites/db";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
+import type {
+  ChatFavorite,
+  FavoriteConfig,
+} from "@/app/api/[locale]/agent/skills/favorites/db";
+import { buildFavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/repository";
+import {
+  resolveFavorite,
+  resolveSkillVariant,
+} from "@/app/api/[locale]/agent/skills/resolver";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import {
   getBestSttModel,
@@ -52,17 +64,11 @@ import {
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
-  getBestTtsModel,
   type TtsModelId,
-  type TtsModelOption,
   type VoiceModelSelection,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import {
-  getBestVideoGenModel,
-  type VideoGenModelOption,
-  type VideoGenModelSelection,
-} from "@/app/api/[locale]/agent/video-generation/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 
 /**
  * Fields read from an active skill variant for bridge model resolution.

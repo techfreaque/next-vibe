@@ -12,6 +12,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { expect } from "vitest";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 
 /** Timestamp of the most recent getBalance() call - bounds the charge audit window. */
@@ -31,34 +32,43 @@ export async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
   // Settle any in-flight fire-and-forget work (embeddings, vision-bridge) from a
   // prior step before reading the balance — their credit deductions are real but
   // land async; measuring before they settle would attribute a prior step's cost
-  // to the current one (cross-test bleed). Embeddings/vision are external fetches,
-  // so draining inflight fetches deterministically bounds the measurement window.
-  const { waitForInflightFetches } =
-    await import("../../../testing/fetch-cache");
-  // Let queued setTimeout(0) embeds kick off their fetch, then drain to settle.
+  // to the current one (cross-test bleed). There is no global fetch state to
+  // drain anymore, so settle on the OBSERVABLE instead: poll until the balance
+  // is stable across two consecutive reads (fixture replay settles within a
+  // tick; live recording within the poll window).
+  const creditsDef = (await import("@/app/api/[locale]/credits/definition"))
+    .default;
+  const readOnce = async (): Promise<number> => {
+    const res = await sendTestRequest({
+      endpoint: creditsDef.GET,
+      user,
+      fixtureContext: undefined,
+    });
+    if (!res.success) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`getBalance failed for user ${user.id}: ${res.message}`);
+    }
+    const raw = res.data?.["total"];
+    return typeof raw === "number" ? raw : Number(raw ?? 0);
+  };
   await new Promise<void>((resolve) => {
     setTimeout(resolve, 50);
   });
-  await waitForInflightFetches();
-  const creditsDef = (await import("@/app/api/[locale]/credits/definition"))
-    .default;
-  const result = await sendTestRequest({
-    endpoint: creditsDef.GET,
-    user,
-  });
-  if (!result.success) {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error(`getBalance failed for user ${user.id}: ${result.message}`);
+  let value = await readOnce();
+  const deadline = Date.now() + 3_000;
+  for (;;) {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 100);
+    });
+    const next = await readOnce();
+    if (next === value || Date.now() > deadline) {
+      value = next;
+      break;
+    }
+    value = next;
   }
   lastBalanceReadAt = new Date();
-  const total = result.data?.["total"];
-  if (typeof total !== "number") {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error(
-      `getBalance: unexpected response shape — total is ${String(total)}`,
-    );
-  }
-  return total;
+  return value;
 }
 
 /**
@@ -79,6 +89,7 @@ export async function pinBalance(
     await import("@/app/api/[locale]/credits/admin-add/definition")
   ).default;
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: adminAddDef.POST,
     data: { targetUserId: user.id, amount: Math.ceil(deficit) },
     user,

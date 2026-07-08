@@ -14,9 +14,10 @@ import { TaskReportRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, locale, streamContext }) =>
+    handler: ({ data, logger, locale, user, streamContext }) =>
       TaskReportRepository.processReport(
         data,
+        user,
         logger,
         locale,
         streamContext.abortSignal,

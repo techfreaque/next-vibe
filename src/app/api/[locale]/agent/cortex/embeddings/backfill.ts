@@ -9,6 +9,7 @@ import "server-only";
 import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
+import { makeHeadlessContext } from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import { computeEmbeddingHash, generateEmbedding } from "./service";
@@ -359,7 +360,12 @@ export async function backfillEmbeddings(force = false): Promise<{
         continue;
       }
 
-      const embedding = await generateEmbedding(textToEmbed);
+      // Backfill is a maintenance root (no stream) — explicit thread-less
+      // context routes embeddings live, never through a fixture.
+      const embedding = await generateEmbedding(
+        textToEmbed,
+        makeHeadlessContext(undefined, undefined),
+      );
 
       if (!embedding) {
         failed++;

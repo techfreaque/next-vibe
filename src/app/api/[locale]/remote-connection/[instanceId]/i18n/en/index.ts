@@ -153,6 +153,24 @@ export const translations = {
       description:
         "Admin override: route ALL AI streams through this connection, bypassing cost and per-user routing rules. One connection at a time.",
     },
+    threadMirrorMode: {
+      label: "Thread Mirroring",
+      description:
+        "Whether threads sync between this instance and the connected one. 'both' mirrors threads in both directions; 'off' keeps every thread where it was created.",
+      options: {
+        both: "Mirror both directions",
+        off: "No mirroring",
+      },
+    },
+    loopLocation: {
+      label: "Loop Location",
+      description:
+        "Where a remote thread's AI loop runs. 'target' runs it on the connected instance (default); 'caller' keeps the loop here while tools still execute remotely.",
+      options: {
+        target: "On the connected instance",
+        caller: "On this instance",
+      },
+    },
     // ── Sync scope ──────────────────────────────────────────────────────────
     syncScope: {
       label: "Sync Scope",

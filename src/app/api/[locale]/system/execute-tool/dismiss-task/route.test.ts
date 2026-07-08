@@ -18,6 +18,7 @@ describe("execute-tool/dismiss-task", () => {
 
   it("DT1: POST rejects missing callId", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.POST,
       // @ts-expect-error intentional — testing missing required field
       data: {},
@@ -30,6 +31,7 @@ describe("execute-tool/dismiss-task", () => {
 
   it("DT2: POST with unknown callId succeeds (idempotent)", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.POST,
       data: { callId: "non-existent-task-00000000" },
     });
@@ -48,6 +50,7 @@ describe("execute-tool/dismiss-task", () => {
 
   it("DT3: POST schema validates correctly for a well-formed request", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: endpoints.POST,
       data: { callId: "00000000-0000-0000-0000-000000000099" },
     });

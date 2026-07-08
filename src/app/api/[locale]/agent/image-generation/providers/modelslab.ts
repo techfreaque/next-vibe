@@ -36,6 +36,8 @@ export async function generateImageWithModelsLab(params: {
   signal?: AbortSignal;
   aspectRatio?: string;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
   const {
     providerModel,
@@ -45,6 +47,7 @@ export async function generateImageWithModelsLab(params: {
     signal,
     aspectRatio,
     inputMediaUrl,
+    fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -66,8 +69,7 @@ export async function generateImageWithModelsLab(params: {
       ? "https://modelslab.com/api/v6/images/img2img"
       : "https://modelslab.com/api/v6/images/text2img";
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    const submitResponse = await fetch(endpoint, {
+    const submitResponse = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -112,6 +114,7 @@ export async function generateImageWithModelsLab(params: {
         eta: result.eta,
       });
 
+      let lastResponse: Response = submitResponse;
       for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
         if (signal?.aborted) {
           return fail({
@@ -119,14 +122,14 @@ export async function generateImageWithModelsLab(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        await pollDelay(POLL_INTERVAL_MS);
+        await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const pollResponse = await fetch(fetchUrl, {
+        const pollResponse = await fetchImpl(fetchUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: agentEnv.MODELSLAB_API_KEY }),
         });
+        lastResponse = pollResponse;
 
         if (!pollResponse.ok) {
           logger.debug("[ModelsLab Image] Poll request failed, retrying", {

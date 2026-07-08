@@ -26,7 +26,7 @@ import { preWarmChannel } from "../../../../system/realtime/client";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";
-import { serializeError } from "../../repository/error-utils";
+import { serializeError } from "../../repository/errors/error-utils";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
 import { scopedTranslation } from "../i18n";

@@ -1,4 +1,3 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -38,6 +37,8 @@ export async function generateMusicWithFalAi(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
+  fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ audioUrl: string }>> {
   const {
     providerModel,
@@ -47,6 +48,7 @@ export async function generateMusicWithFalAi(params: {
     locale,
     signal,
     inputMediaUrl,
+    fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -64,7 +66,7 @@ export async function generateMusicWithFalAi(params: {
   });
 
   try {
-    const submitResponse = await fetch(
+    const submitResponse = await fetchImpl(
       `https://queue.fal.run/${providerModel}`,
       {
         method: "POST",
@@ -97,6 +99,7 @@ export async function generateMusicWithFalAi(params: {
     const requestId = queueResult.request_id;
     logger.debug("[Fal.ai Music] Request queued, polling", { requestId });
 
+    let lastResponse: Response = submitResponse;
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       if (signal?.aborted) {
         return fail({
@@ -104,15 +107,16 @@ export async function generateMusicWithFalAi(params: {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      await pollDelay(POLL_INTERVAL_MS);
+      await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
-      const statusResponse = await fetch(
+      const statusResponse = await fetchImpl(
         `https://queue.fal.run/${providerModel}/requests/${requestId}/status`,
         {
           // eslint-disable-next-line i18next/no-literal-string
           headers: { Authorization: `Key ${agentEnv.FAL_AI_API_KEY}` },
         },
       );
+      lastResponse = statusResponse;
       if (!statusResponse.ok) {
         continue;
       }
@@ -120,7 +124,7 @@ export async function generateMusicWithFalAi(params: {
       const statusData = (await statusResponse.json()) as FalAiStatusResponse;
 
       if (statusData.status === "COMPLETED") {
-        const resultResponse = await fetch(
+        const resultResponse = await fetchImpl(
           `https://queue.fal.run/${providerModel}/requests/${requestId}`,
           {
             // eslint-disable-next-line i18next/no-literal-string

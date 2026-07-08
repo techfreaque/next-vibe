@@ -1,6 +1,6 @@
 /**
  * Headless Test Runner
- * Thin wrapper around runHeadlessAiStream for integration tests.
+ * Thin wrapper around the ai-stream/stream POST endpoint for integration tests.
  * Provides sensible test defaults so individual tests stay concise.
  */
 
@@ -17,8 +17,12 @@ import type {
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
-import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/setup/setup";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import type {
   ChatMessage,
   MessageMetadata,
@@ -29,7 +33,6 @@ import {
 } from "@/app/api/[locale]/agent/chat/enum";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { env } from "@/config/env";
 
 import type { ChatModelId } from "../models";
@@ -62,6 +65,7 @@ export async function resolveUserAndToken(
   // sendTestRequest resolves the public caller (admin leadId) for us — no
   // fabricated lead row, no direct DB write.
   const loginResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: loginDef.POST,
     data: { email, password, rememberMe: false },
   });
@@ -97,6 +101,7 @@ export async function getOrCreateFolder(
     await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
   ).default;
   const listResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: listDef.GET,
     urlPathParams: { rootFolderId },
     user,
@@ -123,6 +128,7 @@ export async function getOrCreateFolder(
     await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
   ).default;
   const createResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: createDef.POST,
     data: { name, parentId: parentId ?? undefined },
     urlPathParams: { rootFolderId },
@@ -147,22 +153,26 @@ export async function getOrCreateFolder(
 export interface TestStreamParams {
   prompt: string;
   user: JwtPayloadType;
+  /**
+   * Fixture record/replay context for the case — travels the whole chain
+   * (streamContext → providers/media/remote dispatch) and anchors on the
+   * thread at creation. Explicit, never ambient.
+   */
+  fixtureContext: FixtureContext | undefined;
   threadId?: string;
   skill?: string;
   /**
-   * Root folder override. Defaults to DefaultFolderId.BACKGROUND.
-   * Loop location rides executionContext.loopLocation — placement never routes.
+   * Root folder override. Defaults to DefaultFolderId.PRIVATE — ALL test
+   * threads live at PRIVATE/tests/<case>/ unless a REMOTE-folder suite
+   * overrides explicitly.
+   * Loop location is a thread/connection property — placement never routes.
    */
   rootFolderId?: DefaultFolderId;
   /**
    * Subfolder UUID within the root folder.
    */
   subFolderId?: string;
-  /**
-   * Explicit loop location for the stream (a connection's instanceId).
-   * Placement never routes — this is the only way the loop moves.
-   */
-  loopInstanceId?: string;
+
   /**
    * Explicit parent message ID for retry/branch tests.
    * When set, the user message is created as a child of this message
@@ -360,12 +370,13 @@ function slimMessages(
 export async function fetchThreadMessages(
   threadId: string,
   user: JwtPayloadType,
-  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
+  rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
   const msgsDef = (
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: msgsDef.GET,
     data: { rootFolderId },
     urlPathParams: { threadId },
@@ -398,8 +409,9 @@ export async function fetchThreadStreamingState(
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: msgsDef.GET,
-    data: { rootFolderId: DefaultFolderId.BACKGROUND },
+    data: { rootFolderId: DefaultFolderId.PRIVATE },
     urlPathParams: { threadId },
     user,
   });
@@ -424,7 +436,7 @@ export async function waitForThreadIdle(
   threadId: string,
   user: JwtPayloadType,
   maxWaitMs = 90_000,
-  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
+  rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
   const pollIntervalMs = 500;
   const start = Date.now();
@@ -433,6 +445,7 @@ export async function waitForThreadIdle(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -467,7 +480,7 @@ export async function waitForThreadSettled(
   threadId: string,
   user: JwtPayloadType,
   maxWaitMs = 120_000,
-  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
+  rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
   const pollIntervalMs = 500;
   const start = Date.now();
@@ -476,6 +489,7 @@ export async function waitForThreadSettled(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -504,8 +518,9 @@ export async function fetchThreadTitle(
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
   ).default;
   const result = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: threadDef.GET,
-    data: { rootFolderId: DefaultFolderId.BACKGROUND },
+    data: { rootFolderId: DefaultFolderId.PRIVATE },
     urlPathParams: { threadId },
     user,
   });
@@ -535,6 +550,7 @@ export async function fetchFavoriteConfigAndModel(
     await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
   ).default;
   const getResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favByIdDef.GET,
     urlPathParams: { id: favoriteId },
     user,
@@ -642,7 +658,6 @@ export async function runTestStream(
     skill: skillParam,
     rootFolderId: rootFolderIdOverride,
     subFolderId,
-    loopLocation,
     explicitParentMessageId,
     attachments,
     audioInput,
@@ -651,9 +666,10 @@ export async function runTestStream(
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
     settleTimeoutMs,
+    streamContext,
   } = params;
 
-  const rootFolderId = rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
+  const rootFolderId = rootFolderIdOverride ?? DefaultFolderId.PRIVATE;
   const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
   const hasToolConfirmations =
     Array.isArray(toolConfirmations) && toolConfirmations.length > 0;
@@ -731,11 +747,11 @@ export async function runTestStream(
   const postResult = await sendTestRequest({
     endpoint: streamDef.POST,
     user,
+    streamContext,
     data: {
       operation,
       rootFolderId,
       subFolderId: subFolderId ?? null,
-      loopInstanceId: loopInstanceId ?? null,
       threadId: threadId ?? crypto.randomUUID(),
       userMessageId,
       parentMessageId: resolvedParentMessageId,

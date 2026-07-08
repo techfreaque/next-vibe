@@ -15,10 +15,12 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 
+import type { ToolExecutionContext } from "../chat/config";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -42,9 +44,7 @@ export class VideoGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: VideoGenerationT,
-    streamContext: {
-      threadId?: string;
-    },
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -53,13 +53,36 @@ export class VideoGenerationRepository {
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
-    const videoModel = getVideoGenModelById(data.model);
+    let videoModel = getVideoGenModelById(data.model);
 
     if (!videoModel) {
       return fail({
         message: t("post.errors.not_found.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
+    }
+
+    // Modality-aware resolution: image-to-video needs an image-capable model.
+    // The model usually comes from the favorite's videoGenModelSelection —
+    // chosen for text-to-video — and the model field is hidden from the AI
+    // (hiddenForPlatforms), so nobody upstream can correct a t2v default for
+    // an i2v request. Resolve to the cheapest image-capable model instead of
+    // letting the provider fail with a misleading init_image error.
+    if (data.inputMediaUrl && !videoModel.inputs.includes("image")) {
+      const { getVideoGenModelsByInputModality } = await import("./models");
+      const imageCapable = getVideoGenModelsByInputModality("image");
+      const substitute = imageCapable.toSorted(
+        (a, b) =>
+          (a.creditCostPerSecond ?? Infinity) -
+          (b.creditCostPerSecond ?? Infinity),
+      )[0];
+      if (substitute) {
+        logger.debug(
+          "[VideoGen] Resolved image-capable model for image-to-video request",
+          { requested: videoModel.id, resolved: substitute.id },
+        );
+        videoModel = substitute;
+      }
     }
 
     // If this model requires image input, validate it's provided
@@ -165,6 +188,10 @@ export class VideoGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
+    // One fixture-aware fetch per generation - carries the repeat counter for
+    // poll loops, so it must not be recreated per call.
+    const fetchImpl = createFixtureFetch(streamContext, logger);
+
     let generationResult: ResponseType<{
       videoUrl: string;
       creditCost?: number;
@@ -181,6 +208,7 @@ export class VideoGenerationRepository {
           inputImageUrl: data.inputMediaUrl,
           logger,
           locale,
+          fetchImpl,
         });
         break;
 
@@ -191,6 +219,7 @@ export class VideoGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
+          streamContext,
         });
         break;
 
@@ -220,17 +249,17 @@ export class VideoGenerationRepository {
     const finalCreditCost = generationResult.data.creditCost ?? creditCost;
 
     // Upload to our storage so the URL is persistent and access-controlled
-    if (streamContext.threadId) {
+    const scThreadId = streamContext.threadId;
+    if (scThreadId) {
       try {
         const storage = getStorageAdapter();
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        const arrayBuf = await fetch(videoUrl).then((r) => r.arrayBuffer());
+        const arrayBuf = await fetchImpl(videoUrl).then((r) => r.arrayBuffer());
         const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
         const ext = videoUrl.includes("webm") ? "webm" : "mp4";
         const uploadResult = await storage.uploadFile(videoBuffer, {
           filename: `generated-video-${Date.now()}.${ext}`,
           mimeType: `video/${ext}`,
-          threadId: streamContext.threadId,
+          threadId: scThreadId,
           userId: user.id,
         });
         videoUrl = uploadResult.url;
@@ -266,6 +295,36 @@ export class VideoGenerationRepository {
       creditCost: finalCreditCost,
       durationSeconds: finalDurationSeconds,
     });
+
+    const toolMessageId = streamContext.currentToolMessageId;
+    if (toolMessageId && !user.isPublic) {
+      const month = new Date().toISOString().slice(0, 7);
+      const slug = `${data.prompt
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60)}-${toolMessageId}`;
+      void Promise.all([
+        import("@/app/api/[locale]/agent/cortex/mounts/gens"),
+        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+      ])
+        .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
+          const path = `/gens/video/${month}/${slug}.md`;
+          return readGenPath(user.id, path)
+            .then(
+              (result) =>
+                result &&
+                syncVirtualNodeToEmbedding(
+                  user.id,
+                  path,
+                  result.content,
+                  streamContext,
+                ),
+            )
+            .catch(() => undefined);
+        })
+        .catch(() => undefined);
+    }
 
     return success({
       videoUrl,

@@ -40,7 +40,12 @@ const USE_NATIVE_TOOLS = false;
  *
  * @returns Provider object with chat() method
  */
-export function createUncensoredAI(logger: EndpointLogger): {
+export function createUncensoredAI(
+  logger: EndpointLogger,
+  // Explicit fetch — the fixture engine binds record/replay per execution
+  // chain (createFixtureFetch); plain live fetch otherwise. Never global.
+  fetchImpl: typeof globalThis.fetch,
+): {
   chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   const apiKey = agentEnv.UNCENSORED_AI_API_KEY;
@@ -120,8 +125,7 @@ export function createUncensoredAI(logger: EndpointLogger): {
     };
 
     // Make the actual request to uncensored AI API
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
-    const response = await fetch(input, modifiedInit);
+    const response = await fetchImpl(input, modifiedInit);
 
     if (!response.ok) {
       return response;

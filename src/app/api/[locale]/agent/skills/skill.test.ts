@@ -19,10 +19,6 @@
 
 import "server-only";
 
-// Install HTTP fetch interceptor before any other imports touch fetch
-import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import { and, eq, ilike } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -32,7 +28,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import type { FixtureContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -48,11 +44,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 
 import { customSkills } from "./db";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  SkillCategory,
-} from "./enum";
+import { ContentLevel, IntelligenceLevel, SkillCategory } from "./enum";
 import { SkillsRepository } from "./repository";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -238,12 +230,12 @@ describe("Skill Creator E2E", () => {
 
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     testSubFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "skill-creator",
       testsParentId,
     );
@@ -261,7 +253,7 @@ describe("Skill Creator E2E", () => {
   it(
     "SC1: Thea delegates to skill-creator via ai-run → tool-help → skill-create → favorite-create (no retries)",
     async () => {
-      setFetchCacheContext("skill-creator-sc1-create");
+      const fixtureCtx: FixtureContext = { name: "skill-creator-sc1-create" };
 
       /**
        * Prompt is sent to Thea (default skill). Thea should delegate to
@@ -290,6 +282,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         user: testUser,
         favoriteId: mainFavoriteId,
         subFolderId: testSubFolderId,
+        streamContext: fixtureCtx,
       });
 
       // eslint-disable-next-line no-console

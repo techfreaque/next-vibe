@@ -18,6 +18,7 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "../../chat/config";
 import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
@@ -39,6 +40,7 @@ export class CortexSearchRepository {
     logger,
     t,
     locale,
+    streamContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -48,6 +50,8 @@ export class CortexSearchRepository {
     logger: EndpointLogger;
     t: CortexSearchT;
     locale: CountryLanguage;
+    /** Fixture chain of the calling stream — the embedding call binds it. */
+    streamContext: ToolExecutionContext;
   }): Promise<ResponseType<CortexSearchResponseOutput>> {
     const path = normalizePath(rawPath);
 
@@ -75,6 +79,7 @@ export class CortexSearchRepository {
                 logger,
                 user,
                 locale,
+                streamContext,
               )
             : Promise.resolve([]),
           // Tasks virtual mount (not in cortexNodes)
@@ -202,6 +207,7 @@ async function runVectorSearch(
   logger: EndpointLogger,
   user: JwtPrivatePayloadType,
   locale: CountryLanguage,
+  streamContext: ToolExecutionContext,
 ): Promise<
   {
     path: string;
@@ -213,7 +219,7 @@ async function runVectorSearch(
 > {
   // Generate embedding for the query
   const { generateEmbedding } = await import("../embeddings/service");
-  const queryEmbedding = await generateEmbedding(query);
+  const queryEmbedding = await generateEmbedding(query, streamContext);
 
   if (!queryEmbedding) {
     logger.info("Vector search skipped - embedding generation failed");

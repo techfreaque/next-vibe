@@ -38,10 +38,6 @@
 
 import "server-only";
 
-// Install HTTP fetch interceptor before any other imports touch fetch
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -50,17 +46,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { env } from "@/config/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import { scopedTranslation } from "../../stream/i18n";
-import {
-  setFetchCacheContext,
-  waitForInflightFetches,
-} from "../../testing/fetch-cache";
+import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
   fetchThreadStreamingState,
@@ -236,13 +228,14 @@ async function fireInteractiveStream(
   threadId: string,
   userMessageId: string,
   subFolderId: string,
+  fixtureContext: FixtureContext,
 ): Promise<void> {
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
   const data: AiStreamPostRequestOutput = {
     operation: "send",
-    rootFolderId: DefaultFolderId.BACKGROUND,
+    rootFolderId: DefaultFolderId.PRIVATE,
     subFolderId,
     threadId,
     userMessageId,
@@ -291,13 +284,14 @@ async function enqueueSecondMessage(
   prompt: string,
   queuedMessageId: string,
   subFolderId: string,
+  fixtureContext: FixtureContext,
 ): Promise<void> {
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
   const data: AiStreamPostRequestOutput = {
     operation: "send",
-    rootFolderId: DefaultFolderId.BACKGROUND,
+    rootFolderId: DefaultFolderId.PRIVATE,
     subFolderId,
     threadId,
     userMessageId: queuedMessageId,
@@ -374,15 +368,15 @@ describe("Mid-Stream Queue - chain integrity", () => {
     }
     testUser = resolved;
 
-    // Create BACKGROUND/tests/mid-stream-queue subfolder for this suite.
+    // Create PRIVATE/tests/mid-stream-queue subfolder for this suite.
     const testsParentId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "tests",
     );
     midStreamQueueFolderId = await getOrCreateFolder(
       testUser,
-      DefaultFolderId.BACKGROUND,
+      DefaultFolderId.PRIVATE,
       "mid-stream-queue",
       testsParentId,
     );
@@ -394,7 +388,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
   fit(
     "MQ1: plain echo — queued message processed after stream ends, strict linear chain",
     async () => {
-      setFetchCacheContext("mq1-plain-echo");
+      const fixtureCtx: FixtureContext = { name: "mq1-plain-echo" };
 
       const thread1Id = crypto.randomUUID();
       const user1MsgId = crypto.randomUUID();
@@ -535,10 +529,6 @@ describe("Mid-Stream Queue - chain integrity", () => {
           ).toBeGreaterThanOrEqual(orderedChain[i - 1]!.createdAt.getTime());
         }
       }
-
-      // Wait for any fire-and-forget goroutines (e.g. syncThreadEmbedding) to
-      // complete so their fetch calls don't contaminate MQ2's counter namespace.
-      await waitForInflightFetches(5_000);
     },
     TEST_TIMEOUT,
   );
@@ -552,7 +542,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
   fit(
     "MQ2: tool call — queued message injected mid-stream via prepareStep, strict linear chain",
     async () => {
-      setFetchCacheContext("mq2-tool-call");
+      const fixtureCtx: FixtureContext = { name: "mq2-tool-call" };
 
       const thread2Id = crypto.randomUUID();
       const user1MsgId = crypto.randomUUID();
@@ -719,9 +709,6 @@ describe("Mid-Stream Queue - chain integrity", () => {
           ).toBeGreaterThanOrEqual(orderedChain[i - 1]!.createdAt.getTime());
         }
       }
-
-      // Drain any lingering fire-and-forget goroutines before test ends
-      await waitForInflightFetches(5_000);
     },
     TEST_TIMEOUT,
   );

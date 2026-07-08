@@ -12,6 +12,8 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
+
 /**
  * Resolve (or create) a quality-tester__visual favorite — GEMINI_3_5_FLASH,
  * image-capable. Used by cases that need the CHAT model to SEE images
@@ -29,6 +31,7 @@ export async function ensureVisualFavorite(
     ),
   ]);
   const favsResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -44,6 +47,7 @@ export async function ensureVisualFavorite(
     return String(existing["id"]);
   }
   const created = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favoriteCreateDef,
     data: { skillId: "quality-tester__visual" },
     user,
@@ -74,6 +78,7 @@ export async function createQualityTesterFavorite(
     ),
   ]);
   const favsResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -85,6 +90,7 @@ export async function createQualityTesterFavorite(
   for (const fav of favsList) {
     if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
       await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: favoriteDeleteDef,
         urlPathParams: { id: String(fav["id"]) },
         user,
@@ -92,6 +98,7 @@ export async function createQualityTesterFavorite(
     }
   }
   const createResult = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favoriteCreateDef,
     data: { skillId: "quality-tester__budget" },
     user,

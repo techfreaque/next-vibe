@@ -384,18 +384,40 @@ export interface ToolExecutionContext {
     output: Record<string, WidgetData> | null;
     errorMessage: string | null;
   }) => Promise<void>;
+  /**
+   * Fixture record/replay context for THIS execution chain (tests only).
+   * Set at the entry point (test runner param; receiver adopts it from the
+   * tool-execute-request payload; streams adopt the THREAD's anchored context
+   * from chat_threads.stream_context.fixtureContext) and passed down explicitly —
+   * never global: AI providers and media-gen tools bind it via
+   * createFixtureFetch. Its presence IS the switch; no env flag, no mode.
+   */
+  fixtureContext: FixtureContext | undefined;
+  /**
+   * Ownership token for this stream execution's 'streaming' claim on
+   * chat_threads.streamingRunId. Generated once per stream in setup; finalize
+   * and error paths pass it to clearStreamingState so only the CURRENT owner
+   * can clear the state — a stale finalizer (late revival, superseded turn)
+   * no-ops instead of clobbering the successor stream's claim. Undefined for
+   * headless tool contexts that never claim streaming.
+   */
+  streamRunId?: string;
 }
 
 /**
  * Create a minimal headless ToolExecutionContext for non-streaming callers:
  * MCP, CLI, cron tasks, tests, vibe-sense. All stream-specific fields are
- * undefined; only rootFolderId, subAgentDepth, and abortSignal are set.
+ * undefined; only rootFolderId, subAgentDepth, threadId, and abortSignal are
+ * set. The threadId doubles as the fixture scope (tests): AI/media calls made
+ * with this context record/replay under that thread's fixture prefix.
  */
 export function makeHeadlessContext(
-  signal?: AbortSignal,
+  // Both explicit at every call site — headless contexts must consciously
+  // decide their abort wiring and thread/fixture scope, never inherit by omission.
+  signal: AbortSignal,
+  fixtureContext: FixtureContext | undefined,
 ): ToolExecutionContext {
   return {
-    fixtureContext,
     rootFolderId: DefaultFolderId.BACKGROUND,
     threadId: undefined,
     aiMessageId: undefined,

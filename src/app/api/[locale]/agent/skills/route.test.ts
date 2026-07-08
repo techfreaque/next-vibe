@@ -128,6 +128,7 @@ describe("Skills CRUD Integration", () => {
   // ── S1: Create a skill ──────────────────────────────────────────────────
   fit("S1: create skill returns slug-based id", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillCreateEndpoint.POST,
       data: {
         name: TEST_SKILL_NAME,
@@ -176,6 +177,7 @@ describe("Skills CRUD Integration", () => {
   // ── S2: GET by slug ─────────────────────────────────────────────────────
   fit("S2: get skill by slug returns full detail", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.GET,
       urlPathParams: { id: createdSkillSlug },
       user: adminUser,
@@ -204,6 +206,7 @@ describe("Skills CRUD Integration", () => {
   // ── S3: List skills - created skill appears ─────────────────────────────
   fit("S3: list skills includes created skill with slug IDs", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillsListEndpoint.GET,
       data: { query: TEST_SKILL_NAME, sourceFilter: SkillSourceFilter.MY },
       user: adminUser,
@@ -230,6 +233,7 @@ describe("Skills CRUD Integration", () => {
   // ── S4: Update skill ────────────────────────────────────────────────────
   fit("S4: update skill changes fields", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.PATCH,
       urlPathParams: { id: createdSkillSlug },
       data: {
@@ -263,6 +267,7 @@ describe("Skills CRUD Integration", () => {
   // ── S5: GET after update ────────────────────────────────────────────────
   fit("S5: get after update reflects changes", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.GET,
       urlPathParams: { id: createdSkillSlug },
       user: adminUser,
@@ -283,6 +288,7 @@ describe("Skills CRUD Integration", () => {
   // ── S6: Publish skill ──────────────────────────────────────────────────
   fit("S6: publish skill transitions to PUBLISHED", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillPublishEndpoint.PATCH,
       urlPathParams: { id: createdSkillSlug },
       data: {
@@ -307,6 +313,7 @@ describe("Skills CRUD Integration", () => {
   fit("S7: published skill appears in all-skills listing", async () => {
     const updatedName = `${TEST_SKILL_NAME} Updated`;
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillsListEndpoint.GET,
       data: { sourceFilter: SkillSourceFilter.ALL, query: updatedName },
       user: adminUser,
@@ -334,6 +341,7 @@ describe("Skills CRUD Integration", () => {
   // ── S8: Vote on skill ─────────────────────────────────────────────────
   fit("S8: upvote on published skill records vote", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
       data: { direction: SkillVoteDirection.UP },
@@ -353,6 +361,7 @@ describe("Skills CRUD Integration", () => {
   // ── S9: Same direction again (toggle off) ─────────────────────────────
   fit("S9: re-upvote toggles off", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
       data: { direction: SkillVoteDirection.UP },
@@ -372,6 +381,7 @@ describe("Skills CRUD Integration", () => {
   // ── S9b: Downvote, then flip to upvote ────────────────────────────────
   fit("S9b: downvote then flip to upvote", async () => {
     const down = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
       data: { direction: SkillVoteDirection.DOWN },
@@ -386,6 +396,7 @@ describe("Skills CRUD Integration", () => {
     expect(down.data.voteCount).toBeLessThanOrEqual(0);
 
     const flip = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillVoteEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
       data: { direction: SkillVoteDirection.UP },
@@ -401,6 +412,7 @@ describe("Skills CRUD Integration", () => {
   // ── S10: Report skill ─────────────────────────────────────────────────
   fit("S10: report skill creates report", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillReportEndpoint.POST,
       urlPathParams: { id: createdSkillSlug },
       data: { reason: "Test report from route suite" },
@@ -419,6 +431,7 @@ describe("Skills CRUD Integration", () => {
   // ── S11: Moderation list ──────────────────────────────────────────────
   fit("S11: moderation list shows reported skill", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillModerationEndpoint.GET,
       data: { minReports: 1 },
       user: adminUser,
@@ -469,6 +482,7 @@ describe("Skills CRUD Integration", () => {
     }
 
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillModerationEndpoint.PATCH,
       data: { id: skillDbId, action: "clear" as const },
       user: adminUser,
@@ -488,6 +502,7 @@ describe("Skills CRUD Integration", () => {
   // ── S13: Unpublish skill ──────────────────────────────────────────────
   fit("S13: unpublish skill transitions to DRAFT", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillPublishEndpoint.PATCH,
       urlPathParams: { id: createdSkillSlug },
       data: {
@@ -524,6 +539,7 @@ describe("Skills CRUD Integration", () => {
     }
 
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.GET,
       urlPathParams: { id: createdSkillUuid },
       user: adminUser,
@@ -549,6 +565,7 @@ describe("Skills CRUD Integration", () => {
   // ── S15: Delete skill ─────────────────────────────────────────────────
   fit("S15: delete skill succeeds", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.DELETE,
       urlPathParams: { id: createdSkillSlug },
       user: adminUser,
@@ -566,6 +583,7 @@ describe("Skills CRUD Integration", () => {
   // ── S16: GET deleted skill → not found ─────────────────────────────────
   fit("S16: get deleted skill returns not found", async () => {
     const response = await sendTestRequest({
+      streamContext: undefined,
       endpoint: skillSingleEndpoint.GET,
       urlPathParams: { id: createdSkillSlug },
       user: adminUser,

@@ -87,7 +87,7 @@ export class RemoteEventBridgeRepository {
    * Fire-and-forget: errors are logged, not thrown.
    */
   static async pushRemoteEvent(params: RemoteEventRelayPayload): Promise<void> {
-    const { userId, logger, syncDomain, envelope } = params;
+    const { userId, logger, syncDomain, envelope, targetInstanceId } = params;
 
     // Domain relay gate: the OWNING domain decides whether an event tagged
     // with its syncDomain may leave the instance (e.g. threads gate incognito
@@ -125,6 +125,7 @@ export class RemoteEventBridgeRepository {
       originInstanceId,
       syncDomain,
       envelope,
+      ...(targetInstanceId ? { targetInstanceId } : {}),
     };
 
     let connections: Array<{
@@ -192,6 +193,12 @@ export class RemoteEventBridgeRepository {
     //
     //  • direct-http: POST to the peer's bridge via the canonical remote-call.
     for (const conn of connections) {
+      // Point-to-point events (tool dispatch) relay over exactly ONE
+      // connection — every other peer of this account must never see them
+      // (double execution / cross-peer leakage otherwise).
+      if (targetInstanceId && conn.instanceId !== targetInstanceId) {
+        continue;
+      }
       // Per-connection domain gate. A domain-less event (e.g. cache
       // invalidation) always relays; a domained event relays only where the
       // peer enabled it.
@@ -205,10 +212,14 @@ export class RemoteEventBridgeRepository {
         // OUR local userId — and subscribes to the bridge endpoint's
         // user-scoped channel for exactly that identity, which is where the
         // emitter delivers a scope:"user" event.
+        //
+        // Point-to-point events additionally carry the connection's leadId as
+        // the frame ADDRESS: the hub channel is shared by every peer connector
+        // of this account, so non-addressed connectors must drop the frame.
         await RemoteEventBridgeRepository.emitBridgeEventToPeer(
           userId,
           conn.tokenLeadId,
-          wire,
+          targetInstanceId ? { ...wire, targetLeadId: conn.tokenLeadId } : wire,
           logger,
         );
         void RemoteConnectionRepository.recordTransportUse(
@@ -297,6 +308,7 @@ export class RemoteEventBridgeRepository {
         originInstanceId: wire.originInstanceId,
         syncDomain: wire.syncDomain,
         envelope: wire.envelope,
+        targetLeadId: wire.targetLeadId,
       },
     });
   }

@@ -6,6 +6,7 @@ import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -22,8 +23,10 @@ export async function generateImageWithUnbottled(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   featureLabel: string;
+  /** Caller's tool-execution context — the fixture chain rides it into the provider dispatch. */
+  streamContext: ToolExecutionContext;
 }): Promise<ResponseType<{ imageUrl: string; creditCost: number }>> {
-  const { input, user, logger, locale, featureLabel } = params;
+  const { input, user, logger, locale, featureLabel, streamContext } = params;
 
   const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
     definition: definitions.POST,
@@ -31,6 +34,7 @@ export async function generateImageWithUnbottled(params: {
     user,
     locale,
     logger,
+    streamContext,
   });
 
   if (!remoteResult.success) {

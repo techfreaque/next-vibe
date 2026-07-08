@@ -1579,6 +1579,8 @@ export const translations = {
         seedream45:
           "Seedream 4.5 - ByteDance's latest image generation model with comprehensive improvements in editing consistency, portrait refinement, and multi-image composition",
         sdxl: "Stable Diffusion XL - Stability AI's high-quality open image generation model",
+        cassetteMusic:
+          "CassetteAI Music - fast text-to-music generation on Fal.ai with clip lengths up to three minutes",
         musicgenStereo:
           "MusicGen Stereo - Meta's open-source stereo music generation model via Replicate",
         stableAudio:

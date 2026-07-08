@@ -116,6 +116,8 @@ export const translations: typeof enTranslations = {
       creditsFailed: "Nie udało się odjąć kredytów za generowanie wideo",
       inputMediaRequired:
         "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",
+      imageInputUnsupported:
+        "Model wideo {{model}} odrzucił obraz wejściowy - prawdopodobnie nie obsługuje image-to-video. Wywołaj generate_video BEZ parametru model (model domyślny animuje obrazy) albo pomiń obraz.",
     },
     success: {
       title: "Wideo wygenerowane",

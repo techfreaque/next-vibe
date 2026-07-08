@@ -35,9 +35,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
@@ -45,10 +42,13 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { env } from "@/config/env";
 
-import { setFetchCacheContext } from "../../testing/fetch-cache";
+import { seedCaseThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -189,7 +189,7 @@ if (!_resolvedRemoteUrl) {
       it(
         "A1: AI calls hermes cortex-list via execute-tool and gets a result back",
         async () => {
-          setFetchCacheContext(`${CACHE_PREFIX}a1`);
+          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}a1` };
 
           const { result, messages } = await runTestStream({
             prompt:
@@ -201,6 +201,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
+            fixtureContext: fixtureCtx,
           });
 
           expect(
@@ -260,7 +261,7 @@ if (!_resolvedRemoteUrl) {
       it(
         "A2: AI writes to hermes cortex via execute-tool and reads it back",
         async () => {
-          setFetchCacheContext(`${CACHE_PREFIX}a2`);
+          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}a2` };
           expect(
             sharedThreadId,
             "A1 must create thread before A2",
@@ -285,6 +286,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
+            fixtureContext: fixtureCtx,
           });
 
           expect(
@@ -345,7 +347,7 @@ if (!_resolvedRemoteUrl) {
       it(
         "B1: AI loop runs on hermes via folder routing, reads hermes cortex natively",
         async () => {
-          setFetchCacheContext(`${CACHE_PREFIX}b1`);
+          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}b1` };
 
           // Stream into REMOTE/hermes/tests/cortex-remote.
           // REMOTE-folder routing: folder ancestry resolves to hermes connection deterministically.
@@ -361,6 +363,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.REMOTE,
             subFolderId: remoteHermesFolderId,
             threadId: sharedThreadId,
+            fixtureContext: fixtureCtx,
           });
 
           expect(
@@ -411,7 +414,6 @@ if (!_resolvedRemoteUrl) {
       it(
         "B2: Thread created in REMOTE folder is stored in local DB (caller keeps its copy)",
         async () => {
-          setFetchCacheContext(`${CACHE_PREFIX}b2`);
           expect(
             sharedThreadId,
             "B1 must create thread before B2",

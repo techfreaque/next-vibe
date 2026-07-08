@@ -125,6 +125,7 @@ async function run<TDef extends CreateApiEndpointAny>(
     endpoint: definition,
     data: input as CreateApiEndpointAny["types"]["RequestOutput"],
     user,
+    streamContext: undefined,
   });
   if (!result.success) {
     return {

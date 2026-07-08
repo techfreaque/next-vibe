@@ -17,14 +17,14 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { ExecuteToolRouting } from "next-vibe/execute-tool/repository/routing";
-import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { ExecuteToolRouting } from "../routing";
+import { RemoteTransport } from "../transport";
 import type {
   RemoteConnectionByIdDeleteResponseOutput,
   RemoteConnectionByIdGetResponseOutput,
@@ -123,6 +123,8 @@ export class RemoteConnectionInstanceRepository {
       syncScope,
       reconnectNow,
       transportMode,
+      threadMirrorMode,
+      loopLocation,
     } = data;
 
     const isAdmin = user.roles?.includes(UserPermissionRole.ADMIN) === true;
@@ -200,6 +202,12 @@ export class RemoteConnectionInstanceRepository {
     }
     if (transportMode !== undefined) {
       patch.transportMode = transportMode;
+    }
+    if (threadMirrorMode !== undefined) {
+      patch.threadMirrorMode = threadMirrorMode;
+    }
+    if (loopLocation !== undefined) {
+      patch.loopLocation = loopLocation;
     }
 
     // Apply to the (potentially renamed) instanceId
@@ -351,11 +359,22 @@ export class RemoteConnectionInstanceRepository {
       instanceId,
     });
 
-    // Hot-close the WS connection immediately
+    // Hot-close both sides of the WS connection immediately:
+    // - outbound connector (local → remote outbound WS, if any)
+    // - inbound connector socket (remote → local inbound WS, if any)
     void import("next-vibe/realtime/connector")
       .then(({ closeConnection }) => closeConnection(instanceId))
       .catch((err: Error) => {
         logger.warn("[DISCONNECT] Failed to close WS connector", {
+          error: err.message,
+        });
+      });
+    void import("@/app/api/[locale]/system/realtime/local-broadcast")
+      .then(({ closeLocalConnectorSocket }) =>
+        closeLocalConnectorSocket(instanceId),
+      )
+      .catch((err: Error) => {
+        logger.warn("[DISCONNECT] Failed to close inbound connector socket", {
           error: err.message,
         });
       });

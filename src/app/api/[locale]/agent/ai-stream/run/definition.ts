@@ -19,6 +19,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { Platform } from "next-vibe/core/definition/platform";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {

@@ -21,8 +21,11 @@ import type {
 import type { CheckVibeDepsT } from "./i18n";
 import {
   domainOf,
+  importsOnlyRunInProcess,
   isCategoryImporter,
   isGeneratedImporter,
+  isInSystem,
+  isRouteExecuteEntrypoint,
   isSelf,
   isUiPageImporter,
   placementOf,
@@ -1288,6 +1291,7 @@ function withUsage(note: string, importers: ReadonlyArray<string>): string {
  */
 function buildNeedsMove(
   graph: Graph,
+  sources: ReadonlyMap<string, string>,
   scope: string,
   ignorePrefixes: ReadonlyArray<string>,
   perCategory: number,
@@ -1318,6 +1322,16 @@ function buildNeedsMove(
       .filter((i) => !isSelf(i) && !isGeneratedImporter(i))
       .toSorted();
     const verdict = placementOf(key, importers);
+    // system/ constants files that export *_ALIAS names are intentionally shared
+    // alias constants — not a promote smell. Outside system/ these still flag.
+    if (
+      verdict.kind === "promote" &&
+      isInSystem(key) &&
+      /\bconstants\b/.test(key.slice(key.lastIndexOf("/") + 1)) &&
+      /_ALIAS\b/.test(sources.get(key) ?? "")
+    ) {
+      continue;
+    }
     if (verdict.kind === "in-place" || verdict.kind === "unused") {
       continue;
     }
@@ -1689,8 +1703,14 @@ function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
     ) {
       continue;
     }
+    const isSkill = key.slice(key.lastIndexOf("/") + 1) === "skill.ts";
     for (const dep of node.imports) {
       if (dep.startsWith(scopePrefix)) {
+        // skill.ts files importing constants.ts files are picking up _ALIAS
+        // string constants (tool names for pinnedTools) — by design, not coupling.
+        if (isSkill && /\/constants\.ts$/.test(dep)) {
+          continue;
+        }
         const set = outsiderImportCount.get(key) ?? new Set<string>();
         set.add(dep);
         outsiderImportCount.set(key, set);
@@ -1831,7 +1851,7 @@ function buildReport(
   ignorePrefixes: ReadonlyArray<string>,
   perSection: number,
 ): PackageGroup[] {
-  const moves = buildNeedsMove(graph, scope, ignorePrefixes, 10_000);
+  const moves = buildNeedsMove(graph, sources, scope, ignorePrefixes, 10_000);
   const colocate = moves.filter((e) => e.moveKind === "reorganize");
   const promote = moves.filter((e) => e.moveKind === "relocate");
 
@@ -2058,6 +2078,7 @@ export class VibeDepsRepository {
         // Category-balanced: top `limit` of EACH category (colocate, promote).
         const entries = buildNeedsMove(
           graph,
+          sources ?? new Map(),
           moveScope,
           ignorePrefixes,
           effectiveLimit,

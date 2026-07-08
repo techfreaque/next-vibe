@@ -41,12 +41,9 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
-import { installWsFixture } from "../../testing/ws-fixture";
-installWsFixture();
-
+// WS fixture record/replay — patches globalThis.WebSocket, must install
+// before any module opens a socket. HTTP fixtures need no install anymore
+// (explicit FixtureContext on each call), but WS interception is still global.
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import {
   closeConnection,
@@ -56,16 +53,16 @@ import {
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { env } from "@/config/env";
 
-import {
-  addLocalhostPort,
-  clearLocalhostPorts,
-  setFetchCacheContext,
-  setFetchCacheStrictMode,
-} from "../../testing/fetch-cache";
+import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -90,6 +87,16 @@ const _remoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 const HERMES_PORT = 3002;
 
+/**
+ * Stream context for the UNBOTTLED setup/teardown block — connection PATCH /
+ * cleanup DELETE traffic, no AI. Thread-less root: localhost is never
+ * intercepted and these calls have no fixture run to anchor.
+ */
+const unbottledSetupFixture: FixtureContext = {
+  name: "unbottled-setup",
+  interceptLocalhostPorts: [HERMES_PORT],
+};
+
 // ── Suite A: WS-Provider ──────────────────────────────────────────────────────
 
 // Shared direct-http connect/credit/teardown block; the ws-provider flags are
@@ -100,6 +107,7 @@ const wsProviderFlagsPatch = async (
   const connByIdDef =
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
   await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: connByIdDef.default.PATCH,
     data: { isInferenceProvider: true, forceSystemProvider: true },
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
@@ -121,10 +129,12 @@ const wsProviderReverseWsHooks = makeReverseWsSetup(_remoteUrl, {
 
 async function cleanupHermesConnections(
   testUser: JwtPrivatePayloadType,
+  fixtureContext: FixtureContext | undefined,
 ): Promise<void> {
   const connListDef =
     await import("@/app/api/[locale]/remote-connection/list/definition");
   const listResult = await sendTestRequest({
+    streamContext,
     endpoint: connListDef.default.GET,
     data: {},
     user: testUser,
@@ -150,16 +160,18 @@ async function cleanupHermesConnections(
       endpoint: connByIdDef.default.DELETE,
       urlPathParams: { instanceId: row.instanceId },
       user: testUser,
+      streamContext,
     });
   }
 }
 
 async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
-  addLocalhostPort(HERMES_PORT);
-  setFetchCacheContext("unbottled-setup");
-
-  await cleanupHermesConnections(testUser);
+  // WS store no longer syncs off the HTTP fixture context — set it explicitly.
+  await cleanupHermesConnections(testUser, unbottledSetupFixture);
   reloadWsProviderConnector();
+  // Connection setup is control-plane E2E against the LIVE hermes — the old
+  // global-patch interception of these login/register calls was an artifact,
+  // not a feature: only AI/media provider calls belong in fixtures.
   await connectToHermes(testUser, LOCAL_DEV_URL);
 
   const connListDefSetup =
@@ -168,6 +180,7 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
     endpoint: connListDefSetup.default.GET,
     data: {},
     user: testUser,
+    fixtureContext: unbottledSetupFixture,
   });
 
   const connRow = connListResult.success
@@ -190,15 +203,14 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
     },
     urlPathParams: { instanceId: connRow.instanceId },
     user: testUser,
+    fixtureContext: unbottledSetupFixture,
   });
 }
 
 async function teardownUnbottled(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
-  await cleanupHermesConnections(testUser);
-  clearLocalhostPorts();
-  setFetchCacheStrictMode(false);
+  await cleanupHermesConnections(testUser, unbottledSetupFixture);
 }
 
 // ── Suite C: Reverse-WS (NAT simulation) ─────────────────────────────────────
@@ -275,6 +287,7 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
 
   while (Date.now() < deadline) {
     const threadResult = await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: threadByIdDef.default.GET,
       data: { rootFolderId: DefaultFolderId.REMOTE },
       urlPathParams: { threadId },
@@ -358,23 +371,28 @@ if (_remoteUrl && _isFixtureMode) {
 
       const testsParentId = await getOrCreateFolder(
         testUser,
-        DefaultFolderId.BACKGROUND,
+        DefaultFolderId.PRIVATE,
         "tests",
       );
       wp3Wp6FolderId = await getOrCreateFolder(
         testUser,
-        DefaultFolderId.BACKGROUND,
+        DefaultFolderId.PRIVATE,
         "ws-provider",
         testsParentId,
       );
 
-      setFetchCacheContext("ws-provider-wp3-wp6-");
+      // No localhost interception here: the ws-provider relay must hit the
+      // live hermes instance (suite prerequisite) — only the local chain
+      // records/replays under this context.
+      const wp3Wp6Fixture: FixtureContext = { name: "ws-provider-wp3-wp6-" };
+      // WS store no longer syncs off the HTTP fixture context — set it explicitly.
       const streamResult = await runTestStream({
         prompt:
           "Call the tool-help tool with query='tool-help' and then reply with EXACTLY: WP_ROUNDTRIP_COMPLETE. Nothing else.",
         user: testUser,
-        rootFolderId: DefaultFolderId.BACKGROUND,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: wp3Wp6FolderId,
+        fixtureContext: wp3Wp6Fixture,
       });
 
       expect(
@@ -404,8 +422,9 @@ if (_remoteUrl && _isFixtureMode) {
       const threadDef =
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
       const threadResult = await sendTestRequest({
+        fixtureContext: undefined,
         endpoint: threadDef.default.GET,
-        data: { rootFolderId: DefaultFolderId.REMOTE },
+        data: { rootFolderId: DefaultFolderId.PRIVATE },
         urlPathParams: { threadId },
         user: testUser,
       });
@@ -463,6 +482,9 @@ if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream — UNBOTTLED Remote Mode (${_remoteUrl}, AI on hermes)`,
     cachePrefix: "unbottled-",
+    // The "provider" is the localhost hermes server — its port counts as
+    // external so the relay's provider calls record/replay per case.
+    fixtureInterceptLocalhostPorts: [HERMES_PORT],
     // Tools and system prompt ALWAYS come from the client (options on the
     // ai-stream) — the provider runs the loop but must identify the CALLER.
     assertSystemPromptFromLocal: true,

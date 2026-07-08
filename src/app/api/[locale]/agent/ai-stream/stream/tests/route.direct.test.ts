@@ -14,9 +14,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import {
   failSuitePrerequisites,
   HERMES_INSTANCE_ID,

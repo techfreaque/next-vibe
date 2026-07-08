@@ -24,13 +24,13 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { RemoteTransport } from "next-vibe/execute-tool/repository/transport";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { SyncScope } from "../db";
 import { instanceIdentities, remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import { RemoteTransport } from "../transport";
 
 /**
  * Reverse entries default to serving every sync domain. The passive side has

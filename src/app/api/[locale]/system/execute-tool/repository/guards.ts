@@ -10,7 +10,6 @@ import { getPreferredName } from "next-vibe/core/core-utils/path";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
 
@@ -19,18 +18,15 @@ import type {
   ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { FOLDER_DENIED_TOOL_IDS } from "@/app/api/[locale]/agent/chat/config";
+import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import { isUuid } from "@/app/api/[locale]/agent/chat/slugify";
-import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
-import { MUSIC_GEN_ALIAS } from "@/app/api/[locale]/agent/music-generation/constants";
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
 import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
 } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { VIDEO_GEN_ALIAS } from "@/app/api/[locale]/agent/video-generation/constants";
 
-import { AWAIT_TASK_ALIAS } from "../await-task/constants";
 import { CallbackMode } from "../constants";
 import type {
   RouteExecuteRequestOutput,
@@ -172,7 +168,7 @@ export class ExecuteToolGuards {
    * Cascade (first non-null availableTools wins):
    *   1. Favorite's availableTools
    *   2. Skill's availableTools (resolved from favorite.skillId, then fallback skillId param)
-   *   3. null (all tools allowed)
+   *   3. User's role-default pinned tool IDs
    *
    * Denied tools accumulate from all levels (union); folder-level hard blocks
    * (FOLDER_DENIED_TOOL_IDS) are applied last.

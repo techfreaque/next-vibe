@@ -19,14 +19,12 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import favoritesCreateDefinitions from "@/app/api/[locale]/agent/skills/favorites/create/definition";
 import favoritesDefinitions from "@/app/api/[locale]/agent/skills/favorites/definition";
@@ -63,6 +61,7 @@ async function setupDirectConnection(
   // Ensure the test favorite exists on hermes — hermes's AI loop resolves favorites
   // from its own DB (not atlas's). Only create if none exists yet.
   const hermesListResp = await sendTestRequest({
+    fixtureContext: undefined,
     endpoint: favoritesDefinitions.GET,
     data: {},
     user: testUser,
@@ -74,6 +73,7 @@ async function setupDirectConnection(
   const alreadyHas = hermesFavs?.some((f) => f.skillId === "quality-tester");
   if (!alreadyHas) {
     await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: favoritesCreateDefinitions.POST,
       data: { skillId: "quality-tester" },
       user: testUser,
@@ -91,6 +91,7 @@ async function teardownDirectConnection(
   // Disable forceSystemProvider on hermes before disconnecting (best-effort)
   try {
     await sendTestRequest({
+      fixtureContext: undefined,
       endpoint: remoteConnectionByIdDefinitions.PATCH,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       data: { forceSystemProvider: false },

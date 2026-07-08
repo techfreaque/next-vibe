@@ -16,6 +16,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tooling/builder/i18n";
 import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";

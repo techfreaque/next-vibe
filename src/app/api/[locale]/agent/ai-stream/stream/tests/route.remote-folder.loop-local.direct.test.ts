@@ -9,9 +9,6 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../testing/fetch-cache";
-installFetchCache();
-
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import {
@@ -26,7 +23,11 @@ import { describeStreamSuite } from "./route-base.test";
 const _remoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
-const hooks = makeDirectSetup(_remoteUrl, { createRemoteFolder: true });
+const hooks = makeDirectSetup(_remoteUrl, {
+  createRemoteFolder: true,
+  // Loop-local topology: the CONNECTION setting keeps the loop here.
+  loopLocation: "caller",
+});
 
 if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({

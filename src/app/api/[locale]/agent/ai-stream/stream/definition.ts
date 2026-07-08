@@ -13,6 +13,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   customWidgetObject,
@@ -27,12 +28,7 @@ import { z } from "zod";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import {
-  TtsModelId,
-  TtsModelIdOptions,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
@@ -414,6 +410,9 @@ const { POST } = createEndpoint({
         optional: true,
         usage: { request: "data" },
         children: {
+          // Only the ON/OFF flag. The VOICE itself resolves from the active
+          // favorite/skill (→ DEFAULT_TTS_VOICE_ID) in stream setup — the client
+          // never sends a voice, it's already part of the favorite.
           enabled: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,

@@ -131,13 +131,17 @@ describe("Catalog Product Ownership Auth", () => {
     "CP1: personal product owner can update it successfully",
     async () => {
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Updated Personal Product" } },
         urlPathParams: { productId: personalProductId },
         user: adminUser,
       });
 
-      expect(result.success, `Update failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `Update failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.id).toBe(personalProductId);
         expect(result.data.result.name).toBe("Updated Personal Product");
@@ -155,6 +159,7 @@ describe("Catalog Product Ownership Auth", () => {
         id: "00000000-0000-0000-0000-000000000011",
       };
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Hacked" } },
         urlPathParams: { productId: personalProductId },
@@ -176,6 +181,7 @@ describe("Catalog Product Ownership Auth", () => {
     "CP3: empty fields object returns VALIDATION_ERROR",
     async () => {
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: {} },
         urlPathParams: { productId: personalProductId },
@@ -199,13 +205,17 @@ describe("Catalog Product Ownership Auth", () => {
     async () => {
       // Admin has ADMIN role in the company (set in beforeAll)
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Updated Company Product" } },
         urlPathParams: { productId: companyProductId },
         user: adminUser,
       });
 
-      expect(result.success, `Update failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
+      expect(
+        result.success,
+        `Update failed: ${result.success ? "" : JSON.stringify(result)}`,
+      ).toBe(true);
       if (result.success) {
         expect(result.data.result.id).toBe(companyProductId);
       }
@@ -230,6 +240,7 @@ describe("Catalog Product Ownership Auth", () => {
         );
 
       const result = await sendTestRequest({
+        streamContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Should Fail" } },
         urlPathParams: { productId: companyProductId },

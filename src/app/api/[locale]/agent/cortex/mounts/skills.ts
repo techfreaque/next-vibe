@@ -423,7 +423,12 @@ export async function writeSkillPath(
   void (async (): Promise<void> => {
     const { syncVirtualNodeToEmbedding } =
       await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
-    await syncVirtualNodeToEmbedding(ctx.userId, path, content);
+    await syncVirtualNodeToEmbedding(
+      ctx.userId,
+      path,
+      content,
+      ctx.streamContext,
+    );
   })().catch(() => {
     // Best-effort embedding sync
   });
@@ -559,7 +564,12 @@ export async function moveSkillPath(
     await removeVirtualNode(ctx.userId, fromPath);
     const readResult = await readSkillPath(ctx.userId, toPath);
     if (readResult) {
-      await syncVirtualNodeToEmbedding(ctx.userId, toPath, readResult.content);
+      await syncVirtualNodeToEmbedding(
+        ctx.userId,
+        toPath,
+        readResult.content,
+        ctx.streamContext,
+      );
     }
   })().catch(() => {
     // Best-effort embedding sync

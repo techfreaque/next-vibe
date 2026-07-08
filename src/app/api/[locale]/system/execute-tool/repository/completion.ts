@@ -15,7 +15,7 @@
 
 import "server-only";
 
-import { and, eq, gt, ne } from "drizzle-orm";
+import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -24,8 +24,10 @@ import type {
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { cronTasks } from "next-vibe/tasks/cron/db";
+import { cronTasks, dbUserIdToOwner } from "next-vibe/tasks/cron/db";
 import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
+import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
+import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
 import {
   CronTaskPriority,
   CronTaskStatus,
@@ -34,8 +36,6 @@ import {
 } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { RESUME_STREAM_ALIAS } from "@/app/api/[locale]/agent/ai-stream/resume-stream/constants";
-import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
@@ -45,9 +45,14 @@ import {
 } from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import {
+  endpoints as revivalEndpoints,
+  REVIVAL_ALIAS as RESUME_STREAM_ALIAS,
+} from "@/app/api/[locale]/system/execute-tool/revival/definition";
+import { scopedTranslation as revivalScopedTranslation } from "@/app/api/[locale]/system/execute-tool/revival/i18n";
 
 import { CallbackMode, type CallbackModeValue } from "../constants";
-import type { PendingCallRevival, WakeUpConfirmRaceResult } from "./types";
+import type { WakeUpConfirmRaceResult } from "./types";
 
 export class TaskCompletion {
   static async handle(params: {
@@ -285,6 +290,7 @@ export class TaskCompletion {
             threadId,
             logger,
             ownerUser,
+            undefined,
           );
           createMessagesEmitter(logger, ownerUser, {
             threadId,
@@ -429,7 +435,7 @@ export class TaskCompletion {
             // Await so callers that await TaskCompletion.handle (e.g. pulse) get a
             // fully resolved revival.
             const { ResumeStreamRepository } =
-              await import("@/app/api/[locale]/agent/ai-stream/resume-stream/repository");
+              await import("@/app/api/[locale]/agent/ai-stream/repository/resume");
             await ResumeStreamRepository.resume(
               resumeInput,
               ownerUser,
@@ -671,8 +677,7 @@ export class TaskCompletion {
       },
     });
 
-    // Backfill wakeUpToolMessageId on the task row so TaskCompletion.handle
-    // can find the right tool message when the goroutine finishes.
+    // Backfill wakeUpToolMessageId into the parked resume-stream task's taskInput jsonb.
     if (pendingTaskId) {
       try {
         await db
@@ -687,6 +692,7 @@ export class TaskCompletion {
           "[wakeup-confirm] Failed to backfill wakeUpToolMessageId (non-fatal)",
           {
             pendingTaskId,
+            parkedId,
             toolMessageId,
             error:
               updateErr instanceof Error
@@ -761,8 +767,25 @@ export class TaskCompletion {
 
   /**
    * Resolve the chat model ID from the current stream context's
-   * favorite/skill cascade. The ONE model-cascade resolution shared by the
+   * favorite/skill cascade — the model-only fast path shared by the
    * execute-tool orchestrator and await-task.
+   *
+   * INTENTIONALLY NOT delegated to the canonical `resolveModelSkill`. The two
+   * differ in ways that would change the resolved model, so merging is not
+   * behavior-preserving:
+   *   - Favorite/skill cascade: this uses resolveSkillFavoriteContext (a single
+   *     combined lookup) and cascades favorite.modelSelection →
+   *     skill.modelSelection ALWAYS trying BOTH the streamContext favorite AND
+   *     its skillId. resolveModelSkill instead, when a favoriteId is present,
+   *     resolves the model from the favorite (with the favorite's OWN skill
+   *     variant as fallback) and never consults the separately-supplied skillId.
+   *   - Availability: this uses getEnvAvailability() (static env); resolveModelSkill
+   *     uses getInstanceAvailability() (augmented with live remote-inference
+   *     state). Same env can resolve to a different best model.
+   *   - Shape: this returns model-only (the sole field every caller reads) with
+   *     no locale/logger/t threading; resolveModelSkill returns the full
+   *     model+skill+favoriteConfig triple and needs locale/logger/t.
+   * Keeping this separate preserves the per-tool-call model-resolution behavior.
    */
   static async resolveStreamModelId(
     streamContext: ToolExecutionContext,

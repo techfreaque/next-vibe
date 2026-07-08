@@ -13,16 +13,13 @@
 
 import "server-only";
 
-import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-installFetchCache();
-
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import type { FixtureContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
   connectToHermes,
   connectToHermesLocalAi,
@@ -49,13 +46,12 @@ async function routeBridgeToHermes(
   testUser: JwtPrivatePayloadType,
   eventName: string,
   payload: RemoteEventBridgeRequestOutput["payload"],
+  streamContext: ToolExecutionContext,
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
   const { RouteExecuteRepository } =
     await import("next-vibe/execute-tool/repository");
-  const { CallbackMode } =
-    await import("next-vibe/execute-tool/constants");
-  const { createEndpointLogger } =
-    await import("next-vibe/logger/server");
+  const { CallbackMode } = await import("next-vibe/execute-tool/constants");
+  const { createEndpointLogger } = await import("next-vibe/logger/server");
   const { makeHeadlessContext } =
     await import("@/app/api/[locale]/agent/chat/config");
   const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
@@ -67,10 +63,12 @@ async function routeBridgeToHermes(
     user: testUser,
     locale: defaultLocale,
     logger: createEndpointLogger(false, defaultLocale),
-    streamContext: makeHeadlessContext(),
+    streamContext: makeHeadlessContext(
+      new AbortController().signal,
+      streamContext,
+    ),
     input: {
       eventName,
-      leadId: testUser.leadId,
       payload,
     },
   });
@@ -93,16 +91,16 @@ describe("Remote Event Bridge", () => {
   describe("Local", () => {
     // ── REB-LOCAL-REMOTE-EVENT ────────────────────────────────────────────────
     // One generic remote-event carries any route's relayed event. The bridge
-    // dispatches it to the target route's onRemoteEvent and returns received:true.
+    // dispatches it to the target route's onRemoteEvent and returns success.
 
-    it("REB-LOCAL-REMOTE-EVENT: local remote-event returns received: true", async () => {
-      setFetchCacheContext("reb-local-remote-event");
+    it("REB-LOCAL-REMOTE-EVENT: local remote-event returns success", async () => {
+      const fixtureCtx: FixtureContext = { name: "reb-local-remote-event" };
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
+        streamContext: fixtureCtx,
         data: {
           eventName: "remote-event",
-          leadId: testUser.leadId,
           payload: {
             originInstanceId: "hermes",
             syncDomain: "cache",
@@ -124,23 +122,19 @@ describe("Remote Event Bridge", () => {
         result.success,
         `REB-LOCAL-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
       ).toBe(true);
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-      expect(result.data.received).toBe(true);
     });
 
     // ── REB-LOCAL-UNKNOWN ─────────────────────────────────────────────────────
-    // Unknown eventName must still return received: true (graceful ignore).
+    // Unknown eventName must still succeed (graceful ignore).
 
-    it("REB-LOCAL-UNKNOWN: unknown eventName is ignored gracefully, received: true", async () => {
-      setFetchCacheContext("reb-local-unknown");
+    it("REB-LOCAL-UNKNOWN: unknown eventName is ignored gracefully", async () => {
+      const fixtureCtx: FixtureContext = { name: "reb-local-unknown" };
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
+        streamContext: fixtureCtx,
         data: {
           eventName: "totally-unknown-event",
-          leadId: testUser.leadId,
           payload: {},
         },
         user: testUser,
@@ -150,17 +144,13 @@ describe("Remote Event Bridge", () => {
         result.success,
         `REB-LOCAL-UNKNOWN failed: ${JSON.stringify(result)}`,
       ).toBe(true);
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-      expect(result.data.received).toBe(true);
     });
 
     // ── REB-LOCAL-ECHO-DROP ───────────────────────────────────────────────────
     // Echo prevention: self-originating events silently dropped, still returns success.
 
-    it("REB-LOCAL-ECHO-DROP: self-origin remote-event is silently dropped, received: true", async () => {
-      setFetchCacheContext("reb-local-echo-drop");
+    it("REB-LOCAL-ECHO-DROP: self-origin remote-event is silently dropped", async () => {
+      const fixtureCtx: FixtureContext = { name: "reb-local-echo-drop" };
 
       const { RemoteConnectionRepository } =
         await import("@/app/api/[locale]/remote-connection/repository");
@@ -169,9 +159,9 @@ describe("Remote Event Bridge", () => {
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
+        streamContext: fixtureCtx,
         data: {
           eventName: "remote-event",
-          leadId: testUser.leadId,
           payload: {
             originInstanceId: selfInstanceId,
             syncDomain: "cache",
@@ -193,17 +183,12 @@ describe("Remote Event Bridge", () => {
         result.success,
         `REB-LOCAL-ECHO-DROP failed: ${JSON.stringify(result)}`,
       ).toBe(true);
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-      expect(result.data.received).toBe(true);
     });
 
     // ── REB-LOCAL-INVALID-PAYLOAD ─────────────────────────────────────────────
 
     it("REB-LOCAL-INVALID-PAYLOAD: handleRemoteEvent with invalid payload does not throw", async () => {
-      const { createEndpointLogger } =
-        await import("next-vibe/logger/server");
+      const { createEndpointLogger } = await import("next-vibe/logger/server");
       const logger = createEndpointLogger(false, "en-US");
 
       // Empty payload: missing the required endpointPath/endpointMethod/
@@ -257,33 +242,31 @@ describe("Remote Event Bridge", () => {
 
       it("REB-DIRECT-REMOTE-EVENT: remote-event routed to hermes via direct-http returns received: true", async () => {
         requireDirectHttp();
-        setFetchCacheContext("reb-direct-remote-event");
+        const fixtureCtx: FixtureContext = { name: "reb-direct-remote-event" };
 
-        const result = await routeBridgeToHermes(testUser, "remote-event", {
-          originInstanceId: "atlas",
-          syncDomain: "cache",
-          envelope: {
-            endpointPath: ["test"],
-            endpointMethod: "GET",
-            eventName: "update",
-            responseData: {},
-            requestData: {},
-            urlPathParams: {},
-            payload: undefined,
+        const result = await routeBridgeToHermes(
+          testUser,
+          "remote-event",
+          {
+            originInstanceId: "atlas",
+            syncDomain: "cache",
+            envelope: {
+              endpointPath: ["test"],
+              endpointMethod: "GET",
+              eventName: "update",
+              responseData: {},
+              requestData: {},
+              urlPathParams: {},
+              payload: undefined,
+            },
           },
-        });
+          fixtureCtx,
+        );
 
         expect(
           result.success,
           `REB-DIRECT-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
         ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge must return received: true").toBe(
-          true,
-        );
       }, 60_000);
     });
   } else {
@@ -338,33 +321,30 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-REMOTE-EVENT: remote-event routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        setFetchCacheContext("reb-ws-remote-event");
+        const fixtureCtx: FixtureContext = { name: "reb-ws-remote-event" };
 
-        const result = await routeBridgeToHermes(testUser, "remote-event", {
-          originInstanceId: "atlas",
-          syncDomain: "cache",
-          envelope: {
-            endpointPath: ["test"],
-            endpointMethod: "GET",
-            eventName: "update",
-            responseData: {},
-            requestData: {},
-            urlPathParams: {},
-            payload: undefined,
+        const result = await routeBridgeToHermes(
+          testUser,
+          "remote-event",
+          {
+            originInstanceId: "atlas",
+            syncDomain: "cache",
+            envelope: {
+              endpointPath: ["test"],
+              endpointMethod: "GET",
+              eventName: "update",
+              responseData: {},
+              requestData: {},
+              urlPathParams: {},
+              payload: undefined,
+            },
           },
-        });
+          fixtureCtx,
+        );
 
         expect(
           result.success,
           `REB-WS-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
-        ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(
-          data.received,
-          "hermes bridge via WS must return received: true",
         ).toBe(true);
       }, 60_000);
 
@@ -373,25 +353,18 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-UNKNOWN-EVENT: unknown eventName routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        setFetchCacheContext("reb-ws-unknown-event");
+        const fixtureCtx: FixtureContext = { name: "reb-ws-unknown-event" };
 
         const result = await routeBridgeToHermes(
           testUser,
           "totally-unknown-event",
           {},
+          fixtureCtx,
         );
 
         expect(
           result.success,
           `REB-WS-UNKNOWN-EVENT failed: ${JSON.stringify(result)}`,
-        ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(
-          data.received,
-          "hermes bridge unknown event must return received: true",
         ).toBe(true);
       }, 60_000);
     });

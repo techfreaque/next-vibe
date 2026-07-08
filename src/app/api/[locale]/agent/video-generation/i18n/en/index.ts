@@ -115,6 +115,8 @@ export const translations = {
       creditsFailed: "Failed to deduct credits for video generation",
       inputMediaRequired:
         "This model requires an input image URL. Paste an image link to animate it.",
+      imageInputUnsupported:
+        "The video model {{model}} rejected the input image - it likely does not support image-to-video. Retry generate_video WITHOUT the model parameter (the default model animates images), or drop the image.",
     },
     success: {
       title: "Video Generated",

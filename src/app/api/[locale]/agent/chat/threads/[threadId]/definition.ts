@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
 import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 import {

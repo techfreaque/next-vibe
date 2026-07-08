@@ -34,6 +34,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR1: POST register rejects empty instanceId", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: definitions.POST,
       data: { instanceId: "", localUrl: "http://localhost:3002" },
     });
@@ -45,6 +46,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR2: POST register rejects missing localUrl", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: definitions.POST,
       // @ts-expect-error intentional — testing missing required field
       data: { instanceId: "hermes" },
@@ -57,6 +59,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR3: POST register rejects invalid URL for localUrl", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: definitions.POST,
       data: { instanceId: "hermes", localUrl: "not-a-url" },
     });
@@ -68,6 +71,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR4: POST register is admin-only", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: definitions.POST,
       data: {
         instanceId: "hermes",
@@ -83,6 +87,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CRU1: PATCH update returns not-found for unknown instanceId", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: updateDefinitions.PATCH,
       data: {
         instanceId: "does-not-exist-xyz",
@@ -104,6 +109,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CRU2: PATCH update is admin-only", async () => {
     const result = await sendTestRequest({
+      streamContext: undefined,
       endpoint: updateDefinitions.PATCH,
       data: {
         instanceId: "hermes",
