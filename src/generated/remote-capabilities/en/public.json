@@ -3245,7 +3245,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Preview",
                 "schema": {
@@ -5153,7 +5153,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Preview",
                 "schema": {
@@ -6278,7 +6278,7 @@
           },
           "schemaType": "primitive"
         },
-        "preview": {
+        "description": {
           "type": "text",
           "label": "Preview",
           "schema": {
@@ -8059,7 +8059,7 @@
           },
           "schemaType": "primitive"
         },
-        "preview": {
+        "description": {
           "type": "text",
           "label": "Preview",
           "schema": {
@@ -10892,6 +10892,71 @@
                 },
                 "schemaType": "primitive"
               },
+              "embedding": {
+                "type": "text",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "embeddingHash": {
+                "type": "text",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "createdAt": {
                 "type": "text",
                 "schema": {
@@ -12963,6 +13028,73 @@
                 },
                 "schemaType": "primitive"
               },
+              "embedding": {
+                "type": "text",
+                "content": "Search Vector",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "embeddingHash": {
+                "type": "text",
+                "content": "Search Vector",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "createdAt": {
                 "type": "text",
                 "content": "Created At",
@@ -14300,7 +14432,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Preview",
                 "schema": {
@@ -15090,7 +15222,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_rename_PATCH",
+    "toolName": "rename-thread",
     "title": "Rename Thread",
     "titleShort": "Rename Thread",
     "description": "Update the title and preview of a chat thread",
@@ -15419,6 +15551,7 @@
     "instanceId": "local",
     "category": "ai",
     "tags": ["Threads"],
+    "aliases": ["rename-thread"],
     "credits": 0
   },
   {

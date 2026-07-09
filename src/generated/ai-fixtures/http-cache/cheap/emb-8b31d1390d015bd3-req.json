@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:b6243d92 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:42]\n\nAssistant: Result has a `favorites` array with 2 entries, each containing `name`, `id`, `description`, `modelId`, `skillId`, and other expected fields. Nothing off.\n\n**STEP_OK**\n\nSystem: [Context: ID:cc403bda | Posted:Jul 9, 01:42]\n\nUser: [T5 detach-dispatch] Call the cortex-write tool with path='/memories/cb-await-task-test' and content='await-task-test-payload' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have a responsePath (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [81%]\n│   │   T7_APPROVE_OK\n│   ├── t2-cheap-test [77%]\n│   │   T2_CHEAP_OK\n│   ├── cb-await-task-test [77%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [75%]\n│   │   wait-inline-test-payload\n│   ├── t8-parallel-test [74%]\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-repeat-test [73%]\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-stress-test [72%]\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-test [72%]\n\n\nSystem: [Context: ID:1956db07 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:42]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"path\":\"/memories/cb-await-task-test\",\"content\":\"await-task-test-payload\"},\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-bg-call-7144c6e2d9434787b7705e64\",\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\"",
+    "encoding_format": "float"
+  }
+}

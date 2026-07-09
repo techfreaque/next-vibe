@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:0aae4561 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:48]\n\nAssistant: **cron-stats** ran successfully. Key stats:\n\n| Metric | Value |\n|--------|-------|\n| `totalTasks` | **17** (numeric ✓) |\n| `activeTasks` | 9 |\n| `totalExecutions` | 39 |\n| `successRate` | 100% |\n| `failedExecutions` | 0 |\n| `systemStatus` | healthy |\n\nTop performing: `system_dataflow_cleanup_POST` (32 execs, avg 92ms) and `db-health` (7 execs, avg 14ms), both 100% success rate.\n\n**STEP_OK**\n\nSystem: [Context: ID:152ccfc7 | Posted:Jul 9, 02:48]\n\nUser: [T11c inventory-stock] Call the inventory-stock tool to list the inventory stock levels. Check that the result has a stockLevels array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:74c11588 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:48]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"inventory-stock\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"stockLevels\":[{\"id\":\"a38ed0ea-5a10-4dd0-b99d-ff7f6467425e\",\"warehouseId\":\"4b27e45b-32b4-4c91-a544-c04fbaa4f106\",\"productId\":\"af15a7d3-aa77-4d05-9e6e-62ff5748dd68\",\"prod",
+    "encoding_format": "float"
+  }
+}

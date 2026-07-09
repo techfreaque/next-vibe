@@ -5,14 +5,11 @@ import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import type {
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 import { chatSettings } from "./db";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// ─── Fragment ──────────────────────────────────────────────────────────────────
 
 export interface CodingAgentSettingData {
   /** null = default (claude-code) */

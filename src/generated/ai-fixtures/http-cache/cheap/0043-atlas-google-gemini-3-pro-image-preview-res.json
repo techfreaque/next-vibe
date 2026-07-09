@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a181e4510e298f2e-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 20:38:22 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783543099-db21CTYYfj7gnfu5NjpK"
+  },
+  "body": {
+    "id": "gen-1783543099-db21CTYYfj7gnfu5NjpK",
+    "object": "chat.completion",
+    "created": 1783543099,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The complete image is a graphic representation of the national flag of Japan. It consists of a large white rectangular background with a distinct, solid red circle centered perfectly within it. The red circle is uniform in color, a vibrant and saturated hue, and its edges are crisp and smooth. The white field is equally solid and bright, offering a high contrast to the central red disc. There are no other markings, text, symbols, or textures present; the image is a clean, minimalist design. The red circle occupies a significant portion of the frame, dominating the center of the white rectangle.",
+          "refusal": null,
+          "reasoning": "**Analyzing Flag Composition**\n\nI'm focusing on the Japanese flag. I've established the subject and composition: the flag is centered and fills the frame. My next step is to detail the elements that comprise it. I'm working to describe it in sufficient detail.\n\n\n**Defining Flag Elements**\n\nI've specified the components. I've broken it down to the main subject, composition, and key elements. I've documented the color scheme, spatial layout and the style. There are no additional elements, like text or symbols.\n\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Flag Composition**\n\nI'm focusing on the Japanese flag. I've established the subject and composition: the flag is centered and fills the frame. My next step is to detail the elements that comprise it. I'm working to describe it in sufficient detail.\n\n\n**Defining Flag Elements**\n\nI've specified the components. I've broken it down to the main subject, composition, and key elements. I've documented the color scheme, spatial layout and the style. There are no additional elements, like text or symbols.\n\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "EsEGCr4GARFNMg+NWU+BFdgfRMfdgMkEC3LziC4P5GSn3DdVjPnI0MXuAJumvEGAnf+gqJzlRxsOsnwUKHHG7ehGWqi8v2FunZ7hDHF95incw0aFkiKEKs7drEhlzLacFlj6Q2mzM9l5px1t96eMf9Gi6fl8dlEShePWne8UXKeNxdRk5pO5RJ6twIV1M894i27tXo2NKvkFzsXgxPALZg7PqoYfIa8OhstZfRHo4kLLHqufvBpErMxJiwOAarQM5ZCdJ/QvbFPsVD36PRLCZCphEeQx3p6sJ14zPG2JYFvEv0HW3JKr8Yc4CLlcPpcNQQr6NuyOmFMaRXW0mD3l7X3VsS6yMxuEbjYGfnSBmiGIstRiekAVzT3g24IceD+lvN4/YveSG5ELulEF1aq0NpDzpoRoN7gxFEVg2U7E0FcQaxuwAWDGNbqblELrcMlpCGxtuToHBG3WovOMqoac/M40dSR7pjurfgNGaLrWFgbgmM5aisyviJNfKDyizWpMP/UWzusSVKO+h/275J8J4BtF4DQ2MGMD8uCKgrad71xeGFqlazfuJOTLMTKuquyXm671rcROTekPTfZrTU6WOOcWTPKMqhessyEgJf7MHQgRUEPqzC+WQWxgzWivpqVTwWqBzpomPODWY4pvuiiBWj9o1/90/1pmAqkILCVizoKLKiRjX+HstB1uIdqLNQQSkK62rPXikQDK5NwGAd2Rp0TgdwpaO097u2w0SxsFClon+DST5T63vBNBr14PqoCLL+oNmojkRjrZ1Rx+qAvm2HOtUT3tONvMdfIyuctAMYc7n2tTXIO5Bp1rf9QNSnU8tjQb0Ozhed0VZJbhNacwypPBJFtCXA8HbuMweS9B4Pd09X5fu90cUIij5EWZeGUs3imX+YW+H6y/uyKi46MqnDYOR4CdT47b4yMp0Y3TNdSu1aOelp4n6GjdyHK5uQcKRWNUkkXUOEK7qNB9HxH5TtVIomnU5tg7+c4a/DaQQi6rrXIL2F3bDDHHa3/XGtrQLSqQqJoMWZdcEJ3AjwKpCa01TwBjCHYtksCOzJXA+fnbzDy5Ndvhpg68IvtWSxIA53gAcIgX78DKJ2NaKRbRaun/20s="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 536,
+      "completion_tokens": 282,
+      "total_tokens": 818,
+      "cost": 0.004456,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004456,
+        "upstream_inference_prompt_cost": 0.001072,
+        "upstream_inference_completions_cost": 0.003384
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 165,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

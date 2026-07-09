@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the cortex-write tool with path='/memories/t7-approve-test' and content='T7_APPROVE_OK'. The cortex-write tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nAssistant: <think>The user wants me to call two tools in parallel in a single response:\n1. tool-help to list available tools\n2. cortex-write with path='/memories/t7-approve-test' and content='T7_APPROVE_OK' - with callbackMode='approve' so it pauses for user confirmation\n\nLet me make both calls.</think>\n\nAssistant: <think>Both calls completed. The tool-help returned the full listing. The cortex-write with approve callback was confirmed by the user and executed successfully - it created the file at `/memories/t7-approve-test` with the content \"T7_APPROVE_OK\". \n\nLet me check: nothing off here. Both results are valid and expected.</think>Both calls completed successfully. `tool-help` returned the full 528-tool catalog across 22 categories. The `cortex-write` with callbackMode `approve` was user-confirmed and executed, writing `T7_APPROVE_OK` to `/memories/t7-approve-test`.\n\n**STEP_OK**\n\nUser: [CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.",
+    "encoding_format": "float"
+  }
+}

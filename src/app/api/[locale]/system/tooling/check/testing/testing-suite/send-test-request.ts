@@ -39,7 +39,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
    * setup callers pass an explicit thread-less makeHeadlessContext(u, u).
    * Pass undefined for pure validation/auth tests that don't touch AI infra.
    */
-  streamContext: ToolExecutionContext;
+  streamContext: ToolExecutionContext | undefined;
 } & (TEndpoint["types"]["RequestOutput"] extends never
   ? { data?: never }
   : { data: TEndpoint["types"]["RequestOutput"] }) &

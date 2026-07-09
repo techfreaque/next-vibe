@@ -28,8 +28,8 @@ import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/
 import {
   clearStreamingState,
   setStreamingStateAborting,
-  StreamRegistry,
 } from "../repository/core/stream";
+import { StreamControl } from "../repository/core/stream-control";
 import type {
   AiStreamCancelPostRequestOutput,
   AiStreamCancelPostResponseOutput,
@@ -65,7 +65,9 @@ export class cancelRepository {
     try {
       const { threadId } = data;
 
-      // Look up the thread to verify ownership
+      // Look up the thread to verify ownership + read its streaming state (the
+      // cross-process truth of whether a stream is live, replacing the old
+      // in-process registry lookup).
       const [thread] = await db
         .select({
           id: chatThreads.id,
@@ -133,23 +135,36 @@ export class cancelRepository {
         // Find the waiting tracking task, write a cancelled result to its tool
         // message, then cancel the task and emit STREAM_FINISHED.
 
-        // Find the waiting tracking task for this thread
-        const [waitingTask] = await db
+        // Find the parked resume-stream task for this thread via taskInput jsonb.
+        const [parkedTask] = await db
           .select({
             id: cronTasks.id,
-            wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+            taskInput: cronTasks.taskInput,
           })
           .from(cronTasks)
-          .where(eq(cronTasks.wakeUpThreadId, threadId))
+          .where(
+            and(
+              eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
+              sql`${cronTasks.taskInput}->>'threadId' = ${threadId}`,
+              eq(cronTasks.enabled, false),
+            ),
+          )
           .limit(1);
 
+        const wakeUpToolMessageId =
+          (
+            parkedTask?.taskInput as
+              | { wakeUpToolMessageId?: string }
+              | undefined
+          )?.wakeUpToolMessageId ?? null;
+
         // Write cancelled result to the waiting tool message
-        if (waitingTask?.wakeUpToolMessageId) {
+        if (wakeUpToolMessageId) {
           try {
             const [existing] = await db
               .select({ metadata: chatMessages.metadata })
               .from(chatMessages)
-              .where(eq(chatMessages.id, waitingTask.wakeUpToolMessageId));
+              .where(eq(chatMessages.id, wakeUpToolMessageId));
 
             if (existing?.metadata?.toolCall) {
               const toolCall = existing.metadata.toolCall;
@@ -166,7 +181,7 @@ export class cancelRepository {
                   },
                   updatedAt: new Date(),
                 })
-                .where(eq(chatMessages.id, waitingTask.wakeUpToolMessageId));
+                .where(eq(chatMessages.id, wakeUpToolMessageId));
 
               createMessagesEmitter(logger, user, {
                 threadId,
@@ -175,7 +190,7 @@ export class cancelRepository {
                 responseData: {
                   messages: [
                     {
-                      id: waitingTask.wakeUpToolMessageId,
+                      id: wakeUpToolMessageId,
                       metadata: {
                         toolCall: {
                           ...toolCall,
@@ -191,7 +206,7 @@ export class cancelRepository {
               logger.info(
                 "[Cancel] Wrote cancelled result to waiting tool message",
                 {
-                  toolMessageId: waitingTask.wakeUpToolMessageId,
+                  toolMessageId: wakeUpToolMessageId,
                   threadId,
                 },
               );
@@ -200,27 +215,30 @@ export class cancelRepository {
             logger.warn(
               "[Cancel] Failed to write cancelled result to tool message",
               {
-                toolMessageId: waitingTask.wakeUpToolMessageId,
+                toolMessageId: wakeUpToolMessageId,
                 error: parseError(writeErr).message,
               },
             );
           }
         }
 
-        // Cancel any tracking tasks for this thread
-        try {
-          await db
-            .update(cronTasks)
-            .set({
-              lastExecutionStatus: CronTaskStatus.CANCELLED,
-              enabled: false,
-            })
-            .where(eq(cronTasks.wakeUpThreadId, threadId));
-        } catch (cancelErr) {
-          logger.warn("[Cancel] Failed to cancel escalated tasks", {
-            threadId,
-            error: parseError(cancelErr).message,
-          });
+        // Cancel any parked resume-stream tasks for this thread
+        if (parkedTask) {
+          try {
+            await db
+              .update(cronTasks)
+              .set({
+                lastExecutionStatus: CronTaskStatus.CANCELLED,
+                enabled: false,
+              })
+              .where(eq(cronTasks.id, parkedTask.id));
+          } catch (cancelErr) {
+            logger.warn("[Cancel] Failed to cancel parked resume task", {
+              threadId,
+              parkedTaskId: parkedTask.id,
+              error: parseError(cancelErr).message,
+            });
+          }
         }
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.

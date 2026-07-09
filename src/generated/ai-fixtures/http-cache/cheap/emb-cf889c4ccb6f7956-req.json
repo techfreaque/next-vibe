@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.\n\nAssistant: <think>The audio description was injected by the system, so I can describe what's in it.</think>The audio is a **20-second hip-hop/trap instrumental loop** at approximately 90-100 BPM. It features:\n\n- **Drums** — punchy kick, snare, and hi-hats driving a classic hip-hop groove\n- **Synth bass** — a simple, foundational low-end line supporting the rhythm\n- **Synth melody/pad** — a bright, atmospheric repeating figure with a slightly ethereal quality\n\nThe production is clean and polished, with a laid-back, rhythmic, slightly hypnotic feel. No vocals are present — it's a continuous loop likely suited for background use in video, games, or transitions.\n\n**STEP_OK**\n\nUser: And I'll see you in the next video. Bye bye.\n\nAssistant: <think>The user is signing off, likely ending this testing session. They're saying goodbye. I should respond warmly and acknowledge the completion of the test suite.</think>See you on the next one! Cheers, and bye for now. 👋\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: The video is a **5-second close-up promotional clip** featuring a pair of medium-brown-skinned hands rapidly manipulating a single Rubik's Cube in the foreground, with hundreds of scattered, mixed-up cubes forming a dense, colorful background. The cube in hand has a white \"X\" logo on one face and is partially scrambled. The hands perform fluid, expert-level rotations of the top and right layers in a rhythmic speed-cubing style. The audio is a crisp, percussive beat synchronized with the cube's clicking sounds, over a lo-fi hip-hop backdrop. The production is high-definition with controlled studio lighting and",
+    "encoding_format": "float"
+  }
+}

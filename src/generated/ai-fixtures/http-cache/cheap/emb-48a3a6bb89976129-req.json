@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result contains a `responsePath` string: `/memories/cb-await-task-test`. It's nested inside the `result` object. The task completed successfully.</think>Result contains a `responsePath` string (`/memories/cb-await-task-test`) nested in the result object. Task completed successfully.\n\n**STEP_OK**\n\nUser: [T5a endLoop] Call the self-instance-id tool with callbackMode='endLoop' EXACTLY ONCE. Do not call it again and do nothing with its result — endLoop ends the turn after the tool runs.\n\nAssistant: <think>The user wants me to call a tool called \"self-instance-id\" with callbackMode='endLoop'. Let me check if this tool exists first by looking at the tool catalog. Actually, I don't see it in the list of tools I have. Let me check the tool-help output from earlier - it's not there. Let me search for it.\n\nWait, I should just try to call it. If it doesn't exist, that's a failure. Let me check tool-help first.</think>\n\nAssistant: <think>The tool exists with name \"self-instance-id\". Now I'll call it with callbackMode='endLoop' which will end the turn after execution.</think>\n\nUser: [T5d wait-inline] Call the cortex-write tool with path='/memories/cb-wait-inline-test' and content='wait-inline-test-payload' and callbackMode='wait'. Check that the result has a responsePath (not a taskId). End your reply with STEP_OK if responsePath is present and non-empty, or FAILED: <reason> if anything is wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: The video attachment is a close-up shot of a person's hands expertly manipulating a **Rubik's cube** in a dimly lit studio. The background is filled with a blurred pile of other cubes creating a colorful mosaic. The person's fingers rotate the top layer with precise, rhythmic movements, producing crisp mechanical clicking sounds. The style is polished and documentary-like with shallow depth of field, emphasizing the tactile mastery of the puzzle.\n\n**STEP_OK**\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else. [audio attachment - system-injected audio description (you cannot see the raw file)]:\nA male voice, speaking at a slow, deliberate pace, says, \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword. Banana, banana. And I need to fill up the last few seconds and it will be\". His voice is clear and recorded with good quality, possibly in a quiet room given the lack of background noise. His tone is neutral but instructional. He enunciates each word clearly.\n\nAssistant: The speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword Banana Banana and I need to fill up the last few seconds and it will be\"\n\n**STEP_OK** — contains \"Banana\" (twice).\n\nUser: [T11 companies-list] Call the companies-list tool to list the companies. Check that the result has a companies array. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"companies-list\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"companies-list\",\"title\":\"My Companies\",\"description\":\"Companies you are a member of\",\"category\":\"companies\",\"parame",
+    "encoding_format": "float"
+  }
+}

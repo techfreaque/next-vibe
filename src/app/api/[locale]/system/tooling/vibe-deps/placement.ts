@@ -85,6 +85,52 @@ export function isInSystem(key: string): boolean {
 }
 
 /**
+ * `execute-tool/repository/index.ts` — the module that exports
+ * `RouteExecuteRepository`, whose `runInProcess` / `runInProcessTyped` methods
+ * are the framework's ONE sanctioned way to call another endpoint in-process
+ * (the "no raw fetch" rule forces every own-endpoint call through them).
+ *
+ * NOTE: this predicate identifies the FILE only. It does NOT by itself grant an
+ * exemption — importing this file for `RouteExecuteRepository.execute` (or any
+ * other member) is still real coupling. The symbol-level check
+ * `importsOnlyRunInProcess` decides whether a given edge is the sanctioned
+ * in-process-call pattern.
+ */
+export function isRouteExecuteEntrypoint(key: string): boolean {
+  return key.endsWith(
+    "src/app/api/[locale]/system/execute-tool/repository/index.ts",
+  );
+}
+
+/**
+ * True when `importerSource` references `RouteExecuteRepository` ONLY through
+ * its sanctioned in-process-call methods (`runInProcess` / `runInProcessTyped`)
+ * — never `.execute`, `.confirm`, or any other member. Such an edge into the
+ * execute-tool repository is the "no raw fetch" call pattern, not domain
+ * coupling, so both coupling lenses ignore it.
+ *
+ * Conservative: if the importer touches `RouteExecuteRepository` in any way
+ * OTHER than `.runInProcess` / `.runInProcessTyped`, it is NOT exempt (the edge
+ * stays a coupling signal). An importer that never names `RouteExecuteRepository`
+ * at all is not the pattern → returns false.
+ */
+const ROUTE_EXECUTE_MEMBER_RE = /RouteExecuteRepository\s*\.\s*(\w+)/g;
+export function importsOnlyRunInProcess(importerSource: string): boolean {
+  let sawRunInProcess = false;
+  ROUTE_EXECUTE_MEMBER_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = ROUTE_EXECUTE_MEMBER_RE.exec(importerSource)) !== null) {
+    const member = m[1];
+    if (member === "runInProcess" || member === "runInProcessTyped") {
+      sawRunInProcess = true;
+    } else {
+      return false; // touches another member → genuine coupling, not exempt
+    }
+  }
+  return sawRunInProcess;
+}
+
+/**
  * Domain aliases: intentionally split domains that are architecturally one unit.
  * `user` (public auth endpoints) and `users` (admin user management) are the
  * same product domain — cross-imports between them are not coupling smells.

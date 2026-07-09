@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result contains a `stockLevels` array with 3 items. All checks pass.</think>The tool ran successfully. The result contains a `stockLevels` array with 3 items: Consulting Hour, Laptop Stand, and Design Template Pack — all from Main Warehouse, none low on stock.\n\n**STEP_OK**\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think>The tool ran successfully and returned a `warehouses` array with 2 entries: Main Warehouse and Secondary Warehouse.</think>The tool ran successfully. The result contains a `warehouses` array with 2 entries: **Main Warehouse** (WH-01, default) and **Secondary Warehouse** (WH-02).\n\n**STEP_OK**\n\nUser: [T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

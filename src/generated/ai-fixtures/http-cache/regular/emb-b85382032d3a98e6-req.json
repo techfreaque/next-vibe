@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/testing-tool-help-with-three-modes-4e4987d2-fd65-45cc-96c2-dc2fabb5e0f1.md\n\n# Testing tool-help with three modes\nFolder: private\nDescription: The goal was to verify that the tool-help function returns correct results for category, search, and tool name queries.",
+    "encoding_format": "float"
+  }
+}

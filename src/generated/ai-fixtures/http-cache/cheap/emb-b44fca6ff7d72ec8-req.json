@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The example UUID is invalid. Let me try without companyId, or I need to find a valid company UUID. Let me try calling without a companyId first.</think>\n\nAssistant: <think>The tool ran successfully. The result has an `invoices` array (empty, but it's there). So STEP_OK.</think>The tool ran successfully. The result contains an `invoices` array (empty array, `total: 0` — no invoices on file, but the structure is correct).\n\n**STEP_OK**\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think>The user wants me to say exactly \"INVALID_PARENT_TEST STEP_OK\". Let me just do that.</think>INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

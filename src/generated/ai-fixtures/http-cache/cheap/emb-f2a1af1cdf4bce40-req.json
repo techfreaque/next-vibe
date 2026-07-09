@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:97728629 | Posted:Jul 9, 11:36]\n\nUser: [T2 cortex-write] Use the cortex-write tool to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use the cortex-read tool to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:c13d2fc0 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 11:36]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"created\":false,\"updatedAt\":\"2026-07-09T09:36:15.229Z\"}}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-read\",\"input\":{\"path\":\"/memories/t2-cheap-test\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responsePath\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\",\"size\":11,\"truncated\":false,\"readonly\":false,\"nodeType\":\"file\",\"updatedAt\":\"2026-07-09T09:36:15.229Z\"}}",
+    "encoding_format": "float"
+  }
+}

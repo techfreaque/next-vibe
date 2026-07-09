@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "- **Tool-help deep dive**: Queried by category (`ai` → 71 tools), keyword (`search` → 12 tools across categories), and specific tool name (`generate_image` → full schema with `prompt` required + optional `inputMediaUrl`). All returned correctly.\n\n- **Credits balance**: `credits-balance` returned `total: 499.25` (495 permanent + 4.25 free, 515 capacity cap).\n\n- **Favorites**: `favorites` returned 2 entries: `quality-tester-budget` (DeepSeek V4 Flash) and `quality-tester-native-image` (Gemini 3.1 Flash).\n\n- **Detach/await-task**: `cortex-write` with `callbackMode=detach` returned `taskId: local-bg-call-7144c6e2d9434787b7705e64` and no `responsePath`. `await-task` with that taskId returned the completed result with `responsePath: /memories/cb-await-task-test`.\n\n- **EndLoop**: `self-instance-id` with `callbackMode=endLoop` returned `instanceId: atlas`.\n\n- **Wait-inline**: `cortex-write` with `callbackMode=wait` returned `responsePath: /memories/cb-wait-inline-test` directly.\n\n- **WakeUp tests**: Three `cortex-write` calls with `callbackMode=wakeUp` all completed inline (no deferred phase) with immediate `responsePath`s: `/memories/cb-wakeup-test`, `/memories/cb-wakeup-repeat-test`, `/memories/cb-wakeup-stress-test`.\n\n- **Approve**: `cortex-write` with `callbackMode=approve` required user confirmation, then wrote to `/memories/t7-approve-test`. Also tested `contact-form` with `callbackMode=approve` — submitted successfully with `name: Test User`, `subject: subject.generalInquiry`, `message: Automated integration test. Please ignore.`.\n\n- **Parallel tools**: `cortex-write` (to `/memories/t8-parallel-test`) and `chat-settings` ran concurrently; both returned expected shapes (`responsePath` + `selectedSkill: thea`).\n\n- **Leads system**: `leads-list` returned 20 leads (first page of 1,006 total across 51 pages, 11 status buckets).\n\n- **Image attachment**: Described the Japanese flag (white rectangle with central red circle, minimalist/high contrast).\n\n- **Multi-attach**: Ima",
+    "encoding_format": "float"
+  }
+}

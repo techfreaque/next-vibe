@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword Banana Banana and I need to fill up the last few seconds and it will be\"\n\n**STEP_OK** — contains \"Banana\" (twice).",
+    "encoding_format": "float"
+  }
+}

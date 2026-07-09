@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:edbd1c29 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:48]\n\nAssistant: **inventory-stock** ran successfully. Result has a `stockLevels` array with 3 items:\n\n| Product | Available | On Hand | Reserved | Unit Cost | Warehouse |\n|---------|-----------|---------|----------|-----------|-----------|\n| Consulting Hour | 52 | 54 | 2 | €29.93 | Main Warehouse |\n| Laptop Stand | 58 | 61 | 3 | €6.09 | Main Warehouse |\n| Design Template Pack | 195 | 205 | 10 | €31.46 | Main Warehouse |\n\nAll items above reorder point — no low stock alerts.\n\n**STEP_OK**\n\nSystem: [Context: ID:e12f50c0 | Posted:Jul 9, 02:49]\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:b52f39e9 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:49]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"inventory-warehouses\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"warehouses\":[{\"id\":\"4b27e45b-32b4-4c9",
+    "encoding_format": "float"
+  }
+}

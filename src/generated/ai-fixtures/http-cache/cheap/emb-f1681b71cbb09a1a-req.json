@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: And I'll see you in the next video. Bye bye.\n\nAssistant: <think>The user is signing off, likely ending this testing session. They're saying goodbye. I should respond warmly and acknowledge the completion of the test suite.</think>See you on the next one! Cheers, and bye for now. 👋\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: The video is a **5-second close-up promotional clip** featuring a pair of medium-brown-skinned hands rapidly manipulating a single Rubik's Cube in the foreground, with hundreds of scattered, mixed-up cubes forming a dense, colorful background. The cube in hand has a white \"X\" logo on one face and is partially scrambled. The hands perform fluid, expert-level rotations of the top and right layers in a rhythmic speed-cubing style. The audio is a crisp, percussive beat synchronized with the cube's clicking sounds, over a lo-fi hip-hop backdrop. The production is high-definition with controlled studio lighting and a shallow depth of field.\n\n**STEP_OK**\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think>The audio attachment description says the speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana, and I need to fill up the last few seconds, and it will be\"\n\nThe word \"banana\" appears in the transcription. The instruction says to repeat back the exact word(s) I heard in the audio, and end with STEP_OK if the transcription contained the word 'banana'.\n\nLet me transcribe what I heard: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana",
+    "encoding_format": "float"
+  }
+}

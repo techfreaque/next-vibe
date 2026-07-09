@@ -1,44 +1,18 @@
 /**
  * Gab AI Provider
- * Extends OpenAI's implementation with custom fetch to handle tool calling via prompt engineering
- * Similar to Venice.ai - supports streaming but uses prompt engineering for tool calls
+ * OpenAI-compatible endpoint that emulates tool calling via prompt engineering.
+ * Streaming supported; fixed-cost model (no usage wait). See the shared factory.
  */
 
 import "server-only";
 
-import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
+import type { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 
 import type { EndpointLogger } from "../../../system/logger/types";
-import { logProviderRequest } from "./shared/debug-file-logger";
-import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
-import {
-  convertDeveloperToSystemMessages,
-  convertToolMessagesToUserMessages,
-  injectToolInstructions,
-  type OpenAIMessage,
-  type OpenAITool,
-} from "./shared/tool-calling-prompt-engineering";
-
-type JSONValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JSONValue[]
-  | { [key: string]: JSONValue };
-
-interface OpenAIRequestBody {
-  model: string;
-  messages: OpenAIMessage[];
-  tools?: OpenAITool[];
-  tool_choice?: string | JSONValue;
-  temperature?: number;
-  max_tokens?: number;
-  stream?: boolean;
-}
+import { createPromptEngineeredProvider } from "./shared/openai-compatible-provider";
 
 /**
  * Create a Gab AI provider with tool calling support via prompt engineering
@@ -51,97 +25,12 @@ export function createGabAI(
 ): {
   chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
-  const apiKey = agentEnv.GAB_AI_API_KEY;
-
-  const customFetch = async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ): Promise<Response> => {
-    if (!init?.body) {
-      logger.error("[GabAI] No request body provided");
-      return new Response(
-        JSON.stringify({ error: "No request body provided" }),
-        { status: 400 },
-      );
-    }
-
-    const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { tools, tool_choice, messages, ...restBody } = parsedBody;
-
-    // Convert developer messages to system and inject tool instructions
-    let modifiedMessages = convertDeveloperToSystemMessages(messages);
-    modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
-    if (tools && tools.length > 0) {
-      modifiedMessages = injectToolInstructions(modifiedMessages, tools);
-    }
-
-    // Prepare request body
-    const requestBody = {
-      ...restBody,
-      messages: modifiedMessages,
-    };
-
-    const bodyString = JSON.stringify(requestBody);
-    logProviderRequest("gab-ai", bodyString);
-
-    // Update request body
-    const modifiedInit: RequestInit = {
-      ...init,
-      body: bodyString,
-    };
-
-    // Make the actual request
-    const response = await fetchImpl(input, modifiedInit);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error("[GabAI] API Error", {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      });
-      return new Response(errorText, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
-    }
-
-    // Check if this is a streaming request
-    const isStreamRequest = parsedBody.stream === true;
-
-    if (!isStreamRequest) {
-      // Non-streaming request
-      const jsonResponse = await response.json();
-      return new Response(JSON.stringify(jsonResponse), {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
-    }
-
-    // Streaming request - process with tool call detection
-    return processStreamingResponseWithToolCalls(
-      response,
-      logger,
-      "GabAI",
-      false, // Don't wait for usage (fixed-cost model)
-    );
-  };
-
-  return {
-    chat: (modelId: string) => {
-      return new OpenAIChatLanguageModel(modelId, {
-        provider: ApiProvider.GAB_AI,
-        headers: () => ({
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${apiKey}`,
-        }),
-        url: ({ path }) => `https://gab.ai/v1${path}`,
-        fetch: customFetch as typeof fetch,
-      });
-    },
-  };
+  return createPromptEngineeredProvider(logger, fetchImpl, {
+    label: "GabAI",
+    provider: ApiProvider.GAB_AI,
+    apiKey: agentEnv.GAB_AI_API_KEY,
+    logTag: "gab-ai",
+    url: ({ path }) => `https://gab.ai/v1${path}`,
+    waitForUsage: false, // fixed-cost model
+  });
 }

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T9 report] A leads list was retrieved for you earlier in this conversation. Look at the leads-list tool result in your context and report how many leads you can see. End your reply with STEP_OK if you can see the leads array in your context, or FAILED: <reason> if no leads result was visible.\n\nAssistant: <think>The user is asking me to look at the leads-list tool result that was already retrieved earlier in this conversation. Let me check - yes, in the previous turn I called leads-list and got a result with a `response.leads` array containing 20 leads. The total count was 1006, and pagination showed 51 pages with 20 leads per page. I can see the leads array in the result from the previous turn.</think>Looking at the leads-list result from the previous turn, I can see the `response.leads` array containing **20 leads** (the first page of 1,006 total leads across 51 pages).\n\n**STEP_OK**\n\nUser: [T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.\n\nAssistant: <think>The user wants me to describe the attached image. The system-injected vision description is present and describes the flag of Japan - a white rectangular background with a centered red circle. I can see and describe this content. Nothing else is off.</think>The attached image shows the **national flag of Japan** — a large white rectangular background with a solid, vibrant red circle centered perfectly on it. The design is clean and minimalist with high contrast, no text, markings, or other elements present. The red circle occupies a significant portion of the frame.\n\n**STEP_OK**\n\nUser: [T10b multi-attach] Two files are attached:",
+    "encoding_format": "float"
+  }
+}

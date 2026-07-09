@@ -361,7 +361,10 @@ export class ChatFoldersRepository {
         });
       }
 
-      // Emit WS event so all open tabs see the new folder in the sidebar immediately
+      // Emit WS event so all open tabs see the new folder in the sidebar
+      // immediately — with the FULL renderable item (not a stub). Without the
+      // behavioral props below (`expanded`, `can*`, `roles*`) the merged folder
+      // shows collapsed and misbehaves on click until a refetch.
       const emitFolderContents = createFolderContentsEmitter(
         logger,
         user,

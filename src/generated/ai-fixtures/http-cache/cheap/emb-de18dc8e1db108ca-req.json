@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result contains `responsePath` = `\"/memories/cb-await-task-test\"` — present and correct. The file was updated (not newly created, as it already existed from earlier).\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

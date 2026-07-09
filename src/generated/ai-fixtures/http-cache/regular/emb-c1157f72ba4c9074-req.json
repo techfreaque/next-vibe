@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result received. Checking:\n\n| Condition | Check |\n|-----------|-------|\n| `taskId` is a non-empty string | `\"local-bg-call-1c4e859cdd6440caba3a1c92\"` ✅ |\n| No `imageUrl` in the result | Not present ✅ |\n\n**STEP_OK taskId=local-bg-call-1c4e859cdd6440caba3a1c92**",
+    "encoding_format": "float"
+  }
+}

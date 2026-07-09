@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The tool returned successfully:\n\n- **imageUrl**: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/efc1bda1-c6e3-4b1b-ac4e-ee3f06415c18/e1afa34e-e25c-4613-8cb7-026af1f20169.png` — non-empty ✅\n- **creditCost**: `2.72` — positive number ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -36,7 +36,6 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
 import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
 import {
@@ -142,10 +141,9 @@ export class LocalExecution {
     const permissions = await ExecuteToolGuards.resolveToolPermissions({
       favoriteId: streamContext.favoriteId,
       skillId: streamContext.skillId,
-      userId,
-      isAdmin,
-      isCustomer,
+      user,
       rootFolderId: streamContext.rootFolderId,
+      logger,
     });
 
     const permissionBlock = ExecuteToolGuards.checkToolPermission(

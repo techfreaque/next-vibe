@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\n\nAssistant: <think>The user wants me to say exactly \"BRANCH_RESPONSE STEP_OK\"</think>BRANCH_RESPONSE STEP_OK\n\nUser: [T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>Let me call the generate_music tool with the given prompt.</think>\n\nAssistant: <think>Let me check the result:\n\n1. `audioUrl` - \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/efc1bda1-c6e3-4b1b-ac4e-ee3f06415c18/2d87318e-3772-4932-bd41-0133aee53322.mp3\" - non-empty ✅\n2. `creditCost` - 10.4 - positive ✅\n3. `durationSeconds` - 8 - between 8 and 120 (inclusive check: 8 >= 8 and 8 <= 120) ✅\n\nAll checks pass. Nothing else is off.</think>Result received. Checking the three conditions:\n\n| Field | Value | Check |\n|-------|-------|-------|\n| `audioUrl` | `http://localhost:3000/api/.../2d87318e-...mp3` | Non-empty ✅ |\n| `creditCost` | 10.4 | Positive ✅ |\n| `durationSeconds` | 8 | Between 8–120 ✅ |\n\nAll three conditions pass. Nothing else is off.\n\n**STEP_OK**\n\nUser: [T4b video-gen] Call the generate_video tool with prompt='spinning cube'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

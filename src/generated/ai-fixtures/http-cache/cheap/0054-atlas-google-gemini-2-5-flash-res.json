@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1822da58893dc81-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 21:28:24 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783546103-EpGVPCjv3nWAUSATZHGK"
+  },
+  "body": {
+    "id": "gen-1783546103-EpGVPCjv3nWAUSATZHGK",
+    "object": "chat.completion",
+    "created": 1783546103,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio is a short clip of an uplifting, bright, and clean electro-funk song. The duration is 27 seconds. The song is in 4/4 time and has a moderate tempo of approximately 105-110 BPM. The key appears to be E major.\n\nThe production is polished and clean. The recording environment sounds like a professional studio.\n\nThe song features the following instruments:\n\n- **Drums:** A drum machine provides a straightforward, consistent electro-funk beat. It includes a kick drum, rimshot (mimicking a snare), and closed hi-hats. The hi-hats play a steady 16th-note rhythm, giving a driving feel without being overly aggressive.\n- **Bass:** A synth bass plays a melodic, funky line that underpins the harmony and provides a groovy foundation. It's clean and well-defined.\n- **Electric Guitar:** A clean-toned electric guitar plays rhythmic chordal stabs, often on the off-beats, contributing to the funky feel. It's possibly a Stratocaster or similar single-coil guitar, given the bright, percussive tone.\n- **Synthesizer:** A bright, polyphonic synth provides the main melodic and harmonic content. It plays catchy, optimistic chords and sometimes short melodic flourishes.\n- **Congas/Percussion:** There are subtle conga or other hand percussion sounds layered into the rhythm, adding a touch of organic warmth and rhythmic complexity.\n\nThe song starts immediately with all instruments playing collectively, establishing the main groove and melodic theme. It continues this theme consistently throughout the short clip, implying a verse or main section of a song. There are no vocals or sound effects in this clip.\n\nThe mood is generally energetic, positive, and danceable.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 371,
+      "total_tokens": 1443,
+      "cost": 0.0017741,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017741,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0009275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

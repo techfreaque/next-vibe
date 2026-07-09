@@ -25,14 +25,14 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
 
-import { ChatMessageRole } from "../../chat/enum";
-import type { MessagesWsEmit } from "../../chat/threads/[threadId]/messages/emitter";
+import { ChatMessageRole } from "../../../chat/enum";
+import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import {
   getBestTtsModel,
   type TtsModelOption,
   type VoiceModelSelection,
-} from "../../text-to-speech/models";
-import { createFixtureFetch } from "../testing/fetch-cache";
+} from "../../../text-to-speech/models";
+import { createFixtureFetch } from "../../testing/fetch-cache";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -104,7 +104,7 @@ export class StreamingTTSHandler {
     user: JwtPayloadType;
     enabled: boolean;
     availability: AgentEnvAvailability;
-    fixtureContext: FixtureContext | undefined;
+    streamContext: ToolExecutionContext;
   }) {
     this.wsEmit = params.wsEmit;
     this.logger = params.logger;
@@ -112,7 +112,7 @@ export class StreamingTTSHandler {
     this.voiceModelSelection = params.voiceModelSelection;
     this.user = params.user;
     this.availability = params.availability;
-    this.fetchImpl = createFixtureFetch(params.fixtureContext, params.logger);
+    this.fetchImpl = createFixtureFetch(params.streamContext, params.logger);
     this.isEnabled = params.enabled;
   }
 
@@ -795,7 +795,7 @@ export function createStreamingTTSHandler(params: {
   enabled: boolean;
   availability: AgentEnvAvailability;
   /** The stream's fixture chain — binds record/replay for the TTS provider calls. */
-  fixtureContext: FixtureContext | undefined;
+  streamContext: ToolExecutionContext;
 }): StreamingTTSHandler {
   return new StreamingTTSHandler(params);
 }

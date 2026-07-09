@@ -946,8 +946,8 @@ export class HelpRepository {
         const { db } = await import("next-vibe/database");
         const { chatSettings } =
           await import("@/app/api/[locale]/agent/chat/settings/db");
-        const { chatFavorites } =
-          await import("@/app/api/[locale]/agent/skills/favorites/db");
+        const { DefaultFolderId } =
+          await import("@/app/api/[locale]/agent/chat/config");
         const { eq } = await import("drizzle-orm");
 
         // webPinnedTools: per-user sidebar bookmarks (independent of AI pinnedTools)

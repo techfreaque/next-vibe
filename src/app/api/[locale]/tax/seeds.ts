@@ -7,6 +7,7 @@
 import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "../companies/db";
@@ -144,7 +145,7 @@ export async function seedDefaultTaxRates(
       isCompound: false,
     });
 
-    logger.info(`Seeded tax rate: ${rate.code} for company ${companyId}`);
+    logger.debug(`Seeded tax rate: ${rate.code} for company ${companyId}`);
   }
 }
 
@@ -176,8 +177,8 @@ export async function dev(
     await seedDefaultTaxRates(company.id, country, logger);
   }
 
-  logger.debug(
-    `Tax seeds: seeded rates for ${allCompanies.length} company/companies`,
+  logger.info(
+    formatDatabase(`Tax rates: ${allCompanies.length} companies`, "🧾"),
   );
 }
 

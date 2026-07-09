@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/tool-catalog-deep-dive-2eccf80c-9f9f-4179-b3b0-511cb75d2db6/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nembedded: true\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"2eccf80c-9f9f-4179-b3b0-511cb75d2db6\"\nthreadTitle: \"Tool Catalog Deep Dive\"\nuploadedAt: \"2026-07-08T21:27:49.295Z\"\n---\n\n# test-image.jpeg\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Tool Catalog Deep Dive |\n| Uploaded | 2026-07-08 |\n\n## Message Context\n\n[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
+    "encoding_format": "float"
+  }
+}

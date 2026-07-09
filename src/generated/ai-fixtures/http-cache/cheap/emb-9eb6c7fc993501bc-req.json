@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The **image** shows the **national flag of Japan** — a clean, minimalist design with a vibrant crimson circle centered on a bright white rectangular field. The edges are sharp and well-defined, the lighting is flat and even.\n\nThe **audio** is a 16-second instrumental hip-hop track with strong reggae/funk influences, featuring a prominent drum groove, a bright organ carrying the melody and harmony, and a subtle bass line. It has a relaxed, chill, nostalgic mood at around 90-100 BPM.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

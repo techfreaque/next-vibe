@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Tool: [result:execute-tool] {\"result\":{\"updatedAt\":\"2026-07-09T00:38:44.521Z\",\"updatedTitle\":\"Tool Catalog Deep Dive\",\"updatedPreview\":\"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\",\"updatedThreadId\":\"681c8369-40be-4fdb-af0c-4359d4a5649e\"}}\n\nAssistant: All three tool-help calls returned correctly. Thread renamed to \"Tool Catalog Deep Dive\". Nothing off anywhere.\n\n**STEP_OK**\n\nSystem: [Context: ID:e00929a3 | Posted:Jul 9, 02:38]\n\nUser: [T2 cortex-write] Use the cortex-write tool to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use the cortex-read tool to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t2-cheap-test [83%]\n│   │   T2_CHEAP_OK\n│   ├── t7-approve-test [82%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── \n\nSystem: [Context: ID:f095f8b5 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:38]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responsePath\":\"/memories/t2-cheap-test\",\"siz",
+    "encoding_format": "float"
+  }
+}

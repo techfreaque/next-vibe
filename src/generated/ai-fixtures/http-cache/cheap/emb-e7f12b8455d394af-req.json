@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:47e25647 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:59]\n\nAssistant: **inventory-warehouses** ran successfully. Result has a `warehouses` array with 2 entries:\n\n| Warehouse | Code | Address | Default | Active |\n|-----------|------|---------|---------|--------|\n| Main Warehouse | WH-01 | 1 Storage Drive, Warehouse District | ✅ Yes | ✅ |\n| Secondary Warehouse | WH-02 | 2 Overflow Road, Storage Park | ❌ No | ✅ |\n\n**STEP_OK**\n\nSystem: [Context: ID:41ad81cb | Posted:Jul 9, 02:59]\n\nUser: [T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [73%]\n│   │   T7_APPROVE_OK\n│   ├── cb-wait-inline-test [73%]\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test [71%]\n│   │   await-task-test-payload\n│   ├── t2-cheap-test [70%]\n│   │   T2_CHEAP_OK\n│   ├── cb-wakeup-stress-test [70%]\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-test [69%]\n│   │   wakeup-test-payload\n│   ├── cb-wakeup-repeat-test [69%]\n│   │   wakeup-repeat-test-payload\n│   ├── t8-parallel-test\n│\n\nSystem: [Context: ID:b6684169 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:59]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"payment-invoice-list\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"total\":0,\"invoices\":[]}}",
+    "encoding_format": "float"
+  }
+}

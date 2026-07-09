@@ -14,6 +14,7 @@
 
 import { Methods } from "next-vibe/core/definition/enums";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
@@ -24,11 +25,16 @@ import {
 } from "next-vibe/ui/ui/card";
 import { DetailField, DetailGrid } from "next-vibe/ui/ui/detail-grid";
 import { Div } from "next-vibe/ui/ui/div";
+import { Activity } from "next-vibe/ui/ui/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
 import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
 import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
+import { WifiOff } from "next-vibe/ui/ui/icons/WifiOff";
 import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
 import { SectionGroup } from "next-vibe/ui/ui/section-group";
 import { StatusPill } from "next-vibe/ui/ui/status-pill";
@@ -56,8 +62,10 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";
@@ -192,7 +200,6 @@ function ViewWidget({
   const endpointMutations = useWidgetEndpointMutations();
 
   const status = useWidgetValue<typeof definitionsType.GET>();
-  // Navigation entry always has the correct runtime urlPathParams; fall back to prop.
   const instanceId =
     (current?.params.urlPathParams as { instanceId?: string } | undefined)
       ?.instanceId ?? instanceIdProp;

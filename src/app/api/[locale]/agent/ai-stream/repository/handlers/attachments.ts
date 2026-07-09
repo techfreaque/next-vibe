@@ -233,7 +233,7 @@ export class FileUploadEventHandler {
 /**
  * Extract text from a PDF buffer.
  */
-export async function extractPdfText(
+async function extractPdfText(
   buffer: Buffer,
   logger: EndpointLogger,
 ): Promise<string | null> {
@@ -254,7 +254,7 @@ export async function extractPdfText(
 /**
  * Extract text from a DOCX buffer.
  */
-export async function extractDocxText(
+async function extractDocxText(
   buffer: Buffer,
   logger: EndpointLogger,
 ): Promise<string | null> {
@@ -273,7 +273,7 @@ export async function extractDocxText(
 /**
  * Extract text from an XLSX buffer (CSV-like output per sheet).
  */
-export async function extractXlsxText(
+async function extractXlsxText(
   buffer: Buffer,
   logger: EndpointLogger,
 ): Promise<string | null> {
@@ -307,7 +307,6 @@ const DOCUMENT_MIME_TYPES = new Set([
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "application/msword",
   "application/vnd.ms-excel",
 ]);
 
@@ -330,7 +329,6 @@ export async function extractDocumentText(
     case "application/pdf":
       return extractPdfText(buffer, logger);
     case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    case "application/msword":
       return extractDocxText(buffer, logger);
     case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
     case "application/vnd.ms-excel":

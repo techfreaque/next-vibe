@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"leads\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"credits-spent-by-leads\",\"description\":\"Sum of usage transactions from lead wallets per resolution bucket\",\"category\":\"analytics\"},{\"name\":\"leads-active\",\"description\":\"Count of non-bounced, non-unsubscribed, non-invalid leads per time bucket\",\"category\":\"analytics\"},{\"na\n\nAssistant: [tool:execute-tool] {\"toolName\":\"leads-list\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Validation failed (1 error):\\n  • paginationInfo: Invalid input: expected object, received undefined\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"leads-list\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"leads-list\",\"title\":\"Leads\",\"description\":\"Retrieve a paginated list of leads with filtering\",\"category\":\"leads\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"statusFilters\":{\"type\":[\"object\",\"null\"],\"anyOf\":[{\"type\":\"ob\n\nAssistant: [tool:execute-tool] {\"toolName\":\"leads-list\",\"input\":{\"paginationInfo\":{\"limit\":20,\"page\":1}},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"response\":{\"leads\":[{\"email\":null,\"businessName\":\"\",\"contactName\":null,\"country\":\"US\",\"language\":\"en\",\"status\":\"enums.leadStatus.websiteUser\",\"source\":\"enums.leadSource.website\",\"currentCampaignStage\":\"enums.emailCampaignStage.notStarted\",\"createdAt\":\"2026-07-08T22:53:33.924Z\",\"phone\":nu",
+    "encoding_format": "float"
+  }
+}

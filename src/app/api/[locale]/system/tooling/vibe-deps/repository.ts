@@ -1318,8 +1318,18 @@ function buildNeedsMove(
     const node = graph.get(key)!;
     // Filter out generated re-emitters and self — same as placementOf — so the
     // count shown matches the consumer set that drove the verdict.
+    // Additionally, for the RouteExecuteRepository entrypoint specifically, drop
+    // importers whose ONLY use of it is the sanctioned in-process-call methods
+    // (runInProcess / runInProcessTyped) — that edge is the "no raw fetch" call
+    // pattern, not coupling, so it must not inflate the domain-spread count.
+    // Importers using .execute (or any other member) are kept — real coupling.
+    const isRouteExecute = isRouteExecuteEntrypoint(key);
     const importers = [...node.importedBy]
       .filter((i) => !isSelf(i) && !isGeneratedImporter(i))
+      .filter(
+        (i) =>
+          !isRouteExecute || !importsOnlyRunInProcess(sources.get(i) ?? ""),
+      )
       .toSorted();
     const verdict = placementOf(key, importers);
     // system/ constants files that export *_ALIAS names are intentionally shared
@@ -1686,7 +1696,11 @@ function buildUnusedSymbols(
  * Only surfaces files outside the scope with ≥2 distinct in-scope imports
  * (single-import coupling is expected and unactionable).
  */
-function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
+function buildConsumerCoupling(
+  graph: Graph,
+  sources: ReadonlyMap<string, string>,
+  scope: string,
+): DepsEntry[] {
   if (!scope) {
     return [];
   }
@@ -1708,7 +1722,18 @@ function buildConsumerCoupling(graph: Graph, scope: string): DepsEntry[] {
       if (dep.startsWith(scopePrefix)) {
         // skill.ts files importing constants.ts files are picking up _ALIAS
         // string constants (tool names for pinnedTools) — by design, not coupling.
-        if (isSkill && /\/constants\.ts$/.test(dep)) {
+        if (isSkill && dep.endsWith("/constants.ts")) {
+          continue;
+        }
+        // RouteExecuteRepository (execute-tool/repository/index.ts): importing it
+        // ONLY for runInProcess / runInProcessTyped is the framework's sanctioned
+        // in-process-call pattern (the "no raw fetch" rule), not domain coupling —
+        // so it doesn't count toward the ≥2 threshold. But an importer that uses
+        // .execute (or any other member) IS coupling and still counts.
+        if (
+          isRouteExecuteEntrypoint(dep) &&
+          importsOnlyRunInProcess(sources.get(key) ?? "")
+        ) {
           continue;
         }
         const set = outsiderImportCount.get(key) ?? new Set<string>();
@@ -1887,7 +1912,7 @@ function buildReport(
     });
   };
 
-  const coupling = buildConsumerCoupling(graph, scope);
+  const coupling = buildConsumerCoupling(graph, sources, scope);
 
   // Split PROMOTE into two distinct signals:
   //   MISPLACED: file NOT in system/, used cross-domain → actually move it into system/

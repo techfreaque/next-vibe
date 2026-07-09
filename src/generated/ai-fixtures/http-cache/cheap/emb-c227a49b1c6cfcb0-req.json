@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result came back with a `total` field of 499.25, which is numeric. Let me check all the fields:\n\n- `capacity`: 515 (numeric) — this seems to be the max capacity\n- `earned`: 0 (numeric)\n- `expiresAt`: null (no expiration)\n- `expiring`: 0 (numeric)\n- `free`: 4.25 (numeric)\n- `permanent`: 495 (numeric)\n- `total`: 499.25 (numeric) ✓\n\nThe total is numeric (499.25). All good. No errors, no raw IDs, no stack traces, nothing confusing. The field names are clear and descriptive.\n\nActually wait - let me also check: is there anything off from the previous turn? The previous turn was [T3b fork-branch] and I just said \"BRANCH_RESPONSE STEP_OK\" which was fine. Nothing leftover.\n\nLet me also check: the tool description says \"Retrieve current user's credit balance with breakdown\" - the total fi\n\nUser: [T4b favorites] Call the favorites tool to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call the `favorites` tool to list favorites. Let me do that.</think>\n\nAssistant: <think>Let me check:\n1. The result has a `favorites` array - yes, it shows 2 favorites.\n2. Each entry has `name`, `id`, `description`, `modelId`, `skillId`, etc. - looks correct.\n3. No errors, no empty results, no raw IDs/JSON blobs/stack traces in user-facing content.\n4. Nothing else is off.\n\nSTEP_OK.</think>Result has a `favorites` array with 2 entries, each containing `name`, `id`, `description`, `modelId`, `skillId`, and other expected fields. Nothing off.\n\n**STEP_OK**\n\nUser: [T5 detach-dispatch] Call the cortex-write tool with path='/memories/cb-await-task-test' and content='await-task-test-payload' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have a responsePath (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or",
+    "encoding_format": "float"
+  }
+}

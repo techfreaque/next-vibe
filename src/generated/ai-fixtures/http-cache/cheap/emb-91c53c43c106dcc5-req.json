@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:485bffe8 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:51]\n\nAssistant: Result has a `favorites` array with 2 entries, each containing `name`, `id`, `description`, `modelId`, `skillId`, and other expected fields. Nothing off.\n\n**STEP_OK**\n\nSystem: [Context: ID:041eddeb | Posted:Jul 8, 22:52]\n\nUser: [T5 detach-dispatch] Call the cortex-write tool with path='/memories/cb-await-task-test' and content='await-task-test-payload' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have a responsePath (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:902c2b9c | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:52]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"path\":\"/memories/cb-await-task-test\",\"content\":\"await-task-test-payload\"},\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-bg-call-7144c6e2d9434787b7705e64\",\"hint\":\"Task detached. Use await-task with this taskId if you need the result.\"",
+    "encoding_format": "float"
+  }
+}

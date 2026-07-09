@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1822ede097ed7e4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 21:29:14 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783546153-R5Egf8IYx4tatWFWEUnG"
+  },
+  "body": {
+    "id": "gen-1783546153-R5Egf8IYx4tatWFWEUnG",
+    "object": "chat.completion",
+    "created": 1783546153,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of a catchy, upbeat pop-funk instrumental. The duration is approximately 25 seconds. The sound quality is clear and polished, suggesting a studio recording environment.\n\nHere's a breakdown of the musical elements:\n\n- **Tempo:** The tempo is moderately fast, estimated around 110-120 BPM, giving it an energetic feel.\n- **Instrumentation and Interaction:**\n    - **Drums:** There's a prominent, driving drum beat that includes a kick, snare, and hi-hat. The hi-hat plays a consistent eighth-note pattern, contributing to the forward momentum. The snare accents are on beats 2 and 4.\n    - **Bass:** A groovy, electric bassline provides a strong rhythmic and harmonic foundation, playing a syncopated pattern that complements the drums and guitar.\n    - **Electric Guitar:** There are at least two electric guitar parts. One plays a clean, rhythmic, chordal part with a distinct funk-influenced strumming pattern, characterized by short, percussive muted notes between the chords. Another guitar might be doubling this, or playing a slightly different rhythmic fill. The overall guitar sound is bright and somewhat compressed.\n    - **Synthesizer/Keyboard:** A bright, pluck-like synthesizer sound plays a repeating melodic motif that is central to the track's hook. It's light and playful.\n\n- **Genre and Mood:** The track clearly falls into the pop-funk or nu-disco genre, reminiscent of artists who blend modern pop sensibilities with classic funk rhythms. The mood is cheerful, energetic, and danceable.\n\n- **Production Style:** The production is clean and polished with a contemporary feel. The instruments are well-balanced in the mix. There's a subtle use of reverb to give the instruments some space without sounding washed out.\n\n- **Structure:** The clip appears to be a continuous loop or a segment that could function as a verse or intro in a full song. There's a repetitive melodic and rhythmic idea throughout.\n\n- **Non-musical audio:** There are no discernible speech, background voices, or other sound effects within this clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 448,
+      "total_tokens": 1520,
+      "cost": 0.0019666,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019666,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00112
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

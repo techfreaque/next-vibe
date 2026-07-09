@@ -62,7 +62,12 @@ const leadResponseSchema = z.object({
   emailsOpened: z.coerce.number(),
   emailsClicked: z.coerce.number(),
   lastEngagementAt: dateSchema.nullable(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   createdAt: dateSchema,
   updatedAt: dateSchema,
 });

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: [tool:execute-tool] {\"input\":{},\"toolName\":\"self-instance-id\",\"callbackMode\":\"endLoop\"}\n\nTool: [result:execute-tool] {\"result\":{\"instanceId\":\"atlas\"}}\n\nSystem: [Context: ID:37b522cd | Posted:Jul 9, 02:55]\n\nUser: [T5d wait-inline] Call the cortex-write tool with path='/memories/cb-wait-inline-test' and content='wait-inline-test-payload' and callbackMode='wait'. Check that the result has a responsePath (not a taskId). End your reply with STEP_OK if responsePath is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── cb-await-task-test [94%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [90%]\n│   │   wait-inline-test-payload\n│   ├── t7-approve-test [87%]\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-repeat-test [86%]\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test [84%]\n│   │   wakeup-test-payload\n│   ├── cb-wakeup-stress-test [82%]\n│   │   wakeup-stress-test-payload\n│   ├── t8-parallel-test [80%]\n│   │   T8_PARALLEL_OK\n│   ├── t2-cheap-tes\n\nSystem: [Context: ID:5920d904 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:55]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"content\":\"wait-inline-test-payload\",\"path\":\"/memories/cb-wait-inline-test\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"created\":false,\"updatedAt\":\"2026-07-09T00:55:28.485Z\"}}",
+    "encoding_format": "float"
+  }
+}

@@ -220,10 +220,11 @@ export async function generateVideoWithModelsLab(params: {
         });
       }
 
-      // Poll budget exhausted but the job is still running upstream. Same
-      // contract as the music provider: the processing response carries
-      // future_links — the URL the finished asset WILL live at. Return it
-      // instead of failing a generation that completes moments later.
+      // Poll budget exhausted. future_links is the URL the finished asset WILL
+      // live at — but returning it blind is a silent failure: if the job never
+      // finished, that URL 404s and we ship a dead video link. Only accept it
+      // if the file is ACTUALLY there now (HEAD via the fixture-aware fetch);
+      // otherwise fail loudly.
       if (futureUrl) {
         logger.warn(
           "[ModelsLab Video] Poll timed out, using future_links URL",

@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async",
+  "status": 200,
+  "headers": {
+    "allow": "GET, POST, DELETE, HEAD, OPTIONS",
+    "connection": "keep-alive",
+    "content-length": "345",
+    "content-type": "application/json",
+    "cross-origin-opener-policy": "same-origin",
+    "date": "Wed, 08 Jul 2026 21:28:20 GMT",
+    "referrer-policy": "same-origin",
+    "server": "granian",
+    "vary": "Accept, origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "body": {
+    "public_id": "c6d2d6d4-e41e-470b-be93-31152c60c1f6",
+    "status": "finished",
+    "error": null,
+    "results": {
+      "openai": {
+        "id": "c6d6dac0-b91d-4339-92f2-862c0dcddd68",
+        "model": null,
+        "error": null,
+        "final_status": "succeeded",
+        "cost": 0.0030024,
+        "text": "And I'll see you in the next video. Bye bye.",
+        "diarization": {
+          "entries": [],
+          "error_message": null,
+          "total_speakers": 0
+        }
+      }
+    }
+  }
+}

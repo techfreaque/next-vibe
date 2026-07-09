@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:7f0a6004 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:17]\n\nAssistant: BRANCH_RESPONSE STEP_OK\n\nSystem: [Context: ID:74c2c183 | Posted:Jul 9, 01:17]\n\nUser: [T4a music-gen] Call the generate_music tool with prompt='upbeat piano melody'. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [94%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test [85%]\n│   │   T8_PARALLEL_OK\n│   ├── t2-cheap-test [81%]\n│   │   T2_CHEAP_OK\n│   ├── cb-wakeup-repeat-test [74%]\n│   │   wakeup-repeat-test-payload\n│   ├── cb-await-task-test [73%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [72%]\n│   │   wait-inline-test-payload\n│   ├── cb-wakeup-stress-test [71%]\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-test [71%]\n\n\nSystem: [Context: ID:42c61036 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:17]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_music\",\"input\":{\"prompt\":\"upbeat piano melody\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"audioUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/cb70a161-8f94-48bd-84ca-1f331de9869b/c23f8222-b9dd-4dcb-92a7-7e7f1667dfef.mp3\",\"creditCost\":10.4,\"durationSeconds\":8}}",
+    "encoding_format": "float"
+  }
+}

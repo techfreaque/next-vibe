@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The audio is a **20-second hip-hop/trap instrumental loop** at approximately 90-100 BPM. It features:\n\n- **Drums** — punchy kick, snare, and hi-hats driving a classic hip-hop groove\n- **Synth bass** — a simple, foundational low-end line supporting the rhythm\n- **Synth melody/pad** — a bright, atmospheric repeating figure with a slightly ethereal quality\n\nThe production is clean and polished, with a laid-back, rhythmic, slightly hypnotic feel. No vocals are present — it's a continuous loop likely suited for background use in video, games, or transitions.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

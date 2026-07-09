@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\nAssistant: <think>I received both an image description and an audio description in the message. Let me describe both.</think>The **image** shows the **national flag of Japan** — a clean, minimalist design with a vibrant crimson circle centered on a bright white rectangular field. The edges are sharp and well-defined, the lighting is flat and even.\n\nThe **audio** is a 16-second instrumental hip-hop track with strong reggae/funk influences, featuring a prominent drum groove, a bright organ carrying the melody and harmony, and a subtle bass line. It has a relaxed, chill, nostalgic mood at around 90-100 BPM.\n\n**STEP_OK**\n\nUser: [T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.\n\nAssistant: <think>The audio description was injected by the system, so I can describe what's in it.</think>The audio is a **20-second hip-hop/trap instrumental loop** at approximately 90-100 BPM. It features:\n\n- **Drums** — punchy kick, snare, and hi-hats driving a classic hip-hop groove\n- **Synth bass** — a simple, foundational low-end line supporting the rhythm\n- **Synth melody/pad** — a bright, atmospheric repeating figure with a slightly ethereal quality\n\nThe production is clean and polished, with a laid-back, rhythmic,",
+    "encoding_format": "float"
+  }
+}

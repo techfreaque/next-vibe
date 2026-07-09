@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Both calls completed. The tool-help returned the full listing. The cortex-write with approve callback was confirmed by the user and executed successfully - it created the file at `/memories/t7-approve-test` with the content \"T7_APPROVE_OK\". \n\nLet me check: nothing off here. Both results are valid and expected.</think>Both calls completed successfully. `tool-help` returned the full 528-tool catalog across 22 categories. The `cortex-write` with callbackMode `approve` was user-confirmed and executed, writing `T7_APPROVE_OK` to `/memories/t7-approve-test`.\n\n**STEP_OK**\n\nUser: [CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.\n\nAssistant: <think>The user wants me to call the contact-form tool directly with the specified arguments. Let me invoke it with callbackMode='approve' since it will need confirmation.</think>\n\nAssistant: <think>The contact-form tool was called with the exact arguments specified. The user confirmed, and the result shows success with a thank you message. Let me check if anything is off:\n\n- The tool was called with the correct arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'\n- The result shows success with a reasonable user-facing message\n- No raw IDs, JSON blobs, stack traces, or confusing output\n- No errors\n\nEverything looks correct.</think>Contact form submitted successfully with the exact arguments. User confirmed, result returned a clean success message.\n\n**STEP_OK**\n\nUser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) the cortex-write tool with path='/memories",
+    "encoding_format": "float"
+  }
+}

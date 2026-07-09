@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result has a `favorites` array with 2 entries, each containing `name`, `id`, `description`, `modelId`, `skillId`, and other expected fields. Nothing off.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

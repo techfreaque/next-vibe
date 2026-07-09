@@ -3,10 +3,7 @@ import "server-only";
 
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import type {
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 import { listMonitors } from "./shared/repository";
 

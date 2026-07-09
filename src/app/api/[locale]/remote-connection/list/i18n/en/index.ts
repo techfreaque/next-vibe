@@ -59,17 +59,35 @@ export const translations = {
     connectedBadge: "Connected",
     registeredBadge: "Registered",
     selfBadge: "Self",
-    lastSynced: "Last synced",
+    lastSynced: "Initial sync",
     never: "Never",
     connectButton: "Link Local Instance",
     connectButtonLocal: "Connect to Cloud",
     incomingBadge: "Incoming",
     inactiveBadge: "Inactive",
+    inferenceProviderBadge: "Inference",
     instanceId: "Instance ID",
     remoteUrl: "Remote URL",
     viewButton: "View",
     editButton: "Edit",
     deleteButton: "Disconnect",
+    // ── Health status labels ───────────────────────────────────────────────────
+    health: {
+      tunnelOpen: "Tunnel open",
+      bridgeActive: "Connected",
+      tunnelWarning: "Tunnel unstable",
+      bridgeWarning: "Connection slow",
+      tunnelLost: "Tunnel lost",
+      bridgeFailed: "Connection failed",
+      disconnected: "Inactive",
+      incomingActive: "Active",
+    },
+    // ── Reconnect button labels ────────────────────────────────────────────────
+    reconnectButton: {
+      reconnect: "Reconnect",
+      retry: "Retry",
+      resync: "Re-sync",
+    },
     // Cloud marketing panel
     cloud: {
       heroTitle: "Own Your AI. Run It Anywhere.",

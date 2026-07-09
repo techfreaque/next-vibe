@@ -346,7 +346,7 @@ export async function complete(
       });
   }
 
-  // Fire-and-forget: sync thread embedding once at stream end with full conversation
+  // Fire-and-forget: sync thread stub + per-message embeddings at stream end
   void ctx.dbWriter.syncThreadEmbedding().catch(() => {
     // Intentional no-op: embedding sync is best-effort
   });

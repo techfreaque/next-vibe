@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "- Thread renamed to \"Tool Catalog Deep Dive\" for systematically testing tool-help across all categories.\n- **tool-help tests (3 calls):** category='ai' → 71 tools with names+descriptions ✓; query='search' → 12 tools across categories ✓; toolName='generate_image' → 1 tool with full parameter schema (prompt required, inputMediaUrl optional) ✓\n- **Favorites list:** returned 2 favorites — Quality Tester (budget variant on DeepSeek V4 Flash) and Quality Tester (native image variant on Gemini 3.1 Flash) ✓\n- **detach + await-task:** cortex-write with detach returned taskId=`local-bg-call-7144c6e2d9434787b7705e64` with no responsePath; await-task on that ID returned responsePath=`/memories/cb-await-task-test` ✓\n- **endLoop:** self-instance-id returned `\"atlas\"` ✓\n- **wait (inline):** cortex-write returned responsePath=`/memories/cb-wait-inline-test` with no taskId ✓\n- **wakeUp tests (3):** all three (cb-wakeup-test, cb-wakeup-repeat-test, cb-wakeup-stress-test) returned deferred results with non-empty responsePaths ✓\n- **approve:** cortex-write with approve mode was user-confirmed and wrote `T7_APPROVE_OK` to `/memories/t7-approve-test` ✓\n- **contact-form:** submitted with name=\"Test User\", subject=\"subject.generalInquiry\", message=\"Automated integration test. Please ignore.\" — user confirmed, success message returned ✓\n- **parallel tools:** cortex-write (responsePath) + chat-settings (selectedSkill=\"thea\", selectedModel=\"kimi-k2.6\") both returned expected shapes ✓\n- **leads-list:** required paginationInfo param; first call errored without it, retried with `{paginationInfo:{limit:20,page:1}}` — returned 20 leads on page 1 of 51, 1,006 total ✓\n- **Lead count confirmed:** 20 leads visible in the leads array from the result ✓\n- **Image attachment:** described the national flag of Japan (white background, centered red circle) ✓\n- **Multi-attach (image + audio):** Japanese flag image + 20s hip-hop/trap instrumental (90 BPM, 808 kick, snare, hi-hat, arpeggiated synth, chill/melan",
+    "encoding_format": "float"
+  }
+}

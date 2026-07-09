@@ -8,10 +8,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 
-import type {
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/favorites-formatter";
 
 import { parseError } from "../../system/core/utils/parse-error";
@@ -26,7 +23,7 @@ import {
   CORTEX_WRITE_ALIAS,
 } from "./constants";
 
-// ─── Data Types ───────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 /** A single file entry in the cortex tree */
 export interface CortexFileEntry {
@@ -639,13 +636,16 @@ interface VectorSearchOpts {
 }
 
 /**
- * Run a vector similarity search within cortex_nodes.
- * Returns ranked results with adjusted scores (recency + path weight).
+ * Run a vector similarity search within cortex_nodes using MaxSim:
+ * a node's score = max similarity across all query vectors (message embeddings).
+ * When no stored embeddings exist yet, falls back to generating one from
+ * fallbackQuery (single API call, same behaviour as before for first turn).
  */
 async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
   const {
     userId,
-    query,
+    messageEmbeddings,
+    fallbackQuery,
     pathPrefix,
     pathPrefixes,
     excludePrefixes = [],

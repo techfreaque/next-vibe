@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:0aa2294f | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:49]\n\nAssistant: **inventory-warehouses** ran successfully. Result has a `warehouses` array with 2 entries:\n\n| Warehouse | Code | Address | Default | Active |\n|-----------|------|---------|---------|--------|\n| Main Warehouse | WH-01 | 1 Storage Drive, Warehouse District | ✅ Yes | ✅ |\n| Secondary Warehouse | WH-02 | 2 Overflow Road, Storage Park | ❌ No | ✅ |\n\n**STEP_OK**\n\nSystem: [Context: ID:a337a05c | Posted:Jul 9, 02:49]\n\nUser: [T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:9338a147 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:49]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"payment-invoice-list\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"total\":0,\"invoices\":[]}}",
+    "encoding_format": "float"
+  }
+}

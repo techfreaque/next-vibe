@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result received. Checking:\n\n| Field | Value | Check |\n|-------|-------|-------|\n| `imageUrl` | absent | ❌ Missing |\n| `status` | `\"status.pending\"` | Task not yet completed |\n| `waiting` | `true` | Wait happened but task is still pending |\n\nThe task did not complete — it's still in `status.pending` state. No `imageUrl` (direct or nested) is present in the result. This is a failure.\n\n**FAILED: await-task returned status=\"status.pending\" and waiting=true but no imageUrl — the background task from generate_image/detach never completed (or await-task didn't poll long enough), so the expected imageUrl is absent.**",
+    "encoding_format": "float"
+  }
+}

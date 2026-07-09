@@ -25,7 +25,7 @@ import { CortexNodeTypeDB, CortexSyncPolicyDB, CortexViewTypeDB } from "./enum";
 
 /**
  * Custom pgvector type for embedding storage.
- * Stores float[] as vector(3072) in PostgreSQL (requires pgvector extension).
+ * Stores float[] as vector(1024) in PostgreSQL (requires pgvector extension).
  * NULL when not yet embedded.
  */
 const vector3072 = customType<{

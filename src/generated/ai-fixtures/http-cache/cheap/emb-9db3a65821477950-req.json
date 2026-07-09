@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "| Field | Value |\n|-------|-------|\n| **total** | **499.25** ✓ |\n| permanent | 495 |\n| free | 4.25 |\n| capacity | 515 |\n| earned | 0 |\n| expiring | 0 |\n| expiresAt | null |\n\nThe `total` field is `499.25` — numeric, valid. The breakdown is clear: 495 permanent credits + 4.25 free credits, with a capacity cap of 515. No errors, no oddities.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

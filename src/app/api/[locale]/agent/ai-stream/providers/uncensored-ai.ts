@@ -368,11 +368,3 @@ function createStreamingResponse(
     },
   });
 }
-
-/**
- * Check if a model ID is an Uncensored.ai model
- */
-export function isUncensoredAIModel(modelId: string): boolean {
-  // eslint-disable-next-line i18next/no-literal-string
-  return modelId === "uncensored-lm" || modelId.startsWith("uncensored-");
-}

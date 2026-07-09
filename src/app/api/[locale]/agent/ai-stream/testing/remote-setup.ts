@@ -1387,7 +1387,7 @@ export async function assertProdDbHasMessages(
 
 /**
  * Assert that all remote cron tasks for a thread completed successfully.
- * Finds tasks where wakeUpThreadId matches and targetInstance is set (remote tasks).
+ * Finds tasks where task_input->>'threadId' matches and targetInstance is set (remote tasks).
  * Asserts at least one exists and all have lastExecutionStatus = "completed".
  */
 export async function assertCronTaskCompleted(threadId: string): Promise<void> {

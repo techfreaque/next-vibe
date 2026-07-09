@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The leads-list tool requires a `paginationInfo` parameter. Let me check the schema for this tool.</think>\n\nAssistant: <think>The tool requires `paginationInfo` as a required parameter. Let me call it with the default pagination info.</think>\n\nAssistant: <think>The result has a `response.leads` array with 20 leads returned. This is correct. The tool returned successfully after I added the required `paginationInfo` parameter.\n\nLet me also check - nothing else is off. The initial error was expected since I didn't know the schema. The second call succeeded.</think>Result has a `response.leads` array with 20 leads. All good.\n\n**STEP_OK**\n\nUser: [T9 report] A leads list was retrieved for you earlier in this conversation. Look at the leads-list tool result in your context and report how many leads you can see. End your reply with STEP_OK if you can see the leads array in your context, or FAILED: <reason> if no leads result was visible.",
+    "encoding_format": "float"
+  }
+}

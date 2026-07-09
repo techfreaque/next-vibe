@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1822e90d976f4f1-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 21:29:02 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783546141-k3VFFdA7VC70k7YLYwYM"
+  },
+  "body": {
+    "id": "gen-1783546141-k3VFFdA7VC70k7YLYwYM",
+    "object": "chat.completion",
+    "created": 1783546141,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second instrumental music clip that can be characterized as video game music, possibly from a retro console or a modern indie game trying to emulate that style. The overall feel is upbeat and a bit whimsical.\n\n**Tempo:** Approximately 100-105 BPM.\n**Time Signature:** 4/4.\n\n**Instruments and Interaction:**\n-   **Drums (Percussion):** A simple, consistent drumbeat drives the rhythm. It sounds like a drum machine or synthesized drums. There's a clear kick drum and snare on beats 2 and 4, and a consistent high-hat pattern.\n-   **Bass:** A synthesized bass plays a somewhat walking bassline, providing a melodic and rhythmic foundation. It's not overly complex but adds to the bouncy feel.\n-   **Melody Instrument (Lead):** A bright, synthesized lead instrument, possibly a square wave or similar retro synth patch, plays the main melody. It's quite catchy and repetitive, typical for video game loops.\n-   **Chords/Harmony:** Another synthesized instrument, possibly strings or pads with a retro sound, plays sustained chords that support the melody. These chords often change every one or two measures.\n\n**Production Style:** The production is clean and polished, but intentionally emulates a retro sound, likely using chiptune-style synthesis or samples. There's a pleasant amount of reverb helping blend the instruments.\n\n**Musical Structure:** The clip presents a continuous loop of a short musical phrase, suggesting it's part of a longer piece or a repeated background track. There's no distinct intro, verse, or chorus within this short segment.\n\n**Mood:** Upbeat, cheerful, lighthearted, and slightly playful. It evokes a sense of exploration, adventure, or a positive game menu.\n\n**Sound Quality and Recording Environment:** The sound quality is clear and high-fidelity, suggesting a studio production, purposefully created to sound like a retro game. There are no external ambient sounds or quality issues.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 421,
+      "total_tokens": 1493,
+      "cost": 0.0018991,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018991,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0010525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

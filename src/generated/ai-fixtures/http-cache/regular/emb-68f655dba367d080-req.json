@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result has:\n- `taskId`: \"local-bg-call-1c4e859cdd6440caba3a1c92\" — a non-empty string ✅\n- No `imageUrl` field ✅ (expected, since it's detached)\n\nEverything checks out. Let me report STEP_OK with the taskId.</think>Result received. Checking:\n\n| Field | Value | Check |\n|-------|-------|-------|\n| `taskId` | `local-bg-call-1c4e859cdd6440caba3a1c92` | Non-empty string ✅ |\n| `imageUrl` | absent (as expected for detached mode) | ✅ |\n\nNothing else is off.\n\n**STEP_OK taskId=local-bg-call-1c4e859cdd6440caba3a1c92**\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-1c4e859cdd6440caba3a1c92'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call await-task with the taskId from the previous turn. Let me do that.</think>\n\nAssistant: <think>The result shows `status: \"status.pending\"` and `waiting: true`. This means the background task is still running. The result does NOT contain an imageUrl yet. \n\nHowever, the instruction says to check that the result contains an imageUrl string. It doesn't - the task is still pending. This is a failure condition.\n\nBut wait - let me reconsider. The await-task returned a result showing the task is still pending. The tool says \"waiting: true\" which means it's going to wait and continue. Let me check if the tool is still waiting or if this is the final result.\n\nLooking at the output more carefully - it says `waiting: true` and `status: \"status.pending\"`. This was returned as the final result, meaning the tool completed its wait but the task was still pending? Or maybe the await-task is a\n\nAssistant: <think>Wait, let me re-read the result more carefully. The output shows:\n\n```\n{\"creditCost\":2.86,\"imageUrl\":\"http://localhost:3000/...\",\"mediaType\":null,\"text\":null}\n```\n\nActually, there IS an imageUrl! Let me look again...\n\nT",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.\n\nAssistant: <think>The user wants me to describe the attached image. The system-injected vision description is present and describes the flag of Japan - a white rectangular background with a centered red circle. I can see and describe this content. Nothing else is off.</think>The attached image shows the **national flag of Japan** — a large white rectangular background with a solid, vibrant red circle centered perfectly on it. The design is clean and minimalist with high contrast, no text, markings, or other elements present. The red circle occupies a significant portion of the frame.\n\n**STEP_OK**\n\nUser: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\nAssistant: <think>I received both an image description and an audio description via system-injected text. The image is described as the Japanese flag, and the audio is described as a hip-hop/trap instrumental. Both are present and accounted for.</think>The **image** is the national flag of Japan — a solid red circle centered on a",
+    "encoding_format": "float"
+  }
+}

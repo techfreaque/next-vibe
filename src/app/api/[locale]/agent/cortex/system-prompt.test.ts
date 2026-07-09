@@ -16,10 +16,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   cleanExcerpt,
-  type CortexData,
   type CortexDirEntry,
   type CortexFileEntry,
   cortexFragment,
+  type CortexRenderData,
+  type CortexUnavailableData,
+  renderCortexFragment,
   renderCortexTree,
 } from "./system-prompt";
 

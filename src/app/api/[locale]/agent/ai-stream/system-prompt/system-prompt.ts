@@ -1,21 +1,16 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import { and, count, eq, like } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { languageConfig } from "next-vibe/core/i18n";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
-import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
@@ -368,7 +363,7 @@ export const extraInstructionsFragment: SystemPromptFragment<PromptContextData> 
     },
   };
 
-// ─── User context fragments (priority 550–710) ───────────────────────────────
+// ─── User context fragments (priority 550–720) ───────────────────────────────
 
 export const userNameFragment: SystemPromptFragment<PromptContextData> = {
   id: "user-name",

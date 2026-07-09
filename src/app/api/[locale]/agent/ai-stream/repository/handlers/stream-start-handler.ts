@@ -54,7 +54,7 @@ export class StreamStartHandler {
      */
     confirmationParentLeafId: string | undefined;
     /** Fixture chain of the stream — bound onto the dbWriter for embedding-sync. */
-    fixtureContext: FixtureContext | undefined;
+    streamContext: ToolExecutionContext;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): StreamContext {
@@ -172,7 +172,7 @@ export class StreamStartHandler {
     emitTitle: EmitThreadTitleFn;
     availability: AgentEnvAvailability;
     /** The stream's fixture chain — TTS provider calls bind record/replay to it. */
-    fixtureContext: FixtureContext | undefined;
+    streamContext: ToolExecutionContext;
     /** Ownership token for the stream's 'streaming' claim (ToolExecutionContext.streamRunId). */
     streamRunId: string | undefined;
     /** Branch leaf below the last confirmed tool — see initializeContext. */

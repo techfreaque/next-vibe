@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:5b6147f3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:41]\n\nAssistant: The tool ran successfully. The result contains a `stockLevels` array with 3 items: Consulting Hour, Laptop Stand, and Design Template Pack — all from Main Warehouse, none low on stock.\n\n**STEP_OK**\n\nSystem: [Context: ID:fcbdac1b | Posted:Jul 8, 22:41]\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:a4f86ba9 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:41]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"inventory-warehouses\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"warehouses\":[{\"id\":\"4b27e45b-32b4-4c91-a544-c04fbaa4f106\",\"name\":\"Main Warehouse\",\"code\":\"WH-01\",\"address\":\"1 Storage Drive, Warehouse District\",\"isActive\":true,\"isDefault\":true,\"createdAt\":\"2026-07-08T18:16:31.431Z\"},{\"id\":\"bba2c8e2-9cff-4181-9c86-778c1a06b8cb\",\"name\":\"Secondary Warehou",
+    "encoding_format": "float"
+  }
+}

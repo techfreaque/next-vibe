@@ -8,6 +8,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
+import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";

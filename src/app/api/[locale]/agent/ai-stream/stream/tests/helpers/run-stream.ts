@@ -511,6 +511,11 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         let lastPulsedAt = Date.now();
         const revivalStart = Date.now();
         let revivalState: string | undefined = "streaming";
+        // Wait for the thread to return to 'idle'. NOTE: 'idle' alone is the
+        // terminal for a phase-1 dispatch (wakeUp phase1 ends idle and its
+        // revival is a SEPARATE later turn) — do NOT additionally require
+        // no-pending-work here, or a phase-1 dispatch (which intentionally
+        // leaves a pending revival) would never settle.
         while (
           revivalState !== "idle" &&
           Date.now() - revivalStart < REVIVAL_TIMEOUT_MS

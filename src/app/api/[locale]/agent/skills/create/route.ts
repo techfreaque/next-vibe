@@ -8,8 +8,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: createSkillDefinition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) =>
-      SkillsRepository.createSkill(data, user, logger, t),
+    handler: ({ data, user, logger, t, streamContext }) =>
+      SkillsRepository.createSkill(data, user, logger, t, streamContext),
     onRemoteEvent: {
       "skill-created": (props) =>
         SkillsRepository.applyRemoteSkillCreate(props),

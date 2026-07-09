@@ -807,6 +807,9 @@ export class FolderContentsRepository {
       return;
     }
     const { createFolderContentsEmitter } = await import("./emitter");
+    // Full renderable folder item (not a stub) so a live-merged mirror folder
+    // doesn't render collapsed/misbehaving. The mirror is the caller's own, so
+    // the permission flags are all true; expanded/roles come from the leaf row.
     const folderItem = {
       id: leaf.id,
       type: "folder" as const,

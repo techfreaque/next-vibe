@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T2 cortex-write] Use the cortex-write tool to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use the cortex-read tool to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>Simple task: write a file, then read it back to verify. Let me do both in parallel since the read depends on the write completing first... actually, I need to write first, then read. Let me do them sequentially.\n\nWait, I can do them in parallel because the system might handle it, but to be safe and correct, I should write first, then read. Let me do them sequentially.\n\nActually, looking at the existing cortex, I see there's already a file at /memories/t2-cheap-test [83%] with content \"T2_CHEAP_OK\". Let me write it (overwrite) and then read it back.</think>\n\nAssistant: <think>Write succeeded (updatedAt set, size 11 = \"T2_CHEAP_OK\" is 11 characters). Now read it back.</think>\n\nAssistant: <think>Write succeeded (size 11, updatedAt timestamp). Read confirmed content is exactly \"T2_CHEAP_OK\" (11 bytes). Nothing off.</think>**Write:** `cortex-write` at `/memories/t2-cheap-test` — returned `updatedAt: 2026-07-08T20:03:40.150Z`, size 11.\n\n**Read:** `cortex-read` at `/memories/t2-cheap-test` — returned `content: \"T2_CHEAP_OK\"`, size 11, not truncated.\n\nContent matches exactly. No errors, no anomalies.\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

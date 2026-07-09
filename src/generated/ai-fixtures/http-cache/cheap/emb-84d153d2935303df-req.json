@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result has a `taskId` string (\"local-bg-call-7144c6e2d9434787b7705e64\") and no `responsePath` field. This is correct for a detached call. Everything checks out.</think>Result has a `taskId` string and no `responsePath`. Correct detached behavior.\n\n**STEP_OK taskId=local-bg-call-7144c6e2d9434787b7705e64**\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-7144c6e2d9434787b7705e64'. Check that the result contains a responsePath string (either directly or nested in a result field). End your reply with STEP_OK if responsePath is present, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call await-task with the taskId from the previous turn, and check that the result contains a responsePath string.</think>\n\nAssistant: <think>The result contains a `responsePath` string: `/memories/cb-await-task-test`. It's nested inside the `result` object. The task completed successfully.</think>Result contains a `responsePath` string (`/memories/cb-await-task-test`) nested in the result object. Task completed successfully.\n\n**STEP_OK**\n\nUser: [T5a endLoop] Call the self-instance-id tool with callbackMode='endLoop' EXACTLY ONCE. Do not call it again and do nothing with its result — endLoop ends the turn after the tool runs.",
+    "encoding_format": "float"
+  }
+}

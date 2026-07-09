@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result has a `responsePath` field with value `/memories/cb-wait-inline-test` — it's present, non-empty, and there's no `taskId` in the top-level result. This is correct for a synchronous (wait) mode call.</think>Result has a `responsePath` (`/memories/cb-wait-inline-test`) and no `taskId` at the top level — correct wait-mode behavior.\n\n**STEP_OK**\n\nUser: [T6a wakeUp-phase1] Call the cortex-write tool with path='/memories/cb-wakeup-test' and content='wakeup-test-payload' and callbackMode='wakeUp'. The write runs asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO responsePath — end your reply with STEP_OK, or FAILED: <reason> if there is a responsePath already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the tool's real output): seeing a non-empty responsePath in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. In phase 2, confirm the deferred result contains a non-empty responsePath, then end with WAKEUP_OK. Only end with WAKEUP_\n\nAssistant: <think>The user wants me to call cortex-write with callbackMode='wakeUp' and check the result. This is phase 1 - the dispatch phase. The result should have a taskId and no responsePath.</think>\n\nAssistant: <think>Phase 1 check: the result has a `taskId` (\"local-wu-call-66df4f1ce30e4fc7aba117f5\") and no `responsePath`. Correct. I need to acknowledge the taskId and stop the turn, as instructed. The thread will be revived automatically when the task completes for phase 2.</think>Dispatched — wakeUp taskId is `local-wu-call-66df4f1ce30e4fc7aba117f5`.\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

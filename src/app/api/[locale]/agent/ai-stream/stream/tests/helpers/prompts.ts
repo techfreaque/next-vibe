@@ -86,9 +86,9 @@ export function toolInstrWithArgs(
 
 /**
  * Assert step completed without the AI reporting issues.
- * Every test prompt ends with "End with STEP_OK if everything worked."
- * If the AI found something wrong, it reports it instead - and the test
- * fails with the AI's feedback as the error message.
+ * Parses the AI's FINAL verdict (reasoning stripped, last token wins): STEP_OK
+ * passes only when it is the last verdict and no trailing FAILED follows. A
+ * FAILED — even after an earlier STEP_OK — fails the test with the AI's report.
  */
 export function assertStepOk(
   content: string | null | undefined,

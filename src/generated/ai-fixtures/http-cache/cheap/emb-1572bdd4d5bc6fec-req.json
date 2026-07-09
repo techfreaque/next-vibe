@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>I need to find the companies-list tool first. Let me search for it.</think>\n\nAssistant: - **Tool-help deep dive**: Queried by category (`ai` → 71 tools), keyword (`search` → 12 tools across categories), and specific tool name (`generate_image` → full schema with `prompt` required + optional `inputMediaUrl`). All returned correctly.\n\n- **Credits balance**: `credits-balance` returned `total: 499.25` (495 permanent + 4.25 free, 515 capacity cap).\n\n- **Favorites**: `favorites` returned 2 entries: `quality-tester-budget` (DeepSeek V4 Flash) and `quality-tester-native-image` (Gemini 3.1 Flash).\n\n- **Detach/await-task**: `cortex-write` with `callbackMode=detach` returned `taskId: local-bg-call-7144c6e2d9434787b7705e64` and no `responsePath`. `await-task` with that taskId returned the completed result with `responsePath: /memories/cb-await-task-test`.\n\n- **EndLoop**: `self-instance-i\n\nAssistant: <think>The tool `companies-list` exists. Let me call it now.</think>\n\nAssistant: <think>The result has a `companies` array with one company (\"Demo Company\") and a `total` of 1. Everything looks correct.</think>Result has a `companies` array with 1 entry (\"Demo Company\", owner role, DE/B2C). Clean.\n\n**STEP_OK**\n\nUser: [T11b follow-up] Call the cron-stats tool to read the cron task stats. Check that the result has a numeric totalTasks. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

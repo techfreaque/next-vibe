@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Now I know companies-list expects page and pageSize params. Let me call it.</think>\n\nAssistant: - Thread renamed to \"Tool Catalog Deep Dive\" for systematically testing tool-help across all categories.\n- **tool-help tests (3 calls):** category='ai' → 71 tools with names+descriptions ✓; query='search' → 12 tools across categories ✓; toolName='generate_image' → 1 tool with full parameter schema (prompt required, inputMediaUrl optional) ✓\n- **Favorites list:** returned 2 favorites — Quality Tester (budget variant on DeepSeek V4 Flash) and Quality Tester (native image variant on Gemini 3.1 Flash) ✓\n- **detach + await-task:** cortex-write with detach returned taskId=`local-bg-call-7144c6e2d9434787b7705e64` with no responsePath; await-task on that ID returned responsePath=`/memories/cb-await-task-test` ✓\n- **endLoop:** self-instance-id returned `\"atlas\"` ✓\n- **wait (inline):** cortex-write \n\nAssistant: <think>The result has a `companies` array with one entry. It looks correct. Let me check:\n\n1. Tool ran successfully ✅\n2. Result has a `companies` array ✅ (contains one company: \"Demo Company\")\n3. Nothing else is off - no errors, no raw IDs exposed in a user-facing way (this is a test, the IDs are in the result which is fine for this context), no stack traces, no confusion\n\nEverything looks good.</think>The tool ran successfully and returned a `companies` array with 1 entry (`Demo Company`, role: owner, type: B2C).\n\n**STEP_OK**\n\nUser: [T11b follow-up] Call the cron-stats tool to read the cron task stats. Check that the result has a numeric totalTasks. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

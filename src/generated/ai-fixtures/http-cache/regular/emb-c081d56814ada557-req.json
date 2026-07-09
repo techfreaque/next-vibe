@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:0ae1bad8 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:17]\n\nAssistant: Result received. Checking:\n\n| Condition | Check |\n|-----------|-------|\n| `taskId` is a non-empty string | `\"local-bg-call-1c4e859cdd6440caba3a1c92\"` ✅ |\n| No `imageUrl` in the result | Not present ✅ |\n\n**STEP_OK taskId=local-bg-call-1c4e859cdd6440caba3a1c92**\n\nSystem: [Context: ID:03d7f5c7 | Posted:Jul 9, 01:17]\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-1c4e859cdd6440caba3a1c92'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [78%]\n│   │   T7_APPROVE_OK\n│   ├── cb-await-task-test [76%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [75%]\n│   │   wait-inline-test-payload\n│   ├── t2-cheap-test [73%]\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test [73%]\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-repeat-test [71%]\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test [71%]\n│   │   wakeup-test-payload\n│   ├── cb-wakeup-stress-test [70%]\n│   │  \n\nSystem: [Context: ID:5e5814c3 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:17]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"await-task\",\"input\":{\"taskId\":\"local-bg-call-1c4e859cdd6440caba3a1c92\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"status\":\"status.pending\",\"waiting\":true,\"originalToolName\":\"generate_image\",\"originalArgs\":{\"prompt\":\"await-task-test\"}}}",
+    "encoding_format": "float"
+  }
+}

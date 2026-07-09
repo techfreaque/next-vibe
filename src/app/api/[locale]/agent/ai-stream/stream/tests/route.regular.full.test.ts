@@ -11,6 +11,11 @@ import "server-only";
 import { describeStreamSuite } from "./route-base.test";
 
 describeStreamSuite({
+  // A NON-EMPTY cachePrefix is required: the fixture engine treats an empty
+  // prefix as "not a fixture run" (readAndBumpFixture's `!row.prefix` guard),
+  // so `cachePrefix: ""` silently disabled record/replay for this whole suite
+  // — every call went live and nothing was stored. Its own folder (distinct
+  // from cheap's "cheap") keeps the two suites' ordinal sequences separate.
   label: "AI Stream Integration - Regular (full)",
   cachePrefix: "",
   cheapMode: false,

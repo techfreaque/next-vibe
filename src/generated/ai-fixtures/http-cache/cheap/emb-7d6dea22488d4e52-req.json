@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: Thank you for watching. Bye.\n\nAssistant: <think>The user is saying goodbye. This seems like the end of the test session. I should respond appropriately. Nothing is off that I can see - the entire test suite ran successfully with all STEP_OK, WAKEUP_OK, and correct results throughout.</think>You're welcome! All tests passed cleanly — every tool call, every callback mode, every attachment, every check. \n\n**STEP_OK** — *Suite complete, zero failures.*\n\nBye! 👋\n\nUser: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: The video attachment is a close-up shot of a person's hands expertly manipulating a **Rubik's cube** in a dimly lit studio. The background is filled with a blurred pile of other cubes creating a colorful mosaic. The person's fingers rotate the top layer with precise, rhythmic movements, producing crisp mechanical clicking sounds. The style is polished and documentary-like with shallow depth of field, emphasizing the tactile mastery of the puzzle.\n\n**STEP_OK**\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think>The transcription contains the word \"Banana\" (twice, actually - \"Banana Banana\").</think>The speaker says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword Banana Banana and I need to fill up the last few seconds and it will be\"\n\n**STEP_OK** — contains \"Banana\" (twice).\n\nUser: [T11 companies-list] Call the companies-list tool to list the companies. Check that the result has a companies array. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

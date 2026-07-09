@@ -3245,7 +3245,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Vorschau",
                 "schema": {
@@ -5153,7 +5153,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Vorschau",
                 "schema": {
@@ -6278,7 +6278,7 @@
           },
           "schemaType": "primitive"
         },
-        "preview": {
+        "description": {
           "type": "text",
           "label": "Vorschau",
           "schema": {
@@ -8059,7 +8059,7 @@
           },
           "schemaType": "primitive"
         },
-        "preview": {
+        "description": {
           "type": "text",
           "label": "Vorschau",
           "schema": {
@@ -10892,6 +10892,71 @@
                 },
                 "schemaType": "primitive"
               },
+              "embedding": {
+                "type": "text",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "embeddingHash": {
+                "type": "text",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "createdAt": {
                 "type": "text",
                 "schema": {
@@ -12963,6 +13028,73 @@
                 },
                 "schemaType": "primitive"
               },
+              "embedding": {
+                "type": "text",
+                "content": "Suchvektor",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "embeddingHash": {
+                "type": "text",
+                "content": "Suchvektor",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "createdAt": {
                 "type": "text",
                 "content": "Erstellt am",
@@ -14300,7 +14432,7 @@
                 },
                 "schemaType": "primitive"
               },
-              "preview": {
+              "description": {
                 "type": "text",
                 "label": "Vorschau",
                 "schema": {
@@ -15090,7 +15222,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_rename_PATCH",
+    "toolName": "rename-thread",
     "title": "Thread umbenennen",
     "titleShort": "Umbenennen",
     "description": "Titel und Vorschau eines Chat-Threads ändern",
@@ -15419,6 +15551,7 @@
     "instanceId": "local",
     "category": "ai",
     "tags": ["Threads"],
+    "aliases": ["rename-thread"],
     "credits": 0
   },
   {

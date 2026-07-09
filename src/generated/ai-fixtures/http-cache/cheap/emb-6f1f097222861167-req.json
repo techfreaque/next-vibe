@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Phase 1 — dispatch: result has `taskId: \"local-wu-call-564b520dac18481197749088\"` and no `responsePath`. Correct wakeUp dispatch behavior.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

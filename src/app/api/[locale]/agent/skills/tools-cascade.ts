@@ -1,22 +1,12 @@
 /**
- * Tool config cascade resolver (server-only)
- * Resolves the effective tool configuration for an AI session:
- *   1. favorite.availableTools / pinnedTools (if set)
- *   2. skill.availableTools / pinnedTools (if set)
- *   3. null = all tools allowed / default visible set
+ * Tool config normalization (server-only).
  *
- * Used by stream-setup and help repository — single source of truth.
+ * The favorite → skill → NO_SKILL/role-default cascade now lives ONCE in
+ * `resolve-context.ts` (`resolveAgentContext`). This module keeps only the
+ * shared `normalizeToolConfig` helper both sides use.
  */
 
 import "server-only";
-
-import { eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
-
-import type { ToolConfigItem } from "../chat/settings/definition";
-import { isUuid } from "../chat/slugify";
-import { DEFAULT_SKILLS } from "./config";
-import { customSkills } from "./db";
 
 export type ResolvedAvailableTools = Array<{
   toolId: string;

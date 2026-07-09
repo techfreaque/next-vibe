@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The **image** is the national flag of Japan — a solid red circle centered on a white background, clean and minimalist.\n\nThe **audio** is a 20-second hip-hop/trap instrumental at ~90 BPM in a minor key. It features a repeating two-bar loop with an 808 kick, sharp snare on 2 & 4, closed hi-hats, and a slightly detuned arpeggiated synth melody with reverb. The mood is chill and melancholic — atmospheric trap / lo-fi hip-hop territory. No vocals. Clean production quality.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

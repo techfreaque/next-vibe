@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The contact-form tool was called with the exact arguments specified. The user confirmed, and the result shows success with a thank you message. Let me check if anything is off:\n\n- The tool was called with the correct arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'\n- The result shows success with a reasonable user-facing message\n- No raw IDs, JSON blobs, stack traces, or confusing output\n- No errors\n\nEverything looks correct.</think>Contact form submitted successfully with the exact arguments. User confirmed, result returned a clean success message.\n\n**STEP_OK**\n\nUser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) the cortex-write tool with path='/memories/t8-parallel-test' and content='T8_PARALLEL_OK' to write a memory node, and (2) the chat-settings tool to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.\n\nAssistant: <think>Both tools ran successfully. \n\n1. cortex-write returned `responsePath: \"/memories/t8-parallel-test\"` - correct.\n2. chat-settings returned `selectedSkill: \"thea\"` - present and non-empty.\n\nBoth tools returned their expected shapes. Nothing off.</think>Both tools ran successfully in parallel. `cortex-write` returned a `responsePath` and `chat-settings` returned a `selectedSkill`.\n\n**STEP_OK**\n\nUser: [T9 setup] Call the leads-list tool to list the leads. Check that the result has a response with a leads array. End your reply with STEP_OK once the leads are listed.",
+    "encoding_format": "float"
+  }
+}

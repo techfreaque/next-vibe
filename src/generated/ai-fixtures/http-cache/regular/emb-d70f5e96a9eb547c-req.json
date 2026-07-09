@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: [tool:execute-tool] {\"input\":{},\"toolName\":\"self-instance-id\",\"callbackMode\":\"endLoop\"}\n\nTool: [result:execute-tool] {\"result\":{\"instanceId\":\"atlas\"}}\n\nSystem: [Context: ID:7e6351da | Posted:Jul 9, 01:18]\n\nUser: [T5d wait-inline] Call the generate_image tool with prompt='wait-inline-test' and callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── cb-await-task-test [81%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [76%]\n│   │   wait-inline-test-payload\n│   ├── t7-approve-test [75%]\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-repeat-test [72%]\n│   │   wakeup-repeat-test-payload\n│   ├── t2-cheap-test [71%]\n│   │   T2_CHEAP_OK\n│   ├── cb-wakeup-test [70%]\n│   │   wakeup-test-payload\n│   ├── t8-parallel-test [69%]\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-stress-test [69%]\n│   │  \n\nSystem: [Context: ID:2f245ac1 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 01:18]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"wait-inline-test\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/cb70a161-8f94-48bd-84ca-1f331de9869b/633a1a77-4b66-4bca-9e49-ae3ef22e503f.png\",\"creditCost\":2.33}}",
+    "encoding_format": "float"
+  }
+}

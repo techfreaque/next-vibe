@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three results came back. Let me verify each and do the thread housekeeping rename.\n\n**Check 1 — Category='ai':** 71 tools matched, non-empty tools array. Each entry has `name` + `description` (e.g. `agent_chat_threads_POST` with description \"Create a new chat thread\"). ✓\n\n**Check 2 — Query='search':** 12 tools matched across categories. All have `name` + `description` (e.g. `brave-search` with description \"Search the internet...\"). ✓\n\n**Check 3 — toolName='generate_image':** 1 tool returned. Has `name: \"generate_image\"`, description \"Generate an image from a text prompt using AI\", and a `parameters` schema with required `prompt` (string, 1-2000 chars) and optional `inputMediaUrl`. ✓\n\nNothing else is off — no errors, no empty results, no raw IDs or JSON blobs in user-facing output, no confusing parameters",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Let me check each result against the requirements:\n\n**1. Category='ai' call:**\n- Returns a `tools` array with entries. ✓\n- Each entry has a `name` + `description`. ✓ (Let me check a few: \"agent_chat_threads_POST\" has name + description. Yes.)\n- The tools array is non-empty (71 tools listed, though only showing a subset). ✓\n- Actually, looking at the result more carefully, the `tools` key shows 71 tools but the output only shows the first ~25 due to pagination. The matchedCount is 71, and the tools array is non-empty. ✓\n\n**2. Query='search' call:**\n- Returns a `tools` array with 12 entries. ✓\n- Each entry has a `name` + `description`. ✓ (All entries have both name and description.)\n- Non-empty. ✓\n\n**3. toolName='generate_image' call:**\n- Returns a `tools` array with 1 entry named `ge\n\nAssistant: <think>The rename worked. Thread was renamed to \"Tool Catalog Deep Dive\" with the proper description. Everything is clean.\n\nNow I need to end with STEP_OK since all three checks passed and nothing else is off.</think>All three tool-help calls returned correctly. Thread renamed to \"Tool Catalog Deep Dive\". Nothing off anywhere.\n\n**STEP_OK**\n\nUser: [T2 cortex-write] Use the cortex-write tool to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use the cortex-read tool to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

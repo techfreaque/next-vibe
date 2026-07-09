@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T11c inventory-stock] Call the inventory-stock tool to list the inventory stock levels. Check that the result has a stockLevels array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think>The user wants me to call the inventory-stock tool. Let me first check the tool schema to know the parameters.</think>\n\nAssistant: <think>The tool takes optional `productId` and `warehouseId` parameters. No required parameters. Let me call it with defaults.</think>\n\nAssistant: <think>The result contains a `stockLevels` array with 3 items. All checks pass.</think>The tool ran successfully. The result contains a `stockLevels` array with 3 items: Consulting Hour, Laptop Stand, and Design Template Pack — all from Main Warehouse, none low on stock.\n\n**STEP_OK**\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Good, the tool exists. Now I need to call it with callbackMode='endLoop' exactly once. The endLoop mode will end the turn after the tool runs, so I won't be able to process the result.</think>\n\nUser: [T5d wait-inline] Call the generate_image tool with prompt='wait-inline-test' and callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nAssistant: <think>The user is asking me to call generate_image with callbackMode='wait' and prompt='wait-inline-test', then check that the result has an imageUrl (not a taskId). Let me do that.</think>\n\nAssistant: <think>The result is a nested object with an `imageUrl` field inside `result`. Let me check:\n\n- `imageUrl`: `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/673ac0ad-8e04-4f8a-b9e8-07faf22cd38d/2430e0af-00a5-4dda-b731-7bf82e558967.png\"` — non-empty ✅\n- No `taskId` in the top-level result ✅\n\nEverything looks good.</think>Result received. Checking:\n\n| Field | Value | Check |\n|-------|-------|-------|\n| `imageUrl` (nested in `result`) | `http://localhost:3000/api/.../2430e0af-...png` | Present and non-empty ✅ |\n| `taskId` | absent | No taskId — this was a synchronous wait ✅ |\n\n**STEP_OK**\n\nUser: [T6a wakeUp-phase1] Call the generate_image tool with prompt='wakeup-test' and callbackMode='wakeUp'. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an \"imageUrl\" field OR a rendered markdown ima",
+    "encoding_format": "float"
+  }
+}

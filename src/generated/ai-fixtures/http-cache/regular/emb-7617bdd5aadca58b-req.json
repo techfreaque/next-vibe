@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Wait — I misread the result. Let me re-examine.\n\nThe returned data is:\n```json\n{\n  \"creditCost\": 2.86,\n  \"imageUrl\": \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/673ac0ad-8e04-4f8a-b9e8-07faf22cd38d/bb549f33-7468-4317-b4db-7fb51ec975e5.png\",\n  \"mediaType\": null,\n  \"text\": null\n}\n```\n\n`imageUrl` is present and non-empty ✅. Nothing else is off.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

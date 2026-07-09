@@ -30,7 +30,11 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
 import {
@@ -39,7 +43,6 @@ import {
 } from "@/app/api/[locale]/remote-connection/db";
 import { env } from "@/config/env";
 
-import type { FixtureContext } from "../../../agent/ai-stream/testing/fetch-cache";
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";
 import {
   ATLAS_INSTANCE_ID,

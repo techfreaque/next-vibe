@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Deferred — got `taskId: local-wu-call-a63f798822ec4050a5ff1f19` and no `responsePath`. The write will complete in the background and wake this thread.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

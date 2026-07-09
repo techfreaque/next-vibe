@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a1822ce96b37f4f1-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 21:27:59 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783546072-sfYoUlm2xnSqMHFg8cX9"
+  },
+  "body": {
+    "id": "gen-1783546072-sfYoUlm2xnSqMHFg8cX9",
+    "object": "chat.completion",
+    "created": 1783546072,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A graphic illustration shows the national flag of Japan. The composition is simple and centered, featuring a large, solid red circle positioned precisely in the middle of a plain white rectangular field. The red disc is a deep, vibrant crimson color, and the white background is a clean, bright white. The edges of the circle and the flag itself are sharp and well-defined. The overall style is clean, modern, and graphic. The lighting is flat and even, emphasizing the design itself.",
+          "refusal": null,
+          "reasoning": "**Describing the Flag**\n\nMy focus is on detailing the Japanese flag. I am analyzing its core elements: the composition, the specific colors used, and the spatial arrangement of its features. This initial stage aims to establish a foundational understanding of its visual structure.\n\n**Analyzing the Flag**\n\nI'm currently dissecting the visual components of the Japanese flag. My process involves breaking down its composition, scrutinizing the specific color palette, and mapping out the precise spatial arrangement of its elements to build a comprehensive understanding of its design.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Describing the Flag**\n\nMy focus is on detailing the Japanese flag. I am analyzing its core elements: the composition, the specific colors used, and the spatial arrangement of its features. This initial stage aims to establish a foundational understanding of its visual structure.\n\n**Analyzing the Flag**\n\nI'm currently dissecting the visual components of the Japanese flag. My process involves breaking down its composition, scrutinizing the specific color palette, and mapping out the precise spatial arrangement of its elements to build a comprehensive understanding of its design.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CoIJAY89a1/pH7QDbunC4yxyADAriiGZoRV2XSB5frSZiudX7jpcgU6GGcvPBNkekwNa99ZtfWtX/ZgVMm1Cws4m3WKnFpe9zlnsUQ1ujUiFv3IrtoHSXr6mMKEK8w4FdgHcvW1RckbcC6sarokjrUKc1w2NMTQo6DXDIm1Mh1M4wxwKCVSvUQwYEgm6e4PPxvnS+QZ5kocprBh0uWvQku9sESKux8siT/KdaMiWsGuxCmkNOLp1RGdLRl+Ywez0GzvhdOHmNndmHT990BI52/UNQNzc/U4QmZxnOC19NcCAysf8Sc1ZNdBkjf2sVmXazYXM4arXE+C2K38I8OmB7W2yzrdAoiGtGCo80fSReuApH/M2W2dL7t5VrIAeuSoSnPF/8mHJCP5ZRyWmOwO/WexEcRgrjGKaUPD3z5U4D7JcFt+Oia9GA4jTQFBQ6NA3rZs502ckiAxDDyD1Yik9Sb/leUaWCFAx250xGt1xuljX0HN4JbZjJY6YIjHdkk3ciEORq3SFHvsgi/6Zb/j0AG+nlco9YPo0iUYOwPMY28vA3G5rwfs53Af1ilZzzSdkTorSSHamcuzRmRmtnn/5v2n4K/83tZokfy4A1Jcd60fHbZsWu4KWEJjPefwnSeOsGWDERRYub7alzX1QzUwz3e7jNcUR32vDoQ41T18rqHt6lI0mdh/4l42mlOt0WUCgcZJhFIxdn/VRA9ZtDsyWHsxi8Rz7uRsP8R67WNbobZurUL+zcrWrCTUtGRNJeObYLASnrIOSq3OflAsdB5ofec29HeJIy5AT6kW8y2TVhCNhQ45/ueWiYdpHIHMPE2lhaavH0P10mQ44o3MJ+dmRMn2xzNnB3DWjZbst/8zyAtvzf31inbutDMlRbA1KiBh1R39VVXi/wjFPJ2WJbiZe4Ph9jUHqCbLk4j6Dj9Ilhg0vVTsX9EHO0JtcFrhRe5V9rZXh1NFYD5EUej9ltSKdqBzmqqDROOfQ4NkbqXLN3a0kzHQdLh3h8uSShdSDoat/25svpI0lThlve29Ovh+TtkTw6ecaZ1bsk9nXL1FlekXWGXhbxqgOuPetNI40qchZkL0nwUs6Lsabq4QM9ItsvJNI/eneH7yEoAgYkG1aenwKLI0Cti+g+KumxBuiCp/QUKZ0NiG08GbdLwoF/dr42sWgeG35pVZlMZpeSttabuI3Bw6zyLkgmPT0l5nvbllimYznADubFQumDqasSCNr2WomoUSdqO/r8NlwSDpIfsIyYdFwVc3BLTuyZT47sCSj3QQHieMCRJL9GgE8u8Gw3BJPQvbaHHMx5rnyPhzkW4VqQb9XqF2SOzI5dbcHVVQjvxvlPiSJ0/+a5a2u0KIRAhQ+cbyw7kqcC/OOsQCWJCATrdUrJlN18Y82ojTMf4u76eXMQBAqA4t4OLxiclmncweFzAVFlMymqxqo4EFwReF44cx9q3FNNiqUMRZOw+0Am9TfhRxR986Q7UIZ+rk9ksgA2AQ6fYuAf8sQOBFcRqUZr6/OnRKtJPe8mVOM9JZRaKda7jU="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 330,
+      "total_tokens": 1167,
+      "cost": 0.005634,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005634,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.00396
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 233,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

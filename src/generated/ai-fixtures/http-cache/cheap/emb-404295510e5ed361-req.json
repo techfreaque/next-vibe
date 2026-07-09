@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:92e57abb | Model:deepseek-v4-flash | Skill:quality-tester | Posted:Jul 9, 11:30]\n\nAssistant: Phase 2 — deferred result has a non-empty `responsePath` (`/memories/cb-wakeup-repeat-test`). Correct wakeUp completion.\n\n**WAKEUP_OK**\n\nSystem: [Context: ID:f474fcd0 | Posted:Jul 9, 11:31]\n\nUser: [T6c#3 wakeUp-repeat] Call the cortex-write tool with path='/memories/cb-wakeup-stress-test' and content='wakeup-stress-test-payload' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no responsePath yet → end with STEP_OK; OR (b) INLINE - a fast task returns the result immediately (a non-empty responsePath) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor a responsePath. If you got a taskId (deferred), you will be revived when the write is done - on revival confirm the deferred result contains a non-empty responsePath and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no responsePath appears.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:815b75ab | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 11:31]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-write\",\"input\":{\"content",
+    "encoding_format": "float"
+  }
+}

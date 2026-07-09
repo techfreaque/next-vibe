@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a182be649f2992b9-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 08 Jul 2026 23:07:12 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783552031-L28qPX7zE76xQTx4azp2"
+  },
+  "body": {
+    "id": "gen-1783552031-L28qPX7zE76xQTx4azp2",
+    "object": "chat.completion",
+    "created": 1783552031,
+    "model": "deepseek/deepseek-v4-flash-20260423",
+    "provider": "Alibaba",
+    "system_fingerprint": null,
+    "service_tier": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "message": {
+          "role": "assistant",
+          "content": "Title: Testing tool-help with three modes\nDescription: The goal was to verify that the tool-help function returns correct results for category, search, and tool name queries.",
+          "refusal": null,
+          "reasoning": "The user wants me to check the results from the three tool-help calls for any issues. Let me analyze each call result carefully.\n\nCall 1: category='ai' - returns 71 tools, first page. The tools array has 71 items, each with name and description. Tools are listed like \"ai_update_credit\", \"chat_completion\", \"generate_image\", etc. Everything looks normal. No errors, no empty results, no raw IDs or JSON blobs in user-facing content.\n\nCall 2: query='search' - returns 12 tools matching \"search\". Tools like \"search_personalization\", \"search_web\", \"search_events\", etc. Each has name and description. Categories listed. No issues.\n\nCall 3: toolName='generate_image' - returns 1 tool with name \"generate_image\", description \"Generate an image from a text prompt using AI\", and a parameters schema. The schema has \"prompt\" (required) and \"inputMedia\" (optional). No errors, no raw IDs displayed, no stack traces.\n\nI don't see any issues with any of these results. All calls succeeded, returned meaningful data, no errors, no empty results, no confusing internal fields exposed. So I should report STEP_OK.\n\nWait, let me re-read the user's instruction: \"You name a chat thread from its transcript. Reply with EXACTLY two lines, nothing else: Title: <=8 words, no quotes, what the conversation is actually about Description: one concrete sentence — the goal or takeaway, not a restatement of the title\"\n\nBut the user also gave me a system prompt about being a quality gate. That seems like a mistake or a copy-paste error. The user's actual instruction is to name the chat thread from its transcript. The transcript consists of the user's message and my previous responses (the tool calls and their results).\n\nSo I need to summarize this conversation. The conversation was about making three tool-help calls to explore tools by category, search query, and specific tool name. The goal was to test the tool-help functionality and check results. The takeaway is that the tool-help works correctly for all three modes.\n\nLet me craft a title and description accordingly.\n\nTitle: \"Testing tool-help with three modes\" (<=8 words, no quotes)\nDescription: \"The goal was to verify that the tool-help function returns correct results for category, search, and tool name queries.\"",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "The user wants me to check the results from the three tool-help calls for any issues. Let me analyze each call result carefully.\n\nCall 1: category='ai' - returns 71 tools, first page. The tools array has 71 items, each with name and description. Tools are listed like \"ai_update_credit\", \"chat_completion\", \"generate_image\", etc. Everything looks normal. No errors, no empty results, no raw IDs or JSON blobs in user-facing content.\n\nCall 2: query='search' - returns 12 tools matching \"search\". Tools like \"search_personalization\", \"search_web\", \"search_events\", etc. Each has name and description. Categories listed. No issues.\n\nCall 3: toolName='generate_image' - returns 1 tool with name \"generate_image\", description \"Generate an image from a text prompt using AI\", and a parameters schema. The schema has \"prompt\" (required) and \"inputMedia\" (optional). No errors, no raw IDs displayed, no stack traces.\n\nI don't see any issues with any of these results. All calls succeeded, returned meaningful data, no errors, no empty results, no confusing internal fields exposed. So I should report STEP_OK.\n\nWait, let me re-read the user's instruction: \"You name a chat thread from its transcript. Reply with EXACTLY two lines, nothing else: Title: <=8 words, no quotes, what the conversation is actually about Description: one concrete sentence — the goal or takeaway, not a restatement of the title\"\n\nBut the user also gave me a system prompt about being a quality gate. That seems like a mistake or a copy-paste error. The user's actual instruction is to name the chat thread from its transcript. The transcript consists of the user's message and my previous responses (the tool calls and their results).\n\nSo I need to summarize this conversation. The conversation was about making three tool-help calls to explore tools by category, search query, and specific tool name. The goal was to test the tool-help functionality and check results. The takeaway is that the tool-help works correctly for all three modes.\n\nLet me craft a title and description accordingly.\n\nTitle: \"Testing tool-help with three modes\" (<=8 words, no quotes)\nDescription: \"The goal was to verify that the tool-help function returns correct results for category, search, and tool name queries.\"",
+              "format": "unknown",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 496,
+      "completion_tokens": 535,
+      "total_tokens": 1031,
+      "cost": 0.000209844,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000209844,
+        "upstream_inference_prompt_cost": 0.000066464,
+        "upstream_inference_completions_cost": 0.00014338
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 499,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

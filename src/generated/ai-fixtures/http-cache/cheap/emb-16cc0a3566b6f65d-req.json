@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The tool ran successfully. Let me check that the result has a numeric `totalTasks`:\n\n- `totalTasks: 17` — yes, it's a number (17).\n\nOther relevant numeric fields: `totalExecutions: 39`, `activeTasks: 9`, `failedExecutions: 0`, `successRate: 100`, `executedTasks: 39`.\n\nAll looks clean. The result has a numeric `totalTasks` (17). STEP_OK.</think>**cron-stats** ran successfully. Key stats:\n\n| Metric | Value |\n|--------|-------|\n| `totalTasks` | **17** (numeric ✓) |\n| `activeTasks` | 9 |\n| `totalExecutions` | 39 |\n| `successRate` | 100% |\n| `failedExecutions` | 0 |\n| `systemStatus` | healthy |\n\nTop performing: `system_dataflow_cleanup_POST` (32 execs, avg 92ms) and `db-health` (7 execs, avg 14ms), both 100% success rate.\n\n**STEP_OK**\n\nUser: [T11c inventory-stock] Call the inventory-stock tool to list the inventory stock levels. Check that the result has a stockLevels array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think>The user wants me to call the inventory-stock tool. Let me check if I have the schema for it. I don't see it in the tool catalog listed above. Let me look it up first with tool-help, or just try to call it directly.\n\nActually, looking at the available tools, I only see `execute-tool` as the available function. I need to call `execute-tool` with `toolName: \"inventory-stock\"`. Let me just try it.</think>\n\nAssistant: <think>The tool returned successfully. Let me check the result:\n\n- `stockLevels` is an array ✓\n- It has 3 items with product info: Consulting Hour, Laptop Stand, Design Template Pack\n- All fields present: id, productName, quantityAvailable, quantityOnHand, warehouseName, etc.\n- No low stock items (all `isLowStock: false`)\n\nEverything looks good.</think>**inventory-stock** ran successfully. Result has a `stockLevels` array with 3 items:\n\n| Product | Available | On Hand | Reserved | Unit Cost | Warehouse |\n|---------|-----------|---------|----------|-----------|-----------|\n| Consulting Hour | 52",
+    "encoding_format": "float"
+  }
+}

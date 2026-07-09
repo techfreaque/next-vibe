@@ -2276,8 +2276,8 @@ describe("Cortex: /documents path operations and edge cases", () => {
 // ── System Prompt Injection Tests ────────────────────────────────────────────
 //
 // These are UNIT tests - no AI stream, no fetch cache.
-// They insert test cortex nodes directly, then call loadCortexData() and
-// cortexFragment.build() to verify system prompt assembly works correctly.
+// They insert test cortex nodes directly, then call cortexFragment.build()
+// directly to verify system prompt assembly works correctly.
 // Self-contained - no dependency on `vibe seed`.
 
 describe("Cortex System Prompt Injection", () => {
@@ -2349,7 +2349,7 @@ describe("Cortex System Prompt Injection", () => {
     }
   }, SP_TIMEOUT);
 
-  // ── SP1: loadCortexData returns test-created memories ─────────────────────
+  // ── SP1: cortexFragment.build returns test-created memories ──────────────
   it(
     "SP1: loadCortexData returns memories with correct structure",
     async () => {
@@ -2358,7 +2358,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2432,7 +2432,6 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
@@ -2490,7 +2489,7 @@ describe("Cortex System Prompt Injection", () => {
     SP_TIMEOUT,
   );
 
-  // ── SP3: incognito returns empty (no memory leak) ─────────────────────────
+  // ── SP3: incognito returns unavailable note (no memory leak) ─────────────
   it(
     "SP3: incognito mode returns empty CortexData (memory isolation)",
     async () => {
@@ -2499,7 +2498,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       const data = await loadCortexData({
@@ -2532,7 +2531,7 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
+      const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       // Query something that should match our test-inserted skills.md
@@ -2560,7 +2559,8 @@ describe("Cortex System Prompt Injection", () => {
       );
 
       // The beforeAll embedded TypeScript/React expertise memories, so a query
-      // about TypeScript skills MUST surface relevant scored files. No skipping.
+      // about TypeScript skills MUST surface relevant scored files with score badges.
+      // No skipping — embeddings must be present.
       expect(
         allFileEntries.length,
         "SP4: vector search must return scored relevant files for the query",
@@ -2600,7 +2600,6 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
@@ -2669,7 +2668,6 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      const { loadCortexData } = await import("./system-prompt");
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 

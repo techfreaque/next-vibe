@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached image shows the **national flag of Japan** — a large white rectangular background with a solid, vibrant red circle centered perfectly on it. The design is clean and minimalist with high contrast, no text, markings, or other elements present. The red circle occupies a significant portion of the frame.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

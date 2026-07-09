@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Let me check the three conditions:\n\n1. `videoUrl` = `\"http://localhost:3000/api/.../28b9ec37-f7bd-455e-bd79-c20bae476813.mp4\"` — non-empty ✅\n2. `creditCost` = `124.8` — positive ✅\n3. `durationSeconds` = `4` — positive ✅\n\nAll good. Nothing else off.</think>Result received. Checking the three conditions:\n\n| Field | Value | Check |\n|-------|-------|-------|\n| `videoUrl` | `http://localhost:3000/api/.../28b9ec37-...mp4` | Non-empty ✅ |\n| `creditCost` | 124.8 | Positive ✅ |\n| `durationSeconds` | 4 | Positive ✅ |\n\nAll three conditions pass. Nothing else is off.\n\n**STEP_OK**\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='await-task-test' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call generate_image with prompt='await-task-test' and callbackMode='detach'. Let me check the tool-help output from earlier to get the exact parameter schema for generate_image.\n\nFrom the T1 results, generate_image takes:\n- prompt (required, string, 1-2000 chars)\n- inputMediaUrl (optional, URI)\n\nAnd callbackMode is a parameter on execute-tool, not on the tool itself. Let me call it with callbackMode='detach'.</think>\n\nAssistant: <think>The result is:\n- `taskId`: `local-bg-call-1c4e859cdd6440caba3a1c92` — a non-empty string ✅\n- No `imageUrl` field — correct, the task is running in the background ✅\n\nEverything checks out.</think>Result received. Checking:\n\n| Condition | Check |\n|-----------|-------|\n| `taskId` is a non-empty string | `\"local-bg-call-1c4e859cdd6440caba3a1c92\"` ✅ |\n| No `imageUrl` in the result | Not present ✅ |\n\n**STEP_OK taskId=local-bg-call-1c4e859cdd6440caba3a1c92**\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-1c4e859cdd6440caba3a1c92'. Check tha",
+    "encoding_format": "float"
+  }
+}

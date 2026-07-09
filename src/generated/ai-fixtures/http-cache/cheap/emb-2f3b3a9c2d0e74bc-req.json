@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Dispatched — wakeUp taskId is `local-wu-call-66df4f1ce30e4fc7aba117f5`.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

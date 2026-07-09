@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Let me check the results carefully:\n\n**Call 1: category='ai'**\n- Returns 71 tools (first page)\n- Each tool has a name and description - CHECK\n- The tools array is non-empty - CHECK\n- Wait, the hint says \"71 tools\" but the totalCount says 528. The category filter narrowed to 71 tools, which makes sense. Good.\n\n**Call 2: query='search'**\n- Returns 12 tools matching \"search\" across categories\n- Each tool has a name and description - CHECK\n- The tools array is non-empty - CHECK\n- Has categories listed too (account, ai, cortex, leads, pos)\n\n**Call 3: toolName='generate_image'**\n- Returns 1 tool - generate_image\n- Has name: \"generate_image\" - CHECK\n- Has description: \"Generate an image from a text prompt using AI\" - CHECK\n- Has a parameters schema with properties (prompt required, inputMe\n\nUser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

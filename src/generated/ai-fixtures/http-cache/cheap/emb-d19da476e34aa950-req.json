@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.\n\nAssistant: <think>I received both an image description and an audio description via system-injected text. The image is described as the Japanese flag, and the audio is described as a hip-hop/trap instrumental. Both are present and accounted for.</think>The **image** is the national flag of Japan — a solid red circle centered on a white background, clean and minimalist.\n\nThe **audio** is a 20-second hip-hop/trap instrumental at ~90 BPM in a minor key. It features a repeating two-bar loop with an 808 kick, sharp snare on 2 & 4, closed hi-hats, and a slightly detuned arpeggiated synth melody with reverb. The mood is chill and melancholic — atmospheric trap / lo-fi hip-hop territory. No vocals. Clean production quality.\n\n**STEP_OK**\n\nUser: [T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.\n\nAssistant: <think>The audio attachment is present with a system-injected description. I can \"hear\" and describe it based on the description provided.</think>The attached audio is a **27-second instrumental pop-funk track** at ~120-130 BPM in a major key (4/4 time). It features:\n\n- **Driving electric bass** playing a funky, syncopated line\n- **Clean electric guitar** with a rhythmic, muted riff\n- **Acoustic drum k",
+    "encoding_format": "float"
+  }
+}

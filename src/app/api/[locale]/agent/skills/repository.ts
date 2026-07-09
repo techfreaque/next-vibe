@@ -48,6 +48,7 @@ import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speec
 import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
 
+import type { ToolExecutionContext } from "../chat/config";
 import { rootlessStreamContext } from "../chat/config";
 import {
   ensureUniqueSlug,
@@ -1259,8 +1260,7 @@ export class SkillsRepository {
             userId,
             `/skills/${skill.id}.md`,
             embeddingContent,
-            // Skill CRUD endpoint — no stream/fixture context (runs live even in
-            // tests, in setup, outside any recorded case).
+            // Caller's stream/fixture context — records/replays in fixture runs.
             streamContext,
           );
         })().catch(() => {

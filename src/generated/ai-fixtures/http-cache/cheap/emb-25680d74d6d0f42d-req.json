@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:e12d2110 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:51]\n\nAssistant: BRANCH_RESPONSE STEP_OK\n\nSystem: [Context: ID:e058f334 | Posted:Jul 8, 22:51]\n\nUser: [T4a credits-balance] Call the credits-balance tool to read the wallet balance. Check that the result has a numeric total. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:4c243c99 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:51]\n\nAssistant: Let me find the credits-balance tool first [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"credits\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"coa-journal-create\",\"title\":\"Create Journal Entry\",\"description\":\"Create a manual double-entry journal. Total debits must equal total credits.\",\"category\":\"accounting\"},{\"name\":\"coa-journal-reverse\",\"title\":\"Reverse Journal Entry\",\"description\":\"Create a reversal entry t",
+    "encoding_format": "float"
+  }
+}

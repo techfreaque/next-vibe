@@ -1,10 +1,7 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import type {
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 import { CONTACT_FORM_ALIAS } from "./constants";
 

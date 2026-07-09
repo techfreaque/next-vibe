@@ -86,11 +86,13 @@ If everything works, respond normally to the user. Only flag issues - don't narr
       audioVisionModelSelection: AUDIO_VISION.geminiFlash,
     },
     {
-      id: "visual",
-      variantName: "skills.qualityTester.variants.visual" as const,
+      id: "native-image",
+      variantName: "skills.qualityTester.variants.nativeImage" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_5_FLASH,
+        // Gemini 3.1 Flash Image Preview (Nano Banana): the chat model IS the
+        // image model — native image generation without a tool round-trip.
+        manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.SMART,
@@ -102,7 +104,12 @@ If everything works, respond normally to the user. Only flag issues - don't narr
         sortBy: ModelSortField.PRICE,
         sortDirection: ModelSortDirection.ASC,
       },
-      imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
+      imageGenModelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+        sortBy: ModelSortField.PRICE,
+        sortDirection: ModelSortDirection.ASC,
+      },
       musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,
       voiceModelSelection: VOICE.neutral,

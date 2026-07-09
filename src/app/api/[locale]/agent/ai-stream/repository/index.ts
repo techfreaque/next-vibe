@@ -36,6 +36,7 @@ import {
   ThreadStreamingState,
 } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
+import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
 import {
   createMessagesEmitter,
   type MessagesWsEmit,
@@ -224,10 +225,10 @@ export class AiStreamRepository {
       AiStreamRepository.extractUserIdentifiers(user, request, headless);
 
     // ================================================================
-    // Headless intake (adapter calls only): inject preCalls as thread
-    // messages and derive operation/parent/userMessageId from thread
-    // state. Must run BEFORE the relay branch so relayed headless turns
-    // forward the DERIVED operation + parent to the remote instance.
+    // Model/skill resolution — ALWAYS, EXACTLY ONE source in precedence:
+    // explicit model (interactive client — model+skill, favoriteConfig as
+    // context) → favoriteId → skill variant. The interactive path carries a
+    // model, so this resolves to source-1 (a no-op on the concrete value).
     // ================================================================
     if (!headless && !isRevival) {
       const { isRemoteHostRequest, delegateToRemoteHost } =
@@ -367,6 +368,7 @@ export class AiStreamRepository {
       mediaModelOverrides,
       toolsOverride,
       parentAbortSignal,
+      parentThreadId,
     });
 
     if (!setupResult.success) {
@@ -496,6 +498,7 @@ export class AiStreamRepository {
       activeToolNames,
       provider,
       streamAbortController,
+      cancelStreamControlSub,
       effectiveCompactTrigger,
       streamContext,
       skipAiTurn,

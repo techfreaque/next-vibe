@@ -887,7 +887,9 @@ const { POST } = createEndpoint({
                           optional: true,
                           icon: "file-output",
                           colSpan: 12,
-                          schema: z.record(z.string(), z.unknown()).optional(),
+                          schema: z
+                            .record(z.string(), WidgetDataSchema)
+                            .optional(),
                         }),
                       },
                     }),
@@ -928,7 +930,7 @@ const { POST } = createEndpoint({
                       optional: true,
                       icon: "plug",
                       colSpan: 12,
-                      schema: z.array(z.unknown()).optional(),
+                      schema: z.array(WidgetDataSchema).optional(),
                     }),
 
                     // Raw build options passthrough
@@ -940,7 +942,7 @@ const { POST } = createEndpoint({
                       optional: true,
                       icon: "settings",
                       colSpan: 12,
-                      schema: z.record(z.string(), z.unknown()).optional(),
+                      schema: z.record(z.string(), WidgetDataSchema).optional(),
                     }),
                   },
                 }),

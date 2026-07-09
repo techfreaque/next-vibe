@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The tool exists with name \"self-instance-id\". Now I'll call it with callbackMode='endLoop' which will end the turn after execution.</think>\n\nUser: [T5d wait-inline] Call the cortex-write tool with path='/memories/cb-wait-inline-test' and content='wait-inline-test-payload' and callbackMode='wait'. Check that the result has a responsePath (not a taskId). End your reply with STEP_OK if responsePath is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nAssistant: <think>The user is asking me to call cortex-write with callbackMode='wait' and check the result. Let me do that.</think>\n\nAssistant: <think>The result has a `responsePath` field with value `/memories/cb-wait-inline-test` — it's present, non-empty, and there's no `taskId` in the top-level result. This is correct for a synchronous (wait) mode call.</think>Result has a `responsePath` (`/memories/cb-wait-inline-test`) and no `taskId` at the top level — correct wait-mode behavior.\n\n**STEP_OK**\n\nUser: [T6a wakeUp-phase1] Call the cortex-write tool with path='/memories/cb-wakeup-test' and content='wakeup-test-payload' and callbackMode='wakeUp'. The write runs asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO responsePath — end your reply with STEP_OK, or FAILED: <reason> if there is a responsePath already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the tool's real output): seeing a non-empty responsePath in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. In phase 2, confirm the deferred result contains a non-empty responsePath, then end with WAKEUP_OK. Only end with WAKEUP_",
+    "encoding_format": "float"
+  }
+}

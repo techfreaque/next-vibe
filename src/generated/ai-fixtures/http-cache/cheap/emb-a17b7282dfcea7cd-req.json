@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [96%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test [90%]\n│   │   T8_PARALLEL_OK\n│   ├── t2-cheap-test [76%]\n│   │   T2_CHEAP_OK\n│   ├── cb-wait-inline-test [71%]\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test [71%]\n│   │   await-task-test-payload\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-tes\n\nSystem: [Context: ID:db904535 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:40]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"leads\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"credits-spent-by-leads\",\"description\":\"Sum of usage transactions from lead wallets per resolution bucket\",\"category\":\"analytics\"},{\"name\":\"leads-active\",\"description\":\"Count of non-bounced, non-unsubscribed, non-invalid leads per time bucket\",\"category\":\"analytics\"},{\"na\n\nAssistant: [tool:execute-tool] {\"toolName\":\"leads-list\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Validation failed (1 error):\\n  • paginationInfo: Invalid input: expected object, received undefined\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"leads-list\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"leads-list\",\"title\":\"Leads\",\"description\":\"Retrieve a paginated list of leads with filtering\",\"category\":\"leads\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{\"statusFilters\":{",
+    "encoding_format": "float"
+  }
+}

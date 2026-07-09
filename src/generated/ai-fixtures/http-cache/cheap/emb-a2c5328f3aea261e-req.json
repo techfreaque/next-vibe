@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The video attachment is a close-up shot of a person's hands expertly manipulating a **Rubik's cube** in a dimly lit studio. The background is filled with a blurred pile of other cubes creating a colorful mosaic. The person's fingers rotate the top layer with precise, rhythmic movements, producing crisp mechanical clicking sounds. The style is polished and documentary-like with shallow depth of field, emphasizing the tactile mastery of the puzzle.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

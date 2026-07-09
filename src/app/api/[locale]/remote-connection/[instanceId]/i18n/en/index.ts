@@ -14,12 +14,14 @@ export const translations = {
       badge: "Active",
       connectedTo: "Remote URL",
       transport: "Transport (outbound)",
-      remoteTransport: "Transport (inbound)",
+      remoteTransport: "Their transport",
       remoteInstance: "Remote instance",
       capabilities: "Capabilities version",
-      lastSynced: "Last synced",
-      wsConnected: "WS connected",
+      lastSynced: "Initial sync",
+      wsConnected: "Connected since",
       refresh: "Refresh",
+      transportReverseWs: "Reverse WS (tunnel)",
+      transportDirectHttp: "Direct HTTP",
     },
     notConnected: {
       title: "Not connected",
@@ -50,16 +52,34 @@ export const translations = {
     sshDescription:
       "SSH configurations and terminal sessions via this connection.",
     sshLink: "Open SSH connections",
+    // ── Connection state banner ────────────────────────────────────────────
+    state: {
+      tunnelActive: "Tunnel open",
+      bridgeActive: "Connected",
+      degraded: "Connection degraded",
+      connectionLost: "Connection lost",
+      inactive: "Inactive",
+      connectedSince: "Since",
+      initialSync: "Synced",
+    },
     // ── Actions ────────────────────────────────────────────────────────────
     reauthButton: "Re-authenticate",
     renameButton: "Rename",
     editButton: "Edit",
+    reconnectButton: "Reconnect",
     disconnectButton: "Disconnect",
     disconnectConfirmTitle: "Disconnect this instance?",
     disconnectConfirmDescription:
       "The connection will be removed. You can reconnect at any time.",
     disconnectConfirmCancel: "Cancel",
     disconnectConfirmProceed: "Disconnect",
+    // ── Edit section titles ────────────────────────────────────────────────
+    edit: {
+      identitySection: "Name",
+      reauthSection: "Re-authenticate",
+      transportSection: "Transport",
+      behaviorSection: "Behavior",
+    },
   },
   get: {
     title: "Remote Connection Status",

@@ -1,0 +1,34 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai/6.0.158 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "You name a chat thread from its transcript. Reply with EXACTLY two lines, nothing else:\nTitle: <=8 words, no quotes, what the conversation is actually about\nDescription: one concrete sentence — the goal or takeaway, not a restatement of the title",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "user: [T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. You \nassistant: <think>Let me make all three tool-help calls in parallel. I'll use the execute-tool tool to call tool-help with different parameters.</think>\nassistant: <think>Let me check the results carefully:\n\n**Call 1: category='ai'**\n- Returns 71 tools (first page)\n- Each tool has a name and description - CHECK\n- The tools array is non-empty - CHECK\n- Wait, the hint says \"71 tools\" but the totalCount says 528. The category filter narrowed to 71 tools, which makes sense. Good.\n\n**Call 2: query='search'**\n- Returns 12 tools matching \"search\" across categories\n- Each tool has a name and description - CHECK\n- The tools array is non-empty - CHECK\n- Has categories listed too (account, ai, cortex, leads, pos)\n\n**Call 3: toolName='generate_image'**\n- Returns 1 tool - generate_image\n- Has name: \"generate_image\" - CHECK\n- Has description: \"Generate an image from a text prompt using AI\" - CHECK\n- Has a parameters schema with properties (prompt required, inputMe",
+        "role": "user"
+      }
+    ],
+    "model": "deepseek/deepseek-v4-flash"
+  }
+}

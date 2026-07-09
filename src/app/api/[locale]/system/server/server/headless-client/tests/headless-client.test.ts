@@ -34,7 +34,10 @@ import {
   resolveUserAndToken,
   runTestStream,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";

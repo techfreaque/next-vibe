@@ -18,6 +18,8 @@ export async function getSeedModule(
   switch (moduleName) {
     case "[rootFolderId]":
       return (await import("../../app/api/[locale]/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
+    case "embeddings":
+      return (await import("../../app/api/[locale]/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
     case "skills":
       return (await import("../../app/api/[locale]/agent/skills/seeds")) as EnvironmentSeeds;
     case "chart-of-accounts":
@@ -67,6 +69,7 @@ export async function getSeedModule(
 export function getAllSeedModuleNames(): string[] {
   return [
     "[rootFolderId]",
+    "embeddings",
     "skills",
     "chart-of-accounts",
     "companies",

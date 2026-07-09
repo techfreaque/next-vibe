@@ -35,6 +35,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { DefaultFolderId } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
+import { scopedTranslation as chatScopedTranslation } from "../i18n";
 import {
   canCreateThreadInFolder,
   canDeleteThread,
@@ -210,7 +211,6 @@ export class ThreadsRepository {
     rootFolderId,
     subFolderId,
     userId,
-    content,
     isIncognito,
     logger,
     user,
@@ -219,6 +219,7 @@ export class ThreadsRepository {
     originInstanceId,
     loopInstanceId,
     syncEligible,
+    parentThreadId,
   }: {
     threadId: string;
     rootFolderId: DefaultFolderId;

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog-deep-dive-f83a1930-f9d7-44d4-b8f0-e334140d8217.md\n\n# Tool Catalog Deep Dive\nFolder: private\nDescription: Systematically testing tool-help with category, keyword, and detail queries across all tool categories.",
+    "encoding_format": "float"
+  }
+}

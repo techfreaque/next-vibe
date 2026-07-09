@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "You're welcome! All tests passed cleanly — every tool call, every callback mode, every attachment, every check. \n\n**STEP_OK** — *Suite complete, zero failures.*\n\nBye! 👋",
+    "encoding_format": "float"
+  }
+}

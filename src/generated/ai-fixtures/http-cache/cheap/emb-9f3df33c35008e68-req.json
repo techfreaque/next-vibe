@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:366b94c4 | Posted:Jul 8, 23:31]\n\nUser: [T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. You \n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Placeholder title \"New Chat\", no description. Do the user's request first — this never changes or delays it. In the SAME turn, also call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement). Fold it in with your other tool calls; don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [77%]\n│   │   T7_APPROVE_OK\n│\n\nSystem: [Context: ID:199f3fff | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 23:31]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"category\":\"ai\"},\"callbackMode\":\"wait\"} [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"search\"},\"callbackMode\":\"wait\"} [tool:execute-tool]",
+    "encoding_format": "float"
+  }
+}

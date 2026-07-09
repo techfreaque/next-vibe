@@ -195,8 +195,6 @@ class PromptFragmentsGenerator {
             promptImportPath,
             fragmentExportNames,
             ownExportName,
-            serverImportPath,
-            serverLoaderExportName,
           };
           entriesByFile.set(`${promptFile}::${id}`, entry);
         }
@@ -399,7 +397,6 @@ ${allPromptCases.join("\n")}
     >();
     // Fragment imports (prompt.ts) - deduplicated by path
     const seenPrompt = new Map<string, string[]>();
-
     for (const f of fragments) {
       if (!seenPrompt.has(f.promptImportPath)) {
         seenPrompt.set(f.promptImportPath, f.fragmentExportNames);
@@ -416,7 +413,7 @@ ${allPromptCases.join("\n")}
       }
     }
 
-    // Build a unified sorted import list (simple-import-sort groups all into one block)
+    // Build a unified sorted import list
     const typesPath = "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
     const allImports: Array<{ path: string; line: string }> = [];
     allImports.push({
@@ -448,7 +445,6 @@ ${allPromptCases.join("\n")}
       if (a.path !== b.path) {
         return a.path.localeCompare(b.path);
       }
-      // type imports come before value imports from the same path
       const aType = a.line.startsWith("import type");
       const bType = b.line.startsWith("import type");
       if (aType !== bType) {
@@ -535,11 +531,20 @@ ${allPromptCases.join("\n")}
 
 import "server-only";
 
+import { and, count, eq, like } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
+
 ${allImports.map((i) => i.line).join("\n")}
 
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+
 /**
- * Combined server loader - loads all fragment data in parallel, builds strings, returns results.
- * Returns leading/trailing arrays (sorted by priority) and byId map of built strings.
+ * Combined server loader - pre-fetches shared data, then runs all fragment
+ * build() calls in parallel. Returns leading/trailing arrays and byId map.
  */
 export async function loadAllPromptFragments(
   params: SystemPromptServerParams,

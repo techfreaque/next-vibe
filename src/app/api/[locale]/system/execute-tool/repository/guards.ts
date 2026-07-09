@@ -5,11 +5,10 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import { getPreferredName } from "next-vibe/core/core-utils/path";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
 
@@ -17,15 +16,6 @@ import type {
   DefaultFolderId,
   ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import { FOLDER_DENIED_TOOL_IDS } from "@/app/api/[locale]/agent/chat/config";
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
-import { isUuid } from "@/app/api/[locale]/agent/chat/slugify";
-import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import {
-  chatFavorites,
-  FAVORITE_CONFIG_COLUMNS,
-} from "@/app/api/[locale]/agent/skills/favorites/db";
 
 import { CallbackMode } from "../constants";
 import type {
@@ -163,19 +153,10 @@ export class ExecuteToolGuards {
   }
 
   /**
-   * Resolve the effective tool permission set for a given context.
-   *
-   * Cascade (first non-null availableTools wins):
-   *   1. Favorite's availableTools
-   *   2. Skill's availableTools (resolved from favorite.skillId, then fallback skillId param)
-   *   3. User's role-default pinned tool IDs
-   *
-   * Denied tools accumulate from all levels (union); folder-level hard blocks
-   * (FOLDER_DENIED_TOOL_IDS) are applied last.
-   *
-   * Called by handleLocalExecute (to gate every tool call through
-   * execute-tool) and by stream-setup.ts (to resolve the tool config before
-   * stream start).
+   * Resolve the effective execute-tool permission set for a context — a thin
+   * adapter over THE central cascade (resolveAgentContext). Returns the CALLABLE
+   * superset (pinned ∪ available) + the denied union. The caller (local.ts)
+   * already holds the user + rootFolderId from the stream context.
    */
   static async resolveToolPermissions(params: {
     favoriteId: string | undefined;
@@ -302,7 +283,10 @@ export class ExecuteToolGuards {
   }
 
   /**
-   * Check whether a specific toolName is permitted by the resolved permissions.
+   * Check whether a specific toolName may be CALLED. A tool is callable iff it
+   * is in `availableTools` (the pinned ∪ available callable superset resolved by
+   * the central cascade, with role defaults folded in) AND not in `deniedToolIds`.
+   * `availableTools === null` means no restriction at any level (all allowed).
    * Returns null if permitted, or an error reason string if blocked.
    */
   static checkToolPermission(

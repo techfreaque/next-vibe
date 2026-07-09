@@ -1,21 +1,22 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import { count } from "drizzle-orm";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import type {
+  RemoteInstancesContext,
   SystemPromptFragment,
   SystemPromptServerParams,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+import { remoteConnections } from "./db";
+import { RemoteConnectionRepository } from "./repository";
 
 export interface RemoteInstancesData {
   remoteConnections: Array<{ instanceId: string }>;

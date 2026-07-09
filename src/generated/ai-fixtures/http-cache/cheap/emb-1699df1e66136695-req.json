@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.\n\nAssistant: <think>The tool returned successfully with an `invoices` array (empty, so no invoices exist yet) and a `total` of 0. The result has the expected `invoices` array.</think>**payment-invoice-list** ran successfully. Result has an `invoices` array (currently empty) with `total: 0` — no invoices exist yet.\n\n**STEP_OK**\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think>The user wants me to say exactly \"INVALID_PARENT_TEST STEP_OK\". Let me just do that.</think>INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

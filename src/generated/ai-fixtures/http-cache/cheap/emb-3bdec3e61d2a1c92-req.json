@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls completed successfully. `tool-help` returned the full 528-tool catalog across 22 categories. The `cortex-write` with callbackMode `approve` was user-confirmed and executed, writing `T7_APPROVE_OK` to `/memories/t7-approve-test`.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

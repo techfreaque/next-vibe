@@ -1178,7 +1178,7 @@ export const endpointsMeta: EndpointMeta[] = [
           pinned: false,
           archived: false,
           tags: [],
-          preview: "Hello, how can I help you?",
+          description: "Hello, how can I help you?",
           metadata: {},
           createdAt: "2024-01-15T10:00:00.000Z",
           updatedAt: "2024-01-15T10:00:00.000Z",
@@ -1255,7 +1255,7 @@ export const endpointsMeta: EndpointMeta[] = [
           rootFolderId: "private",
           folderId: null,
           status: "enums.threadStatus.active",
-          preview: "Hello, how can I help you?",
+          description: "Hello, how can I help you?",
           createdAt: "2024-01-15T10:00:00.000Z",
           updatedAt: "2024-01-15T10:00:00.000Z",
         },
@@ -1480,6 +1480,8 @@ export const endpointsMeta: EndpointMeta[] = [
               errorMessage: null,
               errorCode: null,
               searchVector: null,
+              embedding: null,
+              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1502,6 +1504,8 @@ export const endpointsMeta: EndpointMeta[] = [
               errorMessage: null,
               errorCode: null,
               searchVector: null,
+              embedding: null,
+              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1592,6 +1596,8 @@ export const endpointsMeta: EndpointMeta[] = [
               upvotes: 0,
               downvotes: 0,
               searchVector: null,
+              embedding: null,
+              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1948,7 +1954,7 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_rename_PATCH",
+    toolName: "rename-thread",
     method: "PATCH",
     path: ["agent", "chat", "threads", "rename"],
     allowedRoles: [
@@ -2059,7 +2065,7 @@ export const endpointsMeta: EndpointMeta[] = [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
               threadTitle: "Machine Learning Discussion",
-              preview: "Let's discuss machine learning algorithms...",
+              description: "Let's discuss machine learning algorithms...",
               rank: 0.95,
               headline:
                 "<b>Machine learning</b> algorithms are powerful tools...",
@@ -2075,7 +2081,7 @@ export const endpointsMeta: EndpointMeta[] = [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
               threadTitle: "Machine Learning Discussion",
-              preview: "Let's discuss machine learning algorithms...",
+              description: "Let's discuss machine learning algorithms...",
               rank: 0.95,
               headline:
                 "<b>Machine learning</b> algorithms are powerful tools...",
@@ -9436,7 +9442,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-08T11:45:29.213Z",
+          createdAt: "2026-07-09T11:07:41.882Z",
         },
       },
     },
@@ -9461,7 +9467,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-08T11:45:29.214Z",
+          updatedAt: "2026-07-09T11:07:41.882Z",
         },
       },
     },

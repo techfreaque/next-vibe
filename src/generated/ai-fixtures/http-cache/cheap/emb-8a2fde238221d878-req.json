@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK\n\nAssistant: <think>The user wants me to say exactly \"BRANCH_RESPONSE STEP_OK\".</think>BRANCH_RESPONSE STEP_OK\n\nUser: [T4b favorites] Call the favorites tool to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call the `favorites` tool to list favorites. Let me do that.</think>\n\nAssistant: <think>Let me check:\n1. The result has a `favorites` array - yes, it shows 2 favorites.\n2. Each entry has `name`, `id`, `description`, `modelId`, `skillId`, etc. - looks correct.\n3. No errors, no empty results, no raw IDs/JSON blobs/stack traces in user-facing content.\n4. Nothing else is off.\n\nSTEP_OK.</think>Result has a `favorites` array with 2 entries, each containing `name`, `id`, `description`, `modelId`, `skillId`, and other expected fields. Nothing off.\n\n**STEP_OK**\n\nUser: [T5 detach-dispatch] Call the cortex-write tool with path='/memories/cb-await-task-test' and content='await-task-test-payload' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have a responsePath (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

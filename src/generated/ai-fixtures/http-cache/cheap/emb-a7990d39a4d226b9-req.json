@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The video is a **5-second close-up promotional clip** featuring a pair of medium-brown-skinned hands rapidly manipulating a single Rubik's Cube in the foreground, with hundreds of scattered, mixed-up cubes forming a dense, colorful background. The cube in hand has a white \"X\" logo on one face and is partially scrambled. The hands perform fluid, expert-level rotations of the top and right layers in a rhythmic speed-cubing style. The audio is a crisp, percussive beat synchronized with the cube's clicking sounds, over a lo-fi hip-hop backdrop. The production is high-definition with controlled studio lighting and a shallow depth of field.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

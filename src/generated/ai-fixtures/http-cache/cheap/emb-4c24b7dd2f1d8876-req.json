@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:c0a1365c | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:34]\n\nAssistant: Result has a `taskId` string and no `responsePath`. Correct detached behavior.\n\n**STEP_OK taskId=local-bg-call-7144c6e2d9434787b7705e64**\n\nSystem: [Context: ID:828dd8f9 | Posted:Jul 8, 22:34]\n\nUser: [T5b await-task] Call the await-task tool with taskId='local-bg-call-7144c6e2d9434787b7705e64'. Check that the result contains a responsePath string (either directly or nested in a result field). End your reply with STEP_OK if responsePath is present, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:510fb62b | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 8, 22:34]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"await-task\",\"input\":{\"taskId\":\"local-bg-call-7144c6e2d9434787b7705e64\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"status\":\"status.completed\",\"result\":{\"size\":23,\"created\":false,\"updatedAt\":\"2026-07-08T20:34:24.704Z\",\"responsePath\":\"/memories/cb-await-task-test\"},\"waiting\":false,\"originalToolName\":\"cortex-write\",\"originalArgs\":{\"path\":\"/memories/cb-await-task-test\",\"content\":\"await-task-test-pa",
+    "encoding_format": "float"
+  }
+}

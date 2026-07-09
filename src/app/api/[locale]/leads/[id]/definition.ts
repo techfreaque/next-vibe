@@ -558,7 +558,10 @@ const { PATCH } = createEndpoint({
               metadata: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.metadata.content",
-                schema: z.record(z.string(), z.any()),
+                schema: z.record(
+                  z.string(),
+                  z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                ),
               }),
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
@@ -940,7 +943,10 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 label: "get.response.metadata.content",
 
-                schema: z.record(z.string(), z.any()),
+                schema: z.record(
+                  z.string(),
+                  z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                ),
               }),
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,

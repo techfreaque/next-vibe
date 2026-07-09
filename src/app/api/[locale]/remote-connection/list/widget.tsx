@@ -9,6 +9,7 @@
 "use client";
 
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
@@ -19,13 +20,17 @@ import {
   CardTitle,
 } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
+import { Activity } from "next-vibe/ui/ui/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
+import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
 import { Link2 } from "next-vibe/ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { SiGithub } from "next-vibe/ui/ui/icons/SiGithub";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { WifiOff } from "next-vibe/ui/ui/icons/WifiOff";
@@ -36,6 +41,8 @@ import { H3, P } from "next-vibe/ui/ui/typography";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
@@ -44,6 +51,7 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
 import { GITHUB_REPO_URL } from "@/config/constants";
 import { envClient } from "@/config/env-client";
@@ -95,7 +103,6 @@ function AddConnectionButton({
 
 function ViewButton({
   conn,
-  navigate,
   t,
 }: {
   conn: RemoteConnection;
@@ -337,6 +344,7 @@ function ConnectionRow({
           </Span>
         )}
       </Div>
+
       {!isPickerMode && (
         <Div className="flex items-center gap-1 flex-shrink-0">
           <ViewButton conn={conn} navigate={navigate} t={t} />

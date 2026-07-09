@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached audio is a **27-second instrumental pop-funk track** at ~120-130 BPM in a major key (4/4 time). It features:\n\n- **Driving electric bass** playing a funky, syncopated line\n- **Clean electric guitar** with a rhythmic, muted riff\n- **Acoustic drum kit** with strong snare emphasis\n- **Wah-wah guitar** playing melodic, expressive lines over the groove\n\nThe mood is upbeat, energetic, and danceable — polished studio production, no vocals, just a continuous funk groove.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

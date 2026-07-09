@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>Phase 2 — the deferred result has arrived. It contains a non-empty `responsePath` (`/memories/cb-wakeup-test`). This is correct and expected per the instructions.</think>Phase 2 — deferred result has a non-empty `responsePath` (`/memories/cb-wakeup-test`). Correct wakeUp completion behavior.\n\n**WAKEUP_OK**\n\nUser: [T6c#2 wakeUp-repeat] Call the cortex-write tool with path='/memories/cb-wakeup-repeat-test' and content='wakeup-repeat-test-payload' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no responsePath yet → end with STEP_OK; OR (b) INLINE - a fast task returns the result immediately (a non-empty responsePath) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor a responsePath. If you got a taskId (deferred), you will be revived when the write is done - on revival confirm the deferred result contains a non-empty responsePath and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no responsePath appears.\n\nAssistant: <think>I'll call cortex-write with callbackMode='wakeUp' and wait for the result.</think>\n\nAssistant: <think>This is a deferred result — I got a taskId and no responsePath. That's outcome (a) DEFERRED. I need to end with STEP_OK.</think>Deferred — got `taskId: local-wu-call-a63f798822ec4050a5ff1f19` and no `responsePath`. The write will complete in the background and wake this thread.\n\n**STEP_OK**\n\nUser:",
+    "encoding_format": "float"
+  }
+}

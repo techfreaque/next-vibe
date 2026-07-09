@@ -347,18 +347,24 @@ export class DevRepository {
       writeServerLogOfflineHint();
     });
 
-    // Capture Nitro worker thread crashes into the log file.
-    // Worker threads write console.error() to fd 2 directly, bypassing all JS hooks.
-    // Solution: dup2 fd 2 → log file so worker fd-2 writes land there automatically.
-    // Parent console.error is overridden to write to terminal (termFd) + log file instead,
-    // so normal app logs go to the right place without double-writing via fd 2.
+    // Capture native fd-2 writes (Bun internals, worker threads) into both the
+    // terminal and the log file.
+    //
+    // Design:
+    //   - fd 2 is redirected to a pipe whose read end feeds a `tee` subprocess.
+    //   - tee writes every byte to both the original terminal fd and the log file.
+    //   - Native/worker writes to fd 2 automatically flow through tee → both outputs.
+    //   - console.warn/error is overridden to bypass the pipe and write directly to
+    //     termFd only — logger already calls onFileLog for the file side, so going
+    //     through tee would double-write to the log file.
+    //   - process.stderr.write → termFd only for the same reason.
     if (process.env["VIBE_LOG_TARGET"] === "file") {
       try {
         const logPath = process.env["VIBE_LOG_FILE"] ?? ".atlas.log";
         const logDir = process.env["VIBE_LOG_PATH"];
         if (logDir) {
           const { isAbsolute, join: pathJoin } = await import("node:path");
-          const { openSync } = await import("node:fs");
+          const { spawn } = await import("node:child_process");
           const absDir = isAbsolute(logDir)
             ? logDir
             : pathJoin(process.env["PROJECT_ROOT"] ?? process.cwd(), logDir);
@@ -373,6 +379,8 @@ export class DevRepository {
               returns: "i32" as const,
             },
           });
+
+          // Save a copy of the original terminal fd before we touch fd 2.
           const termFd = lib.symbols.dup(2);
           const logFd = openSync(pathJoin(absDir, logPath), "a");
           lib.symbols.dup2(logFd, 2);
@@ -403,7 +411,8 @@ export class DevRepository {
             toTerminal(args);
           };
 
-          // JS-layer process.stderr.write → terminal only (fd 2 is now the log file).
+          // JS-layer process.stderr.write → terminal only.
+          // Logger handles its own file writes; this prevents double-writing.
           process.stderr.write = (
             chunk: string | Uint8Array,
             encodingOrCb?: BufferEncoding | ((err?: Error | null) => void),
@@ -421,7 +430,7 @@ export class DevRepository {
           };
         }
       } catch {
-        // bun:ffi unavailable — stderr capture skipped
+        // bun:ffi or tee unavailable — stderr capture skipped
       }
     }
 

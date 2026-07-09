@@ -8,6 +8,10 @@
 
 import "server-only";
 
+import { and, count, eq, like } from "drizzle-orm";
+import { db } from "next-vibe/database";
+import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
+
 import {
   autonomyStatusFragment,
   bootstrapFragment,
@@ -25,34 +29,29 @@ import {
   toolExecutionControlFragment,
   userNameFragment,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
-import { loadPromptContextData } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
-import { loadCodingAgentSettingData } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
 import { threadRenameFragment } from "@/app/api/[locale]/agent/chat/threads/rename/system-prompt";
-import { loadThreadRenameData } from "@/app/api/[locale]/agent/chat/threads/rename/system-prompt";
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt";
-import { loadCortexData } from "@/app/api/[locale]/agent/cortex/system-prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
-import { loadFavoritesData } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
 import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt";
-import { loadSkillData } from "@/app/api/[locale]/agent/skills/system-prompt";
 import { webFragment } from "@/app/api/[locale]/agent/web-search/system-prompt";
-import { loadWebData } from "@/app/api/[locale]/agent/web-search/system-prompt";
 import { contactFragment } from "@/app/api/[locale]/contact/system-prompt";
-import { loadContactData } from "@/app/api/[locale]/contact/system-prompt";
 import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt";
-import { loadDesktopData } from "@/app/api/[locale]/desktop/system-prompt";
+import { loadRemoteInstancesContext } from "@/app/api/[locale]/remote-connection/system-prompt";
 import {
   remoteInstancesFragment,
   sshConnectionsFragment,
   systemContextFragment,
 } from "@/app/api/[locale]/remote-connection/system-prompt";
-import { loadRemoteInstancesData } from "@/app/api/[locale]/remote-connection/system-prompt";
 
 /**
- * Combined server loader - loads all fragment data in parallel, builds strings, returns results.
- * Returns leading/trailing arrays (sorted by priority) and byId map of built strings.
+ * Combined server loader - pre-fetches shared data, then runs all fragment
+ * build() calls in parallel. Returns leading/trailing arrays and byId map.
  */
 export async function loadAllPromptFragments(
   params: SystemPromptServerParams,
@@ -61,340 +60,303 @@ export async function loadAllPromptFragments(
   trailing: Array<{ id: string; priority: number; str: string }>;
   byId: Record<string, string | null>;
 }> {
-  const [
-    promptContextDataResult,
-    codingAgentSettingDataResult,
-    contactDataResult,
-    cortexDataResult,
-    desktopDataResult,
-    favoritesDataResult,
-    remoteInstancesDataResult,
-    skillDataResult,
-    threadRenameDataResult,
-    webDataResult,
-  ] = await Promise.allSettled([
-    loadPromptContextData(params),
-    loadCodingAgentSettingData(params),
-    loadContactData(params),
-    loadCortexData(params),
-    loadDesktopData(params),
-    loadFavoritesData(params),
-    loadRemoteInstancesData(params),
-    loadSkillData(params),
-    loadThreadRenameData(params),
-    loadWebData(params),
+  const userId = params.user.isPublic ? undefined : params.user.id;
+
+  // Pre-fetch shared data used by multiple fragments in parallel
+  const [isFreshUserResult, remoteInstancesResult, appNameResult] =
+    await Promise.allSettled([
+      // isFreshUser: used by bootstrap + guest fragments
+      (async (): Promise<boolean> => {
+        if (!userId || params.isIncognito) {
+          return !params.user.isPublic;
+        }
+        const [memoriesCount, tasksCount] = await Promise.all([
+          db
+            .select({ count: count() })
+            .from(cortexNodes)
+            .where(
+              and(
+                eq(cortexNodes.userId, userId),
+                eq(cortexNodes.nodeType, CortexNodeType.FILE),
+                like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+              ),
+            ),
+          db
+            .select({ count: count() })
+            .from(cronTasksTable)
+            .where(eq(cronTasksTable.userId, userId)),
+        ]);
+        return (
+          (memoriesCount[0]?.count ?? 0) === 0 &&
+          (tasksCount[0]?.count ?? 0) === 0
+        );
+      })(),
+      // remoteInstancesContext: used by system-context, remote-instances, ssh-connections
+      loadRemoteInstancesContext(params),
+      // appName: used by identity, platform-overview, bootstrap, guest-context
+      Promise.resolve(
+        chatScopedTranslation.scopedT(params.locale).t("config.appName"),
+      ),
+    ]);
+
+  const enrichedParams: SystemPromptServerParams = {
+    ...params,
+    isFreshUser:
+      isFreshUserResult.status === "fulfilled"
+        ? isFreshUserResult.value
+        : undefined,
+    remoteInstancesContext:
+      remoteInstancesResult.status === "fulfilled"
+        ? remoteInstancesResult.value
+        : undefined,
+    appName:
+      appNameResult.status === "fulfilled" ? appNameResult.value : undefined,
+  };
+
+  // Run all fragment builds in parallel
+  const settled = await Promise.allSettled([
+    autonomyStatusFragment.build(enrichedParams),
+    bootstrapFragment.build(enrichedParams),
+    codingAgentSettingFragment.build(enrichedParams),
+    contactFragment.build(enrichedParams),
+    cortexFragment.build(enrichedParams),
+    desktopFragment.build(enrichedParams),
+    extraInstructionsFragment.build(enrichedParams),
+    favoritesFragment.build(enrichedParams),
+    folderContextFragment.build(enrichedParams),
+    formattingFragment.build(enrichedParams),
+    guestContextFragment.build(enrichedParams),
+    headlessContextFragment.build(enrichedParams),
+    identityFragment.build(enrichedParams),
+    languageFragment.build(enrichedParams),
+    mediaCapabilitiesFragment.build(enrichedParams),
+    messageMetadataFragment.build(enrichedParams),
+    platformOverviewFragment.build(enrichedParams),
+    remoteInstancesFragment.build(enrichedParams),
+    skillFragment.build(enrichedParams),
+    sshConnectionsFragment.build(enrichedParams),
+    subAgentGuardFragment.build(enrichedParams),
+    systemContextFragment.build(enrichedParams),
+    threadRenameFragment.build(enrichedParams),
+    toolExecutionControlFragment.build(enrichedParams),
+    userNameFragment.build(enrichedParams),
+    webFragment.build(enrichedParams),
   ]);
-  const promptContextData =
-    promptContextDataResult.status === "fulfilled"
-      ? promptContextDataResult.value
-      : undefined;
-  const codingAgentSettingData =
-    codingAgentSettingDataResult.status === "fulfilled"
-      ? codingAgentSettingDataResult.value
-      : undefined;
-  const contactData =
-    contactDataResult.status === "fulfilled"
-      ? contactDataResult.value
-      : undefined;
-  const cortexData =
-    cortexDataResult.status === "fulfilled"
-      ? cortexDataResult.value
-      : undefined;
-  const desktopData =
-    desktopDataResult.status === "fulfilled"
-      ? desktopDataResult.value
-      : undefined;
-  const favoritesData =
-    favoritesDataResult.status === "fulfilled"
-      ? favoritesDataResult.value
-      : undefined;
-  const remoteInstancesData =
-    remoteInstancesDataResult.status === "fulfilled"
-      ? remoteInstancesDataResult.value
-      : undefined;
-  const skillData =
-    skillDataResult.status === "fulfilled" ? skillDataResult.value : undefined;
-  const threadRenameData =
-    threadRenameDataResult.status === "fulfilled"
-      ? threadRenameDataResult.value
-      : undefined;
-  const webData =
-    webDataResult.status === "fulfilled" ? webDataResult.value : undefined;
-  const autonomyStatusBuilt = promptContextData
-    ? autonomyStatusFragment.build(promptContextData)
-    : null;
-  const bootstrapBuilt = promptContextData
-    ? bootstrapFragment.build(promptContextData)
-    : null;
-  const codingAgentSettingBuilt = codingAgentSettingData
-    ? codingAgentSettingFragment.build(codingAgentSettingData)
-    : null;
-  const contactBuilt = contactData ? contactFragment.build(contactData) : null;
-  const cortexBuilt = cortexData ? cortexFragment.build(cortexData) : null;
-  const desktopBuilt = desktopData ? desktopFragment.build(desktopData) : null;
-  const extraInstructionsBuilt = promptContextData
-    ? extraInstructionsFragment.build(promptContextData)
-    : null;
-  const favoritesBuilt = favoritesData
-    ? favoritesFragment.build(favoritesData)
-    : null;
-  const folderContextBuilt = promptContextData
-    ? folderContextFragment.build(promptContextData)
-    : null;
-  const formattingBuilt = promptContextData
-    ? formattingFragment.build(promptContextData)
-    : null;
-  const guestContextBuilt = promptContextData
-    ? guestContextFragment.build(promptContextData)
-    : null;
-  const headlessContextBuilt = promptContextData
-    ? headlessContextFragment.build(promptContextData)
-    : null;
-  const identityBuilt = promptContextData
-    ? identityFragment.build(promptContextData)
-    : null;
-  const languageBuilt = promptContextData
-    ? languageFragment.build(promptContextData)
-    : null;
-  const mediaCapabilitiesBuilt = promptContextData
-    ? mediaCapabilitiesFragment.build(promptContextData)
-    : null;
-  const messageMetadataBuilt = promptContextData
-    ? messageMetadataFragment.build(promptContextData)
-    : null;
-  const platformOverviewBuilt = promptContextData
-    ? platformOverviewFragment.build(promptContextData)
-    : null;
-  const remoteInstancesBuilt = remoteInstancesData
-    ? remoteInstancesFragment.build(remoteInstancesData)
-    : null;
-  const skillBuilt = skillData ? skillFragment.build(skillData) : null;
-  const sshConnectionsBuilt = remoteInstancesData
-    ? sshConnectionsFragment.build(remoteInstancesData)
-    : null;
-  const subAgentGuardBuilt = promptContextData
-    ? subAgentGuardFragment.build(promptContextData)
-    : null;
-  const systemContextBuilt = remoteInstancesData
-    ? systemContextFragment.build(remoteInstancesData)
-    : null;
-  const threadRenameBuilt = threadRenameData
-    ? threadRenameFragment.build(threadRenameData)
-    : null;
-  const toolExecutionControlBuilt = promptContextData
-    ? toolExecutionControlFragment.build(promptContextData)
-    : null;
-  const userNameBuilt = promptContextData
-    ? userNameFragment.build(promptContextData)
-    : null;
-  const webBuilt = webData ? webFragment.build(webData) : null;
+  const results = settled.map((r) =>
+    r.status === "fulfilled" ? r.value : null,
+  );
+
   const byId: Record<string, string | null> = {
-    "autonomy-status": autonomyStatusBuilt,
-    bootstrap: bootstrapBuilt,
-    "coding-agent-setting": codingAgentSettingBuilt,
-    contact: contactBuilt,
-    cortex: cortexBuilt,
-    desktop: desktopBuilt,
-    "extra-instructions": extraInstructionsBuilt,
-    favorites: favoritesBuilt,
-    "folder-context": folderContextBuilt,
-    formatting: formattingBuilt,
-    "guest-context": guestContextBuilt,
-    "headless-context": headlessContextBuilt,
-    identity: identityBuilt,
-    language: languageBuilt,
-    "media-capabilities": mediaCapabilitiesBuilt,
-    "message-metadata": messageMetadataBuilt,
-    "platform-overview": platformOverviewBuilt,
-    "remote-instances": remoteInstancesBuilt,
-    skill: skillBuilt,
-    "ssh-connections": sshConnectionsBuilt,
-    "sub-agent-guard": subAgentGuardBuilt,
-    "system-context": systemContextBuilt,
-    "thread-rename": threadRenameBuilt,
-    "tool-execution-control": toolExecutionControlBuilt,
-    "user-name": userNameBuilt,
-    web: webBuilt,
+    "autonomy-status": results[0] ?? null,
+    bootstrap: results[1] ?? null,
+    "coding-agent-setting": results[2] ?? null,
+    contact: results[3] ?? null,
+    cortex: results[4] ?? null,
+    desktop: results[5] ?? null,
+    "extra-instructions": results[6] ?? null,
+    favorites: results[7] ?? null,
+    "folder-context": results[8] ?? null,
+    formatting: results[9] ?? null,
+    "guest-context": results[10] ?? null,
+    "headless-context": results[11] ?? null,
+    identity: results[12] ?? null,
+    language: results[13] ?? null,
+    "media-capabilities": results[14] ?? null,
+    "message-metadata": results[15] ?? null,
+    "platform-overview": results[16] ?? null,
+    "remote-instances": results[17] ?? null,
+    skill: results[18] ?? null,
+    "ssh-connections": results[19] ?? null,
+    "sub-agent-guard": results[20] ?? null,
+    "system-context": results[21] ?? null,
+    "thread-rename": results[22] ?? null,
+    "tool-execution-control": results[23] ?? null,
+    "user-name": results[24] ?? null,
+    web: results[25] ?? null,
   };
   const leading: Array<{ id: string; priority: number; str: string }> = [];
   const trailing: Array<{ id: string; priority: number; str: string }> = [];
-  if (autonomyStatusBuilt) {
+  if (results[0]) {
     leading.push({
       id: "autonomy-status",
       priority: autonomyStatusFragment.priority,
-      str: autonomyStatusBuilt,
+      str: results[0],
     });
   }
-  if (bootstrapBuilt) {
+  if (results[1]) {
     leading.push({
       id: "bootstrap",
       priority: bootstrapFragment.priority,
-      str: bootstrapBuilt,
+      str: results[1],
     });
   }
-  if (codingAgentSettingBuilt) {
+  if (results[2]) {
     leading.push({
       id: "coding-agent-setting",
       priority: codingAgentSettingFragment.priority,
-      str: codingAgentSettingBuilt,
+      str: results[2],
     });
   }
-  if (contactBuilt) {
+  if (results[3]) {
     leading.push({
       id: "contact",
       priority: contactFragment.priority,
-      str: contactBuilt,
+      str: results[3],
     });
   }
-  if (cortexBuilt) {
+  if (results[4]) {
     trailing.push({
       id: "cortex",
       priority: cortexFragment.priority,
-      str: cortexBuilt,
+      str: results[4],
     });
   }
-  if (desktopBuilt) {
+  if (results[5]) {
     leading.push({
       id: "desktop",
       priority: desktopFragment.priority,
-      str: desktopBuilt,
+      str: results[5],
     });
   }
-  if (extraInstructionsBuilt) {
+  if (results[6]) {
     leading.push({
       id: "extra-instructions",
       priority: extraInstructionsFragment.priority,
-      str: extraInstructionsBuilt,
+      str: results[6],
     });
   }
-  if (favoritesBuilt) {
+  if (results[7]) {
     trailing.push({
       id: "favorites",
       priority: favoritesFragment.priority,
-      str: favoritesBuilt,
+      str: results[7],
     });
   }
-  if (folderContextBuilt) {
+  if (results[8]) {
     leading.push({
       id: "folder-context",
       priority: folderContextFragment.priority,
-      str: folderContextBuilt,
+      str: results[8],
     });
   }
-  if (formattingBuilt) {
+  if (results[9]) {
     leading.push({
       id: "formatting",
       priority: formattingFragment.priority,
-      str: formattingBuilt,
+      str: results[9],
     });
   }
-  if (guestContextBuilt) {
+  if (results[10]) {
     leading.push({
       id: "guest-context",
       priority: guestContextFragment.priority,
-      str: guestContextBuilt,
+      str: results[10],
     });
   }
-  if (headlessContextBuilt) {
+  if (results[11]) {
     leading.push({
       id: "headless-context",
       priority: headlessContextFragment.priority,
-      str: headlessContextBuilt,
+      str: results[11],
     });
   }
-  if (identityBuilt) {
+  if (results[12]) {
     leading.push({
       id: "identity",
       priority: identityFragment.priority,
-      str: identityBuilt,
+      str: results[12],
     });
   }
-  if (languageBuilt) {
+  if (results[13]) {
     leading.push({
       id: "language",
       priority: languageFragment.priority,
-      str: languageBuilt,
+      str: results[13],
     });
   }
-  if (mediaCapabilitiesBuilt) {
+  if (results[14]) {
     leading.push({
       id: "media-capabilities",
       priority: mediaCapabilitiesFragment.priority,
-      str: mediaCapabilitiesBuilt,
+      str: results[14],
     });
   }
-  if (messageMetadataBuilt) {
+  if (results[15]) {
     leading.push({
       id: "message-metadata",
       priority: messageMetadataFragment.priority,
-      str: messageMetadataBuilt,
+      str: results[15],
     });
   }
-  if (platformOverviewBuilt) {
+  if (results[16]) {
     leading.push({
       id: "platform-overview",
       priority: platformOverviewFragment.priority,
-      str: platformOverviewBuilt,
+      str: results[16],
     });
   }
-  if (remoteInstancesBuilt) {
+  if (results[17]) {
     leading.push({
       id: "remote-instances",
       priority: remoteInstancesFragment.priority,
-      str: remoteInstancesBuilt,
+      str: results[17],
     });
   }
-  if (skillBuilt) {
+  if (results[18]) {
     leading.push({
       id: "skill",
       priority: skillFragment.priority,
-      str: skillBuilt,
+      str: results[18],
     });
   }
-  if (sshConnectionsBuilt) {
+  if (results[19]) {
     leading.push({
       id: "ssh-connections",
       priority: sshConnectionsFragment.priority,
-      str: sshConnectionsBuilt,
+      str: results[19],
     });
   }
-  if (subAgentGuardBuilt) {
+  if (results[20]) {
     leading.push({
       id: "sub-agent-guard",
       priority: subAgentGuardFragment.priority,
-      str: subAgentGuardBuilt,
+      str: results[20],
     });
   }
-  if (systemContextBuilt) {
+  if (results[21]) {
     leading.push({
       id: "system-context",
       priority: systemContextFragment.priority,
-      str: systemContextBuilt,
+      str: results[21],
     });
   }
-  if (threadRenameBuilt) {
+  if (results[22]) {
     trailing.push({
       id: "thread-rename",
       priority: threadRenameFragment.priority,
-      str: threadRenameBuilt,
+      str: results[22],
     });
   }
-  if (toolExecutionControlBuilt) {
+  if (results[23]) {
     leading.push({
       id: "tool-execution-control",
       priority: toolExecutionControlFragment.priority,
-      str: toolExecutionControlBuilt,
+      str: results[23],
     });
   }
-  if (userNameBuilt) {
+  if (results[24]) {
     leading.push({
       id: "user-name",
       priority: userNameFragment.priority,
-      str: userNameBuilt,
+      str: results[24],
     });
   }
-  if (webBuilt) {
-    leading.push({ id: "web", priority: webFragment.priority, str: webBuilt });
+  if (results[25]) {
+    leading.push({
+      id: "web",
+      priority: webFragment.priority,
+      str: results[25],
+    });
   }
   leading.sort((a, b) => a.priority - b.priority);
   trailing.sort((a, b) => a.priority - b.priority);

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**cron-stats** ran successfully. Key stats:\n\n| Metric | Value |\n|--------|-------|\n| `totalTasks` | **17** (numeric ✓) |\n| `activeTasks` | 9 |\n| `totalExecutions` | 39 |\n| `successRate` | 100% |\n| `failedExecutions` | 0 |\n| `systemStatus` | healthy |\n\nTop performing: `system_dataflow_cleanup_POST` (32 execs, avg 92ms) and `db-health` (7 execs, avg 14ms), both 100% success rate.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

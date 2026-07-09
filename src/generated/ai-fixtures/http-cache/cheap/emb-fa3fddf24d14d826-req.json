@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:e9813119 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:58]\n\nAssistant: **inventory-stock** ran successfully. Result has a `stockLevels` array with 3 items:\n\n| Product | Available | On Hand | Reserved | Unit Cost | Warehouse |\n|---------|-----------|---------|----------|-----------|-----------|\n| Consulting Hour | 52 | 54 | 2 | €29.93 | Main Warehouse |\n| Laptop Stand | 58 | 61 | 3 | €6.09 | Main Warehouse |\n| Design Template Pack | 195 | 205 | 10 | €31.46 | Main Warehouse |\n\nAll items above reorder point — no low stock alerts.\n\n**STEP_OK**\n\nSystem: [Context: ID:254277c6 | Posted:Jul 9, 02:59]\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [73%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── name.m\n\nSystem: [Context: ID:bd425081 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:59]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"inventory-warehouses\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"warehouses\":[{\"id\":\"4b27e45b-32b4-4c9",
+    "encoding_format": "float"
+  }
+}

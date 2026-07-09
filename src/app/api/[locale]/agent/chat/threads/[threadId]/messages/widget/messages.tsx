@@ -861,7 +861,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       lastScrollHandlerHeightRef.current = scrollHeight;
 
       if (atBottom) {
-        // Arrived at bottom - clear smooth scroll flag and re-engage sticky
         smoothScrollingRef.current = false;
         stickyBottomRef.current = true;
       } else if (stickyBottomRef.current && heightGrew) {
@@ -925,6 +924,8 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       container.scrollTop = container.scrollHeight;
       lastSnapScrollHeightRef.current = container.scrollHeight;
       lastScrollHandlerHeightRef.current = container.scrollHeight;
+      // Double-rAF: first frame lets the browser emit the scroll event triggered
+      // by our scrollTop assignment; second frame clears the guard after it fires.
       requestAnimationFrame(() => {
         programmaticScrollRef.current = false;
       });

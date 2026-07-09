@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The result has a `companies` array with one company (\"Demo Company\") and a `total` of 1. Everything looks correct.</think>Result has a `companies` array with 1 entry (\"Demo Company\", owner role, DE/B2C). Clean.\n\n**STEP_OK**\n\nUser: [T11b follow-up] Call the cron-stats tool to read the cron task stats. Check that the result has a numeric totalTasks. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>Let me call the `cron-stats` tool to read the cron task stats.</think>\n\nAssistant: <think>The tool ran successfully. Let me check that the result has a numeric `totalTasks`:\n\n- `totalTasks: 17` — yes, it's a number (17).\n\nOther relevant numeric fields: `totalExecutions: 39`, `activeTasks: 9`, `failedExecutions: 0`, `successRate: 100`, `executedTasks: 39`.\n\nAll looks clean. The result has a numeric `totalTasks` (17). STEP_OK.</think>**cron-stats** ran successfully. Key stats:\n\n| Metric | Value |\n|--------|-------|\n| `totalTasks` | **17** (numeric ✓) |\n| `activeTasks` | 9 |\n| `totalExecutions` | 39 |\n| `successRate` | 100% |\n| `failedExecutions` | 0 |\n| `systemStatus` | healthy |\n\nTop performing: `system_dataflow_cleanup_POST` (32 execs, avg 92ms) and `db-health` (7 execs, avg 14ms), both 100% success rate.\n\n**STEP_OK**\n\nUser: [T11c inventory-stock] Call the inventory-stock tool to list the inventory stock levels. Check that the result has a stockLevels array. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

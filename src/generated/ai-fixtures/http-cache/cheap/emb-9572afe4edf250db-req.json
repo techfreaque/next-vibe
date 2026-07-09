@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:ae97e884 | Posted:Jul 9, 11:38]\n\nUser: [T9 setup] Call the leads-list tool to list the leads. Check that the result has a response with a leads array. End your reply with STEP_OK once the leads are listed.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:57f18250 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 11:38]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"tool-help\",\"input\":{\"query\":\"leads\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"tools\":[{\"name\":\"credits-spent-by-leads\",\"description\":\"Sum of usage transactions from lead wallets per resolution bucket\",\"category\":\"analytics\"},{\"name\":\"leads-active\",\"description\":\"Count of non-bounced, non-unsubscribed, non-invalid leads per time bucket\",\"category\":\"analytics\"},{\"na\n\nAssistant: [tool:execute-tool] {\"toolName\":\"leads-list\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Validation failed (1 error):\\n  • paginationInfo: Invalid input: expected object, received undefined\"}",
+    "encoding_format": "float"
+  }
+}

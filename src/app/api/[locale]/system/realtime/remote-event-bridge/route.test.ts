@@ -19,7 +19,6 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import type { FixtureContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
   connectToHermes,
   connectToHermesLocalAi,
@@ -28,6 +27,8 @@ import {
   HERMES_INSTANCE_ID,
   resolveRemoteUrlSync,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 
 import type {
   RemoteEventBridgeRequestOutput,
@@ -52,8 +53,6 @@ async function routeBridgeToHermes(
     await import("next-vibe/execute-tool/repository");
   const { CallbackMode } = await import("next-vibe/execute-tool/constants");
   const { createEndpointLogger } = await import("next-vibe/logger/server");
-  const { makeHeadlessContext } =
-    await import("@/app/api/[locale]/agent/chat/config");
   const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
 
   return RouteExecuteRepository.runInProcessTyped({

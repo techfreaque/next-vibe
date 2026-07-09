@@ -20,6 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import { chatFolders, chatThreads } from "../../db";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
@@ -52,6 +53,7 @@ export class ThreadRenameRepository {
 
       logger.debug("Renaming thread", {
         threadId,
+        rootFolderId,
         userId: user.id,
         isPublic: user.isPublic,
         hasTitle: title !== undefined,
@@ -68,7 +70,8 @@ export class ThreadRenameRepository {
         });
       }
 
-      // Fetch thread for permission check
+      // Fetch thread for permission check (and to recover the folder when the
+      // stream context didn't carry one — the thread row owns its rootFolderId).
       const [existingThread] = await db
         .select()
         .from(chatThreads)

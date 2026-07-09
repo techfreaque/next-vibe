@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "User: [T4a credits-balance] Call the credits-balance tool to read the wallet balance. Check that the result has a numeric total. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to call the credits-balance tool. Let me first check if I know this tool. I don't see it in my tool catalog, so I need to look it up with tool-help first.</think>Let me find the credits-balance tool first\n\nAssistant: <think>Found it: `credits-balance` with description \"Retrieve current user's credit balance with breakdown\". Let me call it.</think>Found it — `credits-balance`. Let me call it now\n\nAssistant: <think>The result came back with a `total` field of 499.25, which is numeric. Let me check all the fields:\n\n- `capacity`: 515 (numeric) — this seems to be the max capacity\n- `earned`: 0 (numeric)\n- `expiresAt`: null (no expiration)\n- `expiring`: 0 (numeric)\n- `free`: 4.25 (numeric)\n- `permanent`: 495 (numeric)\n- `total`: 499.25 (numeric) ✓\n\nThe total is numeric (499.25). All good. No errors, no raw IDs, no stack traces, nothing confusing. The field names are clear and descriptive.\n\nActually wait - let me also check: is there anything off from the previous turn? The previous turn was [T3b fork-branch] and I just said \"BRANCH_RESPONSE STEP_OK\" which was fine. Nothing leftover.\n\nLet me also check: the tool description says \"Retrieve current user's credit balance with breakdown\" - the total fi\n\nUser: [T4b favorites] Call the favorites tool to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

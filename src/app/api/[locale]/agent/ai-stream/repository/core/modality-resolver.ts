@@ -123,21 +123,7 @@ export interface MessageVariant {
   bridgeType?: BridgeType; // set for gap-fill variants so the UI can pick the right label/icon
 }
 
-export interface MessageAttachment {
-  id: string;
-  url: string;
-  filename: string;
-  mimeType: string;
-  size: number;
-  data?: string;
-}
-
 export type BridgeType = "stt" | "vision" | "translation" | "tts";
-
-export type VariantResolution =
-  | { useFile: true }
-  | { useVariant: MessageVariant }
-  | { needsGeneration: true; type: BridgeType };
 
 /**
  * Resolve the chat model ID from already-loaded favorite + skill data.
@@ -178,6 +164,154 @@ export function resolveChatModelId(
   return null;
 }
 
+/**
+ * THE canonical model+skill resolver for every AI-stream entry (interactive,
+ * ai-run, revival, task-completion). Callers must supply EXACTLY ONE source:
+ *
+ *   1. Explicit `model` (+ `skill`, defaulting to NO_SKILL_ID) — the frontend
+ *      path: the client already resolved its model, so pass it through.
+ *   2. A favorite (`favoriteId` or a pre-loaded `favoriteConfig`) — resolves the
+ *      model from the favorite's modelSelection, falling back to its skill
+ *      variant's model; the skill is the favorite's skillId.
+ *   3. A skill variant id alone (`skill`) — resolves the model from that
+ *      variant's modelSelection.
+ *
+ * Passing an explicit `model` together with a favorite/skill-variant source is
+ * ambiguous (two model sources) → error. Passing none → error. Exactly one wins.
+ */
+export async function resolveModelSkill(params: {
+  model: ChatModelId | undefined;
+  /** Source 1: skill ID (no variant) accompanying an explicit model.
+   *  Source 3: a skill-VARIANT id used ALONE to resolve the model. */
+  skill: string | undefined;
+  favoriteId: string | undefined;
+  favoriteConfig: FavoriteConfig | null;
+  user: JwtPayloadType;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  t: AiStreamT;
+}): Promise<
+  ResponseType<{
+    model: ChatModelId;
+    skill: string;
+    favoriteConfig: FavoriteConfig | null;
+  }>
+> {
+  const { model, skill, favoriteId, favoriteConfig, user, locale, logger, t } =
+    params;
+
+  // ── Exclusivity guard: EXACTLY ONE *model source*. The three sources are
+  //   1. explicit `model` (+ its own `skill` id),
+  //   2. `favoriteId` (resolve the model from that favorite),
+  //   3. a `skill` variant id ALONE.
+  // These three are mutually exclusive: model+favoriteId, favoriteId+skill, and
+  // model+skill(as a variant) are all ambiguous. NOTE: `favoriteConfig` is NOT a
+  // model source here — it is downstream context (tools/prompt) that a caller may
+  // pass alongside an explicit `model`; only `favoriteId` triggers favorite-based
+  // resolution. (A pre-loaded favoriteConfig with NO favoriteId/model/skill is the
+  // sub-agent override path — handled as a resolution fallback below.)
+  const modelSources = [
+    Boolean(model),
+    Boolean(favoriteId),
+    Boolean(skill) && !model,
+  ].filter(Boolean).length;
+  if (modelSources > 1) {
+    logger.error(
+      "[resolveModelSkill] Ambiguous — more than one model source provided",
+      { model, skill, favoriteId },
+    );
+    return fail({
+      message: t("headless.errors.ambiguousModel"),
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+    });
+  }
+
+  // ── 1. Explicit model + its skill id (frontend already resolved both).
+  // favoriteConfig rides through untouched as downstream context.
+  if (model) {
+    return success({
+      model,
+      skill: skill ?? NO_SKILL_ID,
+      favoriteConfig,
+    });
+  }
+
+  const availability = await getInstanceAvailability();
+
+  // ── 2. Favorite → model (favorite modelSelection, skill-variant fallback) ─
+  {
+    if (favoriteId && !user.isPublic && user.id) {
+      const resolved = await resolveFavorite(
+        favoriteId,
+        user.id,
+        user,
+        logger,
+        locale,
+      );
+      if (!resolved) {
+        return fail({
+          message: t("headless.errors.favoriteNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      return success({
+        model: resolved.model,
+        skill: resolved.skill,
+        favoriteConfig: resolved.favoriteConfig,
+      });
+    }
+    if (favoriteConfig) {
+      const skillVariant = await resolveSkillVariant(
+        undefined,
+        parseSkillId(favoriteConfig.skillId).variantId,
+      );
+      const resolvedModel = resolveChatModelId(
+        favoriteConfig.modelSelection ?? undefined,
+        skillVariant?.modelSelection ?? undefined,
+        user,
+        availability,
+      );
+      if (resolvedModel) {
+        return success({
+          model: resolvedModel,
+          skill: favoriteConfig.skillId,
+          favoriteConfig,
+        });
+      }
+    }
+  }
+
+  // ── 3. Skill variant id alone → its model + a skill-derived favoriteConfig.
+  // The favoriteConfig is resolved FROM the skill (not passed) so downstream
+  // setup gets the skill's identity for its tool/model cascades.
+  if (skill) {
+    const skillVariant = await resolveSkillVariant(skill, null);
+    const resolvedModel = resolveChatModelId(
+      undefined,
+      skillVariant?.modelSelection ?? undefined,
+      user,
+      availability,
+    );
+    if (resolvedModel) {
+      return success({
+        model: resolvedModel,
+        skill,
+        favoriteConfig: buildFavoriteConfig({ id: skill, skillId: skill }),
+      });
+    }
+  }
+
+  // ── None resolvable ────────────────────────────────────────────────────
+  logger.error(
+    "[resolveModelSkill] No model could be resolved — need model, favorite, or skill",
+    { hasModel: Boolean(model), favoriteId, skill },
+  );
+  return fail({
+    message: t("headless.errors.missingModelOrSkill"),
+    errorType: ErrorResponseTypes.VALIDATION_ERROR,
+  });
+}
+
 export class ModalityResolver {
   /**
    * Cascade: favorite → skill (selection) → system default
@@ -212,39 +346,6 @@ export class ModalityResolver {
     return getBest(defaultSelection, user, availability);
   }
 
-  /**
-   * Cascade: skill (selection) → favorite → system default
-   * Used by media gen models (image/music/video) - skill config has highest priority.
-   */
-  private static cascadeMediaGenModel<TSelection, TOption>(
-    skillSelection: TSelection | null | undefined,
-    favoriteSelection: TSelection | null | undefined,
-    defaultSelection: TSelection,
-    getBest: (
-      sel: TSelection,
-      user: JwtPayloadType,
-      availability: AgentEnvAvailability,
-    ) => TOption | null,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): TOption | null {
-    const fromSkill = skillSelection
-      ? getBest(skillSelection, user, availability)
-      : null;
-    if (fromSkill) {
-      return fromSkill;
-    }
-
-    const fromFavorite = favoriteSelection
-      ? getBest(favoriteSelection, user, availability)
-      : null;
-    if (fromFavorite) {
-      return fromFavorite;
-    }
-
-    return getBest(defaultSelection, user, availability);
-  }
-
   /** Resolve STT model: favorite → skill variant → system default */
   static resolveSttModel(
     ctx: BridgeContext,
@@ -259,31 +360,6 @@ export class ModalityResolver {
       user,
       availability,
     );
-  }
-
-  /** Resolve TTS voice model: favorite → skill variant → system default */
-  static resolveTtsModel(
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): TtsModelOption | null {
-    return this.cascadeBridgeModel(
-      ctx.favorite?.voiceModelSelection,
-      ctx.skill?.voiceModelSelection,
-      DEFAULT_TTS_MODEL_SELECTION,
-      (sel, u, avail) => getBestTtsModel(sel, u, avail),
-      user,
-      availability,
-    );
-  }
-
-  /** Resolve TTS voice ID: favorite → skill variant → system default */
-  static resolveTtsVoiceId(
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): TtsModelId | null {
-    return this.resolveTtsModel(ctx, user, availability)?.id ?? null;
   }
 
   /** Resolve image vision model: favorite → skill variant → system default */
@@ -339,22 +415,12 @@ export class ModalityResolver {
    * Priority (bridge): favorite → skill → clientVoiceModelId → default.
    * Pass `clientVoiceModelId` when the request carries an explicit voice preference.
    */
-  static resolveTtsSelection(
-    ctx: BridgeContext,
-    clientVoiceModelId?: TtsModelId,
-  ): VoiceModelSelection {
+  /** Resolve the TTS voice selection: favorite → skill → system default. */
+  static resolveTtsSelection(ctx: BridgeContext): VoiceModelSelection {
     return (
       ctx.favorite?.voiceModelSelection ??
       ctx.skill?.voiceModelSelection ??
-      (clientVoiceModelId
-        ? ({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: clientVoiceModelId,
-          } satisfies Extract<
-            VoiceModelSelection,
-            { selectionType: typeof ModelSelectionType.MANUAL }
-          >)
-        : DEFAULT_TTS_MODEL_SELECTION)
+      DEFAULT_TTS_MODEL_SELECTION
     );
   }
 
@@ -383,182 +449,5 @@ export class ModalityResolver {
       ctx.favorite?.videoGenModelSelection ??
       DEFAULT_VIDEO_GEN_MODEL_SELECTION
     );
-  }
-
-  /** Resolve image gen model: skill variant → favorite → system default */
-  static resolveImageGenModel(
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): ImageGenModelOption | null {
-    return this.cascadeMediaGenModel(
-      ctx.skill?.imageGenModelSelection,
-      ctx.favorite?.imageGenModelSelection,
-      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      (sel, u, avail) => getBestImageGenModel(sel, u, avail),
-      user,
-      availability,
-    );
-  }
-
-  /** Resolve music gen model: skill variant → favorite → system default */
-  static resolveMusicGenModel(
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): MusicGenModelOption | null {
-    return this.cascadeMediaGenModel(
-      ctx.skill?.musicGenModelSelection,
-      ctx.favorite?.musicGenModelSelection,
-      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      (sel, u, avail) => getBestMusicGenModel(sel, u, avail),
-      user,
-      availability,
-    );
-  }
-
-  /** Resolve video gen model: skill variant → favorite → system default */
-  static resolveVideoGenModel(
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): VideoGenModelOption | null {
-    return this.cascadeMediaGenModel(
-      ctx.skill?.videoGenModelSelection,
-      ctx.favorite?.videoGenModelSelection,
-      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      (sel, u, avail) => getBestVideoGenModel(sel, u, avail),
-      user,
-      availability,
-    );
-  }
-
-  /**
-   * Determine what a MIME type maps to as a Modality
-   */
-  static getMimeTypeModality(mimeType: string): Modality | null {
-    const lower = mimeType.toLowerCase();
-    if (lower.startsWith("image/")) {
-      return "image";
-    }
-    if (lower.startsWith("video/")) {
-      return "video";
-    }
-    if (lower.startsWith("audio/")) {
-      return "audio";
-    }
-    if (lower.startsWith("application/pdf") || lower.startsWith("text/")) {
-      return "text";
-    }
-    return null;
-  }
-
-  /**
-   * Check whether a bridge is needed for this attachment + model combo
-   */
-  static needsBridge(
-    attachment: MessageAttachment,
-    activeModel: ChatModelOption,
-  ): boolean {
-    const modality = ModalityResolver.getMimeTypeModality(attachment.mimeType);
-    if (!modality) {
-      return false;
-    }
-    return !activeModel.inputs.includes(modality);
-  }
-
-  /**
-   * Check if a media modality can be handled - either natively by the model
-   * or via a bridge model (vision/STT). Returns the unsupported modalities.
-   */
-  static getUnsupportedMediaModalities(
-    attachmentMimeTypes: string[],
-    activeModel: ChatModelOption,
-    ctx: BridgeContext,
-    user: JwtPayloadType,
-    availability: AgentEnvAvailability,
-  ): { modality: Modality; reason: string }[] {
-    const unsupported: { modality: Modality; reason: string }[] = [];
-    const checked = new Set<Modality>();
-
-    for (const mimeType of attachmentMimeTypes) {
-      const modality = ModalityResolver.getMimeTypeModality(mimeType);
-      if (!modality || modality === "text" || checked.has(modality)) {
-        continue;
-      }
-      checked.add(modality);
-
-      if (activeModel.inputs.includes(modality)) {
-        continue; // model supports natively
-      }
-
-      // Check if bridge is available
-      if (modality === "image") {
-        const visionModel = ModalityResolver.resolveImageVisionModel(
-          ctx,
-          user,
-          availability,
-        );
-        if (!visionModel) {
-          unsupported.push({
-            modality,
-            reason:
-              "No image vision model is configured. Enable an OpenRouter API key or select a model that supports image input.",
-          });
-        }
-      } else if (modality === "video") {
-        const visionModel = ModalityResolver.resolveVideoVisionModel(
-          ctx,
-          user,
-          availability,
-        );
-        if (!visionModel) {
-          unsupported.push({
-            modality,
-            reason:
-              "No video vision model is configured. Enable an OpenRouter API key or select a model that supports video input.",
-          });
-        }
-      } else if (modality === "audio") {
-        const sttModel = ModalityResolver.resolveSttModel(
-          ctx,
-          user,
-          availability,
-        );
-        if (!sttModel) {
-          unsupported.push({
-            modality,
-            reason:
-              "No speech-to-text model is configured. Enable voice providers or select a model that supports audio input.",
-          });
-        }
-      }
-    }
-
-    return unsupported;
-  }
-
-  /**
-   * Resolve how to pass an attachment to the active model.
-   */
-  static resolveVariant(
-    attachment: MessageAttachment,
-    activeModel: ChatModelOption,
-    variants: MessageVariant[],
-  ): VariantResolution {
-    const modality = ModalityResolver.getMimeTypeModality(attachment.mimeType);
-
-    if (!modality || activeModel.inputs.includes(modality)) {
-      return { useFile: true };
-    }
-
-    const textVariant = variants.find((v) => v.modality === "text");
-    if (textVariant) {
-      return { useVariant: textVariant };
-    }
-
-    const bridgeType: BridgeType = modality === "audio" ? "stt" : "vision";
-
-    return { needsGeneration: true, type: bridgeType };
   }
 }

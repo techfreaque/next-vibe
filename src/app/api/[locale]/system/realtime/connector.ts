@@ -541,9 +541,11 @@ class WsConnection {
   }
 
   /**
-   * Trigger a pull-on-connect exchange immediately via HTTP, without waiting
-   * for WS open. Used by `restartConnection` to ensure sync fires even when the
-   * WS upgrade fails (e.g. Vite HMR pressure during dev).
+   * Trigger the pull-on-connect exchange immediately via HTTP, without waiting
+   * for WS open. This is THE single entry point that starts the initial sync —
+   * called exactly once by the connect flow (openConnection). It is NOT wired
+   * to WS onOpen, so a WS reconnect never re-syncs; after this one pull, all
+   * state rides live WS remote events.
    */
   doPullNow(): void {
     const { remoteUrl, token, leadId } = this.config;
@@ -1019,6 +1021,8 @@ export async function restartConnection(instanceId: string): Promise<void> {
     );
     return;
   }
+  // openConnection fires the single pull-on-connect for the fresh lifetime
+  // (over HTTP, independent of WS open) — no separate pull needed here.
   openConnection(config);
   // Also fire pullOnConnect directly so sync happens even if WS open fails
   // (e.g. during Vite HMR module invalidation in dev).

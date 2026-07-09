@@ -8,6 +8,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "@/app/api/[locale]/companies/db";

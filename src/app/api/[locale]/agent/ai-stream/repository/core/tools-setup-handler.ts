@@ -85,26 +85,25 @@ export class ToolsSetupHandler {
     // confirmationOverrides (raw client availableTools pre-cascade) takes final precedence
     // so client-specified requiresConfirmation survives cascade overrides.
     const clientConfirmationConfig = new Map<string, boolean>();
-    const allToolConfigs = [
-      ...(params.pinnedTools ?? []),
-      ...(params.availableTools ?? []),
-    ];
-    for (const toolConfig of allToolConfigs) {
+    // A confirmed tool never re-prompts; otherwise its config value stands.
+    const applyConfig = (toolConfig: ToolConfigItem): void => {
       const preferredName = resolveToPreferredName(toolConfig.toolId);
-      const isConfirmedTool = confirmedToolNames.has(preferredName);
       clientConfirmationConfig.set(
         preferredName,
-        isConfirmedTool ? false : toolConfig.requiresConfirmation,
+        confirmedToolNames.has(preferredName)
+          ? false
+          : toolConfig.requiresConfirmation,
       );
+    };
+    for (const toolConfig of params.pinnedTools ?? []) {
+      applyConfig(toolConfig);
     }
-    // Apply confirmation overrides last - always wins over cascade
+    for (const toolConfig of params.availableTools ?? []) {
+      applyConfig(toolConfig);
+    }
+    // Apply confirmation overrides last - always wins over cascade.
     for (const toolConfig of params.confirmationOverrides ?? []) {
-      const preferredName = resolveToPreferredName(toolConfig.toolId);
-      const isConfirmedTool = confirmedToolNames.has(preferredName);
-      clientConfirmationConfig.set(
-        preferredName,
-        isConfirmedTool ? false : toolConfig.requiresConfirmation,
-      );
+      applyConfig(toolConfig);
     }
 
     // Also build a full-path keyed version for loadTools (which checks both preferred + internal names)
@@ -125,7 +124,7 @@ export class ToolsSetupHandler {
     // Build visible tool IDs from client request, or use defaults in agent mode.
     // Always inject await-task so AI can pause on background tasks regardless
     // of the user's saved tool list (it may predate the tool being added to defaults).
-    const visibleToolIdsFromClient = params.pinnedTools
+    const visibleToolIds = params.pinnedTools
       ? params.pinnedTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
       : [...getDefaultToolIdsForFolder(params.user, params.rootFolderId)]; // agent mode = folder+role-appropriate default tool set
 
@@ -133,15 +132,13 @@ export class ToolsSetupHandler {
     // Remote tools use "instanceId__toolName" format and are only in availableTools
     // (permissions). They must also be in pinnedTools for the AI to see them.
     if (params.availableTools) {
-      const visibleSet = new Set(visibleToolIdsFromClient);
+      const visibleSet = new Set(visibleToolIds);
       for (const tool of params.availableTools) {
         if (tool.toolId.includes("__") && !visibleSet.has(tool.toolId)) {
-          visibleToolIdsFromClient.push(tool.toolId);
+          visibleToolIds.push(tool.toolId);
         }
       }
     }
-
-    const visibleToolIds = visibleToolIdsFromClient;
 
     const toolsResult = await loadTools({
       requestedTools: visibleToolIds,

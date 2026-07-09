@@ -159,8 +159,11 @@ export async function generateMusicWithModelsLab(params: {
         });
       }
 
-      // Timed out polling - if we have a future_links URL from the initial response, use it.
-      // ModelsLab provides this pre-known URL where the file will be written once ready.
+      // Timed out polling. ModelsLab gives a `future_links` URL where the file
+      // WILL be written once ready — but blindly returning success with it is a
+      // silent failure: if generation never finished, that URL 404s and the
+      // caller ships a dead audio link. Only accept it if the file is ACTUALLY
+      // there now (HEAD via the same fixture-aware fetch). Otherwise fail loudly.
       if (futureUrl) {
         logger.error(
           "[ModelsLab Music] Poll timed out, using future_links URL",

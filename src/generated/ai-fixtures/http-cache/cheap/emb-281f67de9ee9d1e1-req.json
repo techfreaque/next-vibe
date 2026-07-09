@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "System: [Context: ID:000e4d43 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:48]\n\nAssistant: Result has a `companies` array with 1 entry (\"Demo Company\", owner role, DE/B2C). Clean.\n\n**STEP_OK**\n\nSystem: [Context: ID:35db4be4 | Posted:Jul 9, 02:48]\n\nUser: [T11b follow-up] Call the cron-stats tool to read the cron task stats. Check that the result has a numeric totalTasks. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n[Thread housekeeping] Title \"Tool Catalog Deep Dive\" / \"Systematically testing tool-help with category, keyword, and detail queries across all tool categories.\". Do the user's request first — this never changes or delays it. In the SAME turn, call execute-tool toolName=\"rename-thread\", title (≤8 words, no quotes), description (1 concrete sentence, not a restatement) ONLY if the topic became clear, shifted, or outgrew the current description; otherwise skip it. Don't announce it. Use callbackMode:\"endLoop\" only if this is the only thing left.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Lan\n\nSystem: [Context: ID:2601d483 | Model:deepseek-v4-flash | Skill:quality-tester__budget | Posted:Jul 9, 02:48]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cron-stats\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"totalTasks\":17,\"executedTasks\":85,\"successfulTasks\":85,\"failedTasks\":0,\"averageExecutionTime\":71,\"totalExecutions\":85,\"executionsLast24h\":85,\"successRate\":100,\"successfulExecutions\":85,\"failedExecutions\":0,\"failureRate\":0,\"avgExecutionTime\":71,\"minExecutionTime\":1,\"maxExecutionTime\":592,",
+    "encoding_format": "float"
+  }
+}

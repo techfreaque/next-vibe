@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Assistant: <think>The tool returned successfully. Let me check the result:\n\n- `stockLevels` is an array ✓\n- It has 3 items with product info: Consulting Hour, Laptop Stand, Design Template Pack\n- All fields present: id, productName, quantityAvailable, quantityOnHand, warehouseName, etc.\n- No low stock items (all `isLowStock: false`)\n\nEverything looks good.</think>**inventory-stock** ran successfully. Result has a `stockLevels` array with 3 items:\n\n| Product | Available | On Hand | Reserved | Unit Cost | Warehouse |\n|---------|-----------|---------|----------|-----------|-----------|\n| Consulting Hour | 52 | 54 | 2 | €29.93 | Main Warehouse |\n| Laptop Stand | 58 | 61 | 3 | €6.09 | Main Warehouse |\n| Design Template Pack | 195 | 205 | 10 | €31.46 | Main Warehouse |\n\nAll items above reorder point — no l\n\nUser: [T11c inventory-warehouses] Call the inventory-warehouses tool to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think>The result has a `warehouses` array with 2 items. Both warehouses have proper fields: id, name, code, address, isActive, isDefault, createdAt. This is correct.</think>**inventory-warehouses** ran successfully. Result has a `warehouses` array with 2 entries:\n\n| Warehouse | Code | Address | Default | Active |\n|-----------|------|---------|---------|--------|\n| Main Warehouse | WH-01 | 1 Storage Drive, Warehouse District | ✅ Yes | ✅ |\n| Secondary Warehouse | WH-02 | 2 Overflow Road, Storage Park | ❌ No | ✅ |\n\n**STEP_OK**\n\nUser: [T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

@@ -254,7 +254,10 @@ const { GET } = createEndpoint({
                 }),
                 metadata: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  schema: z.record(z.string(), z.any()),
+                  schema: z.record(
+                    z.string(),
+                    z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                  ),
                 }),
                 updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
