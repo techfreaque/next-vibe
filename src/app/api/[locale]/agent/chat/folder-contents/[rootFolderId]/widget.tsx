@@ -1150,14 +1150,13 @@ function FolderRow({
   const isDefault = isDefaultFolder(item.id);
   const isIncognito = activeRootFolderId === DefaultFolderId.INCOGNITO;
 
-  // For display name + icons: FolderContentsItem has id, name, icon, color fields
-  const folderDisplayName = isDefaultFolder(item.id)
-    ? getFolderDisplayName(
-        { id: item.id, name: item.name ?? "" } as ChatFolder,
-        locale,
-      )
-    : (item.name ?? item.id);
-  const folderIcon = getFolderIcon(item.id, item.icon);
+  // For display name + icons: pass name so scaffold mirrors ("private"/"background")
+  // resolve the same icon/color/translation as their local root counterparts.
+  const folderDisplayName = getFolderDisplayName(
+    { id: item.id, name: item.name ?? "" },
+    locale,
+  );
+  const folderIcon = getFolderIcon(item.id, item.icon, item.name);
   const rootFolderColor = getFolderColor(
     activeRootFolderId,
     item.color ?? undefined,

@@ -71,7 +71,6 @@ export class ChatMessagesRepositoryClient {
           metadata: msg.metadata,
           upvotes: msg.upvotes,
           downvotes: msg.downvotes,
-          searchVector: msg.searchVector,
           createdAt: new Date(msg.createdAt),
           updatedAt: new Date(msg.updatedAt),
         })),

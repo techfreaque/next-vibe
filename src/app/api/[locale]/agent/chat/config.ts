@@ -161,6 +161,37 @@ export interface ToolExecutionContext {
   rootFolderId: DefaultFolderId;
   /** Thread ID of the active conversation */
   threadId: string | undefined;
+  /**
+   * Spawning thread when this stream is a sub-stream/sub-agent child. Carried
+   * IN CONTEXT (not just persisted) because an INCOGNITO sub-stream (image-gen
+   * LLM path) has no DB row for the fixture engine to walk from — the engine
+   * starts the lineage walk here. NULL for top-level streams. Test/dev only in
+   * effect (the fixture engine is the sole consumer); harmless in prod.
+   */
+  parentThreadId?: string;
+  /**
+   * TEST-ONLY fixture plumbing. When a context is cloned for a single
+   * parallel-fan-out call (gap-fill bridge), this pins the fixture ordinal that
+   * call must use — reserved synchronously in a stable order BEFORE the
+   * concurrent fetches fire, so the racing calls never compete for the shared
+   * counter and each replays the same recording every run. Never set in prod
+   * (the fixture engine is dev/test-only); ignored outside the fixture fetch.
+   */
+  fixtureOrdinal?: number;
+  /**
+   * IANA timezone of the turn (e.g. "Europe/Vienna"). Threaded from the client
+   * request for interactive turns and from the owning user / server for
+   * server-driven turns (ai-run, revival, cron). Used for date formatting in
+   * the system prompt so headless turns don't fall back to UTC.
+   */
+  timezone: string;
+  /**
+   * Whether voice (TTS) mode is on for this turn. Threaded so a REVIVAL turn
+   * keeps speaking when the original conversation was in voice mode. The VOICE
+   * itself is NOT here — it resolves from the favorite/skill (→ default). Sub
+   * agents (ai-run) never inherit voice mode.
+   */
+  voiceEnabled: boolean;
   /** The assistant message ID currently being generated */
   aiMessageId: string | undefined;
   /**
@@ -385,15 +416,6 @@ export interface ToolExecutionContext {
     errorMessage: string | null;
   }) => Promise<void>;
   /**
-   * Fixture record/replay context for THIS execution chain (tests only).
-   * Set at the entry point (test runner param; receiver adopts it from the
-   * tool-execute-request payload; streams adopt the THREAD's anchored context
-   * from chat_threads.stream_context.fixtureContext) and passed down explicitly —
-   * never global: AI providers and media-gen tools bind it via
-   * createFixtureFetch. Its presence IS the switch; no env flag, no mode.
-   */
-  fixtureContext: FixtureContext | undefined;
-  /**
    * Ownership token for this stream execution's 'streaming' claim on
    * chat_threads.streamingRunId. Generated once per stream in setup; finalize
    * and error paths pass it to clearStreamingState so only the CURRENT owner
@@ -414,12 +436,19 @@ export interface ToolExecutionContext {
 export function makeHeadlessContext(
   // Both explicit at every call site — headless contexts must consciously
   // decide their abort wiring and thread/fixture scope, never inherit by omission.
-  signal: AbortSignal,
-  fixtureContext: FixtureContext | undefined,
+  signal: AbortSignal | undefined,
+  threadId: string | undefined,
+  // The owning USER's IANA timezone — threaded from stored user/thread state,
+  // never resolved from the server. Incidental non-AI callers may omit it.
+  timezone: string,
 ): ToolExecutionContext {
   return {
     rootFolderId: DefaultFolderId.BACKGROUND,
-    threadId: undefined,
+    threadId,
+    timezone,
+    // Headless callers don't speak; a revival that inherits voice mode sets
+    // this explicitly on its own context.
+    voiceEnabled: false,
     aiMessageId: undefined,
     skillId: undefined,
     headless: true,
@@ -437,6 +466,22 @@ export function makeHeadlessContext(
     escalateToTask: undefined,
     isRevival: undefined,
   };
+}
+
+/**
+ * An EXPLICIT thread-less stream context for genuine execution ROOTS that have
+ * no stream and never should — standalone maintenance (seed generation,
+ * embedding backfill, debug endpoints) and cross-instance relayed appliers.
+ *
+ * Because it carries no threadId, the fixture engine's read returns null and
+ * every external call it reaches runs LIVE (never recorded/replayed). Passing
+ * this — instead of a broken `undefined` — keeps `ToolExecutionContext`
+ * required across the whole chain, so a missing context anywhere ON a real
+ * stream path is a compile error, while these true roots stay greppable.
+ */
+export function rootlessStreamContext(): ToolExecutionContext {
+  // no user context — UTC (dates not user-facing here)
+  return makeHeadlessContext(undefined, undefined, "UTC");
 }
 
 /**

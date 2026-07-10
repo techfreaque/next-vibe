@@ -36,10 +36,6 @@ interface FragmentEntry {
   fragmentExportNames: string[];
   /** The specific export name for THIS fragment ID, e.g. "memoriesFragment" */
   ownExportName: string;
-  /** Absolute @/ import path to the server loader module (same as promptImportPath). */
-  serverImportPath: string | null;
-  /** Export name of the server loader function, e.g. "loadMemoriesData" */
-  serverLoaderExportName: string | null;
 }
 
 /**
@@ -181,9 +177,6 @@ class PromptFragmentsGenerator {
 
         const promptImportPath =
           PromptFragmentsGenerator.toAbsoluteImportPath(promptFile);
-        const serverImportPath = promptImportPath;
-        const serverLoaderExportName =
-          PromptFragmentsGenerator.extractServerLoaderName(promptFile, logger);
 
         // One entry per fragment ID - each knows its own export name and placement
         for (const [id, ownExportName] of idToExportName) {
@@ -209,28 +202,6 @@ class PromptFragmentsGenerator {
     return [...entriesByFile.values()].toSorted((a, b) =>
       a.id.localeCompare(b.id),
     );
-  }
-
-  /**
-   * Extract the exported server loader function name from a server.ts file using regex.
-   * Looks for: export async function loadXxx or export function loadXxx
-   */
-  private static extractServerLoaderName(
-    serverFile: string,
-    logger: EndpointLogger,
-  ): string | null {
-    try {
-      const content = readFileSync(serverFile, "utf-8");
-      const match = /export\s+(?:async\s+)?function\s+(load\w+)/.exec(content);
-      if (match) {
-        return match[1];
-      }
-      logger.warn(`Could not find loader export in ${serverFile}`);
-      return null;
-    } catch {
-      logger.warn(`Could not read server file ${serverFile}`);
-      return null;
-    }
   }
 
   /**
@@ -390,31 +361,18 @@ ${allPromptCases.join("\n")}
       },
     );
 
-    // Unique server imports: serverImportPath → { loaderName, dataVar }
-    const seenServer = new Map<
-      string,
-      { loaderName: string; dataVar: string }
-    >();
     // Fragment imports (prompt.ts) - deduplicated by path
     const seenPrompt = new Map<string, string[]>();
     for (const f of fragments) {
       if (!seenPrompt.has(f.promptImportPath)) {
         seenPrompt.set(f.promptImportPath, f.fragmentExportNames);
       }
-      if (f.serverImportPath && f.serverLoaderExportName) {
-        if (!seenServer.has(f.serverImportPath)) {
-          const raw = f.serverLoaderExportName.replace(/^load/, "");
-          const dataVar = raw.charAt(0).toLowerCase() + raw.slice(1);
-          seenServer.set(f.serverImportPath, {
-            loaderName: f.serverLoaderExportName,
-            dataVar,
-          });
-        }
-      }
     }
 
     // Build a unified sorted import list
     const typesPath = "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+    const remoteImportPath =
+      "@/app/api/[locale]/remote-connection/system-prompt";
     const allImports: Array<{ path: string; line: string }> = [];
     allImports.push({
       path: typesPath,
@@ -424,20 +382,19 @@ ${allPromptCases.join("\n")}
         typesPath,
       ),
     });
+    // Pre-fetch helpers for shared data
+    allImports.push({
+      path: remoteImportPath,
+      line: PromptFragmentsGenerator.formatImport(
+        "import",
+        ["loadRemoteInstancesContext"],
+        remoteImportPath,
+      ),
+    });
     for (const [path, names] of seenPrompt) {
       allImports.push({
         path,
         line: PromptFragmentsGenerator.formatImport("import", names, path),
-      });
-    }
-    for (const [path, { loaderName }] of seenServer) {
-      allImports.push({
-        path,
-        line: PromptFragmentsGenerator.formatImport(
-          "import",
-          [loaderName],
-          path,
-        ),
       });
     }
     // simple-import-sort sorts by path, then by import kind (type before value)
@@ -453,77 +410,26 @@ ${allPromptCases.join("\n")}
       return 0;
     });
 
-    // Generate parallel load calls - deduplicated by server path
-    const loaderCalls: string[] = [];
-    const loaderVarNames: string[] = [];
-    for (const [, { loaderName, dataVar }] of seenServer) {
-      loaderVarNames.push(dataVar);
-      loaderCalls.push(`    ${loaderName}(params),`);
-    }
+    // Build fragment call list (all fragments run in parallel via Promise.allSettled)
+    const fragmentCalls = fragments.map(
+      (f) => `    ${f.ownExportName}.build(enrichedParams),`,
+    );
+    const fragmentCallsStr = fragmentCalls.join("\n");
 
-    // Destructure: always multi-line when > 1 var (formatter always expands)
-    let destructure = "";
-    if (loaderVarNames.length > 0) {
-      const resultVars = loaderVarNames.map((v) => `${v}Result`);
-      const singleLine = `  const [${resultVars.join(", ")}] = await Promise.allSettled([`;
-      if (singleLine.length <= 80) {
-        destructure = `  const [${resultVars.join(", ")}] = await Promise.allSettled([\n${loaderCalls.join("\n")}\n  ]);`;
-      } else {
-        const varLines = resultVars.map((v) => `    ${v},`).join("\n");
-        destructure = `  const [\n${varLines}\n  ] = await Promise.allSettled([\n${loaderCalls.join("\n")}\n  ]);`;
-      }
-    }
-
-    // Resolve each data var from its Promise.allSettled result
-    const resolveLines: string[] = [];
-    for (const [, { dataVar }] of seenServer) {
-      resolveLines.push(
-        PromptFragmentsGenerator.formatResolveLine(
-          dataVar,
-          `${dataVar}Result`,
-          `${dataVar}Result.value`,
-          "undefined",
-        ),
-      );
-    }
-
-    // Build lines for each fragment
-    const buildLines: string[] = [];
-    const builtEntries: string[] = [];
-    const seenBuilt = new Set<string>();
-
-    for (const f of fragments) {
-      if (f.serverImportPath && f.serverLoaderExportName) {
-        const entry = seenServer.get(f.serverImportPath);
-        if (!entry || seenBuilt.has(f.id)) {
-          continue;
-        }
-        seenBuilt.add(f.id);
-        const camel = PromptFragmentsGenerator.toCamel(f.id);
-        buildLines.push(
-          PromptFragmentsGenerator.formatBuildLine(
-            `${camel}Built`,
-            entry.dataVar,
-            `${f.ownExportName}.build(${entry.dataVar})`,
-            "null",
-          ),
-        );
-        builtEntries.push(
-          `    ${PromptFragmentsGenerator.byIdKey(f.id)}: ${camel}Built,`,
-        );
-      }
-    }
+    // byId entries
+    const builtEntries = fragments.map(
+      (f, i) =>
+        `    ${PromptFragmentsGenerator.byIdKey(f.id)}: results[${i}] ?? null,`,
+    );
 
     // Push lines
     const pushLines = fragments
-      .filter((f) => f.serverImportPath)
-      .map((f) => {
-        const camel = PromptFragmentsGenerator.toCamel(f.id);
-        const pushCall = `    ${f.placement}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: ${camel}Built });`;
+      .map((f, i) => {
+        const pushCall = `    ${f.placement}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: results[${i}] });`;
         if (pushCall.length <= 80) {
-          return `  if (${camel}Built) {\n${pushCall}\n  }`;
+          return `  if (results[${i}]) {\n${pushCall}\n  }`;
         }
-        return `  if (${camel}Built) {\n    ${f.placement}.push({\n      id: "${f.id}",\n      priority: ${f.ownExportName}.priority,\n      str: ${camel}Built,\n    });\n  }`;
+        return `  if (results[${i}]) {\n    ${f.placement}.push({\n      id: "${f.id}",\n      priority: ${f.ownExportName}.priority,\n      str: results[${i}],\n    });\n  }`;
       })
       .join("\n");
 
@@ -553,9 +459,67 @@ export async function loadAllPromptFragments(
   trailing: Array<{ id: string; priority: number; str: string }>;
   byId: Record<string, string | null>;
 }> {
-${destructure}
-${resolveLines.join("\n")}
-${buildLines.join("\n")}
+  const userId = params.user.isPublic ? undefined : params.user.id;
+
+  // Pre-fetch shared data used by multiple fragments in parallel
+  const [isFreshUserResult, remoteInstancesResult, appNameResult] =
+    await Promise.allSettled([
+      // isFreshUser: used by bootstrap + guest fragments
+      (async (): Promise<boolean> => {
+        if (!userId || params.isIncognito) {
+          return !params.user.isPublic;
+        }
+        const [memoriesCount, tasksCount] = await Promise.all([
+          db
+            .select({ count: count() })
+            .from(cortexNodes)
+            .where(
+              and(
+                eq(cortexNodes.userId, userId),
+                eq(cortexNodes.nodeType, CortexNodeType.FILE),
+                like(cortexNodes.path, \`\${MEMORIES_PREFIX}/%\`),
+              ),
+            ),
+          db
+            .select({ count: count() })
+            .from(cronTasksTable)
+            .where(eq(cronTasksTable.userId, userId)),
+        ]);
+        return (
+          (memoriesCount[0]?.count ?? 0) === 0 &&
+          (tasksCount[0]?.count ?? 0) === 0
+        );
+      })(),
+      // remoteInstancesContext: used by system-context, remote-instances, ssh-connections
+      loadRemoteInstancesContext(params),
+      // appName: used by identity, platform-overview, bootstrap, guest-context
+      Promise.resolve(
+        chatScopedTranslation.scopedT(params.locale).t("config.appName"),
+      ),
+    ]);
+
+  const enrichedParams: SystemPromptServerParams = {
+    ...params,
+    isFreshUser:
+      isFreshUserResult.status === "fulfilled"
+        ? isFreshUserResult.value
+        : undefined,
+    remoteInstancesContext:
+      remoteInstancesResult.status === "fulfilled"
+        ? remoteInstancesResult.value
+        : undefined,
+    appName:
+      appNameResult.status === "fulfilled" ? appNameResult.value : undefined,
+  };
+
+  // Run all fragment builds in parallel
+  const settled = await Promise.allSettled([
+${fragmentCallsStr}
+  ]);
+  const results = settled.map((r) =>
+    r.status === "fulfilled" ? r.value : null,
+  );
+
   const byId: Record<string, string | null> = {
 ${builtEntries.join("\n")}
   };

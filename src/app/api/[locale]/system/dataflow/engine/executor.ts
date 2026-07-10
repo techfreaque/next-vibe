@@ -49,6 +49,8 @@ const VIBE_SENSE_STREAM_CONTEXT = makeHeadlessContext(
   VIBE_SENSE_ABORT_CONTROLLER.signal,
   // Vibe-sense runs live — never under fixtures.
   undefined,
+  // no user context — UTC (dates not user-facing here)
+  "UTC",
 );
 
 // ─── Execution Context ────────────────────────────────────────────────────────

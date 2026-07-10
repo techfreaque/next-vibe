@@ -340,6 +340,7 @@ export class CronTasksRepository {
               task.userId!,
               `/tasks/${task.id}.md`,
               embeddingContent,
+              rootlessStreamContext(),
             );
           })
           .catch(() => {
@@ -699,5 +700,108 @@ export class CronTasksRepository {
       }
     }
     return CronTasksRepository.updateTask(id, updates, user, locale, logger);
+  }
+
+  /**
+   * Insert a typed cron task. taskInput is validated against the definition's requestSchema.
+   * Returns the parsed taskInput so callers can use it directly without a second parse.
+   */
+  static async insertTyped<TSchema extends z.ZodTypeAny>(
+    definition: { requestSchema: TSchema },
+    values: Omit<typeof cronTasks.$inferInsert, "taskInput"> & {
+      taskInput: z.input<TSchema>;
+    },
+  ): Promise<z.output<TSchema>> {
+    const parsed = definition.requestSchema.parse(
+      values.taskInput,
+    ) as z.output<TSchema>;
+    const row: typeof cronTasks.$inferInsert = {
+      ...values,
+      taskInput: parsed as Record<string, WidgetData>,
+    };
+    await db.insert(cronTasks).values(row);
+    return parsed;
+  }
+
+  /**
+   * Insert a typed cron task, ignoring conflicts.
+   * Returns the parsed taskInput.
+   */
+  static async insertTypedOrIgnore<TSchema extends z.ZodTypeAny>(
+    definition: { requestSchema: TSchema },
+    values: Omit<typeof cronTasks.$inferInsert, "taskInput"> & {
+      taskInput: z.input<TSchema>;
+    },
+  ): Promise<z.output<TSchema>> {
+    const parsed = definition.requestSchema.parse(
+      values.taskInput,
+    ) as z.output<TSchema>;
+    const row: typeof cronTasks.$inferInsert = {
+      ...values,
+      taskInput: parsed as Record<string, WidgetData>,
+    };
+    await db.insert(cronTasks).values(row).onConflictDoNothing();
+    return parsed;
+  }
+
+  /**
+   * Find a task by id and return taskInput typed from the definition's requestSchema.
+   * Returns null if not found.
+   */
+  static async findByIdTyped<TSchema extends z.ZodTypeAny>(
+    definition: { requestSchema: TSchema },
+    id: string,
+  ): Promise<
+    (Omit<CronTaskRow, "taskInput"> & { taskInput: z.output<TSchema> }) | null
+  > {
+    const [row] = await db
+      .select()
+      .from(cronTasks)
+      .where(eq(cronTasks.id, id))
+      .limit(1);
+    if (!row) {
+      return null;
+    }
+    const parsed = definition.requestSchema.parse(
+      row.taskInput,
+    ) as z.output<TSchema>;
+    return { ...row, taskInput: parsed };
+  }
+
+  /** Enable a task by id. Returns true if a row was found and updated. */
+  static async enable(id: string): Promise<boolean> {
+    const result = await db
+      .update(cronTasks)
+      .set({ enabled: true, updatedAt: new Date() })
+      .where(eq(cronTasks.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  /**
+   * Merge additional fields into a task's taskInput, then enable it.
+   * Used when revival context (wakeUpStatus/wakeUpResult) is only known at result time.
+   * Returns true if the row was found and updated.
+   */
+  static async enableWithTaskInputMerge(
+    id: string,
+    extraInput: Record<string, WidgetData>,
+  ): Promise<boolean> {
+    const result = await db
+      .update(cronTasks)
+      .set({
+        enabled: true,
+        updatedAt: new Date(),
+        taskInput: sql`${cronTasks.taskInput} || ${JSON.stringify(extraInput)}::jsonb`,
+      })
+      .where(eq(cronTasks.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  /** Delete tasks by ids — best-effort. */
+  static async deleteByIds(ids: string[]): Promise<void> {
+    if (ids.length === 0) {
+      return;
+    }
+    await db.delete(cronTasks).where(inArray(cronTasks.id, ids));
   }
 }

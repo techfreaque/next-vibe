@@ -116,7 +116,7 @@ export async function answerAsAI(
       messageHistory: messageHistory ?? [],
       attachments: attachments && attachments.length > 0 ? attachments : null,
       toolConfirmations: null,
-      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+      voiceMode: { enabled: false },
       audioInput: { file: null },
       timezone,
       executionContext,

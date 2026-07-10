@@ -83,7 +83,7 @@ export class ChatThreadsRepositoryClient {
           rootFolderId: thread.rootFolderId,
           folderId: thread.folderId ?? null,
           status: thread.status ?? ThreadStatus.ACTIVE,
-          preview: thread.preview ?? null,
+          description: thread.description ?? null,
           pinned: thread.pinned ?? false,
           archived: thread.archived ?? false,
           rolesView: null,

@@ -117,6 +117,7 @@ export function EntityPickerFieldWidget<
 
   const name: string = fieldName;
   const labelField = field.labelField ?? "name";
+  const valueField = field.valueField ?? "id";
 
   const handleOpen = (): void => {
     void resolveListEndpoint(field.listEndpoint).then((ep) => {
@@ -124,7 +125,7 @@ export function EntityPickerFieldWidget<
         renderInModal: true,
         pickerCallback: (value: WidgetData) => {
           const picked = value as Record<string, string>;
-          form?.setValue(name, picked["id"] ?? String(value));
+          form?.setValue(name, picked[valueField] ?? String(value));
           const label =
             picked[labelField] ??
             picked["name"] ??

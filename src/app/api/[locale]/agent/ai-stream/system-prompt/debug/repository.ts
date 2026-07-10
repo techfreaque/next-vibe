@@ -21,7 +21,10 @@ import {
   type DefaultFolderId,
   rootlessStreamContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import {
+  CHAT_MESSAGE_COLUMNS,
+  chatMessages,
+} from "@/app/api/[locale]/agent/chat/db";
 import { loadRawEmbeddingScores } from "@/app/api/[locale]/agent/cortex/system-prompt";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
@@ -51,7 +54,7 @@ export async function buildDebugSystemPrompt({
     const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
-          fixtureContext: undefined,
+          streamContext: rootlessStreamContext(),
           skillId: skillId ?? null,
           user,
           logger,
@@ -61,7 +64,6 @@ export async function buildDebugSystemPrompt({
           callMode: false,
           headless: false,
           subAgentDepth: 0,
-          lastUserMessage: userMessage,
           threadId: threadId ?? null,
         }),
         userMessage && user.id
@@ -69,7 +71,7 @@ export async function buildDebugSystemPrompt({
           : Promise.resolve(undefined),
         threadId
           ? db
-              .select()
+              .select(CHAT_MESSAGE_COLUMNS)
               .from(chatMessages)
               .where(eq(chatMessages.threadId, threadId))
           : Promise.resolve([] as (typeof chatMessages.$inferSelect)[]),

@@ -123,6 +123,7 @@ export class RemoteConnectionInstanceRepository {
       syncScope,
       reconnectNow,
       transportMode,
+      remoteTransportMode,
       threadMirrorMode,
       loopLocation,
     } = data;
@@ -134,6 +135,7 @@ export class RemoteConnectionInstanceRepository {
       forceSystemProvider,
       isInferenceProvider,
       transportMode,
+      remoteTransportMode,
     ];
     if (!isAdmin && adminOnlyFields.some((f) => f !== undefined)) {
       return fail({
@@ -203,6 +205,9 @@ export class RemoteConnectionInstanceRepository {
     if (transportMode !== undefined) {
       patch.transportMode = transportMode;
     }
+    if (remoteTransportMode !== undefined) {
+      patch.remoteTransportMode = remoteTransportMode;
+    }
     if (threadMirrorMode !== undefined) {
       patch.threadMirrorMode = threadMirrorMode;
     }
@@ -237,7 +242,8 @@ export class RemoteConnectionInstanceRepository {
       isInferenceProvider,
       forceSystemProvider,
       syncScope,
-      transportMode,
+      outbound: transportMode,
+      inbound: remoteTransportMode,
     });
 
     // Mirror changed settings to the peer's reverse entry via the peer's real
@@ -247,43 +253,67 @@ export class RemoteConnectionInstanceRepository {
     //   • syncScope          — keeps the sync serve-filter consistent both sides.
     //   • remoteTransportMode — our transportMode IS the peer's "how the remote
     //     reaches me"; the peer stores it and (re)opens/closes its connector.
-    if (
-      (syncScope !== undefined || transportMode !== undefined) &&
+    //   • reconnectNow       — tell the peer to restart its outbound connector too
+    //     (covers the case where the peer's socket was the one that dropped).
+    const shouldSignalPeer =
+      (syncScope !== undefined ||
+        transportMode !== undefined ||
+        remoteTransportMode !== undefined ||
+        reconnectNow === true) &&
       row.token &&
-      row.remoteUrl
-    ) {
-      void (async (): Promise<void> => {
-        try {
-          const selfInstanceId =
-            RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-          const { RouteExecuteRepository } =
-            await import("next-vibe/execute-tool/repository");
-          const { CallbackMode } =
-            await import("next-vibe/execute-tool/constants");
-          const reverseUpdateDef =
-            await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: reverseUpdateDef.default.PATCH,
-            instanceId: targetInstanceId,
-            callbackMode: CallbackMode.WAIT,
-            user,
-            locale,
-            logger,
-            input: {
-              instanceId: selfInstanceId,
-              ...(syncScope !== undefined ? { syncScope } : {}),
-              ...(transportMode !== undefined
-                ? { remoteTransportMode: transportMode }
-                : {}),
-            },
-          });
-        } catch (err) {
-          logger.warn(
-            "[PATCH] Failed to mirror settings to peer — picked up on reconnect",
-            { instanceId: targetInstanceId, error: String(err) },
-          );
-        }
-      })();
+      row.remoteUrl;
+
+    // AWAIT the mirror BEFORE the connector lifecycle below fires its pull.
+    // The peer's stored syncScope is the authoritative serve-filter when WE pull
+    // FROM it; if we reconnect + pull before the mirror lands, the peer still
+    // holds its OLD scope and serves domains we just disabled (the observed leak:
+    // an all-false PATCH still pulled memories/skills/favorites because the peer's
+    // reverse entry was still all-true). Blocking here orders scope-consistency
+    // before the pull. Best-effort: a mirror failure must not fail the PATCH (the
+    // row is saved; the peer converges on its next reconnect), so it is caught.
+    if (shouldSignalPeer) {
+      try {
+        const selfInstanceId =
+          RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+        const { RouteExecuteRepository } =
+          await import("next-vibe/execute-tool/repository");
+        const { CallbackMode } =
+          await import("next-vibe/execute-tool/constants");
+        const reverseUpdateDef =
+          await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
+        await RouteExecuteRepository.runInProcessTyped({
+          definition: reverseUpdateDef.default.PATCH,
+          instanceId: targetInstanceId,
+          callbackMode: CallbackMode.WAIT,
+          user,
+          locale,
+          logger,
+          input: {
+            instanceId: selfInstanceId,
+            // Mirror syncScope ONLY when the PATCH actually changed it — an
+            // absent scope must NOT be sent, or the peer's optional schema keeps
+            // it undefined (correct) while a sent `undefined` would round-trip.
+            // A transportMode-only PATCH leaves the peer's scope untouched.
+            ...(syncScope !== undefined ? { syncScope } : {}),
+            // Our transportMode IS the peer's "how the remote reaches me"
+            // (its remoteTransportMode). And if WE set remoteTransportMode
+            // directly (how the peer reaches us), that IS the peer's own
+            // transportMode — mirror it so both rows stay in lockstep.
+            ...(transportMode !== undefined
+              ? { remoteTransportMode: transportMode }
+              : {}),
+            ...(remoteTransportMode !== undefined
+              ? { transportMode: remoteTransportMode }
+              : {}),
+            ...(reconnectNow === true ? { reconnectNow: true } : {}),
+          },
+        });
+      } catch (err) {
+        logger.warn(
+          "[PATCH] Failed to mirror settings to peer — picked up on reconnect",
+          { instanceId: targetInstanceId, error: String(err) },
+        );
+      }
     }
 
     // Connector lifecycle: the outbound connector (the ONE socket we open to
@@ -293,23 +323,42 @@ export class RemoteConnectionInstanceRepository {
     // so its send leg rides the socket it holds). Keep it open when EITHER
     // post-patch leg is reverse-ws; only a fully direct-http pair closes it.
     // (cloud instances never open outbound sockets; openConnection no-ops there.)
-    const effectiveRemoteMode =
-      (await RemoteConnectionRepository.getRemoteTransportMode(
-        user.id,
-        targetInstanceId,
-      )) ?? row.remoteTransportMode;
-    const effectiveOwnMode = transportMode ?? row.transportMode;
-    if (
-      reconnectNow === true ||
-      effectiveRemoteMode === "reverse-ws" ||
-      effectiveOwnMode === "reverse-ws"
-    ) {
-      const { restartConnection } =
-        await import("next-vibe/realtime/connector");
-      await restartConnection(targetInstanceId);
-    } else {
-      const { closeConnection } = await import("next-vibe/realtime/connector");
-      closeConnection(targetInstanceId);
+    // The settings PATCH above is already committed — the connector lifecycle
+    // below is BEST-EFFORT. A transient hiccup here (a slow transport-mode read,
+    // a connector module that throws under load, a failed WS open) must NEVER
+    // 500 the whole PATCH: the row is saved and the connector self-heals on its
+    // next acquire/pulse. Wrapping the entire block is the root fix for the
+    // intermittent "Handler timed out or threw" reconnect 500s under load.
+    // Open / close / restart the outbound connector AS NEEDED — only when a
+    // transport leg actually changed or the caller asked to reconnect. A
+    // rename-only or scope-only PATCH leaves the socket untouched (no needless
+    // reconnect). restartConnection is transport-aware: it re-runs the ONE HTTP
+    // pull-on-connect for EVERY transport (so `reconnectNow` re-syncs a
+    // direct-http pair too — the sync exchange rides HTTP, never a socket) and
+    // opens a persistent outbound socket ONLY when a leg is genuinely reverse-ws
+    // (EITHER our transportMode OR the peer's remoteTransportMode). A leg flipping
+    // AWAY from reverse-ws is handled too: restartConnection's closeConnection
+    // drops the old socket, then openConnection opens pull-only. Thus this single
+    // call correctly OPENS (leg became reverse-ws), CLOSES (both legs now
+    // direct-http → openConnection is pull-only, stale socket dropped), or
+    // RESTARTS (reconnectNow / credential refresh) as the new modes require.
+    const transportChanged =
+      transportMode !== undefined || remoteTransportMode !== undefined;
+    if (transportChanged || reconnectNow === true) {
+      try {
+        const { restartConnection } =
+          await import("next-vibe/realtime/connector");
+        await restartConnection(targetInstanceId);
+      } catch (connectorErr) {
+        logger.error("[PATCH] connector lifecycle failed (settings saved)", {
+          targetInstanceId,
+          error:
+            connectorErr instanceof Error
+              ? connectorErr.message
+              : String(connectorErr),
+          stack: connectorErr instanceof Error ? connectorErr.stack : undefined,
+        });
+      }
     }
 
     return success({ updated: true });
@@ -693,15 +742,19 @@ export class RemoteConnectionInstanceRepository {
     })();
 
     // Re-home the local connector under the new instanceId — the registry is
-    // keyed by instanceId and the old entry would otherwise go stale
-    // (acquireConnection(newId) would open a duplicate socket). The peer learns
-    // the new name from the self/rename propagation below, NOT a WS control event.
+    // keyed by instanceId and the old entry would otherwise go stale. Only when a
+    // connector is ACTUALLY open (reverse-ws): closeConnection(old) +
+    // restartConnection(new). A direct-http pair has no socket, so there is
+    // nothing to re-home — never open a WS that wasn't already open. The peer
+    // learns the new name from the self/rename propagation below, NOT a WS event.
     void (async (): Promise<void> => {
       try {
-        const { closeConnection, restartConnection } =
+        const { getWsConnection, closeConnection, restartConnection } =
           await import("next-vibe/realtime/connector");
-        closeConnection(instanceId);
-        await restartConnection(newInstanceId);
+        if (getWsConnection(instanceId)) {
+          closeConnection(instanceId);
+          await restartConnection(newInstanceId);
+        }
       } catch {
         /* non-fatal */
       }

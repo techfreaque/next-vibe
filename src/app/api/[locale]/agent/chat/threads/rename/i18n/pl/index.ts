@@ -84,5 +84,13 @@ export const translations: typeof enTranslations = {
       title: "Wątek przemianowany",
       description: "Tytuł i podgląd wątku zostały zaktualizowane",
     },
+    backButton: {
+      label: "Anuluj",
+    },
+    submitButton: {
+      label: "Zapisz",
+      loadingText: "Zapisywanie...",
+    },
+    dynamicTitle: "Zmień nazwę wątku: {{title}}",
   },
 };

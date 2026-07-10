@@ -84,5 +84,13 @@ export const translations: typeof enTranslations = {
       title: "Thread umbenannt",
       description: "Titel und Vorschau des Threads wurden aktualisiert",
     },
+    backButton: {
+      label: "Abbrechen",
+    },
+    submitButton: {
+      label: "Speichern",
+      loadingText: "Wird gespeichert...",
+    },
+    dynamicTitle: "Thread umbenennen: {{title}}",
   },
 };

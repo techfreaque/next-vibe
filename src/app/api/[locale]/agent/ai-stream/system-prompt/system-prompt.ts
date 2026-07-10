@@ -20,52 +20,7 @@ import {
 import { envClient } from "@/config/env-client";
 
 import { FEATURED_MODELS } from "../models";
-import type {
-  MediaCapabilitiesParams,
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "./types";
-
-// ─── Unified prompt context data ──────────────────────────────────────────────
-
-export interface PromptContextData {
-  // Core context (from params - no DB)
-  appName: string;
-  locale: CountryLanguage;
-  languageName: string;
-  countryName: string;
-  flag: string;
-  rootFolderId: DefaultFolderId;
-  subFolderId: string | null;
-  headless: boolean;
-  callMode: boolean;
-  extraInstructions: string;
-  isLocalMode: boolean;
-  freeTierCredits: number;
-  subLabel: string;
-  packLabel: string;
-  uncensoredNames: string;
-  totalModelCount: number;
-  isExposedFolder: boolean;
-  // User context (from DB / client state)
-  privateName: string;
-  publicName: string;
-  isPublicUser: boolean;
-  isAdmin: boolean;
-  /** Computed from DB counts: no memories + no tasks = fresh user */
-  isFreshUser: boolean;
-  /** Whether dreamer (scheduled cortex reorganization) is enabled */
-  dreamerEnabled: boolean;
-  /** Whether autopilot (scheduled background agent work) is enabled */
-  autopilotEnabled: boolean;
-  /** Resolved media generation capabilities (image-gen, music-gen, video-gen) */
-  mediaCapabilities: MediaCapabilitiesParams | null;
-  /**
-   * Sub-agent nesting depth. 0 = top-level stream (user-facing or cron).
-   * 1 = spawned by ai-run from a top-level stream, 2 = spawned by a depth-1 sub-agent, etc.
-   */
-  subAgentDepth: number;
-}
+import type { SystemPromptFragment } from "./types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -103,96 +58,158 @@ function buildHeadlessFolderNote(rootFolderId: DefaultFolderId): string {
   }
 }
 
+function currencySymbol(currency: string): string {
+  if (currency === "EUR") {
+    return "€";
+  }
+  if (currency === "PLN") {
+    return "zł";
+  }
+  return "$";
+}
+
+function buildMediaLine(opts: {
+  label: string;
+  toolAlias: string;
+  modality: string;
+  nativeOutputs: string[];
+  genModelName: string | null;
+  isSameAsChatModel: boolean;
+}): string | null {
+  const {
+    label,
+    toolAlias,
+    modality,
+    nativeOutputs,
+    genModelName,
+    isSameAsChatModel,
+  } = opts;
+  const hasNative = nativeOutputs.includes(modality);
+
+  if (isSameAsChatModel) {
+    return `- ${label}: native (you output ${modality} directly - no tool needed)`;
+  }
+  if (genModelName) {
+    if (hasNative) {
+      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName}. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`. Use native output only if explicitly asked.`;
+    }
+    return `- ${label}: ${genModelName} available. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`.`;
+  }
+  if (hasNative) {
+    return `- ${label}: native (model outputs ${modality} directly without a separate tool)`;
+  }
+  return null;
+}
+
 // ─── Core context fragments (priority 10–90) ─────────────────────────────────
 
-export const identityFragment: SystemPromptFragment<PromptContextData> = {
+export const identityFragment: SystemPromptFragment = {
   id: "identity",
   placement: "leading",
   priority: 10,
-  build: (data) => {
-    const { appName, headless, rootFolderId } = data;
+  build: async (params) => {
+    const { headless, rootFolderId, appName } = params;
+    const name =
+      appName ??
+      chatScopedTranslation.scopedT(params.locale).t("config.appName");
     const today = new Date().toISOString().split("T")[0];
     const isPublicForum =
       rootFolderId === "public" || rootFolderId === "shared";
 
     if (headless) {
       if (isPublicForum) {
-        return `# ${appName}
+        return `# ${name}
 
 **Current Date:** ${today}
 
-You are posting in a public forum on ${appName}. Write as a natural participant - engaging, informative, and conversational. Your response will be visible to everyone.`;
+You are posting in a public forum on ${name}. Write as a natural participant - engaging, informative, and conversational. Your response will be visible to everyone.`;
       }
-      return `# ${appName} - Automated Agent
+      return `# ${name} - Automated Agent
 
 **Current Date:** ${today}
 
-You are an automated AI agent running on ${appName}. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.`;
+You are an automated AI agent running on ${name}. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.`;
     }
 
-    return `# ${appName}
+    return `# ${name}
 
 **Current Date:** ${today}
 
-You are an AI on ${appName} - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.`;
+You are an AI on ${name} - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.`;
   },
 };
 
-export const platformOverviewFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "platform-overview",
-    placement: "leading",
-    priority: 20,
-    build: (data) => {
-      const {
-        appName,
-        isLocalMode,
-        freeTierCredits,
-        subLabel,
-        packLabel,
-        uncensoredNames,
-        totalModelCount,
-      } = data;
+export const platformOverviewFragment: SystemPromptFragment = {
+  id: "platform-overview",
+  placement: "leading",
+  priority: 20,
+  build: async (params) => {
+    const { locale } = params;
+    const isAdmin =
+      !params.user.isPublic &&
+      params.user.roles.includes(UserPermissionRole.ADMIN);
+    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const appName =
+      params.appName ??
+      chatScopedTranslation.scopedT(locale).t("config.appName");
+    const freeTierCredits = productsRepository.getProduct(
+      ProductIds.FREE_TIER,
+      locale,
+    ).credits;
+    const subscriptionProduct = productsRepository.getProduct(
+      ProductIds.SUBSCRIPTION,
+      locale,
+    );
+    const creditPackProduct = productsRepository.getProduct(
+      ProductIds.CREDIT_PACK,
+      locale,
+    );
+    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
+    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
+    const totalModelCount = getAvailableModelCount(
+      isAdmin,
+      getEnvAvailability(),
+    );
+    const uncensoredNames = FEATURED_MODELS.uncensored.join(", ");
 
-      const creditLines = isLocalMode
-        ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
-        : `- **Credits:** 1 credit = $0.01. Cost varies by model.
+    const creditLines = isLocalMode
+      ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
+      : `- **Credits:** 1 credit = $0.01. Cost varies by model.
 - **Free tier:** ${freeTierCredits} credits/month via browser ID - no account needed.
 - **Subscription:** ${subLabel}. **Credit packs:** ${packLabel}.`;
 
-      return `## ${appName}
+    return `## ${appName}
 
 - **Models:** ${totalModelCount} — Claude, GPT, Gemini, Llama, and uncencored ones ${uncensoredNames}.
 ${creditLines}
 - **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).`;
-    },
-  };
+  },
+};
 
-export const headlessContextFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "headless-context",
-    placement: "leading",
-    priority: 30,
-    build: (data) => {
-      if (!data.headless) {
-        return null;
-      }
-      const { rootFolderId } = data;
-      const isPublicForum =
-        rootFolderId === "public" || rootFolderId === "shared";
-      const folderNote = buildHeadlessFolderNote(rootFolderId);
+export const headlessContextFragment: SystemPromptFragment = {
+  id: "headless-context",
+  placement: "leading",
+  priority: 30,
+  build: async (params) => {
+    if (!params.headless) {
+      return null;
+    }
+    const { rootFolderId } = params;
+    const isPublicForum =
+      rootFolderId === "public" || rootFolderId === "shared";
+    const folderNote = buildHeadlessFolderNote(rootFolderId);
 
-      if (isPublicForum) {
-        return `## Public Post Context
+    if (isPublicForum) {
+      return `## Public Post Context
 ${folderNote}
 **Guidelines:**
 - Write a natural, engaging response as a forum participant.
 - Your response will be visible to everyone - keep it helpful and on-topic.
 - Do not mention being automated, headless, or a background agent.
 - Your **last message** (with no tool call) is posted as the reply.`;
-      }
+    }
 
-      return `## Automated Execution Context
+    return `## Automated Execution Context
 
 **⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**
 
@@ -200,33 +217,38 @@ No user watching. Complete the task. No follow-up questions. No pleasantries.
 ${folderNote}
 - If the task fails, state clearly why.
 - State your result once, at the end, without preamble.`;
-    },
-  };
+  },
+};
 
-export const subAgentGuardFragment: SystemPromptFragment<PromptContextData> = {
+export const subAgentGuardFragment: SystemPromptFragment = {
   id: "sub-agent-guard",
   placement: "leading",
   priority: 35,
-  build: (data) => {
-    if (!(data.subAgentDepth > 0)) {
+  build: async (params) => {
+    if (!(params.subAgentDepth > 0)) {
       return null;
     }
-    return `## Sub-Agent Context (depth ${data.subAgentDepth})
+    return `## Sub-Agent Context (depth ${params.subAgentDepth})
 
 You were spawned by another AI agent via \`ai-run\`. You are a worker - do the actual work yourself.
 
-- **Depth ${data.subAgentDepth}** means ${data.subAgentDepth === 1 ? "a top-level agent spawned you" : `you are ${data.subAgentDepth} levels deep in a delegation chain`}.
+- **Depth ${params.subAgentDepth}** means ${params.subAgentDepth === 1 ? "a top-level agent spawned you" : `you are ${params.subAgentDepth} levels deep in a delegation chain`}.
 - You may spawn sub-agents via \`ai-run\` if genuinely needed for a subtask, but never to simply pass along the same task you received. Each level must add value.
 - If you can do the work with the tools available to you, do it directly - don't delegate.`;
   },
 };
 
-export const languageFragment: SystemPromptFragment<PromptContextData> = {
+export const languageFragment: SystemPromptFragment = {
   id: "language",
   placement: "leading",
   priority: 40,
-  build: (data) => {
-    const { languageName, locale, countryName, flag, headless } = data;
+  build: async (params) => {
+    const { locale, headless, rootFolderId } = params;
+    const { language, country } = getLanguageAndCountryFromLocale(locale);
+    const countryInfo = languageConfig.countryInfo[country];
+    const languageName = countryInfo?.langName ?? language;
+    const countryName = countryInfo?.name ?? country;
+    const flag = countryInfo?.flag ?? "🌐";
 
     if (headless) {
       return `## Output Language
@@ -234,9 +256,9 @@ export const languageFragment: SystemPromptFragment<PromptContextData> = {
 Respond in ${languageName} (${locale}) unless the task explicitly specifies otherwise.`;
     }
 
-    const isIncognito = data.rootFolderId === DefaultFolderId.INCOGNITO;
+    const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
     const isPublicFolder =
-      data.rootFolderId === DefaultFolderId.PUBLIC || data.isPublicUser;
+      rootFolderId === DefaultFolderId.PUBLIC || params.user.isPublic;
     const cortexNote =
       !isIncognito && !isPublicFolder
         ? "\nWhen writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers)."
@@ -250,12 +272,12 @@ ALWAYS respond in the language of the user's current message. Default language i
   },
 };
 
-export const folderContextFragment: SystemPromptFragment<PromptContextData> = {
+export const folderContextFragment: SystemPromptFragment = {
   id: "folder-context",
   placement: "leading",
   priority: 50,
-  build: (data) => {
-    const { rootFolderId, subFolderId } = data;
+  build: async (params) => {
+    const { rootFolderId, subFolderId } = params;
     const folderDescription = getFolderDescription(rootFolderId);
     return `## Current Context
 
@@ -263,16 +285,15 @@ export const folderContextFragment: SystemPromptFragment<PromptContextData> = {
   },
 };
 
-export const messageMetadataFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "message-metadata",
-    placement: "leading",
-    priority: 60,
-    build: (data) => {
-      if (data.headless) {
-        return null;
-      }
-      return `## Message Context
+export const messageMetadataFragment: SystemPromptFragment = {
+  id: "message-metadata",
+  placement: "leading",
+  priority: 60,
+  build: async (params) => {
+    if (params.headless) {
+      return null;
+    }
+    return `## Message Context
 
 Each message is prefixed with auto-generated metadata: \`[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]\`
 
@@ -280,15 +301,14 @@ Each message is prefixed with auto-generated metadata: \`[Context: ID:abc12345 |
 
 - Check metadata before responding - multiple skills/models may be active in one thread.
 - Do NOT reproduce \`[Context: ...]\` tags in your responses - they are injected automatically.`;
-    },
-  };
+  },
+};
 
-export const toolExecutionControlFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "tool-execution-control",
-    placement: "leading",
-    priority: 70,
-    build: () => `## Tool Execution
+export const toolExecutionControlFragment: SystemPromptFragment = {
+  id: "tool-execution-control",
+  placement: "leading",
+  priority: 70,
+  build: async () => `## Tool Execution
 
 **Schema first:** Call \`tool-help(toolName="<name>")\` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.
 
@@ -302,14 +322,59 @@ export const toolExecutionControlFragment: SystemPromptFragment<PromptContextDat
 - **\`"approve"\`** — pause for user confirmation
 
 Fast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.`,
-  };
+};
 
-export const formattingFragment: SystemPromptFragment<PromptContextData> = {
+export const mediaCapabilitiesFragment: SystemPromptFragment = {
+  id: "media-capabilities",
+  placement: "leading",
+  priority: 75,
+  build: async (params) => {
+    const mc = params.mediaCapabilities;
+    if (!mc) {
+      return null;
+    }
+
+    const lines = [
+      buildMediaLine({
+        label: "Images",
+        toolAlias: "generate_image",
+        modality: "image",
+        nativeOutputs: mc.nativeOutputs,
+        genModelName: mc.imageGenModelName,
+        isSameAsChatModel: mc.imageGenIsSameAsChatModel,
+      }),
+      buildMediaLine({
+        label: "Music/audio",
+        toolAlias: "generate_music",
+        modality: "audio",
+        nativeOutputs: mc.nativeOutputs,
+        genModelName: mc.musicGenModelName,
+        isSameAsChatModel: mc.musicGenIsSameAsChatModel,
+      }),
+      buildMediaLine({
+        label: "Video",
+        toolAlias: "generate_video",
+        modality: "video",
+        nativeOutputs: mc.nativeOutputs,
+        genModelName: mc.videoGenModelName,
+        isSameAsChatModel: mc.videoGenIsSameAsChatModel,
+      }),
+    ].filter((line): line is string => line !== null);
+
+    if (lines.length === 0) {
+      return null;
+    }
+
+    return `## Media capabilities\n${lines.join("\n")}`;
+  },
+};
+
+export const formattingFragment: SystemPromptFragment = {
   id: "formatting",
   placement: "leading",
   priority: 80,
-  build: (data) => {
-    const { headless, callMode } = data;
+  build: async (params) => {
+    const { headless, callMode } = params;
 
     if (headless) {
       return `## Output Format
@@ -344,64 +409,89 @@ IMPORTANT guidelines for voice responses:
   },
 };
 
-/**
- * Extra instructions — ONE path for every mode. Headless callers (revival
- * instructions, relay tool catalogs) and interactive callers both land here;
- * previously headless extra text was embedded inside headlessContextFragment
- * while interactive used this fragment — two code paths for one concept.
- */
-export const extraInstructionsFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "extra-instructions",
-    placement: "leading",
-    priority: 90,
-    build: (data) => {
-      if (!data.extraInstructions.trim()) {
-        return null;
-      }
-      return `## Additional Instructions\n\n${data.extraInstructions.trim()}`;
-    },
-  };
-
-// ─── User context fragments (priority 550–720) ───────────────────────────────
-
-export const userNameFragment: SystemPromptFragment<PromptContextData> = {
-  id: "user-name",
+export const extraInstructionsFragment: SystemPromptFragment = {
+  id: "extra-instructions",
   placement: "leading",
-  priority: 550,
-  build: (data) => {
-    if (data.headless) {
+  priority: 90,
+  build: async (params) => {
+    const instructions = params.extraInstructions?.trim();
+    if (!instructions) {
       return null;
     }
-    const name = data.isExposedFolder ? data.publicName : data.privateName;
-    if (!name?.trim()) {
-      return null;
-    }
-    return `## User\n\n**Name:** ${name}`;
+    return `## Additional Instructions\n\n${instructions}`;
   },
 };
 
-export const bootstrapFragment: SystemPromptFragment<PromptContextData> = {
+// ─── User context fragments (priority 550–720) ───────────────────────────────
+
+export const userNameFragment: SystemPromptFragment = {
+  id: "user-name",
+  placement: "leading",
+  priority: 550,
+  build: async (params) => {
+    if (params.headless || params.user.isPublic) {
+      return null;
+    }
+
+    try {
+      const [row] = await db
+        .select({
+          privateName: usersTable.privateName,
+          publicName: usersTable.publicName,
+        })
+        .from(usersTable)
+        .where(eq(usersTable.id, params.user.id))
+        .limit(1);
+
+      const name = params.isExposedFolder
+        ? (row?.publicName ?? "")
+        : (row?.privateName ?? "");
+      if (!name.trim()) {
+        return null;
+      }
+      return `## User\n\n**Name:** ${name}`;
+    } catch {
+      return null;
+    }
+  },
+};
+
+export const bootstrapFragment: SystemPromptFragment = {
   id: "bootstrap",
   placement: "leading",
   priority: 700,
-  build: (data) => {
+  build: async (params) => {
     if (
-      data.headless ||
-      !data.isFreshUser ||
-      data.rootFolderId === DefaultFolderId.INCOGNITO
+      params.headless ||
+      !params.isFreshUser ||
+      params.rootFolderId === DefaultFolderId.INCOGNITO
     ) {
       return null;
     }
-    const {
-      appName,
-      isAdmin,
-      isPublicUser,
-      isLocalMode,
-      freeTierCredits,
-      subLabel,
-      packLabel,
-    } = data;
+    const { locale } = params;
+    const isAdmin =
+      !params.user.isPublic &&
+      params.user.roles.includes(UserPermissionRole.ADMIN);
+    const isPublicUser = params.user.isPublic;
+    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const appName =
+      params.appName ??
+      chatScopedTranslation.scopedT(locale).t("config.appName");
+    const freeTierCredits = productsRepository.getProduct(
+      ProductIds.FREE_TIER,
+      locale,
+    ).credits;
+    const subscriptionProduct = productsRepository.getProduct(
+      ProductIds.SUBSCRIPTION,
+      locale,
+    );
+    const creditPackProduct = productsRepository.getProduct(
+      ProductIds.CREDIT_PACK,
+      locale,
+    );
+    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
+    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
+
     const userType = isAdmin ? "admin" : isPublicUser ? "public" : "user";
 
     if (userType === "public") {
@@ -476,17 +566,31 @@ You're all set up with an account. Here's what's available to you:
   },
 };
 
-export const guestContextFragment: SystemPromptFragment<PromptContextData> = {
+export const guestContextFragment: SystemPromptFragment = {
   id: "guest-context",
   placement: "leading",
   priority: 710,
-  build: (data) => {
-    if (data.headless || !data.isPublicUser || data.isFreshUser) {
+  build: async (params) => {
+    if (params.headless || !params.user.isPublic || params.isFreshUser) {
       return null;
     }
-    const { freeTierCredits, subLabel, packLabel, isLocalMode, rootFolderId } =
-      data;
+    const { locale, rootFolderId } = params;
+    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
     const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
+    const freeTierCredits = productsRepository.getProduct(
+      ProductIds.FREE_TIER,
+      locale,
+    ).credits;
+    const subscriptionProduct = productsRepository.getProduct(
+      ProductIds.SUBSCRIPTION,
+      locale,
+    );
+    const creditPackProduct = productsRepository.getProduct(
+      ProductIds.CREDIT_PACK,
+      locale,
+    );
+    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
+    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
 
     if (isLocalMode) {
       if (isIncognito) {
@@ -533,117 +637,38 @@ This user has **no account** - they browse as a guest identified by a browser ID
   },
 };
 
-/**
- * Build a media capability line for a single modality.
- *
- * Four cases:
- * 1. Chat model IS the gen model → native, no tool mention
- * 2. Gen model set, chat model also has native output → both (prefer tool)
- * 3. Gen model set, no native output → tool only
- * 4. No gen model, native output → native only
- */
-function buildMediaLine(opts: {
-  label: string;
-  toolAlias: string;
-  modality: string;
-  nativeOutputs: string[];
-  genModelName: string | null;
-  isSameAsChatModel: boolean;
-}): string | null {
-  const {
-    label,
-    toolAlias,
-    modality,
-    nativeOutputs,
-    genModelName,
-    isSameAsChatModel,
-  } = opts;
-  const hasNative = nativeOutputs.includes(modality);
-
-  if (isSameAsChatModel) {
-    // Case 1: chat model = gen model → native, tool is omitted from pinned
-    return `- ${label}: native (you output ${modality} directly - no tool needed)`;
-  }
-
-  if (genModelName) {
-    if (hasNative) {
-      // Case 2: different gen model + native capability → mention both, prefer tool
-      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName}. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`. Use native output only if explicitly asked.`;
-    }
-    // Case 3: different gen model, no native → tool only
-    return `- ${label}: ${genModelName} available. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`.`;
-  }
-
-  if (hasNative) {
-    // Case 4: no gen model configured, but model can do it natively
-    return `- ${label}: native (model outputs ${modality} directly without a separate tool)`;
-  }
-
-  return null;
-}
-
-export const mediaCapabilitiesFragment: SystemPromptFragment<PromptContextData> =
-  {
-    id: "media-capabilities",
-    placement: "leading",
-    priority: 75,
-    build: (data) => {
-      if (data.mediaCapabilities === null) {
-        return null;
-      }
-      const mc = data.mediaCapabilities;
-      if (!mc) {
-        return null;
-      }
-
-      const lines = [
-        buildMediaLine({
-          label: "Images",
-          toolAlias: "generate_image",
-          modality: "image",
-          nativeOutputs: mc.nativeOutputs,
-          genModelName: mc.imageGenModelName,
-          isSameAsChatModel: mc.imageGenIsSameAsChatModel,
-        }),
-        buildMediaLine({
-          label: "Music/audio",
-          toolAlias: "generate_music",
-          modality: "audio",
-          nativeOutputs: mc.nativeOutputs,
-          genModelName: mc.musicGenModelName,
-          isSameAsChatModel: mc.musicGenIsSameAsChatModel,
-        }),
-        buildMediaLine({
-          label: "Video",
-          toolAlias: "generate_video",
-          modality: "video",
-          nativeOutputs: mc.nativeOutputs,
-          genModelName: mc.videoGenModelName,
-          isSameAsChatModel: mc.videoGenIsSameAsChatModel,
-        }),
-      ].filter((line): line is string => line !== null);
-
-      if (lines.length === 0) {
-        return null;
-      }
-
-      return `## Media capabilities\n${lines.join("\n")}`;
-    },
-  };
-
-export const autonomyStatusFragment: SystemPromptFragment<PromptContextData> = {
+export const autonomyStatusFragment: SystemPromptFragment = {
   id: "autonomy-status",
   placement: "leading",
   priority: 720,
-  build: (data) => {
+  build: async (params) => {
     if (
-      data.headless ||
-      data.isPublicUser ||
-      data.rootFolderId === DefaultFolderId.INCOGNITO
+      params.headless ||
+      params.user.isPublic ||
+      params.rootFolderId === DefaultFolderId.INCOGNITO
     ) {
       return null;
     }
-    const { dreamerEnabled, autopilotEnabled } = data;
+
+    const userId = params.user.id;
+    let dreamerEnabled = false;
+    let autopilotEnabled = false;
+
+    try {
+      const [row] = await db
+        .select({
+          dreamerEnabled: chatSettings.dreamerEnabled,
+          autopilotEnabled: chatSettings.autopilotEnabled,
+        })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, userId))
+        .limit(1);
+
+      dreamerEnabled = row?.dreamerEnabled ?? false;
+      autopilotEnabled = row?.autopilotEnabled ?? false;
+    } catch {
+      return null;
+    }
 
     if (dreamerEnabled && autopilotEnabled) {
       return `## Background Agents
@@ -678,144 +703,3 @@ Neither **Dreamer** nor **Autopilot** is enabled.
 Both can be enabled in **chat settings** (the gear icon in the model selector). They run in the background folder and create session logs so you can review what they did.`;
   },
 };
-
-// ─── Server Loader ────────────────────────────────────────────────────────────
-
-function currencySymbol(currency: string): string {
-  if (currency === "EUR") {
-    return "€";
-  }
-  if (currency === "PLN") {
-    return "zł";
-  }
-  return "$";
-}
-
-export async function loadPromptContextData(
-  params: SystemPromptServerParams,
-): Promise<PromptContextData> {
-  const {
-    user,
-    locale,
-    rootFolderId,
-    subFolderId,
-    headless = false,
-    callMode = false,
-    extraInstructions,
-    isExposedFolder,
-    subAgentDepth,
-    mediaCapabilities,
-  } = params;
-
-  const userId = user.isPublic ? undefined : user.id;
-  const isPublicUser = user.isPublic;
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const isIncognito = rootFolderId === "incognito";
-  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
-
-  const { t } = chatScopedTranslation.scopedT(locale);
-  const appName = t("config.appName");
-
-  const { language, country } = getLanguageAndCountryFromLocale(locale);
-  const countryInfo = languageConfig.countryInfo[country];
-
-  const freeTierCredits = productsRepository.getProduct(
-    ProductIds.FREE_TIER,
-    locale,
-  ).credits;
-  const subscriptionProduct = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-  );
-  const creditPackProduct = productsRepository.getProduct(
-    ProductIds.CREDIT_PACK,
-    locale,
-  );
-  const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
-  const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
-
-  let privateName = "";
-  let publicName = "";
-  let isFreshUser = true;
-  let dreamerEnabled = false;
-  let autopilotEnabled = false;
-
-  if (userId && !isIncognito) {
-    try {
-      const [userRow, memoriesCount, tasksCount, settingsRow] =
-        await Promise.all([
-          db
-            .select({
-              privateName: usersTable.privateName,
-              publicName: usersTable.publicName,
-            })
-            .from(usersTable)
-            .where(eq(usersTable.id, userId))
-            .limit(1),
-          db
-            .select({ count: count() })
-            .from(cortexNodes)
-            .where(
-              and(
-                eq(cortexNodes.userId, userId),
-                eq(cortexNodes.nodeType, CortexNodeType.FILE),
-                like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
-              ),
-            ),
-          db
-            .select({ count: count() })
-            .from(cronTasksTable)
-            .where(eq(cronTasksTable.userId, userId)),
-          db
-            .select({
-              dreamerEnabled: chatSettings.dreamerEnabled,
-              autopilotEnabled: chatSettings.autopilotEnabled,
-            })
-            .from(chatSettings)
-            .where(eq(chatSettings.userId, userId))
-            .limit(1),
-        ]);
-
-      const row = userRow[0];
-      privateName = row?.privateName ?? "";
-      publicName = row?.publicName ?? "";
-      isFreshUser =
-        (memoriesCount[0]?.count ?? 0) === 0 &&
-        (tasksCount[0]?.count ?? 0) === 0;
-      dreamerEnabled = settingsRow[0]?.dreamerEnabled ?? false;
-      autopilotEnabled = settingsRow[0]?.autopilotEnabled ?? false;
-    } catch {
-      // fallback: assume fresh user if DB fails
-    }
-  }
-
-  return {
-    appName,
-    locale,
-    languageName: countryInfo?.langName ?? language,
-    countryName: countryInfo?.name ?? country,
-    flag: countryInfo?.flag ?? "🌐",
-    rootFolderId,
-    subFolderId,
-    headless,
-    callMode,
-    extraInstructions: extraInstructions ?? "",
-    isLocalMode,
-    freeTierCredits,
-    subLabel,
-    packLabel,
-    uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-    totalModelCount: getAvailableModelCount(isAdmin, getEnvAvailability()),
-    isExposedFolder,
-    privateName,
-    publicName,
-    isPublicUser,
-    isAdmin,
-    isFreshUser,
-    dreamerEnabled,
-    autopilotEnabled,
-    mediaCapabilities: mediaCapabilities ?? null,
-    subAgentDepth,
-  };
-}

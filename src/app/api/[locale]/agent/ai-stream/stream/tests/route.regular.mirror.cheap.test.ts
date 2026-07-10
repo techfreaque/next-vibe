@@ -27,14 +27,18 @@ const _isFixtureMode = isHermesInFixtureMode();
 if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: "AI Stream Integration - Regular (cheap) + hermes thread mirror",
-    // SAME prefix as route.regular.cheap: identical fixture contexts, no new
-    // recordings — the mirror rides the events, not the model traffic.
-    cachePrefix: "cheap-",
+    // SAME prefix as route.regular.cheap (verbatim, not just slug-equal):
+    // identical fixture contexts, no new recordings — the mirror rides the WS
+    // events, not the model traffic. Intentional shared-folder replay.
+    cachePrefix: "cheap",
     cheapMode: true,
-    // Full connect (both sides, remoteUserId, syncScope threads/chat) so the
-    // live mirror + pull-on-connect reconcile are active for the whole suite.
+    // The mirror suite is the ONE place that exercises the pull-based thread
+    // SYNC (offline reconcile) — every other remote suite relies on event-driven
+    // placement alone. It enables EXACTLY the threads domain, nothing else.
     setup: async (testUser) => {
-      await connectToHermes(testUser);
+      await connectToHermes(testUser, undefined, {
+        syncScope: { threads: true },
+      });
     },
     teardown: async (testUser) => {
       await disconnectFromHermes(testUser.id);

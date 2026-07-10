@@ -20,7 +20,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ConnectionHealthSchema } from "../db";
+import { ConnectionHealthSchema, TransportModeSchema } from "../db";
 import { REMOTE_CONNECTIONS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -72,6 +72,10 @@ export const { GET } = createEndpoint({
             healthStatus: ConnectionHealthSchema,
             /** True for incoming connections (cloud-side reverse entries) */
             isReverseEntry: z.boolean(),
+            /** How WE reach the peer (our send leg). */
+            transportMode: TransportModeSchema.nullable(),
+            /** How the PEER reaches us (mirror of the peer's transportMode). */
+            remoteTransportMode: TransportModeSchema.nullable(),
           }),
         ),
       }),
@@ -148,6 +152,8 @@ export const { GET } = createEndpoint({
             hasToken: true,
             healthStatus: "healthy",
             isReverseEntry: true,
+            transportMode: "reverse-ws",
+            remoteTransportMode: "direct-http",
           },
         ],
         selfInstanceId: "atlas",

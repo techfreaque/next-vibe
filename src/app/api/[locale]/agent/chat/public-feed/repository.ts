@@ -103,7 +103,7 @@ export class PublicFeedRepository {
         .select({
           id: chatThreads.id,
           title: chatThreads.title,
-          preview: chatThreads.preview,
+          description: chatThreads.description,
           folderId: chatThreads.folderId,
           streamingState: chatThreads.streamingState,
           createdAt: chatThreads.createdAt,
@@ -148,7 +148,7 @@ export class PublicFeedRepository {
         return {
           id: row.id,
           title: row.title,
-          preview: row.preview ?? null,
+          description: row.description ?? null,
           folderId: row.folderId ?? null,
           folderName: row.folderName ?? null,
           authorId: row.userId ?? null,

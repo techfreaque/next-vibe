@@ -20,14 +20,6 @@ export interface ModeConfig {
    *  "direct-cheap-"). Replay is ordinal-driven within this folder. */
   cachePrefix: string;
   /**
-   * Suite-wide FixtureContext options merged into every case's context by
-   * route-base's setCaseFixture: strict = throw on any uncached external
-   * call; interceptLocalhostPorts = treat these localhost ports as external
-   * (remote-mode suites whose "provider" is a localhost server).
-   */
-  fixtureStrict?: boolean;
-  fixtureInterceptLocalhostPorts?: number[];
-  /**
    * Cheap variant: media-gen steps swap to cortex/tool-help equivalents with
    * the same observable thread shape. Every callback mode and folder
    * assertion still runs — only the operation is cheaper.
@@ -114,5 +106,20 @@ export interface ModeConfig {
 export function deriveLoopRunsRemote(cfg: ModeConfig): boolean {
   return (
     cfg.rootFolderIdOverride === DefaultFolderId.REMOTE && !cfg.forceLocalLoop
+  );
+}
+
+/**
+ * True when ANY leg of this mode reaches the remote (hermes) instance — a
+ * remote-folder loop, a tools-remote wrap, an inference-provider relay, or a
+ * live hermes mirror. The fixture harness seeds the fixtures row on BOTH DBs
+ * for these modes so the receiver replays under the SAME (threadId, prefix).
+ */
+export function deriveUsesRemote(cfg: ModeConfig): boolean {
+  return Boolean(
+    cfg.remoteInstanceId ||
+    cfg.rootFolderIdOverride === DefaultFolderId.REMOTE ||
+    cfg.assertRelayRan ||
+    cfg.assertMirrorOnHermes,
   );
 }

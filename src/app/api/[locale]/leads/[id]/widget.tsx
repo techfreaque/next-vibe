@@ -107,6 +107,25 @@ import {
 
 // ─── Enum type helpers ────────────────────────────────────────────────────────
 
+/**
+ * Drop null-valued entries from a metadata record so it matches the form field's
+ * `Record<string, string | number | boolean>` type (which does not allow null).
+ */
+function stripNullValues(
+  record: Record<string, string | number | boolean | null> | null | undefined,
+): Record<string, string | number | boolean> | undefined {
+  if (!record) {
+    return undefined;
+  }
+  const out: Record<string, string | number | boolean> = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (value !== null) {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
 type LeadStatusValue = (typeof LeadStatus)[keyof typeof LeadStatus];
 type LeadSourceValue = (typeof LeadSource)[keyof typeof LeadSource];
 type EmailCampaignStageValue =
@@ -1078,7 +1097,7 @@ export function LeadDetailContainer(): React.JSX.Element {
         currentCampaignStage:
           data.campaignTracking.currentCampaignStage ?? undefined,
         notes: data.metadata.notes ?? undefined,
-        metadata: data.metadata.metadata ?? undefined,
+        metadata: stripNullValues(data.metadata.metadata),
         convertedUserId: data.conversion.convertedUserId ?? undefined,
         subscriptionConfirmedAt: data.conversion.subscriptionConfirmedAt
           ? new Date(data.conversion.subscriptionConfirmedAt)
@@ -1398,7 +1417,7 @@ export function LeadEditContainer(): React.JSX.Element {
         form.setValue("notes", metadata.notes ?? undefined);
       }
       if (metadata.metadata !== undefined) {
-        form.setValue("metadata", metadata.metadata);
+        form.setValue("metadata", stripNullValues(metadata.metadata));
       }
     }
     if (conversion) {

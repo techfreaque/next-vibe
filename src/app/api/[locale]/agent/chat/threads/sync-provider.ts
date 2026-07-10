@@ -44,6 +44,7 @@ import {
 
 import { DefaultFolderId } from "../config";
 import {
+  CHAT_MESSAGE_COLUMNS,
   chatFolders,
   type ChatMessage,
   chatMessages,
@@ -98,7 +99,7 @@ const syncedThreadSchema = z.object({
   defaultModel: z.string().nullable(),
   defaultSkill: z.string().nullable(),
   systemPrompt: z.string().nullable(),
-  preview: z.string().nullable(),
+  description: z.string().nullable(),
   tags: z.array(z.string()),
   pinned: z.boolean(),
   archived: z.boolean(),
@@ -270,6 +271,56 @@ export function originRootSegment(originRootFolderId: string): string {
 }
 
 /**
+ * Resolve the scaffold folder id for a foreign-origin thread mirror.
+ * The scaffold REMOTE/<originInstanceId>/<private|background> is guaranteed to
+ * exist from the moment a connection is live (created in onConnectionEstablished).
+ * Returns the scaffold folder id, or null if it hasn't been created yet (race
+ * during the very first connection exchange before onConnectionEstablished runs).
+ */
+export async function resolveScaffoldFolderId(
+  userId: string,
+  originInstanceId: string,
+  originRootFolderId: string,
+): Promise<string | null> {
+  const segment = originRootSegment(originRootFolderId);
+  // Walk REMOTE → <originInstanceId> → <segment> by name to find the leaf.
+  const [instanceFolder] = await db
+    .select({ id: chatFolders.id })
+    .from(chatFolders)
+    .where(
+      and(
+        eq(chatFolders.userId, userId),
+        eq(
+          chatFolders.rootFolderId,
+          DefaultFolderId.REMOTE as (typeof chatFolders.$inferSelect)["rootFolderId"],
+        ),
+        eq(chatFolders.name, originInstanceId),
+        isNull(chatFolders.parentId),
+      ),
+    )
+    .limit(1);
+  if (!instanceFolder) {
+    return null;
+  }
+  const [segmentFolder] = await db
+    .select({ id: chatFolders.id })
+    .from(chatFolders)
+    .where(
+      and(
+        eq(chatFolders.userId, userId),
+        eq(
+          chatFolders.rootFolderId,
+          DefaultFolderId.REMOTE as (typeof chatFolders.$inferSelect)["rootFolderId"],
+        ),
+        eq(chatFolders.name, segment),
+        eq(chatFolders.parentId, instanceFolder.id),
+      ),
+    )
+    .limit(1);
+  return segmentFolder?.id ?? null;
+}
+
+/**
  * Race-proof select-or-create of ONE folder segment. Concurrent creators
  * (live thread-updated appliers, message-stub placement, relay landings, the
  * pull-sync applier) previously raced select-then-insert and produced
@@ -284,6 +335,7 @@ async function selectOrCreateFolderSegment(
   parentId: string | null,
   icon?: IconKey | null,
   color?: string | null,
+  pinned?: boolean,
 ): Promise<string | null> {
   const lockKey = `${userId}|${rootFolderId}|${parentId ?? ""}|${name}`;
   return db.transaction(async (tx) => {
@@ -320,6 +372,7 @@ async function selectOrCreateFolderSegment(
         parentId,
         icon: icon ?? null,
         color: color ?? null,
+        pinned: pinned ?? false,
       })
       .returning({ id: chatFolders.id });
     return created?.id ?? null;
@@ -336,15 +389,21 @@ export async function ensureFolderChain(
   userId: string,
   rootFolderId: string,
   names: readonly string[],
+  pinnedLeaf?: boolean,
 ): Promise<string | null> {
   try {
     let parentId: string | null = null;
-    for (const name of names) {
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      const isLeaf = i === names.length - 1;
       parentId = await selectOrCreateFolderSegment(
         userId,
         rootFolderId,
         name,
         parentId,
+        null,
+        null,
+        isLeaf && pinnedLeaf ? true : undefined,
       );
       if (parentId === null) {
         return null;
@@ -590,14 +649,18 @@ export const threadsSyncProvider: SyncProvider = {
   // landing) hangs off these stable roots; no wire ever ships name chains.
   // Both are pinned so they stay anchored at the top of the REMOTE subfolder.
   async onConnectionEstablished(userId, peerInstanceId): Promise<void> {
-    await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
-      peerInstanceId,
-      "private",
-    ]);
-    await ensureFolderChain(userId, DefaultFolderId.REMOTE, [
-      peerInstanceId,
-      "background",
-    ]);
+    await ensureFolderChain(
+      userId,
+      DefaultFolderId.REMOTE,
+      [peerInstanceId, "private"],
+      true,
+    );
+    await ensureFolderChain(
+      userId,
+      DefaultFolderId.REMOTE,
+      [peerInstanceId, "background"],
+      true,
+    );
   },
 
   // Thread-scoped relay gate: incognito and transient (sync_eligible=false)
@@ -614,22 +677,21 @@ export const threadsSyncProvider: SyncProvider = {
   labelKey: "threads",
 
   async getCursor(userId): Promise<ThreadsSyncCursor> {
-    const threads = await db
-      .select({ id: chatThreads.id, updatedAt: chatThreads.updatedAt })
+    // Single aggregation query: max thread updatedAt and per-thread message
+    // high-water marks in one pass, avoiding a full table load into memory.
+    const [threadMaxRow] = await db
+      .select({ maxUpdatedAt: max(chatThreads.updatedAt) })
       .from(chatThreads)
       .where(eq(chatThreads.userId, userId));
 
-    if (threads.length === 0) {
+    if (!threadMaxRow?.maxUpdatedAt) {
       return { threadsCursor: new Date(0).toISOString(), messageCursors: {} };
     }
 
-    const threadsCursor = threads
-      .map((t) => t.updatedAt.toISOString())
-      .reduce((a, b) => (a > b ? a : b));
+    const threadsCursor = threadMaxRow.maxUpdatedAt.toISOString();
 
-    // Build per-thread message cursors (latest message updatedAt per thread —
-    // matches the updatedAt-based serve filter so in-place backfills/edits are
-    // not skipped on the next pull).
+    // Per-thread message cursors via subquery — avoids shipping all thread IDs
+    // over the wire in a potentially huge IN clause.
     const messageCursors: Record<string, string> = {};
     const lastMessageRows = await db
       .select({
@@ -640,7 +702,10 @@ export const threadsSyncProvider: SyncProvider = {
       .where(
         inArray(
           chatMessages.threadId,
-          threads.map((t) => t.id),
+          db
+            .select({ id: chatThreads.id })
+            .from(chatThreads)
+            .where(eq(chatThreads.userId, userId)),
         ),
       )
       .groupBy(chatMessages.threadId);
@@ -713,6 +778,16 @@ export const threadsSyncProvider: SyncProvider = {
 
       const result: SyncedThread[] = [];
 
+      // Byte budget: a single thread with fat message content (media data-URLs)
+      // can be multiple MB; 200 such threads in one payload reached ~180MB and
+      // wedged the receiving instance for tens of seconds. Cap the serialized
+      // payload by BYTES, not just count — once the budget is hit, stop and let
+      // the peer's next (cursor-advanced) pull fetch the rest. Always include at
+      // least the first thread so a single oversized thread still makes progress.
+      const THREAD_SYNC_BUDGET_BYTES = 8_000_000; // ~8MB per exchange
+      let serializedBytes = 0;
+      let byteTruncated = false;
+
       // Resolve each thread's ORIGIN (owning instance + folder name chain) —
       // the receiver places foreign-origin threads by SAME-ID folder lookup.
       const { RemoteConnectionRepository } =
@@ -720,29 +795,76 @@ export const threadsSyncProvider: SyncProvider = {
       const selfInstanceId =
         await RemoteConnectionRepository.getLocalInstanceId(userId);
 
-      // Load messages for all threads in one query, grouped per thread in
-      // memory. Ascending createdAt: parents precede children (parentId
-      // self-FK), and the per-thread message cursor advances to the last
-      // served message.
+      // Load messages in two passes — split by ownership so cursor filtering
+      // can be applied at the DB level for own-origin threads.
+      //
+      // Foreign-origin: owner-authoritative → serve ALL messages so the peer's
+      // mirror is always complete. Cursor doesn't apply.
+      //
+      // Own-origin: cursor-filtered. Use the minimum message cursor across the
+      // own-origin set as a global DB prefilter (returns a superset), then
+      // refine per-thread in the in-memory filter below. This avoids loading
+      // already-delivered messages on incremental syncs.
       const messagesByThreadId = new Map<string, ChatMessage[]>();
       if (threads.length > 0) {
-        const allMessages = await db
-          .select()
-          .from(chatMessages)
-          .where(
-            inArray(
-              chatMessages.threadId,
-              threads.map((t) => t.id),
-            ),
-          )
-          .orderBy(asc(chatMessages.createdAt));
-        for (const message of allMessages) {
-          const group = messagesByThreadId.get(message.threadId);
-          if (group) {
-            group.push(message);
-          } else {
-            messagesByThreadId.set(message.threadId, [message]);
+        // Partition thread ids by origin so each class gets the right query.
+        const foreignIds: string[] = [];
+        const ownIds: string[] = [];
+        for (const t of threads) {
+          if (t.rootFolderId === DefaultFolderId.INCOGNITO || !t.syncEligible) {
+            continue;
           }
+          const { originInstanceId } = describeThreadOrigin(t, selfInstanceId);
+          if (originInstanceId !== selfInstanceId) {
+            foreignIds.push(t.id);
+          } else {
+            ownIds.push(t.id);
+          }
+        }
+
+        const fetchMessages = async (
+          threadIds: string[],
+          minUpdatedAt?: string,
+        ): Promise<void> => {
+          if (threadIds.length === 0) {
+            return;
+          }
+          const where = minUpdatedAt
+            ? and(
+                inArray(chatMessages.threadId, threadIds),
+                sql`${chatMessages.updatedAt} > ${minUpdatedAt}::timestamp`,
+              )
+            : inArray(chatMessages.threadId, threadIds);
+          const rows = await db
+            .select(CHAT_MESSAGE_COLUMNS)
+            .from(chatMessages)
+            .where(where)
+            .orderBy(asc(chatMessages.createdAt));
+          for (const message of rows) {
+            const group = messagesByThreadId.get(message.threadId);
+            if (group) {
+              group.push(message);
+            } else {
+              messagesByThreadId.set(message.threadId, [message]);
+            }
+          }
+        };
+
+        // Foreign-origin: no cursor limit — mirror needs complete history.
+        await fetchMessages(foreignIds);
+
+        // Own-origin: prefilter by the minimum per-thread message cursor so
+        // the DB only returns candidates that changed since the peer last saw
+        // them. Per-thread refinement happens in the in-memory filter below.
+        if (ownIds.length > 0) {
+          const ownCursors = ownIds
+            .map((id) => typedCursor?.messageCursors[id])
+            .filter((c): c is string => c !== undefined);
+          const minCursor =
+            ownCursors.length > 0
+              ? ownCursors.reduce((a, b) => (a < b ? a : b))
+              : undefined;
+          await fetchMessages(ownIds, minCursor);
         }
       }
 
@@ -782,7 +904,7 @@ export const threadsSyncProvider: SyncProvider = {
               m.updatedAt.getTime() > msgCursorTime),
         );
 
-        result.push({
+        const serializedThread: SyncedThread = {
           id: thread.id,
           originInstanceId: origin.originInstanceId,
           loopInstanceId: thread.loopInstanceId ?? null,
@@ -793,7 +915,7 @@ export const threadsSyncProvider: SyncProvider = {
           defaultModel: thread.defaultModel ?? null,
           defaultSkill: thread.defaultSkill ?? null,
           systemPrompt: thread.systemPrompt ?? null,
-          preview: thread.preview ?? null,
+          description: thread.description ?? null,
           tags: thread.tags ?? [],
           pinned: thread.pinned,
           archived: thread.archived,
@@ -813,7 +935,26 @@ export const threadsSyncProvider: SyncProvider = {
             createdAt: m.createdAt.toISOString(),
             updatedAt: m.updatedAt.toISOString(),
           })),
-        });
+        };
+
+        // Enforce the byte budget: stop BEFORE pushing a thread that would take
+        // the payload over budget — but always keep the first thread so a lone
+        // oversized thread still makes forward progress. The cursor (below) is
+        // derived from the LAST included thread, so the peer resumes exactly
+        // here on its next pull; no thread is skipped or lost.
+        const threadBytes = Buffer.byteLength(
+          JSON.stringify(serializedThread),
+          "utf8",
+        );
+        if (
+          result.length > 0 &&
+          serializedBytes + threadBytes > THREAD_SYNC_BUDGET_BYTES
+        ) {
+          byteTruncated = true;
+          break;
+        }
+        serializedBytes += threadBytes;
+        result.push(serializedThread);
       }
 
       // Cursor derived from the served threads — the batch high-water mark.
@@ -843,10 +984,10 @@ export const threadsSyncProvider: SyncProvider = {
       }
 
       // Full-presence manifest — only when this batch COMPLETES the serve
-      // (raw batch under the limit), so a receiver never reaps against a
-      // partial view of our threads.
+      // (raw batch under the limit AND not byte-truncated), so a receiver never
+      // reaps against a partial view of our threads.
       let presentThreadIds: string[] | undefined;
-      if (threads.length < THREAD_SYNC_BATCH) {
+      if (threads.length < THREAD_SYNC_BATCH && !byteTruncated) {
         const presentRows = await db
           .select({ id: chatThreads.id })
           .from(chatThreads)
@@ -926,6 +1067,7 @@ export const threadsSyncProvider: SyncProvider = {
       }
     }
     const folderCache = new Map<string, string | null>();
+    const scaffoldCache = new Map<string, string | null>();
 
     // Load existing threads and messages for the incoming ids up front
     const remoteThreadIds = remoteThreads.map((t) => t.id);
@@ -988,26 +1130,46 @@ export const threadsSyncProvider: SyncProvider = {
         });
         // Placement is a plain SAME-ID lookup: the sender's folders landed
         // above (and continuously via folder events + the connect scaffold)
-        // — no chains ride any wire. A not-yet-synced folder leaves the
-        // mirror unplaced for this pass; the next exchange heals it.
+        // — no chains ride any wire. When the specific folder hasn't synced
+        // yet, fall back to the scaffold (REMOTE/<origin>/private|background)
+        // so the thread always lands inside the correct instance subtree
+        // rather than at the REMOTE root. The next exchange heals it to the
+        // correct sub-folder via the same-id lookup succeeding then.
         let folderId: string | null = null;
-        if (isForeignOrigin && remoteThread.folderId) {
-          const cached = folderCache.get(remoteThread.folderId);
-          if (cached !== undefined) {
-            folderId = cached;
-          } else {
-            const [folderRow] = await db
-              .select({ id: chatFolders.id })
-              .from(chatFolders)
-              .where(
-                and(
-                  eq(chatFolders.id, remoteThread.folderId),
-                  eq(chatFolders.userId, userId),
-                ),
-              )
-              .limit(1);
-            folderId = folderRow ? remoteThread.folderId : null;
-            folderCache.set(remoteThread.folderId, folderId);
+        if (isForeignOrigin) {
+          if (remoteThread.folderId) {
+            const cached = folderCache.get(remoteThread.folderId);
+            if (cached !== undefined) {
+              folderId = cached;
+            } else {
+              const [folderRow] = await db
+                .select({ id: chatFolders.id })
+                .from(chatFolders)
+                .where(
+                  and(
+                    eq(chatFolders.id, remoteThread.folderId),
+                    eq(chatFolders.userId, userId),
+                  ),
+                )
+                .limit(1);
+              folderId = folderRow ? remoteThread.folderId : null;
+              folderCache.set(remoteThread.folderId, folderId);
+            }
+          }
+          // Fallback: when the specific folder didn't resolve, place inside
+          // the scaffold so the thread never surfaces at the REMOTE root.
+          if (folderId === null) {
+            const scaffoldKey = `${remoteThread.originInstanceId}|${remoteThread.originRootFolderId}`;
+            if (scaffoldCache.has(scaffoldKey)) {
+              folderId = scaffoldCache.get(scaffoldKey) ?? null;
+            } else {
+              folderId = await resolveScaffoldFolderId(
+                userId,
+                remoteThread.originInstanceId,
+                remoteThread.originRootFolderId,
+              );
+              scaffoldCache.set(scaffoldKey, folderId);
+            }
           }
         }
 
@@ -1031,7 +1193,7 @@ export const threadsSyncProvider: SyncProvider = {
                 defaultModel: remoteThread.defaultModel as ChatModelId | null,
                 defaultSkill: remoteThread.defaultSkill,
                 systemPrompt: remoteThread.systemPrompt,
-                preview: remoteThread.preview,
+                description: remoteThread.description,
                 tags: remoteThread.tags,
                 pinned: remoteThread.pinned,
                 archived: remoteThread.archived,
@@ -1074,7 +1236,7 @@ export const threadsSyncProvider: SyncProvider = {
             defaultModel: remoteThread.defaultModel as ChatModelId | null,
             defaultSkill: remoteThread.defaultSkill,
             systemPrompt: remoteThread.systemPrompt,
-            preview: remoteThread.preview,
+            description: remoteThread.description,
             tags: remoteThread.tags,
             pinned: remoteThread.pinned,
             archived: remoteThread.archived,

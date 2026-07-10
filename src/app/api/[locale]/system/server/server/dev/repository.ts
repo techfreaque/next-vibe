@@ -382,14 +382,27 @@ export class DevRepository {
 
           // Save a copy of the original terminal fd before we touch fd 2.
           const termFd = lib.symbols.dup(2);
-          const logFd = openSync(pathJoin(absDir, logPath), "a");
-          lib.symbols.dup2(logFd, 2);
+          const fullLogPath = pathJoin(absDir, logPath);
 
-          // Override console.error and console.warn to write to the terminal only.
-          // Both write to fd 2 in Bun; with fd 2 redirected to the log file they would
-          // double-write (once via fd 2, once via logger's onFileLog/appendFileSync).
-          // The override sends to terminal; logger's onFileLog handles the log file write.
-          // Worker threads bypass this JS override → their fd-2 writes land in the log file directly.
+          // Spawn `tee -a <logfile>` with its stdin connected to a pipe.
+          // tee writes every byte it reads to both stdout (→ termFd) and the file.
+          // We open its stdout on termFd so output lands on the user's terminal.
+          const teeProc = spawn("tee", ["-a", fullLogPath], {
+            stdio: ["pipe", termFd, "ignore"],
+          });
+          const teeStdin = teeProc.stdin!;
+
+          // Point fd 2 at the write end of the tee pipe so native/worker writes
+          // (Bun internals, [Bun.serve], [SSR onError]) flow through tee automatically.
+          const pipeWriteFd = (teeStdin as { fd?: number }).fd ?? -1;
+          if (pipeWriteFd >= 0) {
+            lib.symbols.dup2(pipeWriteFd, 2);
+          }
+
+          // Logger calls console.warn/error then separately calls onFileLog.
+          // If we let console.* go through fd 2 → tee → file, onFileLog would
+          // add a second copy. So override to write only to termFd (terminal),
+          // trusting logger's onFileLog for the file side.
           const toTerminal = (args: LoggerMetadata[]): void => {
             const text = args
               .map((a) =>
@@ -632,8 +645,9 @@ export class DevRepository {
 
       logger.info(formatDatabase("Database ready", "🗄️ "));
 
-      // Auto-open all active reverse-ws connectors so cross-instance sync works
-      // after server restart without requiring the user to reconnect manually.
+      // Re-run pull-on-connect for all active connections (and re-open reverse-ws
+      // sockets) so cross-instance sync converges after a server restart without
+      // requiring the user to reconnect manually.
       void DevRepository.openReverseWsConnectors(logger);
 
       return true;
@@ -657,27 +671,31 @@ export class DevRepository {
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
       for (const conn of connections) {
-        if (conn.transportMode === "reverse-ws") {
-          openConnection({
-            id: conn.id,
-            instanceId: conn.instanceId,
-            remoteUrl: conn.remoteUrl,
-            token: conn.token,
-            leadId: conn.leadId,
-            userId: conn.userId,
-            remoteUserId: conn.remoteUserId,
-            capabilitiesVersion: conn.capabilitiesVersion,
-            sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
-            syncScope: conn.syncScope,
-            syncCursors: conn.syncCursors,
-            pushCursors: null,
-          });
-          opened++;
-        }
+        // openConnection runs the ONE HTTP pull-on-connect for EVERY transport
+        // and opens a persistent socket only for a reverse-ws leg — so every
+        // active connection re-syncs on boot, direct-http included, and only
+        // reverse-ws legs get a socket.
+        openConnection({
+          id: conn.id,
+          instanceId: conn.instanceId,
+          remoteUrl: conn.remoteUrl,
+          token: conn.token,
+          leadId: conn.leadId,
+          userId: conn.userId,
+          remoteUserId: conn.remoteUserId,
+          capabilitiesVersion: conn.capabilitiesVersion,
+          sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
+          syncScope: conn.syncScope,
+          syncCursors: conn.syncCursors,
+          pushCursors: null,
+          transportMode: conn.transportMode,
+          remoteTransportMode: conn.remoteTransportMode,
+        });
+        opened++;
       }
       if (opened > 0) {
         logger.info(
-          `[Connector] Auto-opened ${String(opened)} reverse-ws connector(s) on startup`,
+          `[Connector] Re-synced ${String(opened)} connection(s) on startup`,
         );
       }
     } catch (err) {

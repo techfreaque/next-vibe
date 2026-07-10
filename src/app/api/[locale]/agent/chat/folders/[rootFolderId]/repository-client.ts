@@ -168,6 +168,9 @@ export class ChatFoldersRepositoryClient {
         if (!old?.success) {
           return old;
         }
+        if (old.data.items.some((it) => it.id === newItem.id)) {
+          return old;
+        }
         return success({
           ...old.data,
           items: [newItem, ...old.data.items],

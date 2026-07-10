@@ -350,7 +350,8 @@ describe("Compacting - context management", () => {
   fit(
     "C1: mid-stream compacting — large initial context, fires after 5 tools, tools still work after, model responds C1_PASS",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "compacting-first-tool" };
+      const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+        await seedCaseThread("compacting-first-tool");
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
       // Restored to its original value after the test regardless of outcome.
@@ -381,7 +382,8 @@ describe("Compacting - context management", () => {
           favoriteId: mainFavoriteId,
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
-          fixtureContext: fixtureCtx,
+          threadId: fixtureThreadId,
+          streamContext: fixtureCtx,
         });
 
         expect(result.success, "C1: stream must succeed").toBe(true);
@@ -482,7 +484,8 @@ describe("Compacting - context management", () => {
   fit(
     "C2: mid-stream compacting — compacting fires during tool loop, chain stays linear, follow-up turn appends correctly",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "compacting-mid-stream" };
+      const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+        await seedCaseThread("compacting-mid-stream");
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
       // Restored to its original value after the test regardless of outcome.
@@ -515,7 +518,8 @@ describe("Compacting - context management", () => {
           favoriteId: mainFavoriteId,
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
-          fixtureContext: fixtureCtx,
+          threadId: fixtureThreadId,
+          streamContext: fixtureCtx,
         });
 
         expect(turn1.result.success, "C2-T1: turn 1 stream must succeed").toBe(
@@ -568,8 +572,8 @@ describe("Compacting - context management", () => {
             "No preamble, no tools, no punctuation beyond that.",
           user: testUser,
           favoriteId: mainFavoriteId,
-          threadId: threadId!,
-          fixtureContext: fixtureCtx,
+          threadId: fixtureThreadId,
+          streamContext: fixtureCtx,
         });
 
         expect(turn2.result.success, "C2-T2: turn 2 stream must succeed").toBe(

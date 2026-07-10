@@ -162,6 +162,11 @@ export const translations = {
         directHttp: "Direct HTTP",
       },
     },
+    remoteTransportMode: {
+      label: "Their Transport Mode",
+      description:
+        "How the peer reaches this side. reverse-ws: we hold an outbound connector to receive their sends. direct-http: they POST our bridge.",
+    },
     // ── Behavior ────────────────────────────────────────────────────────────
     isInferenceProvider: {
       label: "Inference Provider",

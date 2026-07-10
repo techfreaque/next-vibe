@@ -151,10 +151,13 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           // Live web request — never under fixtures.
           rootFolderId: DefaultFolderId.PRIVATE,
           threadId: undefined,
+          // no user context — UTC (dates not user-facing here)
+          timezone: "UTC",
           aiMessageId: undefined,
           skillId: undefined,
           headless: undefined,
           subAgentDepth: 0,
+          voiceEnabled: false,
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
           pendingToolMessages: undefined,

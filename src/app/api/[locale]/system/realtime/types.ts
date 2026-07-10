@@ -206,6 +206,12 @@ export interface WsConnectionData {
   channels: Set<string>;
   /** Connection timestamp */
   connectedAt: number;
+  /**
+   * Set only for reverse-ws connector sockets (local → cloud outbound WS).
+   * Identifies which remoteConnections row opened this socket so the server
+   * can forcibly close it on disconnect without waiting for the client side.
+   */
+  connectorInstanceId?: string;
 }
 
 // ============================================================================

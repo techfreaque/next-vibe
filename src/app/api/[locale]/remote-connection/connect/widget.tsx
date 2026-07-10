@@ -73,8 +73,9 @@ function SyncScopeEditor({
     syncProvidersEndpoint.read?.data?.providers ?? [];
 
   const current: Record<string, boolean> = {};
+  const scopeRecord = syncScope as Record<string, boolean | undefined> | null;
   for (const p of providers) {
-    current[p.key] = syncScope?.[p.key] ?? false;
+    current[p.key] = scopeRecord?.[p.key] ?? false;
   }
 
   const toggle = (key: string): void => {

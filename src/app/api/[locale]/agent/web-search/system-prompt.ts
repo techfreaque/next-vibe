@@ -9,22 +9,29 @@ import { envClient } from "@/config/env-client";
 import { FETCH_URL_SHORT_ALIAS } from "../fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "./constants";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
-export interface WebData {
-  /** Whether the user has browser automation available (admin + local/chrome configured) */
-  hasBrowser: boolean;
-  /** Whether the user is on the cloud version (show local CTA) */
-  isCloud: boolean;
-}
-
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 
-export const webFragment: SystemPromptFragment<WebData> = {
+export const webFragment: SystemPromptFragment = {
   id: "web",
   placement: "leading",
   priority: 120, // After core identity (10-90), before user-specific (250+)
-  build: (data) => {
+  build: async (params) => {
+    const isAdmin =
+      !params.user.isPublic &&
+      params.user.roles.includes(UserPermissionRole.ADMIN);
+    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+
+    let hasBrowser = false;
+    if (isAdmin) {
+      try {
+        const { browserEnv } = await import("@/app/api/[locale]/browser/env");
+        hasBrowser =
+          isLocalMode || browserEnv.CHROME_EXECUTABLE_PATH !== undefined;
+      } catch {
+        // Browser module not available
+      }
+    }
+
     const lines: string[] = [];
 
     lines.push(`## Web
@@ -33,11 +40,11 @@ You can search the web and read URLs:
 - \`${WEB_SEARCH_ALIAS}\` - search query → results (auto-selects user's preferred engine)
 - \`${FETCH_URL_SHORT_ALIAS}\` - any URL → markdown content`);
 
-    if (data.hasBrowser) {
+    if (hasBrowser) {
       lines.push(`
 
 You have full browser automation. \`tool-help query=browser\` lists all tools; \`tool-help query=browser-<toolname>\` gives full schema.`);
-    } else if (data.isCloud) {
+    } else if (!isLocalMode) {
       lines.push(`
 For JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.`);
     }
@@ -45,31 +52,3 @@ For JS-heavy sites or interactive pages, the local version of unbottled includes
     return lines.join("");
   },
 };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-export async function loadWebData(
-  params: SystemPromptServerParams,
-): Promise<WebData> {
-  const { user } = params;
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
-
-  // Browser is available for admin users in local mode or when Chrome is configured
-  let hasBrowser = false;
-  if (isAdmin) {
-    try {
-      const { browserEnv } = await import("@/app/api/[locale]/browser/env");
-      hasBrowser =
-        isLocalMode || browserEnv.CHROME_EXECUTABLE_PATH !== undefined;
-    } catch {
-      // Browser module not available
-    }
-  }
-
-  return {
-    hasBrowser,
-    isCloud: !isLocalMode,
-  };
-}

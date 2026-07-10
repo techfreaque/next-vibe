@@ -14,7 +14,14 @@ import "server-only";
  */
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { StandardSyncCursor, SyncCursor, ThreadsSyncCursor } from "../db";
+import {
+  isSyncDomainEnabled,
+  type StandardSyncCursor,
+  type SyncCursor,
+  type SyncDomain,
+  type SyncScope,
+  type ThreadsSyncCursor,
+} from "../db";
 
 // ─── Interface ───────────────────────────────────────────────────────────────
 
@@ -42,8 +49,8 @@ interface SyncSerializeResult {
  *  - Is responsible for tombstone handling in upsertFromJson
  */
 export interface SyncProvider {
-  /** Unique key: "memories", "documents", "skills", "favorites", "threads" */
-  readonly key: string;
+  /** The sync domain this provider owns — one of the typed SYNC_DOMAINS. */
+  readonly key: SyncDomain;
 
   /**
    * Label key suffix used to look up the provider name in the remote-connection
@@ -108,7 +115,7 @@ export interface SyncProvider {
 
 // ─── Registry ────────────────────────────────────────────────────────────────
 
-const providers = new Map<string, SyncProvider>();
+const providers = new Map<SyncDomain, SyncProvider>();
 let registered = false;
 
 export function registerSyncProvider(provider: SyncProvider): void {
@@ -175,6 +182,12 @@ export async function buildSyncPayloads(
   incomingCursors: Record<string, SyncCursor | string>,
   userId: string,
   logger: EndpointLogger,
+  // The connection's syncScope. `null` = no allowlist (open connection) → serve
+  // every provider. Otherwise serve ONLY the domains enabled in the typed scope —
+  // the serve side is the authoritative scope gate: a provider must NEVER
+  // serialize a disabled domain, even when the caller sends no cursor for it
+  // (absent cursor = "full history", which would otherwise leak the whole domain).
+  syncScope: SyncScope | null = null,
 ): Promise<{
   syncPayloads: Record<string, string>;
   syncCounts: Record<string, number>;
@@ -187,6 +200,9 @@ export async function buildSyncPayloads(
   const ourCursors: Record<string, SyncCursor> = {};
 
   for (const [key, provider] of providers) {
+    if (syncScope !== null && !isSyncDomainEnabled(syncScope, provider.key)) {
+      continue;
+    }
     try {
       const raw = incomingCursors[key] ?? null;
       const theirCursor: SyncCursor | null =
@@ -217,15 +233,22 @@ export async function applySyncPayloads(
   payloads: Record<string, string>,
   userId: string,
   logger: EndpointLogger,
+  // The connection's syncScope. `null` = no allowlist → apply every payload.
+  // Otherwise apply ONLY the domains enabled in the typed scope — the receiver is
+  // the last authoritative scope gate: a disabled domain served by a
+  // mis-scoped peer must never land in the local DB.
+  syncScope: SyncScope | null = null,
 ): Promise<Record<string, number>> {
   await ensureProvidersRegistered();
 
   const results: Record<string, number> = {};
 
-  for (const [key, json] of Object.entries(payloads)) {
-    const provider = providers.get(key);
-    if (!provider) {
-      logger.warn(`No sync provider registered for key "${key}"`);
+  for (const [key, provider] of providers) {
+    const json = payloads[key];
+    if (json === undefined) {
+      continue;
+    }
+    if (syncScope !== null && !isSyncDomainEnabled(syncScope, provider.key)) {
       continue;
     }
     try {

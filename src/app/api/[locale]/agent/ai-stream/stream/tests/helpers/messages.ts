@@ -311,9 +311,19 @@ export function assertToolMessageComplete(
       const effectiveResult = isExecuteTool
         ? resolveToolResult(msg)
         : toolResultRecord(msg.toolCall?.result);
+      // Surface the tool's REAL failure reason, not a bare "null result": when
+      // a tool errors, the toolCall carries status + a structured error. Dump
+      // them (and the raw result) so the throw reports why it failed.
+      const tc = msg.toolCall;
+      const failDetail =
+        tc?.error !== undefined
+          ? ` — tool error: ${JSON.stringify(tc.error)}`
+          : tc?.status === "failed"
+            ? " — toolCall.status=failed with no result"
+            : ` — status=${String(tc?.status)}, raw result=${JSON.stringify(tc?.result ?? null)}`;
       expect(
         effectiveResult,
-        `[${stepName}] Tool '${expectedToolName}' must have a result`,
+        `[${stepName}] Tool '${expectedToolName}' must have a result${failDetail}`,
       ).toBeTruthy();
     }
   }

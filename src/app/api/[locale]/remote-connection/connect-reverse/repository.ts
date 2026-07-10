@@ -27,24 +27,9 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { SyncScope } from "../db";
-import { instanceIdentities, remoteConnections } from "../db";
+import { instanceIdentities, remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import { RemoteTransport } from "../transport";
-
-/**
- * Reverse entries default to serving every sync domain. The passive side has
- * no UI to choose a scope; it mirrors whatever the initiator chose to pull.
- * A null/all-false scope makes the server-side serve filter return nothing.
- */
-const REVERSE_ENTRY_SYNC_SCOPE: SyncScope = {
-  memories: true,
-  documents: true,
-  skills: true,
-  favorites: true,
-  threads: true,
-  chat: true,
-};
 import type { RemoteRegisterPostRequestInput } from "./definition";
 import type { RemoteRegisterT } from "./i18n";
 
@@ -109,6 +94,12 @@ export class RemoteConnectionRegisterRepository {
   > {
     const { instanceId, localUrl, reverseToken, reverseLeadId, selfUserId } =
       data;
+    // Parse to a concrete scope (field defaults filled) for the DB row.
+    const syncScope = SyncScopeSchema.parse(data.syncScope);
+    // The initiator's own transport toward us → our reverse entry's
+    // remoteTransportMode (how the peer reaches us). Undefined for older
+    // initiators → the column default (direct-http) applies.
+    const remoteTransportMode = data.remoteTransportMode;
 
     const selfInstanceId = await RemoteConnectionRepository.getLocalInstanceId(
       user.id,
@@ -153,11 +144,12 @@ export class RemoteConnectionRegisterRepository {
         isActive: true,
         isReverseEntry: true,
         remoteUserId: selfUserId ?? null,
-        // Mirror threads on both sides by default so remote folder shows history.
-        // The passive side serves whatever the initiator pulls. Default ALL
-        // domains on — a null syncScope makes the server-side serve filter
-        // drop everything, so the initiator's pull returns nothing.
-        syncScope: REVERSE_ENTRY_SYNC_SCOPE,
+        // The reverse entry MIRRORS the initiator's scope — both sides serve the
+        // SAME domains. Kept in sync thereafter via connect-reverse/update.
+        syncScope,
+        // How the initiator reaches us (its own transport leg). Omitted → column
+        // default (direct-http).
+        ...(remoteTransportMode ? { remoteTransportMode } : {}),
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -170,8 +162,10 @@ export class RemoteConnectionRegisterRepository {
           remoteUserId: selfUserId ?? null,
           token: encryptedReverseToken,
           leadId: reverseLeadId,
-          // Backfill the scope on re-register if a prior row stored null.
-          syncScope: REVERSE_ENTRY_SYNC_SCOPE,
+          // Re-register mirrors the initiator's current scope.
+          syncScope,
+          // Re-register refreshes how the initiator reaches us.
+          ...(remoteTransportMode ? { remoteTransportMode } : {}),
           updatedAt: new Date(),
         },
       });

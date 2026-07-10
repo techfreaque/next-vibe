@@ -8,6 +8,8 @@ import {
 } from "next-vibe/realtime/emitter";
 import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
 
+import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
+
 import { DefaultFolderId } from "../../../config";
 import messagesDefinitions from "./definition";
 
@@ -27,6 +29,7 @@ export type MessagesWsEmit = EmitEventNamed<
 export interface MessagesChannelRouting {
   threadId: string;
   rootFolderId: DefaultFolderId;
+  resolvedRelayContext?: ResolvedRelayContext;
 }
 
 /**
@@ -81,6 +84,7 @@ export function createMessagesGetEmitter(
   return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
     ...messagesChannelBinding(routing),
     fanOut: messagesFanOut(routing, undefined),
+    resolvedRelayContext: routing.resolvedRelayContext,
   });
 }
 
@@ -99,5 +103,6 @@ export function createMessagesEmitter(
   return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
     ...messagesChannelBinding(routing),
     fanOut: messagesFanOut(routing, options?.fanOut),
+    resolvedRelayContext: routing.resolvedRelayContext,
   });
 }

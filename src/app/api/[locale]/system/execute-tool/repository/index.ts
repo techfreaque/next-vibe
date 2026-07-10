@@ -62,6 +62,7 @@ import { ExecuteToolGuards } from "./guards";
 import { LocalExecution } from "./local";
 import { PendingCalls } from "./pending-calls";
 import { RemoteDispatch } from "./remote";
+import { ResultSignals } from "./result-signals";
 import type { RouteExecuteContext } from "./types";
 
 export class RouteExecuteRepository {
@@ -131,7 +132,44 @@ export class RouteExecuteRepository {
         toolName = toolName.slice(separatorIdx + 2);
       }
 
-      const { input } = data;
+      let { input } = data;
+
+      // Misplaced callbackMode hoist: models regularly put callbackMode INSIDE
+      // the target tool's input ({toolName: "generate_image", input: {prompt,
+      // callbackMode: "detach"}, callbackMode: "wait"}). callbackMode is
+      // execute-tool's OWN contract word — no target tool declares it — so the
+      // intent is unambiguous: hoist it to the envelope (input's value wins
+      // over an absent or default-"wait" envelope value) and strip it from the
+      // input so target-schema validation never sees it. Skip nested
+      // execute-tool inputs — there the inner envelope owns its callbackMode.
+      if (
+        toolName !== "execute-tool" &&
+        input !== null &&
+        typeof input === "object" &&
+        !Array.isArray(input) &&
+        "callbackMode" in input
+      ) {
+        const misplaced = CallbackModeDB.find(
+          (m) => m === String(input["callbackMode"]),
+        );
+        const cleanInput = { ...input };
+        delete cleanInput["callbackMode"];
+        input = cleanInput;
+        if (
+          misplaced &&
+          (data.callbackMode === undefined ||
+            data.callbackMode === null ||
+            data.callbackMode === CallbackMode.WAIT)
+        ) {
+          logger.debug(
+            "[RouteExecute] Hoisted misplaced callbackMode from input to envelope",
+            { toolName, misplaced, envelopeMode: data.callbackMode ?? null },
+          );
+          data = { ...data, callbackMode: misplaced, input };
+        } else {
+          data = { ...data, input };
+        }
+      }
 
       // Remote execution path - create a one-shot task for the target instance.
       // Revival circuit-breaker: auto-upgrade remote WAIT → WAKE_UP in revival
@@ -264,7 +302,7 @@ export class RouteExecuteRepository {
    */
   static async runInProcess(params: {
     toolName: string;
-    input?: WidgetData;
+    input?: Record<string, WidgetData>;
     instanceId?: string;
     callbackMode?: CallbackModeValue;
     user: JwtPayloadType;
@@ -288,7 +326,7 @@ export class RouteExecuteRepository {
     const result = await RouteExecuteRepository.execute(
       {
         toolName: params.toolName,
-        input: (params.input ?? {}) as RouteExecuteRequestOutput["input"],
+        input: params.input ?? {},
         instanceId: params.instanceId,
         callbackMode: params.callbackMode ?? CallbackMode.WAIT,
       },
@@ -329,7 +367,7 @@ export class RouteExecuteRepository {
       callbackMode?: CallbackModeValue;
       user: JwtPayloadType;
       locale: CountryLanguage;
-      logger?: EndpointLogger;
+      logger: EndpointLogger;
       streamContext?: ToolExecutionContext;
       platform?: Platform;
     } & (TDef["types"]["RequestOutput"] extends never
@@ -347,9 +385,12 @@ export class RouteExecuteRepository {
   ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
     const { definition, input, urlPathParams, ...rest } = params;
     const logger = rest.logger ?? createEndpointLogger(false, rest.locale);
-    const streamContext = rest.streamContext ?? makeHeadlessContext();
+    const streamContext =
+      rest.streamContext ??
+      // no user context — UTC (dates not user-facing here)
+      makeHeadlessContext(undefined, undefined, "UTC");
     const rawToolName =
-      (definition.aliases?.[0] as string | undefined) ??
+      definition.aliases?.[0] ??
       `${definition.path.join("_")}_${definition.method}`;
     // Strip Next.js path param brackets: [threadId] → threadId (matches generated route-handler keys)
     const toolName = rawToolName.replace(/\[([^\]]+)\]/g, "$1");
@@ -383,9 +424,9 @@ export class RouteExecuteRepository {
         !Array.isArray(routingResult.data) &&
         "result" in routingResult.data
       ) {
-        return success(
-          (routingResult.data as { result: WidgetData }).result,
-        ) as ResponseType<TDef["types"]["ResponseOutput"]>;
+        return success(routingResult.data.result) as ResponseType<
+          TDef["types"]["ResponseOutput"]
+        >;
       }
       return routingResult as ResponseType<TDef["types"]["ResponseOutput"]>;
     }
@@ -431,8 +472,8 @@ export class RouteExecuteRepository {
       definition: TDef;
       user: JwtPayloadType;
       locale: CountryLanguage;
-      logger?: EndpointLogger;
-      streamContext?: ToolExecutionContext;
+      logger: EndpointLogger;
+      streamContext: ToolExecutionContext;
       platform?: Platform;
     } & (TDef["types"]["RequestOutput"] extends never
       ? { input?: never }
@@ -548,6 +589,36 @@ export class RouteExecuteRepository {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const abortController = new AbortController();
     const callbackMode = requestData.callbackMode ?? CallbackMode.WAIT;
+    const isAsyncMode =
+      callbackMode === CallbackMode.DETACH ||
+      callbackMode === CallbackMode.WAKE_UP;
+
+    const relayResult = async (
+      result: ResponseType<RouteExecuteResponseOutput>,
+    ): Promise<void> => {
+      logger.debug("[RouteExecute] relaying result to requester", {
+        callId: roundtrip.callId,
+        success: result.success,
+        originInstanceId: props.originInstanceId ?? null,
+      });
+      RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
+      // Fan the result back over the RECEIVER's local connections (keyed by
+      // our local userId, NOT the requester's id — the bridge resolves the
+      // back leg from our remoteConnections rows). The requester matches by
+      // callId, not userId.
+      await RouteExecuteRepository.emitToolResult(
+        roundtrip.callId,
+        localUserId,
+        result,
+        logger,
+        // Address the result to the REQUESTER's connection — the SENDING
+        // instance (originInstanceId). props.instanceId is the event's TARGET
+        // (this instance): using it addressed the reply to ourselves and the
+        // requester never received the result (observed: direct-suite tool
+        // dispatches timing out after 90s with the execution long finished).
+        props.originInstanceId,
+      );
+    };
 
     // ONE receiver context for every mode. Caller identity + fixture context
     // ride the roundtrip payload (the event's payloadType) — never the public
@@ -562,69 +633,61 @@ export class RouteExecuteRepository {
     // local detach). onAsyncTaskSettled relays the settled outcome back as the
     // tool-execute-result event; the requester's parked semantics (revival /
     // fire-and-forget) live on ITS side, driven by that event.
-    if (
-      callbackMode === CallbackMode.DETACH ||
-      callbackMode === CallbackMode.WAKE_UP
-    ) {
-      const receiverCtx: ToolExecutionContext = {
-        // The caller's fixture context rides the payload and continues down
-        // THIS execution chain (providers/media bind it per execution).
-        ...makeHeadlessContext(abortController.signal, roundtrip.fixtureContext),
-        remoteDispatchCallId: roundtrip.callId,
-        onAsyncTaskSettled: async (outcome): Promise<void> => {
-          RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
-          const settledResult: ResponseType<RouteExecuteResponseOutput> =
-            outcome.status === "completed"
-              ? success({ result: outcome.output ?? {} })
-              : fail({
-                  message: t("executeTool.post.errors.unknown.title"),
-                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
-                    error: outcome.errorMessage ?? "Tool execution failed",
-                  },
-                });
-          await RouteExecuteRepository.emitToolResult(
-            roundtrip.callId,
-            localUserId,
-            settledResult,
-            logger,
-          );
-        },
-      };
-      const dispatched = await RouteExecuteRepository.execute(
+    const receiverCtx: ToolExecutionContext = {
+      // no user context — UTC (dates not user-facing here); wire payload carries
+      // only the fixture-scope threadId, not the caller's timezone.
+      ...makeHeadlessContext(
+        abortController.signal,
+        roundtrip.streamContext,
+        "UTC",
+      ),
+      skillId: roundtrip.callerSkillId ?? undefined,
+      favoriteId: roundtrip.callerFavoriteId ?? undefined,
+      ...(isAsyncMode
+        ? {
+            remoteDispatchCallId: roundtrip.callId,
+            onAsyncTaskSettled: async (outcome): Promise<void> => {
+              await relayResult(
+                outcome.status === "completed"
+                  ? success({ result: outcome.output ?? {} })
+                  : fail({
+                      message: t("executeTool.post.errors.unknown.title"),
+                      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                      messageParams: {
+                        error: outcome.errorMessage ?? "Tool execution failed",
+                      },
+                    }),
+              );
+            },
+          }
+        : {}),
+    };
+
+    const runExecute = (): Promise<ResponseType<RouteExecuteResponseOutput>> =>
+      RouteExecuteRepository.execute(
         {
           toolName: requestData.toolName,
           input: requestData.input,
           instanceId: undefined,
-          callbackMode,
+          callbackMode: isAsyncMode ? callbackMode : CallbackMode.WAIT,
         },
         taskUserCtx.user,
         defaultLocale,
         logger,
         t,
-        // Caller identity rides the roundtrip payload — adopted into the
-        // execution context so fieldDefaults resolve against the caller's
-        // skill/favorite.
-        {
-          ...receiverCtx,
-          skillId: roundtrip.callerSkillId ?? undefined,
-          favoriteId: roundtrip.callerFavoriteId ?? undefined,
-        },
+        receiverCtx,
         // Gate under the CALLER's original surface — the RELAY dispatches
         // ai-stream itself (AI_TOOL_OFF), which must not be gated as an AI
         // tool call. AI-model calls arrive with callerPlatform=AI.
         roundtrip.callerPlatform ?? Platform.AI,
       );
+
+    if (isAsyncMode) {
+      const dispatched = await runExecute();
       if (!dispatched.success) {
         // Dispatch itself failed (guards, task insert) — relay immediately so
         // the requester's pending call resolves instead of hitting deadline.
-        RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
-        await RouteExecuteRepository.emitToolResult(
-          roundtrip.callId,
-          localUserId,
-          dispatched,
-          logger,
-        );
+        await relayResult(dispatched);
       }
       return;
     }
@@ -637,36 +700,7 @@ export class RouteExecuteRepository {
     // the event protocol exists to avoid. Ack delivery immediately; the
     // requester's WAIT resolves via the tool-execute-result event.
     void (async (): Promise<void> => {
-      const result = await RouteExecuteRepository.execute(
-        {
-          toolName: requestData.toolName,
-          input: requestData.input,
-          instanceId: undefined,
-          callbackMode: CallbackMode.WAIT,
-        },
-        taskUserCtx.user,
-        defaultLocale,
-        logger,
-        t,
-        // Caller identity + fixture context ride the roundtrip payload (see
-        // the event's payloadType) — never the public request schema.
-        {
-          ...makeHeadlessContext(abortController.signal, roundtrip.fixtureContext),
-          skillId: roundtrip.callerSkillId ?? undefined,
-          favoriteId: roundtrip.callerFavoriteId ?? undefined,
-        },
-        roundtrip.callerPlatform ?? Platform.AI,
-      );
-      RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
-      // Fan the result back over the RECEIVER's local connections (keyed by our
-      // local userId, NOT the requester's id — the bridge resolves the back leg
-      // from our remoteConnections rows). atlas matches by callId, not userId.
-      await RouteExecuteRepository.emitToolResult(
-        roundtrip.callId,
-        localUserId,
-        result,
-        logger,
-      );
+      await relayResult(await runExecute());
     })().catch((error: Error) => {
       RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
       logger.error(
@@ -696,7 +730,7 @@ export class RouteExecuteRepository {
       return;
     }
     // `result` arrives as untyped wire JSON — narrow to the output-object contract.
-    let output = PendingCalls.toOutputObject(result as WidgetData);
+    let output = PendingCalls.toOutputObject(result);
     // Explicit wire status; hint-presence fallback only for peers on the old
     // wire shape (a success carrying a hint is misread as failed there).
     const status: "completed" | "failed" =
@@ -708,43 +742,50 @@ export class RouteExecuteRepository {
     if (status === "failed" && hint && output?.["message"] === undefined) {
       output = { ...(output ?? {}), message: hint };
     }
+
+    // Publish the result to the dispatching call's pub/sub channel FIRST. The
+    // dispatcher subscribed INLINE when it sent the request (ResultSignals) — the
+    // bus crosses PROCESSES (proxy ↔ app; a test harness running the loop out of
+    // the server process), so this resolves the waiter wherever it lives, without
+    // relying on the in-memory PendingCalls being in THIS process.
+    ResultSignals.deliver(taskId, { status, output, hint }, props.user, logger);
+
     const outcome = PendingCalls.complete(taskId, { status, output });
 
     if (outcome.kind === "completed") {
       // WAIT/END_LOOP callers are already unblocked by PendingCalls.complete's
-      // waiters. A parked wakeUp (or auto-upgraded WAIT) carries a revival
-      // target — fire the local revival now (requester-side; no cross-instance
-      // task). Detach with no revival target is a no-op here.
-      if (outcome.revival) {
-        await TaskCompletion.fireRevivalForOwner({
-          revival: outcome.revival,
-          status,
-          output,
-          taskId,
-          logger,
-        });
-      }
+      // waiters. A wakeUp (or auto-upgraded WAIT) has a parked resume-stream
+      // task — enable+fire it now. Detach has no parked task so this is a no-op.
+      await TaskCompletion.enableAndFireParkedResumeTask({
+        taskId,
+        status,
+        output,
+        locale: props.locale,
+        logger,
+        abortSignal: new AbortController().signal,
+      });
       return;
     }
 
     if (outcome.kind === "unknown") {
-      // No in-memory pending call in THIS process. Two recovery paths:
-      //  1. DURABLE HANDOFF — the waiter lives in a SIBLING process (dev
-      //     server vs CLI vs tests share one DB): persist the outcome so its
-      //     PendingCalls.awaitResult DB-poll fallback resolves it. Also makes
-      //     WAIT survive a requester restart.
-      //  2. Parked-thread revival from the tool message (wakeUp semantics).
+      // No in-memory pending call in THIS process. The cross-process WAIT waiter
+      // was ALREADY resolved above by ResultSignals.deliver (KeyedRemoteSignal
+      // over the WS hub / bridge) — the transient signal fires only if a waiter is
+      // subscribed RIGHT NOW. A DETACHED result has no live waiter: await-task
+      // retrieves it minutes later, so it needs a DURABLE store. Persist it for
+      // PendingCalls.getReconciled (await-task's cross-process read). WAIT never
+      // depends on this row — it is resolved live by the signal.
       await db
         .insert(pendingCallResults)
         .values({ callId: taskId, status, output })
         .onConflictDoNothing()
         .catch((err: Error) => {
-          logger.warn(
-            "[RouteExecute] failed to persist cross-process WAIT result",
-            { callId: taskId, error: err.message },
-          );
+          logger.warn("[RouteExecute] failed to persist detached tool result", {
+            callId: taskId,
+            error: err.message,
+          });
         });
-      // Opportunistic purge of unconsumed stale rows (no waiter ever came).
+      // Opportunistic purge of unconsumed stale rows (no await-task ever came).
       void db
         .delete(pendingCallResults)
         .where(
@@ -752,6 +793,7 @@ export class RouteExecuteRepository {
         )
         .catch(() => undefined);
 
+      // Parked-thread wakeUp: revive the thread from its tool message.
       await RouteExecuteRepository.reviveFromToolMessage(
         taskId,
         status,
@@ -772,6 +814,10 @@ export class RouteExecuteRepository {
     localUserId: string,
     result: ResponseType<RouteExecuteResponseOutput>,
     logger: EndpointLogger,
+    /** The requester connection (our local name for it). Addressed frame:
+     *  other peers of this account never see the result. undefined = legacy
+     *  broadcast (restart-revival fallback where the requester row is unknown). */
+    targetInstanceId: string | undefined,
   ): Promise<void> {
     const resultData: WidgetData = result.success
       ? (JSON.parse(
@@ -820,6 +866,7 @@ export class RouteExecuteRepository {
       executeDefinition.POST,
       logger,
       localUser,
+      targetInstanceId ? { targetInstanceId } : undefined,
     )("tool-execute-result", { responseData: resultPayload });
   }
 

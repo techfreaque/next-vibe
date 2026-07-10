@@ -159,26 +159,53 @@ function serverOnlyTracePlugin(
   };
 }
 
-// Walk the importer graph recursively and invalidate every module that
-// transitively depends on the changed file. Only invalidating the leaf module
-// leaves importers with stale cached references - they never know to re-fetch.
+// Maximum number of modules to invalidate before giving up on surgical eviction.
+// If a changed file is a widely-shared utility (i18n, zod, response.schema),
+// walking the full importer tree could invalidate the entire project, which is
+// worse than a targeted clear. When we exceed this limit we return false so
+// the caller can fall back to a full cache clear instead.
+const SSR_EVICT_LIMIT = 150;
+
+// Walk the importer graph recursively and collect every module that transitively
+// depends on the changed file. Returns false if the visited set exceeds SSR_EVICT_LIMIT
+// (caller should fall back to full clear).
 function invalidateWithImporters(
   graph: EnvironmentModuleGraph,
   startId: string,
   visited: Set<string>,
-): void {
+): boolean {
   if (visited.has(startId)) {
-    return;
+    return true;
+  }
+  if (visited.size >= SSR_EVICT_LIMIT) {
+    return false;
   }
   visited.add(startId);
   const mod = graph.getModuleById(startId);
   if (!mod) {
-    return;
+    return true;
   }
   graph.invalidateModule(mod);
   for (const importer of mod.importers) {
     if (importer.id) {
-      invalidateWithImporters(graph, importer.id, visited);
+      if (!invalidateWithImporters(graph, importer.id, visited)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Surgically invalidate only the modules in `ids` from the SSR runner cache.
+// Uses invalidateModule() per node so unrelated modules stay warm.
+function evictSsrModules(
+  evaluatedModules: EvaluatedModules,
+  ids: Set<string>,
+): void {
+  for (const id of ids) {
+    const node = evaluatedModules.getModuleById(id);
+    if (node) {
+      evaluatedModules.invalidateModule(node);
     }
   }
 }
@@ -846,6 +873,20 @@ class ViteCompiler {
             return null;
           },
         } as Plugin,
+        {
+          name: "exclude-generator-seeds",
+          enforce: "pre",
+          load(id: string) {
+            const clean = id.replace(/\?.*$/, "");
+            if (
+              clean.endsWith("/generator.ts") ||
+              clean.endsWith("/seeds.ts")
+            ) {
+              return "export default {};";
+            }
+            return null;
+          },
+        } as Plugin,
         // In the client environment, mark node:* built-ins as external so
         // server-only modules that import them don't cause Rollup to fail.
         // Also covers bare built-in names (util, net, fs, etc.) used by pg/nodemailer.
@@ -1198,18 +1239,25 @@ class ViteCompiler {
                   if (!file?.endsWith("/widget.tsx")) {
                     continue;
                   }
-                  // Invalidate client module graph so next request gets fresh code
-                  const clientEnv = srv.environments?.["client"];
-                  if (clientEnv) {
-                    const mod = clientEnv.moduleGraph.getModuleById(file);
-                    if (mod) {
-                      clientEnv.moduleGraph.invalidateModule(mod);
-                    }
-                  }
-                  // Clear SSR runner cache
+                  // Invalidate the changed widget in the SSR module graph, then
+                  // full-clear evaluatedModules (surgical per-module eviction
+                  // causes TDZ errors — see ssr-clear-on-hmr comment).
                   const ssrEnv = srv.environments?.["ssr"];
                   if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                    ssrEnv.runner.evaluatedModules.clear();
+                    const ssrVisited = new Set<string>();
+                    const scoped = invalidateWithImporters(
+                      ssrEnv.moduleGraph,
+                      file,
+                      ssrVisited,
+                    );
+                    if (scoped) {
+                      evictSsrModules(
+                        ssrEnv.runner.evaluatedModules,
+                        ssrVisited,
+                      );
+                    } else {
+                      ssrEnv.runner.evaluatedModules.clear();
+                    }
                   }
                   // Derive the browser-relative URL (strip absolute prefix up to /src/)
                   const srcIdx = file.indexOf("/src/");
@@ -1575,13 +1623,31 @@ class ViteCompiler {
               return null;
             },
           } as Plugin,
-          // After HMR invalidates any src/ module, clear the SSR module runner
-          // evaluated module cache. Without this, the runner keeps stale module
-          // instances with partially-initialized circular imports, causing:
-          //   "Cannot access '__vite_ssr_import_N__' before initialization"
-          // Clearing forces fresh re-evaluation on the next SSR request.
-          // We clear both on HMR (for file changes) and on every incoming SSR
-          // request (for page reloads after HMR) so stale state never survives.
+          // generator.ts and seeds.ts files are CLI-only - they scan the filesystem
+          // with dynamic import(variable) at build time and must never be processed
+          // by Vite's import-analysis plugin (it can't statically analyze them).
+          {
+            name: "exclude-generator-seeds",
+            enforce: "pre",
+            load(id: string) {
+              const clean = id.replace(/\?.*$/, "");
+              if (
+                clean.endsWith("/generator.ts") ||
+                clean.endsWith("/seeds.ts")
+              ) {
+                return "export default {};";
+              }
+              return null;
+            },
+          } as Plugin,
+          // After HMR invalidates any src/ module, surgically evict only the
+          // changed modules (and their transitive importers) from the SSR runner
+          // cache. Full .clear() is avoided — it causes all unrelated modules to
+          // re-evaluate on the next request, which reads as a page reload.
+          //
+          // CSS changes skip SSR eviction entirely: Tailwind rescans can fire
+          // globals.css HMR without any real source change and CSS never affects
+          // SSR module bindings.
           {
             name: "ssr-clear-on-hmr",
             configureServer(srv) {
@@ -1617,10 +1683,7 @@ class ViteCompiler {
               if (srcModules.length === 0) {
                 return;
               }
-              // Skip SSR invalidation for CSS-only changes. Tailwind rescans
-              // can trigger globals.css HMR without any actual source change —
-              // CSS doesn't affect SSR module bindings, so clearing the SSR
-              // cache just causes unnecessary full re-evaluation + page reloads.
+              // Skip SSR work for CSS-only changes.
               const nonCssModules = srcModules.filter(
                 (m) => m.id && !m.id.endsWith(".css"),
               );
@@ -1635,38 +1698,44 @@ class ViteCompiler {
               process.stdout.write(`${hmrMsg}\n`);
               serverFileLog(hmrMsg);
 
-              // SSR: clear the runner evaluated-module cache so stale
-              // __vite_ssr_import_N__ bindings from circular deps are reset,
-              // then invalidate the SSR graph for each changed module + importers.
+              // SSR: invalidate the changed modules in the module graph (marks
+              // them stale for Vite's dependency tracking), then always do a
+              // full evaluatedModules.clear().
+              //
+              // Surgical per-module eviction from evaluatedModules causes TDZ
+              // errors: an importer that was NOT evicted still holds a reference
+              // to the old namespace object of the evicted module. When the
+              // evicted module re-executes, its top-level bindings (the Vite
+              // __vite_ssr_import_N__ consts) are in TDZ until the module
+              // completes — but the still-alive importer tries to call into
+              // them before that. Full clear avoids this by forcing all SSR
+              // modules to re-evaluate together on the next request.
+              //
+              // Client invalidation is intentionally NOT done here — Vite's own
+              // HMR propagation handles it automatically from the `modules` list.
               const ssrEnv = viteServer.environments?.["ssr"];
-              if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                ssrEnv.runner.evaluatedModules.clear();
-              }
               if (ssrEnv) {
-                const visited = new Set<string>();
+                const ssrVisited = new Set<string>();
+                let scoped = true;
                 for (const mod of nonCssModules) {
                   if (mod.id) {
-                    invalidateWithImporters(
-                      ssrEnv.moduleGraph,
-                      mod.id,
-                      visited,
-                    );
+                    if (
+                      !invalidateWithImporters(
+                        ssrEnv.moduleGraph,
+                        mod.id,
+                        ssrVisited,
+                      )
+                    ) {
+                      scoped = false;
+                      break;
+                    }
                   }
                 }
-              }
-
-              // Client: walk importers and invalidate so the browser receives
-              // an HMR update for every module that transitively used the changed file.
-              const clientEnv = viteServer.environments?.["client"];
-              if (clientEnv) {
-                const visited = new Set<string>();
-                for (const mod of nonCssModules) {
-                  if (mod.id) {
-                    invalidateWithImporters(
-                      clientEnv.moduleGraph,
-                      mod.id,
-                      visited,
-                    );
+                if (isRunnableDevEnvironment(ssrEnv)) {
+                  if (scoped) {
+                    evictSsrModules(ssrEnv.runner.evaluatedModules, ssrVisited);
+                  } else {
+                    ssrEnv.runner.evaluatedModules.clear();
                   }
                 }
               }
@@ -1791,6 +1860,44 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
               return { code: `${code}${hmrSnippet}`, map: null };
             },
           } as Plugin,
+          // TanStack route self-accept: route files (layout.tsx, page.tsx,
+          // __root.tsx) are loaded via React.lazy() or TanStack's router and
+          // have no HMR boundary — changes bubble all the way up to a full
+          // page reload. Injecting import.meta.hot.accept() makes each route
+          // module self-accepting so Vite re-evaluates it in place. TanStack's
+          // router re-renders the affected route subtree without reloading.
+          // Client-only: SSR does not use import.meta.hot.
+          {
+            name: "route-hmr-self-accept",
+            enforce: "post",
+            transform(
+              code: string,
+              id: string,
+              opts,
+            ): { code: string; map: null } | undefined {
+              if (opts?.ssr || this.environment?.name === "ssr") {
+                return undefined;
+              }
+              const cleanId = id.replace(/\?.*$/, "");
+              const isRoute =
+                cleanId.includes("/app-tanstack/routes/") ||
+                cleanId.endsWith("/__root.tsx") ||
+                (cleanId.includes("/src/app/") &&
+                  (cleanId.endsWith("/layout.tsx") ||
+                    cleanId.endsWith("/page.tsx")));
+              if (!isRoute) {
+                return undefined;
+              }
+              // Already has an accept handler
+              if (code.includes("import.meta.hot.accept")) {
+                return undefined;
+              }
+              return {
+                code: `${code}\nif (import.meta.hot) { import.meta.hot.accept(); }\n`,
+                map: null,
+              };
+            },
+          } as Plugin,
         ] as PluginOption[],
         resolve: {
           tsconfigPaths: true,
@@ -1877,18 +1984,18 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           // their own package directory (e.g. drizzle-zod → node_modules/src/).
           // false = never ignore any sourcemap, serve them all.
           sourcemapIgnoreList: false,
-          // Pre-transform the SSR entry + all definition files so the first
-          // real request doesn't pay the cold module-evaluation cost.
-          // Definition files call lazyWidget() and those dynamic imports are
-          // pre-compiled here so Suspense boundaries resolve fast on first load.
+          // Pre-transform only the SSR entry + generated route tree so the
+          // first real request doesn't pay the full cold-evaluation cost.
+          // Warming all definition.ts files pulls in DB/drizzle/pg on the
+          // SSR side and noticeably delays startup — skip them. Shared deps
+          // (react, router, i18n) warm naturally as route files load; any
+          // subsequent endpoint that shares those deps benefits for free.
           warmup: {
             ssrFiles: [
               `${srcDirectory}/router.tsx`,
-              ...new Bun.Glob("src/app/api/**/definition.ts").scanSync({
-                cwd: ROOT_DIR,
-                absolute: true,
-              }),
+              `${srcDirectory}/routes/__root.tsx`,
             ],
+            clientFiles: [`${srcDirectory}/router.tsx`],
           },
         } as InlineConfig["server"],
         // Use a TanStack-specific cache dir so it doesn't conflict with

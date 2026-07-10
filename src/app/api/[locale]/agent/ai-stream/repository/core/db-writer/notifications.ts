@@ -93,14 +93,6 @@ export function emitVoiceTranscribed(
       ],
     },
   });
-
-  // Update sidebar title when STT sets the content for a new thread
-  if (params.isNewThread && params.threadId && params.text) {
-    emitThreadTitleUpdated(w, {
-      threadId: params.threadId,
-      title: params.text.slice(0, 50),
-    });
-  }
 }
 
 /**

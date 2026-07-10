@@ -74,6 +74,11 @@ export const translations: typeof enTranslations = {
     incomingBadge: "Eingehend",
     inactiveBadge: "Inaktiv",
     inferenceProviderBadge: "Inferenz",
+    transportBadge: "raus {{out}} · rein {{in}}",
+    transport: {
+      reverseWs: "WS",
+      directHttp: "HTTP",
+    },
     health: {
       tunnelOpen: "Tunnel offen",
       bridgeActive: "Verbunden",

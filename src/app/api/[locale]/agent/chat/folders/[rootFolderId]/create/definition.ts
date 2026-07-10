@@ -242,7 +242,7 @@ const { POST } = createEndpoint({
             title: null,
             folderId: null,
             status: null,
-            preview: null,
+            description: null,
             archived: null,
             canEdit: null,
             canPost: null,

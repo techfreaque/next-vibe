@@ -148,12 +148,11 @@ export class RouteExecutionExecutor {
       // of text tokens and causes context overflow).
       if (isContentResponse(result)) {
         if (params.platform === Platform.AI) {
-          const cr = result as ContentResponse;
           type AiPart =
             | { type: "text"; text: string }
             | { type: "image-data"; data: string; mediaType: string };
           const parts: AiPart[] = [];
-          for (const b of cr.content) {
+          for (const b of result.content) {
             if (b.type === "text") {
               parts.push({ type: "text", text: b.text });
             } else if (b.type === "image") {

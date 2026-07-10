@@ -116,7 +116,6 @@ function makeUserMessage(content: string, id: string): ChatMessage {
     downvotes: 0,
     createdAt: now,
     updatedAt: now,
-    searchVector: null,
   };
 }
 
@@ -152,7 +151,6 @@ function makeAssistantMessage(
     downvotes: 0,
     createdAt: now,
     updatedAt: now,
-    searchVector: null,
   };
 }
 

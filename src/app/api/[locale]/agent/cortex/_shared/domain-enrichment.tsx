@@ -18,14 +18,17 @@ import { scopedTranslation } from "../i18n";
 import { findMountWidget } from "../mounts/widget-registry";
 
 interface DomainEnrichmentProps {
-  responsePath: string;
+  responsePath: string | undefined;
 }
 
 export function DomainEnrichment({
   responsePath,
 }: DomainEnrichmentProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
-  const match = useMemo(() => findMountWidget(responsePath), [responsePath]);
+  const match = useMemo(
+    () => (responsePath ? findMountWidget(responsePath) : null),
+    [responsePath],
+  );
   const LazyWidget = useMemo(
     () => (match ? React.lazy(match.config.loadWidget) : null),
     [match],

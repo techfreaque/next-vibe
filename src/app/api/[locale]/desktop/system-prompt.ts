@@ -18,41 +18,61 @@ export enum DesktopPlatform {
   UNKNOWN = "unknown",
 }
 
-export interface DesktopData {
-  /** null = not admin, skip fragment entirely */
-  isAdmin: boolean;
-  /** Detected supported env, or null if unsupported platform */
-  desktopEnv: SupportedDesktopEnv | null;
-  platform: DesktopPlatform;
-  monitors: Array<{
-    name: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    primary: boolean;
-  }>;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getPlatform(): DesktopPlatform {
+  switch (process.platform) {
+    case "linux":
+      return DesktopPlatform.LINUX;
+    case "darwin":
+      return DesktopPlatform.MACOS;
+    case "win32":
+      return DesktopPlatform.WINDOWS;
+    default:
+      return DesktopPlatform.UNKNOWN;
+  }
+}
+
+function detectDesktopEnv(): SupportedDesktopEnv | null {
+  if (process.platform === "win32") {
+    return "windows";
+  }
+  if (process.platform !== "linux") {
+    return null;
+  }
+  const xdg = (process.env.XDG_CURRENT_DESKTOP ?? "").toLowerCase();
+  const session = (process.env.DESKTOP_SESSION ?? "").toLowerCase();
+  if (xdg.includes("kde") || session.includes("plasma")) {
+    return "kde";
+  }
+  return null;
 }
 
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 
-export const desktopFragment: SystemPromptFragment<DesktopData> = {
+export const desktopFragment: SystemPromptFragment = {
   id: "desktop",
   placement: "leading",
   priority: 65,
-  build: (data) => {
-    if (!data.isAdmin) {
+  build: async (params) => {
+    const isAdmin =
+      !params.user.isPublic &&
+      params.user.roles.includes(UserPermissionRole.ADMIN);
+
+    if (!isAdmin) {
       return null;
     }
 
-    // Unsupported platform — tell the AI so it doesn't try desktop tools
-    if (!data.desktopEnv) {
+    const platform = getPlatform();
+    const desktopEnv = detectDesktopEnv();
+
+    if (!desktopEnv) {
       const platformLabel =
-        data.platform === DesktopPlatform.MACOS
+        platform === DesktopPlatform.MACOS
           ? "macOS"
-          : data.platform === DesktopPlatform.LINUX
+          : platform === DesktopPlatform.LINUX
             ? "Linux (unsupported desktop env)"
-            : data.platform;
+            : platform;
 
       return `## Desktop Control — Not Available
 Platform: ${platformLabel}. Desktop automation tools exist but don't support this environment yet.
@@ -60,8 +80,22 @@ Supported: Linux/KDE (Wayland), Windows. macOS support is planned.
 Don't attempt to use \`desktop_*\` tools — they will fail.`;
     }
 
-    const primary = data.monitors.find((m) => m.primary);
-    const monitorLines = data.monitors
+    let monitors: Array<{
+      name: string;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      primary: boolean;
+    }> = [];
+    try {
+      monitors = await listMonitors(params.logger);
+    } catch {
+      // non-fatal — fragment still renders without monitor list
+    }
+
+    const primary = monitors.find((m) => m.primary);
+    const monitorLines = monitors
       .map((m) => {
         const tag = m.primary ? " [PRIMARY]" : "";
         return `  ${m.name}${tag}: ${m.width}×${m.height} @(${m.x},${m.y})`;
@@ -69,11 +103,11 @@ Don't attempt to use \`desktop_*\` tools — they will fail.`;
       .join("\n");
 
     const monitorBlock =
-      data.monitors.length > 0 ? `\nMonitors:\n${monitorLines}` : "";
+      monitors.length > 0 ? `\nMonitors:\n${monitorLines}` : "";
 
-    const defaultMonitor = primary?.name ?? data.monitors[0]?.name ?? "primary";
+    const defaultMonitor = primary?.name ?? monitors[0]?.name ?? "primary";
 
-    if (data.desktopEnv === "windows") {
+    if (desktopEnv === "windows") {
       return `## Desktop Control — Windows${monitorBlock}
 
 You can fully control this desktop via PowerShell. Act fast — don't narrate, just do.
@@ -113,7 +147,7 @@ You can fully control this desktop via PowerShell. Act fast — don't narrate, j
     }
 
     const kdeSection =
-      data.desktopEnv === "kde"
+      desktopEnv === "kde"
         ? `
 **KDE shortcuts & power-user knowledge:**
 - **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.
@@ -130,7 +164,7 @@ You can fully control this desktop via PowerShell. Act fast — don't narrate, j
 - Notification popups appear bottom-right; interact with \`click\` at that region or dismiss with \`press-key\` Escape.`
         : "";
 
-    return `## Desktop Control — Linux/${data.desktopEnv.toUpperCase()} Wayland${monitorBlock}
+    return `## Desktop Control — Linux/${desktopEnv.toUpperCase()} Wayland${monitorBlock}
 
 You can fully control this desktop. Act fast — don't narrate, just do.${kdeSection}
 
@@ -158,60 +192,3 @@ You can fully control this desktop. Act fast — don't narrate, just do.${kdeSec
 - Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).`;
   },
 };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-function getPlatform(): DesktopPlatform {
-  switch (process.platform) {
-    case "linux":
-      return DesktopPlatform.LINUX;
-    case "darwin":
-      return DesktopPlatform.MACOS;
-    case "win32":
-      return DesktopPlatform.WINDOWS;
-    default:
-      return DesktopPlatform.UNKNOWN;
-  }
-}
-
-function detectDesktopEnv(): SupportedDesktopEnv | null {
-  if (process.platform === "win32") {
-    return "windows";
-  }
-  if (process.platform !== "linux") {
-    return null;
-  }
-  const xdg = (process.env.XDG_CURRENT_DESKTOP ?? "").toLowerCase();
-  const session = (process.env.DESKTOP_SESSION ?? "").toLowerCase();
-  if (xdg.includes("kde") || session.includes("plasma")) {
-    return "kde";
-  }
-  return null;
-}
-
-export async function loadDesktopData(
-  params: SystemPromptServerParams,
-): Promise<DesktopData> {
-  const isAdmin =
-    !params.user.isPublic &&
-    params.user.roles.includes(UserPermissionRole.ADMIN);
-
-  const platform = getPlatform();
-
-  if (!isAdmin) {
-    return { isAdmin: false, desktopEnv: null, platform, monitors: [] };
-  }
-
-  const desktopEnv = detectDesktopEnv();
-
-  let monitors: DesktopData["monitors"] = [];
-  if (desktopEnv) {
-    try {
-      monitors = await listMonitors(params.logger);
-    } catch {
-      // non-fatal — fragment still renders without monitor list
-    }
-  }
-
-  return { isAdmin: true, desktopEnv, platform, monitors };
-}

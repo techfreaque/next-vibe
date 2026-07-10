@@ -50,18 +50,12 @@ const { POST } = createEndpoint({
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
-    usage: { request: "data", response: true } as const,
+    usage: { request: "data" } as const,
     children: {
       eventName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        columns: 6,
-        schema: z.string().min(1),
-      }),
-      leadId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 6,
+        columns: 12,
         schema: z.string().min(1),
       }),
       payload: requestField(scopedTranslation, {
@@ -72,32 +66,10 @@ const { POST } = createEndpoint({
           originInstanceId: z.string().optional(),
           syncDomain: z.string().optional(),
           envelope: z.custom<AnyEndpointEventEnvelope>().optional(),
+          // Point-to-point address: shared hub channel reaches every peer
+          // connector — only the addressed connection applies the frame.
+          targetLeadId: z.string().optional(),
         }),
-      }),
-
-      // ── Response fields ────────────────────────────────────────────────────
-      received: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.boolean(),
-      }),
-
-      // ── Generic server-event payload fields ────────────────────────────────
-      // One relay event. The bridge dispatches to the target route's onRemoteEvent.
-      // All 4 event fields travel together inside the envelope — not split here.
-      originInstanceId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-      syncDomain: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-      envelope: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.custom<AnyEndpointEventEnvelope>().optional(),
       }),
     },
   }),
@@ -125,7 +97,7 @@ const { POST } = createEndpoint({
         UserRole.PARTNER_EMPLOYEE,
         UserRole.ADMIN,
       ] as const,
-      responseFields: ["originInstanceId", "syncDomain", "envelope"] as const,
+      requestFields: ["payload"] as const,
       operation: "merge" as const,
     },
   },
@@ -184,13 +156,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         eventName: "remote-event",
-        leadId: "lead-uuid-here",
         payload: {},
-      },
-    },
-    responses: {
-      default: {
-        received: true,
       },
     },
   },

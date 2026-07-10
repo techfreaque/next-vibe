@@ -48,6 +48,13 @@ export class RemoteConnectionSelfRenameRepository {
 
     const oldInstanceId = oldIdentity.instanceId;
 
+    // No-op rename (same id): nothing changed — skip the DB writes, the peer
+    // propagation, and the connector reconnect entirely. Prevents a defensive
+    // "restore identity" (atlas→atlas) from pointlessly reconnecting the tunnel.
+    if (newInstanceId === oldInstanceId) {
+      return success({ updated: true });
+    }
+
     const result = await db
       .update(instanceIdentities)
       .set({ instanceId: newInstanceId, updatedAt: new Date() })
@@ -95,7 +102,24 @@ export class RemoteConnectionSelfRenameRepository {
           const propagateResult =
             await RouteExecuteRepository.runInProcessTyped({
               definition: reverseUpdateDef.PATCH,
-              input: { instanceId: oldInstanceId, newInstanceId },
+              input: {
+                instanceId: oldInstanceId,
+                newInstanceId,
+                // Carry the connection's CURRENT scope (unchanged by a rename) so
+                // both sides stay in sync — never a hardcoded default.
+                syncScope: conn.syncScope ?? {
+                  memories: false,
+                  documents: false,
+                  skills: false,
+                  favorites: false,
+                  threads: false,
+                },
+                // The reverse-ws channel key is derived from our instanceId, so
+                // renaming us changes it — the peer must reconnect its connector
+                // (with our new id) or the tunnel goes dead. connect-reverse/
+                // update restarts it when reconnectNow is set.
+                reconnectNow: true,
+              },
               instanceId: conn.instanceId,
               user,
               locale,

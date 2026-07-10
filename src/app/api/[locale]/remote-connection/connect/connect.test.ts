@@ -171,7 +171,7 @@ if (_remoteUrl) {
       ).toBe(HERMES_INSTANCE_ID);
 
       const { ExecuteToolRouting } = await import(
-        "next-vibe/execute-tool/repository/routing"
+        "@/app/api/[locale]/remote-connection/routing"
       );
       const { createEndpointLogger } = await import("next-vibe/logger/server");
       const target = await ExecuteToolRouting.resolveTarget({

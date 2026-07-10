@@ -115,18 +115,6 @@ export const cronTasks = pgTable("cron_tasks", {
   // Instance routing - null means "run only on host instance"
   targetInstance: text("target_instance"),
 
-  // Revival context - typed columns for wakeUp/wait callback flow.
-  // Stored here (not in taskInput) so they are first-class typed fields
-  // that handleTaskCompletion can read without parsing untyped JSON.
-  wakeUpThreadId: text("wake_up_thread_id"),
-  wakeUpToolMessageId: text("wake_up_tool_message_id"),
-  wakeUpLeafMessageId: text("wake_up_leaf_message_id"),
-  wakeUpCallbackMode: text("wake_up_callback_mode"),
-  wakeUpModelId: text("wake_up_model_id"),
-  wakeUpSkillId: text("wake_up_skill_id"),
-  wakeUpFavoriteId: text("wake_up_favorite_id"),
-  wakeUpSubAgentDepth: integer("wake_up_sub_agent_depth"),
-
   // Metadata
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
 

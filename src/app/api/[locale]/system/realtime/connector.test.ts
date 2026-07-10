@@ -139,6 +139,9 @@ async function loadConnectionConfig(
     syncScope: (row.syncScope as SyncScope) ?? null,
     syncCursors: row.syncCursors ?? null,
     pushCursors: row.pushCursors ?? null,
+    // These CN tests exercise the WS lifecycle, so present as reverse-ws.
+    transportMode: row.transportMode ?? "reverse-ws",
+    remoteTransportMode: row.remoteTransportMode ?? null,
   };
 }
 
@@ -164,7 +167,19 @@ async function patchHermesAtlasConnection(
     streamContext: undefined,
     endpoint: connByIdDef.PATCH,
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-    data: { ...patch, reconnectNow: true },
+    data: {
+      ...patch,
+      // syncScope is required on the PATCH; default to full-except-threads
+      // when a caller only reconfigures identity/reconnect.
+      syncScope: patch.syncScope ?? {
+        memories: true,
+        documents: true,
+        skills: true,
+        favorites: true,
+        threads: false,
+      },
+      reconnectNow: true,
+    },
     user,
     instanceId: HERMES_INSTANCE_ID,
   });
@@ -403,7 +418,6 @@ if (_remoteUrl) {
               threads: true,
               memories: false,
               favorites: false,
-              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -442,7 +456,6 @@ if (_remoteUrl) {
             threads: true,
             memories: false,
             favorites: false,
-            chat: false,
           } satisfies SyncScope,
         };
         // Block documents on hermes's side the real production way: PATCH
@@ -455,7 +468,6 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
-            chat: false,
           },
         });
         // Give hermes time to reconnect with the new scope before opening connections
@@ -527,7 +539,6 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
-              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -546,7 +557,6 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
-            chat: false,
           },
         });
 
@@ -570,7 +580,6 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
-              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -590,7 +599,6 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
-            chat: false,
           },
         });
         // Give hermes time to reconnect with the new scope before opening connections
@@ -613,7 +621,6 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
-            chat: false,
           } satisfies SyncScope,
         };
 
@@ -712,7 +719,6 @@ if (_remoteUrl) {
               skills: true,
               threads: true,
               memories: true,
-              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -731,7 +737,6 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
-            chat: false,
           },
         });
 
@@ -975,7 +980,6 @@ if (_remoteUrl) {
                 threads: true,
                 memories: false,
                 favorites: true,
-                chat: false,
               },
             },
             user: testUser,
@@ -1025,7 +1029,6 @@ if (_remoteUrl) {
               skills: true,
               threads: true,
               memories: true,
-              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })

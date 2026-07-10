@@ -451,8 +451,6 @@ export class PulseHealthRepository {
                 | undefined;
               let finalDurationMs = 0;
               let didLogHistory = false;
-              let finalOutput: Record<string, WidgetData> | null = null;
-              const pulseAbortController = new AbortController();
 
               for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 if (attempt > 0) {
@@ -484,9 +482,10 @@ export class PulseHealthRepository {
                       streamContext: {
                         // Cron tasks never carry the context explicitly — a
                         // revival adopts the THREAD anchor at stream setup.
-                        fixtureContext: undefined,
                         rootFolderId: DefaultFolderId.BACKGROUND,
                         threadId: undefined,
+                        // no user context — UTC (dates not user-facing here)
+                        timezone: "UTC",
                         aiMessageId: undefined,
                         currentToolMessageId: undefined,
                         callerToolCallId: undefined,
@@ -499,6 +498,7 @@ export class PulseHealthRepository {
                         subAgentDepth: 0,
                         isRevival: undefined,
                         waitingForRemoteResult: undefined,
+                        voiceEnabled: false,
                         abortSignal: taskAbortController.signal,
                         callerCallbackMode: undefined,
                         escalateToTask: undefined,
@@ -592,7 +592,6 @@ export class PulseHealthRepository {
                   taskSucceeded = true;
                   finalStatus = CronTaskStatus.COMPLETED;
                   finalMessage = null;
-                  finalOutput = typedResult.data ?? null;
                   break;
                 }
 
@@ -675,39 +674,6 @@ export class PulseHealthRepository {
                 });
                 emitTaskQueue("task-updated", {
                   responseData: completedPayload,
-                });
-              }
-
-              // If task has callback context (set by await-task or execute-tool AI path),
-              // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
-              // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
-              const taskCallbackMode =
-                (dbTask.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
-              const taskThreadId = dbTask.wakeUpThreadId ?? null;
-              const taskToolMessageId = dbTask.wakeUpToolMessageId ?? null;
-
-              if (taskToolMessageId) {
-                await TaskCompletion.handle({
-                  toolMessageId: taskToolMessageId,
-                  threadId: taskThreadId,
-                  callbackMode: taskCallbackMode,
-                  status: finalStatus,
-                  output: taskSucceeded ? (finalOutput ?? null) : null,
-                  taskId: dbTask.id,
-                  modelId: dbTask.wakeUpModelId ?? null,
-                  skillId: dbTask.wakeUpSkillId ?? null,
-                  favoriteId: dbTask.wakeUpFavoriteId ?? null,
-                  leafMessageId: dbTask.wakeUpLeafMessageId ?? null,
-                  subAgentDepth: dbTask.wakeUpSubAgentDepth ?? 0,
-                  ownerUser: cronUser,
-                  logger,
-                  directResumeLocale: userLocale,
-                  abortSignal: pulseAbortController.signal,
-                }).catch((completionErr: Error) => {
-                  logger.error("handleTaskCompletion failed in pulse", {
-                    taskId: dbTask.id,
-                    error: completionErr.message,
-                  });
                 });
               }
             } catch (unexpectedError) {

@@ -36,7 +36,17 @@ describe("Remote Connection connect-reverse", () => {
     const result = await sendTestRequest({
       streamContext: undefined,
       endpoint: definitions.POST,
-      data: { instanceId: "", localUrl: "http://localhost:3002" },
+      data: {
+        instanceId: "",
+        localUrl: "http://localhost:3002",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
     });
 
     expect(result.success, "CR1: must fail validation").toBe(false);
@@ -61,7 +71,17 @@ describe("Remote Connection connect-reverse", () => {
     const result = await sendTestRequest({
       streamContext: undefined,
       endpoint: definitions.POST,
-      data: { instanceId: "hermes", localUrl: "not-a-url" },
+      data: {
+        instanceId: "hermes",
+        localUrl: "not-a-url",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
     });
 
     expect(result.success, "CR3: must fail — invalid URL").toBe(false);
@@ -76,6 +96,13 @@ describe("Remote Connection connect-reverse", () => {
       data: {
         instanceId: "hermes",
         localUrl: "http://localhost:3002",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
       },
       user: customerUser,
     });
@@ -97,7 +124,6 @@ describe("Remote Connection connect-reverse", () => {
           skills: true,
           favorites: true,
           threads: true,
-          chat: false,
         },
       },
     });
@@ -119,7 +145,6 @@ describe("Remote Connection connect-reverse", () => {
           skills: true,
           favorites: true,
           threads: true,
-          chat: false,
         },
       },
       user: customerUser,

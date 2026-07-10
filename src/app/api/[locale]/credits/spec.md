@@ -73,15 +73,38 @@ Credits are automatically:
 
 ### Database Schema
 
-**user_credits** - Current credit balance per user
+Three tables: a **wallet** per owner holds the balance, **packs** hold the actual
+purchased/granted credits (so expiry can be tracked per source), and
+**transactions** are the immutable audit log.
+
+**credit_wallets** - one wallet per user OR lead (exactly one owner set)
 
 ```typescript
 {
   id: uuid,
-  userId: uuid,
-  amount: number,
-  type: "subscription" | "permanent" | "free",
-  expiresAt: timestamp | null,
+  userId: uuid | null,      // exactly one of userId/leadId set
+  leadId: uuid | null,
+  balance: number,          // total paid balance (sum of pack remainders)
+  freeCreditsRemaining: number,  // free tier; default 20, lead wallets share the pool
+  freePeriodStart: timestamp,
+  freePeriodId: string,     // e.g. "2026-06" — month bucket for the free reset
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+**credit_packs** - purchased/subscription/granted credits, deducted expiring-soonest-first
+
+```typescript
+{
+  id: uuid,
+  walletId: uuid,
+  originalAmount: number,
+  remaining: number,
+  type: CreditPackType,     // subscription | permanent | bonus | earned
+  expiresAt: timestamp | null,  // null = never expires
+  source: string | null,    // 'stripe_subscription' | 'stripe_purchase' | 'admin_grant' | …
+  metadata: jsonb,
   createdAt: timestamp,
   updatedAt: timestamp
 }
@@ -92,13 +115,14 @@ Credits are automatically:
 ```typescript
 {
   id: uuid,
-  userId: uuid | null,
-  leadId: uuid | null,
-  amount: number, // Negative for deductions
+  walletId: uuid,
+  amount: number,           // Negative for deductions
   balanceAfter: number,
-  type: "purchase" | "subscription" | "usage" | "expiry" | "free_tier",
+  type: CreditTransactionType,  // purchase | subscription | usage | expiry | free_grant | refund | transfer | referral_earning | referral_payout | …
   modelId: string | null,
+  feature: string | null,
   messageId: uuid | null,
+  packId: uuid | null,      // which pack the movement hit
   createdAt: timestamp
 }
 ```
@@ -133,20 +157,21 @@ Returns transaction history with filters.
 
 ## React Hooks
 
+`useCredits(user, logger, initialData)` returns the standard endpoint object
+(`EndpointReturn`) — read the balance off its `read` query, or `null` when
+`initialData` is `null` (the hook is disabled for unauthenticated users). The GET
+response fields are `total, expiring, permanent, earned, free, expiresAt, capacity`
+(there is no `balance`/`freeCreditsRemaining` field on the response — `total` is the
+spendable balance, `free` the remaining free-tier credits).
+
 ```typescript
 import { useCredits } from '@/app/api/[locale]/credits/hooks';
 
-function MyComponent() {
-  const { data: credits, isLoading } = useCredits();
+function MyComponent({ user, logger, initialData }) {
+  const credits = useCredits(user, logger, initialData);
+  const data = credits?.read.data;
 
-  return (
-    <div>
-      <p>Balance: {credits?.total} credits</p>
-      <p>Free: {credits?.free}</p>
-      <p>Paid: {credits?.paid}</p>
-      <p>Subscription: {credits?.subscription}</p>
-    </div>
-  );
+  return <p>Balance: {data?.total} credits (free: {data?.free})</p>;
 }
 ```
 
@@ -166,64 +191,3 @@ For non-authenticated users:
 - Multiple users on same device share credits
 - 20 free credits per lead
 - Can purchase credits without account
-
-## Best Practices
-
-### For Developers
-
-1. **Set Appropriate Costs**
-   - Free features: `credits: 0`
-   - Cheap features: `credits: 1-5`
-   - Expensive features: `credits: 10+`
-
-2. **Display Costs Upfront**
-   - Show credit cost before execution
-   - Warn if user doesn't have enough
-   - Suggest purchasing more credits
-
-3. **Handle Insufficient Credits**
-   - Check balance before execution
-   - Return clear error message
-   - Provide purchase link
-
-4. **Track Usage**
-   - Log all credit transactions
-   - Include context (modelId, messageId)
-   - Enable usage analytics
-
-### For Users
-
-1. **Monitor Your Balance**
-   - Check credits regularly
-   - Set up low-balance alerts
-   - Purchase before running out
-
-2. **Optimize Usage**
-   - Use cheaper models when possible
-   - Batch operations to save credits
-   - Use free features when available
-
-3. **Purchase Strategy**
-   - Buy larger packs for better value
-   - Consider subscription for heavy usage
-   - Free tier good for testing
-
-## Troubleshooting
-
-**"Insufficient credits" error**:
-
-- Check your balance
-- Purchase more credits
-- Wait for subscription renewal
-
-**Credits not deducted**:
-
-- Check transaction log
-- Verify operation completed
-- Contact support if issue persists
-
-**Credits expired**:
-
-- Only subscription credits expire
-- Check expiry date in balance
-- Renew subscription to restore

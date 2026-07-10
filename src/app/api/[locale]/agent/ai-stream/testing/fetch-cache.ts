@@ -5,17 +5,30 @@
  * and matched by REQUEST CONTENT — zero global or process state. Every call
  * site that talks to an external service (AI providers, media generation, TTS/
  * STT, embeddings) receives the context down the execution chain
- * (ToolExecutionContext.fixtureContext) and binds it once via
+ * (ToolExecutionContext.streamContext) and binds it once via
  * `createFixtureFetch(context)`.
  *
  * Caches every call as two files:
  *   src/generated/ai-fixtures/http-cache/{cachePrefix}/{N}-{instance}-{model}-req.json
  *   src/generated/ai-fixtures/http-cache/{cachePrefix}/{N}-{instance}-{model}-res.json
  * where {N} is a zero-padded ORDINAL from the run's single counter (stored on
- * the counter thread's stream_context, atomically bumped per call). Match is
- * ORDER-driven, not content-hashed: the Nth external call replays file N. One
- * folder per test file; {instance} (atlas/hermes) disambiguates cross-instance
- * calls.
+ * the fixtures table, atomically bumped per call). Match is ORDER-driven, not
+ * content-hashed: the Nth external call replays file N. One folder per test
+ * file; {instance} (atlas/hermes) disambiguates cross-instance calls.
+ *
+ * EXCEPTION — embeddings are CONTENT-ADDRESSED (`emb-{sha256(body)}-res.json`)
+ * and do NOT consume the shared ordinal: they fire both on-path and
+ * fire-and-forget, so their count/order varies per run. Ordinal-keying made
+ * them miss → go live → burn the idle watchdog AND drift the counter for the
+ * AI calls. Hashing the body makes the same text always hit, order-independent.
+ *
+ * DETERMINISTIC PARALLEL FAN-OUT — gap-fill fires several modality-bridge model
+ * calls concurrently (Promise.all, kept for prod/dev throughput). Promise.all
+ * preserves RESULT order but not fetch-FIRING order, so racing bumps would
+ * assign ordinals non-deterministically. The gap-fill layer therefore RESERVES
+ * each bridge call's ordinal synchronously in a stable order BEFORE the
+ * fan-out (reserveFixtureOrdinals) and pins it on streamContext.fixtureOrdinal
+ * so the racing fetches replay the same file every run.
  *
  * Response file formats:
  *   SSE streams  → { type: "sse",    events: ["data: {...}", "data: [DONE]"], ... }
@@ -35,12 +48,15 @@
  * Cache bust: delete src/generated/ai-fixtures/http-cache/{testCase}/
  */
 
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
+
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import { createEndpointLogger } from "../../../system/logger/server";
 import type { EndpointLogger } from "../../../system/logger/types";
@@ -59,38 +75,29 @@ export const HTTP_CACHE_DIR = join(
 );
 
 /**
- * TEMPORARY DEBUG SWITCH: when true, any fixture-cache MISS (a live fetch
- * about to happen inside a fixture context) and any AI/media call WITHOUT a
- * fixture context during a bun test run CRASH loudly instead of silently
- * going live. Flip to false to allow a recording pass.
+ * The ONE fixture switch.
+ *
+ * `true`  → REPLAY-ONLY: a cache miss on an ORDINAL (conversational) call
+ *           throws instead of going live. This proves every conversational AI
+ *           call site routes through the engine — a missed path would go live
+ *           and this catches it. CONTENT-ADDRESSED calls (embeddings + modality
+ *           bridges) are exempt: keyed by input hash, a miss just means a new
+ *           input, so they re-record silently.
+ * `false` → RECORD: a miss falls through to a live fetch and records the file.
+ *
+ * Flip to `false` for a recording pass, back to `true` to enforce replay.
  */
-export const CRASH_ON_FIXTURE_MISS = true;
+export const FIXTURE_STRICT = true;
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
 /**
  * The ONE value that flows the execution chain (ToolExecutionContext.
- * fixtureContext, the tool-execute-request wire payload, revival records).
+ * streamContext, the tool-execute-request wire payload, revival records).
  * There is no process or global replay state anywhere: fixture matching is
  * ordinal-addressed (see bumpFixtureCounter): the run's single counter, stored
- * on the counter thread's stream_context, orders the recordings.
+ * in the fixtures table, orders the recordings.
  */
-export interface FixtureContext {
-  /** Fixture directory name (= test file cache prefix). One folder per file;
-   *  stable across runs so recordings are reused. */
-  name: string;
-  /**
-   * Throw on cache miss instead of fetching live — proves a run is fully
-   * fixture-driven with zero network access. Travels the chain like `name`,
-   * so a strict test is strict on the receiving instance too.
-   */
-  strict?: boolean;
-  /**
-   * Localhost ports treated as external (intercepted) — for remote-mode tests
-   * where the "remote" provider is a localhost server.
-   */
-  interceptLocalhostPorts?: number[];
-}
 
 /**
  * Marker header on replayed responses. Poll loops read it (see
@@ -140,7 +147,39 @@ type ResFile =
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function slugify(s: string): string {
+/**
+ * Normalize an embedding request body so the SAME semantic content hashes
+ * identically across runs. The embedded text carries auto-added per-message
+ * context metadata whose tokens vary every run:
+ *   - `ID:<8-hex shortId>` — a fresh random id per message.
+ *   - `Posted:<Mon D, HH:MM>` — a wall-clock timestamp.
+ * Both are replaced with a fixed placeholder before hashing (content-addressing
+ * only; the real request body sent to the provider is untouched).
+ */
+export function normalizeEmbeddingBodyForHash(bodyStr: string): string {
+  return (
+    bodyStr
+      .replace(/ID:[0-9a-f]{6,}/g, "ID:X")
+      .replace(/Posted:[^|\]\\"]+/g, "Posted:X")
+      // Per-run UUIDs (thread/message/file ids embedded in cortex document paths
+      // and titles, e.g. `.../tool-catalog-deep-dive-<uuid>.md`) vary every run.
+      .replace(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+        "UUID",
+      )
+      // ISO-8601 timestamps embedded in synced content / tool results (e.g. a
+      // memory's `updatedAt`, a rendered cortex node's captured time) are fresh
+      // every run. The cortex system-prompt embeds this text, so an unstripped
+      // timestamp drifted the hash → strict cache miss every run. Match with or
+      // without milliseconds and trailing Z/offset.
+      .replace(
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/g,
+        "TIMESTAMP",
+      )
+  );
+}
+
+export function slugify(s: string): string {
   return s
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -187,60 +226,29 @@ function deriveModelName(url: string, bodyStr: string): string {
   }
 }
 
-/** Returns true for external URLs we should intercept */
-function isExternal(url: string, interceptPorts?: number[]): boolean {
+/** Returns true for external URLs we should intercept. Localhost is NEVER
+ *  intercepted — it's the DB, WS proxy, and cross-instance dev servers, all of
+ *  which must talk live. Only external (real provider) hosts are recorded. */
+function isExternal(url: string): boolean {
   try {
     const u = new URL(url);
     if (u.protocol !== "http:" && u.protocol !== "https:") {
       return false;
     }
     const h = u.hostname;
-    if (
+    return (
       h !== "localhost" &&
       h !== "127.0.0.1" &&
       h !== "::1" &&
       !h.endsWith(".local")
-    ) {
-      return true;
-    }
-    // Also intercept specific localhost ports opted-in via the context
-    // (remote-mode tests where the "remote" provider is a localhost server).
-    if (!interceptPorts?.length) {
-      return false;
-    }
-    const port = parseInt(
-      u.port || (u.protocol === "https:" ? "443" : "80"),
-      10,
     );
-    return interceptPorts.includes(port);
   } catch {
     return false;
   }
 }
 
-/**
- * Content-addressed fixture key: sha256 of method + url + normalized body
- * (JSON bodies are key-sorted first). The same request maps to the same
- * fixture file in ANY process or instance — replay needs no shared ordering
- * state at all. Only literally-identical repeats (poll loops, SDK retries)
- * are disambiguated, by a per-fetch-instance repeat counter (see
- * createFixtureFetch) that lives and dies with one execution chain.
- */
-function requestHash(url: string, method: string, bodyStr: string): string {
-  let normBody = bodyStr;
-  if (bodyStr) {
-    try {
-      normBody = JSON.stringify(
-        sortJsonKeys(JSON.parse(bodyStr) as WidgetData),
-      );
-    } catch {
-      normBody = bodyStr;
-    }
-  }
-  return createHash("sha256")
-    .update(`${method} ${url}\n${normalizeVolatile(normBody)}`)
-    .digest("hex")
-    .slice(0, 8);
+export function cacheDir(testCase: string): string {
+  return join(HTTP_CACHE_DIR, testCase);
 }
 
 /**
@@ -249,60 +257,144 @@ function requestHash(url: string, method: string, bodyStr: string): string {
  * disambiguates which dev server made the call in cross-instance runs; model is
  * human-readable context.
  */
-function normalizeVolatile(text: string): string {
-  return (
-    text
-      // UUIDs
-      .replace(
-        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
-        "<uuid>",
-      )
-      // ISO dates/timestamps (2026-07-07T01:17:05.888Z / 2026-07-07 01:17)
-      .replace(
-        /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?/g,
-        "<ts>",
-      )
-      // Prose dates with clock ("Jul 7, 01:17" / "Jul 7, 2026")
-      .replace(
-        /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(, \d{4})?(,? \d{2}:\d{2}(:\d{2})?)?/g,
-        "<date>",
-      )
-      // Bare dates without a time part ("Current Date: 2026-07-07") — the ISO
-      // rule above only matches datetime. Without this, every midnight
-      // invalidates every recording.
-      .replace(/\b\d{4}-\d{2}-\d{2}\b/g, "<d>")
-      // Bare clock times
-      .replace(/\b\d{2}:\d{2}:\d{2}\b/g, "<time>")
-      // Provider-generated tool-call ids ("call_af1fadecef28..."). NOT caught
-      // by the hex rule below: "_" is a word character, so \b never matches
-      // between "call_" and the hex tail.
-      .replace(/call_[a-zA-Z0-9]+/g, "<callid>")
-      // Long hex ids (message/context/task fragments, >=8 hex chars)
-      .replace(/\b[0-9a-f]{8,}\b/gi, "<hex>")
-  );
+export function fileStem(
+  instance: string,
+  modelName: string,
+  ordinal: number,
+): string {
+  const n = String(ordinal).padStart(4, "0");
+  return `${n}-${instance}-${modelName}`;
 }
 
-/** Recursively sort object keys so hashing is insensitive to key order. */
-function sortJsonKeys(value: WidgetData): WidgetData {
-  if (Array.isArray(value)) {
-    return value.map(sortJsonKeys);
+/** Resolve THIS instance's short name (atlas / hermes) for the fixture stem. */
+export async function resolveInstanceName(): Promise<string> {
+  try {
+    const { RemoteConnectionRepository } =
+      await import("@/app/api/[locale]/remote-connection/repository");
+    return slugify(RemoteConnectionRepository.deriveDefaultSelfInstanceId());
+  } catch {
+    return "atlas";
   }
-  if (value !== null && typeof value === "object" && !(value instanceof Date)) {
-    const out: Record<string, WidgetData> = {};
-    for (const key of Object.keys(value).toSorted()) {
-      out[key] = sortJsonKeys(value[key]);
+}
+
+/**
+ * Atomically read the run's fixture folder AND bump its ordinal in ONE round
+ * trip, keyed by threadId. Returns null when there's no fixtures row (not a
+ * fixture run — go live). Race-free (tests are sequential), decoupled from the
+ * thread row.
+ */
+/**
+ * Resolve the fixture-scope threadId for a stream by walking its thread
+ * lineage: if `threadId` has a fixtures row it IS the scope; otherwise follow
+ * the parent chain up until a thread WITH a fixtures row is found. The first
+ * hop can come from IN-CONTEXT `parentThreadId` (an INCOGNITO sub-stream has no
+ * DB row to read a parent from); deeper hops read `chatThreads.parent_thread_id`.
+ * A sub-stream/sub-agent (image-gen LLM path, ai-run child) thus records into —
+ * and shares the single counter of — its spawning run's root thread, so the
+ * one-counter-per-folder invariant holds without reusing the parent's threadId
+ * for stream identity. Returns null when no ancestor is a fixture run (prod).
+ * Bounded depth guards against a cycle. Called ONCE per bound fetch.
+ */
+async function resolveFixtureRootThreadId(
+  threadId: string,
+  contextParentThreadId: string | undefined,
+): Promise<string | null> {
+  const { db } = await import("next-vibe/database");
+  const { fixtures } = await import("./fixtures.db");
+  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const { eq } = await import("drizzle-orm");
+  let current: string | null = threadId;
+  const seen = new Set<string>();
+  for (let depth = 0; current && depth < 16; depth++) {
+    if (seen.has(current)) {
+      return null;
     }
-    return out;
+    seen.add(current);
+    const [fx] = await db
+      .select({ threadId: fixtures.threadId })
+      .from(fixtures)
+      .where(eq(fixtures.threadId, current))
+      .limit(1);
+    if (fx) {
+      return current;
+    }
+    // First hop: prefer the in-context parent (incognito sub-stream has no row).
+    if (depth === 0 && contextParentThreadId) {
+      current = contextParentThreadId;
+      continue;
+    }
+    const [thread] = await db
+      .select({ parentThreadId: chatThreads.parentThreadId })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, current))
+      .limit(1);
+    current = thread?.parentThreadId ?? null;
   }
-  return value;
+  return null;
 }
 
-function cacheDir(testCase: string): string {
-  return join(HTTP_CACHE_DIR, testCase);
+export async function readAndBumpFixture(
+  threadId: string,
+): Promise<{ prefix: string; ordinal: number } | null> {
+  const { db } = await import("next-vibe/database");
+  const { fixtures } = await import("./fixtures.db");
+  const { eq, sql } = await import("drizzle-orm");
+  const [row] = await db
+    .update(fixtures)
+    .set({ counter: sql`${fixtures.counter} + 1` })
+    .where(eq(fixtures.threadId, threadId))
+    .returning({ prefix: fixtures.prefix, ordinal: fixtures.counter });
+  if (!row?.prefix) {
+    return null;
+  }
+  return { prefix: row.prefix, ordinal: row.ordinal };
 }
 
-function fileStem(modelName: string, index: number): string {
-  return index === 1 ? modelName : `${modelName}-${index}`;
+/**
+ * Reserve `count` fixture ordinals up-front, in order, for a DETERMINISTIC
+ * PARALLEL FAN-OUT (gap-fill). The caller bumps the shared counter `count`
+ * times SEQUENTIALLY here — before firing its concurrent bridge fetches — then
+ * pins one reserved ordinal per fetch via streamContext.fixtureOrdinal. This
+ * moves the ordinal ASSIGNMENT out of the racing fetches (which would otherwise
+ * bump in nondeterministic resolution order) while the model calls themselves
+ * still run in parallel.
+ *
+ * Returns [] when this is not a fixture run (no fixtures row) — prod/dev live
+ * runs then take the normal live-fetch path, unaffected.
+ */
+export async function reserveFixtureOrdinals(
+  threadId: string,
+  count: number,
+): Promise<number[]> {
+  const ordinals: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const fx = await readAndBumpFixture(threadId);
+    if (!fx) {
+      // No fixtures row → not a fixture run. Nothing reserved; caller fires live.
+      return [];
+    }
+    ordinals.push(fx.ordinal);
+  }
+  return ordinals;
+}
+
+/**
+ * Non-bumping read of a run's fixture prefix by threadId (the claude-code store
+ * bumps via readAndBumpFixture; this is for callers that only need the folder).
+ * Returns null when there's no fixtures row (not a fixture run).
+ */
+export async function readFixturePrefix(
+  threadId: string,
+): Promise<string | null> {
+  const { db } = await import("next-vibe/database");
+  const { fixtures } = await import("./fixtures.db");
+  const { eq } = await import("drizzle-orm");
+  const [row] = await db
+    .select({ prefix: fixtures.prefix })
+    .from(fixtures)
+    .where(eq(fixtures.threadId, threadId))
+    .limit(1);
+  return row?.prefix ?? null;
 }
 
 function headersToRecord(headers: Headers): Record<string, string> {
@@ -501,9 +593,9 @@ function buildResFile(
  * Caching any would break the relay: stale responseThreadId → dead WS channel;
  * cached broadcast/bridge POST → dispatch or result never delivered → remote hang.
  */
-function isPassthroughUrl(url: string, interceptPorts?: number[]): boolean {
+function isPassthroughUrl(url: string): boolean {
   return (
-    !isExternal(url, interceptPorts) ||
+    !isExternal(url) ||
     url.includes("/agent/ai-stream/stream") ||
     url.includes("/ws/broadcast") ||
     url.includes("/system/execute-tool")
@@ -511,17 +603,25 @@ function isPassthroughUrl(url: string, interceptPorts?: number[]): boolean {
 }
 
 /**
- * Record/replay fetch for ONE explicit fixture context and ONE execution
- * chain. The per-call ordinal comes from the run's single counter (atomic
- * read-and-bump on the counter thread's stream_context), so the Nth external
- * call of the whole run maps to file N — order-driven, no content hashing.
+ * Record/replay fetch bound to ONE threadId. The fixture prefix + ordinal are
+ * read from the fixtures table (DB, one round-trip) — there is NO
+ * FixtureContext object on the chain. The Nth external call of the whole run
+ * maps to file `<N>-<instance>-<model>`; order-driven, no content hashing. If
+ * the thread has no fixture prefix, this is not a fixture run → live fetch.
  */
 async function engineFetch(
-  fixtureContext: FixtureContext,
-  repeats: Map<string, number>,
+  streamThreadId: string,
   input: RequestInfo | URL,
   init: RequestInit | undefined,
   logger: EndpointLogger,
+  /**
+   * Pre-reserved ordinal for a deterministic parallel-fan-out call (gap-fill
+   * bridge). When set, the fetch uses it verbatim instead of bumping the shared
+   * counter — see the addressing block. Undefined for normal ordinal calls.
+   */
+  pinnedOrdinal: number | undefined,
+  /** In-context spawning thread for a sub-stream (lineage walk first hop). */
+  contextParentThreadId: string | undefined,
 ): Promise<Response> {
   // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- the record/replay engine's live leg
   const originalFetch = fetch;
@@ -532,30 +632,102 @@ async function engineFetch(
         ? input.toString()
         : input.url;
 
-  if (isPassthroughUrl(url, fixtureContext.interceptLocalhostPorts)) {
+  if (isPassthroughUrl(url)) {
     return originalFetch(input, init);
   }
 
-  const dir = slugify(fixtureContext.name);
+  // Resolve the fixture SCOPE once: the stream's own thread if it's a fixture
+  // run, else walk lineage (context parent → chatThreads.parent_thread_id) to
+  // the spawning run's root thread. A sub-stream (image-gen LLM path, ai-run
+  // child) thus records into + shares the counter of its run's root folder. No
+  // ancestor is a fixture run → not a fixture run → live fetch.
+  const threadId =
+    (await resolveFixtureRootThreadId(streamThreadId, contextParentThreadId)) ??
+    streamThreadId;
+
+  let bodyStr = "";
+  if (init?.body) {
+    bodyStr =
+      typeof init.body === "string"
+        ? init.body
+        : init.body instanceof URLSearchParams
+          ? init.body.toString()
+          : JSON.stringify(init.body);
+  }
+
+  // ── Ordinal vs content-addressing ──────────────────────────────────────────
+  // ORDINAL (default): conversational chat/agent turns. Their body depends on
+  // the PRIOR turn's response, so identity = position in the call sequence
+  // (the shared per-thread counter orders them).
+  //
+  // CONTENT-ADDRESSED (hash of body, OFF the shared ordinal): calls whose body
+  // is a PURE FUNCTION of their own input, fired fire-and-forget with a
+  // run-to-run-varying count/interleaving. Keeping them off the ordinal means
+  // they can't desync the conversational chain. Detected from the request
+  // alone (no markers):
+  //   1. Embeddings (URL).
+  //   2. Auto-title (fixed AUTO_TITLE_SYSTEM_PROMPT marker in a system message)
+  //      — a fire-and-forget background summary fired after the turn finalizes;
+  //      it must NOT consume a conversational ordinal or every suite's fixtures
+  //      would shift by one call per new-thread turn.
+  const isEmbeddingCall = /\/embeddings\b/.test(url);
+  const isContentAddressed = isEmbeddingCall;
+
+  // Resolve the run's fixture folder + stem:
+  //   - Content-addressed (embeddings): body hash, no ordinal bump.
+  //   - PINNED ordinal: a parallel-fan-out call (gap-fill bridge) whose ordinal
+  //     was reserved synchronously by the caller BEFORE the concurrent fetches
+  //     fired. Use it verbatim (no bump) so racing fetches never compete for
+  //     the counter and each replays the same file regardless of which promise
+  //     settles first -- keeps gap-fill parallel in prod/dev yet deterministic
+  //     under fixtures (the T10e banana-vs-music desync).
+  //   - Otherwise: the shared ordinal (read + bump).
+  let prefix: string;
+  let ordinalStem: string;
+  if (isContentAddressed) {
+    const p = await readFixturePrefix(threadId);
+    if (!p) {
+      return originalFetch(input, init);
+    }
+    prefix = p;
+    // Content-address embeddings by a NORMALIZED body: the embedded text carries
+    // per-message context metadata that is VOLATILE across runs — the auto-added
+    // `[Context: ID:<shortId> | ... | Posted:<timestamp>]` line has a fresh random
+    // shortId and a wall-clock timestamp every run. Hashing the raw body made the
+    // SAME semantic content miss every time → the embedding went LIVE and stalled
+    // the run on the fetch watchdog. Strip those volatile tokens before hashing so
+    // identical content always resolves to the same fixture.
+    const bodyHash = createHash("sha256")
+      .update(normalizeEmbeddingBodyForHash(bodyStr))
+      .digest("hex")
+      .slice(0, 16);
+    ordinalStem = `emb-${bodyHash}`;
+  } else if (pinnedOrdinal !== undefined) {
+    const p = await readFixturePrefix(threadId);
+    if (!p) {
+      return originalFetch(input, init);
+    }
+    prefix = p;
+    const modelName = deriveModelName(url, bodyStr);
+    const instanceName = await resolveInstanceName();
+    ordinalStem = fileStem(instanceName, modelName, pinnedOrdinal);
+  } else {
+    const fx = await readAndBumpFixture(threadId);
+    if (!fx) {
+      return originalFetch(input, init);
+    }
+    prefix = fx.prefix;
+    const modelName = deriveModelName(url, bodyStr);
+    const instanceName = await resolveInstanceName();
+    ordinalStem = fileStem(instanceName, modelName, fx.ordinal);
+  }
+
+  const dir = slugify(prefix);
 
   {
-    let bodyStr = "";
-    if (init?.body) {
-      bodyStr =
-        typeof init.body === "string"
-          ? init.body
-          : init.body instanceof URLSearchParams
-            ? init.body.toString()
-            : JSON.stringify(init.body);
-    }
-
     const modelName = deriveModelName(url, bodyStr);
-    const hash = requestHash(url, init?.method ?? "GET", bodyStr);
     const testCaseDir = cacheDir(dir);
-    const repeatKey = `${modelName}-${hash}`;
-    const repeatIndex = (repeats.get(repeatKey) ?? 0) + 1;
-    repeats.set(repeatKey, repeatIndex);
-    const stem = fileStem(repeatKey, repeatIndex);
+    const stem = ordinalStem;
     const rp = join(testCaseDir, `${stem}-res.json`);
 
     // ── Cache hit ────────────────────────────────────────────────────────────
@@ -563,7 +735,7 @@ async function engineFetch(
       logger.debug("[FetchCache] HIT", {
         rp: rp.split("/").slice(-3).join("/"),
         model: modelName,
-        index: repeatIndex,
+        stem,
       });
       const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
       // SSE responses use sseEventsToTickingStream (pull-based, one event per
@@ -577,83 +749,56 @@ async function engineFetch(
     logger.debug("[FetchCache] MISS", {
       rp: rp.split("/").slice(-3).join("/"),
       model: modelName,
-      index: repeatIndex,
+      stem,
     });
 
     // ── Cache miss ────────────────────────────────────────────────────────────
-    if (CRASH_ON_FIXTURE_MISS) {
-      // oxlint-disable-next-line restricted-syntax -- temporary debug crash on any uncached fetch
-      throw new Error(
-        // eslint-disable-next-line i18next/no-literal-string
-        `[FetchCache CRASH_ON_FIXTURE_MISS] cache miss for ${init?.method ?? "GET"} ${url}\n  context: ${dir}\n  expected: ${stem}-res.json`,
-      );
-    }
-    if (fixtureContext.strict) {
+    // REPLAY-ONLY (FIXTURE_STRICT): a miss on ANY external call — AI model,
+    // media-gen bridge (pinned-ordinal) OR embedding (content-addressed) —
+    // throws. There are NO exemptions: an unrecorded or drifted call site MUST
+    // fail loudly instead of silently going live and burning wall-clock. This
+    // holds on BOTH instances (atlas + hermes) since each runs this same engine.
+    // Recording passes (FIXTURE_STRICT=false) fall through and record every miss.
+    if (FIXTURE_STRICT) {
       // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
       throw new Error(
         // eslint-disable-next-line i18next/no-literal-string
-        `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${dir}, expected: ${stem}-res.json)`,
+        `[FetchCache STRICT] cache miss for ${init?.method ?? "GET"} ${url}\n  context: ${dir}\n  expected: ${stem}-res.json`,
       );
     }
 
-    // Live-fetch watchdog + stall retry: 5-minute TOTAL budget (long LLM/
-    // compacting streams are legitimate) plus a 45s IDLE budget until the
-    // FIRST body chunk and 30s between subsequent chunks — provider
-    // connections occasionally open and then stall without ever sending a
-    // token; without the idle abort such a recording burns the whole test
-    // timeout as a silent hang (observed repeatedly: empty assistant row,
-    // thread stuck streaming). Pre-first-chunk stalls are retried once on a
-    // fresh connection (nothing was delivered, so a retry is transparent);
-    // mid-stream stalls can only abort — the caller already consumed chunks.
-    let watchdog = makeLiveFetchWatchdog();
+    // Live-fetch watchdog: an IDLE budget until the FIRST body chunk (provider
+    // connections occasionally open then stall without sending a token; without
+    // the idle abort such a recording burns the whole test timeout as a silent
+    // hang) and 30s between subsequent chunks. A stall aborts ONCE — no retry
+    // (a retry just stacks another idle budget and blows the settle timeout).
+    const watchdog = makeLiveFetchWatchdog();
     let real: Response;
     let firstChunk: Uint8Array | undefined;
     let bodyReader: ReadableStreamDefaultReader<Uint8Array> | undefined;
     let isStreamResponse = false;
     let bufferedBody: Uint8Array | undefined;
-    for (let attempt = 0; ; attempt++) {
-      try {
-        real = await originalFetch(input, {
-          ...init,
-          signal: watchdog.signal,
-        });
-        isStreamResponse = (real.headers.get("content-type") ?? "").includes(
-          "event-stream",
-        );
-        if (isStreamResponse && real.body) {
-          // Read the first chunk under the watchdog: a connection that opens
-          // and never sends is indistinguishable from a slow model otherwise.
-          bodyReader = real.body.getReader();
-          watchdog.touchIdle(45_000);
-          const first = await bodyReader.read();
-          firstChunk = first.done ? undefined : first.value;
-        } else {
-          // Non-streaming (JSON/binary): buffer INSIDE the retry loop — a
-          // body that stalls after headers is just as retryable as one that
-          // never sends headers (nothing reached the caller yet).
-          bufferedBody = new Uint8Array(await real.arrayBuffer());
-          watchdog.clear();
-        }
-        break;
-      } catch (liveErr) {
+    try {
+      real = await originalFetch(input, { ...init, signal: watchdog.signal });
+      isStreamResponse = (real.headers.get("content-type") ?? "").includes(
+        "event-stream",
+      );
+      if (isStreamResponse && real.body) {
+        // Read the first chunk under the watchdog: a connection that opens and
+        // never sends is indistinguishable from a slow model otherwise.
+        bodyReader = real.body.getReader();
+        watchdog.touchIdle(45_000);
+        const first = await bodyReader.read();
+        firstChunk = first.done ? undefined : first.value;
+      } else {
+        // Non-streaming (JSON/binary): buffer under the watchdog.
+        bufferedBody = new Uint8Array(await real.arrayBuffer());
         watchdog.clear();
-        const msg = liveErr instanceof Error ? liveErr.message : "";
-        const isStall =
-          /idle timeout/.test(msg) ||
-          (liveErr instanceof Error &&
-            liveErr.name === "AbortError" &&
-            /idle timeout/.test(String(liveErr.cause ?? "")));
-        if (attempt === 0 && isStall) {
-          logger.warn(
-            "[FetchCache] live fetch stalled before first chunk - retrying once",
-            { url },
-          );
-          watchdog = makeLiveFetchWatchdog();
-          continue;
-        }
-        // oxlint-disable-next-line restricted-syntax -- rethrow: fetch contract is throw-on-network-error
-        throw liveErr;
       }
+    } catch (liveErr) {
+      watchdog.clear();
+      // oxlint-disable-next-line restricted-syntax -- rethrow: fetch contract is throw-on-network-error
+      throw liveErr;
     }
     watchdog.touchIdle(30_000);
     const responseHeaders = headersToRecord(real.headers);
@@ -791,38 +936,50 @@ function makeLiveFetchWatchdog(): {
 }
 
 /**
- * Bind a fixture context into a standalone fetch implementation — THE entry
- * into the fixture engine. AI providers receive it via their `fetch` option;
- * media-gen/TTS/STT/embedding call sites create one per execution from
- * `streamContext.fixtureContext` and use it for their external calls.
- *
- * Each instance carries its own repeat counter for literally-identical
- * requests (poll loops, SDK retries), scoped to the execution chain that
- * created it. Without a context this is the plain live fetch — the presence
- * of an explicit fixtureContext on the chain IS the switch; there is no env
- * flag and no mode.
+ * True only in dev/test — prod never touches the fixture engine (no DB lookup,
+ * no interception). The switch is the environment, not an ambient flag.
+ */
+function fixturesEnabled(): boolean {
+  const env = process.env.NODE_ENV;
+  return env === "development" || env === "test";
+}
+
+/**
+ * Bind a fixture-aware fetch to a stream context — THE entry into the engine.
+ * Every AI/media/embedding/TTS/STT call site already has the ToolExecutionContext
+ * (or one) and passes it here; the engine uses `streamContext` as the
+ * fixture scope, reading the thread's prefix + bumping its ordinal from the DB
+ * per fetch. In prod (or with no context/threadId) this is the plain live
+ * fetch — zero overhead.
  */
 export function createFixtureFetch(
-  fixtureContext: FixtureContext | undefined,
+  streamContext: ToolExecutionContext | undefined,
   logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
 ): typeof globalThis.fetch {
-  if (!fixtureContext) {
-    if (CRASH_ON_FIXTURE_MISS && process.env.NODE_ENV === "test") {
-      // oxlint-disable-next-line restricted-syntax -- temporary debug crash: AI/media call without fixture context in a test run
-      throw new Error(
-        // eslint-disable-next-line i18next/no-literal-string
-        "[FetchCache CRASH_ON_FIXTURE_MISS] createFixtureFetch called WITHOUT a fixtureContext during a test run - this AI/media call would go live",
-      );
-    }
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live fetch for AI/media call sites outside fixture mode
+  const threadId = streamContext?.threadId;
+  if (!threadId || !fixturesEnabled()) {
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
     return fetch;
   }
-  const repeats = new Map<string, number>();
+  // A parallel-fan-out caller (gap-fill) binds a per-call context carrying a
+  // pre-reserved ordinal; the racing fetch uses it verbatim (no counter race).
+  const pinnedOrdinal = streamContext?.fixtureOrdinal;
+  // Sub-stream lineage: the engine walks this → parent → root to find the run's
+  // fixture folder (incognito sub-streams have no DB row, so the first hop is
+  // in-context).
+  const contextParentThreadId = streamContext?.parentThreadId;
   // Bun's fetch type carries a `preconnect` member — satisfy it by borrowing
   // the real one (a pure DNS/TLS warm-up; irrelevant to record/replay).
   const bound = Object.assign(
     (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
-      engineFetch(fixtureContext, repeats, input, init, logger),
+      engineFetch(
+        threadId,
+        input,
+        init,
+        logger,
+        pinnedOrdinal,
+        contextParentThreadId,
+      ),
     // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- borrowing the live fetch's preconnect
     { preconnect: fetch.preconnect.bind(fetch) },
   );

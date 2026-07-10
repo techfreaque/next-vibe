@@ -153,7 +153,11 @@ export class HeadlessClientRepository {
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
       for (const conn of connections) {
-        if (conn.transportMode === "reverse-ws" && !conn.isReverseEntry) {
+        // openConnection runs the ONE HTTP pull-on-connect for EVERY transport
+        // and opens a persistent socket only for a reverse-ws leg. Reverse
+        // entries never drive an outbound connector (the peer holds the socket),
+        // so skip them entirely.
+        if (!conn.isReverseEntry) {
           openConnection({
             id: conn.id,
             instanceId: conn.instanceId,
@@ -167,6 +171,8 @@ export class HeadlessClientRepository {
             syncScope: conn.syncScope,
             syncCursors: conn.syncCursors,
             pushCursors: null,
+            transportMode: conn.transportMode,
+            remoteTransportMode: conn.remoteTransportMode,
           });
           opened++;
         }

@@ -101,7 +101,8 @@ export async function generate(
   // thread-less headless context routes its embeddings live (never a fixture).
   const { makeHeadlessContext } =
     await import("@/app/api/[locale]/agent/chat/config");
-  const rootCtx = makeHeadlessContext(undefined, undefined);
+  // no user context — UTC (dates not user-facing here)
+  const rootCtx = makeHeadlessContext(undefined, undefined, "UTC");
   const { getAllTemplates } =
     await import("@/app/api/[locale]/agent/cortex/seeds/templates");
   const { defaultLocale } = await import("next-vibe/core/i18n/core/config");

@@ -122,6 +122,7 @@ const { GET } = createEndpoint({
       syncScope: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
+        // null when not connected (no stored scope).
         schema: SyncScopeSchema.nullable(),
       }),
     },
@@ -285,6 +286,29 @@ const { PATCH } = createEndpoint({
         schema: TransportModeSchema.optional(),
         hidden: true,
       }),
+      // How the PEER reaches us (mirror of the peer's transportMode). Normally
+      // driven by the peer via connect-reverse/update, but settable here for
+      // completeness/admin override — it drives OUR connector lifecycle (a
+      // reverse-ws value means we hold an outbound connector to receive the
+      // peer's sends).
+      remoteTransportMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.remoteTransportMode.label" as const,
+        description: "patch.remoteTransportMode.description" as const,
+        options: [
+          {
+            value: "reverse-ws",
+            label: "patch.transportMode.options.reverseWs" as const,
+          },
+          {
+            value: "direct-http",
+            label: "patch.transportMode.options.directHttp" as const,
+          },
+        ],
+        schema: TransportModeSchema.optional(),
+        hidden: true,
+      }),
       // ── Behavior ────────────────────────────────────────────────────────
       isInferenceProvider: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -340,6 +364,11 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "patch.syncScope.label" as const,
         description: "patch.syncScope.description" as const,
+        // OPTIONAL — only present when the user actually changes scope. It MUST
+        // stay undefined otherwise: SyncScopeSchema's per-field .default(true)
+        // would otherwise fill an absent scope with ALL-TRUE and a
+        // transportMode-only / reconnectNow PATCH would silently re-enable every
+        // domain (and mirror that all-true onto the peer).
         schema: SyncScopeSchema.optional(),
       }),
       // ── Reconnect ───────────────────────────────────────────────────────
@@ -406,10 +435,47 @@ const { PATCH } = createEndpoint({
   examples: {
     urlPathParams: { default: { instanceId: "hermes" } },
     requests: {
-      rename: { newInstanceId: "hermes-work" },
-      reauth: { email: "you@example.com", password: "new-password" },
-      inferenceProvider: { isInferenceProvider: true },
-      forceSystem: { forceSystemProvider: true },
+      rename: {
+        newInstanceId: "hermes-work",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
+      reauth: {
+        email: "you@example.com",
+        password: "new-password",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
+      inferenceProvider: {
+        isInferenceProvider: true,
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
+      forceSystem: {
+        forceSystemProvider: true,
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
       syncScope: {
         syncScope: {
           memories: true,
@@ -419,8 +485,26 @@ const { PATCH } = createEndpoint({
           threads: false,
         },
       },
-      reconnectNow: { reconnectNow: true },
-      transportMode: { transportMode: "reverse-ws" as const },
+      reconnectNow: {
+        reconnectNow: true,
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
+      transportMode: {
+        transportMode: "reverse-ws" as const,
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
     },
     responses: { default: { updated: true } },
   },

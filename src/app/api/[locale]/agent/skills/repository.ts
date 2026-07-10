@@ -111,7 +111,6 @@ export class SkillsRepository {
   private static getSkillReferenceIds(
     skillId: string,
     skillSlug: string | null,
-    streamContext: ToolExecutionContext,
   ): string[] {
     if (!skillSlug || skillSlug === skillId) {
       return [skillId];
@@ -1138,6 +1137,9 @@ export class SkillsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: SkillsT,
+    /** Caller's stream/fixture context — threaded to the embedding sync so it
+     *  records/replays under the run's fixture prefix instead of hitting live. */
+    streamContext: ToolExecutionContext,
     relayed = false,
     forcedSlug?: string,
   ): Promise<ResponseType<SkillCreateResponseOutput>> {
@@ -1306,6 +1308,9 @@ export class SkillsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    /** Caller's stream/fixture context — threaded to the embedding sync so it
+     *  records/replays under the run's fixture prefix instead of hitting live. */
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SkillUpdateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -1566,7 +1571,8 @@ export class SkillsRepository {
           userId,
           `/skills/${updated.id}.md`,
           embeddingContent,
-          undefined,
+          // Caller's stream/fixture context — records/replays in fixture runs.
+          streamContext,
         );
       })().catch(() => {
         // Best-effort embedding sync
@@ -1616,7 +1622,6 @@ export class SkillsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<SkillDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -1824,6 +1829,8 @@ export class SkillsRepository {
       user,
       logger,
       t,
+      // Relayed apply — no originating stream; thread-less root routes live.
+      rootlessStreamContext(),
       true,
       remoteSlug,
     );

@@ -5,22 +5,16 @@ import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/sy
 
 import { CONTACT_FORM_ALIAS } from "./constants";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
-export interface ContactData {
-  isLoggedIn: boolean;
-}
-
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 
-export const contactFragment: SystemPromptFragment<ContactData> = {
+export const contactFragment: SystemPromptFragment = {
   id: "contact",
   placement: "leading",
   priority: 500,
-  build: (data) => {
-    const emailNote = data.isLoggedIn
-      ? "User is logged in - leave email field empty."
-      : "User not logged in - submit without email if not provided. Never ask for it.";
+  build: async (params) => {
+    const emailNote = params.user.isPublic
+      ? "User not logged in - submit without email if not provided. Never ask for it."
+      : "User is logged in - leave email field empty.";
 
     return `## Contact Support
 Tool: \`${CONTACT_FORM_ALIAS}\` - use for bugs, billing, complaints, or anything needing a human.
@@ -29,11 +23,3 @@ If user seems frustrated or stuck, offer: "Want me to ping our support team?"
 ${emailNote}`;
   },
 };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-export async function loadContactData(
-  params: SystemPromptServerParams,
-): Promise<ContactData> {
-  return { isLoggedIn: !params.user.isPublic };
-}

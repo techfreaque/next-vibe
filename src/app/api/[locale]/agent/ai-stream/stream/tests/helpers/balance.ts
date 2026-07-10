@@ -42,7 +42,7 @@ export async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
     const res = await sendTestRequest({
       endpoint: creditsDef.GET,
       user,
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
     });
     if (!res.success) {
       // oxlint-disable-next-line restricted-syntax
@@ -89,7 +89,7 @@ export async function pinBalance(
     await import("@/app/api/[locale]/credits/admin-add/definition")
   ).default;
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: adminAddDef.POST,
     data: { targetUserId: user.id, amount: Math.ceil(deficit) },
     user,

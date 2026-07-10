@@ -17,6 +17,6 @@ describeStreamSuite({
   // — every call went live and nothing was stored. Its own folder (distinct
   // from cheap's "cheap") keeps the two suites' ordinal sequences separate.
   label: "AI Stream Integration - Regular (full)",
-  cachePrefix: "",
+  cachePrefix: "regular",
   cheapMode: false,
 });

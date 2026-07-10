@@ -1,6 +1,10 @@
 import { copyFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
+// Captured before dotenv runs — used as the "this process started now" fallback
+// when VIBE_START_TIME is not already in the environment.
+const MODULE_LOAD_TIME = Date.now();
+
 import { config } from "dotenv";
 import { Platform } from "next-vibe/core/definition/platform";
 import { MCP_ALIAS } from "next-vibe/platforms/mcp/serve/constants";
@@ -260,11 +264,13 @@ export function loadEnvironment(): EnvironmentResult {
   // eslint-disable-next-line i18next/no-literal-string
   process.env["VIBE_PID"] = String(process.pid);
 
-  // Stamp process start time once (user .env wins if set).
-  if (!callerEnv["VIBE_START_TIME"]) {
-    (process.env as Record<string, string>)["VIBE_START_TIME"] = String(
-      Date.now(),
-    );
+  // Stamp process start time once. Use the value inherited from the shell/parent if
+  // present (so all spawned sub-processes share the same origin), otherwise fall back
+  // to MODULE_LOAD_TIME (captured before dotenv ran, so it's as close to true start
+  // as possible even when this process was launched directly without the shell wrapper).
+  if (!process.env["VIBE_START_TIME"]) {
+    (process.env as Record<string, string>)["VIBE_START_TIME"] =
+      String(MODULE_LOAD_TIME);
   }
 
   // Must be computed before the NODE_ENV assignment so vibe --hermes dev is excluded.

@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
         description: "Argumenty wejściowe uruchomionego narzędzia.",
       },
     },
+    dynamicTitle: "Oczekuj: {{toolName}}",
     widget: {
       noToolName: "Brak nazwy narzędzia.",
       resolving: "Rozwiązywanie narzędzia...",

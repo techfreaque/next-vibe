@@ -17405,93 +17405,6 @@
                 },
                 "schemaType": "primitive"
               },
-              "searchVector": {
-                "type": "text",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "embedding": {
-                "type": "text",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "array",
-                        "element": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "minValue": null,
-                          "maxValue": null,
-                          "isInt": false,
-                          "isFinite": true,
-                          "format": null
-                        }
-                      },
-                      "type": "array",
-                      "element": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "minValue": null,
-                        "maxValue": null,
-                        "isInt": false,
-                        "isFinite": true,
-                        "format": null
-                      }
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "embeddingHash": {
-                "type": "text",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
               "createdAt": {
                 "type": "text",
                 "schema": {
@@ -19534,96 +19447,6 @@
                   "isInt": false,
                   "isFinite": true,
                   "format": null
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "searchVector": {
-                "type": "text",
-                "content": "Search Vector",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "embedding": {
-                "type": "text",
-                "content": "Search Vector",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "array",
-                        "element": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "minValue": null,
-                          "maxValue": null,
-                          "isInt": false,
-                          "isFinite": true,
-                          "format": null
-                        }
-                      },
-                      "type": "array",
-                      "element": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "minValue": null,
-                        "maxValue": null,
-                        "isInt": false,
-                        "isFinite": true,
-                        "format": null
-                      }
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "embeddingHash": {
-                "type": "text",
-                "content": "Search Vector",
-                "schema": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "string"
-                      },
-                      "type": "string",
-                      "format": null,
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  },
-                  "type": "nullable"
                 },
                 "usage": {
                   "response": true
@@ -26173,10 +25996,6 @@
     "titleShort": "Rename Thread",
     "description": "Update the title and preview of a chat thread",
     "fields": {
-      "type": "container",
-      "title": "Rename Thread",
-      "description": "Set a new title or preview for the thread",
-      "layoutType": "stacked",
       "usage": {
         "request": "data",
         "response": true
@@ -26488,8 +26307,32 @@
             "response": true
           },
           "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Cancel",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "submit_button",
+          "text": "patch.submitButton.label",
+          "loadingText": "patch.submitButton.loadingText",
+          "variant": "primary",
+          "size": "default"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

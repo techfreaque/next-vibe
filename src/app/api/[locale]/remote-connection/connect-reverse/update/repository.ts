@@ -33,7 +33,14 @@ export class ReverseConnectionUpdateRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<{ updated: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const { instanceId, syncScope, remoteTransportMode, newInstanceId } = data;
+    const {
+      instanceId,
+      syncScope,
+      remoteTransportMode,
+      transportMode,
+      newInstanceId,
+      reconnectNow,
+    } = data;
 
     const [row] = await db
       .select({
@@ -70,6 +77,9 @@ export class ReverseConnectionUpdateRepository {
     }
     if (remoteTransportMode !== undefined) {
       patch.remoteTransportMode = remoteTransportMode;
+    }
+    if (transportMode !== undefined) {
+      patch.transportMode = transportMode;
     }
     // The caller renamed itself: our row's instanceId is OUR label for the
     // caller — update it, the REMOTE subfolder, and any tasks targeting the
@@ -113,22 +123,27 @@ export class ReverseConnectionUpdateRepository {
       newInstanceId,
     });
 
-    // Connector lifecycle on THIS side: open the outbound connector to the peer
-    // (subscribing to its remote-event hub) exactly when the peer reaches us via
-    // reverse-ws — i.e. remoteTransportMode became "reverse-ws". Otherwise the
-    // peer reaches us directly and we keep no socket. (cloud instances never open
-    // outbound sockets; openConnection no-ops there.)
-    if (remoteTransportMode !== undefined) {
-      const effectiveInstanceId = patch.instanceId ?? localInstanceId;
-      if (remoteTransportMode === "reverse-ws") {
-        const { restartConnection } =
-          await import("next-vibe/realtime/connector");
-        await restartConnection(effectiveInstanceId);
-      } else {
-        const { closeConnection } =
-          await import("next-vibe/realtime/connector");
-        closeConnection(effectiveInstanceId);
-      }
+    // Connector lifecycle on THIS side. restartConnection is transport-aware: it
+    // re-runs the ONE HTTP pull-on-connect for EVERY transport (so a mirrored
+    // `reconnectNow` re-syncs a direct-http pair too — the exchange rides HTTP,
+    // never a socket) and opens a persistent outbound connector ONLY when the
+    // peer reaches us via reverse-ws. A direct-http pair therefore re-syncs
+    // without ever opening a pointless "closed before established" socket.
+    // (cloud instances never open outbound sockets; openConnection no-ops there.)
+    // Open / close / restart the connector AS NEEDED — when EITHER transport leg
+    // changed (our remoteTransportMode or our transportMode) or the caller asked
+    // to reconnect. restartConnection opens a socket iff a leg is reverse-ws,
+    // else stays pull-only (dropping any stale socket) — so this one call opens,
+    // closes, or restarts to match the new mode pair.
+    const effectiveInstanceId = patch.instanceId ?? localInstanceId;
+    if (
+      reconnectNow === true ||
+      remoteTransportMode !== undefined ||
+      transportMode !== undefined
+    ) {
+      const { restartConnection } =
+        await import("next-vibe/realtime/connector");
+      await restartConnection(effectiveInstanceId);
     }
 
     return success({ updated: true });

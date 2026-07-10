@@ -7,6 +7,7 @@ import "server-only";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
 
 import type { MessagesWsEmit } from "../../../../chat/threads/[threadId]/messages/emitter";
@@ -62,6 +63,15 @@ export interface DbWriterState {
   totalCreditsDeducted: number;
   /** Tracks the thread ID of the last assistant message - used for embedding sync */
   lastThreadId: string | null;
+  /**
+   * In-flight embed of the just-written assistant message. Fired at content-done
+   * (write time), awaited by the next step's cortex refresh so the mid-step
+   * search sees this turn's assistant vector without re-embedding a query.
+   * Best-effort: rejections are swallowed at the await site.
+   */
+  assistantEmbedPromise: Promise<void> | null;
+  /** Stream context (its threadId) — binds the write-time embed to the fixture chain. */
+  readonly streamContext: ToolExecutionContext;
 }
 
 /** Throttle window in ms - coalesces content updates to same message */
@@ -100,13 +110,15 @@ export function buildThinThreadContent(thread: {
   title: string | null;
   rootFolderId: string;
   tags: string[] | null;
-  preview: string | null;
+  description: string | null;
 }): string {
   return [
     `# ${thread.title ?? "Untitled"}`,
     `Folder: ${thread.rootFolderId}`,
     thread.tags?.length ? `Tags: ${thread.tags.join(", ")}` : "",
-    thread.preview ? `Preview: ${thread.preview.slice(0, 300)}` : "",
+    thread.description
+      ? `Description: ${thread.description.slice(0, 300)}`
+      : "",
   ]
     .filter(Boolean)
     .join("\n");

@@ -68,5 +68,7 @@ export const translations: typeof enTranslations = {
       title: "Stream abgebrochen",
       description: "Der KI-Stream wurde erfolgreich abgebrochen",
     },
+    streamInterrupted:
+      "Generierung wurde gestoppt. Teilantwort wurde gespeichert.",
   },
 };

@@ -119,7 +119,7 @@ const { POST } = createEndpoint({
       results: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "fields.results.title",
-        schema: z.array(z.record(z.string(), z.any())).optional(),
+        schema: z.array(z.record(z.string(), WidgetDataSchema)).optional(),
       }),
 
       rowCount: responseField(scopedTranslation, {

@@ -125,7 +125,7 @@ export const { GET } = createEndpoint({
             message: z.string(),
             errorType: z.string().nullable(),
             stackTrace: z.string().nullable(),
-            metadata: z.array(z.any()).nullable(),
+            metadata: z.array(WidgetDataSchema).nullable(),
             fingerprint: z.string(),
             occurrences: z.number(),
             resolved: z.boolean(),

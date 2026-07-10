@@ -135,16 +135,23 @@ export class AwaitTaskRepository {
             user,
           );
 
-          PendingCalls.setRevival(taskId, {
+          // Park a disabled resume-stream task with full revival context.
+          // handleToolResult enables+fires it when the result event arrives.
+          // restart/cross-process safety: reviveFromToolMessage reads the parked
+          // task via pendingCallId stored below.
+          await TaskCompletion.parkResumeStreamTask({
+            taskId,
+            callbackMode: CallbackMode.WAIT,
             threadId: pendThreadId,
             toolMessageId: pendToolMessageId,
-            callbackMode: CallbackMode.WAIT,
             leafMessageId: streamContext.leafMessageId ?? null,
             modelId: pendModelId,
             skillId: streamContext.skillId ?? null,
             favoriteId: streamContext.favoriteId ?? null,
             subAgentDepth: streamContext.subAgentDepth ?? 0,
-            userId: user.id ?? "",
+            ownerUserId: !user.isPublic ? user.id : null,
+            selfInstanceId: null,
+            logger,
           });
 
           // Persist callId on the await-task tool message so ANY process that
@@ -249,10 +256,13 @@ export class AwaitTaskRepository {
       }
 
       const originalToolName = task.routeId ?? undefined;
-      const rawTaskInput = task.taskInput as Record<string, WidgetData> | null;
-      const cleanTaskInput = rawTaskInput ?? {};
+      const cleanTaskInput = task.taskInput ?? {};
       const originalArgs =
         Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
+
+      // Compute the tool message ID upfront — available from streamContext regardless of task state.
+      const effectiveToolMessageId =
+        streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
       // Already terminal — return result inline.
       if (AwaitTaskRepository.isTerminal(task.lastExecutionStatus)) {
@@ -265,13 +275,13 @@ export class AwaitTaskRepository {
         // (detach never backfills the tool message). Read it first; only fall
         // back to the tool-message backfill (wakeUp/wait) if history is empty.
         let storedResult = await AwaitTaskRepository.readStoredResult(taskId);
-        if (storedResult === undefined && task.wakeUpToolMessageId) {
+        if (storedResult === undefined && effectiveToolMessageId) {
           // Poll briefly: the DB row flips terminal before the tool message backfill lands.
           for (let attempt = 0; attempt < 15; attempt++) {
             const [toolMessage] = await db
               .select({ metadata: chatMessages.metadata })
               .from(chatMessages)
-              .where(eq(chatMessages.id, task.wakeUpToolMessageId))
+              .where(eq(chatMessages.id, effectiveToolMessageId))
               .limit(1);
             const toolCall = toolMessage?.metadata?.toolCall;
             const terminal =
@@ -292,7 +302,7 @@ export class AwaitTaskRepository {
         // Suppress any pending wakeUp revival — we're delivering inline.
         AwaitTaskRepository.suppressWakeUp(
           streamContext,
-          task.wakeUpToolMessageId,
+          effectiveToolMessageId ?? null,
         );
 
         await AwaitTaskRepository.cleanupTask(taskId, logger);
@@ -309,8 +319,6 @@ export class AwaitTaskRepository {
       // Task still running — register this stream as a waiter via WAIT mode.
       // TaskCompletion.handle will backfill the tool message and schedule resume-stream.
       const effectiveThreadId = streamContext.threadId;
-      const effectiveToolMessageId =
-        streamContext.currentToolMessageId ?? streamContext.aiMessageId;
 
       // Cross-instance / headless caller with NOTHING to park: returning
       // "pending" is useless (there is no local stream to pause and revive —
@@ -363,21 +371,23 @@ export class AwaitTaskRepository {
         user,
       );
 
-      await db
-        .update(cronTasks)
-        .set({
-          wakeUpCallbackMode: CallbackMode.WAIT,
-          wakeUpThreadId: effectiveThreadId,
-          wakeUpToolMessageId: effectiveToolMessageId,
-          wakeUpModelId: modelId,
-          wakeUpSkillId: streamContext.skillId ?? null,
-          wakeUpFavoriteId: streamContext.favoriteId ?? null,
-          wakeUpLeafMessageId: streamContext.leafMessageId ?? null,
-          wakeUpSubAgentDepth: streamContext.subAgentDepth ?? 0,
-          userId: !user.isPublic ? user.id : (task.userId ?? null),
-          updatedAt: new Date(),
-        })
-        .where(eq(cronTasks.id, taskId));
+      // Pre-create a disabled resume-stream task with the full revival context
+      // in its taskInput. When the original task completes, complete/local.ts
+      // enables this task by flipping enabled=true — no wakeUp columns needed.
+      await TaskCompletion.parkResumeStreamTask({
+        taskId,
+        callbackMode: CallbackMode.WAIT,
+        threadId: effectiveThreadId,
+        toolMessageId: effectiveToolMessageId ?? null,
+        leafMessageId: streamContext.leafMessageId ?? null,
+        modelId,
+        skillId: streamContext.skillId ?? null,
+        favoriteId: streamContext.favoriteId ?? null,
+        subAgentDepth: streamContext.subAgentDepth ?? 0,
+        ownerUserId: !user.isPublic ? user.id : (task.userId ?? null),
+        selfInstanceId: null,
+        logger,
+      });
 
       // Bounded inline wait. The dispatched task usually completes within a
       // second or two (fixture replay; or a fast tool). Delivering the result
@@ -431,7 +441,7 @@ export class AwaitTaskRepository {
       // Suppress any existing wakeUp revival that may have been queued.
       AwaitTaskRepository.suppressWakeUp(
         streamContext,
-        task.wakeUpToolMessageId,
+        effectiveToolMessageId ?? null,
       );
 
       streamContext.waitingForRemoteResult = true;
@@ -475,7 +485,7 @@ export class AwaitTaskRepository {
       .orderBy(desc(cronTaskExecutions.startedAt))
       .limit(1);
     return execRow?.result !== null && execRow?.result !== undefined
-      ? (execRow.result as WidgetData)
+      ? execRow.result
       : undefined;
   }
 

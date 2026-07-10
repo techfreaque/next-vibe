@@ -49,9 +49,14 @@ function makeDir(
   };
 }
 
-function makeData(partial?: Partial<CortexData>): CortexData {
+const DEFAULT_LOCALE_ROOTS = { memories: "/memories", documents: "/documents" };
+
+function makeData(
+  partial: Partial<Omit<CortexRenderData, "localeRoots">> & {
+    localeRoots?: CortexRenderData["localeRoots"];
+  } = {},
+): CortexRenderData {
   return {
-    unavailableNote: "",
     tree: [],
     threadCounts: {},
     totalThreads: 0,
@@ -59,14 +64,19 @@ function makeData(partial?: Partial<CortexData>): CortexData {
     searchCount: 0,
     genCount: 0,
     taskCount: 0,
+    languageName: undefined,
+    localeRoots: DEFAULT_LOCALE_ROOTS,
     ...partial,
   };
 }
 
-function buildFragment(partial?: Partial<CortexData>): string {
-  const result = cortexFragment.build(makeData(partial));
-  // build never returns null for CortexData, but the type allows it.
-  return result ?? "";
+function buildFragment(partial: Parameters<typeof makeData>[0] = {}): string {
+  return renderCortexFragment(makeData(partial));
+}
+
+function buildUnavailable(unavailableNote: string): string {
+  const data: CortexUnavailableData = { unavailableNote };
+  return renderCortexFragment(data);
 }
 
 // ── cleanExcerpt ──────────────────────────────────────────────────────────────
@@ -409,9 +419,7 @@ describe("cortexFragment metadata", () => {
 
 describe("cortexFragment.build - unavailable", () => {
   it("returns only the unavailable note when set", () => {
-    const out = buildFragment({
-      unavailableNote: "Cortex is disabled in incognito mode.",
-    });
+    const out = buildUnavailable("Cortex is disabled in incognito mode.");
     expect(out).toBe("## Cortex\nCortex is disabled in incognito mode.");
   });
 });
@@ -481,7 +489,7 @@ describe("cortexFragment.build - structure and content", () => {
       ],
     });
     const data = makeData({ tree: [dir] });
-    const out = cortexFragment.build(data) ?? "";
+    const out = renderCortexFragment(data);
     expect(out).toContain(renderCortexTree(data));
     expect(out).toContain("memories/ (1)");
   });

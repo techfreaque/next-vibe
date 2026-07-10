@@ -149,7 +149,6 @@ function baseMockMsg(overrides: {
     downvotes: 0,
     createdAt: now,
     updatedAt: now,
-    searchVector: null,
     ...overrides,
   };
 }

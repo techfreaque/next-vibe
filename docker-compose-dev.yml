@@ -3,14 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
-    container_name: dev-postgres
+    container_name: ${COMPOSE_PROJECT_NAME:-next-vibe}-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: atlas
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - atlas_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -21,4 +21,4 @@ services:
       start_period: 10s
 
 volumes:
-  postgres_data:
+  atlas_data:

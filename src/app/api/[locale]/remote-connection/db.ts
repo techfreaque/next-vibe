@@ -97,24 +97,31 @@ export const SYNC_DOMAINS = [
 
 export type SyncDomain = (typeof SYNC_DOMAINS)[number];
 
-export const SyncScopeSchema = z
-  .object({
-    memories: z.boolean().default(false),
-    documents: z.boolean().default(false),
-    skills: z.boolean().default(false),
-    favorites: z.boolean().default(false),
-    threads: z.boolean().default(false),
-  })
-  .catchall(z.boolean());
+// Per-field defaults so the connect UI can present a sensible starting scope
+// (memories/documents/skills/favorites on, threads off). The user always sends
+// the full object; the defaults just seed the form.
+export const SyncScopeSchema = z.object({
+  memories: z.boolean().default(true),
+  documents: z.boolean().default(true),
+  skills: z.boolean().default(true),
+  favorites: z.boolean().default(true),
+  threads: z.boolean().default(false),
+});
 export type SyncScope = z.infer<typeof SyncScopeSchema>;
 
-export const DEFAULT_SYNC_SCOPE: SyncScope = {
-  memories: false,
-  documents: false,
-  skills: false,
-  favorites: false,
-  threads: false,
-};
+/**
+ * The single typed gate for "is this sync domain enabled in this scope?".
+ * `domain` is a `SyncDomain`, so `scope[domain]` is a typed boolean field — no
+ * magic string keys, no `Record<string, boolean>` cast. Every serve/apply/pull
+ * filter routes through here so the scope check is defined once and stays in
+ * lockstep with `SYNC_DOMAINS`.
+ */
+export function isSyncDomainEnabled(
+  scope: SyncScope,
+  domain: SyncDomain,
+): boolean {
+  return scope[domain];
+}
 
 /**
  * Per-domain sync cursors. Each domain stores its own cursor type.
@@ -238,12 +245,16 @@ export const remoteConnections = pgTable(
     /**
      * How THIS side reaches the remote (our send leg).
      * Auto-detected on connect (ping → direct-http if reachable, else reverse-ws).
+     * Default is "direct-http": the socket-free transport. A socket is opened
+     * only once reverse-ws is EXPLICITLY established — never on the pre-detection
+     * default — so a fresh connect never opens a premature "closed before
+     * established" socket while detection is still in flight.
      */
     transportMode: text("transport_mode", {
       enum: ["reverse-ws", "direct-http"],
     })
       .notNull()
-      .default("reverse-ws"),
+      .default("direct-http"),
 
     /**
      * How the REMOTE reaches THIS side (the peer's send leg — mirror of the

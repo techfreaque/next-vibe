@@ -401,7 +401,7 @@ if (_remoteUrl) {
     // ── RN4: stream from remote/hermes folder routes to hermes after rename ───
 
     it("RN4: stream from remote/hermes subfolder routes AI to hermes — prod DB receives messages", async () => {
-      const fixtureCtx: FixtureContext = { name: "rename-rn4-" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       // Run a stream from the localFolderId (remote/hermes subfolder).
       // REMOTE-folder routing is deterministic — folder ancestry resolves to hermes.

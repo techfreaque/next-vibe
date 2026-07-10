@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Results summary:**\n\n| Call | Input | Tools Returned | name + description | parameters |\n|------|-------|:---:|:---:|:---:|\n| 1 | `category: 'ai'` | 12 | ✓ | — |\n| 2 | `query: 'search'` | 2 | ✓ | — |\n| 3 | `toolName: 'generate_image'` | 1 | ✓ | ✓ full schema |\n\nAll three calls to `hermes` returned valid, non-empty results with proper structure. No errors, no raw internals, no missing fields.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -103,6 +103,9 @@ function extractThinkingSections(content: string): {
  * Returns the content with <Chat> tags replaced by their inner content
  */
 function processChatTags(content: string): string {
+  if (typeof content !== "string") {
+    return "";
+  }
   let processedContent = content;
 
   // Replace complete <Chat>...</Chat> tags with just their content

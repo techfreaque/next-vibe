@@ -325,7 +325,7 @@ const { GET } = createEndpoint({
               enumOptions: ThreadStatusOptions,
               schema: z.enum(ThreadStatusDB).nullable(),
             }),
-            preview: responseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.items.item.preview.content" as const,
               schema: z.string().nullable(),
@@ -490,7 +490,17 @@ const { GET } = createEndpoint({
       },
     },
     "streaming-state-changed": {
-      responseFields: { items: ["id", "streamingState"] as const },
+      // type/rootFolderId/folderId discriminators travel too so a not-yet-cached
+      // thread doesn't merge as a partial stub (renderers drop items without them).
+      responseFields: {
+        items: [
+          "id",
+          "streamingState",
+          "type",
+          "rootFolderId",
+          "folderId",
+        ] as const,
+      },
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const rootFolderId = ctx.urlPathParams.rootFolderId;
@@ -510,7 +520,14 @@ const { GET } = createEndpoint({
     },
     "stream-finished": {
       responseFields: {
-        items: ["id", "streamingState", "preview", "updatedAt"] as const,
+        items: [
+          "id",
+          "streamingState",
+          "updatedAt",
+          "type",
+          "rootFolderId",
+          "folderId",
+        ] as const,
       },
       operation: "merge" as const,
       onEvent: async (ctx) => {
@@ -524,7 +541,7 @@ const { GET } = createEndpoint({
           if (item?.id) {
             await updateIncognitoThread(item.id, {
               streamingState: item.streamingState,
-              preview: item.preview,
+              description: item.description,
               updatedAt: item.updatedAt,
             });
           }
@@ -539,7 +556,7 @@ const { GET } = createEndpoint({
           "title",
           "folderId",
           "status",
-          "preview",
+          "description",
           "rootFolderId",
           "updatedAt",
         ] as const,
@@ -557,7 +574,7 @@ const { GET } = createEndpoint({
             await updateIncognitoThread(item.id, {
               title: item.title ?? undefined,
               folderId: item.folderId,
-              preview: item.preview,
+              description: item.description,
             });
           }
         }
@@ -668,6 +685,23 @@ const { GET } = createEndpoint({
           // Date-grouped lists need timestamps or the new folder lands in "Older".
           "createdAt",
           "updatedAt",
+          // Behavioral props the sidebar renderer needs — WITHOUT these the
+          // merged folder is a stub: `expanded` missing → shows collapsed and
+          // click toggles wrong; the `can*` / `roles*` gate the context menu.
+          // A created folder must arrive with these or it misbehaves until a
+          // refetch. Matches the GET's folder-item shape (repository.ts).
+          "expanded",
+          "canManage",
+          "canCreateThread",
+          "canModerate",
+          "canDelete",
+          "canManagePermissions",
+          "rolesView",
+          "rolesManage",
+          "rolesCreateThread",
+          "rolesPost",
+          "rolesModerate",
+          "rolesAdmin",
         ] as const,
       },
       operation: "merge" as const,

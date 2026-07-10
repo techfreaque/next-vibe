@@ -94,7 +94,7 @@ Links are created when two leads are identified as the same person.
 
 **What happens:**
 
-- Row inserted in `lead_lead_links` (leadId, linkedLeadId, reason, createdAt)
+- Row inserted in `lead_lead_links` (leadId1, leadId2, linkReason, linkedAt, createdAt) — `linkReason` is one of `track_page | referral | manual | test | ip_match`
 - Both leads join the same lead group → free-credit pool is now shared and checked atomically across all group wallets
 - Campaign stages remain independent per lead
 - If any lead in the group is already linked to a user → newly linked lead immediately binds to that user too
@@ -111,8 +111,8 @@ Links are created when two leads are identified as the same person.
 
 **What happens:**
 
-1. Row inserted in `user_lead_links` (userId, leadId, isPrimary, reason, createdAt)
-2. All other leads in the same lead group also linked to the user (reason: `group`)
+1. Row inserted in `user_lead_links` (userId, leadId, linkReason, linkedAt, createdAt) — `linkReason` is one of `signup | login | merge | manual`
+2. All other leads in the same lead group also linked to the user
 3. Converting lead's free credits transferred to user wallet via TRANSFER transaction
 4. All linked lead wallets frozen (freeCreditsRemaining → 0, no further deductions)
 5. COLD and NEWSLETTER_NURTURE campaigns halted on all linked leads
@@ -128,7 +128,7 @@ Links are created when two leads are identified as the same person.
 
 ## Email campaigns
 
-Campaign state lives in `lead_campaigns` (one row per lead+campaignType): campaignType, stage, journeyVariant, startedAt, lastSentAt, haltedAt, haltReason, status (active/halted/completed).
+Campaign history lives in `email_campaigns` — **one row per scheduled/sent email**, not one state row per lead. Each row: `leadId`, `campaignType`, `stage`, `journeyVariant`, `subject`, `templateName`, `scheduledAt`, `sentAt`, `status` (`EmailStatus`: PENDING → SENT → …), provider fields (`emailProvider`, `externalId`, `smtpAccountId`), engagement timestamps (`openedAt`, `clickedAt`, `unsubscribedAt`, `bouncedAt`), and `error`/`retryCount`. A lead's current campaign position is derived from its latest row's `stage`/`status` — there is no separate halt-state row.
 
 ### Campaign types
 
@@ -296,7 +296,7 @@ Filters: status, source, campaign type, has user, has subscription, lead score r
 
 ## Build priority
 
-1. `lead_campaigns` table - decouple campaign state from lead row; one row per lead+campaignType
+1. `email_campaigns` table - per-send campaign history decoupled from the lead row (campaign position derived from the latest row's stage/status)
 2. Campaign halting - synchronous on status update; cron skips halted rows
 3. Lead-to-lead linking - fingerprint match, email match, login-on-new-device, admin merge
 4. Lead-to-user linking - group cascade, wallet freeze + transfer, campaign halt + re-enqueue

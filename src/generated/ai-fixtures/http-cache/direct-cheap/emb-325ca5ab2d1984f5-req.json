@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T9 report] A leads list was retrieved for you earlier in this conversation. Look at the leads-list tool result in your context and report how many leads you can see. End your reply with STEP_OK if you can see the leads array in your context, or FAILED: <reason> if no leads result was visible.",
+    "encoding_format": "float"
+  }
+}

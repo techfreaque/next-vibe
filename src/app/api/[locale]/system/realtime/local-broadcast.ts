@@ -29,6 +29,13 @@ export interface LocalBroadcastTarget {
    * count, so presence-gating only applies when this target is registered.
    */
   getChannelSize: (channel: string) => number;
+  /**
+   * Forcibly close the inbound WS socket for a reverse-ws connector.
+   * Called on disconnect so both outbound connector and inbound socket tear
+   * down immediately on the same side rather than waiting for the remote to
+   * close its end first.
+   */
+  closeConnectorSocket: (instanceId: string) => void;
 }
 
 let registered: LocalBroadcastTarget | null = null;
@@ -49,4 +56,13 @@ export function clearLocalBroadcast(): void {
 /** The in-process target, or null when the proxy runs in a separate process. */
 export function getLocalBroadcast(): LocalBroadcastTarget | null {
   return registered;
+}
+
+/**
+ * Close the inbound connector socket for `instanceId` if the WS server is
+ * running in-process. No-op when the proxy is in a separate process (the
+ * outbound connector's stop() will close the socket from the remote side).
+ */
+export function closeLocalConnectorSocket(instanceId: string): void {
+  registered?.closeConnectorSocket(instanceId);
 }

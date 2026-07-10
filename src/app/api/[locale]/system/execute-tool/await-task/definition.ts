@@ -33,6 +33,15 @@ const { POST } = createEndpoint({
   titleShort: "post.titleShort",
   description: "post.description",
   icon: "clock",
+  dynamicTitle: ({ response }) => {
+    if (response?.originalToolName) {
+      return {
+        message: "post.dynamicTitle" as const,
+        messageParams: { toolName: response.originalToolName },
+      };
+    }
+    return undefined;
+  },
   statusBadge: {
     loading: {
       label: "post.status.waiting",

@@ -8,20 +8,53 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { resolveFavorite } from "@/app/api/[locale]/agent/skills/resolver";
 
 /**
- * Resolve (or create) a quality-tester__visual favorite — GEMINI_3_5_FLASH,
- * image-capable. Used by cases that need the CHAT model to SEE images
- * (T11f I2I + verify); the budget variant (deepseek-v4-flash) is text-only.
+ * A resolved test favorite: its DB id plus the CONCRETE models the stream would
+ * pick for it — resolved through the SAME resolvers the stream uses
+ * (`resolveFavorite` for chat, `getBestImageGenModel` for image gen). Never a
+ * hardcoded model literal: whatever the variant declares, or whatever the user
+ * overrode the favorite to at runtime, is what gets asserted.
  */
-export async function ensureVisualFavorite(
+export interface ResolvedVariantFavorite {
+  id: string;
+  /** The concrete chat model the favorite resolves to (manual / filters / variant / user override). */
+  chatModelId: ChatModelId;
+  /** The concrete image-gen model the favorite resolves to, when it configures one. */
+  imageGenModelId: ImageGenModelId | null;
+}
+
+const DEFAULT_LOCALE: CountryLanguage = "en-US" as CountryLanguage;
+
+/**
+ * Resolve (or create) the ONE favorite for a skill VARIANT, then resolve the
+ * concrete models it points at.
+ *
+ * Runtime override survives: if the user already has a favorite for this
+ * `variantSkillId` (they may have edited its model in the UI), that row is
+ * REUSED — never deleted/recreated — so the override is honoured. Only when no
+ * favorite exists is a fresh one created from the variant's declared config.
+ *
+ * The returned `chatModelId` / `imageGenModelId` come from the real resolvers,
+ * so assertions compare a message's `model` against what the favorite ACTUALLY
+ * resolves to (MANUAL id, AUTO/filters pick, or user override) — not a literal.
+ */
+export async function ensureVariantFavorite(
   user: JwtPrivatePayloadType,
-): Promise<string> {
+  variantSkillId: string,
+): Promise<ResolvedVariantFavorite> {
   const [favsDef, favoriteCreateDef] = await Promise.all([
     import("@/app/api/[locale]/agent/skills/favorites/definition").then(
       (m) => m.default.GET,
@@ -30,8 +63,10 @@ export async function ensureVisualFavorite(
       (m) => m.default.POST,
     ),
   ]);
+
+  // Reuse an existing favorite for this variant (runtime override wins).
   const favsResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -41,22 +76,73 @@ export async function ensureVisualFavorite(
       ? (favsResult.data["favorites"] as Record<string, WidgetData>[])
       : [];
   const existing = favsList.find(
-    (f) => String(f["skillId"] ?? "") === "quality-tester__visual",
+    (f) => String(f["skillId"] ?? "") === variantSkillId,
   );
-  if (existing?.["id"]) {
-    return String(existing["id"]);
+  let favoriteId = existing?.["id"] ? String(existing["id"]) : undefined;
+
+  if (!favoriteId) {
+    const created = await sendTestRequest({
+      streamContext: rootlessStreamContext(),
+      endpoint: favoriteCreateDef,
+      data: { skillId: variantSkillId },
+      user,
+    });
+    if (!created.success || !created.data?.["id"]) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+      throw new Error(
+        `ensureVariantFavorite(${variantSkillId}): create failed — ${created.success ? "id missing" : String((created as { message?: string }).message ?? "")}`,
+      );
+    }
+    favoriteId = String(created.data["id"]);
   }
-  const created = await sendTestRequest({
-    fixtureContext: undefined,
-    endpoint: favoriteCreateDef,
-    data: { skillId: "quality-tester__visual" },
+
+  return resolveVariantFavoriteModels(user, favoriteId);
+}
+
+/**
+ * Resolve the concrete chat + image-gen models a favorite points at, exactly as
+ * the stream would — the single source of truth for model assertions.
+ */
+export async function resolveVariantFavoriteModels(
+  user: JwtPrivatePayloadType,
+  favoriteId: string,
+): Promise<ResolvedVariantFavorite> {
+  const logger = createEndpointLogger(false, DEFAULT_LOCALE);
+  const resolved = await resolveFavorite(
+    favoriteId,
+    user.id,
     user,
-  });
-  if (!created.success || !created.data?.["id"]) {
+    logger,
+    DEFAULT_LOCALE,
+  );
+  if (!resolved) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error("ensureVisualFavorite: create failed");
+    throw new Error(
+      `resolveVariantFavoriteModels: favorite ${favoriteId} did not resolve to a model`,
+    );
   }
-  return String(created.data["id"]);
+  // Image-gen model: resolved through the same filter the stream uses.
+  const imageGenSelection = resolved.favoriteConfig.imageGenModelSelection;
+  let imageGenModelId: ImageGenModelId | null = null;
+  if (imageGenSelection) {
+    const availability = await getInstanceAvailability();
+    imageGenModelId =
+      getBestImageGenModel(imageGenSelection, user, availability)?.id ?? null;
+  }
+  return { id: favoriteId, chatModelId: resolved.model, imageGenModelId };
+}
+
+/**
+ * Resolve (or create) the favorite for cases that need the CHAT model to SEE
+ * images (T11f I2I + verify). Every chat model can see images — only native
+ * image OUTPUT is special (that's the native-image variant) — so seeing images
+ * just uses the default budget favorite. Reuse-or-create, never patch.
+ */
+export async function ensureVisualFavorite(
+  user: JwtPrivatePayloadType,
+): Promise<string> {
+  const { id } = await ensureVariantFavorite(user, "quality-tester__budget");
+  return id;
 }
 
 /**
@@ -78,7 +164,7 @@ export async function createQualityTesterFavorite(
     ),
   ]);
   const favsResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -90,7 +176,7 @@ export async function createQualityTesterFavorite(
   for (const fav of favsList) {
     if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
       await sendTestRequest({
-        fixtureContext: undefined,
+        streamContext: rootlessStreamContext(),
         endpoint: favoriteDeleteDef,
         urlPathParams: { id: String(fav["id"]) },
         user,
@@ -98,7 +184,7 @@ export async function createQualityTesterFavorite(
     }
   }
   const createResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: favoriteCreateDef,
     data: { skillId: "quality-tester__budget" },
     user,

@@ -190,7 +190,6 @@ export async function createAndSendUserMessage(
         downvotes: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-        searchVector: null,
       };
 
       upsertMessage(
@@ -231,7 +230,6 @@ export async function createAndSendUserMessage(
         downvotes: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-        searchVector: null,
       };
       upsertMessage(
         threadId,

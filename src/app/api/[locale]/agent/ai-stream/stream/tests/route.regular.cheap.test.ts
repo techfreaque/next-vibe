@@ -13,7 +13,6 @@ import { describeStreamSuite } from "./route-base.test";
 
 describeStreamSuite({
   label: "AI Stream Integration - Regular (cheap)",
-  cachePrefix: "cheap-",
+  cachePrefix: "cheap",
   cheapMode: true,
-  stopAfterFirstCase: true, // TEMPORARY DEBUG: bail after T1
 });

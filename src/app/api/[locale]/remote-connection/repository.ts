@@ -358,6 +358,7 @@ export class RemoteConnectionRepository {
       remoteUserId: string | null;
       localUrl: string | null;
       transportMode: "reverse-ws" | "direct-http";
+      remoteTransportMode: "reverse-ws" | "direct-http" | null;
       syncScope: SyncScope | null;
       isReverseEntry: boolean;
     }>
@@ -387,6 +388,7 @@ export class RemoteConnectionRepository {
         remoteUserId: r.remoteUserId ?? null,
         localUrl: r.localUrl ?? null,
         transportMode: r.transportMode,
+        remoteTransportMode: r.remoteTransportMode ?? null,
         syncScope: r.syncScope ?? null,
         isReverseEntry: r.isReverseEntry,
       }));
@@ -401,6 +403,7 @@ export class RemoteConnectionRepository {
       token: string;
       leadId: string;
       instanceId: string;
+      syncScope: SyncScope | null;
     }>
   > {
     const rows = await db
@@ -420,6 +423,7 @@ export class RemoteConnectionRepository {
         token: RemoteConnectionRepository.decryptToken(r.token),
         leadId: r.leadId,
         instanceId: r.instanceId,
+        syncScope: r.syncScope ?? null,
       }));
   }
 
@@ -484,6 +488,14 @@ export class RemoteConnectionRepository {
   ): Promise<{
     capabilities: RemoteToolCapability[] | null;
     transportMode: "reverse-ws" | "direct-http";
+    /**
+     * How the PEER reaches THIS side (mirror of the peer's own transportMode).
+     * Load-bearing for the dispatch's result back-leg: when the peer reaches us
+     * via reverse-ws it publishes on its hub (our connector receives); when
+     * direct-http it POSTs to our bridge. Carried alongside transportMode so the
+     * dispatch never has to re-query it.
+     */
+    remoteTransportMode: "reverse-ws" | "direct-http" | null;
     remoteUrl: string;
     /** Local instance URL - set on cloud-side records to push tasks/memories directly. */
     localUrl: string | null;
@@ -500,6 +512,7 @@ export class RemoteConnectionRepository {
       .select({
         capabilities: remoteConnections.capabilities,
         transportMode: remoteConnections.transportMode,
+        remoteTransportMode: remoteConnections.remoteTransportMode,
         remoteUrl: remoteConnections.remoteUrl,
         localUrl: remoteConnections.localUrl,
         token: remoteConnections.token,
@@ -521,6 +534,7 @@ export class RemoteConnectionRepository {
     return {
       capabilities: row.capabilities,
       transportMode: row.transportMode,
+      remoteTransportMode: row.remoteTransportMode ?? null,
       remoteUrl: row.remoteUrl,
       localUrl: row.localUrl,
       leadId: row.leadId,

@@ -228,7 +228,6 @@ async function fireInteractiveStream(
   threadId: string,
   userMessageId: string,
   subFolderId: string,
-  fixtureContext: FixtureContext,
 ): Promise<void> {
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -247,7 +246,7 @@ async function fireInteractiveStream(
     favoriteConfig: null,
     toolConfirmations: null,
     messageHistory: [],
-    voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+    voiceMode: { enabled: false },
     audioInput: { file: null },
     resumeToken: null,
     timezone: "UTC",
@@ -261,7 +260,6 @@ async function fireInteractiveStream(
     logger,
     user,
     request: undefined,
-    headless: false,
     t,
     subAgentDepth: 0,
   });
@@ -284,7 +282,6 @@ async function enqueueSecondMessage(
   prompt: string,
   queuedMessageId: string,
   subFolderId: string,
-  fixtureContext: FixtureContext,
 ): Promise<void> {
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -303,7 +300,7 @@ async function enqueueSecondMessage(
     favoriteConfig: null,
     toolConfirmations: null,
     messageHistory: [],
-    voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+    voiceMode: { enabled: false },
     audioInput: { file: null },
     resumeToken: null,
     timezone: "UTC",
@@ -317,7 +314,6 @@ async function enqueueSecondMessage(
     logger,
     user,
     request: undefined,
-    headless: false,
     t,
     subAgentDepth: 0,
   });
@@ -388,9 +384,8 @@ describe("Mid-Stream Queue - chain integrity", () => {
   fit(
     "MQ1: plain echo — queued message processed after stream ends, strict linear chain",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "mq1-plain-echo" };
-
       const thread1Id = crypto.randomUUID();
+      await seedFixtureThread(thread1Id, "mq1-plain-echo", false);
       const user1MsgId = crypto.randomUUID();
       const queued2MsgId = crypto.randomUUID();
 
@@ -542,9 +537,8 @@ describe("Mid-Stream Queue - chain integrity", () => {
   fit(
     "MQ2: tool call — queued message injected mid-stream via prepareStep, strict linear chain",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "mq2-tool-call" };
-
       const thread2Id = crypto.randomUUID();
+      await seedFixtureThread(thread2Id, "mq2-tool-call", false);
       const user1MsgId = crypto.randomUUID();
       const queued2MsgId = crypto.randomUUID();
 

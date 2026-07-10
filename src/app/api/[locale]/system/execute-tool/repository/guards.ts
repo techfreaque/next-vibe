@@ -26,47 +26,6 @@ import type { ResolvedToolPermissions, ToolConfigItem } from "./types";
 
 export class ExecuteToolGuards {
   /**
-   * Tools that are always accessible regardless of the availableTools whitelist.
-   *
-   * Two groups:
-   *  1. Infrastructure tools (tool-help, await-task) the AI needs to function —
-   *     discovery + task management. Blocking them breaks basic agent operation.
-   *  2. Media-generation tools (generate_image/video/music). Their availability is
-   *     governed by the favorite/skill's mediaGen MODEL selection, not the regular
-   *     availableTools whitelist: stream-setup.ts:filterUnavailableMediaTools only
-   *     offers them to the model when a gen model is configured (and resolves the
-   *     model at execution via media-gen-resolution.ts). A media tool that reaches
-   *     execute-tool was therefore already legitimately offered, so re-blocking it
-   *     via the availableTools whitelist is wrong — and inconsistent with the
-   *     detach/wakeUp paths, which never ran this check. (Direct-mode T5d: the
-   *     thea-cheap favorite configures imageGen but omits generate_image from
-   *     availableTools, so the WAIT call was blocked while the detach call ran.)
-   *
-   * All exempt tools can still be hard-blocked via deniedTools when required.
-   */
-  private static readonly WHITELIST_EXEMPT_TOOLS = new Set<string>([
-    TOOL_HELP_ALIAS,
-    AWAIT_TASK_ALIAS,
-    IMAGE_GEN_ALIAS,
-    MUSIC_GEN_ALIAS,
-    VIDEO_GEN_ALIAS,
-  ]);
-
-  /**
-   * Whether a tool bypasses availableTools whitelists (infrastructure + media
-   * tools — see WHITELIST_EXEMPT_TOOLS above). Used by the relay catalog
-   * builder so it applies the SAME exemption the execution gate uses: a
-   * whitelist must not strip tool-help/await-task/media from the advertised
-   * catalog when the gate would allow them anyway.
-   */
-  static isWhitelistExemptTool(toolName: string): boolean {
-    return (
-      ExecuteToolGuards.WHITELIST_EXEMPT_TOOLS.has(toolName) ||
-      ExecuteToolGuards.WHITELIST_EXEMPT_TOOLS.has(getPreferredName(toolName))
-    );
-  }
-
-  /**
    * Revival circuit-breaker: headless revival streams (resume-stream after a
    * wakeUp task completed) must not create new remote WAIT dispatches — each
    * revival would call execute-tool, create a task, wait, resume-stream again,
@@ -161,133 +120,32 @@ export class ExecuteToolGuards {
   static async resolveToolPermissions(params: {
     favoriteId: string | undefined;
     skillId: string | undefined;
-    userId: string | undefined;
+    user: JwtPayloadType;
     rootFolderId: DefaultFolderId;
+    logger: EndpointLogger;
   }): Promise<ResolvedToolPermissions> {
-    const { favoriteId, skillId, userId, rootFolderId } = params;
-    const deniedToolIds = new Set<string>();
-
-    // Resolve favorite
-    let fav: {
-      skillId: string | null;
-      availableTools: Array<{
-        toolId: string;
-        requiresConfirmation?: boolean | null;
-      }> | null;
-      deniedTools: Array<{
-        toolId: string;
-        requiresConfirmation?: boolean | null;
-      }> | null;
-    } | null = null;
-
-    if (favoriteId && userId) {
-      const condition = isUuid(favoriteId)
-        ? eq(chatFavorites.id, favoriteId)
-        : eq(chatFavorites.slug, favoriteId);
-      const [row] = await db
-        .select({
-          skillId: FAVORITE_CONFIG_COLUMNS.skillId,
-          availableTools: FAVORITE_CONFIG_COLUMNS.availableTools,
-          deniedTools: FAVORITE_CONFIG_COLUMNS.deniedTools,
-        })
-        .from(chatFavorites)
-        .where(condition)
-        .limit(1);
-      fav = row ?? null;
-    }
-
-    // Effective skillId: from favorite first, then caller-supplied fallback
-    const effectiveSkillId = fav?.skillId ?? skillId ?? null;
-
-    // Collect skill-level denied tools
-    if (effectiveSkillId) {
-      const defaultSkill = DEFAULT_SKILLS.find(
-        (s) => s.id === effectiveSkillId,
-      );
-      if (defaultSkill) {
-        for (const t of defaultSkill.deniedTools ?? []) {
-          deniedToolIds.add(t.toolId);
-        }
-      } else {
-        const cond = isUuid(effectiveSkillId)
-          ? eq(customSkills.id, effectiveSkillId)
-          : eq(customSkills.slug, effectiveSkillId);
-        const [skillRow] = await db
-          .select({ deniedTools: customSkills.deniedTools })
-          .from(customSkills)
-          .where(cond)
-          .limit(1);
-        for (const t of skillRow?.deniedTools ?? []) {
-          deniedToolIds.add(t.toolId);
-        }
-      }
-    }
-
-    // Stack favorite denied tools
-    for (const t of fav?.deniedTools ?? []) {
-      deniedToolIds.add(t.toolId);
-    }
-
-    // Folder-level hard blocks
-    for (const toolId of FOLDER_DENIED_TOOL_IDS[rootFolderId] ?? []) {
-      deniedToolIds.add(toolId);
-    }
-
-    // 1. Favorite availableTools
-    if (fav?.availableTools !== null && fav?.availableTools !== undefined) {
-      return {
-        availableTools: ExecuteToolGuards.normalizeItems(fav.availableTools),
-        deniedToolIds,
-      };
-    }
-
-    // 2. Skill availableTools
-    if (effectiveSkillId) {
-      const defaultSkill = DEFAULT_SKILLS.find(
-        (s) => s.id === effectiveSkillId,
-      );
-      if (defaultSkill?.availableTools) {
-        return {
-          availableTools: ExecuteToolGuards.normalizeItems(
-            defaultSkill.availableTools,
-          ),
-          deniedToolIds,
-        };
-      }
-
-      if (!defaultSkill) {
-        const cond = isUuid(effectiveSkillId)
-          ? eq(customSkills.id, effectiveSkillId)
-          : eq(customSkills.slug, effectiveSkillId);
-        const [skillRow] = await db
-          .select({ availableTools: customSkills.availableTools })
-          .from(customSkills)
-          .where(cond)
-          .limit(1);
-        if (
-          skillRow?.availableTools !== null &&
-          skillRow?.availableTools !== undefined
-        ) {
-          return {
-            availableTools: ExecuteToolGuards.normalizeItems(
-              skillRow.availableTools,
-            ),
-            deniedToolIds,
-          };
-        }
-      }
-    }
-
-    // 3. All tools allowed
-    return { availableTools: null, deniedToolIds };
+    const { resolveAgentContext } =
+      await import("@/app/api/[locale]/agent/skills/resolve-context");
+    const resolved = await resolveAgentContext({
+      favoriteId: params.favoriteId,
+      skillId: params.skillId,
+      user: params.user,
+      rootFolderId: params.rootFolderId,
+      logger: params.logger,
+    });
+    return {
+      availableTools: resolved.availableTools,
+      deniedToolIds: resolved.deniedToolIds,
+    };
   }
 
   /**
-   * Check whether a specific toolName may be CALLED. A tool is callable iff it
-   * is in `availableTools` (the pinned ∪ available callable superset resolved by
-   * the central cascade, with role defaults folded in) AND not in `deniedToolIds`.
-   * `availableTools === null` means no restriction at any level (all allowed).
-   * Returns null if permitted, or an error reason string if blocked.
+   * Check whether a specific toolName may be CALLED. `availableTools` is the
+   * truth: the resolved callable set for this context. `availableTools === null`
+   * means ALL tools for the caller's role are callable (no skill/favorite
+   * restriction). When non-null, the tool must be in it. `deniedToolIds` always
+   * subtracts. The endpoint's own `allowedRoles` filters on top separately (the
+   * route layer). Returns null if permitted, else an error reason.
    */
   static checkToolPermission(
     toolName: string,
@@ -303,12 +161,6 @@ export class ExecuteToolGuards {
     }
 
     if (permissions.availableTools !== null) {
-      // Infrastructure tools are always accessible — blocking them via whitelist
-      // breaks basic agent operation (tool discovery, task management).
-      if (ExecuteToolGuards.isWhitelistExemptTool(toolName)) {
-        return null;
-      }
-
       const allowed = permissions.availableTools.some(
         (t) => t.toolId === toolName || t.toolId === preferred,
       );

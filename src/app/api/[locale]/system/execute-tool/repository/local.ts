@@ -91,10 +91,10 @@ export class LocalExecution {
     options?: {
       instanceId?: string;
       toolCallId?: string;
-      fixtureContext?: FixtureContext;
+      streamContext: ToolExecutionContext;
     },
   ): string {
-    const { instanceId, toolCallId, fixtureContext } = options ?? {};
+    const { instanceId, toolCallId, streamContext } = options ?? {};
     const prefix = instanceId ? `${type}-${instanceId}` : type;
     if (!toolCallId) {
       return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -104,7 +104,7 @@ export class LocalExecution {
       .replace(/[^a-zA-Z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
     const deterministic = `${prefix}-${token}`;
-    if (fixtureContext) {
+    if (streamContext) {
       return deterministic;
     }
     return `${deterministic}-${Math.random().toString(36).slice(2, 8)}`;
@@ -134,10 +134,14 @@ export class LocalExecution {
 
     logger.debug("[RouteExecute] Executing route", { toolName });
 
-    // Resolve tool whitelist + denylist from favorite → skill → user default pinned cascade.
-    // Uses the streamContext's favoriteId/skillId (set by the AI loop that called us),
-    // or undefined for headless/cron callers (→ user default pinned, only folder blocks apply).
-    const userId = !user.isPublic && "id" in user ? user.id : undefined;
+    // Resolve the callable tool set (pinned ∪ available) + denied via THE central
+    // cascade (favorite → skill → NO_SKILL/role defaults). Uses the streamContext's
+    // favoriteId/skillId set by the AI loop that called us; folder blocks fold in.
+    logger.debug("[RouteExecute] PROBE resolving permissions", {
+      toolName,
+      favoriteId: streamContext.favoriteId ?? null,
+      skillId: streamContext.skillId ?? null,
+    });
     const permissions = await ExecuteToolGuards.resolveToolPermissions({
       favoriteId: streamContext.favoriteId,
       skillId: streamContext.skillId,
@@ -146,14 +150,19 @@ export class LocalExecution {
       logger,
     });
 
+    logger.debug("[RouteExecute] PROBE permissions resolved", { toolName });
     const permissionBlock = ExecuteToolGuards.checkToolPermission(
       toolName,
       permissions,
     );
     if (permissionBlock !== null) {
-      logger.debug("[RouteExecute] Tool blocked by permission cascade", {
+      logger.warn("[TOOL-BLOCK] execute-tool denied by permission cascade", {
         toolName,
         reason: permissionBlock,
+        rootFolderId: streamContext.rootFolderId,
+        deniedToolIds: [...permissions.deniedToolIds],
+        whitelistSize: permissions.availableTools?.length ?? null,
+        whitelist: permissions.availableTools?.map((x) => x.toolId) ?? null,
       });
       return fail({
         message: t("executeTool.post.errors.forbidden.title"),
@@ -180,8 +189,52 @@ export class LocalExecution {
       streamContext.callerCallbackMode = callbackMode ?? undefined;
     }
 
-    const result =
-      await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
+    // Subscribe IN PARALLEL to mid-execution control signals for this call (the
+    // AI SDK toolCallId). A control TOOL delivers one mid-flight; we race it
+    // against the tool's own execution. The actions MIRROR the callback modes:
+    //   - cancel → interrupt: abort this call's per-call signal, return the error
+    //              AS the tool result (turn + sibling calls continue).
+    //   - detach → convert the still-running call to DETACH: it keeps running in
+    //              the background, its result is discarded, the turn is unblocked.
+    //   - wakeUp → convert the still-running call to WAKE_UP: it keeps running in
+    //              the background and revives the thread with its result.
+    // detach/wakeUp hand the in-flight execution to the async completion path and
+    // return { taskId, hint } immediately — exactly as if it had been dispatched
+    // that mode from the start. No registry/store: the waiter is transient.
+    const controlCallId = streamContext?.callerToolCallId;
+    const perCallAbort = new AbortController();
+    const control = controlCallId
+      ? ControlSignals.subscribe(controlCallId, user, logger)
+      : undefined;
+    let controlAction: ControlAction | undefined;
+
+    // The handler runs under a signal firing on EITHER the stream abort OR this
+    // call's per-call abort (a cancel signal). Aborting one call leaves the turn
+    // and sibling calls untouched. For detach/wakeUp the execution must SURVIVE
+    // the turn ending, so those paths swap in a fresh, stream-independent signal
+    // below (the goroutine handoff).
+    const execStreamContext: ToolExecutionContext = streamContext
+      ? {
+          ...streamContext,
+          abortSignal: AbortSignal.any([
+            streamContext.abortSignal,
+            perCallAbort.signal,
+          ]),
+        }
+      : {
+          // no user context — UTC (dates not user-facing here)
+          ...makeHeadlessContext(undefined, undefined, "UTC"),
+          callerCallbackMode: callbackMode ?? undefined,
+          abortSignal: perCallAbort.signal,
+        };
+
+    logger.debug("[RouteExecute] PROBE calling generic handler", {
+      toolName,
+      hasPreloaded: preloadedHandler !== undefined,
+    });
+
+    const execPromise =
+      RouteExecutionExecutor.executeGenericHandler<WidgetData>({
         toolName,
         data: input ?? {},
         urlPathParams,
@@ -190,11 +243,66 @@ export class LocalExecution {
         logger,
         platform,
         preloadedHandler,
-        streamContext: streamContext ?? {
-          ...makeHeadlessContext(),
-          callerCallbackMode: callbackMode ?? undefined,
-        },
+        streamContext: execStreamContext,
       });
+
+    // Race execution against a control signal.
+    if (control) {
+      const raced = await Promise.race([
+        execPromise.then(() => ({ action: null }) as const),
+        control.signal.then((action) => {
+          if (action === "cancel") {
+            perCallAbort.abort(new Error("tool_cancelled"));
+          }
+          return { action } as const;
+        }),
+      ]);
+      controlAction = raced.action ?? undefined;
+      control.cancel();
+    }
+
+    // Cancel signal: INTERRUPT this one call. Return the error AS this call's tool
+    // result IMMEDIATELY — do NOT await the aborted execution (a tool that ignores
+    // its abort signal, or is stuck, would otherwise hang the cancel forever). The
+    // aborted execution unwinds in the background. This is a TOOL-scoped
+    // interruption: the stream is untouched (perCallAbort is chained INTO the
+    // tool's context only, never the stream signal), the turn and sibling calls
+    // keep running, and the AI reads this error as the call's result and continues.
+    if (controlAction === "cancel") {
+      void execPromise.catch(() => undefined); // swallow the background rejection
+      logger.debug("[RouteExecute] Tool call cancelled via control tool", {
+        toolName,
+        callId: controlCallId,
+      });
+      return fail({
+        message: t("executeTool.post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
+    // detach / wakeUp arrived while the call is STILL running (execPromise not yet
+    // settled): convert it to the async path. Hand execPromise to the background
+    // completer under the chosen mode and return { taskId, hint } now, so the turn
+    // ends while the tool finishes. If execPromise already settled, the race
+    // resolved with action:null and we fall through to the normal inline return.
+    if (
+      (controlAction === "detach" || controlAction === "wakeUp") &&
+      streamContext
+    ) {
+      return LocalExecution.convertInFlightToAsync({
+        ctx,
+        mode:
+          controlAction === "wakeUp"
+            ? CallbackMode.WAKE_UP
+            : CallbackMode.DETACH,
+        input,
+        execPromise,
+        callId: controlCallId,
+      });
+    }
+
+    // Non-control path: await the execution to settle.
+    const result = await execPromise;
 
     // Discard result if stream was cancelled during tool execution.
     // The abort signal may have fired while the tool was running - any result
@@ -213,7 +321,7 @@ export class LocalExecution {
     if (!result.success) {
       const endpoint = await getEndpoint(toolName);
       const compactDetails = formatValidationErrorCompact(
-        result.messageParams as Record<string, string | number> | undefined,
+        result.messageParams,
         endpoint,
       );
       if (compactDetails) {
@@ -247,7 +355,7 @@ export class LocalExecution {
     mode: typeof CallbackMode.DETACH | typeof CallbackMode.WAKE_UP;
   }): Promise<ResponseType<RouteExecuteResponseOutput>> {
     const { ctx, input, mode } = params;
-    const { toolName, resolvedModelId, user, logger, streamContext } = ctx;
+    const { toolName, user, logger, streamContext } = ctx;
     const isWakeUp = mode === CallbackMode.WAKE_UP;
 
     // Receiver side of a remote dispatch: the requester's callId IS the task
@@ -257,7 +365,7 @@ export class LocalExecution {
       streamContext.remoteDispatchCallId ??
       LocalExecution.generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
         toolCallId: streamContext.callerToolCallId,
-        fixtureContext: streamContext.fixtureContext,
+        streamContext: streamContext,
       });
 
     const effectiveThreadId = streamContext.threadId;
@@ -312,13 +420,6 @@ export class LocalExecution {
       toolName,
       callbackMode: mode,
       input,
-      effectiveThreadId,
-      effectiveToolMessageId,
-      effectiveLeafMessageId,
-      resolvedModelId: isWakeUp ? resolvedModelId : null,
-      skillId: streamContext.skillId ?? null,
-      favoriteId: streamContext.favoriteId ?? null,
-      subAgentDepth: streamContext.subAgentDepth ?? 0,
       userId: user.id,
     });
 
@@ -407,50 +508,44 @@ export class LocalExecution {
           );
         } else {
           try {
-            // Atomic claim: flip terminal ONLY IF the mode is still the dispatch
-            // mode. Lost claim = await-task upgraded to a waiter (WAIT/WAKE_UP)
-            // — force the row terminal and fire the WAITER's revival instead.
-            const claimed = await LocalExecution.markTaskCompleted(
+            await LocalExecution.markTaskCompleted(taskId);
+
+            // If await-task parked a revival (WAIT/WAKE_UP), merge the result into
+            // the parked task's taskInput and enable+fire it.
+            const revived = await TaskCompletion.enableAndFireParkedResumeTask({
               taskId,
+              status:
+                finalStatus === CronTaskStatus.COMPLETED
+                  ? "completed"
+                  : "failed",
+              output: finalResult,
+              locale: ctx.locale,
               logger,
-            );
-            if (!claimed) {
-              await LocalExecution.markTaskCompleted(taskId);
-            }
+              abortSignal: goroutineAbortController.signal,
+            });
 
-            // Latest context picks up waiter target + any routing written by
-            // await-task before the race resolved.
-            const latest = await LocalExecution.readLatestTaskContext(taskId);
-            const upgradedMode: CallbackModeValue | null = !claimed
-              ? latest.wakeUpCallbackMode === CallbackMode.WAIT
-                ? CallbackMode.WAIT
-                : CallbackMode.WAKE_UP
-              : null;
-            const finalMode: CallbackModeValue = upgradedMode ?? mode;
-
-            const targetToolMessageId =
-              latest.wakeUpToolMessageId ?? effectiveToolMessageId;
-            const targetThreadId = latest.wakeUpThreadId ?? effectiveThreadId;
-
-            if (targetToolMessageId && targetThreadId && !user.isPublic) {
+            // For DETACH (no parked revival) or wakeUp dispatched by this goroutine
+            // directly (no await-task waiter), still fire TaskCompletion.handle for
+            // TASK_COMPLETED emit and thread reconcile.
+            if (
+              !revived &&
+              effectiveToolMessageId &&
+              effectiveThreadId &&
+              !user.isPublic
+            ) {
               const ownerUser: JwtPrivatePayloadType = user;
               await TaskCompletion.handle({
-                toolMessageId: targetToolMessageId,
-                threadId: targetThreadId,
-                callbackMode: finalMode,
+                toolMessageId: effectiveToolMessageId,
+                threadId: effectiveThreadId,
+                callbackMode: mode,
                 status: finalStatus,
                 output: finalResult,
                 taskId,
-                modelId: latest.wakeUpModelId ?? null,
-                skillId: latest.wakeUpSkillId ?? streamContext.skillId ?? null,
-                favoriteId:
-                  latest.wakeUpFavoriteId ?? streamContext.favoriteId ?? null,
-                leafMessageId:
-                  latest.wakeUpLeafMessageId ?? effectiveLeafMessageId,
-                subAgentDepth:
-                  latest.wakeUpSubAgentDepth ??
-                  streamContext.subAgentDepth ??
-                  0,
+                modelId: null,
+                skillId: streamContext.skillId ?? null,
+                favoriteId: streamContext.favoriteId ?? null,
+                leafMessageId: effectiveLeafMessageId,
+                subAgentDepth: streamContext.subAgentDepth ?? 0,
                 ownerUser,
                 logger,
                 directResumeLocale: ctx.locale,
@@ -506,6 +601,252 @@ export class LocalExecution {
     });
   }
 
+  /**
+   * Convert an ALREADY-RUNNING inline WAIT call to an async (DETACH / WAKE_UP)
+   * task mid-flight — the reaction to a `detach` / `resume-when-done` control tool.
+   *
+   * The tool is already executing (execPromise). We must NOT re-execute it (that
+   * would run the side effect twice). Instead: create the RUNNING task row, return
+   * { taskId, hint } NOW so the turn ends, and in the background await the EXISTING
+   * execPromise and run the same completion tail as executeAsync (revive for
+   * wakeUp, reconcile-and-discard for detach). Behaviour is identical to having
+   * dispatched the call in that mode from the start — the mid-flight tools mirror
+   * the callback modes exactly.
+   */
+  static async convertInFlightToAsync(params: {
+    ctx: RouteExecuteContext;
+    mode: typeof CallbackMode.DETACH | typeof CallbackMode.WAKE_UP;
+    input: Record<string, WidgetData> | undefined;
+    execPromise: Promise<ResponseType<WidgetData>>;
+    callId: string | undefined;
+  }): Promise<ResponseType<RouteExecuteResponseOutput>> {
+    const { ctx, mode, input, execPromise } = params;
+    const { toolName, user, logger, streamContext } = ctx;
+    const isWakeUp = mode === CallbackMode.WAKE_UP;
+
+    const taskId =
+      streamContext.remoteDispatchCallId ??
+      LocalExecution.generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
+        toolCallId: streamContext.callerToolCallId,
+        streamContext,
+      });
+
+    const effectiveThreadId = streamContext.threadId;
+    const pendingEntry = streamContext.callerToolCallId
+      ? streamContext.pendingToolMessages?.get(streamContext.callerToolCallId)
+      : undefined;
+    let resolvedToolMessageId: string | undefined =
+      pendingEntry?.messageId ?? streamContext.currentToolMessageId;
+    let resolvedLeafMessageId: string | null =
+      pendingEntry?.toolCallData?.parentId ??
+      streamContext.leafMessageId ??
+      null;
+    if (
+      !resolvedToolMessageId &&
+      streamContext.callerToolCallId &&
+      effectiveThreadId
+    ) {
+      const row = await LocalExecution.resolveToolMessageFromDb({
+        callerToolCallId: streamContext.callerToolCallId,
+        threadId: effectiveThreadId,
+      });
+      if (row) {
+        resolvedToolMessageId = row.id;
+        resolvedLeafMessageId = resolvedLeafMessageId ?? row.parentId;
+      }
+    }
+    const effectiveToolMessageId =
+      resolvedToolMessageId ?? streamContext.aiMessageId;
+    const effectiveLeafMessageId = resolvedLeafMessageId;
+
+    await LocalExecution.createLocalTask({
+      taskId,
+      toolName,
+      callbackMode: mode,
+      input,
+      userId: user.id,
+    });
+
+    // Background: await the EXISTING execution (no re-run), persist history, then
+    // run the standard completion tail (revive for wakeUp, reconcile for detach).
+    void (async (): Promise<void> => {
+      const startedAt = new Date();
+      const goroutineAbort = new AbortController();
+      let finalResult: Record<string, WidgetData> | null = null;
+      let finalStatus: (typeof CronTaskStatusDB)[number] =
+        CronTaskStatus.FAILED;
+      let errorMessage: string | null = null;
+
+      try {
+        const result = await execPromise;
+        finalStatus = result.success
+          ? CronTaskStatus.COMPLETED
+          : CronTaskStatus.FAILED;
+        finalResult =
+          result.success && result.data !== undefined
+            ? PendingCalls.toOutputObject(result.data)
+            : null;
+        errorMessage =
+          !result.success && "message" in result
+            ? String(result.message)
+            : null;
+        await LocalExecution.insertExecutionHistory({
+          taskId,
+          toolName,
+          startedAt,
+          finalStatus,
+          finalResult,
+          triggeredBy: isWakeUp ? "wakeup" : "detach",
+          logger,
+        });
+      } catch (err) {
+        errorMessage = err instanceof Error ? err.message : String(err);
+        logger.error("[RouteExecute] In-flight conversion execution failed", {
+          taskId,
+          toolName,
+          mode,
+          error: errorMessage,
+        });
+      } finally {
+        try {
+          await LocalExecution.markTaskCompleted(taskId);
+          const revived = await TaskCompletion.enableAndFireParkedResumeTask({
+            taskId,
+            status:
+              finalStatus === CronTaskStatus.COMPLETED ? "completed" : "failed",
+            output: finalResult,
+            locale: ctx.locale,
+            logger,
+            abortSignal: goroutineAbort.signal,
+          });
+          if (
+            !revived &&
+            effectiveToolMessageId &&
+            effectiveThreadId &&
+            !user.isPublic
+          ) {
+            const ownerUser: JwtPrivatePayloadType = user;
+            await TaskCompletion.handle({
+              toolMessageId: effectiveToolMessageId,
+              threadId: effectiveThreadId,
+              callbackMode: mode,
+              status: finalStatus,
+              output: finalResult,
+              taskId,
+              modelId: null,
+              skillId: streamContext.skillId ?? null,
+              favoriteId: streamContext.favoriteId ?? null,
+              leafMessageId: effectiveLeafMessageId,
+              subAgentDepth: streamContext.subAgentDepth ?? 0,
+              ownerUser,
+              logger,
+              directResumeLocale: ctx.locale,
+              abortSignal: goroutineAbort.signal,
+            });
+          }
+        } catch (completionErr) {
+          logger.error(
+            "[RouteExecute] In-flight conversion completion failed",
+            {
+              taskId,
+              mode,
+              error:
+                completionErr instanceof Error
+                  ? completionErr.message
+                  : String(completionErr),
+            },
+          );
+        }
+        PendingCalls.notifyTaskCompletion(taskId, finalStatus);
+      }
+    })();
+
+    // Flip the ORIGINAL tool message to PENDING in the UI: patch its callbackMode
+    // to the new mode + a { taskId, status: pending } result, then emit the regular
+    // definition-driven `tool-result-updated` event. The message renders as pending
+    // (tool-parts keys pending off callbackMode detach/wakeUp) and is updated to its
+    // final state by TaskCompletion.handle's own event when the work completes.
+    if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
+      await LocalExecution.emitConvertedPending({
+        toolMessageId: effectiveToolMessageId,
+        threadId: effectiveThreadId,
+        mode,
+        taskId,
+        user,
+        logger,
+      });
+    }
+
+    logger.debug("[RouteExecute] Converted in-flight call to async", {
+      toolName,
+      taskId,
+      mode,
+    });
+    return success({
+      taskId,
+      hint: isWakeUp ? DISPATCH_HINTS.wakeUp : DISPATCH_HINTS.detach,
+    });
+  }
+
+  /**
+   * Patch a tool message to the PENDING state after a mid-flight conversion and
+   * emit `tool-result-updated`. Sets callbackMode to the new async mode so the UI
+   * renders it as pending; the completion path later emits the final result.
+   */
+  private static async emitConvertedPending(params: {
+    toolMessageId: string;
+    threadId: string;
+    mode: typeof CallbackMode.DETACH | typeof CallbackMode.WAKE_UP;
+    taskId: string;
+    user: JwtPrivatePayloadType;
+    logger: RouteExecuteContext["logger"];
+  }): Promise<void> {
+    const { toolMessageId, threadId, mode, taskId, user, logger } = params;
+    const { chatMessages, chatThreads } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    const [msg] = await db
+      .select({ metadata: chatMessages.metadata })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, toolMessageId))
+      .limit(1);
+    if (!msg?.metadata?.toolCall) {
+      return;
+    }
+    const patchedToolCall = {
+      ...msg.metadata.toolCall,
+      callbackMode: mode,
+      result: { taskId, status: "status.pending" },
+    };
+    await db
+      .update(chatMessages)
+      .set({
+        metadata: { ...msg.metadata, toolCall: patchedToolCall },
+        updatedAt: new Date(),
+      })
+      .where(eq(chatMessages.id, toolMessageId));
+
+    const [threadRow] = await db
+      .select({ rootFolderId: chatThreads.rootFolderId })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    if (!threadRow?.rootFolderId) {
+      return;
+    }
+    const { createMessagesEmitter } =
+      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter");
+    createMessagesEmitter(logger, user, {
+      threadId,
+      rootFolderId: threadRow.rootFolderId,
+    })("tool-result-updated", {
+      responseData: {
+        messages: [
+          { id: toolMessageId, metadata: { toolCall: patchedToolCall } },
+        ],
+      },
+    });
+  }
+
   /* ── Internals ──────────────────────────────────────────────────────────── */
 
   /**
@@ -530,7 +871,16 @@ export class LocalExecution {
     } = params;
     const { toolName, logger } = ctx;
 
-    const result = await RouteExecutionExecutor.executeGenericHandler<
+    // Hard max-duration guard: a background task MUST NOT hang forever. If the
+    // handler (e.g. a media-gen sub-stream whose provider stalls) never
+    // settles, the goroutine would never reach its completion/finally and the
+    // await-task waiter would wait indefinitely. Race the handler against a
+    // ceiling; on timeout treat the task as FAILED so the parked revival still
+    // fires with a terminal result instead of pinning the thread. Generous
+    // enough for real media gen (a few minutes).
+    const GOROUTINE_MAX_DURATION_MS = 300_000;
+    const timeoutSentinel = Symbol("goroutine-timeout");
+    const handlerPromise = RouteExecutionExecutor.executeGenericHandler<
       Record<string, WidgetData>
     >({
       toolName,
@@ -541,6 +891,41 @@ export class LocalExecution {
       platform: Platform.MCP,
       streamContext: goroutineStreamContext,
     });
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    const timeoutPromise = new Promise<typeof timeoutSentinel>((resolve) => {
+      timeoutHandle = setTimeout(
+        () => resolve(timeoutSentinel),
+        GOROUTINE_MAX_DURATION_MS,
+      );
+    });
+    const raced = await Promise.race([handlerPromise, timeoutPromise]);
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
+    if (raced === timeoutSentinel) {
+      logger.error(
+        "[RouteExecute] Async task exceeded max duration - marking FAILED",
+        { taskId, toolName, maxMs: GOROUTINE_MAX_DURATION_MS },
+      );
+      const timedOutAt = new Date();
+      await LocalExecution.insertExecutionHistory({
+        taskId,
+        toolName,
+        startedAt,
+        completedAt: timedOutAt,
+        finalStatus: CronTaskStatus.FAILED,
+        finalResult: null,
+        triggeredBy,
+        logger,
+      });
+      return {
+        finalStatus: CronTaskStatus.FAILED,
+        finalResult: null,
+        errorMessage: `Background task exceeded ${String(GOROUTINE_MAX_DURATION_MS)}ms`,
+        completedAt: timedOutAt,
+      };
+    }
+    const result = raced;
 
     const completedAt = new Date();
     const finalStatus: (typeof CronTaskStatusDB)[number] = result.success
@@ -551,6 +936,46 @@ export class LocalExecution {
     const errorMessage =
       !result.success && "message" in result ? String(result.message) : null;
 
+    await LocalExecution.insertExecutionHistory({
+      taskId,
+      toolName,
+      startedAt,
+      completedAt,
+      finalStatus,
+      finalResult,
+      triggeredBy,
+      logger,
+    });
+
+    return { finalStatus, finalResult, errorMessage, completedAt };
+  }
+
+  /**
+   * Append a cron_task_executions history row. Shared by the goroutine path
+   * (executeInGoroutine) and the mid-flight conversion (convertInFlightToAsync).
+   * Append-only: the timestamp tail keeps executionId unique when a deterministic
+   * (fixture-mode) taskId re-runs. Non-fatal on failure — the parent cron_tasks
+   * row may have been deleted (test teardown).
+   */
+  private static async insertExecutionHistory(params: {
+    taskId: string;
+    toolName: string;
+    startedAt: Date;
+    completedAt?: Date;
+    finalStatus: (typeof CronTaskStatusDB)[number];
+    finalResult: Record<string, WidgetData> | null;
+    triggeredBy: string;
+    logger?: RouteExecuteContext["logger"];
+  }): Promise<void> {
+    const {
+      taskId,
+      toolName,
+      startedAt,
+      finalStatus,
+      finalResult,
+      triggeredBy,
+    } = params;
+    const completedAt = params.completedAt ?? new Date();
     try {
       await db.insert(cronTaskExecutions).values({
         taskId,
@@ -566,9 +991,8 @@ export class LocalExecution {
         config: {},
       });
     } catch (execInsertErr) {
-      // Parent cron_tasks row may have been deleted (e.g. test teardown cancelThreadTasks).
-      logger.warn(
-        "[execute-tool goroutine] Failed to insert execution history (parent deleted?)",
+      params.logger?.warn(
+        "[execute-tool] Failed to insert execution history (parent deleted?)",
         {
           taskId,
           error:
@@ -578,8 +1002,6 @@ export class LocalExecution {
         },
       );
     }
-
-    return { finalStatus, finalResult, errorMessage, completedAt };
   }
 
   /**
@@ -590,10 +1012,7 @@ export class LocalExecution {
    * context), rowCount is 0 — the goroutine lost the race and must fire the
    * waiter's revival instead (after calling this again unconditionally).
    */
-  private static async markTaskCompleted(
-    taskId: string,
-    requiredMode?: CallbackModeValue,
-  ): Promise<boolean> {
+  private static async markTaskCompleted(taskId: string): Promise<boolean> {
     const updated = await db
       .update(cronTasks)
       .set({
@@ -601,57 +1020,9 @@ export class LocalExecution {
         lastExecutedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(
-        requiredMode
-          ? and(
-              eq(cronTasks.id, taskId),
-              eq(cronTasks.wakeUpCallbackMode, requiredMode),
-            )
-          : eq(cronTasks.id, taskId),
-      );
+      .where(eq(cronTasks.id, taskId));
 
     return updated.rowCount !== null && updated.rowCount > 0;
-  }
-
-  /**
-   * Re-read task row for upgraded wakeUp context (set by await-task).
-   * Returns the latest columns.
-   */
-  private static async readLatestTaskContext(taskId: string): Promise<{
-    wakeUpCallbackMode: string | null;
-    wakeUpThreadId: string | null;
-    wakeUpToolMessageId: string | null;
-    wakeUpModelId: string | null;
-    wakeUpSkillId: string | null;
-    wakeUpFavoriteId: string | null;
-    wakeUpLeafMessageId: string | null;
-    wakeUpSubAgentDepth: number | null;
-  }> {
-    const [row] = await db
-      .select({
-        wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
-        wakeUpThreadId: cronTasks.wakeUpThreadId,
-        wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
-        wakeUpModelId: cronTasks.wakeUpModelId,
-        wakeUpSkillId: cronTasks.wakeUpSkillId,
-        wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
-        wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
-        wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
-      })
-      .from(cronTasks)
-      .where(eq(cronTasks.id, taskId))
-      .limit(1);
-
-    return {
-      wakeUpCallbackMode: row?.wakeUpCallbackMode ?? null,
-      wakeUpThreadId: row?.wakeUpThreadId ?? null,
-      wakeUpToolMessageId: row?.wakeUpToolMessageId ?? null,
-      wakeUpModelId: row?.wakeUpModelId ?? null,
-      wakeUpSkillId: row?.wakeUpSkillId ?? null,
-      wakeUpFavoriteId: row?.wakeUpFavoriteId ?? null,
-      wakeUpLeafMessageId: row?.wakeUpLeafMessageId ?? null,
-      wakeUpSubAgentDepth: row?.wakeUpSubAgentDepth ?? null,
-    };
   }
 
   /**
@@ -670,10 +1041,10 @@ export class LocalExecution {
       .where(
         and(
           eq(chatMessages.threadId, threadId),
-          drizzleSql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${callerToolCallId}`,
+          sql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${callerToolCallId}`,
         ),
       )
-      .orderBy(drizzleSql`${chatMessages.createdAt} DESC`)
+      .orderBy(sql`${chatMessages.createdAt} DESC`)
       .limit(1);
     return row ?? null;
   }
@@ -687,29 +1058,9 @@ export class LocalExecution {
     toolName: string;
     callbackMode: CallbackModeValue; // DETACH or WAKE_UP
     input: Record<string, WidgetData> | undefined;
-    effectiveThreadId: string | undefined;
-    effectiveToolMessageId: string | undefined;
-    effectiveLeafMessageId: string | null;
-    resolvedModelId: string | null | undefined; // only stored for WAKE_UP
-    skillId: string | null | undefined;
-    favoriteId: string | null | undefined;
-    subAgentDepth: number;
     userId: string | undefined;
   }): Promise<void> {
-    const {
-      taskId,
-      toolName,
-      callbackMode,
-      input,
-      effectiveThreadId,
-      effectiveToolMessageId,
-      effectiveLeafMessageId,
-      resolvedModelId,
-      skillId,
-      favoriteId,
-      subAgentDepth,
-      userId,
-    } = params;
+    const { taskId, toolName, callbackMode, input, userId } = params;
 
     const isWakeUp = callbackMode === CallbackMode.WAKE_UP;
 
@@ -735,15 +1086,6 @@ export class LocalExecution {
         runOnce: true,
         lastExecutionStatus: CronTaskStatus.RUNNING,
         taskInput: input ?? {},
-        wakeUpCallbackMode: callbackMode,
-        wakeUpThreadId: effectiveThreadId ?? null,
-        wakeUpToolMessageId: effectiveToolMessageId ?? null,
-        // Only store modelId for WAKE_UP — DETACH never wakes up the AI with a specific model.
-        wakeUpModelId: isWakeUp ? (resolvedModelId ?? undefined) : undefined,
-        wakeUpSkillId: skillId ?? null,
-        wakeUpFavoriteId: favoriteId ?? null,
-        wakeUpLeafMessageId: effectiveLeafMessageId,
-        wakeUpSubAgentDepth: subAgentDepth,
         outputMode: TaskOutputMode.STORE_ONLY,
         notificationTargets: [],
         tags: [isWakeUp ? "wakeup" : "detach", "local"],
@@ -756,14 +1098,6 @@ export class LocalExecution {
           lastExecutionStatus: CronTaskStatus.RUNNING,
           enabled: false,
           taskInput: input ?? {},
-          wakeUpCallbackMode: callbackMode,
-          wakeUpThreadId: effectiveThreadId ?? null,
-          wakeUpToolMessageId: effectiveToolMessageId ?? null,
-          wakeUpModelId: isWakeUp ? (resolvedModelId ?? null) : null,
-          wakeUpSkillId: skillId ?? null,
-          wakeUpFavoriteId: favoriteId ?? null,
-          wakeUpLeafMessageId: effectiveLeafMessageId,
-          wakeUpSubAgentDepth: subAgentDepth,
           userId,
           updatedAt: new Date(),
         },

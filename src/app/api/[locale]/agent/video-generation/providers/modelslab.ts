@@ -26,13 +26,13 @@ interface ModelsLabVideoResponse {
   message?: string;
 }
 
-// Allow tests to override poll interval to avoid 5s × N waits on fixture replay
-const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
-// Video generation routinely takes several minutes (VEO ~1-5 min, heavier
-// models longer). Poll for up to 240s (same budget as the music provider);
-// slower jobs are NOT failures — exhaustion falls back to the future_links
-// URL from the submit response, which becomes valid when the job completes.
-const MAX_POLL_ATTEMPTS = 120;
+// Real interval ALWAYS — never a test-only shortcut. pollDelay() collapses to
+// 10ms on REPLAY (via the fixture-replay header), so replays stay fast; a
+// RECORDING run must actually wait the real cadence or it times out before the
+// job finishes and records a bogus future_links fallback.
+// Video routinely takes several minutes (VEO ~1-5 min). 3s × 90 = 4.5 min.
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 90;
 
 export async function generateVideoWithModelsLab(params: {
   providerModel: string;
@@ -226,13 +226,29 @@ export async function generateVideoWithModelsLab(params: {
       // if the file is ACTUALLY there now (HEAD via the fixture-aware fetch);
       // otherwise fail loudly.
       if (futureUrl) {
-        logger.warn(
-          "[ModelsLab Video] Poll timed out, using future_links URL",
-          {
-            futureUrl,
-          },
-        );
-        return success({ videoUrl: futureUrl });
+        let ready = false;
+        try {
+          const head = await fetchImpl(futureUrl, { method: "HEAD", signal });
+          ready = head.ok;
+          if (!ready) {
+            logger.error(
+              "[ModelsLab Video] Poll timed out; future_links URL not ready",
+              { futureUrl, status: head.status },
+            );
+          }
+        } catch (headErr) {
+          logger.error(
+            "[ModelsLab Video] Poll timed out; future_links HEAD check failed",
+            { futureUrl, error: parseError(headErr).message },
+          );
+        }
+        if (ready) {
+          logger.debug(
+            "[ModelsLab Video] Poll timed out but future_links file is ready",
+            { futureUrl },
+          );
+          return success({ videoUrl: futureUrl });
+        }
       }
 
       return fail({

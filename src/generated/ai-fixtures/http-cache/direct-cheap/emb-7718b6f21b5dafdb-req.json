@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I notice the previous T7 test already left a file at `/memories/t7-approve-test` with content `T7_APPROVE_OK`. This suggests the approve callback mode was already tested and succeeded in a prior turn. Let me proceed with the requested two parallel calls.",
+    "encoding_format": "float"
+  }
+}

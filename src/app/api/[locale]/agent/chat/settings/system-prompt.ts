@@ -11,23 +11,30 @@ import { chatSettings } from "./db";
 
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 
-export interface CodingAgentSettingData {
-  /** null = default (claude-code) */
-  codingAgent: "claude-code" | "open-code" | "next-vibe-coder" | null;
-}
+export const codingAgentSettingFragment: SystemPromptFragment = {
+  id: "coding-agent-setting",
+  placement: "leading",
+  priority: 610,
+  build: async (params) => {
+    const { user } = params;
 
-// ─── Fragment ──────────────────────────────────────────────────────────────────
+    if (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN)) {
+      return null;
+    }
 
-export const codingAgentSettingFragment: SystemPromptFragment<CodingAgentSettingData> =
-  {
-    id: "coding-agent-setting",
-    placement: "leading",
-    priority: 610,
-    build: (data) => {
-      if (data.codingAgent === null) {
+    try {
+      const rows = await db
+        .select({ codingAgent: chatSettings.codingAgent })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, user.id))
+        .limit(1);
+
+      const codingAgent = rows[0]?.codingAgent ?? null;
+
+      if (codingAgent === null) {
         return null;
       }
-      if (data.codingAgent === "next-vibe-coder") {
+      if (codingAgent === "next-vibe-coder") {
         return `## Coding Agent
 
 When delegating coding work, use the \`ai-run\` tool with the \`vibe-coder\` skill. Pass the full task description as the prompt. The vibe-coder skill carries the full project context and coding conventions.`;
@@ -36,29 +43,8 @@ When delegating coding work, use the \`ai-run\` tool with the \`vibe-coder\` ski
       return `## Coding Agent
 
 When delegating coding work, use the \`coding-agent\` tool. Pass the full task description as the prompt.`;
-    },
-  };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-export async function loadCodingAgentSettingData(
-  params: SystemPromptServerParams,
-): Promise<CodingAgentSettingData> {
-  const { user } = params;
-
-  if (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN)) {
-    return { codingAgent: null };
-  }
-
-  try {
-    const rows = await db
-      .select({ codingAgent: chatSettings.codingAgent })
-      .from(chatSettings)
-      .where(eq(chatSettings.userId, user.id))
-      .limit(1);
-
-    return { codingAgent: rows[0]?.codingAgent ?? null };
-  } catch {
-    return { codingAgent: null };
-  }
-}
+    } catch {
+      return null;
+    }
+  },
+};

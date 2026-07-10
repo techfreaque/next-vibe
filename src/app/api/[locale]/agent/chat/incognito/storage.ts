@@ -457,6 +457,12 @@ export async function createIncognitoThread(
     userId: "incognito",
     leadId: null,
     title,
+    originInstanceId: null,
+    loopInstanceId: null,
+    // Incognito never syncs — no server rows, viewer-local only.
+    syncEligible: false,
+    // Client-created incognito threads are top-level (no sub-stream lineage).
+    parentThreadId: null,
     rootFolderId: rootFolderId,
     folderId: subFolderId,
     status: ThreadStatus.ACTIVE,
@@ -466,8 +472,7 @@ export async function createIncognitoThread(
     pinned: false,
     archived: false,
     tags: [],
-    preview: null,
-    metadata: {},
+    description: null,
     rolesView: null,
     rolesEdit: null,
     rolesPost: null,
@@ -475,6 +480,8 @@ export async function createIncognitoThread(
     rolesAdmin: null,
     published: false,
     streamingState: ThreadStreamingState.IDLE,
+    // Incognito threads never claim a streaming run (viewer-local, no revival).
+    streamingRunId: null,
     sortOrder: 0,
     canPost: true,
     canEdit: true,
@@ -523,7 +530,6 @@ export async function createIncognitoMessage(
     downvotes: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-    searchVector: null,
   };
 
   await saveMessage(message);

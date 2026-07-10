@@ -36,7 +36,8 @@ const { POST } = createEndpoint({
   category: "devTools",
   subCategory: "tasksSync",
   tags: ["tags.remoteSync" as const],
-  allowedRoles: [UserRole.ADMIN] as const,
+  aliases: ["complete-task"],
+  allowedRoles: [UserRole.ADMIN, UserRole.MCP_VISIBLE] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -61,13 +62,15 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.enum([
-          CronTaskStatus.RUNNING,
-          CronTaskStatus.COMPLETED,
-          CronTaskStatus.FAILED,
-          CronTaskStatus.CANCELLED,
-          CronTaskStatus.TIMEOUT,
-        ]),
+        schema: z
+          .enum([
+            CronTaskStatus.RUNNING,
+            CronTaskStatus.COMPLETED,
+            CronTaskStatus.FAILED,
+            CronTaskStatus.CANCELLED,
+            CronTaskStatus.TIMEOUT,
+          ])
+          .optional(),
       }),
       durationMs: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -105,6 +108,15 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: taskInputSchema.optional(),
       }),
+      // AI-caller path (Claude Code / MCP): when status is omitted the caller
+      // is signalling its own async work is done. response maps to output and
+      // status defaults to COMPLETED.
+      response: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: taskInputSchema.optional(),
+      }),
       startedAt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -124,7 +136,7 @@ const { POST } = createEndpoint({
             threadId: z.string().nullable(),
             toolMessageId: z.string().nullable(),
             leafMessageId: z.string().nullable(),
-            modelId: z.string().nullable(),
+            modelId: z.enum(ChatModelId).nullable(),
             skillId: z.string().nullable(),
             favoriteId: z.string().nullable(),
             subAgentDepth: z.number(),

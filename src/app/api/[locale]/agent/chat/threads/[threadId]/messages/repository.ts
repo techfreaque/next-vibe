@@ -28,10 +28,12 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/tree-walk";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import { DefaultFolderId } from "../../../config";
 import {
+  CHAT_MESSAGE_COLUMNS,
   chatFolders,
   type ChatMessage,
   chatMessages,
@@ -164,7 +166,7 @@ export class MessagesRepository {
       // Check if any siblings exist that aren't already in the branch
       const branchIds = new Set(branchMessages.map((m) => m.id));
       const siblings = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(
           and(
@@ -213,7 +215,7 @@ export class MessagesRepository {
   } | null> {
     // Get the message by ID (supports both user and AI messages)
     const [message] = await db
-      .select()
+      .select(CHAT_MESSAGE_COLUMNS)
       .from(chatMessages)
       .where(eq(chatMessages.id, messageId))
       .limit(1);
@@ -261,6 +263,12 @@ export class MessagesRepository {
     }>;
     /** Extra metadata to merge into the message (e.g. isQueued, queuedSettings) */
     extraMetadata?: Partial<NonNullable<ChatMessage["metadata"]>>;
+    /**
+     * Fixture chain of the calling stream — required to embed the message AT
+     * WRITE TIME (the row lands with its search vector). Optional so non-stream
+     * callers (rare) can skip embedding; those messages simply carry no vector.
+     */
+    streamContext: ToolExecutionContext | undefined;
   }): Promise<{ resolvedParentId: string | null }> {
     // Incognito threads live in client storage only — no DB row exists or should be created.
     if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
@@ -330,6 +338,32 @@ export class MessagesRepository {
       }
     }
 
+    // Embed the message content AT WRITE TIME so the row lands with its search
+    // vector — cortex search reads stored vectors only and never re-embeds a
+    // query. Best-effort: a missing API key or embed failure leaves the row
+    // vectorless (search just has one fewer query vector) but NEVER blocks the
+    // write. Runs before the insert so it rides the same row.
+    let embeddingFields:
+      | { embedding: number[]; embeddingHash: string }
+      | undefined;
+    if (params.streamContext) {
+      try {
+        const { embedMessageContent } =
+          await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
+        embeddingFields =
+          (await embedMessageContent(
+            { role: params.role, content: params.content, metadata: null },
+            params.streamContext,
+          )) ?? undefined;
+      } catch (embedErr) {
+        params.logger.warn("createUserMessage: embed failed (non-fatal)", {
+          messageId: params.messageId,
+          error:
+            embedErr instanceof Error ? embedErr.message : String(embedErr),
+        });
+      }
+    }
+
     const now = new Date();
     await db
       .insert(chatMessages)
@@ -343,6 +377,7 @@ export class MessagesRepository {
         authorName: params.authorName ?? null,
         isAI: false,
         metadata: hasMetadata ? metadata : undefined,
+        ...(embeddingFields ?? {}),
       })
       // Queue processor already inserted + updated this message before calling
       // createAiStream — skip the duplicate rather than failing the stream.
@@ -706,7 +741,7 @@ export class MessagesRepository {
 
       // Get all messages in thread
       const messages = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(eq(chatMessages.threadId, data.threadId))
         .orderBy(chatMessages.createdAt);
@@ -717,21 +752,28 @@ export class MessagesRepository {
         .select({
           id: cronTasks.id,
           displayName: cronTasks.displayName,
-          wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+          taskInput: cronTasks.taskInput,
         })
         .from(cronTasks)
         .where(
-          and(
-            eq(cronTasks.wakeUpThreadId, data.threadId),
-            sql`${cronTasks.lastExecutionStatus} IN (${CronTaskStatus.PENDING}, ${CronTaskStatus.RUNNING}, ${CronTaskStatus.SCHEDULED})`,
-          ),
+          sql`${cronTasks.taskInput}->>'threadId' = ${data.threadId}
+            AND ${cronTasks.lastExecutionStatus} IN (${CronTaskStatus.PENDING}, ${CronTaskStatus.RUNNING}, ${CronTaskStatus.SCHEDULED})`,
         );
 
-      const backgroundTasks = rawBackgroundTasks.map((task) => ({
-        id: task.id,
-        displayName: task.displayName,
-        toolCallId: task.wakeUpToolMessageId ?? null,
-      }));
+      const backgroundTasks = rawBackgroundTasks.map((task) => {
+        const toolMsgId =
+          task.taskInput &&
+          typeof task.taskInput === "object" &&
+          "wakeUpToolMessageId" in task.taskInput
+            ? ((task.taskInput as { wakeUpToolMessageId?: string })
+                .wakeUpToolMessageId ?? null)
+            : null;
+        return {
+          id: task.id,
+          displayName: task.displayName,
+          toolCallId: toolMsgId,
+        };
+      });
 
       logger.debug("Messages retrieved", {
         threadId: data.threadId,
@@ -970,6 +1012,7 @@ export class MessagesRepository {
     leadId?: string | null;
     rootFolderId: DefaultFolderId;
     subFolderId?: string | null;
+    locale: CountryLanguage;
     logger: EndpointLogger;
   }): Promise<
     ResponseType<{ userMessageId: string; assistantMessageId: string }>
@@ -988,7 +1031,9 @@ export class MessagesRepository {
       if (!existingThread) {
         await db.insert(chatThreads).values({
           id: params.threadId,
-          title: params.prompt.slice(0, 80) || "New Chat",
+          title: chatScopedTranslation
+            .scopedT(params.locale)
+            .t("common.newChat"),
           rootFolderId: params.rootFolderId ?? DefaultFolderId.PRIVATE,
           folderId: params.subFolderId ?? null,
           userId: params.userId ?? null,

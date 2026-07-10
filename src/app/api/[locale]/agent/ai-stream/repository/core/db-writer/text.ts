@@ -166,6 +166,16 @@ export async function emitContentDone(
       cachedInputTokens: cachedInputTokens ?? null,
       timeToFirstToken: timeToFirstToken ?? null,
     });
+
+    // Embed this assistant message at write time — the next step's cortex
+    // refresh awaits this promise so its search sees the vector (cortex search
+    // reads stored vectors only). The assistant row exists now with final
+    // content, so it can carry its own vector like the user message does.
+    w.assistantEmbedPromise = (async (): Promise<void> => {
+      const { embedAssistantMessageRow } =
+        await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
+      await embedAssistantMessageRow(messageId, content, w.streamContext);
+    })();
   }
 }
 

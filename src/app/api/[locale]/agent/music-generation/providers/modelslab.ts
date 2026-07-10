@@ -25,8 +25,13 @@ interface ModelsLabMusicResponse {
   message?: string;
 }
 
-const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
-const MAX_POLL_ATTEMPTS = 80;
+// Real interval ALWAYS — never a test-only shortcut. pollDelay() collapses to
+// 10ms on REPLAY (via the fixture-replay response header), so replays stay
+// fast; a RECORDING run must actually wait the real cadence or it times out
+// before the generation finishes and records a bogus future_links fallback.
+// 3s × 60 = 3 min budget — music gen routinely takes a couple of minutes.
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 60;
 
 export async function generateMusicWithModelsLab(params: {
   providerModel: string;
@@ -165,11 +170,33 @@ export async function generateMusicWithModelsLab(params: {
       // caller ships a dead audio link. Only accept it if the file is ACTUALLY
       // there now (HEAD via the same fixture-aware fetch). Otherwise fail loudly.
       if (futureUrl) {
-        logger.error(
-          "[ModelsLab Music] Poll timed out, using future_links URL",
-          { futureUrl },
-        );
-        return success({ audioUrl: futureUrl });
+        let ready = false;
+        try {
+          const head = await fetchImpl(futureUrl, { method: "HEAD", signal });
+          ready = head.ok;
+          if (!ready) {
+            logger.error(
+              "[ModelsLab Music] Poll timed out; future_links URL not ready",
+              { futureUrl, status: head.status },
+            );
+          }
+        } catch (headErr) {
+          logger.error(
+            "[ModelsLab Music] Poll timed out; future_links HEAD check failed",
+            { futureUrl, error: parseError(headErr).message },
+          );
+        }
+        if (ready) {
+          logger.debug(
+            "[ModelsLab Music] Poll timed out but future_links file is ready",
+            { futureUrl },
+          );
+          return success({ audioUrl: futureUrl });
+        }
+        return fail({
+          message: t("post.errors.requestTimedOut"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
       }
 
       logger.error("[ModelsLab Music] Poll timed out, no future_links");

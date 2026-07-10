@@ -19,10 +19,24 @@ import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type {
-  remoteConnections,
-  TransportMode,
-} from "@/app/api/[locale]/remote-connection/db";
-import type { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
+  RemoteCallParams,
+  RemoteCallResult,
+  RemoteConnectionRow,
+  RemoteConnInfo,
+  RemoteTarget,
+  ResolveInferenceProviderParams,
+  ResolveTargetParams,
+} from "@/app/api/[locale]/remote-connection/types";
+
+export type {
+  RemoteCallParams,
+  RemoteCallResult,
+  RemoteConnectionRow,
+  RemoteConnInfo,
+  RemoteTarget,
+  ResolveInferenceProviderParams,
+  ResolveTargetParams,
+};
 
 import type { RouteExecuteResponseOutput } from "../definition";
 
@@ -80,115 +94,9 @@ export type PhaseResult =
   | { kind: "return"; value: ResponseType<RouteExecuteResponseOutput> }
   | { kind: "fallthrough" };
 
-/* ── Routing ───────────────────────────────────────────────────────────────── */
-
-export type RemoteConnectionRow = typeof remoteConnections.$inferSelect;
-
-/**
- * Resolved connection info for a remote instance (never null at the transport
- * phase — capability validation already rejected the null case).
- */
-export type RemoteConnInfo = NonNullable<
-  Awaited<
-    ReturnType<typeof RemoteConnectionRepository.getConnectionForInstance>
-  >
->;
-
-export interface RemoteTarget {
-  /** The name this side uses for the remote (e.g. "hermes" on atlas). */
-  instanceId: string;
-  remoteUrl: string;
-  token: string;
-  leadId: string;
-  transportMode: TransportMode;
-  /**
-   * When true, the executor PERSISTS its own copy of the thread (relay mode:
-   * REMOTE-folder routing / full inference provider). Tools and system prompt
-   * ALWAYS come from the CLIENT (options on the ai-stream) — this flag only
-   * controls thread storage + billing side, never prompt/tool origin.
-   */
-  useRemoteContext: boolean;
-  /**
-   * True when OUR row for this peer is a reverse entry (the peer connected TO
-   * us). Determines the peer's landing root for relay-persisted threads:
-   * false → peer is the serving side → REMOTE/<ourId>; true → peer is a
-   * client → BACKGROUND/remote/<ourId>.
-   */
-  isReverseEntry: boolean;
-}
-
-export interface ResolveTargetParams {
-  userId: string;
-  /** Explicit override — skips all routing matching */
-  instanceId?: string;
-  /**
-   * The thread/stream's loop location (a connection's instanceId). Placement
-   * is DATA and never routes; this explicit property is the only way a
-   * stream's loop moves to another instance (per-stream request field, or the
-   * chat_threads.loop_instance_id column persisting it for follow-up turns).
-   */
-  loopInstanceId?: string;
-  /** Model API provider (e.g. "openai", "anthropic") — used for provider-based routing */
-  modelProvider?: string;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-}
-
-export interface ResolveInferenceProviderParams {
-  userId: string;
-  /** Model API provider (e.g. "openai", "anthropic") — used for inference provider routing */
-  modelProvider?: string;
-  logger: EndpointLogger;
-}
-
-/* ── Transport ─────────────────────────────────────────────────────────────── */
-
-/**
- * Params for RemoteTransport.callRaw — the single sanctioned raw-HTTP call to
- * a remote instance. Used ONLY where the connection cannot be resolved by a
- * `remoteConnections` row yet (connection bootstrap: ping-for-leadId,
- * remote/self login, register) OR where the raw Response headers/status are
- * required. Every other remote call goes through
- * RouteExecuteRepository.runInProcessTyped.
- */
-export interface RemoteCallParams {
-  /** Base URL of the remote instance (e.g. https://thea.example). */
-  remoteUrl: string;
-  /**
-   * Path AFTER `/api/` including locale, e.g. `en-US/user/public/login`. Omit
-   * to hit `remoteUrl` directly (leadId-bootstrap ping against the locale page).
-   */
-  apiPath?: string;
-  method: Methods;
-  /** JSON body for POST/DELETE. */
-  body?: Record<string, WidgetData>;
-  /** Session token, if one exists yet (register / authenticated bootstrap). */
-  token?: string;
-  /**
-   * lead_id to send. For an authenticated call it is combined with the token in
-   * the Bearer header; for a pre-login call it is sent as the lead_id Cookie.
-   */
-  leadId?: string;
-  /** Follow redirects (leadId ping) vs surface them (manual). Default "follow". */
-  redirect?: "follow" | "manual";
-  timeoutMs?: number;
-}
-
-/** Result of RemoteTransport.callRaw. */
-export interface RemoteCallResult {
-  ok: boolean;
-  status: number;
-  /** Parsed JSON body (null if the response had no JSON body). */
-  body: Record<string, WidgetData> | null;
-  /** lead_id extracted from the response Set-Cookie header, if present. */
-  setCookieLeadId: string | null;
-  /** True when the fetch itself threw (network error / timeout). */
-  networkError: boolean;
-}
-
 /** Discriminated result of a synchronous direct-http tool call. */
 export type DirectCallResult =
-  | { ok: true; data: Record<string, WidgetData> }
+  | { ok: true; data: RouteExecuteResponseOutput }
   | {
       ok: false;
       /** The peer's error message, when its response body carried one. */
@@ -218,20 +126,6 @@ export interface PendingCallResult {
   output: Record<string, WidgetData> | null;
 }
 
-/** Revival target attached by await-task after dispatch. */
-export interface PendingCallRevival {
-  threadId: string;
-  toolMessageId: string;
-  callbackMode: string;
-  leafMessageId: string | null;
-  modelId: string | null;
-  skillId: string | null;
-  favoriteId: string | null;
-  subAgentDepth: number;
-  /** Owner user id — needed to fire the revival from reconciliation. */
-  userId: string;
-}
-
 export interface PendingCallEntry {
   callId: string;
   instanceId: string;
@@ -244,7 +138,6 @@ export interface PendingCallEntry {
   createdAt: number;
   deadlineTimer: ReturnType<typeof setTimeout> | null;
   result: PendingCallResult | null;
-  revival: PendingCallRevival | null;
   waiters: Array<(result: PendingCallResult) => void>;
   tombstoneTimer: ReturnType<typeof setTimeout> | null;
   /** Fired exactly once when the call settles (result, discard, or deadline).
@@ -267,7 +160,6 @@ export interface PendingCallInfo {
 export type CompletePendingCallOutcome =
   | {
       kind: "completed";
-      revival: PendingCallRevival | null;
       threadId: string | null;
       toolMessageId: string | null;
     }
@@ -287,20 +179,6 @@ export interface GoroutineResult {
    *  relays (receiver → requester result events) keep the real error text. */
   errorMessage: string | null;
   completedAt: Date;
-}
-
-/* ── Revival ───────────────────────────────────────────────────────────────── */
-
-/** Resolved params for TaskCompletion.handle, minus status/output/taskId/ownerUser/logger/locale. */
-export interface RevivalTarget {
-  toolMessageId: string;
-  threadId: string | null;
-  callbackMode: CallbackModeValue;
-  modelId: string | null;
-  skillId: string | null;
-  favoriteId: string | null;
-  leafMessageId: string | null;
-  subAgentDepth: number;
 }
 
 /* ── Completion ────────────────────────────────────────────────────────────── */

@@ -51,6 +51,7 @@ function installBroadcast(): void {
     broadcastToAll,
     broadcastBatch: vi.fn(),
     getChannelSize: () => channelSize,
+    closeConnectorSocket: vi.fn(),
   };
   registerLocalBroadcast(target);
 }

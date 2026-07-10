@@ -151,7 +151,7 @@ export const { GET } = createEndpoint({
             completedAt: z.string().nullable(),
             durationMs: z.coerce.number().nullable(),
             error: errorResponseSchema.nullable(),
-            result: z.record(z.string(), z.unknown()).nullable(),
+            result: z.record(z.string(), WidgetDataSchema).nullable(),
             environment: z.string().nullable(),
             createdAt: z.string(),
           }),

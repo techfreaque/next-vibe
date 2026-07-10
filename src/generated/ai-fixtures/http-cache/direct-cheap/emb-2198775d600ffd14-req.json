@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog-explorer-6ab83b87-dbb3-4779-a2e3-ed79e3227c17.md\n\n# Tool Catalog Explorer\nFolder: private\nDescription: Testing tool-help with category, keyword, and schema queries on hermes instance.",
+    "encoding_format": "float"
+  }
+}

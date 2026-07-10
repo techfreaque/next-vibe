@@ -93,8 +93,8 @@ export interface SystemPromptResult {
 }
 
 export interface SystemPromptParams {
-  /** Fixture chain of the stream — cortex vector-search embeddings bind it. */
-  fixtureContext: FixtureContext | undefined;
+  /** Fixture thread id — cortex vector-search embeddings bind it. */
+  streamContext: ToolExecutionContext;
   skillId: string | null | undefined;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -112,7 +112,8 @@ export interface SystemPromptParams {
   excludeMemories?: boolean;
   memoryLimit?: number | null;
   mediaCapabilities?: MediaCapabilitiesParams;
-  lastUserMessage?: string;
+  /** Fired user-message embed — awaited by the cortex search (see server params). */
+  messageEmbedReady?: Promise<void>;
   threadId: string | null;
   voiceTranscription?: {
     wasTranscribed: boolean;
@@ -138,7 +139,6 @@ export async function buildSystemPrompt(
     excludeMemories,
     memoryLimit,
     mediaCapabilities,
-    lastUserMessage,
     voiceTranscription,
   } = params;
 
@@ -155,7 +155,7 @@ export async function buildSystemPrompt(
   });
 
   const serverParams: SystemPromptServerParams = {
-    fixtureContext: params.fixtureContext,
+    streamContext: params.streamContext,
     user,
     logger,
     locale,
@@ -170,9 +170,9 @@ export async function buildSystemPrompt(
     subAgentDepth,
     callMode: callMode ?? false,
     extraInstructions: extraInstructions ?? "",
-    lastUserMessage,
     memoryLimit: memoryLimit ?? null,
     mediaCapabilities,
+    messageEmbedReady: params.messageEmbedReady,
     threadId: params.threadId ?? null,
   };
 

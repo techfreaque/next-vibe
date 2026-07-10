@@ -312,7 +312,7 @@ export class AbortErrorHandler {
     tools?: Record<string, CoreTool>;
     toolsConfig?: Map<
       string,
-      { requiresConfirmation: boolean; credits: number; label: string }
+      { requiresConfirmation?: boolean; credits: number; label: string }
     >;
     user: JwtPayloadType;
     t: AiStreamT;
@@ -585,6 +585,17 @@ export class AbortErrorHandler {
           messageId: ctx.currentAssistantMessageId,
         });
       }
+    }
+
+    // USER_CANCELLED: drain all in-memory pending remote calls for this thread
+    // so clearStreamingState sees no pending work and sets the thread IDLE.
+    // Without this, PendingCalls.hasForThread() returns true for the in-flight
+    // remote call, clearStreamingState pins the thread to WAITING, and a second
+    // cancel finds WAITING → sends StreamControl to a dead stream → stuck forever.
+    if (streamAbort?.reason === AbortReason.USER_CANCELLED && threadId) {
+      const { PendingCalls } =
+        await import("next-vibe/execute-tool/repository/pending-calls");
+      PendingCalls.cancelAllForThread(threadId);
     }
 
     // Clear streaming state in DB + registry.

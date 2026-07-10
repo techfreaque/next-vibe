@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T6a wakeUp-phase1] Call execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/cb-wakeup-test', 'content':'wakeup-test-payload'}, callbackMode='wakeUp'. The write runs asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO responsePath — end your reply with STEP_OK, or FAILED: <reason> if there is a responsePath already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the tool's real output): seeing a non-empty responsePath in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. In phase 2, confirm the deferred result contains a non-empty responsePath, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO responsePath appears.",
+    "encoding_format": "float"
+  }
+}

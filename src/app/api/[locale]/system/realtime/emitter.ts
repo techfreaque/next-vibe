@@ -30,11 +30,11 @@ import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
 
 import { buildUserWsChannel, buildWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";
+import type { ResolvedRelayContext } from "./remote-event-bridge/relay-context";
 import type {
   AnyEndpointEventEnvelope,
   EmitChannelKind,
   EmitDataRuntime,
-  EmitEventNamed,
   EmitResult,
   EndpointEmitter,
 } from "./structured-events";
@@ -108,6 +108,19 @@ export interface RemoteEventRelayPayload<TPayload = AnyEndpointEventEnvelope> {
   logger: EndpointLogger;
   syncDomain?: SyncDomain;
   envelope: TPayload;
+  /**
+   * Point-to-point delivery: relay ONLY over the connection to this instance.
+   * Broadcast semantics (thread mirroring etc.) leave it unset. Tool dispatch
+   * (tool-execute-request/result) MUST set it — an account with several peers
+   * would otherwise double-execute requests and leak results across peers.
+   */
+  targetInstanceId?: string;
+  /**
+   * Pre-resolved relay context for this session (originInstanceId + connections).
+   * When provided, pushRemoteEvent skips both per-event DB queries entirely.
+   * Resolve once at session/stream start via resolveRemoteEventContext().
+   */
+  resolvedRelayContext?: ResolvedRelayContext;
 }
 
 /**
@@ -120,6 +133,12 @@ export interface RemoteEventWirePayload<TPayload = AnyEndpointEventEnvelope> {
   originInstanceId: string;
   syncDomain?: SyncDomain;
   envelope: TPayload;
+  /**
+   * Receiver ADDRESS for point-to-point frames on the shared reverse-ws hub
+   * channel: the target connection's leadId (both sides know it — rename-proof,
+   * unlike instance names). Set by the bridge per delivery leg.
+   */
+  targetLeadId?: string;
 }
 
 /**
@@ -214,6 +233,17 @@ interface EmitterOptions {
   };
   /** Set false to suppress remote relay (e.g. connector replaying a peer stream). Default true. */
   readonly fanOut?: boolean;
+  /**
+   * Point-to-point remote relay: deliver ONLY over the connection to this
+   * instance (see RemoteEventRelayPayload.targetInstanceId).
+   */
+  readonly targetInstanceId?: string;
+  /**
+   * Pre-resolved relay context (originInstanceId + active connections).
+   * When set, every remoteEvent emit on this emitter skips both per-event DB
+   * queries. Resolve once per session via resolveRemoteEventContext().
+   */
+  readonly resolvedRelayContext?: ResolvedRelayContext;
 }
 
 export type ChannelBinding<TEndpoint extends CreateApiEndpointAny> =
@@ -238,7 +268,7 @@ export type ChannelBinding<TEndpoint extends CreateApiEndpointAny> =
  * options (batcher/fanOut) ride on the same object, so there is never a separate
  * arg forcing an empty channel slot.
  */
-type ChannelArgs<TEndpoint extends CreateApiEndpointAny> =
+export type ChannelArgs<TEndpoint extends CreateApiEndpointAny> =
   HasNoUrlParams<TEndpoint> extends true
     ? HasNoCacheKey<TEndpoint> extends true
       ? [channel?: ChannelBinding<TEndpoint>]
@@ -251,7 +281,7 @@ type ChannelArgs<TEndpoint extends CreateApiEndpointAny> =
  * the emitter body reads the binding through it without a cast — `urlPathParams`
  * and `requestData` are each present only when the endpoint declares them.
  */
-interface ChannelKeyView {
+export interface ChannelKeyView {
   readonly urlPathParams?: Record<string, string>;
   readonly requestData?: CacheKeyParams;
   readonly kindOverride?: EmitChannelKind;
@@ -281,12 +311,7 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
   logger: EndpointLogger,
   user: JwtPayloadType,
   ...rest: ChannelArgs<TEndpoint>
-): EmitEventNamed<
-  TEndpoint["types"]["EventResponsePayloads"],
-  TEndpoint["types"]["EventRequestPayloads"],
-  TEndpoint["types"]["EventEmitUrlPayloads"],
-  TEndpoint["types"]["EventPayloadTypes"]
-> {
+): EndpointEmitter<TEndpoint> {
   const [channel] = rest;
   const options: EmitterOptions = channel ?? {};
   const userId = user.isPublic ? user.leadId : user.id;
@@ -386,6 +411,8 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
           logger,
           syncDomain: eventDecl.syncDomain,
           envelope,
+          targetInstanceId: options?.targetInstanceId,
+          resolvedRelayContext: options?.resolvedRelayContext,
         };
         void import("next-vibe/realtime/remote-event-bridge/repository").then(
           ({ RemoteEventBridgeRepository }) =>
@@ -406,12 +433,7 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
     // signature to an overload union, so this is the one place the erased impl is
     // re-typed as its typed facade — through `any` per the standard pattern.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }) as EmitEventNamed<any, any, any, any> as EmitEventNamed<
-    TEndpoint["types"]["EventResponsePayloads"],
-    TEndpoint["types"]["EventRequestPayloads"],
-    TEndpoint["types"]["EventEmitUrlPayloads"],
-    TEndpoint["types"]["EventPayloadTypes"]
-  >;
+  }) as EndpointEmitter<TEndpoint>;
 }
 
 /**

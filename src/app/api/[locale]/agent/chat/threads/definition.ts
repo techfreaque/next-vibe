@@ -220,7 +220,7 @@ const { GET } = createEndpoint({
               text: "get.response.threads.thread.status.content" as const,
               schema: z.enum(ThreadStatusDB),
             }),
-            preview: responseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.threads.thread.preview.content" as const,
               schema: z.string().nullable(),
@@ -465,7 +465,7 @@ const { GET } = createEndpoint({
           await import("@/app/api/[locale]/agent/chat/incognito/storage");
         await updateIncognitoThread(item.id, {
           streamingState: item.streamingState,
-          preview: item.preview,
+          description: item.description,
           updatedAt: item.updatedAt,
         });
       },
@@ -679,6 +679,10 @@ const { POST } = createEndpoint({
       onEvent: async ({ requestData, logger }) => {
         const rootFolderId =
           requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
+        // The thread's real subfolder — insert into the LIST cache keyed by it
+        // so a subfolder thread (e.g. PRIVATE/cheap) appears in its own list,
+        // not the root. Was hardcoded null, so subfolder views never saw it.
+        const subFolderId = requestData.subFolderId ?? null;
         const threadId = requestData.id;
         const { apiClient } =
           await import("next-vibe/platforms/react/hooks/store");
@@ -701,9 +705,9 @@ const { POST } = createEndpoint({
               id: threadId,
               title: requestData.title ?? "",
               rootFolderId,
-              folderId: null,
+              folderId: subFolderId,
               status: ThreadStatus.ACTIVE,
-              preview: null,
+              description: null,
               pinned: false,
               archived: false,
               rolesView: [],
@@ -728,7 +732,7 @@ const { POST } = createEndpoint({
               },
             };
           },
-          { requestData: { rootFolderId, subFolderId: null } },
+          { requestData: { rootFolderId, subFolderId } },
         );
       },
     },

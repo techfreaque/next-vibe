@@ -76,7 +76,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
             CampaignType.NOTIFICATION,
           ],
         });
-        logger.info(`Created SMTP messenger account: ${SMTP_ACCOUNT_NAME}`);
+        logger.debug(`Created SMTP messenger account: ${SMTP_ACCOUNT_NAME}`);
       }
     }
 
@@ -127,7 +127,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       isActive: true,
     });
 
-    logger.info(`Created lead magnet platform-email config for ${adminEmail}`);
+    logger.info(
+      formatDatabase(`Lead magnet: configured for ${adminEmail}`, "📬"),
+    );
   } catch (error) {
     logger.error(`Lead magnet seed failed: ${String(error)}`);
   }

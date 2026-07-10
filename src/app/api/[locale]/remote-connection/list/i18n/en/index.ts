@@ -66,6 +66,11 @@ export const translations = {
     incomingBadge: "Incoming",
     inactiveBadge: "Inactive",
     inferenceProviderBadge: "Inference",
+    transportBadge: "out {{out}} · in {{in}}",
+    transport: {
+      reverseWs: "WS",
+      directHttp: "HTTP",
+    },
     instanceId: "Instance ID",
     remoteUrl: "Remote URL",
     viewButton: "View",

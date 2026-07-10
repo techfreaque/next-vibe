@@ -189,7 +189,8 @@ if (!_resolvedRemoteUrl) {
       it(
         "A1: AI calls hermes cortex-list via execute-tool and gets a result back",
         async () => {
-          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}a1` };
+          const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+            await seedCaseThread(`${CACHE_PREFIX}a1`, true);
 
           const { result, messages } = await runTestStream({
             prompt:
@@ -200,8 +201,8 @@ if (!_resolvedRemoteUrl) {
             favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
-            threadId: sharedThreadId,
-            fixtureContext: fixtureCtx,
+            threadId: fixtureThreadId,
+            streamContext: fixtureCtx,
           });
 
           expect(
@@ -261,7 +262,6 @@ if (!_resolvedRemoteUrl) {
       it(
         "A2: AI writes to hermes cortex via execute-tool and reads it back",
         async () => {
-          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}a2` };
           expect(
             sharedThreadId,
             "A1 must create thread before A2",
@@ -286,7 +286,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(undefined, sharedThreadId, /* no user context — UTC (dates not user-facing here) */ "UTC"),
           });
 
           expect(
@@ -347,7 +347,8 @@ if (!_resolvedRemoteUrl) {
       it(
         "B1: AI loop runs on hermes via folder routing, reads hermes cortex natively",
         async () => {
-          const fixtureCtx: FixtureContext = { name: `${CACHE_PREFIX}b1` };
+          const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+            await seedCaseThread(`${CACHE_PREFIX}b1`, true);
 
           // Stream into REMOTE/hermes/tests/cortex-remote.
           // REMOTE-folder routing: folder ancestry resolves to hermes connection deterministically.
@@ -362,8 +363,8 @@ if (!_resolvedRemoteUrl) {
             favoriteId: mainFavoriteId,
             rootFolderId: DefaultFolderId.REMOTE,
             subFolderId: remoteHermesFolderId,
-            threadId: sharedThreadId,
-            fixtureContext: fixtureCtx,
+            threadId: fixtureThreadId,
+            streamContext: fixtureCtx,
           });
 
           expect(

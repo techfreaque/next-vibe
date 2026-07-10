@@ -370,18 +370,18 @@ function ThreadRow({
                   >
                     {thread.title}
                   </Div>
-                  {!compact && thread.preview && (
+                  {!compact && thread.description && (
                     <Div className="text-xs text-muted-foreground truncate">
-                      {thread.preview}
+                      {thread.description}
                     </Div>
                   )}
                 </Div>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-xs">
                 <P className="text-sm">{thread.title}</P>
-                {thread.preview && (
+                {thread.description && (
                   <P className="text-xs text-muted-foreground mt-1">
-                    {thread.preview}
+                    {thread.description}
                   </P>
                 )}
               </TooltipContent>

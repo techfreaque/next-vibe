@@ -228,7 +228,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
               .update(customSkills)
               .set({ variants: skillData.variants })
               .where(eq(customSkills.id, existingSkill.id));
-            logger.info(`Updated variants for test skill: ${skillData.name}`);
+            logger.debug(`Updated variants for test skill: ${skillData.name}`);
           } else {
             logger.debug(
               `Test skill "${skillData.name}" already exists, skipping`,
@@ -247,13 +247,16 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           userId: adminId,
         });
 
-        logger.info(`Created test skill: ${skillData.name} (slug: ${slug})`);
+        logger.debug(`Created test skill: ${skillData.name} (slug: ${slug})`);
       } catch (error) {
         logger.error(
           `Failed to create test skill "${skillData.name}": ${String(error)}`,
         );
       }
     }
+    logger.info(
+      formatDatabase(`Test skills: ${TEST_SKILLS.length} seeded`, "🧠"),
+    );
   } catch (error) {
     logger.error(`Skills seed failed: ${String(error)}`);
   }

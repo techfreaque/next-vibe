@@ -156,6 +156,11 @@ export const translations: typeof enTranslations = {
         directHttp: "Direkt HTTP",
       },
     },
+    remoteTransportMode: {
+      label: "Ihr Transportmodus",
+      description:
+        "Wie die Gegenstelle diese Seite erreicht. reverse-ws: wir halten einen ausgehenden Connector, um ihre Sendungen zu empfangen. direct-http: sie senden an unsere Bridge.",
+    },
     isInferenceProvider: {
       label: "Inferenz-Provider",
       description:

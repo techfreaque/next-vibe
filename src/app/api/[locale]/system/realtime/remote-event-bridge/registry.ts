@@ -166,6 +166,98 @@ function unwrapArrayElement(schema: z.ZodTypeAny): z.ZodTypeAny {
   return schema;
 }
 
+/**
+ * Gate an envelope's four fields against an entry's event declaration, returning
+ * the normalised typed records, or null on validation failure (logged). Shared by
+ * the remote-event and client-emit dispatch paths — the correctness gate is
+ * identical; only the ORIGIN (server-to-server vs browser) and AUTH differ.
+ */
+function gateEnvelope(
+  entry: RegistryEntry,
+  envelope: AnyEndpointEventEnvelope,
+  logger: EndpointLogger,
+): {
+  responseData: Record<string, WidgetData>;
+  requestData: Record<string, WidgetData>;
+  urlPathParams: Record<string, WidgetData>;
+  payload: WidgetData;
+} | null {
+  const { endpoint } = entry;
+  const eventDecl = (
+    endpoint.events as
+      | Record<
+          string,
+          {
+            responseFields?:
+              | readonly string[]
+              | Record<string, readonly string[] | true>;
+            requestFields?: readonly string[];
+            urlPathParamsFields?: readonly string[];
+            payloadType?: z.ZodTypeAny;
+          }
+        >
+      | undefined
+  )?.[envelope.eventName];
+
+  const responseGate = buildFieldSchema(
+    endpoint.responseSchema,
+    eventDecl?.responseFields as
+      | readonly string[]
+      | Record<string, readonly string[] | true>
+      | undefined,
+  ).safeParse(envelope.responseData ?? {});
+  const requestGate = buildFieldSchema(
+    endpoint.requestSchema,
+    eventDecl?.requestFields,
+  ).safeParse(envelope.requestData ?? {});
+  const urlGate = buildFieldSchema(
+    endpoint.requestUrlPathParamsSchema,
+    eventDecl?.urlPathParamsFields,
+  ).safeParse(envelope.urlPathParams ?? {});
+
+  if (!responseGate.success || !requestGate.success || !urlGate.success) {
+    logger.warn(
+      "[RemoteEventRegistry] Envelope parse failed — dropping event",
+      {
+        eventName: envelope.eventName,
+        endpointPath: entry.endpoint.path.join("/"),
+        responseError: responseGate.success
+          ? undefined
+          : responseGate.error.message,
+        requestError: requestGate.success
+          ? undefined
+          : requestGate.error.message,
+        urlError: urlGate.success ? undefined : urlGate.error.message,
+      },
+    );
+    return null;
+  }
+
+  let parsedPayload: WidgetData = undefined;
+  if (eventDecl?.payloadType) {
+    const gate = eventDecl.payloadType.safeParse(envelope.payload);
+    if (!gate.success) {
+      logger.warn(
+        "[RemoteEventRegistry] Payload parse failed — dropping event",
+        {
+          eventName: envelope.eventName,
+          endpointPath: entry.endpoint.path.join("/"),
+          error: gate.error.message,
+        },
+      );
+      return null;
+    }
+    parsedPayload = WidgetDataSchema.parse(envelope.payload);
+  }
+
+  return {
+    responseData: recordSchema.parse(responseGate.data),
+    requestData: recordSchema.parse(requestGate.data),
+    urlPathParams: recordSchema.parse(urlGate.data),
+    payload: parsedPayload,
+  };
+}
+
 export async function dispatchRemoteEvent(
   endpointPath: readonly string[],
   method: string,
@@ -225,72 +317,9 @@ export async function dispatchRemoteEvent(
     return;
   }
 
-  const { endpoint } = entry;
-  const eventDecl = (
-    endpoint.events as
-      | Record<
-          string,
-          {
-            responseFields?:
-              | readonly string[]
-              | Record<string, readonly string[] | true>;
-            requestFields?: readonly string[];
-            urlPathParamsFields?: readonly string[];
-            payloadType?: z.ZodTypeAny;
-          }
-        >
-      | undefined
-  )?.[envelope.eventName];
-
-  const responseGate = buildFieldSchema(
-    endpoint.responseSchema,
-    eventDecl?.responseFields as
-      | readonly string[]
-      | Record<string, readonly string[] | true>
-      | undefined,
-  ).safeParse(envelope.responseData ?? {});
-  const requestGate = buildFieldSchema(
-    endpoint.requestSchema,
-    eventDecl?.requestFields,
-  ).safeParse(envelope.requestData ?? {});
-  const urlGate = buildFieldSchema(
-    endpoint.requestUrlPathParamsSchema,
-    eventDecl?.urlPathParamsFields,
-  ).safeParse(envelope.urlPathParams ?? {});
-
-  if (!responseGate.success || !requestGate.success || !urlGate.success) {
-    ctx.logger.warn(
-      "[RemoteEventRegistry] Envelope parse failed — dropping event",
-      {
-        eventName: envelope.eventName,
-        endpointPath: endpointPath.join("/"),
-        responseError: responseGate.success
-          ? undefined
-          : responseGate.error.message,
-        requestError: requestGate.success
-          ? undefined
-          : requestGate.error.message,
-        urlError: urlGate.success ? undefined : urlGate.error.message,
-      },
-    );
+  const gated = gateEnvelope(entry, envelope, ctx.logger);
+  if (!gated) {
     return;
-  }
-
-  let parsedPayload: WidgetData = undefined;
-  if (eventDecl?.payloadType) {
-    const gate = eventDecl.payloadType.safeParse(envelope.payload);
-    if (!gate.success) {
-      ctx.logger.warn(
-        "[RemoteEventRegistry] Payload parse failed — dropping event",
-        {
-          eventName: envelope.eventName,
-          endpointPath: endpointPath.join("/"),
-          error: gate.error.message,
-        },
-      );
-      return;
-    }
-    parsedPayload = WidgetDataSchema.parse(envelope.payload);
   }
 
   // Authorization is the connection's identity, not a per-resource channel check.
@@ -305,10 +334,7 @@ export async function dispatchRemoteEvent(
   // does not exist on this instance yet, so it would wrongly drop the very sync
   // meant to create it.
   await handler({
-    responseData: recordSchema.parse(responseGate.data),
-    requestData: recordSchema.parse(requestGate.data),
-    urlPathParams: recordSchema.parse(urlGate.data),
-    payload: parsedPayload,
+    ...gated,
     instanceId: ctx.instanceId,
     originInstanceId: ctx.originInstanceId,
     user: ctx.user,

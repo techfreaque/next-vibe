@@ -53,7 +53,6 @@ import { SkillCategory } from "@/app/api/[locale]/agent/skills/enum";
 import remoteConnectionDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
 import remoteConnectDefinitions from "@/app/api/[locale]/remote-connection/connect/definition";
 import {
-  DEFAULT_SYNC_SCOPE,
   remoteConnections,
   type SyncScope,
 } from "@/app/api/[locale]/remote-connection/db";
@@ -172,7 +171,6 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -624,7 +622,6 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -952,7 +949,6 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -1389,7 +1385,6 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -1712,7 +1707,6 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -2127,7 +2121,6 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -2453,7 +2446,6 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,
@@ -2820,7 +2812,10 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 
       // 1. Disable threads sync on atlas's hermes connection row
       const scopeThreadsOff: SyncScope = {
-        ...DEFAULT_SYNC_SCOPE,
+        memories: true,
+        documents: true,
+        skills: true,
+        favorites: true,
         threads: false,
       };
       await db
@@ -2864,7 +2859,10 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       } finally {
         // 6. Restore syncScope.threads=true
         const scopeThreadsOn: SyncScope = {
-          ...DEFAULT_SYNC_SCOPE,
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
           threads: true,
         };
         await db
@@ -3157,7 +3155,7 @@ describe("Mount hierarchy: /threads", () => {
         title: "Test Thread",
         rootFolderId: "private",
         tags: ["test", "e2e"],
-        preview: "Hello, this is a test preview",
+        description: "Hello, this is a test preview",
       });
 
       expect(thin, "T5: must contain title").toContain("# Test Thread");
@@ -4333,7 +4331,6 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
             skills: true,
             favorites: true,
             threads: true,
-            chat: true,
           },
         },
         user: devUser,

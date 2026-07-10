@@ -2,8 +2,8 @@ import "server-only";
 
 /**
  * Cortex Embedding Service
- * Generates text embeddings via OpenRouter (qwen/qwen3-embedding-8b, 3072 dims).
- * Used for semantic search across cortex nodes.
+ * Generates text embeddings via OpenRouter (baai/bge-m3, 3072 dims).
+ * Used for semantic search across cortex nodes and chat messages.
  */
 import { createHash } from "node:crypto";
 
@@ -14,20 +14,24 @@ import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { ToolExecutionContext } from "../../chat/config";
 
-/** Embedding model dimension */
-export const EMBEDDING_DIMENSIONS = 3072;
+/** Embedding model used for all cortex and message embeddings */
+export const EMBEDDING_MODEL = "baai/bge-m3";
+
+/** Embedding model dimension (baai/bge-m3 native = 1024) */
+export const EMBEDDING_DIMENSIONS = 1024;
 
 /** Credits charged per embedding API call */
-export const EMBEDDING_CREDIT_COST = 0.1;
+export const EMBEDDING_CREDIT_COST = 0.01;
 
 /**
  * Compute a SHA-256 hash of the text that would be embedded (path + content).
- * Used to skip redundant embedding API calls when nothing changed.
- * v2: prefix invalidates all pre-v2 embeddings (content-only era) so they
- * are regenerated with the new path+content strategy on next write/backfill.
+ * Includes the model name — changing EMBEDDING_MODEL invalidates all hashes
+ * so backfill automatically re-embeds every node (no user credit deduction).
  */
 export function computeEmbeddingHash(path: string, content: string): string {
-  return createHash("sha256").update(`v2:${path}\n\n${content}`).digest("hex");
+  return createHash("sha256")
+    .update(`${EMBEDDING_MODEL}:${path}\n\n${content}`)
+    .digest("hex");
 }
 
 interface EmbeddingResponse {
@@ -107,8 +111,35 @@ export async function generateEmbedding(
       "[cortex-embedding] Failed to generate embedding",
       parseError(error),
     );
+    // In a FIXTURE run (the stream's threadId maps to a fixtures row), a failed
+    // embedding is NOT benign — it means the fixture is missing or the live
+    // record leg broke. Throw so the test fails loudly instead of silently
+    // degrading to no-memory. Prod (no fixtures row) stays resilient → null.
+    if (await isFixtureContext(streamContext)) {
+      // oxlint-disable-next-line restricted-syntax -- fail the fixture run loudly
+      throw error instanceof Error
+        ? error
+        : // eslint-disable-next-line i18next/no-literal-string
+          new Error(`embedding failed in fixture run: ${String(error)}`);
+    }
     return null;
   }
+}
+
+/**
+ * True when the stream is running under a fixtures context (its threadId maps to
+ * a fixtures row) — i.e. a test record/replay run, where a failed embedding must
+ * fail the run rather than silently degrade.
+ */
+async function isFixtureContext(
+  streamContext: ToolExecutionContext,
+): Promise<boolean> {
+  if (!streamContext.threadId) {
+    return false;
+  }
+  const { readFixturePrefix } =
+    await import("@/app/api/[locale]/agent/ai-stream/testing/fetch-cache");
+  return (await readFixturePrefix(streamContext.threadId)) !== null;
 }
 
 /**
@@ -128,7 +159,7 @@ async function callEmbeddingApi(
       "X-Title": "Unbottled AI",
     },
     body: JSON.stringify({
-      model: "qwen/qwen3-embedding-8b",
+      model: EMBEDDING_MODEL,
       input: text,
       encoding_format: "float",
     }),

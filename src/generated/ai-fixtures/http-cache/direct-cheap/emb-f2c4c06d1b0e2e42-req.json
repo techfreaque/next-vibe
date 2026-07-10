@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Result:** `leads-list` on hermes returned successfully with:\n\n- **Total leads:** 1,941 (across 39 pages)\n- **Counts by status:** websiteUser (571), signedUp (361), new (308), unsubscribed (114), subscriptionConfirmed (108), pending (100), campaignRunning (102), bounced (96), invalid (91), newsletterSubscriber (90), inContact (0)\n- **Lead entries:** 50 per page with full details (id, status, source, country, language, timestamps, metadata)\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

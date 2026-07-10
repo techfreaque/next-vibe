@@ -1,65 +1,48 @@
 import "server-only";
 
-import type {
-  SystemPromptFragment,
-  SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
-export interface SkillData {
-  skillPrompt: string;
-}
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 
-export const skillFragment: SystemPromptFragment<SkillData> = {
+export const skillFragment: SystemPromptFragment = {
   id: "skill",
   placement: "leading",
   priority: 600,
-  build: (data) => {
-    if (!data.skillPrompt?.trim()) {
+  build: async (params) => {
+    const { skillId, user, logger, locale } = params;
+
+    if (!skillId) {
       return null;
     }
-    return `## Your Role\n\n${data.skillPrompt.trim()}`;
+
+    try {
+      const { SkillsRepository } = await import("./repository");
+      const result = await SkillsRepository.getSkillById(
+        { id: skillId },
+        user,
+        logger,
+        locale,
+      );
+
+      if (!result.success) {
+        logger.warn("Skill not found, using default behavior", {
+          skillId,
+          error: result.message,
+        });
+        return null;
+      }
+
+      const prompt = result.data.systemPrompt?.trim();
+      if (!prompt) {
+        return null;
+      }
+      return `## Your Role\n\n${prompt}`;
+    } catch (error) {
+      logger.error("Failed to load skill for system prompt", {
+        skillId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
   },
 };
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-export async function loadSkillData(
-  params: SystemPromptServerParams,
-): Promise<SkillData> {
-  const { skillId, user, logger, locale } = params;
-
-  if (!skillId) {
-    return { skillPrompt: "" };
-  }
-
-  try {
-    const { SkillsRepository } = await import("./repository");
-    const result = await SkillsRepository.getSkillById(
-      { id: skillId },
-      user,
-      logger,
-      locale,
-    );
-
-    if (!result.success) {
-      logger.warn("Skill not found, using default behavior", {
-        skillId,
-        error: result.message,
-      });
-      return { skillPrompt: "" };
-    }
-
-    const prompt = result.data.systemPrompt;
-    return { skillPrompt: prompt?.trim() ?? "" };
-  } catch (error) {
-    logger.error("Failed to load skill for system prompt", {
-      skillId,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return { skillPrompt: "" };
-  }
-}

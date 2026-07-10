@@ -298,7 +298,8 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
         locale,
         logger,
         platform: platform,
-        streamContext: makeHeadlessContext(undefined, undefined),
+        // no user context \u2014 UTC (dates not user-facing here)
+        streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
       });
       setSaveMsg("Saved \u2713");
       setEdits({});
@@ -670,7 +671,8 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
         locale,
         logger,
         platform: platform,
-        streamContext: makeHeadlessContext(undefined, undefined),
+        // no user context — UTC (dates not user-facing here)
+        streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
       });
       setSaveMsg("Saved ✓");
     } catch {
@@ -982,7 +984,8 @@ export function SystemSettingsPatchWidget(): JSX.Element {
           locale,
           logger,
           platform: platform as Platform,
-          streamContext: makeHeadlessContext(undefined, undefined),
+          // no user context — UTC (dates not user-facing here)
+          streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
         });
         if (result.success) {
           const value = result.data;

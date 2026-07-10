@@ -62,6 +62,7 @@
     ".next-prod",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx",
+    "src/generated/ai-fixtures",
     "**/test-project/**",
     "**/test-files/**",
     ".dist-tanstack",

@@ -263,7 +263,7 @@ export class FolderContentsRepository {
           title: null,
           folderId: null,
           status: null,
-          preview: null,
+          description: null,
           pinned: folder.pinned,
           archived: null,
           canEdit: null,
@@ -438,7 +438,7 @@ export class FolderContentsRepository {
           title: thread.title,
           folderId: thread.folderId,
           status: thread.status,
-          preview: thread.preview,
+          description: thread.description,
           pinned: thread.pinned,
           archived: thread.archived,
           canEdit,
@@ -661,7 +661,7 @@ export class FolderContentsRepository {
           title: thread.title,
           folderId: thread.folderId,
           status: thread.status,
-          preview: thread.preview,
+          description: thread.description,
           pinned: thread.pinned,
           archived: thread.archived,
           canEdit,
@@ -799,6 +799,14 @@ export class FolderContentsRepository {
         sortOrder: chatFolders.sortOrder,
         createdAt: chatFolders.createdAt,
         updatedAt: chatFolders.updatedAt,
+        // Behavioral props so the emitted folder item is complete (not a stub).
+        expanded: chatFolders.expanded,
+        rolesView: chatFolders.rolesView,
+        rolesManage: chatFolders.rolesManage,
+        rolesCreateThread: chatFolders.rolesCreateThread,
+        rolesPost: chatFolders.rolesPost,
+        rolesModerate: chatFolders.rolesModerate,
+        rolesAdmin: chatFolders.rolesAdmin,
       })
       .from(chatFolders)
       .where(eq(chatFolders.id, leafId))
@@ -821,6 +829,18 @@ export class FolderContentsRepository {
       rootFolderId: DefaultFolderId.REMOTE,
       createdAt: leaf.createdAt,
       updatedAt: leaf.updatedAt,
+      expanded: leaf.expanded,
+      canManage: true,
+      canCreateThread: true,
+      canModerate: true,
+      canDelete: true,
+      canManagePermissions: true,
+      rolesView: leaf.rolesView ?? [],
+      rolesManage: leaf.rolesManage ?? [],
+      rolesCreateThread: leaf.rolesCreateThread ?? [],
+      rolesPost: leaf.rolesPost ?? [],
+      rolesModerate: leaf.rolesModerate ?? [],
+      rolesAdmin: leaf.rolesAdmin ?? [],
     };
     const { createEndpointEmitter } =
       await import("next-vibe/realtime/emitter");

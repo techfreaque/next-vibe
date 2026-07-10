@@ -3,14 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
-    container_name: preview-postgres
+    container_name: ${COMPOSE_PROJECT_NAME:-next-vibe}-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: hermes
     volumes:
-      - postgres_preview_data:/var/lib/postgresql/data
+      - hermes_data:/var/lib/postgresql/data
     ports:
       - "${PREVIEW_DB_PORT:-5433}:5432"
     healthcheck:
@@ -21,4 +21,4 @@ services:
       start_period: 10s
 
 volumes:
-  postgres_preview_data:
+  hermes_data:

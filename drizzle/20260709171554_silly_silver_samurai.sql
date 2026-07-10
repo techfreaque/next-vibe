@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ALTER COLUMN "transport_mode" SET DEFAULT 'direct-http';

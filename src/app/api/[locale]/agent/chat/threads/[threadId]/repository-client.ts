@@ -68,8 +68,9 @@ export class ChatThreadByIdRepositoryClient {
         pinned: thread.pinned ?? false,
         archived: thread.archived ?? false,
         tags: thread.tags ?? [],
-        preview: (thread.preview as string | null | undefined) ?? null,
-        metadata: thread.metadata ?? {},
+        description: (thread.description as string | null | undefined) ?? null,
+        // No durable per-thread stream state to expose here.
+        metadata: {},
         createdAt: new Date(thread.createdAt),
         updatedAt: new Date(thread.updatedAt),
         leadId: null as string | null,
@@ -180,7 +181,7 @@ export class ChatThreadByIdRepositoryClient {
         rootFolderId: thread.rootFolderId,
         folderId: thread.folderId ?? null,
         status: thread.status ?? ThreadStatus.ACTIVE,
-        preview: thread.preview ?? null,
+        description: thread.description ?? null,
         createdAt: new Date(thread.createdAt),
         updatedAt: new Date(thread.updatedAt),
       });

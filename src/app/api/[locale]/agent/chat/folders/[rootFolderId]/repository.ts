@@ -369,9 +369,29 @@ export class ChatFoldersRepository {
         logger,
         user,
         newFolder.rootFolderId,
+        { subFolderId: newFolder.parentId },
       );
-      // Folder CRUD SYNCS by SAME id: the item's regular fields carry
-      // everything the peer needs; the applier gates on rootFolderId.
+      // Compute the same permission flags the GET builds for a folder item.
+      const newFolderMap = { [newFolder.id]: newFolder };
+      const [
+        canManageFlag,
+        canCreateThreadFlag,
+        canModerateFlag,
+        canDeleteFlag,
+        canManagePermsFlag,
+      ] = await Promise.all([
+        canManageFolder(user, newFolder, logger, locale, newFolderMap),
+        canCreateThreadInFolder(user, newFolder, logger, locale, newFolderMap),
+        canHideFolder(user, newFolder, logger, locale, newFolderMap),
+        canDeleteFolder(user, newFolder, logger, locale, newFolderMap),
+        canManageFolderPermissions(
+          user,
+          newFolder,
+          logger,
+          locale,
+          newFolderMap,
+        ),
+      ]);
       emitFolderContents("folder-created", {
         responseData: {
           items: [
@@ -386,6 +406,18 @@ export class ChatFoldersRepository {
               rootFolderId: newFolder.rootFolderId,
               createdAt: newFolder.createdAt,
               updatedAt: newFolder.updatedAt,
+              expanded: newFolder.expanded,
+              canManage: canManageFlag,
+              canCreateThread: canCreateThreadFlag,
+              canModerate: canModerateFlag,
+              canDelete: canDeleteFlag,
+              canManagePermissions: canManagePermsFlag,
+              rolesView: newFolder.rolesView ?? [],
+              rolesManage: newFolder.rolesManage ?? [],
+              rolesCreateThread: newFolder.rolesCreateThread ?? [],
+              rolesPost: newFolder.rolesPost ?? [],
+              rolesModerate: newFolder.rolesModerate ?? [],
+              rolesAdmin: newFolder.rolesAdmin ?? [],
             },
           ],
         },

@@ -20,9 +20,15 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+import { buildSseMessageRow } from "@/app/api/[locale]/agent/ai-stream/repository/core/db-writer/sse-row";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
+import { MessagesRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository";
 import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/execute-tool/revival/definition";
 
 import {
@@ -74,28 +80,20 @@ export class cancelRepository {
           userId: chatThreads.userId,
           leadId: chatThreads.leadId,
           rootFolderId: chatThreads.rootFolderId,
+          streamingState: chatThreads.streamingState,
         })
         .from(chatThreads)
         .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       if (!thread) {
-        // Incognito (client-only) threads are never written to DB but are still
-        // registered in StreamRegistry. The threadId itself is the ownership proof.
-        const wasIncognitoActive = StreamRegistry.cancel(threadId);
-        if (wasIncognitoActive) {
-          logger.info("[Cancel] Incognito stream cancelled via registry", {
-            threadId,
-          });
-          return success({ cancelled: true });
-        }
-        logger.warn("[Cancel] Thread not found for cancel request", {
-          threadId,
-        });
-        return fail({
-          message: t("post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
+        // Incognito (client-only) threads are never written to DB. The threadId
+        // itself is the ownership proof. Deliver a cancel on the thread's control
+        // channel — the running stream (this process, or another via the redis
+        // bus) aborts itself. Fire-and-forget: no live stream simply has no reactor.
+        StreamControl.deliver(threadId, "cancel", user, logger);
+        logger.info("[Cancel] Incognito cancel signal delivered", { threadId });
+        return success({ cancelled: true });
       }
 
       // Check ownership: only the thread owner (or admin) can cancel
@@ -119,18 +117,50 @@ export class cancelRepository {
       // Mark as aborting before sending abort signal - gives frontend immediate feedback
       await setStreamingStateAborting(threadId, logger, user);
 
-      // Cancel the stream via the registry
-      const wasActive = StreamRegistry.cancel(threadId);
+      // STREAMING: a live stream is running — deliver the cancel signal on the
+      // pub/sub control channel. The stream's AbortController fires, its
+      // AbortErrorHandler cleans up (saves partial content, credits, clears state).
+      const isStreaming =
+        thread.streamingState === ThreadStreamingState.STREAMING;
+      // WAITING: the stream already exited (parked an escalated task or a remote
+      // WAIT call). No live stream subscriber — StreamControl.deliver() fires into
+      // a vacuum. Must run the parked-task cancellation path instead.
+      const isWaiting = thread.streamingState === ThreadStreamingState.WAITING;
 
-      if (wasActive) {
-        logger.info("[Cancel] Stream cancelled via registry", { threadId });
+      if (isStreaming) {
+        StreamControl.deliver(threadId, "cancel", user, logger);
+        logger.info("[Cancel] Stream cancelled via control channel", {
+          threadId,
+        });
         // The abort triggers AbortErrorHandler which handles:
         // - Credit deduction for partial results
         // - DB content save
         // - isStreaming = false (via clearStreamingState in abort handler)
         // - WS error/interruption event
-      } else {
-        // No active stream in registry - thread may be in "waiting" state
+        return success({ cancelled: true });
+      }
+
+      if (!isWaiting) {
+        // Thread is IDLE or ABORTING — nothing to cancel. The setStreamingStateAborting
+        // above was a no-op; reset to IDLE so the frontend unlocks.
+        await clearStreamingState(threadId, logger, user, undefined);
+        createMessagesEmitter(logger, user, {
+          threadId,
+          rootFolderId: thread.rootFolderId,
+        })("stream-finished", {
+          responseData: { streamingState: ThreadStreamingState.IDLE },
+        });
+        logger.info("[Cancel] Thread not streaming - nothing to cancel", {
+          threadId,
+          state: thread.streamingState,
+        });
+        return success({ cancelled: false });
+      }
+
+      // WAITING state: stream died but a parked escalated task or in-flight remote
+      // call is keeping the thread locked. Cancel the parked task and clear state.
+      {
+        // No active stream in registry - thread is in "waiting" state
         // (stream died, escalated task still in flight).
         // Find the waiting tracking task, write a cancelled result to its tool
         // message, then cancel the task and emit STREAM_FINISHED.
@@ -158,13 +188,23 @@ export class cancelRepository {
               | undefined
           )?.wakeUpToolMessageId ?? null;
 
+        // Track the parentId for the interruption error message
+        let interruptionParentId: string | null = null;
+
         // Write cancelled result to the waiting tool message
         if (wakeUpToolMessageId) {
           try {
             const [existing] = await db
-              .select({ metadata: chatMessages.metadata })
+              .select({
+                metadata: chatMessages.metadata,
+                parentId: chatMessages.parentId,
+              })
               .from(chatMessages)
               .where(eq(chatMessages.id, wakeUpToolMessageId));
+
+            // Use the tool message's parentId so the interruption error message
+            // lands as a sibling of the tool call (same branch).
+            interruptionParentId = existing?.parentId ?? null;
 
             if (existing?.metadata?.toolCall) {
               const toolCall = existing.metadata.toolCall;
@@ -240,22 +280,67 @@ export class cancelRepository {
             });
           }
         }
+        // Drain in-memory pending remote calls so clearStreamingState can set IDLE.
+        // A remote call in PendingCalls.hasForThread() would pin the thread to WAITING.
+        const { PendingCalls } =
+          await import("next-vibe/execute-tool/repository/pending-calls");
+        PendingCalls.cancelAllForThread(threadId);
+
+        // Emit interruption error message so the UI shows "stopped" indicator.
+        const interruptionContent = t("post.streamInterrupted");
+        const errorMessageId = crypto.randomUUID();
+        try {
+          await MessagesRepository.createErrorMessage({
+            messageId: errorMessageId,
+            threadId,
+            content: interruptionContent,
+            errorType: StreamErrorType.STREAM_INTERRUPTED,
+            parentId: interruptionParentId,
+            user,
+            sequenceId: null,
+            logger,
+          });
+        } catch (msgErr) {
+          logger.warn("[Cancel] Failed to persist interruption error message", {
+            threadId,
+            error: parseError(msgErr).message,
+          });
+        }
+
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
         // state - without this the client stays stuck in aborting/isStreaming.
         await clearStreamingState(threadId, logger, user, undefined);
-        createMessagesEmitter(logger, user, {
+
+        const emit = createMessagesEmitter(logger, user, {
           threadId,
           rootFolderId: thread.rootFolderId,
-        })("stream-finished", {
+        });
+        emit("message-created", {
+          responseData: {
+            streamingState: ThreadStreamingState.IDLE,
+            messages: [
+              buildSseMessageRow({
+                id: errorMessageId,
+                threadId,
+                role: ChatMessageRole.ERROR,
+                content: interruptionContent,
+                parentId: interruptionParentId,
+                authorId: "id" in user ? (user.id ?? null) : null,
+                errorType: StreamErrorType.STREAM_INTERRUPTED,
+              }),
+            ],
+          },
+        });
+        emit("stream-finished", {
           responseData: { streamingState: ThreadStreamingState.IDLE },
         });
         logger.info(
-          "[Cancel] No active stream found - cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
+          "[Cancel] WAITING thread cleared - cancelled parked tasks, emitted STREAM_INTERRUPTED + STREAM_FINISHED",
           { threadId },
         );
       }
 
-      return success({ cancelled: wasActive });
+      return success({ cancelled: true });
     } catch (error) {
       logger.error("Failed to cancel stream", parseError(error));
       return fail({

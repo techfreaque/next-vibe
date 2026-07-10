@@ -152,6 +152,7 @@ function ReadOnlyMessages(): React.JSX.Element {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const inputHeight = useInputHeight();
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
 
   // Subscribe only to the messages array - re-renders when messages change,
   // NOT when streamingState or backgroundTasks change.
@@ -198,6 +199,7 @@ function ReadOnlyMessages(): React.JSX.Element {
         >
           <LinearMessageView
             messages={path}
+            threadId={activeThreadId ?? null}
             branchInfo={branchInfo}
             locale={locale}
             logger={logger}

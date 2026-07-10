@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
               label: "get.response.items.item.threadTitle.content" as const,
               schema: z.string(),
             }),
-            preview: responseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.items.item.preview.content" as const,
               schema: z.string().nullable(),

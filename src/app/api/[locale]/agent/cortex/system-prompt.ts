@@ -1,7 +1,6 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import type { ModelMessage } from "ai";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -12,7 +11,6 @@ import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/sy
 import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/favorites-formatter";
 
 import { parseError } from "../../system/core/utils/parse-error";
-import type { ToolExecutionContext } from "../chat/config";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
   CORTEX_EXEC_ALIAS,
@@ -72,17 +70,11 @@ export interface CortexData {
   unavailableNote: string;
   /** Root-level dirs: memories, documents, threads, skills, tasks, favorites */
   tree: CortexEntry[];
-  /** Thread counts by root folder id */
   threadCounts: Record<string, number>;
-  /** Total thread count across all folders */
   totalThreads: number;
-  /** Total upload count */
   uploadCount: number;
-  /** Total web search count */
   searchCount: number;
-  /** Total AI-generated media count */
   genCount: number;
-  /** User-authored cron task count */
   taskCount: number;
   languageName?: string;
   localeRoots?: { memories: string; documents: string };
@@ -313,7 +305,11 @@ function renderFileEntryLines(entry: CortexFileEntry): string[] {
 }
 
 // ─── Budget (chars, ~4 chars/token) ──────────────────────────────────────────
-
+// Total cortex context target ≈ 30k tokens (~120k chars) spread across domains.
+// Memories (the user's own facts) get the largest slice; docs share a combined
+// cap with memories; threads (conversation recall) and skills follow; tasks are
+// a small always-current slice. Sum of individual caps ≈ 113k chars ≈ 28k
+// tokens, with memoriesAndDocuments holding that pair to 45k chars.
 const CHAR_BUDGET = {
   memories: 12000,
   documents: 8000,
@@ -636,10 +632,12 @@ interface VectorSearchOpts {
 }
 
 /**
- * Run a vector similarity search within cortex_nodes using MaxSim:
- * a node's score = max similarity across all query vectors (message embeddings).
- * When no stored embeddings exist yet, falls back to generating one from
- * fallbackQuery (single API call, same behaviour as before for first turn).
+ * Vector similarity search within cortex_nodes using MaxSim, in ONE SQL query:
+ * a node's score = max cosine similarity across the current thread's recent
+ * stored message embeddings. There is NO query-embedding API call — the query
+ * vectors are read from chatMessages.embedding (written at message-write time)
+ * inside the same statement via a CTE. Returns [] when the thread has no stored
+ * message vectors yet (brand-new thread) — cortex data is optional.
  */
 async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
   const {
@@ -664,6 +662,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
 
     const { db } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
+    const { chatMessages } = await import("../chat/db");
     const { CortexNodeType } = await import("./enum");
     const { eq, and, isNotNull, notLike, like, or, sql } =
       await import("drizzle-orm");

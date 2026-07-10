@@ -22,6 +22,26 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { LoggerMetadata } from "next-vibe/logger/types";
 
 import { errorLogs } from "../db";
+
+/**
+ * Metadata is JSONB — at rest it is plain JSON (Errors/Dates already
+ * serialized), so it is WidgetData-shaped. Parse each entry through
+ * WidgetDataSchema to get the response's WidgetData[] type honestly (validate,
+ * don't cast). Returns null for an empty/absent payload.
+ */
+function normalizeMetadata(
+  raw: LoggerMetadata[] | null | undefined,
+): WidgetData[] | null {
+  const arr = Array.isArray(raw)
+    ? raw
+    : raw !== null && raw !== undefined
+      ? [raw]
+      : null;
+  if (!arr || arr.length === 0) {
+    return null;
+  }
+  return arr.map((entry) => WidgetDataSchema.parse(entry));
+}
 import type {
   ErrorLogsPatchRequestOutput,
   ErrorLogsPatchResponseOutput,
@@ -117,11 +137,11 @@ export class ErrorLogsRepository {
           message: row.message,
           errorType: row.errorType,
           stackTrace: row.stackTrace,
-          metadata: Array.isArray(row.metadata)
-            ? row.metadata
-            : row.metadata !== null && row.metadata !== undefined
-              ? [row.metadata]
-              : null,
+          // Metadata is stored as JSONB — at rest it is plain JSON (Errors /
+          // Dates already serialized), so it IS WidgetData-shaped. Normalize the
+          // read value through a JSON round-trip to the response's WidgetData
+          // type (faithful, not a cast — the wire/DB form is already JSON).
+          metadata: normalizeMetadata(row.metadata),
           fingerprint: row.fingerprint,
           occurrences: row.occurrences,
           resolved: row.resolved,

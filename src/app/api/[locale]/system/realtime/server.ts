@@ -42,6 +42,27 @@ import { authenticateWsRequest, authorizeWsChannel } from "./ws-channel-auth";
 const channels = new Map<string, Set<ServerWebSocket<WsConnectionData>>>();
 
 /**
+ * Reverse-ws connector sockets, keyed by connectorInstanceId.
+ * Populated on upgrade when the ?connectorInstanceId= param is present.
+ * Lets disconnect close the inbound socket immediately without waiting
+ * for the remote side to close its outbound connector first.
+ */
+const connectorSockets = new Map<string, ServerWebSocket<WsConnectionData>>();
+
+function closeConnectorSocket(instanceId: string): void {
+  const ws = connectorSockets.get(instanceId);
+  if (!ws) {
+    return;
+  }
+  connectorSockets.delete(instanceId);
+  try {
+    ws.close();
+  } catch {
+    /* already closing */
+  }
+}
+
+/**
  * True for every spelling of the loopback address. The proxy listens on "::",
  * so an IPv4 loopback peer is reported as the IPv4-mapped form
  * "::ffff:127.0.0.1"; plain "127.0.0.1" and IPv6 "::1" also occur.
@@ -299,7 +320,13 @@ export function startWebSocketServer(
               event: string;
               data: WsWireMessage["data"];
             };
-            broadcastLocalToAll(
+            // Publish through the pub/sub adapter (NOT broadcastLocalToAll
+            // directly): the adapter fans out to WS sockets AND fires any
+            // in-process server-side subscribers (KeyedRemoteSignal). This makes
+            // the hub the authoritative cross-process bus — a loopback POST from
+            // another process reaches BOTH WS-client subscribers and in-hub
+            // inline subscribers, so publish/subscribe co-locate freely.
+            getPubSubAdapter().publish(
               singleBody.channel,
               singleBody.event,
               singleBody.data,
@@ -390,6 +417,9 @@ export function startWebSocketServer(
           }
         }
 
+        const connectorInstanceId =
+          url.searchParams.get("connectorInstanceId") ?? undefined;
+
         const upgraded = bunServer.upgrade(req, {
           data: {
             user,
@@ -446,6 +476,12 @@ export function startWebSocketServer(
         ws.data.channels.clear();
         for (const channel of initialChannels) {
           subscribeToChannel(ws, channel);
+        }
+        if (ws.data.connectorInstanceId) {
+          connectorSockets.set(
+            ws.data.connectorInstanceId,
+            ws as ServerWebSocket<WsConnectionData>,
+          );
         }
         logger.debug(
           `[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`,
@@ -514,6 +550,9 @@ export function startWebSocketServer(
         if (ws.data.proxyWs) {
           ws.data.proxyWs.close();
           return;
+        }
+        if (ws.data.connectorInstanceId) {
+          connectorSockets.delete(ws.data.connectorInstanceId);
         }
         unsubscribeFromAll(ws as ServerWebSocket<WsConnectionData>);
         logger.debug("[WS] Connection closed");

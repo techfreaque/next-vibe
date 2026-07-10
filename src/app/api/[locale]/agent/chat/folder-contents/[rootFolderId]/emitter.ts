@@ -5,6 +5,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
 
 import folderContentsDefinitions, {
   type FolderContentsGetWsEmit,
@@ -22,15 +23,28 @@ export function createFolderContentsEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
   rootFolderId: DefaultFolderId,
+  options?: {
+    fanOut?: boolean;
+    subFolderId?: string | null;
+    resolvedRelayContext?: ResolvedRelayContext;
+  },
 ): FolderContentsGetWsEmit {
   return createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
     urlPathParams: { rootFolderId },
-    // folder-contents GET keys on subFolderId/threadIds (includeInCacheKey). List
-    // events target the folder's root view — the channel the client subscribes to
-    // with subFolderId undefined and no threadIds — so we key on those exact
-    // values, matching the subscription. Type-safe: requestData is required.
-    requestData: { subFolderId: undefined, threadIds: undefined },
+    ...(options?.fanOut === false ? { fanOut: false as const } : {}),
+    // folder-contents GET keys on subFolderId/threadIds (includeInCacheKey), and
+    // the WS CHANNEL keys on those same fields — so a viewer of a NESTED folder
+    // (subFolderId set) is on a DIFFERENT channel than the root view. List events
+    // must therefore target the channel of the folder the item actually lives in:
+    // pass `subFolderId` = the thread's folderId so the nested-folder viewer
+    // receives it. Omitted / null → the root view's channel (subFolderId
+    // undefined), matching a root-level item. threadIds is never a channel filter.
+    requestData: {
+      subFolderId: options?.subFolderId ?? undefined,
+      threadIds: undefined,
+    },
     kindOverride:
       FolderContentsRepository.emitChannelForFolder(rootFolderId).kind,
+    resolvedRelayContext: options?.resolvedRelayContext,
   });
 }

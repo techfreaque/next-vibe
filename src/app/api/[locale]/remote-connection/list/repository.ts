@@ -90,6 +90,8 @@ export class RemoteConnectionListRepository {
         hasToken: !!r.token,
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),
         isReverseEntry: r.isReverseEntry,
+        transportMode: r.transportMode,
+        remoteTransportMode: r.remoteTransportMode ?? null,
       })),
       selfInstanceId,
       syncEnabled,

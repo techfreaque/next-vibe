@@ -58,7 +58,7 @@ import {
   triggerHermesPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
-import type { SyncScope } from "../db";
+import type { SyncDomain, SyncScope } from "../db";
 import { remoteConnections } from "../db";
 import {
   applySyncPayloads,
@@ -502,7 +502,10 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP-REG: registerSyncProvider: provider is callable after registration", async () => {
-    const testKey = `test-provider-${randomUUID().slice(0, 8)}`;
+    // Provider keys are typed SyncDomain values. Re-register the "memories"
+    // domain with a stub to prove registration wires upsertFromJson through
+    // applySyncPayloads; the real provider is restored on the next process boot.
+    const testKey: SyncDomain = "memories";
     let upsertCalled = false;
 
     const testProvider: SyncProvider = {
@@ -922,7 +925,6 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
-              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -1006,7 +1008,6 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
-              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })

@@ -46,8 +46,24 @@ export class AdminAddCreditsRepository {
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
+    // Credit the user's REAL primary lead wallet — the same leadId the balance
+    // READ resolves (userLeadLinks[0], see CreditRepository.getBalance). Using
+    // targetUserId as the leadId funds a phantom wallet the read never sees, so
+    // the credited balance appears to vanish (and reads as Forbidden/empty when
+    // an AI tool queries it). The primary lead link is the first row for the user.
+    const [primaryLink] = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, data.targetUserId))
+      .limit(1);
+    if (!primaryLink?.leadId) {
+      return fail({
+        message: t("adminAdd.post.errors.notFound.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const result = await CreditRepository.addCredits(
-      { userId: data.targetUserId, leadId: data.targetUserId },
+      { userId: data.targetUserId, leadId: primaryLink.leadId },
       data.amount,
       "bonus",
       logger,

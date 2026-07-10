@@ -9,6 +9,7 @@ import { CancelToolRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => CancelToolRepository.cancel(data, logger),
+    handler: ({ data, logger, user }) =>
+      CancelToolRepository.cancel(data, user, logger),
   },
 });

@@ -58,11 +58,26 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.syncScope.label" as const,
         description: "patch.syncScope.description" as const,
+        // OPTIONAL — mirrored ONLY when the initiator actually changed scope. It
+        // MUST stay undefined otherwise: SyncScopeSchema's per-field
+        // .default(true) would fill an absent scope with ALL-TRUE, so a
+        // transportMode-only mirror would clobber the peer's scope to all-on
+        // (observed: reverse-update re-enabling every domain and re-syncing).
         schema: SyncScopeSchema.optional(),
       }),
       // How the peer reaches US (mirror of the peer's own transportMode). Sets
       // our row's remoteTransportMode and (re)opens/closes our connector.
       remoteTransportMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.syncScope.label" as const,
+        description: "patch.syncScope.description" as const,
+        schema: TransportModeSchema.optional(),
+      }),
+      // OUR own send leg toward the peer, mirrored from the peer's directly-set
+      // remoteTransportMode (how it reaches us == our transportMode). Keeps both
+      // rows' transport pair in lockstep when either side edits it directly.
+      transportMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.syncScope.label" as const,
@@ -78,6 +93,15 @@ const { PATCH } = createEndpoint({
         label: "patch.newInstanceId.label" as const,
         description: "patch.newInstanceId.description" as const,
         schema: z.string().min(1).max(32).optional(),
+      }),
+      // The caller wants US to restart our outbound connector to them (needed
+      // when the peer's socket was the one that dropped and we hold no socket
+      // to reconnect on our own).
+      reconnectNow: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        schema: z.boolean().optional(),
+        hidden: true,
       }),
       updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -140,7 +164,6 @@ const { PATCH } = createEndpoint({
           skills: true,
           favorites: true,
           threads: true,
-          chat: false,
         },
       },
     },

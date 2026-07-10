@@ -258,7 +258,8 @@ export class CortexWriteRepository {
       relayed: true,
       // Relayed applier — no fixture chain crosses instances; an explicit
       // thread-less context routes embeddings live.
-      streamContext: makeHeadlessContext(undefined, undefined),
+      // no user context — UTC (dates not user-facing here)
+      streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex write", {

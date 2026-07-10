@@ -28,7 +28,13 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { QueryResult, QueryResultRow } from "pg";
 
-import { chatFolders, chatMessages, chatThreads } from "../../../../db";
+import {
+  CHAT_MESSAGE_COLUMNS,
+  chatFolders,
+  type ChatMessage,
+  chatMessages,
+  chatThreads,
+} from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
 import type {
   PathGetRequestOutput,
@@ -183,7 +189,7 @@ export class pathRepository {
     })[],
     threadId: string,
   ): Promise<{
-    messages: (typeof chatMessages.$inferSelect)[];
+    messages: ChatMessage[];
   }> {
     if (ancestorChain.length === 0) {
       return { messages: [] };
@@ -225,7 +231,7 @@ export class pathRepository {
     }
 
     const rows = await db
-      .select()
+      .select(CHAT_MESSAGE_COLUMNS)
       .from(chatMessages)
       .where(
         and(
@@ -440,28 +446,27 @@ export class pathRepository {
       // Annotate real messages with chunk boundary flags in metadata:
       // - oldest message: hasOlderHistory=true if older chunks exist
       // - leaf messages that continue into a newer chunk: hasNewerHistory=true + newerAnchorId
-      const messagesWithFlags: (typeof chatMessages.$inferSelect)[] =
-        messages.map((msg) => {
-          const isOldestAnchor = msg.id === oldestLoadedMessageId;
-          const newerAnchorId = leafsWithNewerChunk.get(msg.id) ?? null;
-          const needsFlags =
-            (isOldestAnchor && hasOlderHistory) || newerAnchorId !== null;
-          if (!needsFlags) {
-            return msg;
-          }
-          return {
-            ...msg,
-            metadata: {
-              ...msg.metadata,
-              ...(isOldestAnchor && hasOlderHistory
-                ? { hasOlderHistory: true }
-                : {}),
-              ...(newerAnchorId !== null
-                ? { hasNewerHistory: true, newerAnchorId }
-                : {}),
-            },
-          };
-        });
+      const messagesWithFlags: ChatMessage[] = messages.map((msg) => {
+        const isOldestAnchor = msg.id === oldestLoadedMessageId;
+        const newerAnchorId = leafsWithNewerChunk.get(msg.id) ?? null;
+        const needsFlags =
+          (isOldestAnchor && hasOlderHistory) || newerAnchorId !== null;
+        if (!needsFlags) {
+          return msg;
+        }
+        return {
+          ...msg,
+          metadata: {
+            ...msg.metadata,
+            ...(isOldestAnchor && hasOlderHistory
+              ? { hasOlderHistory: true }
+              : {}),
+            ...(newerAnchorId !== null
+              ? { hasNewerHistory: true, newerAnchorId }
+              : {}),
+          },
+        };
+      });
 
       logger.debug("Chunk messages retrieved", {
         threadId: urlPathParams.threadId,

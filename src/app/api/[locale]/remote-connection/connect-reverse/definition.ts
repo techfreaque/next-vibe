@@ -22,6 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
+import { SyncScopeSchema, TransportModeSchema } from "../db";
 import { scopedTranslation } from "./i18n";
 const RemoteRegisterWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.RemoteRegisterWidget })),
@@ -96,6 +97,30 @@ const { POST } = createEndpoint({
         columns: 6,
         hidden: true,
         schema: z.string().optional(),
+      }),
+      // The initiator's sync scope — the reverse entry MIRRORS it so both sides
+      // agree on which domains sync (kept in sync thereafter via
+      // connect-reverse/update on every scope change). Required: the initiator
+      // always sends its full scope.
+      syncScope: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        columns: 12,
+        hidden: true,
+        schema: SyncScopeSchema,
+      }),
+      // The initiator's OWN transport leg toward us (how the initiator reaches
+      // this side). We store it as the reverse entry's `remoteTransportMode` —
+      // it drives whether WE open an outbound connector (a reverse-ws initiator
+      // means we subscribe to its hub). Optional for older initiators; the
+      // column default (direct-http) applies when absent, kept in sync thereafter
+      // via connect-reverse/update.
+      remoteTransportMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        hidden: true,
+        schema: TransportModeSchema.optional(),
       }),
       submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
@@ -177,6 +202,13 @@ const { POST } = createEndpoint({
       default: {
         instanceId: "hermes",
         localUrl: "http://localhost:3000",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
       },
     },
     responses: {

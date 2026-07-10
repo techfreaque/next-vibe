@@ -743,7 +743,8 @@ function InteractiveHelp({
           logger: createEndpointLogger(false, locale),
           platform,
           streamContext: {
-            ...makeHeadlessContext(),
+            // no user context — UTC (dates not user-facing here)
+            ...makeHeadlessContext(undefined, undefined, "UTC"),
             rootFolderId: DefaultFolderId.PRIVATE,
           },
         }),

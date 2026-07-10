@@ -236,7 +236,7 @@ export async function sendMessage(
         const { createIncognitoThread } =
           await import("@/app/api/[locale]/agent/chat/incognito/storage");
         await createIncognitoThread(
-          content.slice(0, 50) || "New Chat",
+          chatScopedTranslation.scopedT(locale).t("common.newChat"),
           currentRootFolderId,
           currentSubFolderId,
           createdThreadIdForNewThread,
@@ -255,11 +255,11 @@ export async function sendMessage(
           type ThreadItem = (typeof oldData.data.threads)[number];
           const newThreadItem: ThreadItem = {
             id: newThreadId,
-            title: content.slice(0, 50) || "New Chat",
+            title: chatScopedTranslation.scopedT(locale).t("common.newChat"),
             rootFolderId: currentRootFolderId,
             folderId: currentSubFolderId,
             status: ThreadStatus.ACTIVE,
-            preview: null,
+            description: null,
             pinned: false,
             archived: false,
             streamingState: ThreadStreamingState.IDLE,
@@ -302,10 +302,10 @@ export async function sendMessage(
         createdAt: now,
         updatedAt: now,
         // thread fields
-        title: content.slice(0, 50) || "New Chat",
+        title: chatScopedTranslation.scopedT(locale).t("common.newChat"),
         folderId: currentSubFolderId,
         status: ThreadStatus.ACTIVE,
-        preview: null,
+        description: null,
         pinned: false,
         archived: false,
         streamingState: ThreadStreamingState.IDLE,

@@ -28,8 +28,6 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
-import type { FixtureContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import {
@@ -38,17 +36,21 @@ import {
   DISPATCH_HINTS,
 } from "../constants";
 import type { RouteExecuteRequestOutput } from "../definition";
-import executeDefinition from "../definition";
 import { TaskCompletion } from "./completion";
 import { ExecuteToolGuards } from "./guards";
 import { LocalExecution } from "./local";
 import { PendingCalls } from "./pending-calls";
+import { ResultSignals } from "./result-signals";
+import { callToolDirect } from "./transport/direct";
+import { emitToolRequest } from "./transport/events";
+import {
+  marshalFilesForWire,
+  resolveCallerFieldDefaults,
+} from "./transport/wire";
 import type {
-  DirectCallResult,
-  PendingCallRevival,
+  PendingCallResult,
   PhaseResult,
   RemoteConnInfo,
-  RevivalTarget,
   RouteExecuteContext,
 } from "./types";
 
@@ -92,7 +94,7 @@ export class RemoteDispatch {
     // Pre-resolve the target's caller-context field defaults before dispatch —
     // uniformly for every tool that declares fieldDefaults (no special cases).
     const preferredName = getPreferredName(ctx.toolName);
-    strippedInput = await RemoteDispatch.resolveCallerFieldDefaults({
+    strippedInput = await resolveCallerFieldDefaults({
       ctx,
       toolName: preferredName,
       input: strippedInput,
@@ -102,7 +104,7 @@ export class RemoteDispatch {
     // them to the base64 shape endpoint file-field schemas accept as the wire
     // alternative ({ filename, mimeType, data }) — the receiving side's zod
     // union transforms it back into a File.
-    strippedInput = await RemoteDispatch.marshalFilesForWire(strippedInput);
+    strippedInput = await marshalFilesForWire(strippedInput);
 
     // Normalize incoming toolName to preferred name (alias > canonical).
     // Capabilities are stored using the preferred name so both alias and
@@ -237,7 +239,7 @@ export class RemoteDispatch {
   }
 
   /**
-   * Persist the pendingCallId on the tool message so dismiss-task can cancel the
+   * Persist the pendingCallId on the tool message so detach can cancel the
    * revival, and so a late result event can revive even after a requester restart
    * (the tool message holds the revival metadata; the result event carries callId).
    *
@@ -348,7 +350,7 @@ export class RemoteDispatch {
     const callId = LocalExecution.generateTaskId("remote-ws", {
       instanceId,
       toolCallId: streamContext.callerToolCallId,
-      fixtureContext: streamContext.fixtureContext,
+      streamContext,
     });
 
     // Shared deadline backstop: after PENDING_CALL_DEADLINE_MS with no result
@@ -364,35 +366,32 @@ export class RemoteDispatch {
       if (outcome.kind !== "completed") {
         return;
       }
-      const target: RevivalTarget | null =
-        RemoteDispatch.revivalToTarget(outcome.revival) ??
-        (effectiveToolMessageId
-          ? {
-              toolMessageId: effectiveToolMessageId,
-              threadId: effectiveThreadId ?? null,
-              callbackMode,
-              modelId: resolvedModelId,
-              skillId: streamContext.skillId ?? null,
-              favoriteId: streamContext.favoriteId ?? null,
-              leafMessageId: streamContext.leafMessageId ?? null,
-              subAgentDepth: streamContext.subAgentDepth ?? 0,
-            }
-          : null);
-      if (target) {
-        // Fresh AbortController: the revival is not tied to the stream that
-        // dispatched the original remote call.
+      // Parked task (created at wakeUp dispatch or WAIT auto-upgrade) carries full
+      // revival context — just merge the failure output and fire. Falls back to
+      // reviveFromToolMessage (restart-safe) if no parked task exists (detach).
+      const firedParked = await TaskCompletion.enableAndFireParkedResumeTask({
+        taskId: callId,
+        status: "failed",
+        output: { error: errorMessage },
+        locale,
+        logger,
+        abortSignal: new AbortController().signal,
+      });
+      if (!firedParked && effectiveToolMessageId) {
+        // No parked task (DETACH or missing) — fall back to direct handle() with
+        // full context from dispatch. For DETACH this is a no-op (no revival wanted).
         await TaskCompletion.handle({
-          toolMessageId: target.toolMessageId,
-          threadId: target.threadId,
-          callbackMode: target.callbackMode,
+          toolMessageId: effectiveToolMessageId,
+          threadId: effectiveThreadId ?? null,
+          callbackMode,
           status: CronTaskStatus.FAILED,
           output: { error: errorMessage },
           taskId: callId,
-          modelId: target.modelId,
-          skillId: target.skillId,
-          favoriteId: target.favoriteId,
-          leafMessageId: target.leafMessageId,
-          subAgentDepth: target.subAgentDepth,
+          modelId: resolvedModelId,
+          skillId: streamContext.skillId ?? null,
+          favoriteId: streamContext.favoriteId ?? null,
+          leafMessageId: streamContext.leafMessageId ?? null,
+          subAgentDepth: streamContext.subAgentDepth ?? 0,
           ownerUser: user,
           logger,
           directResumeLocale: locale,
@@ -416,10 +415,28 @@ export class RemoteDispatch {
     const connInfo = params.connInfo;
     const { token } = connInfo;
     const dispatchToolDef = await getEndpoint(toolName);
-    const isControlPlane =
-      platform !== Platform.AI && dispatchToolDef?.timeoutMs !== 0;
-    if (token !== null && isControlPlane) {
-      const direct = await RemoteDispatch.callToolDirect({
+    const isBounded = dispatchToolDef?.timeoutMs !== 0;
+    // Use the SYNCHRONOUS inline HTTP leg (callToolDirect — result in the HTTP
+    // response) when:
+    //   - control-plane (non-AI, bounded) calls, OR
+    //   - AI-platform WAIT/END_LOOP over DIRECT-HTTP: direct-http has no reverse
+    //     channel for a tool-execute-result EVENT to come back on, so the async
+    //     event path (emitToolRequest + awaitResult) can never receive the
+    //     result → the inline wait "times out" and wrongly upgrades to wakeUp.
+    //     A synchronous POST returns the result inline, which is exactly WAIT
+    //     semantics. detach/wakeUp still use the async path (they return a
+    //     taskId immediately and revive later).
+    const isBlockingMode =
+      callbackMode === CallbackMode.WAIT ||
+      callbackMode === CallbackMode.END_LOOP;
+    const isDirectHttpBlockingAi =
+      platform === Platform.AI &&
+      isBlockingMode &&
+      connInfo.transportMode === "direct-http";
+    const useInlineHttp =
+      isBounded && (platform !== Platform.AI || isDirectHttpBlockingAi);
+    if (token !== null && useInlineHttp) {
+      const direct = await callToolDirect({
         remoteUrl: connInfo.remoteUrl,
         token,
         leadId: connInfo.leadId,
@@ -473,33 +490,45 @@ export class RemoteDispatch {
     // 13-minute waits). 10s covers a full WS reconnect handshake; on timeout the
     // dispatch proceeds unheld and the late-resolving ref is released
     // immediately (no leak).
-    const releaseConnectorRef: () => void = await new Promise((resolve) => {
-      let settled = false;
-      const settle = (release: () => void, lateRelease: boolean): void => {
-        if (settled) {
-          if (lateRelease) {
-            release();
-          }
-          return;
-        }
-        settled = true;
-        resolve(release);
-      };
-      const timer = setTimeout(() => {
-        settle(() => undefined, false);
-      }, 10_000);
-      import("next-vibe/realtime/connector")
-        .then(async (m) => m.acquireConnection(instanceId))
-        .then((release) => {
-          clearTimeout(timer);
-          settle(release, true);
-          return undefined;
-        })
-        .catch(() => {
-          clearTimeout(timer);
-          settle(() => undefined, false);
+    // The RESULT rides OUR outbound connector's hub subscription ONLY when the
+    // PEER reaches us via reverse-ws (remoteTransportMode === "reverse-ws"): then
+    // it publishes the tool-execute-result on its hub and our connector receives
+    // it, so the connector must stay open until the result settles. When the peer
+    // reaches us via direct-http it POSTs the result to our bridge over HTTP —
+    // no connector needed, and holding one causes spurious WS connect attempts to
+    // an instance that may run no WS server. So gate on remoteTransportMode (the
+    // result leg), NOT our own transportMode (our request leg).
+    const peerReachesUsViaReverseWs =
+      connInfo.remoteTransportMode === "reverse-ws";
+    const releaseConnectorRef: () => void = !peerReachesUsViaReverseWs
+      ? () => undefined
+      : await new Promise((resolve) => {
+          let settled = false;
+          const settle = (release: () => void, lateRelease: boolean): void => {
+            if (settled) {
+              if (lateRelease) {
+                release();
+              }
+              return;
+            }
+            settled = true;
+            resolve(release);
+          };
+          const timer = setTimeout(() => {
+            settle(() => undefined, false);
+          }, 10_000);
+          import("next-vibe/realtime/connector")
+            .then(async (m) => m.acquireConnection(instanceId))
+            .then((release) => {
+              clearTimeout(timer);
+              settle(release, true);
+              return undefined;
+            })
+            .catch(() => {
+              clearTimeout(timer);
+              settle(() => undefined, false);
+            });
         });
-    });
 
     // ── detach / wakeUp: fire-and-forget ──────────────────────────────────────
     // Register a requester-local pending call carrying the revival context, emit
@@ -527,25 +556,29 @@ export class RemoteDispatch {
         onSettled: releaseConnectorRef,
       });
 
-      // wakeUp parks the thread and MUST be revived when the result lands — store
-      // its revival context so handleToolResult can resume it (no cross-instance
-      // task). detach is fire-and-forget: it stores NO revival (the thread stays
-      // idle); if the AI later calls await-task, THAT attaches a WAIT revival.
-      // The persisted callId is likewise wakeUp-only: it exists so dismiss-task
-      // can cancel the revival and a late result event can revive after a
-      // requester restart — both wakeUp concerns. Storing it for detach caused
-      // a restart-time result event to fire a WAKE_UP revival for a detach
-      // dispatch (reviveFromToolMessage revives as wakeUp), violating detach's
-      // no-revival contract.
+      // wakeUp parks the thread and MUST be revived when the result lands.
+      // Park a disabled resume-stream cron task with full revival context so the
+      // result handler (handleToolResult) can simply enable+fire it — no
+      // in-memory revival context needed. detach is fire-and-forget: stores no
+      // revival (thread stays idle); if AI later calls await-task, THAT parks.
+      // The persisted callId is wakeUp-only (detach cancel + restart safety).
+      // Storing it for detach caused restart-time result events to fire wakeUp
+      // revival for a detach dispatch, violating detach's no-revival contract.
       if (callbackMode === CallbackMode.WAKE_UP && effectiveToolMessageId) {
-        PendingCalls.setRevival(
-          callId,
-          RemoteDispatch.revivalFromContext(ctx, {
-            threadId: effectiveThreadId ?? "",
-            toolMessageId: effectiveToolMessageId,
-            userId: user.id,
-          }),
-        );
+        await TaskCompletion.parkResumeStreamTask({
+          taskId: callId,
+          callbackMode: CallbackMode.WAKE_UP,
+          threadId: effectiveThreadId ?? "",
+          toolMessageId: effectiveToolMessageId,
+          leafMessageId: streamContext.leafMessageId ?? null,
+          modelId: resolvedModelId,
+          skillId: streamContext.skillId ?? null,
+          favoriteId: streamContext.favoriteId ?? null,
+          subAgentDepth: streamContext.subAgentDepth ?? 0,
+          ownerUserId: user.id,
+          selfInstanceId: null,
+          logger,
+        });
         await RemoteDispatch.storePendingCallId(
           effectiveToolMessageId,
           callId,
@@ -553,7 +586,7 @@ export class RemoteDispatch {
         );
       }
 
-      await RemoteDispatch.emitToolRequest({
+      await emitToolRequest({
         callId,
         userId: user.id,
         toolName,
@@ -562,6 +595,7 @@ export class RemoteDispatch {
         callerPlatform: platform,
         callerSkillId: streamContext.skillId ?? null,
         callerFavoriteId: streamContext.favoriteId ?? null,
+        streamContext: streamContext,
         locale,
         logger,
         user,
@@ -611,7 +645,16 @@ export class RemoteDispatch {
       );
     }
 
-    await RemoteDispatch.emitToolRequest({
+    // Subscribe to the result on the pub/sub bus BEFORE emitting the request, so
+    // no result can arrive between emit and subscribe. The bus crosses PROCESSES
+    // (proxy ↔ app, or a test harness running the loop out of the server
+    // process) — so this resolves the WAIT even when the result event lands in
+    // handleToolResult in a DIFFERENT process than this one (the reverse-ws
+    // event-path case: the in-memory PendingCalls waiter here would otherwise
+    // never fire). Same definition-derived channel as ControlSignals.
+    const resultSub = ResultSignals.subscribe(callId, user, logger);
+
+    await emitToolRequest({
       callId,
       userId: user.id,
       toolName,
@@ -620,7 +663,7 @@ export class RemoteDispatch {
       callerPlatform: platform,
       callerSkillId: streamContext.skillId ?? null,
       callerFavoriteId: streamContext.favoriteId ?? null,
-      fixtureContext: streamContext.fixtureContext,
+      streamContext: streamContext,
       locale,
       logger,
       user,
@@ -633,10 +676,23 @@ export class RemoteDispatch {
         ? RemoteDispatch.NO_TIMEOUT_INLINE_MS
         : (definedTimeoutMs ?? RemoteDispatch.DEFAULT_INLINE_TIMEOUT_MS);
 
-    const inlineResult = await PendingCalls.awaitResult(
-      callId,
-      inlineTimeoutMs,
+    // Block on the result via the ONE KeyedRemoteSignal subscription opened
+    // above: it resolves whether handleToolResult ran in THIS process (in-process
+    // adapter fast path, built into the primitive) or another process/instance
+    // (WS hub + bridge). No separate in-memory PendingCalls waiter — that would
+    // only ever fire same-process and never for the reverse-ws event-path. On
+    // timeout the race yields null → wakeUp auto-upgrade below. Always unsubscribe.
+    const timeoutSignal = new Promise<PendingCallResult | null>((resolve) => {
+      setTimeout(() => resolve(null), inlineTimeoutMs);
+    });
+    const resultSignal: Promise<PendingCallResult> = resultSub.signal.then(
+      (s) => ({ status: s.status, output: s.output }),
     );
+    const inlineResult: PendingCallResult | null = await Promise.race([
+      resultSignal,
+      timeoutSignal,
+    ]);
+    resultSub.cancel();
 
     if (!inlineResult) {
       // WAIT → wakeUp auto-upgrade: the tool is still running on the remote.
@@ -647,14 +703,20 @@ export class RemoteDispatch {
         { toolName, instanceId, callId, inlineTimeoutMs },
       );
       if (effectiveToolMessageId && effectiveThreadId) {
-        PendingCalls.setRevival(
-          callId,
-          RemoteDispatch.revivalFromContext(ctx, {
-            threadId: effectiveThreadId,
-            toolMessageId: effectiveToolMessageId,
-            userId: user.id,
-          }),
-        );
+        await TaskCompletion.parkResumeStreamTask({
+          taskId: callId,
+          callbackMode: CallbackMode.WAKE_UP,
+          threadId: effectiveThreadId,
+          toolMessageId: effectiveToolMessageId,
+          leafMessageId: streamContext.leafMessageId ?? null,
+          modelId: resolvedModelId,
+          skillId: streamContext.skillId ?? null,
+          favoriteId: streamContext.favoriteId ?? null,
+          subAgentDepth: streamContext.subAgentDepth ?? 0,
+          ownerUserId: user.id,
+          selfInstanceId: null,
+          logger,
+        });
         // Now a REAL park: flip the inline marker so a late result event (in any
         // process) revives the parked thread via reviveFromToolMessage.
         await RemoteDispatch.storePendingCallId(
@@ -714,310 +776,6 @@ export class RemoteDispatch {
     return {
       kind: "return",
       value: success({ result: inlineResult.output ?? {} }),
-    };
-  }
-
-  /**
-   * Synchronous direct-http remote call: POST the target tool to the peer's
-   * execute-tool endpoint and return its response. Wire plumbing only — it does
-   * NOT re-enter the local execute() dispatch (which would recurse). Used solely
-   * by the direct-http WAIT/END_LOOP leg.
-   */
-  private static async callToolDirect(params: {
-    remoteUrl: string;
-    token: string;
-    leadId: string;
-    toolName: string;
-    input: Record<string, WidgetData> | null;
-    locale: string;
-    logger: RouteExecuteContext["logger"];
-    toolTimeoutMs?: number;
-  }): Promise<DirectCallResult> {
-    const { remoteUrl, token, leadId, toolName, input, locale, logger } =
-      params;
-    const url = `${remoteUrl}/api/${locale}/${executeDefinition.POST.path.join("/")}`;
-    const timeoutMs =
-      params.toolTimeoutMs === 0 ? 600_000 : (params.toolTimeoutMs ?? 90_000);
-    // The dev HTTP layer (vite/nitro) flakily drops multi-MB request bodies
-    // ("socket closed unexpectedly" while reading) and answers with its
-    // pre-handler {"unhandled":true} 500 — the handler never ran, so a retry is
-    // side-effect free. ONLY that exact marker is retried; handler errors never.
-    const maxAttempts = 3;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        // This IS the direct-http dispatch primitive that runInProcessTyped/execute()
-        // sits on top of — it POSTs the tool to the peer's execute-tool endpoint and
-        // must NOT re-enter execute() (would recurse). The one place raw fetch is the
-        // irreducible wire for cross-instance dispatch.
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- cross-instance dispatch primitive
-        const resp = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
-            // Keepalive socket reuse corrupts multi-MB bodies between Bun's
-            // fetch and the peer's HTTP layer (measured: 3/6 uploads of a 5MB
-            // JSON body stall ~12s and die with "socket closed unexpectedly";
-            // with Connection: close it is 0/6). A fresh connection per
-            // dispatch costs one localhost/LAN handshake and makes delivery
-            // deterministic.
-            Connection: "close",
-          },
-          body: JSON.stringify({
-            toolName,
-            input: input ?? {},
-          }),
-          signal: AbortSignal.timeout(timeoutMs),
-        });
-        if (!resp.ok) {
-          // Surface the peer's real error (e.g. "Read-Only" from a forbidden cortex
-          // write) instead of collapsing every failure into an opaque local error —
-          // the AI/caller needs the actual reason to react correctly.
-          let remoteMessage: string | undefined;
-          let preHandlerFailure = false;
-          try {
-            const errBody = (await resp.json()) as {
-              message?: string;
-              unhandled?: boolean;
-            };
-            remoteMessage =
-              typeof errBody.message === "string" ? errBody.message : undefined;
-            // Real handler/validation errors always carry a JSON message; a
-            // JSON response WITHOUT one (or with the pre-handler `unhandled`
-            // marker) is HTTP-layer garbage from a dropped/truncated body.
-            preHandlerFailure =
-              errBody.unhandled === true || remoteMessage === undefined;
-          } catch {
-            remoteMessage = undefined;
-            // A response whose body isn't even JSON (dev proxy HTML error page,
-            // empty 400/431 after a truncated multi-MB upload) never came from
-            // a handler — our handlers always answer JSON with a message. The
-            // handler had no valid input, so it provably never ran.
-            preHandlerFailure = true;
-          }
-          // 405 = the dev router rejected the METHOD while its route tree was
-          // (re)building — the handler PROVABLY never ran, so this is retriable
-          // for every tool, including non-idempotent (timeoutMs:0) ones.
-          const routerNotReady = resp.status === 405;
-          // Pre-handler failures are retried for EVERY tool: the body never
-          // parsed, so the handler provably never ran and no side effects
-          // exist — the retry is the FIRST real delivery.
-          if ((routerNotReady || preHandlerFailure) && attempt < maxAttempts) {
-            logger.warn(
-              "[RouteExecute] callToolDirect pre-handler failure — retrying",
-              { toolName, status: resp.status, attempt },
-            );
-            // The dev HTTP layer drops large bodies in bursts — an immediate
-            // resend hits the same stressed socket pool and fails identically.
-            // A short backoff lets the proxy recover before the retry.
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, 750 * attempt);
-            });
-            continue;
-          }
-          logger.warn("[RouteExecute] callToolDirect HTTP error", {
-            toolName,
-            status: resp.status,
-            remoteMessage,
-          });
-          return { ok: false, remoteMessage };
-        }
-        const body = (await resp.json()) as {
-          data?: Record<string, WidgetData>;
-        };
-        return { ok: true, data: body.data ?? {} };
-      } catch (err) {
-        logger.warn("[RouteExecute] callToolDirect network error", {
-          toolName,
-          error: err instanceof Error ? err.message : String(err),
-        });
-        return { ok: false };
-      }
-    }
-    return { ok: false };
-  }
-
-  /**
-   * Emit the definition-driven `tool-execute-request` event toward the peer. The
-   * bridge routes it over the connection's leg; the peer's
-   * onRemoteEvent["tool-execute-request"] runs it and emits `tool-execute-result`.
-   */
-  private static async emitToolRequest(params: {
-    callId: string;
-    userId: string;
-    toolName: string;
-    input: Record<string, WidgetData> | null;
-    callbackMode: CallbackModeValue;
-    callerPlatform: Platform;
-    callerSkillId: string | null;
-    callerFavoriteId: string | null;
-    /**
-     * The dispatching execution's fixture context — forwarded on the wire so
-     * the receiver records/replays the relayed execution's external calls
-     * under the SAME per-test directory. Explicit chain, never ambient.
-     */
-    fixtureContext: FixtureContext | undefined;
-    locale: string;
-    logger: RouteExecuteContext["logger"];
-    user: RouteExecuteContext["user"];
-  }): Promise<void> {
-    const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
-    const { fixtureContext } = params;
-    createEndpointEmitter(
-      executeDefinition.POST,
-      params.logger,
-      params.user,
-    )("tool-execute-request", {
-      requestData: {
-        toolName: params.toolName,
-        input: params.input ?? {},
-        // The receiver runs the tool LOCALLY — no further instanceId hop.
-        instanceId: undefined,
-        callbackMode: params.callbackMode,
-      },
-      payload: {
-        callId: params.callId,
-        userId: params.userId,
-        locale: params.locale,
-        // Wire-internal caller context: identity for fieldDefaults + the
-        // surface the receiver gates/renders under. Envelope side-channel —
-        // never the public request schema.
-        callerSkillId: params.callerSkillId ?? undefined,
-        callerFavoriteId: params.callerFavoriteId ?? undefined,
-        callerPlatform: params.callerPlatform,
-        ...(fixtureContext ? { fixtureContext } : {}),
-      },
-    });
-  }
-
-  /**
-   * Resolve the target tool's declared fieldDefaults with the CALLER's context
-   * and inject any resolved values into the outgoing input. Locally these same
-   * resolvers run inside the route handler (createGenericHandler); the receiving
-   * peer lacks the caller's skill/favorite context, so context-dependent
-   * defaults must resolve HERE before dispatch — same resolvers, same context,
-   * uniformly for EVERY tool ("transport is invisible", no per-tool shortcuts).
-   */
-  private static async resolveCallerFieldDefaults(params: {
-    ctx: RouteExecuteContext;
-    toolName: string;
-    input: Record<string, WidgetData> | null;
-  }): Promise<Record<string, WidgetData> | null> {
-    const { ctx, toolName } = params;
-    const { getRouteHandler } = await import("@/generated/routes/handlers");
-    const handler = await getRouteHandler(toolName);
-    const fieldDefaults = handler?.fieldDefaults;
-    if (!fieldDefaults) {
-      return params.input;
-    }
-    let input = params.input;
-    for (const [field, resolver] of Object.entries(fieldDefaults)) {
-      if (!resolver || input?.[field] !== undefined) {
-        continue;
-      }
-      const value = await resolver({
-        user: ctx.user,
-        locale: ctx.locale,
-        platform: ctx.platform,
-        streamContext: ctx.streamContext,
-      });
-      if (value !== undefined) {
-        input = { ...(input ?? {}), [field]: value };
-        ctx.logger.debug(
-          "[RouteExecute] Pre-resolved caller field default for remote dispatch",
-          { toolName, field },
-        );
-      }
-    }
-    return input;
-  }
-
-  /**
-   * Recursively convert File instances inside a wire payload to the base64
-   * object shape ({ filename, mimeType, data }) that endpoint file-field
-   * schemas accept as the JSON alternative. Files stringify to {} on the wire —
-   * without this, every cross-instance call carrying an attachment fails
-   * validation on the receiving side.
-   */
-  private static async marshalFilesForWire(
-    input: Record<string, WidgetData> | null,
-  ): Promise<Record<string, WidgetData> | null> {
-    if (input === null) {
-      return null;
-    }
-    const marshalValue = async (value: WidgetData): Promise<WidgetData> => {
-      if (value instanceof File) {
-        return {
-          filename: value.name,
-          mimeType: value.type,
-          data: Buffer.from(await value.arrayBuffer()).toString("base64"),
-        };
-      }
-      if (Array.isArray(value)) {
-        return Promise.all(value.map((item) => marshalValue(item)));
-      }
-      if (
-        value !== null &&
-        typeof value === "object" &&
-        !(value instanceof Date)
-      ) {
-        const out: Record<string, WidgetData> = {};
-        for (const [k, v] of Object.entries(value)) {
-          out[k] = await marshalValue(v);
-        }
-        return out;
-      }
-      return value;
-    };
-    const result: Record<string, WidgetData> = {};
-    for (const [key, value] of Object.entries(input)) {
-      result[key] = await marshalValue(value);
-    }
-    return result;
-  }
-
-  /**
-   * Build the wakeUp revival context from the dispatch's stream context — the
-   * ONE construction shared by the wakeUp dispatch registration and the WAIT
-   * inline-timeout auto-upgrade (same mode, same routing fields).
-   */
-  private static revivalFromContext(
-    ctx: RouteExecuteContext,
-    anchor: { threadId: string; toolMessageId: string; userId: string },
-  ): PendingCallRevival {
-    return {
-      threadId: anchor.threadId,
-      toolMessageId: anchor.toolMessageId,
-      callbackMode: CallbackMode.WAKE_UP,
-      leafMessageId: ctx.streamContext.leafMessageId ?? null,
-      modelId: ctx.resolvedModelId,
-      skillId: ctx.streamContext.skillId ?? null,
-      favoriteId: ctx.streamContext.favoriteId ?? null,
-      subAgentDepth: ctx.streamContext.subAgentDepth ?? 0,
-      userId: anchor.userId,
-    };
-  }
-
-  /** Narrow an attached await-task revival to a completion target (null-safe). */
-  private static revivalToTarget(
-    revival: PendingCallRevival | null,
-  ): RevivalTarget | null {
-    if (!revival) {
-      return null;
-    }
-    return {
-      toolMessageId: revival.toolMessageId,
-      threadId: revival.threadId,
-      callbackMode:
-        revival.callbackMode === CallbackMode.WAIT
-          ? CallbackMode.WAIT
-          : CallbackMode.WAKE_UP,
-      modelId: revival.modelId,
-      skillId: revival.skillId,
-      favoriteId: revival.favoriteId,
-      leafMessageId: revival.leafMessageId,
-      subAgentDepth: revival.subAgentDepth,
     };
   }
 }

@@ -66,5 +66,7 @@ export const translations = {
       title: "Stream Cancelled",
       description: "The AI stream has been cancelled successfully",
     },
+    streamInterrupted:
+      "Generation was stopped. Partial response has been saved.",
   },
 };

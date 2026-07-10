@@ -35,7 +35,7 @@ function getLogDir(): string | null {
     return null;
   }
   const p = process.env["VIBE_LOG_PATH"];
-  if (!p) {
+  if (!p || p === "false") {
     return null;
   }
   return p;
@@ -86,7 +86,7 @@ function getLogDirSync(): string | null {
     return null;
   }
   const p = process.env["VIBE_LOG_PATH"];
-  if (!p) {
+  if (!p || p === "false") {
     return null;
   }
   const debugDir = resolveLogDir(p);

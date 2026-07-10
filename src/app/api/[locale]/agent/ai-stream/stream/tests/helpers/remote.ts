@@ -84,9 +84,15 @@ function makeRemoteSetup(
       // Idempotent: clean up any leftover connection from a previous failed
       // run, then establish the transport-appropriate connection E2E (login
       // on the remote, register this instance, sync capabilities).
-      const connectOptions = options.loopLocation
-        ? { loopLocation: options.loopLocation }
-        : undefined;
+      // Sync scope = EXACTLY what the suite tests: remote-folder suites enable
+      // favorites sync (relevant to placement UX); plain direct/relay suites
+      // enable nothing (thread placement rides remote events, not sync).
+      const connectOptions = {
+        ...(options.loopLocation ? { loopLocation: options.loopLocation } : {}),
+        ...(options.createRemoteFolder
+          ? { syncScope: { favorites: true } }
+          : {}),
+      };
       if (transport === "direct-http") {
         await remoteSetup.disconnectFromHermes(testUser.id);
         await remoteSetup.connectToHermes(testUser, url, connectOptions);
@@ -291,7 +297,7 @@ export async function getOrCreateRemoteFolderChain(params: {
   let parentId: string | null = null;
   for (const name of params.names) {
     const listResult = await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: listDef.GET,
       urlPathParams: { rootFolderId: params.rootFolderId },
       user: params.user,
@@ -314,7 +320,7 @@ export async function getOrCreateRemoteFolderChain(params: {
     }
     const createResult: ResponseType<Record<string, WidgetData>> =
       await sendTestRequest({
-        fixtureContext: undefined,
+        streamContext: rootlessStreamContext(),
         endpoint: createDef.POST,
         data: { name, parentId: parentId ?? undefined },
         urlPathParams: { rootFolderId: params.rootFolderId },

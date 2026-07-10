@@ -110,13 +110,9 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "post.syncScope.label" as const,
         description: "post.syncScope.description" as const,
-        schema: SyncScopeSchema.default({
-          memories: true,
-          documents: true,
-          skills: true,
-          favorites: true,
-          threads: true,
-        }),
+        // Optional: absent → the repository applies the default scope
+        // (SyncScopeSchema field defaults).
+        schema: SyncScopeSchema,
       }),
       formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
@@ -221,6 +217,10 @@ const { POST } = createEndpoint({
                 hasToken: true,
                 healthStatus: "healthy",
                 isReverseEntry: false,
+                // Fresh connect starts on the socket-free leg both ways; transport
+                // detection PATCHes reverse-ws afterwards if applicable.
+                transportMode: "direct-http",
+                remoteTransportMode: "direct-http",
               };
             const exists = prev.data.connections.some(
               (c) => c.instanceId === instanceId,
@@ -248,6 +248,13 @@ const { POST } = createEndpoint({
         remoteUrl: envClient.NEXT_PUBLIC_PROJECT_URL,
         email: "you@example.com",
         password: "your-password",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
       },
     },
     responses: {

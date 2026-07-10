@@ -38,11 +38,7 @@ import {
   deductAndEmitCredits,
   type DeductAndEmitCreditsParams,
 } from "./db-writer/credits";
-import {
-  syncMessageEmbeddings,
-  syncThreadEmbedding,
-  syncUploadEmbedding,
-} from "./db-writer/embedding-sync";
+import { syncUploadEmbedding } from "./db-writer/embedding-sync";
 import * as mediaWrites from "./db-writer/media";
 import * as notificationWrites from "./db-writer/notifications";
 import type { EmitThreadTitleFn, WriterDeps } from "./db-writer/shared";
@@ -65,6 +61,9 @@ export class MessageDbWriter {
   totalCreditsDeducted = 0;
   /** Tracks the thread ID of the last assistant message - used for embedding sync */
   lastThreadId: string | null = null;
+  /** In-flight embed of the just-written assistant message (fired at content-done,
+   *  awaited by the next step's cortex refresh). See DbWriterState. */
+  assistantEmbedPromise: Promise<void> | null = null;
   /** Stream context of the owning stream (its threadId) - binds embedding-sync
    *  API calls so they record/replay. Passed at construction. */
   streamContext: ToolExecutionContext;
@@ -563,13 +562,6 @@ export class MessageDbWriter {
       attachments,
       this.streamContext,
     );
-  }
-
-  /**
-   * Sync the current thread stub to cortex_nodes for directory listing.
-   */
-  syncThreadEmbedding(): Promise<void> {
-    return syncThreadEmbedding(this.lastThreadId, this.streamContext);
   }
 
   // ─── throttle / low-level DB writes ────────────────────────────────────────

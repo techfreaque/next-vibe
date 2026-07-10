@@ -191,7 +191,8 @@ export class MCPRegistry {
         user: context.user,
         locale: context.locale,
         logger,
-        streamContext: makeHeadlessContext(context.signal, undefined),
+        // no user context — UTC (dates not user-facing here)
+        streamContext: makeHeadlessContext(context.signal, undefined, "UTC"),
         platform: Platform.MCP,
       });
       if (!result.success) {
@@ -235,7 +236,8 @@ export class MCPRegistry {
       });
     }
 
-    const streamContext = makeHeadlessContext(context.signal, undefined);
+    // no user context — UTC (dates not user-facing here)
+    const streamContext = makeHeadlessContext(context.signal, undefined, "UTC");
 
     // Remote routing: check if a remote connection's routing rules match this request.
     // Same logic as CLI remote leg — if a target is found, route through runInProcess

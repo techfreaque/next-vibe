@@ -64,7 +64,7 @@ export class TaskCompletion {
     output: WidgetData | null;
     taskId: string;
     /** Revival routing - typed columns from the cron task row */
-    modelId?: string | null;
+    modelId?: ChatModelId | null;
     skillId?: string | null;
     favoriteId?: string | null;
     /** Branch leaf message ID at tool-call time - typed column wakeUpLeafMessageId */
@@ -109,8 +109,18 @@ export class TaskCompletion {
       subAgentDepth,
     } = params;
 
+    // `status` reaches this method in TWO shapes depending on the caller:
+    //   • the CronTaskStatus enum value ("status.completed") — cron/task paths
+    //   • the raw wire literal ("completed") — reviveFromToolMessage, which
+    //     forwards the tool-execute-result event's { status: "completed" }.
+    // Treat BOTH success spellings as success; anything else is a failure.
+    // (Missing this equated a successful direct-http wakeUp result with "failed"
+    // — the deferred tool message rendered a red Error badge despite a valid
+    // result payload.)
     const toolStatus =
-      status === CronTaskStatus.COMPLETED ? "completed" : "failed";
+      status === CronTaskStatus.COMPLETED || status === "completed"
+        ? "completed"
+        : "failed";
 
     // 1. Backfill result into the originating tool call message (cache-stable).
     //    The tool message is the canonical result store for every callback mode
@@ -334,43 +344,7 @@ export class TaskCompletion {
     ) {
       try {
         const resumeTaskId = `resume-stream-${taskId}-${Date.now()}`;
-
-        // Build resume-stream input from typed columns only - never from raw taskInput JSON.
-        const { resumeStreamRequestSchema } =
-          await import("@/app/api/[locale]/agent/ai-stream/resume-stream/definition");
-        const resumeInput = resumeStreamRequestSchema.parse({
-          threadId,
-          callbackMode,
-          // Revival routing - from typed wakeUp* columns on the cron task row.
-          ...(modelId ? { modelId } : {}),
-          ...(skillId ? { skillId } : {}),
-          ...(favoriteId ? { favoriteId } : {}),
-          // Pass the tool message ID so resume-stream can find the original tool call metadata.
-          ...(toolMessageId ? { wakeUpToolMessageId: toolMessageId } : {}),
-          // Branch leaf from typed column - resume-stream appends to the correct branch.
-          ...(leafMessageId ? { leafMessageId } : {}),
-          // wakeUp: pass the task result so resume-stream can create the deferred TOOL message
-          // without touching the original. Stored as object in taskInput JSONB.
-          // For failures with no output, synthesize a minimal failure result so the deferred
-          // message has real data and the revival AI can confirm the failure.
-          ...(callbackMode === CallbackMode.WAKE_UP
-            ? {
-                wakeUpStatus: toolStatus,
-                wakeUpResult:
-                  output !== undefined &&
-                  output !== null &&
-                  typeof output === "object" &&
-                  !Array.isArray(output)
-                    ? output
-                    : toolStatus === "failed"
-                      ? { success: false, status: "failed" }
-                      : undefined,
-              }
-            : {}),
-          // Cleanup: pass both task IDs so resume-stream can delete them after revival.
-          wakeUpTaskId: taskId,
-          resumeTaskId,
-        });
+        const nonNullThreadId = threadId;
 
         logger.debug("[TaskCompletion] Scheduling resume-stream task", {
           threadId,
@@ -380,30 +354,54 @@ export class TaskCompletion {
           resumeTaskId,
         });
 
-        await db.insert(cronTasks).values({
-          id: resumeTaskId,
-          shortId: resumeTaskId,
-          routeId: RESUME_STREAM_ALIAS,
-          displayName: `Resume stream for ${taskId}`,
-          category: TaskCategory.SYSTEM,
-          schedule: "* * * * *",
-          priority: CronTaskPriority.HIGH,
-          enabled: true,
-          runOnce: true,
-          taskInput: JSON.parse(JSON.stringify(resumeInput)) as Record<
-            string,
-            WidgetData
-          >,
-          outputMode: TaskOutputMode.STORE_ONLY,
-          notificationTargets: [],
-          tags: [RESUME_STREAM_ALIAS, taskId],
-          hidden: true,
-          userId: ownerUser.id,
-          // Pin to the instance that owns the thread so the cron pulse only
-          // picks it up on the correct machine. Null = any instance (local flows
-          // where directResumeLocale is provided and direct fire handles revival).
-          ...(selfInstanceId ? { targetInstance: selfInstanceId } : {}),
-        });
+        const wakeUpResult: Record<string, WidgetData> | undefined =
+          callbackMode === CallbackMode.WAKE_UP
+            ? output !== undefined &&
+              output !== null &&
+              typeof output === "object" &&
+              !Array.isArray(output) &&
+              !(output instanceof Date)
+              ? output
+              : toolStatus === "failed"
+                ? { success: false, status: "failed" }
+                : undefined
+            : undefined;
+
+        const resumeInput = await CronTasksRepository.insertTyped(
+          revivalEndpoints.POST,
+          {
+            id: resumeTaskId,
+            shortId: resumeTaskId,
+            routeId: RESUME_STREAM_ALIAS,
+            displayName: `Resume stream for ${taskId}`,
+            category: TaskCategory.SYSTEM,
+            schedule: "* * * * *",
+            priority: CronTaskPriority.HIGH,
+            enabled: true,
+            runOnce: true,
+            taskInput: {
+              threadId: nonNullThreadId,
+              callbackMode: callbackMode ?? undefined,
+              ...(modelId ? { modelId } : {}),
+              ...(skillId ? { skillId } : {}),
+              ...(favoriteId ? { favoriteId } : {}),
+              ...(toolMessageId ? { wakeUpToolMessageId: toolMessageId } : {}),
+              ...(leafMessageId ? { leafMessageId } : {}),
+              subAgentDepth,
+              ...(callbackMode === CallbackMode.WAKE_UP
+                ? { wakeUpStatus: toolStatus, wakeUpResult }
+                : {}),
+              wakeUpTaskId: taskId,
+              resumeTaskId,
+            },
+            outputMode: TaskOutputMode.STORE_ONLY,
+            notificationTargets: [],
+            tags: [RESUME_STREAM_ALIAS, taskId],
+            hidden: true,
+            userId: ownerUser.id,
+            ...(selfInstanceId ? { targetInstance: selfInstanceId } : {}),
+          },
+        );
 
         logger.debug("[TaskCompletion] resume-stream task scheduled", {
           resumeTaskId,
@@ -430,13 +428,13 @@ export class TaskCompletion {
             )
             .returning({ id: cronTasks.id });
           if (claimedRows.length > 0) {
-            const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
+            const { t } = revivalScopedTranslation.scopedT(directResumeLocale);
             // Always use ownerUser for the revival stream - correct credit validation.
             // Await so callers that await TaskCompletion.handle (e.g. pulse) get a
             // fully resolved revival.
-            const { ResumeStreamRepository } =
-              await import("@/app/api/[locale]/agent/ai-stream/repository/resume");
-            await ResumeStreamRepository.resume(
+            const { RevivalRepository } =
+              await import("@/app/api/[locale]/system/execute-tool/revival/repository");
+            await RevivalRepository.resume(
               resumeInput,
               ownerUser,
               directResumeLocale,
@@ -486,61 +484,6 @@ export class TaskCompletion {
         });
       }
     }
-  }
-
-  /**
-   * Resolve the task owner from a pending-call revival target and fire
-   * TaskCompletion.handle with the revival's context. The ONE shared path for
-   * every "a result landed for a parked call in THIS process" site: the
-   * tool-execute-result wire handler, cross-process reconciliation, and the
-   * dispatch deadline backstop all delegate here.
-   */
-  static async fireRevivalForOwner(params: {
-    revival: PendingCallRevival;
-    status: "completed" | "failed";
-    output: Record<string, WidgetData> | null;
-    taskId: string;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    const { revival, status, output, taskId, logger } = params;
-    const { resolveTaskOwnerUser } =
-      await import("next-vibe/tasks/cron/resolve-task-user");
-    const { dbUserIdToOwner } = await import("next-vibe/tasks/cron/db");
-    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-
-    const ownerCtx = await resolveTaskOwnerUser(
-      dbUserIdToOwner(revival.userId),
-      defaultLocale,
-      logger,
-    );
-    if (!ownerCtx) {
-      return;
-    }
-    await TaskCompletion.handle({
-      toolMessageId: revival.toolMessageId,
-      threadId: revival.threadId,
-      callbackMode:
-        revival.callbackMode === CallbackMode.WAIT
-          ? CallbackMode.WAIT
-          : CallbackMode.WAKE_UP,
-      status:
-        status === "completed"
-          ? CronTaskStatus.COMPLETED
-          : CronTaskStatus.FAILED,
-      output,
-      taskId,
-      modelId: revival.modelId,
-      skillId: revival.skillId,
-      favoriteId: revival.favoriteId,
-      leafMessageId: revival.leafMessageId,
-      subAgentDepth: revival.subAgentDepth,
-      ownerUser: ownerCtx.user,
-      logger,
-      directResumeLocale: defaultLocale,
-      // Fresh controller: the revival is independent of whichever stream or
-      // event handler delivered the result.
-      abortSignal: new AbortController().signal,
-    });
   }
 
   /**
@@ -670,7 +613,6 @@ export class TaskCompletion {
             errorMessage: null,
             upvotes: 0,
             downvotes: 0,
-            searchVector: null,
           },
         ],
         streamingState: ThreadStreamingState.STREAMING,
@@ -679,14 +621,15 @@ export class TaskCompletion {
 
     // Backfill wakeUpToolMessageId into the parked resume-stream task's taskInput jsonb.
     if (pendingTaskId) {
+      const parkedId = `resume-stream-parked-${pendingTaskId}`;
       try {
         await db
           .update(cronTasks)
           .set({
-            wakeUpToolMessageId: toolMessageId,
+            taskInput: sql`${cronTasks.taskInput} || ${JSON.stringify({ wakeUpToolMessageId: toolMessageId })}::jsonb`,
             updatedAt: new Date(),
           })
-          .where(eq(cronTasks.id, pendingTaskId));
+          .where(eq(cronTasks.id, parkedId));
       } catch (updateErr) {
         logger.warn(
           "[wakeup-confirm] Failed to backfill wakeUpToolMessageId (non-fatal)",
@@ -722,18 +665,21 @@ export class TaskCompletion {
    * Stream-state wiring (waitingForRemoteResult, pendingTimeoutMs, WS events,
    * cancel handler) remains in ai-stream/repository/core/escalation-handler.ts.
    */
-  static async createEscalationTask(opts: {
-    callbackMode: string;
-    displayName?: string;
-    threadId: string | null;
-    toolMessageId: string | null;
-    leafMessageId: string | null;
-    modelId: string | null;
-    skillId: string | null;
-    favoriteId: string | null;
-    subAgentDepth: number;
-    userId: string;
-  }): Promise<string> {
+  static async createEscalationTask(
+    opts: {
+      callbackMode: CallbackModeValue;
+      displayName?: string;
+      threadId: string;
+      toolMessageId: string | null;
+      leafMessageId: string | null;
+      modelId: ChatModelId | null;
+      skillId: string | null;
+      favoriteId: string | null;
+      subAgentDepth: number;
+      userId: string;
+    },
+    logger: EndpointLogger,
+  ): Promise<string> {
     const taskId = `escalated-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     await db.insert(cronTasks).values({
@@ -748,21 +694,205 @@ export class TaskCompletion {
       runOnce: true,
       lastExecutionStatus: CronTaskStatus.RUNNING,
       taskInput: {},
-      wakeUpCallbackMode: opts.callbackMode,
-      wakeUpThreadId: opts.threadId,
-      wakeUpToolMessageId: opts.toolMessageId,
-      wakeUpLeafMessageId: opts.leafMessageId,
-      wakeUpModelId: opts.modelId,
-      wakeUpSkillId: opts.skillId,
-      wakeUpFavoriteId: opts.favoriteId,
-      wakeUpSubAgentDepth: opts.subAgentDepth,
       outputMode: TaskOutputMode.STORE_ONLY,
       notificationTargets: [],
       tags: ["escalated", "local"],
       userId: opts.userId,
     });
 
+    // Park the revival context as a typed resume-stream task (no wakeUp columns on the task row).
+    await TaskCompletion.parkResumeStreamTask({
+      taskId,
+      callbackMode: opts.callbackMode,
+      threadId: opts.threadId,
+      toolMessageId: opts.toolMessageId,
+      leafMessageId: opts.leafMessageId,
+      modelId: opts.modelId,
+      skillId: opts.skillId,
+      favoriteId: opts.favoriteId,
+      subAgentDepth: opts.subAgentDepth,
+      ownerUserId: opts.userId,
+      selfInstanceId: null,
+      logger,
+    });
+
     return taskId;
+  }
+
+  /**
+   * Pre-create a disabled resume-stream task with the full revival context in
+   * its taskInput (typed to resume-stream's schema). Called by await-task when
+   * parking a thread. Callers enable it via enableAndFireParkedResumeTask.
+   */
+  static async parkResumeStreamTask(opts: {
+    taskId: string;
+    callbackMode: CallbackModeValue;
+    threadId: string;
+    toolMessageId: string | null;
+    leafMessageId: string | null;
+    modelId: ChatModelId | null;
+    skillId: string | null;
+    favoriteId: string | null;
+    subAgentDepth: number;
+    ownerUserId: string | null;
+    selfInstanceId: string | null;
+    logger: EndpointLogger;
+  }): Promise<string> {
+    const {
+      taskId,
+      callbackMode,
+      threadId,
+      toolMessageId,
+      leafMessageId,
+      modelId,
+      skillId,
+      favoriteId,
+      subAgentDepth,
+      ownerUserId,
+      selfInstanceId,
+      logger,
+    } = opts;
+
+    const resumeTaskId = `resume-stream-parked-${taskId}`;
+
+    await CronTasksRepository.insertTypedOrIgnore(revivalEndpoints.POST, {
+      id: resumeTaskId,
+      shortId: resumeTaskId,
+      routeId: RESUME_STREAM_ALIAS,
+      displayName: `Parked revival for ${taskId}`,
+      category: TaskCategory.SYSTEM,
+      schedule: "* * * * *",
+      priority: CronTaskPriority.HIGH,
+      enabled: false,
+      runOnce: true,
+      taskInput: {
+        threadId,
+        callbackMode,
+        ...(modelId ? { modelId } : {}),
+        ...(skillId ? { skillId } : {}),
+        ...(favoriteId ? { favoriteId } : {}),
+        ...(toolMessageId ? { wakeUpToolMessageId: toolMessageId } : {}),
+        ...(leafMessageId ? { leafMessageId } : {}),
+        subAgentDepth,
+        wakeUpTaskId: taskId,
+        resumeTaskId,
+      },
+      outputMode: TaskOutputMode.STORE_ONLY,
+      notificationTargets: [],
+      tags: [RESUME_STREAM_ALIAS, taskId],
+      hidden: true,
+      userId: ownerUserId,
+      ...(selfInstanceId ? { targetInstance: selfInstanceId } : {}),
+    });
+
+    logger.debug("[TaskCompletion] Parked disabled resume-stream task", {
+      resumeTaskId,
+      taskId,
+      threadId,
+      toolMessageId,
+    });
+
+    return resumeTaskId;
+  }
+
+  /**
+   * Merge wakeUpStatus/wakeUpResult into the parked task's taskInput, enable
+   * it, then direct-fire via RevivalRepository.resume (same atomic claim+fire
+   * as handle()'s directResumeLocale path). Falls back to the cron pulse if
+   * direct-fire fails. No-op if no parked task exists (detach/inline WAIT).
+   */
+  static async enableAndFireParkedResumeTask(params: {
+    taskId: string;
+    status: "completed" | "failed";
+    output: Record<string, WidgetData> | null;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    abortSignal: AbortSignal;
+  }): Promise<boolean> {
+    const { taskId, status, output, locale, logger, abortSignal } = params;
+    const parkedId = `resume-stream-parked-${taskId}`;
+    const wakeUpStatus = status === "completed" ? "completed" : "failed";
+    const wakeUpResult: Record<string, WidgetData> | undefined =
+      output !== null && output !== undefined ? output : undefined;
+
+    const extraInput: Record<string, WidgetData> = { wakeUpStatus };
+    if (wakeUpResult !== undefined) {
+      extraInput["wakeUpResult"] = wakeUpResult;
+    }
+    const found = await CronTasksRepository.enableWithTaskInputMerge(
+      parkedId,
+      extraInput,
+    );
+    if (!found) {
+      return false;
+    }
+    logger.debug(
+      "[TaskCompletion] Enabled parked resume-stream task for fire",
+      {
+        parkedId,
+        taskId,
+        wakeUpStatus,
+      },
+    );
+
+    // Read typed taskInput to fire directly.
+    const parkedTask = await CronTasksRepository.findByIdTyped(
+      revivalEndpoints.POST,
+      parkedId,
+    );
+    if (!parkedTask) {
+      return true; // enabled but claimed by concurrent pulse already
+    }
+    const ownerCtx = await resolveTaskOwnerUser(
+      dbUserIdToOwner(parkedTask.userId),
+      locale,
+      logger,
+    );
+    if (!ownerCtx) {
+      return true;
+    }
+
+    // Atomic claim — same as handle()'s direct-fire block.
+    const claimedRows = await db
+      .update(cronTasks)
+      .set({ enabled: false, updatedAt: new Date() })
+      .where(and(eq(cronTasks.id, parkedId), eq(cronTasks.enabled, true)))
+      .returning({ id: cronTasks.id });
+
+    if (claimedRows.length === 0) {
+      logger.debug(
+        "[TaskCompletion] parked resume-stream already claimed by pulse",
+        { parkedId },
+      );
+      return true;
+    }
+
+    const { t } = revivalScopedTranslation.scopedT(locale);
+    const { RevivalRepository } =
+      await import("@/app/api/[locale]/system/execute-tool/revival/repository");
+    await RevivalRepository.resume(
+      parkedTask.taskInput,
+      ownerCtx.user,
+      locale,
+      logger,
+      t,
+      abortSignal,
+      parkedTask.taskInput.subAgentDepth ?? 0,
+    ).catch(async (fireErr) => {
+      logger.warn(
+        "[TaskCompletion] Direct parked-task fire failed - re-enabling for cron",
+        {
+          parkedId,
+          error: fireErr instanceof Error ? fireErr.message : String(fireErr),
+        },
+      );
+      await db
+        .update(cronTasks)
+        .set({ enabled: true, updatedAt: new Date() })
+        .where(eq(cronTasks.id, parkedId));
+    });
+
+    return true;
   }
 
   /**

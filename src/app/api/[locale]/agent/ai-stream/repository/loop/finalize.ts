@@ -139,7 +139,11 @@ export async function complete(
     cachedInputTokens: finalCachedInputTokens,
     uncachedInputTokens: finalUncachedInputTokens,
     cacheWriteTokens: finalCacheWriteTokens,
-  } = state.tokenAccumulator.finalize(sdkTotals, providerCacheWriteTokens);
+  } = TokenAccumulator.finalize(
+    state.p.ctx,
+    sdkTotals,
+    providerCacheWriteTokens,
+  );
   const finalTotalTokens =
     finalUncachedInputTokens + finalCachedInputTokens + finalOutputTokens;
 
@@ -328,13 +332,21 @@ export async function complete(
   // committed" on the next turn).
   await ctx.dbWriter.flushAll();
 
-  // Clear streaming state in DB + registry
-  await clearStreamingState(threadId, logger, user);
+  // Clear streaming state in DB + registry — owned clear: no-ops if a newer
+  // stream (queued turn, revival) has taken over the claim.
+  await clearStreamingState(
+    threadId,
+    logger,
+    user,
+    state.p.streamContext.streamRunId,
+  );
 
-  // Fire-and-forget: mirror the finished thread to connected peers (gated
-  // per connection by syncScope["threads"]) — the live message events
-  // already streamed; this push carries title/placement (origin folder
-  // chain) so the peer's mirror lands at REMOTE/<origin>/<path>.
+  // Fire-and-forget: mirror the finished thread to connected peers via the
+  // thread-updated remote EVENT (column-gated by syncEligible/incognito, NOT by
+  // syncScope — placement is event-driven and independent of the pull-sync
+  // domain). The live message events already streamed; this push carries
+  // title/placement (origin folder chain) so the peer's mirror lands at
+  // REMOTE/<origin>/<path>.
   if (!user.isPublic) {
     const mirrorUserId = user.id;
     void import("@/app/api/[locale]/agent/chat/threads/sync-provider")
@@ -346,10 +358,11 @@ export async function complete(
       });
   }
 
-  // Fire-and-forget: sync thread stub + per-message embeddings at stream end
-  void ctx.dbWriter.syncThreadEmbedding().catch(() => {
-    // Intentional no-op: embedding sync is best-effort
-  });
+  // No embedding work at finalize. Per-MESSAGE vectors are written AT
+  // MESSAGE-WRITE TIME (createUserMessage + emitContentDone). The thread STUB
+  // (title/description → cortex_nodes) is a function of the thread's IDENTITY,
+  // which only changes on rename — so it is embedded there (rename/repository)
+  // and nowhere else. Embedding it on every turn-finalize was pure re-work.
 
   // Cleanup stream context
   ctx.cleanup();

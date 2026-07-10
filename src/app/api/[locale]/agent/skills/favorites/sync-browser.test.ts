@@ -460,7 +460,16 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: connByIdDef.PATCH,
-        data: { transportMode: mode },
+        data: {
+          transportMode: mode,
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
         urlPathParams: { instanceId: "hermes" },
         user: atlasUser,
       });
@@ -513,7 +522,6 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
             skills: true,
             favorites: true,
             threads: false,
-            chat: false,
           },
           transportMode: "direct-http",
         },

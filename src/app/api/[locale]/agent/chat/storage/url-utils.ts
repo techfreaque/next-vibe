@@ -3,8 +3,6 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { envClient } from "@/config/env-client";
 
-import { getStorageAdapter } from "./index";
-
 /**
  * Converts a relative storage URL to an absolute URL by prepending NEXT_PUBLIC_APP_URL.
  * Used so that AI models, SSE events, and external consumers see fully-qualified URLs.
@@ -52,12 +50,15 @@ export function parseStorageUrl(
 export async function fetchStorageFileAsBase64(
   url: string,
   user?: JwtPayloadType,
+  /** Fixture-aware fetch when called inside a stream; defaults to live fetch. */
+  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<string | null> {
   const parsed = parseStorageUrl(url);
   if (!parsed) {
     // External URL - plain fetch, no auth concern
     try {
-      const response = await fetch(url);
+      const response = await fetchImpl(url);
       if (!response.ok) {
         return null;
       }
@@ -68,6 +69,9 @@ export async function fetchStorageFileAsBase64(
     }
   }
 
+  // Lazy import: adapters ← index ← url-utils is a module cycle; a static
+  // import here TDZ-crashes SSR after partial HMR invalidation
+  const { getStorageAdapter } = await import("./index");
   const storage = getStorageAdapter();
 
   // Verify ownership when a user is provided

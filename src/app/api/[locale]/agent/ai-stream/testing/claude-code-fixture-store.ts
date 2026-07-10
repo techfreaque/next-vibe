@@ -27,53 +27,22 @@ import { join } from "node:path";
 
 import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
 
-import { FIXTURE_STRICT, type FixtureContext } from "./fetch-cache";
-
-const CLAUDE_CODE_CACHE_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "..",
-  "..",
-  "..",
-  "..",
-  "..",
-  "generated",
-  "ai-fixtures",
-  "claude-code",
-);
+import type { ToolExecutionContext } from "../../chat/config";
+import {
+  cacheDir,
+  fileStem,
+  FIXTURE_STRICT,
+  readAndBumpFixture,
+  resolveInstanceName,
+  slugify,
+} from "./fetch-cache";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface FixtureFile {
+interface PartsFixtureFile {
+  type: "parts";
   modelId: string;
-  userPrompt: string;
   parts: LanguageModelV2StreamPart[];
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
-
-function fixturePath(
-  contextName: string,
-  modelId: string,
-  userPrompt: string,
-): string {
-  const hash = createHash("sha256")
-    .update(`${modelId}\n${userPrompt}`)
-    .digest("hex")
-    .slice(0, 8);
-  return join(
-    CLAUDE_CODE_CACHE_DIR,
-    slugify(contextName),
-    `${slugify(modelId)}-${hash}-res.json`,
-  );
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -84,34 +53,39 @@ function fixturePath(
  * stream's thread the producer runs directly.
  */
 export async function withClaudeCodeFixture(
-  fixtureContext: FixtureContext | undefined,
+  streamContext: ToolExecutionContext | undefined,
   modelId: string,
-  userPrompt: string,
   producer: () => Promise<ReadableStream<LanguageModelV2StreamPart>>,
 ): Promise<ReadableStream<LanguageModelV2StreamPart>> {
-  if (!fixtureContext) {
+  const threadId = streamContext?.threadId;
+  // No thread → not a fixture run. Read prefix + bump the run's single ordinal
+  // in one round-trip (same counter the HTTP engine bumps). No prefix → live.
+  const fx = threadId ? await readAndBumpFixture(threadId) : null;
+  if (!fx) {
     return producer();
   }
 
-  const fp = fixturePath(fixtureContext.name, modelId, userPrompt);
+  const instance = await resolveInstanceName();
+  const stem = fileStem(instance, slugify(modelId), fx.ordinal);
+  const fp = join(cacheDir(slugify(fx.prefix)), `${stem}-res.json`);
 
   // ── Cache hit ────────────────────────────────────────────────────────────
   if (existsSync(fp)) {
-    const fixture = JSON.parse(readFileSync(fp, "utf-8")) as FixtureFile;
+    const fixture = JSON.parse(readFileSync(fp, "utf-8")) as PartsFixtureFile;
     return replayFixture(fixture.parts);
   }
 
-  if (fixtureContext.strict) {
+  if (FIXTURE_STRICT) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached agent call
     throw new Error(
       // eslint-disable-next-line i18next/no-literal-string
-      `[ClaudeCodeFixture STRICT] No fixture for ${modelId} (context: ${fixtureContext.name}, expected: ${fp})`,
+      `[ClaudeCodeFixture STRICT] No fixture for ${modelId} (context: ${slugify(fx.prefix)}, expected: ${stem}-res.json)`,
     );
   }
 
   // ── Cache miss - real call ───────────────────────────────────────────────
   const realStream = await producer();
-  return captureAndWrite(realStream, fp, modelId, userPrompt);
+  return captureAndWrite(realStream, fp, modelId);
 }
 
 // ── Internals ─────────────────────────────────────────────────────────────────
@@ -137,7 +111,6 @@ function captureAndWrite(
   source: ReadableStream<LanguageModelV2StreamPart>,
   fp: string,
   modelId: string,
-  userPrompt: string,
 ): ReadableStream<LanguageModelV2StreamPart> {
   const collected: LanguageModelV2StreamPart[] = [];
 
@@ -152,9 +125,9 @@ function captureAndWrite(
     flush(): void {
       const dir = fp.slice(0, fp.lastIndexOf("/"));
       mkdirSync(dir, { recursive: true });
-      const fixture: FixtureFile = {
+      const fixture: PartsFixtureFile = {
+        type: "parts",
         modelId,
-        userPrompt: userPrompt.slice(0, 500),
         parts: collected,
       };
       writeFileSync(fp, JSON.stringify(fixture, null, 2), "utf-8");

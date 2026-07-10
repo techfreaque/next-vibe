@@ -67,5 +67,7 @@ export const translations: typeof enTranslations = {
       title: "Strumień anulowany",
       description: "Strumień AI został pomyślnie anulowany",
     },
+    streamInterrupted:
+      "Generowanie zostało zatrzymane. Częściowa odpowiedź została zapisana.",
   },
 };

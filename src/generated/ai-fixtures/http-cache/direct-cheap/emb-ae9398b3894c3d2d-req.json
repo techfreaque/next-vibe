@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T7a approve-phase1] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list available tools, and (2) execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/t7-approve-test', 'content':'T7_APPROVE_OK'}. The cortex-write tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.",
+    "encoding_format": "float"
+  }
+}

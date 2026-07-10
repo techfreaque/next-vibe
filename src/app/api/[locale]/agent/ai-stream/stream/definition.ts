@@ -320,7 +320,21 @@ const { POST } = createEndpoint({
         description: "post.messageHistory.description" as const,
         schema: z
           .array(
-            selectChatMessageSchema.extend({
+            z.object({
+              id: z.string(),
+              threadId: z.string(),
+              role: z.nativeEnum(ChatMessageRole),
+              parentId: z.string().nullable(),
+              sequenceId: z.string().nullable(),
+              isAI: z.boolean(),
+              model: z.nativeEnum(ChatModelId).nullable(),
+              skill: z.string().nullable(),
+              metadata: z.custom<MessageMetadata>(),
+              upvotes: z.number().nullish(),
+              downvotes: z.number().nullish(),
+              searchVector: z.string().nullish(),
+              embedding: z.array(z.number()).nullish(),
+              embeddingHash: z.string().nullish(),
               createdAt: dateSchema.nullable(),
               updatedAt: dateSchema.nullable(),
               // Tool messages in incognito mode may send content as an array
@@ -329,8 +343,8 @@ const { POST } = createEndpoint({
               content: z
                 .union([
                   z.string(),
-                  z.array(z.unknown()),
-                  z.record(z.string(), z.unknown()),
+                  z.array(WidgetDataSchema),
+                  z.record(z.string(), WidgetDataSchema),
                   z.null(),
                 ])
                 .transform((v) =>
@@ -339,7 +353,7 @@ const { POST } = createEndpoint({
                 .optional(),
               // errorMessage may also be a structured object in some clients
               errorMessage: z
-                .union([z.string(), z.unknown()])
+                .union([z.string(), WidgetDataSchema])
                 .transform((v) =>
                   typeof v === "string" || v === null || v === undefined
                     ? v
@@ -350,9 +364,6 @@ const { POST } = createEndpoint({
               authorName: z.string().nullish(),
               errorType: z.string().nullish(),
               errorCode: z.string().nullish(),
-              upvotes: z.number().nullish(),
-              downvotes: z.number().nullish(),
-              searchVector: z.string().nullish(),
             }),
           )
           .optional()
@@ -421,15 +432,6 @@ const { POST } = createEndpoint({
             columns: 6,
             schema: z.coerce.boolean().default(false),
           }),
-          voice: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            options: TtsModelIdOptions,
-            label: "post.voiceMode.voice.label",
-            description: "post.voiceMode.voice.description",
-            columns: 6,
-            schema: z.enum(TtsModelId).default(DEFAULT_TTS_VOICE_ID),
-          }),
         },
       }),
 
@@ -453,7 +455,25 @@ const { POST } = createEndpoint({
             // wire shape (remote relay POST bodies) — same contract as
             // attachments; a relayed STT turn must survive the hop.
             schema: z
-              .instanceof(File)
+              .union([
+                z.instanceof(File),
+                z
+                  .object({
+                    filename: z.string().min(1),
+                    mimeType: z.string().min(1),
+                    data: z.string().min(1),
+                  })
+                  .transform(
+                    (att) =>
+                      new File(
+                        [Buffer.from(att.data, "base64")],
+                        att.filename,
+                        {
+                          type: att.mimeType,
+                        },
+                      ),
+                  ),
+              ])
               .refine((file) => file.size <= 25 * 1024 * 1024, {
                 message: "post.audioInput.validation.maxSize",
               })
@@ -475,14 +495,12 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z
           .discriminatedUnion("mode", [
-            z.object({ mode: z.literal("local") }),
+            z.object({
+              mode: z.literal("local"),
+            }),
             z.object({
               mode: z.literal("inference-provider"),
               instanceId: z.string(),
-              /** Original requesting user — provider runs AI under its own user but
-               *  must dispatch tool call-backs and emit events under the caller's identity. */
-              callerUserId: z.string().uuid(),
-              callerLeadId: z.string().uuid(),
               tools: z
                 .array(
                   z.object({
@@ -505,22 +523,9 @@ const { POST } = createEndpoint({
             z.object({
               mode: z.literal("relay"),
               instanceId: z.string(),
-              /** Original requesting user — provider runs AI under its own user but
-               *  must dispatch tool call-backs and emit events under the caller's identity. */
-              callerUserId: z.string().uuid(),
-              callerLeadId: z.string().uuid(),
-              threadMirrorMode: z.enum(["both", "local", "cloud", "none"]),
-              folderPath: z.array(z.string()).optional(),
-              systemPrompt: z.string().optional(),
-              tools: z
-                .array(
-                  z.object({
-                    name: z.string().min(1),
-                    description: z.string(),
-                    parameters: z.custom<JSONSchema7>(),
-                  }),
-                )
-                .optional(),
+              /** The CONNECTION's thread mirroring policy — 'off' keeps the
+               *  executor's landing transient (no persisted copy). */
+              threadMirrorMode: z.enum(["both", "off"]),
               confirmationOverrides: z
                 .array(
                   z.object({
@@ -596,6 +601,24 @@ const { POST } = createEndpoint({
         label: "post.response.finishReason",
         schema: z.string().optional(),
       }),
+      // Relay (PUSH-PUSH model): the receiver's synchronous response carries
+      // the full turn summary — the caller never pulls the receiver's thread
+      // to build its own response; its mirror converges from pushed events.
+      lastAiMessageContent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.lastAiMessageContent",
+        schema: z.string().nullable().optional(),
+      }),
+      lastGeneratedMediaUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.lastGeneratedMediaUrl",
+        schema: z.string().nullable().optional(),
+      }),
+      totalCreditsDeducted: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.totalCreditsDeducted",
+        schema: z.coerce.number().optional(),
+      }),
     },
   }),
 
@@ -661,7 +684,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+        voiceMode: { enabled: false },
         audioInput: { file: null },
         timezone: "America/New_York",
         executionContext: { mode: "local" },
@@ -682,7 +705,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+        voiceMode: { enabled: false },
         audioInput: { file: null },
         timezone: "America/New_York",
         executionContext: { mode: "local" },
@@ -703,7 +726,7 @@ const { POST } = createEndpoint({
         messageHistory: [],
         attachments: [],
         resumeToken: null,
-        voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
+        voiceMode: { enabled: false },
         audioInput: { file: null },
         timezone: "America/New_York",
         executionContext: { mode: "local" },

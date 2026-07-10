@@ -20,23 +20,6 @@ export const CallbackMode = {
 export type CallbackModeValue =
   (typeof CallbackMode)[keyof typeof CallbackMode];
 
-/**
- * Routing metadata stored in taskInput for remote tasks.
- * Read by handleTaskCompletion and /report to backfill results
- * and schedule resume-stream.
- */
-export interface TaskRoutingContext {
-  callbackMode: CallbackModeValue;
-  threadId?: string;
-  toolMessageId?: string;
-  modelId?: string;
-  skillId?: string;
-  favoriteId?: string;
-  /** Branch leaf message ID at tool-call time. Stored so resume-stream can append
-   * the deferred result to the correct branch even if the user switches branches. */
-  leafMessageId?: string;
-}
-
 /** DB-safe tuple for text() enum constraint */
 export const CallbackModeDB = [
   CallbackMode.WAIT,
@@ -45,3 +28,27 @@ export const CallbackModeDB = [
   CallbackMode.END_LOOP,
   CallbackMode.APPROVE,
 ] as const;
+
+/**
+ * Dispatch hint texts — the AI-facing steering strings returned with async
+ * dispatch results. ONE definition per hint: local and remote dispatches must
+ * steer the model identically (same mode = same hint on every transport).
+ *
+ * The wakeUp hint is the dispatch's only per-turn steer against a re-call: the
+ * tool stays available for the rest of the turn, and a tool-primed model
+ * (notably a relay receiver whose system prompt carries the execute-tool
+ * tool-catalog) will otherwise re-dispatch it in a loop. Be explicit —
+ * acknowledge the taskId and STOP; the result arrives via the automatic
+ * wake-up revival.
+ */
+export const DISPATCH_HINTS = {
+  /** DETACH: fire-and-forget; result retrievable via await-task. */
+  detach:
+    'Task detached. To fetch the result, call await-task with taskId="<the taskId returned above>".',
+  /** WAKE_UP: result injected automatically; model must acknowledge and stop. */
+  wakeUp:
+    "Dispatched — taskId returned. The result will be injected automatically when ready and will wake up this thread. No need to call await-task.",
+  /** Remote WAIT that timed out inline and auto-upgraded to wakeUp semantics. */
+  waitUpgradedToWakeUp:
+    "Tool is taking longer than expected. The result will be injected automatically when ready and will wake up this thread. No need to call await-task.",
+} as const;

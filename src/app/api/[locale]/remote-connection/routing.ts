@@ -16,7 +16,6 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
-import type { TransportMode } from "./db";
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";
 import type {
@@ -229,7 +228,8 @@ export class ExecuteToolRouting {
       remoteUrl: row.remoteUrl,
       token: RemoteConnectionRepository.decryptToken(row.token),
       leadId: row.leadId,
-      transportMode: row.transportMode as TransportMode,
+      transportMode: row.transportMode,
+      remoteTransportMode: row.remoteTransportMode ?? null,
       useRemoteContext,
       isReverseEntry: row.isReverseEntry,
     };

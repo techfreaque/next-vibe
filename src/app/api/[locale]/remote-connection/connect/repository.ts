@@ -35,7 +35,12 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 
 import registerEndpoints from "../connect-reverse/definition";
-import { remoteConnections, SyncScopeSchema } from "../db";
+import {
+  remoteConnections,
+  type SyncScope,
+  SyncScopeSchema,
+  type TransportMode,
+} from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import { ExecuteToolRouting } from "../routing";
 import { RemoteTransport } from "../transport";
@@ -112,6 +117,14 @@ export class RemoteConnectionConnectRepository {
     locale: CountryLanguage;
     reverseToken?: string;
     reverseLeadId?: string;
+    /** The initiator's sync scope — mirrored onto the peer's reverse entry. */
+    syncScope: SyncScope;
+    /**
+     * The initiator's OWN transport leg toward the peer (how WE reach them).
+     * The peer stores it as its reverse entry's remoteTransportMode (how the
+     * initiator reaches it) so it knows whether to open an outbound connector.
+     */
+    remoteTransportMode: TransportMode;
     logger: EndpointLogger;
   }): Promise<{
     ok: boolean;
@@ -129,6 +142,8 @@ export class RemoteConnectionConnectRepository {
       locale,
       reverseToken,
       reverseLeadId,
+      syncScope,
+      remoteTransportMode,
       logger,
     } = params;
     const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
@@ -146,6 +161,8 @@ export class RemoteConnectionConnectRepository {
         instanceId,
         localUrl,
         selfUserId,
+        syncScope,
+        remoteTransportMode,
         ...(reverseToken ? { reverseToken } : {}),
         ...(reverseLeadId ? { reverseLeadId } : {}),
       },
@@ -400,6 +417,14 @@ export class RemoteConnectionConnectRepository {
         locale,
         reverseToken,
         reverseLeadId,
+        // Mirror OUR chosen scope onto the peer's reverse entry (concrete).
+        syncScope: SyncScopeSchema.parse(data.syncScope),
+        // Our send leg toward the peer at connect time. Same-machine detection
+        // runs async AFTER this and may PATCH us to direct-http; a reverse-ws
+        // flip is then mirrored to the peer via connect-reverse/update. The DB
+        // default is direct-http (the socket-free leg), so that is our starting
+        // transport here — the peer records it as its remoteTransportMode.
+        remoteTransportMode: "direct-http",
         logger,
       });
 
@@ -461,9 +486,8 @@ export class RemoteConnectionConnectRepository {
         instanceId,
         remoteUserId: registerResult.remoteUserId ?? undefined,
         isInferenceProvider: data.isInferenceProvider,
-        syncScope: data.syncScope
-          ? SyncScopeSchema.parse(data.syncScope)
-          : undefined,
+        // Normalize through the schema so field defaults are concrete on the row.
+        syncScope: SyncScopeSchema.parse(data.syncScope),
         logger,
       },
     );
@@ -520,9 +544,14 @@ export class RemoteConnectionConnectRepository {
       });
     }
 
-    // ── Step 6c: Hot-open WS connection immediately (no restart needed) ───────
-    // Read back the stored row to get the DB id, then open the WS socket.
-    // Fire-and-forget — connection setup is non-blocking.
+    // ── Step 6c: Fire the ONE pull-on-connect (and open a socket iff needed) ──
+    // ALWAYS call openConnection: it runs the single HTTP pull-on-connect for
+    // EVERY transport (direct-http included — the sync exchange rides HTTP, not a
+    // socket) and opens a persistent outbound socket ONLY when a leg is genuinely
+    // reverse-ws. Because `transportMode`/`remoteTransportMode` both default to
+    // "direct-http", a fresh connect (before detection PATCHes reverse-ws) opens
+    // NO socket — no premature "closed before established" noise — yet still
+    // performs its connect sync. Fire-and-forget — connection setup is non-blocking.
     void (async (): Promise<void> => {
       try {
         const [stored] = await db
@@ -536,6 +565,7 @@ export class RemoteConnectionConnectRepository {
             syncCursors: remoteConnections.syncCursors,
             pushCursors: remoteConnections.pushCursors,
             transportMode: remoteConnections.transportMode,
+            remoteTransportMode: remoteConnections.remoteTransportMode,
           })
           .from(remoteConnections)
           .where(
@@ -545,11 +575,7 @@ export class RemoteConnectionConnectRepository {
             ),
           )
           .limit(1);
-        // Open the persistent WS when the stored row is already negotiated to
-        // reverse-ws (e.g. reconnect after the ping recorded the transport).
-        // Fresh connects wait for the ping to determine reachability;
-        // direct-http connections POST directly to the remote stream endpoint.
-        if (stored && stored.transportMode === "reverse-ws") {
+        if (stored) {
           const { openConnection } =
             await import("next-vibe/realtime/connector");
           openConnection({
@@ -565,6 +591,8 @@ export class RemoteConnectionConnectRepository {
             syncScope: stored.syncScope ?? null,
             syncCursors: stored.syncCursors ?? null,
             pushCursors: stored.pushCursors ?? null,
+            transportMode: stored.transportMode,
+            remoteTransportMode: stored.remoteTransportMode,
           });
         }
       } catch (err) {

@@ -224,6 +224,5 @@ export function addErrorMessageToChat(
     downvotes: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-    searchVector: null,
   });
 }

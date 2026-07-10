@@ -62,10 +62,7 @@ async function routeBridgeToHermes(
     user: testUser,
     locale: defaultLocale,
     logger: createEndpointLogger(false, defaultLocale),
-    streamContext: makeHeadlessContext(
-      new AbortController().signal,
-      streamContext,
-    ),
+    streamContext,
     input: {
       eventName,
       payload,
@@ -93,7 +90,7 @@ describe("Remote Event Bridge", () => {
     // dispatches it to the target route's onRemoteEvent and returns success.
 
     it("REB-LOCAL-REMOTE-EVENT: local remote-event returns success", async () => {
-      const fixtureCtx: FixtureContext = { name: "reb-local-remote-event" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
@@ -127,7 +124,7 @@ describe("Remote Event Bridge", () => {
     // Unknown eventName must still succeed (graceful ignore).
 
     it("REB-LOCAL-UNKNOWN: unknown eventName is ignored gracefully", async () => {
-      const fixtureCtx: FixtureContext = { name: "reb-local-unknown" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
@@ -149,7 +146,7 @@ describe("Remote Event Bridge", () => {
     // Echo prevention: self-originating events silently dropped, still returns success.
 
     it("REB-LOCAL-ECHO-DROP: self-origin remote-event is silently dropped", async () => {
-      const fixtureCtx: FixtureContext = { name: "reb-local-echo-drop" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       const { RemoteConnectionRepository } =
         await import("@/app/api/[locale]/remote-connection/repository");
@@ -241,7 +238,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-DIRECT-REMOTE-EVENT: remote-event routed to hermes via direct-http returns received: true", async () => {
         requireDirectHttp();
-        const fixtureCtx: FixtureContext = { name: "reb-direct-remote-event" };
+        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
         const result = await routeBridgeToHermes(
           testUser,
@@ -320,7 +317,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-REMOTE-EVENT: remote-event routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        const fixtureCtx: FixtureContext = { name: "reb-ws-remote-event" };
+        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
         const result = await routeBridgeToHermes(
           testUser,
@@ -352,7 +349,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-UNKNOWN-EVENT: unknown eventName routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        const fixtureCtx: FixtureContext = { name: "reb-ws-unknown-event" };
+        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
         const result = await routeBridgeToHermes(
           testUser,

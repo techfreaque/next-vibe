@@ -125,7 +125,7 @@ const { GET } = createEndpoint({
         label: "get.response.thread.tags.content" as const,
         schema: z.array(z.string()),
       }),
-      preview: responseField(scopedTranslation, {
+      description: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.thread.preview.content" as const,
         schema: z.string().nullable(),
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
       metadata: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.thread.metadata.content" as const,
-        schema: z.record(z.string(), z.any()),
+        schema: z.record(z.string(), WidgetDataSchema),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -274,7 +274,7 @@ const { GET } = createEndpoint({
         pinned: false,
         archived: false,
         tags: [],
-        preview: "Hello, how can I help you?",
+        description: "Hello, how can I help you?",
         metadata: {},
         createdAt: "2024-01-15T10:00:00.000Z",
         updatedAt: "2024-01-15T10:00:00.000Z",
@@ -626,7 +626,7 @@ const { DELETE } = createEndpoint({
         label: "delete.response.status.content" as const,
         schema: z.enum(ThreadStatus),
       }),
-      preview: responseField(scopedTranslation, {
+      description: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "delete.response.preview.content" as const,
         schema: z.string().nullable(),
@@ -748,7 +748,7 @@ const { DELETE } = createEndpoint({
         rootFolderId: DefaultFolderId.PRIVATE,
         folderId: null,
         status: ThreadStatus.ACTIVE,
-        preview: "Hello, how can I help you?",
+        description: "Hello, how can I help you?",
         createdAt: "2024-01-15T10:00:00.000Z",
         updatedAt: "2024-01-15T10:00:00.000Z",
       },

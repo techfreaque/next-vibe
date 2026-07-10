@@ -236,12 +236,6 @@ const { GET } = createEndpoint({
                 "get.response.messages.message.downvotes.content" as const,
               schema: z.number(),
             }),
-            searchVector: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              content:
-                "get.response.messages.message.searchVector.content" as const,
-              schema: z.string().nullable(),
-            }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
@@ -329,7 +323,6 @@ const { GET } = createEndpoint({
             metadata: null,
             upvotes: 0,
             downvotes: 0,
-            searchVector: null,
             createdAt: "2024-01-15T10:00:00.000Z",
             updatedAt: "2024-01-15T10:00:00.000Z",
           },

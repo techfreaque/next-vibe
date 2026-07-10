@@ -61,7 +61,7 @@ async function setupDirectConnection(
   // Ensure the test favorite exists on hermes — hermes's AI loop resolves favorites
   // from its own DB (not atlas's). Only create if none exists yet.
   const hermesListResp = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: favoritesDefinitions.GET,
     data: {},
     user: testUser,
@@ -73,7 +73,7 @@ async function setupDirectConnection(
   const alreadyHas = hermesFavs?.some((f) => f.skillId === "quality-tester");
   if (!alreadyHas) {
     await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: favoritesCreateDefinitions.POST,
       data: { skillId: "quality-tester" },
       user: testUser,
@@ -91,10 +91,20 @@ async function teardownDirectConnection(
   // Disable forceSystemProvider on hermes before disconnecting (best-effort)
   try {
     await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: remoteConnectionByIdDefinitions.PATCH,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-      data: { forceSystemProvider: false },
+      data: {
+        forceSystemProvider: false,
+        // Coding-agent test — exercises NO sync domain.
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
       user: testUser,
       instanceId: HERMES_INSTANCE_ID,
     });
@@ -122,9 +132,7 @@ async function teardownDirectConnection(
  * For WAIT/END_LOOP that fell back to the queue path (network failure), the
  * revival also arrives via the same callback path once hermes completes.
  */
-async function runDirectPulse(
-  threadId: string,
-): Promise<void> {
+async function runDirectPulse(threadId: string): Promise<void> {
   const deadline = Date.now() + 120_000;
   while (Date.now() < deadline) {
     const [thread] = await db

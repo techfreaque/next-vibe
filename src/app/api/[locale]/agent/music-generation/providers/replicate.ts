@@ -21,8 +21,11 @@ interface ReplicatePrediction {
   error?: string;
 }
 
-const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 3000;
-const MAX_POLL_ATTEMPTS = 80;
+// Real interval ALWAYS (pollDelay collapses replays via the header) — a
+// test-only shortcut would time out a RECORDING before the gen finishes.
+// 3s × 60 = 3 min budget.
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 60;
 
 async function pollPrediction(
   predictionId: string,

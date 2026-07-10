@@ -5,6 +5,7 @@ dist
 .env
 .env.staging
 .npmrc
+.tanstack
 
 # Generated files - these are just to big and will generated before build anyways
 **/system/generated/endpoints-meta

@@ -2,7 +2,7 @@
  * System Prompt Fragment Types
  *
  * Each fragment lives in a single flat file:
- *   <module>/system-prompt.ts   - fragment definition + server-only data loader
+ *   <module>/system-prompt.ts   - fragment definition only, build() fetches inline
  *
  * Priority: lower = earlier in the section.
  * Built-ins use multiples of 100. Module fragments use gaps (e.g. 150, 250).
@@ -15,10 +15,24 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
+/** Remote instance connection info — pre-fetched once, shared by 3 fragments. */
+export interface RemoteInstancesContext {
+  remoteConnections: Array<{ instanceId: string }>;
+  instanceId: string | null | undefined;
+  knownInstanceIds: string[];
+  isAdmin: boolean;
+  appName: string;
+  appUrl: string;
+  isLocalMode: boolean;
+  isDev: boolean;
+  totalModelCount: number;
+  sshConnectionCount: number;
+}
+
 /**
- * Standard params passed to every server-side fragment data loader.
- * All loaders accept this same shape - they ignore fields they don't need.
- * This is the superset of all per-loader params so builder.ts can call them uniformly.
+ * Standard params passed to every fragment's build() function.
+ * Fields used by multiple fragments are pre-fetched by loadAllPromptFragments
+ * and passed here so each fragment reads without re-fetching.
  */
 export interface SystemPromptServerParams {
   user: JwtPayloadType;
@@ -40,16 +54,26 @@ export interface SystemPromptServerParams {
   callMode?: boolean;
   /** Extra per-request instructions to append */
   extraInstructions?: string;
-  /** Last user message content - used for vector search context injection */
-  lastUserMessage?: string;
+  /**
+   * Fired user-message embed. The cortex fragment awaits it before its vector
+   * search so the just-written message's stored vector is present (no race, no
+   * blocking the message write). Absent → nothing to await.
+   */
+  messageEmbedReady?: Promise<void>;
   /** Active thread ID — passed to fragments that need thread context (e.g. rename) */
   threadId?: string | null;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
   /** Resolved media generation capabilities for the current request */
   mediaCapabilities?: MediaCapabilitiesParams;
-  /** Fixture chain of the stream — cortex vector-search embeddings bind it. */
-  fixtureContext: FixtureContext | undefined;
+  /** Fixture thread id — cortex vector-search embeddings bind it. */
+  streamContext: ToolExecutionContext;
+  /** Pre-fetched: whether user has no memories and no tasks (used by bootstrap + guest fragments). */
+  isFreshUser?: boolean;
+  /** Pre-computed app name from i18n config (used by identity, platform, bootstrap, guest fragments). */
+  appName?: string;
+  /** Pre-fetched remote instances + SSH context (used by system-context, remote-instances, ssh-connections fragments). */
+  remoteInstancesContext?: RemoteInstancesContext;
 }
 
 /** Resolved media generation model info passed from stream-setup to the system prompt fragment. */
@@ -69,20 +93,15 @@ export interface MediaCapabilitiesParams {
 
 /**
  * A fragment that contributes content to the leading or trailing system prompt.
- * Return null from build() to omit the fragment entirely.
+ * build() receives the full params and fetches what it needs inline.
+ * Return null to omit the fragment entirely.
  */
-export interface SystemPromptFragment<TData> {
+export interface SystemPromptFragment {
   id: string;
   placement: "leading" | "trailing";
   priority: number;
-  build: (data: TData) => string | null;
+  build: (params: SystemPromptServerParams) => Promise<string | null>;
 }
 
-/**
- * Opaque shape of a fragment as seen from a dynamic module import.
- */
-// oxlint-disable-next-line typescript/no-explicit-any
-export type PromptFragmentModuleEntry = SystemPromptFragment<any>;
-
 /** Shape of a dynamically-imported prompt module (each named export is a fragment). */
-export type PromptFragmentModule = Record<string, PromptFragmentModuleEntry>;
+export type PromptFragmentModule = Record<string, SystemPromptFragment>;

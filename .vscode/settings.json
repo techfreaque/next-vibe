@@ -53,6 +53,7 @@
     "public/vibe-frame/**": true,
     "src/generated/**": true,
     ".tmp/**": true,
+    ".tanstack/**": true,
     "**/testing/fixtures/**": true
   },
   // "terminal.integrated.profiles.linux": {

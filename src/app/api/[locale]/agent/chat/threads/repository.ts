@@ -58,17 +58,6 @@ import { scopedTranslation, type ThreadsT } from "./i18n";
  * Threads Repository - Static class pattern
  */
 export class ThreadsRepository {
-  private static generateThreadTitle(content: string): string {
-    const maxLength = 50;
-    const minLastSpace = 20;
-    const ellipsis = "...";
-    const truncated = content.slice(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(" ");
-    return lastSpace > minLastSpace
-      ? `${truncated.slice(0, lastSpace)}${ellipsis}`
-      : truncated;
-  }
-
   /**
    * Verify existing thread and check permissions
    * Returns thread ID if valid, error response otherwise
@@ -226,7 +215,6 @@ export class ThreadsRepository {
     subFolderId: string | null | undefined;
     userId?: string;
     leadId?: string;
-    content: string;
     isIncognito: boolean;
     logger: EndpointLogger;
     user: JwtPayloadType;
@@ -237,6 +225,8 @@ export class ThreadsRepository {
     loopInstanceId?: string | null;
     /** Transient plumbing threads (tool executions) set false — never derived from folders. */
     syncEligible?: boolean;
+    /** Spawning thread when this is a sub-stream/sub-agent child. NULL/absent = top-level. */
+    parentThreadId?: string | null;
   }): Promise<
     ResponseType<{
       threadId: string;
@@ -284,7 +274,7 @@ export class ThreadsRepository {
       return success({ threadId: verifyResult.data, isNew: false });
     }
 
-    const title = ThreadsRepository.generateThreadTitle(content);
+    const title = chatScopedTranslation.scopedT(locale).t("common.newChat");
     let folder: ChatFolder | null = null;
 
     if (subFolderId) {
@@ -437,6 +427,7 @@ export class ThreadsRepository {
       originInstanceId: originInstanceId ?? null,
       loopInstanceId: effectiveLoopInstanceId,
       syncEligible: syncEligible ?? true,
+      parentThreadId: parentThreadId ?? null,
       // Thread creation is fixture-agnostic: record/replay bookkeeping lives in
       // the dedicated `fixtures` table (keyed by threadId), written by the test
       // harness up front on every instance. A fresh thread with a provided id
@@ -602,7 +593,7 @@ export class ThreadsRepository {
         conditions.push(
           or(
             ilike(chatThreads.title, `%${search}%`),
-            ilike(chatThreads.preview, `%${search}%`),
+            ilike(chatThreads.description, `%${search}%`),
           )!,
         );
       }
@@ -723,7 +714,7 @@ export class ThreadsRepository {
             rootFolderId: thread.rootFolderId,
             folderId: thread.folderId,
             status: thread.status,
-            preview: thread.preview,
+            description: thread.description,
             pinned: thread.pinned,
             archived: thread.archived,
             // Preserve null values for inheritance (null = inherit, [] = deny, [roles...] = allow)
@@ -920,7 +911,7 @@ export class ThreadsRepository {
         pinned: false,
         archived: false,
         tags: [],
-        preview: null,
+        description: null,
       } satisfies typeof chatThreads.$inferInsert;
 
       const [dbThread] = await db
@@ -1075,6 +1066,9 @@ export class ThreadsRepository {
     // PUSH-ONLY convergence: no waiting — the sender ships the chain first
     // (ordered on the WS leg) and re-pushes placement at every turn end, so
     // a reordered leg heals on the next thread-updated.
+    // When the specific folder hasn't synced yet, fall back to the scaffold
+    // (REMOTE/<originInstanceId>/private|background) so the thread lands in
+    // the correct instance subtree rather than at the REMOTE root.
     let mirrorFolderId: string | null = null;
     if (requestData.subFolderId) {
       const [folderRow] = await db
@@ -1083,6 +1077,17 @@ export class ThreadsRepository {
         .where(eq(chatFolders.id, requestData.subFolderId))
         .limit(1);
       mirrorFolderId = folderRow ? requestData.subFolderId : null;
+    }
+    if (mirrorFolderId === null && originInstanceId) {
+      const { resolveScaffoldFolderId } =
+        await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+      const senderRootFolderId =
+        requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
+      mirrorFolderId = await resolveScaffoldFolderId(
+        userId,
+        originInstanceId,
+        senderRootFolderId,
+      );
     }
     await db
       .insert(chatThreads)

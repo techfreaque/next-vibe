@@ -759,6 +759,14 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     if (container) {
       smoothScrollingRef.current = true;
       container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+      // Cap the smooth-scroll guard: if the container doesn't report "at bottom"
+      // within 1.5 s (animation interrupted, content grew past target, etc.) we
+      // clear the flag so sticky snaps can resume.  The scroll listener will also
+      // clear it early when we genuinely arrive.
+      const guard = smoothScrollingRef;
+      setTimeout(() => {
+        guard.current = false;
+      }, 1500);
     }
   }, []);
 
@@ -842,32 +850,44 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     const BUTTON_THRESHOLD = 800; // px - show scroll button when this far from bottom
 
     const handleScroll = (): void => {
-      // Ignore scroll events that we triggered ourselves (programmatic scrollTop assignment).
-      // Without this guard our own snaps can briefly appear as "not at bottom" if layout
-      // hasn't fully settled, which would release sticky.
-      if (programmaticScrollRef.current) {
-        return;
-      }
-
       const { scrollTop, scrollHeight, clientHeight } = container;
       const distFromBottom = scrollHeight - scrollTop - clientHeight;
       const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
-      // Detect if scrollHeight grew since last scroll event. When content expands
-      // (markdown renders, image loads) scrollHeight grows but scrollTop stays the same,
-      // making distFromBottom appear large even though the user didn't scroll. Only release
-      // sticky when the height didn't change - i.e., a genuine user upward drag.
-      const heightGrew = scrollHeight > lastScrollHandlerHeightRef.current;
+      // If our programmatic snap just ran, the scroll event it triggers will
+      // show scrollTop == scrollHeight (or very close). Treat that as "at bottom"
+      // regardless of the flag timing — and clear the flag.
+      if (programmaticScrollRef.current) {
+        if (atBottom) {
+          programmaticScrollRef.current = false;
+          stickyBottomRef.current = true;
+          smoothScrollingRef.current = false;
+        }
+        // Not at bottom yet during programmatic scroll (layout still settling) — ignore.
+        return;
+      }
+
       lastScrollHandlerHeightRef.current = scrollHeight;
 
       if (atBottom) {
         smoothScrollingRef.current = false;
         stickyBottomRef.current = true;
-      } else if (stickyBottomRef.current && heightGrew) {
-        // Content grew while snapped: don't release sticky.
-        // The ResizeObserver / useLayoutEffect will fire and snap us back down.
-      } else {
-        stickyBottomRef.current = false;
+        // Reset snap height so the next content growth triggers a snap even if
+        // scrollHeight is the same as last time (e.g. after compaction shrunk content).
+        lastSnapScrollHeightRef.current = scrollHeight;
+      } else if (stickyBottomRef.current) {
+        // Not at bottom but sticky is set. This means content grew past the
+        // viewport — a scroll event caused by content growth, not a user drag.
+        // Only release sticky if the user is actually dragging up: detect that
+        // by checking whether scrollHeight changed since the snap. If scrollHeight
+        // equals what we last snapped to, the user scrolled up themselves.
+        if (scrollHeight <= lastSnapScrollHeightRef.current) {
+          // scrollHeight unchanged since last snap → genuine user upward drag
+          stickyBottomRef.current = false;
+          smoothScrollingRef.current = false;
+        }
+        // else: content grew, distFromBottom is large but we're still sticky —
+        // leave sticky alone; ResizeObserver/useLayoutEffect will snap us down.
       }
       setShowScrollButton(distFromBottom > BUTTON_THRESHOLD);
     };
@@ -927,7 +947,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       // Double-rAF: first frame lets the browser emit the scroll event triggered
       // by our scrollTop assignment; second frame clears the guard after it fires.
       requestAnimationFrame(() => {
-        programmaticScrollRef.current = false;
+        requestAnimationFrame(() => {
+          programmaticScrollRef.current = false;
+        });
       });
     };
 
@@ -1002,7 +1024,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       lastSnapScrollHeightRef.current = container.scrollHeight;
       lastScrollHandlerHeightRef.current = container.scrollHeight;
       requestAnimationFrame(() => {
-        programmaticScrollRef.current = false;
+        requestAnimationFrame(() => {
+          programmaticScrollRef.current = false;
+        });
       });
       return;
     }
@@ -1024,7 +1048,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     lastSnapScrollHeightRef.current = container.scrollHeight;
     lastScrollHandlerHeightRef.current = container.scrollHeight;
     requestAnimationFrame(() => {
-      programmaticScrollRef.current = false;
+      requestAnimationFrame(() => {
+        programmaticScrollRef.current = false;
+      });
     });
   });
 

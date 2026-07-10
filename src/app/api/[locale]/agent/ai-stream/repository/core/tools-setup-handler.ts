@@ -16,7 +16,7 @@ import type { ToolCall } from "../../../chat/db";
  */
 interface ToolConfigItem {
   toolId: string;
-  requiresConfirmation: boolean;
+  requiresConfirmation?: boolean;
 }
 
 export class ToolsSetupHandler {
@@ -54,7 +54,7 @@ export class ToolsSetupHandler {
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<
       string,
-      { requiresConfirmation: boolean; credits: number; label: string }
+      { requiresConfirmation?: boolean; credits: number; label: string }
     >;
     /** Set of tool names (preferred) the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
@@ -84,7 +84,7 @@ export class ToolsSetupHandler {
     // Keyed by preferred tool name for consistent lookup.
     // confirmationOverrides (raw client availableTools pre-cascade) takes final precedence
     // so client-specified requiresConfirmation survives cascade overrides.
-    const clientConfirmationConfig = new Map<string, boolean>();
+    const clientConfirmationConfig = new Map<string, boolean | undefined>();
     // A confirmed tool never re-prompts; otherwise its config value stands.
     const applyConfig = (toolConfig: ToolConfigItem): void => {
       const preferredName = resolveToPreferredName(toolConfig.toolId);
@@ -109,11 +109,11 @@ export class ToolsSetupHandler {
     // Also build a full-path keyed version for loadTools (which checks both preferred + internal names)
     const toolConfirmationConfig = new Map<string, boolean>();
     for (const [preferredName, value] of clientConfirmationConfig) {
-      toolConfirmationConfig.set(preferredName, value);
+      toolConfirmationConfig.set(preferredName, value ?? false);
       // Also add the full path key so loadTools can find it by internal name
       const fullPath = getFullPath(preferredName);
       if (fullPath && fullPath !== preferredName) {
-        toolConfirmationConfig.set(fullPath, value);
+        toolConfirmationConfig.set(fullPath, value ?? false);
       }
     }
 
@@ -154,7 +154,7 @@ export class ToolsSetupHandler {
     // Client config overrides endpoint definition; confirmed tools are never re-confirmed
     const toolsConfig = new Map<
       string,
-      { requiresConfirmation: boolean; credits: number; label: string }
+      { requiresConfirmation?: boolean; credits: number; label: string }
     >();
     for (const [toolName, meta] of toolsResult.toolsMeta) {
       const { credits, label } = meta;

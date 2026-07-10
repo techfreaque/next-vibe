@@ -61,7 +61,19 @@ export const useTourState = create<TourState>()(
     {
       name: "ai-chat-tour-state",
       version: 2,
-      partialize: () => ({}),
+      // Persist only the durable onboarding flags; transient UI state and the
+      // action callbacks are recreated from the store's initializer on rehydrate.
+      // Returns a full TourState (the custom PersistStorage typing requires it) by
+      // spreading the live state and pinning the ephemeral fields to their
+      // defaults so nothing stale is written.
+      partialize: (state): TourState => ({
+        ...state,
+        isActive: false,
+        modelSelectorOpen: false,
+        modelSelectorOnboarding: false,
+        currentStepIndex: 0,
+        advanceTour: null,
+      }),
       storage: {
         getItem: (key: string): StorageValue<TourState> | null => {
           try {

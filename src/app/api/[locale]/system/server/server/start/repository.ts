@@ -725,27 +725,31 @@ export class ServerStartRepository {
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
       for (const conn of connections) {
-        if (conn.transportMode === "reverse-ws") {
-          openConnection({
-            id: conn.id,
-            instanceId: conn.instanceId,
-            remoteUrl: conn.remoteUrl,
-            token: conn.token,
-            leadId: conn.leadId,
-            userId: conn.userId,
-            remoteUserId: conn.remoteUserId,
-            capabilitiesVersion: conn.capabilitiesVersion,
-            sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
-            syncScope: conn.syncScope,
-            syncCursors: conn.syncCursors,
-            pushCursors: null,
-          });
-          opened++;
-        }
+        // openConnection runs the ONE HTTP pull-on-connect for EVERY transport
+        // and opens a persistent socket only for a reverse-ws leg — so every
+        // active connection re-syncs on boot, direct-http included, and only
+        // reverse-ws legs get a socket.
+        openConnection({
+          id: conn.id,
+          instanceId: conn.instanceId,
+          remoteUrl: conn.remoteUrl,
+          token: conn.token,
+          leadId: conn.leadId,
+          userId: conn.userId,
+          remoteUserId: conn.remoteUserId,
+          capabilitiesVersion: conn.capabilitiesVersion,
+          sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
+          syncScope: conn.syncScope,
+          syncCursors: conn.syncCursors,
+          pushCursors: null,
+          transportMode: conn.transportMode,
+          remoteTransportMode: conn.remoteTransportMode,
+        });
+        opened++;
       }
       if (opened > 0) {
         logger.info(
-          `[Connector] Auto-opened ${String(opened)} reverse-ws connector(s) on startup`,
+          `[Connector] Re-synced ${String(opened)} connection(s) on startup`,
         );
       }
     } catch (err) {

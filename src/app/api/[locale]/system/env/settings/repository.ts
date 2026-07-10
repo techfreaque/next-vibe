@@ -588,7 +588,7 @@ export class SystemSettingsRepository {
     logger: EndpointLogger,
     t: SystemSettingsT,
   ): Promise<ResponseType<SystemSettingsPostResponseOutput>> {
-    const { email, password, remoteUrl } = data;
+    const { email, password, remoteUrl, syncScope } = data;
 
     const { RemoteConnectionConnectRepository } =
       await import("@/app/api/[locale]/remote-connection/connect/repository");
@@ -597,7 +597,13 @@ export class SystemSettingsRepository {
     const { t: connectT } = connectScopedTranslation.scopedT(locale);
 
     const result = await RemoteConnectionConnectRepository.connectRemote(
-      { email, password, remoteUrl, isInferenceProvider: true },
+      {
+        email,
+        password,
+        remoteUrl,
+        isInferenceProvider: true,
+        syncScope,
+      },
       user,
       logger,
       connectT,

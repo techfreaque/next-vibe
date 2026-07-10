@@ -708,6 +708,22 @@ export type EmitEventNamed<
         >]
       >;
 
+/**
+ * The fully-inferred emit facade for an endpoint — the SINGLE source of truth for
+ * both directions. Wires the endpoint's OWN computed event maps (types.Event*)
+ * into EmitEventNamed, so the per-event payload types come straight from the
+ * definition with no re-spelling. Referenced by the server→client emitter
+ * (createEndpointEmitter) AND the client→server emitter (createEndpointClientEmitter):
+ * neither restates the four maps, so they can never drift.
+ */
+export type EndpointEmitter<TEndpoint extends CreateApiEndpointAny> =
+  EmitEventNamed<
+    TEndpoint["types"]["EventResponsePayloads"],
+    TEndpoint["types"]["EventRequestPayloads"],
+    TEndpoint["types"]["EventEmitUrlPayloads"],
+    TEndpoint["types"]["EventPayloadTypes"]
+  >;
+
 // ============================================================================
 // RUNTIME HELPERS
 // ============================================================================

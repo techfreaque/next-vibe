@@ -1478,9 +1478,6 @@ export const endpointsMeta: EndpointMeta[] = [
               errorType: null,
               errorMessage: null,
               errorCode: null,
-              searchVector: null,
-              embedding: null,
-              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1502,9 +1499,6 @@ export const endpointsMeta: EndpointMeta[] = [
               errorType: null,
               errorMessage: null,
               errorCode: null,
-              searchVector: null,
-              embedding: null,
-              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1595,9 +1589,6 @@ export const endpointsMeta: EndpointMeta[] = [
               metadata: null,
               upvotes: 0,
               downvotes: 0,
-              searchVector: null,
-              embedding: null,
-              embeddingHash: null,
               createdAt: "2024-01-15T10:00:00.000Z",
               updatedAt: "2024-01-15T10:00:00.000Z",
             },
@@ -1985,7 +1976,7 @@ export const endpointsMeta: EndpointMeta[] = [
           updatedThreadId: "550e8400-e29b-41d4-a716-446655440000",
           updatedTitle: "My Renamed Thread",
           updatedPreview: "A short description of this conversation",
-          updatedAt: "2024-01-15T10:00:00.000Z",
+          updatedAt: {},
         },
       },
     },
@@ -9450,7 +9441,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-09T11:07:41.882Z",
+          createdAt: "2026-07-09T21:26:47.282Z",
         },
       },
     },
@@ -9475,7 +9466,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-09T11:07:41.882Z",
+          updatedAt: "2026-07-09T21:26:47.282Z",
         },
       },
     },
@@ -15608,10 +15599,47 @@ export const endpointsMeta: EndpointMeta[] = [
     tags: ["Fernverbindung"],
     examples: {
       inputs: {
-        rename: { newInstanceId: "hermes-work" },
-        reauth: { email: "you@example.com", password: "new-password" },
-        inferenceProvider: { isInferenceProvider: true },
-        forceSystem: { forceSystemProvider: true },
+        rename: {
+          newInstanceId: "hermes-work",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
+        reauth: {
+          email: "you@example.com",
+          password: "new-password",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
+        inferenceProvider: {
+          isInferenceProvider: true,
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
+        forceSystem: {
+          forceSystemProvider: true,
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
         syncScope: {
           syncScope: {
             memories: true,
@@ -15621,8 +15649,26 @@ export const endpointsMeta: EndpointMeta[] = [
             threads: false,
           },
         },
-        reconnectNow: { reconnectNow: true },
-        transportMode: { transportMode: "reverse-ws" },
+        reconnectNow: {
+          reconnectNow: true,
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
+        transportMode: {
+          transportMode: "reverse-ws",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
         default: { instanceId: "hermes" },
       },
       responses: { default: { updated: true } },
@@ -15663,7 +15709,17 @@ export const endpointsMeta: EndpointMeta[] = [
     tags: ["Fernverbindung"],
     examples: {
       inputs: {
-        default: { instanceId: "hermes", localUrl: "http://localhost:3000" },
+        default: {
+          instanceId: "hermes",
+          localUrl: "http://localhost:3000",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
       },
       responses: {
         default: {
@@ -15698,7 +15754,6 @@ export const endpointsMeta: EndpointMeta[] = [
             skills: true,
             favorites: true,
             threads: true,
-            chat: false,
           },
         },
       },
@@ -15725,6 +15780,13 @@ export const endpointsMeta: EndpointMeta[] = [
           remoteUrl: "https://unbottled.ai",
           email: "you@example.com",
           password: "your-password",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
         },
       },
       responses: {
@@ -15765,6 +15827,8 @@ export const endpointsMeta: EndpointMeta[] = [
               hasToken: true,
               healthStatus: "healthy",
               isReverseEntry: true,
+              transportMode: "reverse-ws",
+              remoteTransportMode: "direct-http",
             },
           ],
           selfInstanceId: "atlas",

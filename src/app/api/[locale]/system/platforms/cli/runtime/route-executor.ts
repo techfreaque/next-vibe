@@ -482,7 +482,8 @@ export class RouteDelegationHandler {
         logger,
         platform: options.platform,
         preloadedHandler: routeHandler,
-        streamContext: makeHeadlessContext(options.signal),
+        // no user context — UTC (dates not user-facing here)
+        streamContext: makeHeadlessContext(options.signal, undefined, "UTC"),
       });
       // runInProcess wraps inline WAIT success as { result: <data> } for MCP/AI
       // display. CLI formatting needs the raw endpoint data — unwrap it.
@@ -689,7 +690,8 @@ async function executeRemoteEndpoint(params: {
         user,
         locale,
         logger: transportLogger,
-        streamContext: makeHeadlessContext(signal),
+        // no user context — UTC (dates not user-facing here)
+        streamContext: makeHeadlessContext(signal, undefined, "UTC"),
         platform,
       });
     }

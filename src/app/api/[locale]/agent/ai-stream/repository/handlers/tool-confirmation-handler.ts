@@ -15,17 +15,23 @@ import { ConfirmedExecution } from "next-vibe/execute-tool/repository/confirmed"
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
+
 import { db } from "../../../../system/database";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
-import { chatMessages, chatThreads } from "../../../chat/db";
+import {
+  CHAT_MESSAGE_COLUMNS,
+  chatMessages,
+  chatThreads,
+} from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { AiStreamT } from "../../stream/i18n";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import { walkToLeafMessage } from "../core/tree-walk";
 
-export class ToolConfirmationHandler {
+class ToolConfirmationHandler {
   /**
    * Handle tool confirmation - execute tool and update message in DB/messageHistory
    */
@@ -42,6 +48,7 @@ export class ToolConfirmationHandler {
     user: JwtPayloadType;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
+    resolvedRelayContext?: ResolvedRelayContext;
   }): Promise<
     ResponseType<{
       threadId: string;
@@ -57,6 +64,7 @@ export class ToolConfirmationHandler {
       logger,
       user,
       t,
+      resolvedRelayContext,
     } = params;
 
     logger.debug("[Tool Confirmation] handleToolConfirmationInSetup called", {
@@ -74,7 +82,7 @@ export class ToolConfirmationHandler {
       ) as ChatMessage | undefined;
     } else if (!isIncognito) {
       const [dbMessage] = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(eq(chatMessages.id, toolConfirmation.messageId))
         .limit(1);
@@ -102,156 +110,34 @@ export class ToolConfirmationHandler {
     }
 
     if (toolConfirmation.confirmed) {
-      // Execute tool with updated args.
-      // For execute-tool: check the original callbackMode before overriding.
-      // If wakeUp: fire-and-forget - confirm returns immediately, revival delivers result.
-      // Otherwise: override callbackMode to 'wait' so the inner tool executes inline.
-      const baseArgs = toolConfirmation.updatedArgs
-        ? {
-            ...(toolCall.args as Record<
-              string,
-              string | number | boolean | null
-            >),
-            ...toolConfirmation.updatedArgs,
-          }
-        : toolCall.args;
-
-      // Detect original callbackMode BEFORE overriding (needed for wakeUp fire-and-forget path).
-      const isExecuteToolWrapper = toolCall.toolName === EXECUTE_TOOL_ALIAS;
-      const originalCallbackMode =
-        isExecuteToolWrapper &&
-        typeof baseArgs === "object" &&
-        baseArgs !== null &&
-        !Array.isArray(baseArgs) &&
-        "callbackMode" in baseArgs
-          ? (baseArgs as Record<string, string | number | boolean | null>)
-              .callbackMode
-          : null;
-      const isWakeUpConfirm = originalCallbackMode === CallbackMode.WAKE_UP;
-
-      // When execute-tool wraps the target tool, unwrap and call the inner tool directly.
-      // Keeping execute-tool as the wrapper double-nests the result ({ result: { result: ... } })
-      // and in the APPROVE case re-triggers the APPROVE gate inside execute-tool.
-      // Exception: wakeUp — execute-tool's local-async handler owns task creation, so the
-      // wrapper must stay for the wakeUp path.
-      const shouldUnwrapExecuteTool = isExecuteToolWrapper && !isWakeUpConfirm;
-      const execToolName = shouldUnwrapExecuteTool
-        ? String(
-            (baseArgs as Record<string, string | number | boolean | null>)
-              .toolName ?? toolCall.toolName,
-          )
-        : toolCall.toolName;
-      const execInput = shouldUnwrapExecuteTool
-        ? (((baseArgs as Record<string, WidgetData>).input as Record<
-            string,
-            WidgetData
-          > | null) ?? {})
-        : (baseArgs as Record<string, WidgetData>);
-
-      // Set currentToolMessageId so RouteExecuteRepository (wakeUp path) can call
-      // handleTaskCompletion with the correct toolMessageId for revival backfill.
+      // Re-execute the confirmed call. All execute-tool-specific knowledge
+      // (unwrap EXECUTE_TOOL_ALIAS, callbackMode override, { result: ... } strip,
+      // wakeUp confirm-race) lives in ConfirmedExecution — this handler keeps only
+      // the message-tree persistence below.
       params.streamContext.currentToolMessageId = toolConfirmation.messageId;
-      // Signal that this is a confirmed re-execution so execute-tool's requiresConfirmation
-      // gate is bypassed — the user already confirmed, we must not halt again.
-      params.streamContext.isConfirmedReExecution = true;
 
-      logger.debug("[Tool Confirmation] Executing tool", {
-        toolName: execToolName,
-        baseArgs,
-      });
-
-      let toolResult: WidgetData | undefined;
-      let toolError: ErrorResponseType | undefined;
-
-      // Route through RouteExecuteRepository so all callbackMode logic (WAKE_UP,
-      // WAIT, requiresConfirmation gate) is handled in one place.
-      const execResult = await RouteExecuteRepository.runInProcess({
-        toolName: execToolName,
-        input: execInput,
-        callbackMode: isWakeUpConfirm
-          ? CallbackMode.WAKE_UP
-          : CallbackMode.WAIT,
+      const confirmed = await ConfirmedExecution.run({
+        toolCall,
+        toolMessage,
+        toolMessageId: toolConfirmation.messageId,
+        updatedArgs: toolConfirmation.updatedArgs,
+        isIncognito,
         user,
         locale,
         logger,
         streamContext: params.streamContext,
-        platform: Platform.AI,
       });
+      const { toolResult, toolError, baseArgs } = confirmed;
 
-      if (execResult.success) {
-        // runInProcess wraps tool results in { result: ... } for AI/MCP display.
-        // For direct tool calls (not execute-tool wrapper), unwrap to match what
-        // the old loadTools()+tool.execute() path returned — the raw tool output.
-        // For execute-tool wrappers (already unwrapped to the inner tool),
-        // keep the { result: ... } layer since resolveToolResult will strip it.
-        const rawData = execResult.data;
-        toolResult =
-          !isExecuteToolWrapper &&
-          rawData !== null &&
-          typeof rawData === "object" &&
-          !Array.isArray(rawData) &&
-          "result" in (rawData as Record<string, WidgetData>)
-            ? ((rawData as Record<string, WidgetData>)["result"] as WidgetData)
-            : rawData;
-        // Inject a hint so the AI understands why the tool ran despite callbackMode="approve"
-        if (
-          toolResult !== null &&
-          typeof toolResult === "object" &&
-          !Array.isArray(toolResult)
-        ) {
-          toolResult = {
-            ...(toolResult as Record<string, WidgetData>),
-            _hint:
-              "This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.",
-          };
-        }
-        logger.debug("[Tool Confirmation] Tool execution completed", {
-          toolName: toolCall.toolName,
-          hasResult: !!toolResult,
-        });
-      } else {
-        logger.error("[Tool Confirmation] Tool execution failed", {
-          toolName: toolCall.toolName,
-          message: execResult.message,
-        });
-        toolError = execResult;
-      }
-
-      // wakeUp confirm race: execute-tool returned {taskId, status:'pending'} immediately.
-      // detectWakeUpConfirmRace determines whether the goroutine is still running (Case B)
-      // or already landed its result (Case A). See handlers/completion.ts for full rationale.
-      if (
-        isWakeUpConfirm &&
-        toolResult !== undefined &&
-        typeof toolResult === "object" &&
-        toolResult !== null &&
-        "status" in toolResult &&
-        toolResult.status === CronTaskStatus.PENDING &&
-        !isIncognito
-      ) {
-        const pendingTaskId =
-          typeof toolResult.taskId === "string" ? toolResult.taskId : undefined;
-
-        const raceResult = await TaskCompletion.detectWakeUpConfirmRace({
-          toolMessage,
-          toolCall,
-          toolMessageId: toolConfirmation.messageId,
-          pendingTaskId,
-          user,
-          logger,
-        });
-
-        if (raceResult.kind === "case-b") {
-          return {
-            success: true,
-            data: {
-              threadId: toolMessage.threadId,
-              toolMessageId: toolConfirmation.messageId,
-              wakeUpPending: true,
-            },
-          };
-        }
-        // Case A: fall through to the deferred insertion path below.
+      if (confirmed.wakeUpPending) {
+        return {
+          success: true,
+          data: {
+            threadId: toolMessage.threadId,
+            toolMessageId: toolConfirmation.messageId,
+            wakeUpPending: true,
+          },
+        };
       }
 
       const confirmedToolCallBase: Omit<ToolCall, "isDeferred"> = {
@@ -358,6 +244,7 @@ export class ToolConfirmationHandler {
             threadId: toolMessage.threadId,
             user,
             logger,
+            resolvedRelayContext,
           });
         logger.debug(
           "[Tool Confirmation] Tool executed - deferred confirm message inserted",
@@ -476,6 +363,7 @@ export class ToolConfirmationHandler {
             threadId: toolMessage.threadId,
             user,
             logger,
+            resolvedRelayContext,
           });
         logger.debug("[Tool Confirmation] Tool rejected - deferred inserted", {
           originalMessageId: toolConfirmation.messageId,
@@ -517,8 +405,16 @@ export class ToolConfirmationHandler {
     threadId: string;
     user: JwtPayloadType;
     logger: EndpointLogger;
+    resolvedRelayContext?: ResolvedRelayContext;
   }): Promise<string> {
-    const { toolMessage, toolCall, threadId, user, logger } = params;
+    const {
+      toolMessage,
+      toolCall,
+      threadId,
+      user,
+      logger,
+      resolvedRelayContext,
+    } = params;
 
     const [threadRow] = await db
       .select({ rootFolderId: chatThreads.rootFolderId })
@@ -556,6 +452,7 @@ export class ToolConfirmationHandler {
     const emitter = createMessagesEmitter(logger, user, {
       threadId,
       rootFolderId,
+      resolvedRelayContext,
     });
     emitter("message-created", {
       responseData: {
@@ -613,6 +510,7 @@ export class ToolConfirmationProcessor {
     user: JwtPayloadType;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
+    resolvedRelayContext?: ResolvedRelayContext;
   }): Promise<
     ResponseType<
       Array<{
@@ -655,6 +553,7 @@ export class ToolConfirmationProcessor {
           user,
           t,
           streamContext: params.streamContext,
+          resolvedRelayContext: params.resolvedRelayContext,
         });
 
       if (!confirmResult.success) {

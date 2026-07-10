@@ -175,7 +175,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC1: Thea uses ai-run with vibe-coder skill ──────────────────────────
   it("VC1: when codingAgent=next-vibe-coder, Thea delegates coding tasks via ai-run(skill=vibe-coder)", async () => {
-    const fixtureCtx: FixtureContext = { name: "vibe-coder-vc1" };
+    const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+            await seedCaseThread("vibe-coder-vc1");
 
     const { result, messages } = await runTestStream({
       user: testUser,
@@ -186,7 +187,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       // Two-level agent chain (Thea → ai-run sub-agent incl. a 30s shell-exec
       // window) legitimately takes 2-4 min on a live first recording.
       settleTimeoutMs: 240_000,
-      fixtureContext: fixtureCtx,
+      threadId: fixtureThreadId,
+      streamContext: fixtureCtx,
     });
 
     expect(
@@ -272,7 +274,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC2: vibe-coder skill has SSH awareness ───────────────────────────────
   it("VC2: vibe-coder skill has ssh-exec available and provides SSH guidance when no connections exist", async () => {
-    const fixtureCtx: FixtureContext = { name: "vibe-coder-vc2" };
+    const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+            await seedCaseThread("vibe-coder-vc2");
 
     const { result, messages } = await runTestStream({
       user: testUser,
@@ -280,7 +283,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       favoriteId: VIBE_CODER_FAVORITE_ID,
       rootFolderId: DefaultFolderId.PRIVATE,
       subFolderId: vibeCoderFolderId,
-      fixtureContext: fixtureCtx,
+      threadId: fixtureThreadId,
+      streamContext: fixtureCtx,
     });
 
     expect(

@@ -300,6 +300,7 @@ export class ImageGenerationRepository {
           streamContext: makeHeadlessContext(
             streamContext.abortSignal,
             streamContext.threadId,
+            streamContext.timezone,
           ),
         });
         break;
@@ -450,32 +451,57 @@ export class ImageGenerationRepository {
       : "";
 
     const chatModel = chatModelOptionsIndex[modelConfig.id];
-    const result = await runHeadlessAiStream({
-      model: chatModel?.id,
+    // Synthetic request data — the headless intake phase inside createAiStream
+    // derives operation/parent/userMessageId; this only supplies ingredients.
+    // Always INCOGNITO (threadMode "none") — the outer AI stream persists the
+    // tool result. Fresh threadId (reusing the outer one would supersede/abort
+    // the outer stream); the sub-stream is linked to the caller via
+    // parentThreadId below so it walks to the caller's fixture root.
+    const syntheticData: AiStreamPostRequestOutput = {
+      operation: "send", // placeholder — headlessIntake derives the real one
+      rootFolderId: DefaultFolderId.INCOGNITO,
+      subFolderId: null,
+      threadId: crypto.randomUUID(),
+      userMessageId: null,
+      parentMessageId: null,
+      content: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}${refHint}`,
+      role: ChatMessageRole.USER,
+      // chatModel may be undefined when the image model isn't in the chat index —
+      // fall back to the default chat model so the request is well-formed.
+      model: chatModel?.id ?? DEFAULT_CHAT_MODEL_ID,
       skill: NO_SKILL_ID,
-      prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}${refHint}`,
       favoriteConfig: buildFavoriteConfig({
         id: "image-gen-headless",
         skillId: NO_SKILL_ID,
         availableTools: [],
         pinnedTools: [],
       }),
-      // Always "none" - the outer AI stream persists the tool result.
-      // Using "append" with the same threadId would re-register in StreamRegistry,
-      // aborting the outer stream (superseded).
-      // Do NOT pass outer threadId - using the same threadId would re-register
-      // in StreamRegistry, aborting the outer stream. FilePartHandler uploads to
-      // an ephemeral thread; we re-upload to the real thread below.
-      rootFolderId: DefaultFolderId.INCOGNITO,
-      subAgentDepth: streamContext.subAgentDepth,
-      headlessInstructions:
-        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
-      maxTurns: 1,
-      user,
+      toolConfirmations: null,
+      messageHistory: [],
+      voiceMode: { enabled: false },
+      audioInput: { file: null },
+      resumeToken: null,
+      timezone: "UTC",
+      attachments: null,
+      executionContext: { mode: "local" as const },
+    };
+    const result = await AiStreamRepository.createAiStream({
+      data: syntheticData,
       locale,
       logger,
+      user,
+      request: undefined,
       t: aiStreamT,
-      abortSignal: streamContext.abortSignal,
+      awaitResult: true,
+      subAgentDepth: streamContext.subAgentDepth,
+      extraInstructions:
+        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
+      maxToolCalls: 1,
+      parentAbortSignal: streamContext.abortSignal,
+      // Link the sub-stream to the caller thread: provenance + the fixture
+      // engine walks child → parent → root to record/replay in the run's folder
+      // instead of going live under this fresh incognito id.
+      parentThreadId: streamContext.threadId,
     });
 
     if (!result.success) {

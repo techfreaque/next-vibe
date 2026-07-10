@@ -104,6 +104,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       broadcastToAll,
       broadcastBatch: vi.fn(),
       getChannelSize: vi.fn(() => 1),
+      closeConnectorSocket: vi.fn(),
     });
 
     await RouteExecuteRepository.handleIncomingToolRequest(
@@ -138,6 +139,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       broadcastToAll,
       broadcastBatch: vi.fn(),
       getChannelSize: vi.fn(() => 1),
+      closeConnectorSocket: vi.fn(),
     });
 
     await RouteExecuteRepository.handleIncomingToolRequest(
@@ -207,7 +209,6 @@ describe("RouteExecuteRepository remote handlers", () => {
       .spyOn(PendingCalls, "complete")
       .mockReturnValue({
         kind: "completed",
-        revival: null,
         threadId: null,
         toolMessageId: null,
       });

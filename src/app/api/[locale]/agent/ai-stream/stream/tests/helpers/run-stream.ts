@@ -52,7 +52,10 @@ export async function assertNoPendingTasks(threadId: string): Promise<void> {
     .select({ id: cronTasks.id, status: cronTasks.lastExecutionStatus })
     .from(cronTasks)
     .where(
-      and(eq(cronTasks.wakeUpThreadId, threadId), eq(cronTasks.enabled, true)),
+      and(
+        sql`${cronTasks.taskInput}->>'threadId' = ${threadId}`,
+        eq(cronTasks.enabled, true),
+      ),
     );
   const active = pending.filter(
     (p) => !terminalStatuses.includes(p.status ?? ""),
@@ -74,7 +77,14 @@ export interface RunStreamDeps {
    * passes it EXPLICITLY into runTestStream → streamContext → the whole
    * chain; the thread anchors it for later turns and revivals.
    */
-  getCaseFixture: () => FixtureContext | undefined;
+  getCaseFixture: () => ToolExecutionContext | undefined;
+  /**
+   * The case's fixture-seeded threadId (minted by setCaseFixture, its fixtures
+   * row already written on every relevant instance). runStream uses it as the
+   * stream threadId whenever the case doesn't pass an explicit one, so every
+   * turn / revival / remote copy shares one id and one cache folder.
+   */
+  getCaseThreadId: () => string | undefined;
   /** Thread messages, testUser-bound. */
   getMessages: (tid: string) => Promise<SlimMessage[]>;
   /** Current streamingState for a thread via the messages endpoint. */
@@ -83,11 +93,13 @@ export interface RunStreamDeps {
   getTestSubFolderId: () => string | undefined;
   /** REMOTE-folder modes: per-suite folder nested inside the instance folder. */
   getOverrideSubFolderId: () => string | undefined;
+  /** The user's IANA timezone — sent on every stream POST body. */
+  timezone: string;
 }
 
 export type RunStreamParams = Omit<
   Parameters<typeof runTestStream>[0],
-  "fixtureContext"
+  "streamContext"
 > & {
   /** Set ONLY for tests that exercise tool error paths. */
   allowToolErrors?: boolean;
@@ -96,7 +108,7 @@ export type RunStreamParams = Omit<
    * deps.getCaseFixture() — that injection IS the conscious explicit pass
    * required by runTestStream's own signature. Set to override per call.
    */
-  fixtureContext?: FixtureContext;
+  streamContext?: ToolExecutionContext;
 };
 
 export type RunStreamFn = (
@@ -121,11 +133,16 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
   return async function runStream(
     params: RunStreamParams,
   ): Promise<ReturnType<typeof runTestStream>> {
+    // The stream's threadId: an explicit per-call id wins; otherwise the case's
+    // fixture-seeded id (setCaseFixture already wrote its fixtures row on every
+    // relevant instance). This id rides the whole case — turns, revivals, and
+    // remote copies all share it, so one cache folder serves the run everywhere.
+    const effectiveThreadId = params.threadId ?? deps.getCaseThreadId();
     // Snapshot the thread BEFORE the stream so post-stream checks can
     // distinguish this stream's tool messages from earlier ones.
     const preStreamMessageIds = new Set<string>(
-      params.threadId
-        ? (await getMessages(params.threadId)).map((m) => m.id)
+      effectiveThreadId
+        ? (await getMessages(effectiveThreadId)).map((m) => m.id)
         : [],
     );
     // Every stream lands in <suiteRoot> → tests → <testCaseName> unless the
@@ -152,15 +169,26 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
     // So: drain pending wakeUp tasks first (their revival flips the thread
     // through streaming and back), then require idle. Generous window —
     // revivals take a full model turn.
-    if (params.threadId) {
+    // Settle only when CONTINUING an existing thread (prior messages present) —
+    // a brand-new case thread has nothing to drain. Keyed on the snapshot, not
+    // on threadId presence (every stream now carries the case's seeded id).
+    if (effectiveThreadId && preStreamMessageIds.size > 0) {
       const settleDeadline = Date.now() + 120_000;
+      // Did this thread EVER carry an in-flight task while we drained? The
+      // stability window below only matters for a wakeUp/detach task that goes
+      // terminal mid-drain and fires its revival a beat later. When no task was
+      // ever pending (the common case — plain text/tool turns), that race is
+      // impossible, so skip the 1.5s stability sleep + redundant second idle
+      // read entirely. This is the per-turn fixed cost that dominated replay
+      // wall-clock (~1.5s × every continuing turn) with no correctness role.
+      let sawPendingTask = false;
       for (;;) {
         const pending = await db
           .select({ id: cronTasks.id, status: cronTasks.lastExecutionStatus })
           .from(cronTasks)
           .where(
             and(
-              eq(cronTasks.wakeUpThreadId, params.threadId),
+              sql`${cronTasks.taskInput}->>'threadId' = ${effectiveThreadId}`,
               eq(cronTasks.enabled, true),
             ),
           );
@@ -170,6 +198,9 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
               p.status ?? "",
             ),
         );
+        if (active.length > 0) {
+          sawPendingTask = true;
+        }
         if (active.length === 0 || Date.now() > settleDeadline) {
           break;
         }
@@ -177,28 +208,40 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           setTimeout(resolve, 500);
         });
       }
-      // Idle must be STABLE: a just-terminal wakeUp task fires its revival
-      // stream a beat later (terminal → revival → streaming → idle). Two
-      // consecutive idle reads with a gap close that window.
       await waitForThreadIdle(
-        params.threadId,
+        effectiveThreadId,
         params.user,
         60_000,
         effectiveRootFolderId,
       );
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 1_500);
-      });
-      await waitForThreadIdle(
-        params.threadId,
-        params.user,
-        60_000,
-        effectiveRootFolderId,
-      );
+      // Idle must be STABLE only when a task was in flight: a just-terminal
+      // wakeUp task fires its revival stream a beat later (terminal → revival →
+      // streaming → idle). Two consecutive idle reads with a gap close that
+      // window. No task ⇒ no late revival ⇒ no stability wait needed.
+      if (sawPendingTask) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 1_500);
+        });
+        await waitForThreadIdle(
+          effectiveThreadId,
+          params.user,
+          60_000,
+          effectiveRootFolderId,
+        );
+      }
     }
+    // The case's fixture context (thread-anchored, carries the threadId). A
+    // per-call override wins; otherwise the suite-closure case fixture; a case
+    // that set neither runs with an explicit thread-less root (live external).
+    const caseStreamContext =
+      params.streamContext ?? deps.getCaseFixture() ?? rootlessStreamContext();
     const firstResult = await runTestStream({
-      fixtureContext: deps.getCaseFixture(),
+      timezone: deps.timezone,
       ...params,
+      // The seeded case threadId (or an explicit per-call one) — its fixtures
+      // row is already written, so the AI loop replays from ordinal 0.
+      threadId: effectiveThreadId,
+      streamContext: caseStreamContext,
       rootFolderId: effectiveRootFolderId,
       subFolderId: effectiveSubFolderId,
       // Remote-folder loop-local topology is a CONNECTION setting
@@ -409,48 +452,63 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
       let threadStreamingState = await getStreamingState(tid);
       let revivalPending = false;
 
+      // Pending work = a running task targeting the thread, a scheduled or
+      // PARKED resume-stream revival row, or an in-flight remote call. Any of
+      // them means a revival is still coming — the thread may read 'idle' while
+      // a background goroutine + its parked revival are pending, so callers
+      // must treat "idle + pending work" as NOT settled. Hoisted here so both
+      // the pre-'waiting' poll AND the revival wait below can use it.
+      const { PendingCalls } =
+        await import("next-vibe/execute-tool/repository/pending-calls");
+      const hasPendingWork = async (): Promise<boolean> => {
+        const [runningTask] = await db
+          .select({ id: cronTasks.id })
+          .from(cronTasks)
+          .where(
+            and(
+              sql`${cronTasks.taskInput}->>'threadId' = ${tid}`,
+              eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
+            ),
+          )
+          .limit(1);
+        if (runningTask) {
+          return true;
+        }
+        // A resume-stream row for this thread — ENABLED (revival scheduled) OR
+        // PARKED/disabled (await-task registered a WAIT waiter; it flips
+        // enabled=true + fires the revival when the underlying task completes).
+        // Both mean a revival is pending. A long-running local detach (real
+        // image gen, >15s inline window) takes exactly this parked path.
+        // ONLY count NON-TERMINAL rows: a resume-stream task whose
+        // lastExecutionStatus is terminal (completed/failed/cancelled/stopped)
+        // has already run — treating it as pending would make the settle wait
+        // loop never converge (T6a wakeUp leaves a terminal parked row behind).
+        // Actionable = enabled (scheduled/running) OR parked with a null/pending
+        // status (waiting for its underlying task to complete + fire it).
+        const [resumeRow] = await db
+          .select({ id: cronTasks.id })
+          .from(cronTasks)
+          .where(
+            and(
+              like(cronTasks.routeId, "resume-stream%"),
+              sql`${cronTasks.taskInput}->>'threadId' = ${tid}`,
+              sql`(${cronTasks.lastExecutionStatus} IS NULL
+                   OR ${cronTasks.lastExecutionStatus} NOT IN ('completed','failed','cancelled','stopped'))`,
+            ),
+          )
+          .limit(1);
+        if (resumeRow) {
+          return true;
+        }
+        return PendingCalls.hasForThread(tid);
+      };
+
       // The aborting stream writes 'waiting' asynchronously AFTER the
       // result is returned (clearStreamingState reconciles against the DB
       // first). When a remote call is genuinely in flight, poll briefly so
       // the transition isn't missed — otherwise assertions run against a
       // thread that is about to enter 'waiting'.
       if (threadStreamingState !== "waiting") {
-        // Pending work = a running task targeting the thread, a scheduled
-        // revival row, or an in-flight remote call. Any of them means the
-        // thread is about to enter 'waiting' (or jump straight to a
-        // revival) — poll the transition instead of racing it.
-        const { PendingCalls } =
-          await import("next-vibe/execute-tool/repository/pending-calls");
-        const hasPendingWork = async (): Promise<boolean> => {
-          const [runningTask] = await db
-            .select({ id: cronTasks.id })
-            .from(cronTasks)
-            .where(
-              and(
-                eq(cronTasks.wakeUpThreadId, tid),
-                eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
-              ),
-            )
-            .limit(1);
-          if (runningTask) {
-            return true;
-          }
-          const [resumeRow] = await db
-            .select({ id: cronTasks.id })
-            .from(cronTasks)
-            .where(
-              and(
-                eq(cronTasks.enabled, true),
-                like(cronTasks.routeId, "resume-stream%"),
-                sql`${cronTasks.taskInput}->>'threadId' = ${tid}`,
-              ),
-            )
-            .limit(1);
-          if (resumeRow) {
-            return true;
-          }
-          return PendingCalls.hasForThread(tid);
-        };
         // The caller's stream has returned — a 'streaming' state on the
         // thread now belongs to a revival claim and counts as pending work.
         revivalPending =
@@ -488,7 +546,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           .where(
             and(
               like(cronTasks.routeId, "resume-stream%"),
-              sql`(${cronTasks.wakeUpThreadId} IS NULL OR ${cronTasks.wakeUpThreadId} != ${tid})`,
+              sql`(${cronTasks.taskInput}->>'threadId' IS NULL OR ${cronTasks.taskInput}->>'threadId' != ${tid})`,
             ),
           );
 
@@ -504,7 +562,11 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         // + revival turn can take a while on cold instances.
         // If the AI retries a failed tool call, the thread may go back to 'waiting'
         // mid-revival. In that case, call pulse again (up to MAX_PULSE_RETRIES).
-        const REVIVAL_TIMEOUT_MS = cfg.pulse ? 30_000 : 120_000;
+        // Media detach/wait: a real background gen (image ~40s) can exceed the
+        // 2-min budget — honor the caller's media settle budget when larger.
+        const REVIVAL_TIMEOUT_MS = cfg.pulse
+          ? 30_000
+          : Math.max(120_000, params.settleTimeoutMs ?? 0);
         const REVIVAL_POLL_INTERVAL_MS = 500;
         const MAX_PULSE_RETRIES = 3;
         let pulseRetries = 0;

@@ -248,7 +248,7 @@ if (_remoteUrl && _isFixtureMode) {
     // ── TM1: threadMirrorMode='both' — thread on initiating side AND remote ──
 
     it("TM1: stream from remote/hermes folder stores thread locally (remote/hermes) AND on hermes (remote/atlas)", async () => {
-      const fixtureCtx: FixtureContext = { name: "transport-mirror-tm1" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       // threadMirrorMode='both' is the default set by connect().
       // Stream from remote/hermes → resolveTarget() matches folderId routing rule
@@ -354,7 +354,7 @@ if (_remoteUrl && _isFixtureMode) {
     // mirrored thread reaches a terminal (idle) streaming state on atlas.
 
     it("TM3: atlas → hermes stream mirrors thread to atlas and reaches idle", async () => {
-      const fixtureCtx: FixtureContext = { name: "transport-mirror-tm3" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       const { result } = await runTestStream({
         user: testUser,

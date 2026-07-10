@@ -34,7 +34,10 @@ import { describe, expect, it } from "vitest";
 import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import {
+  remoteConnections,
+  type SyncScope,
+} from "@/app/api/[locale]/remote-connection/db";
 import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
 
@@ -191,11 +194,15 @@ export async function checkServersReady(
 
 let prodPool: Pool | null = null;
 let prodDb: ReturnType<
-  typeof drizzle<typeof userSchema & typeof remoteConnectionSchema>
+  typeof drizzle<
+    typeof userSchema & typeof remoteConnectionSchema & typeof fixtureSchema
+  >
 > | null = null;
 
 export function getProdDb(): ReturnType<
-  typeof drizzle<typeof userSchema & typeof remoteConnectionSchema>
+  typeof drizzle<
+    typeof userSchema & typeof remoteConnectionSchema & typeof fixtureSchema
+  >
 > {
   if (!prodDb) {
     const baseUrl = env.DATABASE_URL.replace(
@@ -212,6 +219,7 @@ export function getProdDb(): ReturnType<
       schema: {
         ...userSchema,
         ...remoteConnectionSchema,
+        ...fixtureSchema,
       },
     });
   }
@@ -388,7 +396,7 @@ export async function ensureRemoteUserCredits(
     );
   }
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: adminAddDefinitions.POST,
     data: { targetUserId: userId, amount: minCredits },
     user: adminUser,
@@ -428,6 +436,18 @@ export async function connectToHermes(
      * 'caller' = the loop-local topology suites (loop here, tools remote).
      */
     loopLocation?: "target" | "caller";
+    /**
+     * The EXACT sync domains this suite exercises — nothing more. Default is
+     * ALL-OFF: a suite that doesn't test sync connects with every domain
+     * disabled (remote-folder thread PLACEMENT rides remote events, gated by
+     * column eligibility only — it never needs the pull-sync domain). Each suite
+     * opts into precisely what it verifies:
+     *   • remote-folder suites → { favorites: true } (favorites are relevant to
+     *     placement UX), rest off;
+     *   • route.regular.mirror.cheap → { threads: true } (it tests the pull-sync
+     *     reconciliation itself).
+     */
+    syncThreads?: boolean;
   },
 ): Promise<void> {
   const { sendTestRequest } =
@@ -447,21 +467,22 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/connect/definition")
   ).default;
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: connectDef.POST,
     data: {
       remoteUrl,
       email: env.VIBE_ADMIN_USER_EMAIL,
       password: env.VIBE_ADMIN_USER_PASSWORD,
       // Full mirror scope except favorites: live favorite sync would
-      // LWW-overwrite the suite's quality-tester favorite mid-run.
+      // LWW-overwrite the suite's quality-tester favorite mid-run. Threads
+      // pull-sync only when the caller opts in (mirror suite); placement always
+      // rides remote events regardless.
       syncScope: {
         memories: true,
         documents: true,
         skills: true,
-        favorites: false,
-        threads: true,
-        chat: true,
+        favorites: true,
+        threads: options?.syncThreads ?? false,
       },
     },
     user,
@@ -487,26 +508,20 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
   ).default;
   const patchResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: connByIdDef.PATCH,
     data: {
       transportMode: "direct-http",
       ...(options?.loopLocation ? { loopLocation: options.loopLocation } : {}),
       syncScope: {
-        // Favorites sync would LWW-overwrite the test's freshly-created
-        // quality-tester favorite (null whitelist) with the hermes user's
-        // personal config (e.g. a 19-tool activeTools whitelist) mid-run —
-        // silently changing which tools the suites may call. Test favorites
-        // are created locally per run; never sync them.
-        favorites: false,
+        favorites: true,
         documents: true,
         memories: true,
         skills: true,
-        // Threads/chat mirror LIVE to the peer: origin-aware placement lands
-        // every local thread at REMOTE/<origin>/<its local folder chain> on
-        // hermes, and pull-on-connect reconciles anything missed offline.
-        threads: true,
-        chat: true,
+        // Placement mirrors LIVE via remote events (origin-aware, column-gated)
+        // regardless of this flag. Threads PULL-sync (offline reconcile) only
+        // when the caller opts in — the mirror suite is the sole opt-in.
+        threads: options?.syncThreads ?? false,
       },
     },
     urlPathParams: { instanceId: connectedInstanceId },
@@ -619,7 +634,7 @@ export async function connectToHermesLocalAi(
   // hermes's own transportMode — it stays direct-http so the result returns to
   // atlas over http (the bridge's back leg). One call; the mirror does the rest.
   const localPatch = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: connByIdDef.PATCH,
     data: { transportMode: "reverse-ws" },
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
@@ -655,7 +670,7 @@ async function waitForHermesConnectorReady(
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const res = await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: connByIdDef.GET,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user,
@@ -707,7 +722,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
     await import("@/app/api/[locale]/remote-connection/list/definition")
   ).default;
   const listResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -721,7 +736,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
-        fixtureContext: undefined,
+        streamContext: rootlessStreamContext(),
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: conn.instanceId },
         user: adminUser,
@@ -748,7 +763,7 @@ export async function normalizeHermesSyncScope(): Promise<void> {
     await import("@/app/api/[locale]/remote-connection/list/definition")
   ).default;
   const listResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -762,16 +777,18 @@ export async function normalizeHermesSyncScope(): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
-        fixtureContext: undefined,
+        streamContext: rootlessStreamContext(),
         endpoint: connByIdDef.PATCH,
+        // Local suites (no explicit remote setup) test NO sync — force every
+        // domain off on any lingering hermes connection so a prior remote
+        // suite's scope can't leak in and mutate this run's state.
         data: {
           syncScope: {
-            favorites: false,
+            favorites: true,
             documents: true,
             memories: true,
             skills: true,
-            threads: true,
-            chat: true,
+            threads: false,
           },
         },
         urlPathParams: { instanceId: conn.instanceId },
@@ -808,7 +825,7 @@ export async function unregisterDevFromHermes(
   ).default;
   try {
     const listResult = await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: listDef.GET,
       data: {},
       user: adminUser,
@@ -821,7 +838,7 @@ export async function unregisterDevFromHermes(
       : [{ instanceId: ATLAS_INSTANCE_ID }];
     for (const row of atlasRows) {
       await sendTestRequest({
-        fixtureContext: undefined,
+        streamContext: rootlessStreamContext(),
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: row.instanceId },
         user: adminUser,
@@ -831,7 +848,7 @@ export async function unregisterDevFromHermes(
   } catch {
     // Best-effort: at minimum delete the canonical atlas row via the endpoint.
     await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: connByIdDef.DELETE,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user: adminUser,
@@ -900,7 +917,7 @@ export async function restoreAtlasIdentity(): Promise<void> {
     );
   }
   await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: selfRenameDef.PATCH,
     data: { newInstanceId: ATLAS_INSTANCE_ID, propagate: false },
     user: adminUser,
@@ -933,7 +950,7 @@ async function triggerHermesReconnect(): Promise<void> {
     );
   }
   const resp = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: connByIdDef.PATCH,
     data: { reconnectNow: true },
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
@@ -1403,7 +1420,7 @@ export async function assertCronTaskCompleted(threadId: string): Promise<void> {
     .from(cronTasks)
     .where(
       and(
-        eq(cronTasks.wakeUpThreadId, threadId),
+        sql`${cronTasks.taskInput}->>'threadId' = ${threadId}`,
         sql`${cronTasks.targetInstance} IS NOT NULL`,
       ),
     );
@@ -1463,7 +1480,7 @@ export async function assertNoOrphanPendingTasks(
     .from(cronTasks)
     .where(
       and(
-        eq(cronTasks.wakeUpThreadId, threadId),
+        sql`${cronTasks.taskInput}->>'threadId' = ${threadId}`,
         eq(cronTasks.enabled, true),
         sql`${cronTasks.lastExecutionStatus} IS NULL`,
       ),

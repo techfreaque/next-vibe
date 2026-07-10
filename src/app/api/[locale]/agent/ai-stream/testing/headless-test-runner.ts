@@ -65,7 +65,7 @@ export async function resolveUserAndToken(
   // sendTestRequest resolves the public caller (admin leadId) for us — no
   // fabricated lead row, no direct DB write.
   const loginResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: loginDef.POST,
     data: { email, password, rememberMe: false },
   });
@@ -101,7 +101,7 @@ export async function getOrCreateFolder(
     await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
   ).default;
   const listResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: listDef.GET,
     urlPathParams: { rootFolderId },
     user,
@@ -128,7 +128,7 @@ export async function getOrCreateFolder(
     await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
   ).default;
   const createResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: createDef.POST,
     data: { name, parentId: parentId ?? undefined },
     urlPathParams: { rootFolderId },
@@ -158,7 +158,7 @@ export interface TestStreamParams {
    * (streamContext → providers/media/remote dispatch) and anchors on the
    * thread at creation. Explicit, never ambient.
    */
-  fixtureContext: FixtureContext | undefined;
+  streamContext: ToolExecutionContext;
   threadId?: string;
   skill?: string;
   /**
@@ -234,6 +234,9 @@ export interface TestStreamParams {
    * Raise it for those cases so both recording and replay finish cleanly.
    */
   settleTimeoutMs?: number;
+  /** The user's IANA timezone for the stream POST body. Defaults to "UTC" only
+   *  for incidental callers; suites pass the user's real zone. */
+  timezone?: string;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -258,6 +261,9 @@ export interface SlimMessage {
     callbackMode?: string;
     waitingForConfirmation?: boolean;
     isConfirmed?: boolean;
+    /** Structured tool error — surfaced in assertions so a failed tool call
+     *  reports its real reason instead of a bare "null result". */
+    error?: NonNullable<MessageMetadata["toolCall"]>["error"];
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
   /** True when this is a compacting summary message */
@@ -345,6 +351,7 @@ function slimMessages(
               : undefined,
           isConfirmed:
             r.metadata.toolCall.isConfirmed === true ? true : undefined,
+          error: r.metadata.toolCall.error,
         }
       : null,
     generatedMedia: r.metadata?.generatedMedia
@@ -376,7 +383,7 @@ export async function fetchThreadMessages(
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: msgsDef.GET,
     data: { rootFolderId },
     urlPathParams: { threadId },
@@ -409,7 +416,7 @@ export async function fetchThreadStreamingState(
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: msgsDef.GET,
     data: { rootFolderId: DefaultFolderId.PRIVATE },
     urlPathParams: { threadId },
@@ -445,7 +452,7 @@ export async function waitForThreadIdle(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -489,7 +496,7 @@ export async function waitForThreadSettled(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
-      fixtureContext: undefined,
+      streamContext: rootlessStreamContext(),
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -510,25 +517,45 @@ export async function waitForThreadSettled(
 }
 
 /** Fetch the thread title via endpoint */
-export async function fetchThreadTitle(
+/**
+ * Fetch a thread's title + description via the thread [threadId] GET endpoint
+ * — the endpoint resolves remote threads exactly like the messages GET, so
+ * this works unchanged for cross-instance suites. `title` is NOT NULL (defaults
+ * to the translated "New Chat"); `description` is nullable (null until an
+ * auto-title/rename sets it).
+ */
+export async function fetchThreadMeta(
   threadId: string,
   user: JwtPayloadType,
-): Promise<string | null> {
+  rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
+): Promise<{ title: string | null; description: string | null }> {
   const threadDef = (
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
   ).default;
   const result = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: threadDef.GET,
-    data: { rootFolderId: DefaultFolderId.PRIVATE },
+    data: { rootFolderId },
     urlPathParams: { threadId },
     user,
   });
   if (!result.success) {
-    return null;
+    return { title: null, description: null };
   }
   const title = result.data?.["title"];
-  return typeof title === "string" ? title : null;
+  const description = result.data?.["description"];
+  return {
+    title: typeof title === "string" ? title : null,
+    description: typeof description === "string" ? description : null,
+  };
+}
+
+export async function fetchThreadTitle(
+  threadId: string,
+  user: JwtPayloadType,
+  rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
+): Promise<string | null> {
+  return (await fetchThreadMeta(threadId, user, rootFolderId)).title;
 }
 
 /**
@@ -550,7 +577,7 @@ export async function fetchFavoriteConfigAndModel(
     await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
   ).default;
   const getResult = await sendTestRequest({
-    fixtureContext: undefined,
+    streamContext: rootlessStreamContext(),
     endpoint: favByIdDef.GET,
     urlPathParams: { id: favoriteId },
     user,
@@ -667,6 +694,7 @@ export async function runTestStream(
     operationOverride: callerOperationOverride,
     settleTimeoutMs,
     streamContext,
+    timezone = "UTC",
   } = params;
 
   const rootFolderId = rootFolderIdOverride ?? DefaultFolderId.PRIVATE;
@@ -710,14 +738,6 @@ export async function runTestStream(
 
   // ── Stream POST body — identical to createAndSendUserMessage (shared.ts) ──
   const userMessageId = hasToolConfirmations ? null : crypto.randomUUID();
-  const voiceSel = favoriteConfig?.voiceModelSelection;
-  const resolvedVoice =
-    voiceSel &&
-    "manualModelId" in voiceSel &&
-    typeof voiceSel.manualModelId === "string" &&
-    voiceSel.manualModelId
-      ? voiceSel.manualModelId
-      : DEFAULT_TTS_VOICE_ID;
 
   const streamDef = (
     await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
@@ -764,9 +784,9 @@ export async function runTestStream(
       messageHistory: [],
       attachments: attachments && attachments.length > 0 ? attachments : null,
       audioInput: { file: audioInput ?? null },
-      voiceMode: { enabled: false, voice: resolvedVoice },
+      voiceMode: { enabled: false },
       resumeToken: null,
-      timezone: "UTC",
+      timezone,
       executionContext: { mode: "local" as const },
     },
   });

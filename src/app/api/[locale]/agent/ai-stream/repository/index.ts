@@ -26,6 +26,8 @@ import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
+import { RemoteEventBridgeRepository } from "@/app/api/[locale]/system/realtime/remote-event-bridge/repository";
 
 import type { ToolExecutionContext } from "../../chat/config";
 import { DefaultFolderId, makeHeadlessContext } from "../../chat/config";
@@ -94,10 +96,115 @@ import {
   handleWakeUpRevivalBatch,
   subscribeWakeUpSignal,
   type WakeUpPayload,
-} from "./revival";
-import type { HeadlessIntake } from "./setup";
-import { runHeadlessIntakePhase, setupAiStream } from "./setup";
-import { buildSystemPrompt } from "./system-prompt/builder";
+} from "./revival/revival";
+import {
+  type HeadlessIntake,
+  type HeadlessPreCall,
+  runHeadlessIntakePhase,
+} from "./setup/headless-intake-phase";
+import { type HeadlessAiStreamResult, setupAiStream } from "./setup/setup";
+
+/**
+ * The single source of truth for createAiStream's parameters. The overloads
+ * are expressed as intersections with { awaitResult: true } / { awaitResult?: false }
+ * so the ~20-field list exists exactly ONCE (it used to be typed three times
+ * and had drifted between the copies).
+ */
+export interface CreateAiStreamParams {
+  data: AiStreamPostRequestOutput;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  user: JwtPayloadType;
+  request: NextRequest | undefined;
+  /** Revival stream (resume-stream after a wakeUp task completed). */
+  isRevival?: boolean;
+  /**
+   * True for ws-provider RECEIVER loops (relay / inference-provider): the loop
+   * runs headless here but mirrors a live interactive session on the
+   * originator — confirmation gates apply (see ToolExecutionContext).
+   */
+  relayReceiver?: boolean;
+  /** FOREIGN copy: the owning instance (relay executor landing). */
+  originInstanceId?: string;
+  /** Transient plumbing thread (tool executions): excluded from thread sync. */
+  syncEligible?: boolean;
+  /** Model-pipe relay receiver: suppress this instance's own identity in the
+   *  system prompt — the caller's relayed context is authoritative. */
+  suppressSelfIdentity?: boolean;
+  t: AiStreamT;
+  extraInstructions?: string;
+  excludeMemories?: boolean;
+  favoriteIdOverride?: string;
+  sequenceIdOverride?: string;
+  subAgentDepth: number;
+  mediaModelOverrides?: {
+    musicGenModelSelection?: MusicGenModelSelection;
+    videoGenModelSelection?: VideoGenModelSelection;
+    imageGenModelSelection?: ImageGenModelSelection;
+  };
+  /** Override tools entirely (ws-provider relay / API provider client tools). */
+  toolsOverride?: Record<string, CoreTool>;
+  /**
+   * The ToolExecutionContext the toolsOverride closures were BOUND to (the
+   * relay receiver builds them against a headless context before the stream
+   * exists). The stream wires its live pendingToolMessages map onto it so
+   * per-call tool-message resolution — and with it the wakeUp/detach park
+   * anchor (storePendingCallId + revival registration) — works exactly like
+   * server-loaded tools.
+   */
+  toolsContext?: ToolExecutionContext;
+  /** Parent stream's abort signal - sub-stream aborts when parent does. */
+  parentAbortSignal?: AbortSignal;
+  /**
+   * Per-tool confirmation requirements injected by the relay target
+   * (ws-provider) — the remote loop has no favorite of its own, so these
+   * carry the caller's favorite/skill confirmation gates to the remote
+   * execute-tool gate. Merged into the resolved availableTools confirmations.
+   */
+  confirmationOverridesOverride?: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
+  /**
+   * Cap on agent-loop tool-call rounds for THIS stream (ai-run maxTurns).
+   * Defaults to MAX_TOOL_CALLS when omitted.
+   */
+  maxToolCalls?: number;
+  /**
+   * Headless-adapter intake: inject preCalls as thread messages and derive
+   * the effective operation/parent/userMessageId from thread state before
+   * any branch runs. Set ONLY by awaitResult callers that build a synthetic
+   * request (ai-run) — interactive clients and the ws-provider/relay receivers
+   * send fully-formed data instead.
+   */
+  headlessIntake?: HeadlessIntake;
+  /**
+   * Called as soon as the thread ID is known (before intake/preCalls and the
+   * AI turn). ai-run uses this to emit a partial tool result carrying the
+   * threadId so the parent UI renders sub-thread messages in real-time.
+   */
+  onThreadCreated?: (threadId: string) => Promise<void>;
+  /**
+   * REVIVAL: deferred wakeUp payload. When set (with isRevival), the intake
+   * phase inserts the deferred TOOL message at the chain leaf before the loop,
+   * so revival "just calls createAiStream" — no separate pre-insertion step.
+   */
+  deferredWakeUpPayload?: WakeUpPayload;
+  /**
+   * REVIVAL: explicit parent message id for history loading (skips the
+   * "last message by createdAt" fallback). Set by revival so the deferred
+   * TOOL result is the ancestry root. `isRevival` already selects the
+   * "wakeup-resume" operation (no CONTINUE_CONVERSATION_PROMPT).
+   */
+  explicitParentMessageId?: string;
+  /**
+   * Spawning thread when this stream is a SUB-STREAM/SUB-AGENT (ai-run child,
+   * image-gen LLM sub-stream). Persisted on the child thread row (provenance);
+   * the fixture engine walks it child → parent → root to find the run's counter.
+   * NULL/absent for top-level streams and relay mirrors.
+   */
+  parentThreadId?: string;
+}
 
 export class AiStreamRepository {
   /**
@@ -111,7 +218,7 @@ export class AiStreamRepository {
   private static extractUserIdentifiers(
     user: JwtPayloadType,
     request: NextRequest | undefined,
-    headless: boolean,
+    awaitResult: boolean,
   ): {
     userId: string | undefined;
     leadId: string;
@@ -123,54 +230,504 @@ export class AiStreamRepository {
       ? request.headers.get("x-forwarded-for") ||
         request.headers.get("x-real-ip") ||
         undefined
-      : headless
+      : awaitResult
         ? "headless"
         : "cli";
 
     return { userId, leadId: user.leadId, ipAddress };
   }
 
-  /** Headless overload - returns structured result with threadId + lastAiMessageId */
-  static createAiStream(params: {
-    data: AiStreamPostRequestOutput;
+  /**
+   * Emit the thread-created event to the threads + folder-contents channels so
+   * other tabs/clients render a newly-created thread immediately. Pure WS
+   * emission — no state mutation. Callers gate on isNewThread && !incognito &&
+   * !relayReceiver (a foreign-copy landing must never echo creation).
+   */
+  private static emitThreadCreated(params: {
+    threadId: string;
+    title: string;
+    rootFolderId: DefaultFolderId;
+    subFolderId: string | null;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    resolvedRelayContext?: ResolvedRelayContext;
+  }): void {
+    const {
+      threadId,
+      title,
+      rootFolderId,
+      subFolderId,
+      logger,
+      user,
+      resolvedRelayContext,
+    } = params;
+    const now = new Date();
+    createThreadsPostEmitter(logger, user, { resolvedRelayContext })(
+      "thread-created",
+      {
+        requestData: {
+          id: threadId,
+          title,
+          rootFolderId: rootFolderId as Exclude<
+            DefaultFolderId,
+            typeof DefaultFolderId.INCOGNITO
+          >,
+          // SAME-id placement for cross-instance mirrors: the peer hangs its
+          // mirror off this exact folder id once the chain has synced.
+          subFolderId: subFolderId ?? undefined,
+        },
+      },
+    );
+    // Target the channel of the folder the thread lives in (subFolderId) so a
+    // viewer of a NESTED folder — on that folder's channel, not the root view's —
+    // receives the create. Root-level threads (subFolderId null) hit the root view.
+    createFolderContentsEmitter(logger, user, rootFolderId, {
+      subFolderId,
+      resolvedRelayContext,
+    })("thread-created", {
+      responseData: {
+        items: [
+          {
+            id: threadId,
+            type: "thread" as const,
+            title,
+            rootFolderId,
+            folderId: subFolderId,
+            status: ThreadStatus.ACTIVE,
+            streamingState: ThreadStreamingState.STREAMING,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
+      },
+    });
+  }
+
+  /**
+   * Strip <think>...</think> reasoning tags from AI message content.
+   * Handles both complete tags and incomplete (streaming-cut) trailing tags.
+   */
+  /**
+   * Execute a single pre-call and return its result.
+   * Args are passed as flat merged data — execute-tool auto-splits
+   * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
+   */
+  private static async executePreCall(
+    routeId: string,
+    mergedArgs: Record<string, WidgetData>,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    streamContext: ToolExecutionContext,
+  ): Promise<
+    ResponseType<{
+      routeId: string;
+      args: Record<string, WidgetData>;
+      data: WidgetData;
+    }>
+  > {
+    logger.debug("[AiStreamRun] Executing pre-call", { routeId });
+
+    const result = await RouteExecuteRepository.runInProcess({
+      toolName: routeId,
+      input: mergedArgs,
+      callbackMode: CallbackMode.WAIT,
+      user,
+      locale,
+      logger,
+      streamContext,
+      platform: Platform.AI,
+    });
+
+    if (!result.success) {
+      return fail({
+        message:
+          result.message ?? "app.api.agent.ai-stream.run.errors.preCallFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    // runInProcess wraps inline WAIT results as { result: actualData }.
+    // Unwrap so callers get the endpoint's raw output, not the execute-tool wrapper.
+    const rawData = result.data;
+    const unwrapped =
+      rawData !== null &&
+      typeof rawData === "object" &&
+      !Array.isArray(rawData) &&
+      "result" in rawData
+        ? rawData.result
+        : rawData;
+    return success({
+      routeId,
+      args: mergedArgs,
+      data: unwrapped,
+    });
+  }
+
+  /**
+   * RUN mode one-shot (`ai-run`), folded INTO createAiStream. Called from the
+   * `waitForResult` branch of createAiStream. Runs the genuinely run-specific
+   * work — pre-call EXECUTION, sub-agent favorite override, companion soul
+   * injection — then delegates the actual turn to
+   * `createAiStream({ awaitResult: true })` (which resolves model/skill/tool-config
+   * ONCE, so this method deliberately does NOT re-resolve them). Waits for the
+   * headless turn to settle, reads the last assistant message + tokens from the
+   * DB, strips think tags, fetches thread metadata, and shapes the run response.
+   */
+  static async runAndWait({
+    data,
+    locale,
+    logger,
+    user,
+    t: aiStreamT,
+    streamContext,
+  }: {
+    data: AiStreamRunPostRequestOutput;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    request: NextRequest | undefined;
-    headless: true;
-    isRevival?: boolean;
     t: AiStreamT;
-    extraInstructions?: string;
-    excludeMemories?: boolean;
-    favoriteIdOverride?: string;
-    sequenceIdOverride?: string;
-    subAgentDepth: number;
-    mediaModelOverrides?: {
-      musicGenModelSelection?: MusicGenModelSelection;
-      videoGenModelSelection?: VideoGenModelSelection;
-      imageGenModelSelection?: ImageGenModelSelection;
-    };
-    providerOverride?: ApiProvider;
-    /** Parent stream's abort signal - sub-stream aborts when parent does */
-    parentAbortSignal?: AbortSignal;
-  }): Promise<ResponseType<HeadlessAiStreamResult>>;
+    streamContext: ToolExecutionContext;
+  }): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
+    const prompt = data.prompt;
+    const subAgentDepth = streamContext.subAgentDepth ?? 0;
+    const runPreCalls = data.preCalls;
+    const extraInstructions = data.instructions;
+    const excludeMemories = data.excludeMemories ?? false;
+    const favoriteIdOverride = data.favoriteId;
+    const maxToolCalls = data.maxTurns;
+    const parentAbortSignal = streamContext.abortSignal;
+    const onThreadCreated = streamContext.emitPartialToolResult
+      ? async (subThreadId: string): Promise<void> => {
+          await streamContext.emitPartialToolResult!({ threadId: subThreadId });
+        }
+      : undefined;
+    // The calling companion's skill (for companion-soul inheritance) rides the
+    // stream context of the invoking turn.
+    const callerSkillId = streamContext.skillId;
+    try {
+      const rootFolderId = data.rootFolderId ?? DefaultFolderId.BACKGROUND;
+
+      // incognito rootFolder → no persistence; existing thread → append; else new.
+      const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
+      const headlessThreadMode: "none" | "new" | "append" = isIncognito
+        ? "none"
+        : "new";
+
+      // ── Step 1: Execute pre-calls sequentially ──────────────────────────
+      const preCallResults: Array<{
+        routeId: string;
+        args: Record<string, WidgetData>;
+        success: boolean;
+        data?: WidgetData;
+        error?: string;
+        executionTimeMs?: number;
+      }> = [];
+
+      const preCallAbortController = new AbortController();
+
+      if (runPreCalls && runPreCalls.length > 0) {
+        // Pre-calls run in the run's own folder at the parent's sub-agent depth
+        // (makeHeadlessContext defaults to BACKGROUND/depth-0; override both).
+        const preCallContext: ToolExecutionContext = {
+          ...makeHeadlessContext(
+            preCallAbortController.signal,
+            undefined,
+            streamContext.timezone,
+          ),
+          rootFolderId,
+          headless: undefined,
+          subAgentDepth,
+          isRevival: false,
+        };
+        for (const call of runPreCalls) {
+          const startTime = Date.now();
+          const result = await AiStreamRepository.executePreCall(
+            call.routeId,
+            call.args,
+            user,
+            locale,
+            logger,
+            preCallContext,
+          );
+          preCallResults.push({
+            routeId: result.success ? result.data.routeId : call.routeId,
+            args: result.success ? result.data.args : call.args,
+            success: result.success,
+            data: result.success ? result.data.data : undefined,
+            error: result.success ? undefined : result.message,
+            executionTimeMs: Date.now() - startTime,
+          });
+        }
+      }
+
+      logger.debug("[AiStreamRun] Running headless stream", {
+        model: data.model,
+        promptLength: prompt.length,
+        preCallCount: preCallResults.length,
+      });
+
+      // Map to HeadlessPreCall format for proper tool message injection.
+      const headlessPreCalls: HeadlessPreCall[] = preCallResults.map(
+        (r): HeadlessPreCall => ({
+          routeId: r.routeId,
+          args: r.args,
+          result: r.data ?? null,
+          success: r.success,
+          error: r.error,
+          executionTimeMs: r.executionTimeMs,
+        }),
+      );
+
+      // ── Sub-agent favorite override ──────────────────────────────────────
+      // When invoked from within an active stream, the invoking favorite
+      // (favoriteIdOverride) may carry a subAgentFavoriteId. If so, the
+      // sub-agent inherits THAT favorite's full config instead of the parent's.
+      // null = task isolation (default); set = power-user override.
+      let effectiveFavoriteId = favoriteIdOverride;
+      let overrideFavoriteConfig: FavoriteConfig | null = null;
+      const userId = user.isPublic ? undefined : user.id;
+      if (favoriteIdOverride && userId) {
+        const [invokingFavorite] = await db
+          .select({ subAgentFavoriteId: chatFavorites.subAgentFavoriteId })
+          .from(chatFavorites)
+          .where(
+            and(
+              or(
+                eq(chatFavorites.id, favoriteIdOverride),
+                eq(chatFavorites.slug, favoriteIdOverride),
+              ),
+              eq(chatFavorites.userId, userId),
+            ),
+          )
+          .limit(1);
+
+        if (invokingFavorite?.subAgentFavoriteId) {
+          effectiveFavoriteId = invokingFavorite.subAgentFavoriteId;
+          const [overrideFav] = await db
+            .select(FAVORITE_CONFIG_COLUMNS)
+            .from(chatFavorites)
+            .where(
+              and(
+                eq(chatFavorites.id, invokingFavorite.subAgentFavoriteId),
+                eq(chatFavorites.userId, userId),
+              ),
+            )
+            .limit(1);
+          if (overrideFav) {
+            overrideFavoriteConfig = overrideFav;
+          }
+        }
+      }
+
+      // ── Companion soul injection ─────────────────────────────────────────
+      // When the calling companion (streamContext.skillId) has a companionPrompt
+      // set, prepend it to instructions so the sub-agent inherits the soul.
+      let effectiveInstructions = extraInstructions;
+      if (callerSkillId) {
+        const companionPrompt =
+          await SkillsRepository.getCompanionPrompt(callerSkillId);
+        if (companionPrompt) {
+          effectiveInstructions = effectiveInstructions
+            ? `${companionPrompt}\n\n${effectiveInstructions}`
+            : companionPrompt;
+        }
+      }
+
+      // ── Step 2: Resolve model/skill (the ONE resolution) + build request ──
+      // ai-run supplies EXACTLY ONE model source, in precedence order:
+      // explicit model (source-1, skill as label) → favorite → skill variant.
+      // The sub-agent override favoriteConfig rides as downstream context.
+      const runModel = data.model || undefined;
+      const runFavoriteId = runModel ? undefined : effectiveFavoriteId;
+      const runSkill = runModel
+        ? data.skill || undefined // source-1 skill label
+        : runFavoriteId
+          ? undefined // favorite carries its own skill
+          : data.skill || undefined; // source-3 skill variant
+      const resolvedForRun = await resolveModelSkill({
+        model: runModel,
+        skill: runSkill,
+        favoriteConfig: overrideFavoriteConfig,
+        favoriteId: runFavoriteId,
+        user,
+        locale,
+        logger,
+        t: aiStreamT,
+      });
+      if (!resolvedForRun.success) {
+        return resolvedForRun;
+      }
+      // ai-run is a text one-shot: no voice/audio/attachments inputs exist on
+      // the request, so those fields are genuinely empty here (not defaulted).
+      const syntheticData: AiStreamPostRequestOutput = {
+        operation: "send",
+        rootFolderId,
+        subFolderId: data.subFolderId ?? null,
+        threadId: data.appendThreadId ?? crypto.randomUUID(),
+        userMessageId: null,
+        parentMessageId: null,
+        content: prompt,
+        role: ChatMessageRole.USER,
+        model: resolvedForRun.data.model,
+        skill: resolvedForRun.data.skill,
+        favoriteConfig: resolvedForRun.data.favoriteConfig,
+        toolConfirmations: null,
+        messageHistory: [],
+        voiceMode: { enabled: false },
+        audioInput: { file: null },
+        resumeToken: null,
+        // Inherited from the calling stream's context (originally the frontend).
+        timezone: streamContext.timezone,
+        attachments: null,
+        executionContext: { mode: "local" as const },
+      };
+
+      const streamResult = await AiStreamRepository.createAiStream({
+        data: syntheticData,
+        locale,
+        logger,
+        user,
+        request: undefined,
+        t: aiStreamT,
+        awaitResult: true,
+        headlessIntake: {
+          preCalls: headlessPreCalls.length > 0 ? headlessPreCalls : undefined,
+          operationOverride: "send",
+        },
+        isRevival: false,
+        extraInstructions: effectiveInstructions,
+        excludeMemories,
+        favoriteIdOverride: effectiveFavoriteId,
+        subAgentDepth: subAgentDepth + 1,
+        onThreadCreated,
+        parentAbortSignal,
+        maxToolCalls,
+        // Sub-agent child: link to the spawning thread for provenance + fixture
+        // root walk. The `data.appendThreadId ?? random` id above stays the
+        // child's own identity.
+        parentThreadId: streamContext.threadId,
+      });
+
+      if (!streamResult.success) {
+        return streamResult;
+      }
+
+      return AiStreamRepository.shapeRunResult({
+        headlessResult: streamResult.data,
+        isIncognito,
+        headlessThreadMode,
+        preCallResults,
+        logger,
+      });
+    } catch (error) {
+      const msg = parseError(error).message;
+      logger.error("[AiStreamRun] Failed", { error: msg });
+      return fail({
+        message: aiStreamT("errors.unexpectedError", { error: msg }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Shape the headless turn result into the ai-run response: read the last
+   * assistant message + tokens from the DB (in-memory content for incognito),
+   * strip think-tags, fetch thread metadata, and attach the pre-call summary.
+   */
+  private static async shapeRunResult(params: {
+    headlessResult: HeadlessAiStreamResult;
+    isIncognito: boolean;
+    headlessThreadMode: "none" | "new" | "append";
+    preCallResults: Array<{
+      routeId: string;
+      success: boolean;
+      error?: string;
+    }>;
+    logger: EndpointLogger;
+  }): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
+    const {
+      headlessResult,
+      isIncognito,
+      headlessThreadMode,
+      preCallResults,
+      logger,
+    } = params;
+    const { lastAiMessageId, threadId, lastAiMessageContent } = headlessResult;
+
+    // Incognito → messages aren't persisted; use in-memory content directly.
+    // Persistent modes → DB read also provides token metadata.
+    let rawText: string | null = lastAiMessageContent ?? null;
+    let promptTokens: number | null = null;
+    let completionTokens: number | null = null;
+    let creditCost: number | null = null;
+
+    if (!isIncognito) {
+      const [aiMessage] = await db
+        .select({
+          content: chatMessages.content,
+          metadata: chatMessages.metadata,
+        })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, lastAiMessageId))
+        .limit(1);
+
+      rawText = aiMessage?.content ?? rawText;
+      promptTokens = aiMessage?.metadata?.promptTokens ?? null;
+      completionTokens = aiMessage?.metadata?.completionTokens ?? null;
+      creditCost = aiMessage?.metadata?.creditCost ?? null;
+    }
+
+    const text = rawText ? stripThinkTags(rawText) : null;
+    const resultThreadId =
+      (headlessThreadMode !== "none" ? threadId : null) ?? null;
+
+    let threadTitle: string | null = null;
+    let threadCreatedAt: string | null = null;
+    if (resultThreadId) {
+      const [thread] = await db
+        .select({ title: chatThreads.title, createdAt: chatThreads.createdAt })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, resultThreadId))
+        .limit(1);
+      threadTitle = thread?.title ?? null;
+      threadCreatedAt = thread?.createdAt?.toISOString() ?? null;
+    }
+
+    logger.debug("[AiStreamRun] Complete", {
+      lastAiMessageId,
+      threadId: resultThreadId,
+      textLength: text?.length ?? 0,
+      promptTokens,
+      completionTokens,
+    });
+
+    return success({
+      text,
+      threadId: resultThreadId,
+      lastAiMessageId: headlessThreadMode !== "none" ? lastAiMessageId : null,
+      threadTitle,
+      threadCreatedAt,
+      promptTokens,
+      completionTokens,
+      creditCost,
+      preCallResults: preCallResults.map((r) => ({
+        routeId: r.routeId,
+        success: r.success,
+        error: r.error ?? null,
+      })),
+    });
+  }
+
+  /** Headless overload - returns structured result with threadId + lastAiMessageId */
+  static createAiStream(
+    params: CreateAiStreamParams & { awaitResult: true },
+  ): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload - returns response output (events stream via WS) */
-  static createAiStream(params: {
-    data: AiStreamPostRequestOutput;
-    locale: CountryLanguage;
-    logger: EndpointLogger;
-    user: JwtPayloadType;
-    request: NextRequest | undefined;
-    headless?: false;
-    t: AiStreamT;
-    extraInstructions?: string;
-    excludeMemories?: boolean;
-    subAgentDepth: number;
-    sequenceIdOverride?: string;
-    /** Override tools entirely (for API provider client-provided tools) */
-    toolsOverride?: Record<string, CoreTool>;
-  }): Promise<ResponseType<AiStreamPostResponseOutput>>;
+  static createAiStream(
+    params: CreateAiStreamParams & { awaitResult?: false },
+  ): Promise<ResponseType<AiStreamPostResponseOutput>>;
 
   static async createAiStream({
     data,
@@ -178,7 +735,7 @@ export class AiStreamRepository {
     logger,
     user,
     request,
-    headless = false,
+    awaitResult = false,
     isRevival,
     relayReceiver,
     originInstanceId,
@@ -195,34 +752,26 @@ export class AiStreamRepository {
     toolsContext,
     parentAbortSignal,
     confirmationOverridesOverride,
-  }: {
-    data: AiStreamPostRequestOutput;
-    locale: CountryLanguage;
-    logger: EndpointLogger;
-    user: JwtPayloadType;
-    request: NextRequest | undefined;
-    headless?: boolean;
-    isRevival?: boolean;
-    t: AiStreamT;
-    extraInstructions?: string;
-    excludeMemories?: boolean;
-    favoriteIdOverride?: string;
-    sequenceIdOverride?: string;
-    subAgentDepth: number;
-    mediaModelOverrides?: {
-      musicGenModelSelection?: MusicGenModelSelection;
-      videoGenModelSelection?: VideoGenModelSelection;
-      imageGenModelSelection?: ImageGenModelSelection;
-    };
-    providerOverride?: ApiProvider;
-    toolsOverride?: Record<string, CoreTool>;
-    parentAbortSignal?: AbortSignal;
+    maxToolCalls,
+    headlessIntake,
+    onThreadCreated,
+    deferredWakeUpPayload,
+    explicitParentMessageId,
+    parentThreadId,
+  }: CreateAiStreamParams & {
+    awaitResult?: boolean;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
   > {
     const { userId, leadId, ipAddress } =
-      AiStreamRepository.extractUserIdentifiers(user, request, headless);
+      AiStreamRepository.extractUserIdentifiers(user, request, awaitResult);
+
+    // Notify the caller of the thread ID before any work starts (ai-run emits
+    // a partial tool result so the parent UI can render the sub-thread live).
+    if (onThreadCreated) {
+      await onThreadCreated(data.threadId);
+    }
 
     // ================================================================
     // Model/skill resolution — ALWAYS, EXACTLY ONE source in precedence:
@@ -230,12 +779,74 @@ export class AiStreamRepository {
     // context) → favoriteId → skill variant. The interactive path carries a
     // model, so this resolves to source-1 (a no-op on the concrete value).
     // ================================================================
-    if (!headless && !isRevival) {
-      const { isRemoteHostRequest, delegateToRemoteHost } =
-        await import("../../support/remote-host-repository");
-      if (isRemoteHostRequest(data)) {
-        return delegateToRemoteHost({ data, user, locale, logger, request });
+    {
+      const streamModel = data.model || undefined;
+      const streamFavoriteId = streamModel ? undefined : favoriteIdOverride;
+      const streamSkill = streamModel
+        ? data.skill || undefined
+        : streamFavoriteId
+          ? undefined
+          : data.skill || undefined;
+      const resolved = await resolveModelSkill({
+        model: streamModel,
+        skill: streamSkill,
+        favoriteConfig: data.favoriteConfig ?? null,
+        favoriteId: streamFavoriteId,
+        user,
+        locale,
+        logger,
+        t: aiStreamT,
+      });
+      if (!resolved.success) {
+        return resolved;
       }
+      data = {
+        ...data,
+        model: resolved.data.model,
+        skill: resolved.data.skill,
+        favoriteConfig: resolved.data.favoriteConfig,
+      };
+    }
+
+    // ================================================================
+    // Headless intake: inject preCalls as thread messages and derive
+    // operation/parent/userMessageId from thread state. Must run BEFORE
+    // the relay branch so relayed headless turns forward the DERIVED
+    // operation + parent to the remote instance.
+    //
+    // Runs whenever the intake phase must derive operation/userMessageId,
+    // i.e. any turn that does NOT already carry a userMessageId from a client:
+    //   - explicit `headlessIntake` (adapter/ai-run with preCalls or override)
+    //   - a REVIVAL (wakeUp/WAIT resume — derives "wakeup-resume")
+    //   - ANY headless (awaitResult) send that a synthetic caller (e.g. the
+    //     media-gen sub-stream) built with content but no userMessageId
+    // Without this, the "send" placeholder + null userMessageId falls through
+    // to setup's userMessageId guard and fails with "Invalid JSON in request
+    // body". The intake phase is the ONE place that mints the userMessageId, so
+    // no synthetic call site has to remember to pass `headlessIntake`.
+    // ================================================================
+    const needsIntakeDerivation =
+      isRevival ||
+      (awaitResult &&
+        !data.userMessageId &&
+        !(data.toolConfirmations && data.toolConfirmations.length > 0));
+    const effectiveHeadlessIntake: HeadlessIntake | undefined =
+      headlessIntake ?? (needsIntakeDerivation ? {} : undefined);
+    if (effectiveHeadlessIntake) {
+      const intakeResult = await runHeadlessIntakePhase({
+        data,
+        intake: effectiveHeadlessIntake,
+        isRevival,
+        explicitParentMessageId,
+        deferredWakeUpPayload,
+        user,
+        locale,
+        logger,
+      });
+      if (!intakeResult.success) {
+        return intakeResult;
+      }
+      data = intakeResult.data;
     }
 
     // ================================================================
@@ -246,103 +857,70 @@ export class AiStreamRepository {
     //     <folderPath> location (remote-chat-root REMOTE-folder routing).
     // ================================================================
     if (
-      data.operation === "send" &&
-      data.threadId &&
-      data.userMessageId &&
-      data.rootFolderId !== DefaultFolderId.INCOGNITO &&
-      StreamRegistry.isActive(data.threadId)
+      data.executionContext.mode === "inference-provider" ||
+      data.executionContext.mode === "relay"
     ) {
-      const authorName = userId
-        ? await UserRepository.getUserPublicName(userId, logger)
-        : null;
-
-      await MessagesRepository.createUserMessage({
-        messageId: data.userMessageId,
-        threadId: data.threadId,
-        rootFolderId: data.rootFolderId,
-        role: ChatMessageRole.USER,
-        content: data.content,
-        parentId: data.parentMessageId || null,
-        userId,
-        authorName,
-        logger,
-        extraMetadata: {
-          isQueued: true,
-          queuedSettings: {
-            model: data.model,
-            skill: data.skill,
-            rootFolderId: data.rootFolderId,
-            subFolderId: data.subFolderId ?? null,
-            voiceMode: data.voiceMode ?? {
-              enabled: false,
-              voice: DEFAULT_TTS_VOICE_ID,
-            },
-            favoriteConfig: data.favoriteConfig
-              ? buildFavoriteConfig({
-                  ...data.favoriteConfig,
-                  ...parseSkillId(data.favoriteConfig.skillId),
-                })
-              : null,
-            timezone: data.timezone,
-          },
-        },
-      });
-
-      // Emit message-created so the frontend can confirm persistence
-      const wsEmit = createMessagesEmitter(
-        data.threadId,
-        data.rootFolderId,
+      const { runWsProviderStream } = await import("./relay/receiver");
+      return runWsProviderStream({
+        data,
+        // Narrowed by the mode check above - the branch needs the relay fields.
+        executionContext: data.executionContext,
+        locale,
         logger,
         user,
-      );
-      wsEmit("message-created", {
-        streamingState: "streaming", // Keep streaming state - the AI is still streaming
-        messages: [
-          {
-            id: data.userMessageId,
-            threadId: data.threadId,
-            role: ChatMessageRole.USER,
-            isAI: false,
-            content: data.content,
-            parentId: data.parentMessageId || null,
-            sequenceId: null,
-            model: null,
-            skill: null,
-            metadata: { isQueued: true },
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            authorId: userId ?? null,
-            authorName: null,
-            errorType: null,
-            errorCode: null,
-            errorMessage: null,
-            upvotes: 0,
-            downvotes: 0,
-            searchVector: null,
-          },
-        ],
+        request,
+        t: aiStreamT,
       });
-
-      // Register in-memory so the running stream's prepareStep can inject this
-      // message as the next user turn without ending and restarting the stream.
-      QueueRegistry.push(data.threadId, {
-        id: data.userMessageId,
-        content: data.content,
-        metadata: { isQueued: true },
-        createdAt: new Date(),
-      });
-
-      logger.info("[AI Stream] Queued message created", {
-        messageId: data.userMessageId,
-        threadId: data.threadId,
-      });
-
-      return success({
-        success: true,
-        messageId: data.userMessageId,
-        responseThreadId: data.threadId,
-      }) satisfies ResponseType<AiStreamPostResponseOutput>;
     }
+
+    // ================================================================
+    // Remote host: resolve routing to find a remote target.
+    // Priority: per-stream loopInstanceId → thread's loop_instance_id column →
+    // creation-time REMOTE/<x> stamp → inference-provider fallback. Placement
+    // never routes. Delegates via the ws-provider/stream protocol.
+    //
+    // NEVER for receiver loops (relayReceiver): the executor IS the loop
+    // location — its copy carries loop_instance_id NULL by construction.
+    // ================================================================
+    if (!relayReceiver) {
+      const relayResult = await runRelayBranch({
+        data,
+        locale,
+        logger,
+        user,
+        userId,
+        leadId,
+        ipAddress,
+        headless: awaitResult,
+        aiStreamT,
+        subAgentDepth,
+      });
+      if (relayResult !== null) {
+        return relayResult;
+      }
+    }
+
+    // ================================================================
+    // Auto-queue: if the thread is already streaming, save the user
+    // message with isQueued metadata and return immediately - no AI
+    // stream, no credits, no tools. The queue processor will pick
+    // this up after the current stream ends. (Server-side detection.)
+    // ================================================================
+    const queueResult = await runAutoQueueBranch({
+      data,
+      user,
+      userId,
+      logger,
+    });
+    if (queueResult !== null) {
+      return queueResult;
+    }
+
+    // Resolve relay context once for this stream — skips per-event DB queries
+    // on originInstanceId + activeConnections throughout the entire stream.
+    const resolvedRelayContext: ResolvedRelayContext | undefined = userId
+      ? await RemoteEventBridgeRepository.resolveRemoteEventContext(userId)
+      : undefined;
 
     const setupResult = await setupAiStream({
       data,
@@ -355,7 +933,7 @@ export class AiStreamRepository {
       aiStreamT,
       maxDuration: AiStreamRepository.maxDuration,
       request,
-      headless,
+      headless: awaitResult,
       subAgentDepth,
       isRevival,
       relayReceiver,
@@ -369,6 +947,7 @@ export class AiStreamRepository {
       toolsOverride,
       parentAbortSignal,
       parentThreadId,
+      resolvedRelayContext,
     });
 
     if (!setupResult.success) {
@@ -377,100 +956,7 @@ export class AiStreamRepository {
         message: setupResult.message,
         threadId: data.threadId,
       });
-      // Emit error to chat thread if we have a threadId - setup failures (e.g. insufficient
-      // credits, bad model) should appear as error bubbles in the thread, not silently fail.
-      const threadId = data.threadId;
-      const isIncognito = data.rootFolderId === "incognito";
-      if (threadId && !user.isPublic && "id" in user) {
-        // Chain error as child of the previous branch tip (last assistant/tool message).
-        // Do NOT use userMessageId - the user message has not been persisted to DB yet
-        // at setup time, so it cannot be a valid parent FK reference.
-        const setupErrorParentId = data.parentMessageId || null;
-        // Credit errors (FORBIDDEN / PAYMENT_REQUIRED) must never be stored in DB -
-        // they are transient validation failures, not persistent thread state.
-        const isCreditError =
-          setupResult.errorType?.errorCode ===
-            ErrorResponseTypes.FORBIDDEN.errorCode ||
-          setupResult.errorType?.errorCode ===
-            ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
-        try {
-          const errorMessageId = crypto.randomUUID();
-          const errorContent = serializeError(setupResult);
-          const errorType = setupResult.errorType
-            ? `${setupResult.errorType.errorCode}`
-            : "SETUP_ERROR";
-          // Persist error message to DB only for non-incognito, non-credit-error threads.
-          // Skip silently if the thread doesn't exist yet (new thread where setup failed before any DB write).
-          if (!isIncognito && !isCreditError) {
-            try {
-              await MessagesRepository.createErrorMessage({
-                messageId: errorMessageId,
-                threadId,
-                content: errorContent,
-                errorType,
-                parentId: setupErrorParentId,
-                user,
-                sequenceId: null,
-                logger,
-              });
-            } catch (dbErr) {
-              // Thread may not exist in DB yet (new thread, setup failed before creation).
-              // Still emit via WS so the client can display the error.
-              logger.debug(
-                "[AiStream] Could not persist setup error message to DB (thread may not exist yet)",
-                {
-                  threadId,
-                  error: dbErr instanceof Error ? dbErr.message : String(dbErr),
-                },
-              );
-            }
-          }
-          // Always emit via WS so the frontend can display the error (incognito stores it client-side)
-          const setupErrorEmit = createMessagesEmitter(
-            threadId,
-            data.rootFolderId,
-            logger,
-            user,
-          );
-          setupErrorEmit("message-created", {
-            streamingState: "idle",
-            messages: [
-              {
-                id: errorMessageId,
-                threadId,
-                role: ChatMessageRole.ERROR,
-                content: errorContent,
-                parentId: setupErrorParentId,
-                sequenceId: null,
-                model: null,
-                skill: null,
-                metadata: {},
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                isAI: false,
-                authorId: "id" in user ? (user.id ?? null) : null,
-                authorName: null,
-                errorType: errorType ?? null,
-                errorCode: null,
-                errorMessage: null,
-                upvotes: 0,
-                downvotes: 0,
-                searchVector: null,
-              },
-            ],
-          });
-        } catch (emitErr) {
-          logger.warn("[AiStream] Failed to emit setup error to chat", {
-            threadId,
-            parentId: setupErrorParentId,
-            error: emitErr instanceof Error ? emitErr.message : String(emitErr),
-            cause:
-              emitErr instanceof Error && emitErr.cause instanceof Error
-                ? emitErr.cause.message
-                : undefined,
-          });
-        }
-      }
+      await emitSetupError({ setupResult, data, user, logger });
       return setupResult;
     }
 
@@ -507,6 +993,24 @@ export class AiStreamRepository {
     } = setupResult.data;
     let trailingSystemMessage = initialTrailingSystemMessage;
 
+    // Relay-injected confirmation gates: the relay target (ws-provider) carries
+    // the caller's favorite/skill confirmation requirements here because the
+    // remote loop has no favorite of its own. Merge into whatever stream-setup
+    // resolved so the execute-tool gate fires on the remote for these tools.
+    if (
+      confirmationOverridesOverride &&
+      confirmationOverridesOverride.length > 0
+    ) {
+      const existing = streamContext.confirmationOverrides ?? [];
+      const merged = [...existing];
+      for (const o of confirmationOverridesOverride) {
+        if (!merged.some((e) => e.toolId === o.toolId)) {
+          merged.push(o);
+        }
+      }
+      streamContext.confirmationOverrides = merged;
+    }
+
     // All confirmations were wakeUp-pending OR a confirmed execute-tool (queue WAIT) already
     // created a remote task - no AI turn needed here.
     // wakeUp-pending: resume-stream will handle revival when each goroutine completes.
@@ -522,9 +1026,9 @@ export class AiStreamRepository {
       if (isWaitPending && threadResultThreadId) {
         // Set thread → waiting so the UI shows the stop button and blocks new messages.
         // clearStreamingState is called by handleTaskCompletion when the revival fires.
-        await setStreamingStateWaiting(threadResultThreadId);
+        await setStreamingStateWaiting(threadResultThreadId, logger, user);
       }
-      if (headless) {
+      if (awaitResult) {
         return {
           success: true,
           data: {
@@ -560,97 +1064,68 @@ export class AiStreamRepository {
     // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
 
-    // Insert all pending wakeUp deferred messages, then fire ONE revival from the last one.
-    // Batching ensures: if multiple wakeUp tools complete before the stream yields,
-    // all their deferred messages are inserted as a linear chain, and a single AI
-    // turn sees all of them - no duplicate revival responses.
-    const handleWakeUpRevivalBatch = async (
-      payloads: WakeUpPayload[],
-    ): Promise<void> => {
-      if (payloads.length === 0) {
-        return;
-      }
-      const { insertDeferredWakeUpMessage } =
-        await import("./core/deferred-inserter");
-
-      let lastDeferredId = "";
-      let lastPayload = payloads[0];
-      // All deferred messages in a batch share one sequenceId so the UI groups
-      // them into a single assistant bubble together with the revival AI response.
-      const batchSequenceId = crypto.randomUUID();
-
-      // Insert all deferred messages sequentially so they form a linear chain
-      // (each walkToLeafMessage finds the previous deferred as the new leaf).
-      for (const payload of payloads) {
-        const { deferredId } = await insertDeferredWakeUpMessage(
-          threadResultThreadId,
-          payload,
-          logger,
-          user,
-          batchSequenceId,
-        );
-        lastDeferredId = deferredId;
-        lastPayload = payload;
-      }
-
-      logger.debug("[WakeUp] Firing revival after stream yield", {
-        threadId: threadResultThreadId,
-        deferredCount: payloads.length,
-        lastDeferredId,
-      });
-      const { runHeadlessAiStream } = await import("./headless");
-      await runHeadlessAiStream({
-        favoriteId: lastPayload.favoriteId,
-        favoriteConfig: null,
-        model: lastPayload.resolvedModel,
-        skill: lastPayload.resolvedSkill,
-        prompt: "",
-        wakeUpRevival: true,
-        explicitParentMessageId: lastDeferredId,
-        sequenceIdOverride: batchSequenceId,
-        threadId: threadResultThreadId,
-        rootFolderId: data.rootFolderId,
-        subAgentDepth,
-        user,
-        locale,
-        logger,
-        t: aiStreamT,
-        abortSignal: streamAbortController.signal,
-      }).catch((err: Error) => {
-        logger.error("[WakeUp] Revival failed", {
-          threadId: threadResultThreadId,
-          error: err.message,
-        });
-      });
-    };
-
     // Create emitter on the messages channel - events are owned by messages endpoint.
-    const wsEmit: WsEmitCallback = createMessagesEmitter(
-      threadResultThreadId,
-      data.rootFolderId,
-      logger,
-      user,
-    );
+    const wsEmit: MessagesWsEmit = createMessagesEmitter(logger, user, {
+      threadId: threadResultThreadId,
+      rootFolderId: data.rootFolderId,
+      resolvedRelayContext,
+    });
     const emitTitle = (threadId: string, title: string): void => {
-      emitThreadTitleUpdated(threadId, title, data.rootFolderId, logger, user);
+      createThreadsGetEmitter(logger, user, {
+        rootFolderId: data.rootFolderId,
+        subFolderId: null,
+        resolvedRelayContext,
+      })("thread-title-updated", {
+        responseData: {
+          threads: [{ id: threadId, title }],
+        },
+      });
+      if (data.rootFolderId) {
+        createFolderContentsEmitter(logger, user, data.rootFolderId, {
+          resolvedRelayContext,
+        })("thread-title-updated", {
+          responseData: {
+            items: [{ id: threadId, title }],
+          },
+        });
+      }
     };
 
-    // Emit thread-created so other tabs/clients can render the new thread in the
-    // sidebar immediately (the optimistic update only exists in the creating client).
-    if (isNewThread && !isIncognito) {
-      emitThreadCreated(
-        threadResultThreadId,
-        effectiveContent.slice(0, 50) || "New Chat",
-        data.rootFolderId,
-        data.subFolderId ?? null,
+    // Emit thread-created so other tabs/clients can render the new thread in
+    // the sidebar immediately (the optimistic update only exists in the
+    // creating client). NEVER for relay-receiver loops (foreign-copy landing).
+    if (isNewThread && !isIncognito && !relayReceiver) {
+      AiStreamRepository.emitThreadCreated({
+        threadId: threadResultThreadId,
+        title: chatScopedTranslation.scopedT(locale).t("common.newChat"),
+        rootFolderId: data.rootFolderId,
+        subFolderId: data.subFolderId ?? null,
         logger,
         user,
-      );
+        resolvedRelayContext,
+      });
     }
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
       const runStream = async (): Promise<void> => {
+        const streamAvailability = await getInstanceAvailability();
+
+        // Phase-2 confirmation parent: with parallel tools the confirmed
+        // message is not necessarily the branch tip (a sibling tool that ran
+        // without confirmation chains after it) — walk to the actual leaf so
+        // the AI response never branches the chain.
+        const lastConfirmed =
+          toolConfirmationResults[toolConfirmationResults.length - 1];
+        const confirmationParentLeafId =
+          lastConfirmed && !isIncognito
+            ? await walkToLeafMessage(
+                threadResultThreadId,
+                lastConfirmed.messageId,
+                lastConfirmed.messageId,
+              )
+            : undefined;
+
         // Initialize stream context, TTS handler, and emit tool confirmations.
         // User MESSAGE_CREATED is emitted below, after the compacting check.
         const { ctx, ttsHandler, emittedToolResultIds } =
@@ -671,12 +1146,82 @@ export class AiStreamRepository {
             wsEmit,
             emitTitle,
             sequenceIdOverride,
+            availability: streamAvailability,
+            streamContext: streamContext,
+            streamRunId: streamContext.streamRunId,
+            confirmationParentLeafId,
           });
+
+        // Tear down the stream-control pub/sub subscription when the stream ends
+        // (normal completion). A cancel signal auto-settles the subscription; this
+        // covers the no-cancel path so the bus handler is never left dangling.
+        ctx.onCleanup(cancelStreamControlSub);
 
         // Wire StreamContext.pendingToolMessages into ToolExecutionContext so
         // tools-loader can inject the correct currentToolMessageId per toolCallId
         // before calling each tool's execute() - parallel-safe, no polling needed.
         streamContext.pendingToolMessages = ctx.pendingToolMessages;
+        // toolsOverride closures (relay receiver) hold their OWN pre-stream
+        // context — wire the live map onto it too, or wakeUp/detach dispatches
+        // from those tools never resolve a tool message id and lose their park
+        // anchor (pendingCallId) + revival registration.
+        if (toolsContext) {
+          toolsContext.pendingToolMessages = ctx.pendingToolMessages;
+          // The park/revival anchors also need the live thread identity —
+          // registerPendingCall stores threadId for wakeUp revival and the
+          // completion handler schedules resume-stream against it. A null
+          // threadId silently skips the resume-stream scheduling.
+          toolsContext.threadId = streamContext.threadId;
+          // Confirmation gating: applyConfirmationGate skips pure-headless
+          // contexts (headless && !relayReceiver) and reads the caller's
+          // confirmationOverrides — without these the receiver executes
+          // requiresConfirmation tools WITHOUT approval.
+          toolsContext.relayReceiver = streamContext.relayReceiver;
+          toolsContext.confirmationOverrides =
+            streamContext.confirmationOverrides;
+          // MUTABLE coordination state must be SHARED, not copied: tools set
+          // flags mid-stream (await-task → waitingForRemoteResult +
+          // pendingTimeoutMs, confirmation gate → stepHasToolsAwaitingConfirmation,
+          // wakeUp suppression → suppressedWakeUpToolMessageIds) and the LOOP
+          // reads them from ITS streamContext (stop conditions, park logic) —
+          // and vice versa (currentToolMessageId/leafMessageId are written by
+          // the loop and read by tools). A one-way field copy silently drops
+          // every flag set after this point (observed: relay-receiver
+          // await-task set waitingForRemoteResult on the tools context, the
+          // loop never paused, the model re-polled forever). Accessor-bridge
+          // them so the tools context is a live view onto the loop's
+          // stream context.
+          const bridgeField = <
+            K extends
+              | "waitingForRemoteResult"
+              | "pendingTimeoutMs"
+              | "stepHasToolsAwaitingConfirmation"
+              | "suppressedWakeUpToolMessageIds"
+              | "callerCallbackMode"
+              | "currentToolMessageId"
+              | "aiMessageId"
+              | "leafMessageId",
+          >(
+            field: K,
+          ): void => {
+            Object.defineProperty(toolsContext, field, {
+              configurable: true,
+              enumerable: true,
+              get: (): (typeof streamContext)[K] => streamContext[field],
+              set: (value: (typeof streamContext)[K]): void => {
+                streamContext[field] = value;
+              },
+            });
+          };
+          bridgeField("waitingForRemoteResult");
+          bridgeField("pendingTimeoutMs");
+          bridgeField("stepHasToolsAwaitingConfirmation");
+          bridgeField("suppressedWakeUpToolMessageIds");
+          bridgeField("callerCallbackMode");
+          bridgeField("currentToolMessageId");
+          bridgeField("aiMessageId");
+          bridgeField("leafMessageId");
+        }
 
         // Wire emitPartialToolResult so long-running tools (e.g. ai-run) can
         // stream intermediate state (like a sub-thread ID) before completion.
@@ -727,14 +1272,14 @@ export class AiStreamRepository {
           threadResultThreadId,
           (payload) => {
             logger.debug(
-              "[WakeUp] Signal received - will yield at next step boundary",
+              "[WakeUp] Signal received - queued for live-stream injection",
               {
                 threadId: threadResultThreadId,
                 toolMessageId: payload.toolMessageId,
               },
             );
             capturedWakeUpPayloads.push(payload);
-            ctx.shouldYieldForWakeUp = true;
+            ctx.pendingWakeUpInjections.push(payload);
           },
         );
         ctx.onCleanup(unsubscribeWakeUp);
@@ -744,23 +1289,28 @@ export class AiStreamRepository {
           // Revival streams (wakeUp/wait acknowledgment) never compact: they are short
           // one-line responses confirming async task results. Compacting before "your
           // image is ready" is wasteful. The next user-initiated turn compacts if needed.
-          const compactingCheck =
-            await MessageContextBuilder.shouldTriggerCompacting({
-              threadId: threadResultThreadId,
-              currentUserMessageId: userMessageId,
-              currentUserContent: effectiveContent,
-              currentUserRole: effectiveRole,
-              currentUserMetadata: userMessageMetadata,
-              userId,
-              parentMessageId: effectiveParentMessageId,
-              isIncognito,
-              messageHistory: data.messageHistory ?? undefined,
-              systemPrompt,
-              tools,
-              model: data.model,
-              logger,
-              compactTrigger: effectiveCompactTrigger,
-            });
+          const compactingCheck = await shouldTriggerCompacting({
+            threadId: threadResultThreadId,
+            currentUserMessageId: userMessageId,
+            currentUserContent: effectiveContent,
+            currentUserRole: effectiveRole,
+            currentUserMetadata: userMessageMetadata,
+            userId,
+            parentMessageId: effectiveParentMessageId,
+            isIncognito,
+            messageHistory: data.messageHistory ?? undefined,
+            systemPrompt,
+            tools,
+            modelConfig,
+            timezone: data.timezone,
+            rootFolderId: data.rootFolderId,
+            locale,
+            logger,
+            compactTrigger: isRevival
+              ? Number.MAX_SAFE_INTEGER
+              : effectiveCompactTrigger,
+            streamContext: streamContext,
+          });
 
           logger.debug("[Compacting] Check result", {
             shouldCompact: compactingCheck.shouldCompact,
@@ -781,6 +1331,7 @@ export class AiStreamRepository {
           if (
             userMessageId &&
             data.operation !== "answer-as-ai" &&
+            toolConfirmationResults.length === 0 &&
             !compactingCheck.shouldCompact
           ) {
             InitialEventsHandler.emitUserMessage({
@@ -824,14 +1375,16 @@ export class AiStreamRepository {
               | undefined;
             {
               try {
-                const { MessageConverter } = await import("./context");
-                const preConvertedHistory =
-                  await MessageConverter.toAiSdkMessages(
-                    compactingCheck.branchMessages,
-                    logger,
-                    data.timezone,
-                    data.rootFolderId,
-                  );
+                const { toAiSdkMessages } = await import("./context/convert");
+                const preConvertedHistory = await toAiSdkMessages(
+                  compactingCheck.branchMessages,
+                  logger,
+                  data.timezone,
+                  data.rootFolderId,
+                  undefined,
+                  undefined,
+                  streamContext,
+                );
                 const gapFilledForCompacting = await GapFillExecutor.runGapFill(
                   {
                     messages: preConvertedHistory,
@@ -844,6 +1397,7 @@ export class AiStreamRepository {
                     logger,
                     user,
                     locale,
+                    streamContext: streamContext,
                   },
                 );
                 preFilledHistoryMessages = gapFilledForCompacting as Parameters<
@@ -891,6 +1445,7 @@ export class AiStreamRepository {
               compactingMessageCreatedAt,
               preFilledHistoryMessages,
               t: aiStreamT,
+              streamContext: streamContext,
             });
 
             // Check if compacting failed
@@ -906,14 +1461,12 @@ export class AiStreamRepository {
               return;
             }
 
-            // Refresh cortex context - messages[] has the full conversation
-            // that was just compacted, so embedding search reflects current topic.
+            // Refresh cortex context after compaction. The search reads this
+            // thread's stored message embeddings (written at write time) — no
+            // query is built or embedded here.
             try {
-              const { buildEmbeddingQuery } =
-                await import("../../cortex/system-prompt");
               const refreshedPrompt = await buildSystemPrompt({
                 ...systemPromptParams,
-                lastUserMessage: buildEmbeddingQuery(messages),
                 voiceTranscription: null,
               });
               trailingSystemMessage = refreshedPrompt.trailingSystemMessage;
@@ -934,24 +1487,24 @@ export class AiStreamRepository {
             }
 
             // Rebuild message history with compacted version
-            const rebuiltHistory =
-              await MessageContextBuilder.rebuildWithCompactedHistory({
-                compactedSummary: compactingResult.compactedSummary,
-                compactingMessageId: compactingResult.compactingMessageId,
-                currentUserMessage: compactingCheck.currentUserMessage,
-                threadId: threadResultThreadId,
-                isIncognito,
-                messageHistory: data.messageHistory ?? undefined,
-                logger,
-                upcomingAssistantMessageId: aiMessageId,
-                upcomingAssistantMessageCreatedAt: new Date(),
-                model: data.model,
-                skill: data.skill,
-                timezone: data.timezone,
-                rootFolderId: data.rootFolderId,
-                trailingSystemMessage,
-                locale,
-              });
+            const rebuiltHistory = await rebuildWithCompactedHistory({
+              compactedSummary: compactingResult.compactedSummary,
+              compactingMessageId: compactingResult.compactingMessageId,
+              currentUserMessage: compactingCheck.currentUserMessage,
+              threadId: threadResultThreadId,
+              isIncognito,
+              messageHistory: data.messageHistory ?? undefined,
+              logger,
+              upcomingAssistantMessageId: aiMessageId,
+              upcomingAssistantMessageCreatedAt: new Date(),
+              model: data.model,
+              skill: data.skill,
+              timezone: data.timezone,
+              rootFolderId: data.rootFolderId,
+              trailingSystemMessage,
+              locale,
+              streamContext: streamContext,
+            });
 
             // Check if rebuilding failed
             if (!rebuiltHistory) {
@@ -996,7 +1549,7 @@ export class AiStreamRepository {
           // Hard-truncate safety net: drop oldest non-system messages if we are
           // still over the model's context window (e.g. compacting wasn't enough,
           // or a single message is enormous).
-          const truncated = MessageContextBuilder.truncateToContextWindow(
+          const truncated = truncateToContextWindow(
             messages,
             compactingCheck.modelContextWindow,
             logger,
@@ -1013,7 +1566,7 @@ export class AiStreamRepository {
           if (threadResultThreadId) {
             ctx.dbWriter.emitStreamingStateChanged({
               threadId: threadResultThreadId,
-              state: "streaming",
+              state: ThreadStreamingState.STREAMING,
             });
           }
 
@@ -1038,110 +1591,58 @@ export class AiStreamRepository {
               logger,
               user,
               locale,
+              streamContext: streamContext,
             });
             messages.length = 0;
             messages.push(...gapFilledMessages);
           }
 
-          logger.debug(
-            "[AI Stream] Calling StreamExecutionHandler.executeStream",
-            {
-              messageCount: messages.length,
-              hasTools: !!tools,
-              modelId: data.model,
-            },
-          );
+          logger.debug("[AI Stream] Starting StreamLoop", {
+            messageCount: messages.length,
+            hasTools: !!tools,
+            modelId: data.model,
+          });
 
-          // Execute main AI stream - UNBOTTLED models bypass local AI SDK
-          // and relay through unbottled.ai cloud instead.
-          if (modelConfig.apiProvider === ApiProvider.UNBOTTLED) {
-            const { executeUnbottledStream } =
-              await import("./handlers/unbottled-stream-handler");
-            const { parseUnbottledCredentials, agentEnv } =
-              await import("@/app/api/[locale]/agent/env");
-            const unbottledSession = parseUnbottledCredentials(
-              agentEnv.UNBOTTLED_CLOUD_CREDENTIALS,
-            );
-            if (!unbottledSession) {
-              ctx.dbWriter.emitError(
-                fail({
-                  message: aiStreamT("route.errors.streamCreationFailed"),
-                  errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                }),
-                ctx.lastParentId,
-              );
-            } else {
-              await executeUnbottledStream({
-                session: unbottledSession,
-                modelConfig,
-                content: effectiveContent,
-                threadId: threadResultThreadId,
-                aiMessageId,
-                userMessageId: userMessageId ?? "",
-                parentMessageId: effectiveParentMessageId || null,
-                model: data.model,
-                skill: data.skill,
-                sequenceId: sequenceIdOverride ?? crypto.randomUUID(),
-                userId,
-                user,
-                isIncognito,
-                streamAbortController,
-                logger,
-                timezone: data.timezone,
-                locale,
-                t: aiStreamT,
-                dbWriter: ctx.dbWriter,
-                wsEmit,
-                streamContext,
-              });
-              // Capture dbWriter state for headless callers
-              if (ctx.dbWriter.lastAssistantMessageId) {
-                capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
-              }
-              capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
-              capturedLastGeneratedMediaUrl =
-                ctx.dbWriter.lastGeneratedMediaUrl;
-              capturedTotalCreditsDeducted += ctx.dbWriter.totalCreditsDeducted;
-            }
-          } else {
-            await StreamExecutionHandler.executeStream({
-              provider,
-              modelConfig,
-              messages,
-              streamAbortController,
-              systemPrompt,
-              trailingSystemMessage,
-              tools,
-              toolsConfig,
-              activeToolNames,
-              ctx,
-              threadId: threadResultThreadId,
+          await new StreamLoop({
+            provider,
+            modelConfig,
+            messages,
+            streamAbortController,
+            systemPrompt,
+            trailingSystemMessage,
+            tools,
+            toolsConfig,
+            activeToolNames,
+            ctx,
+            threadId: threadResultThreadId,
+            model: data.model,
+            skill: data.skill,
+            isIncognito,
+            userId,
+            emittedToolResultIds,
+            ttsHandler,
+            user,
+            locale,
+            logger,
+            t: aiStreamT,
+            streamContext,
+            maxToolCalls,
+            imageSize: data.imageSize ?? undefined,
+            imageQuality: data.imageQuality ?? undefined,
+            musicDuration: data.musicDuration ?? undefined,
+            systemPromptParams,
+            midStreamCompactingThreshold: tools ? effectiveCompactTrigger : 0,
+            midStreamCompactingParams: {
               model: data.model,
               skill: data.skill,
+              threadId: threadResultThreadId,
               isIncognito,
               userId,
               user,
-              locale,
-              logger,
+              providerModel: provider.chat(modelConfig.providerModel),
               t: aiStreamT,
-              streamContext,
-              imageSize: data.imageSize ?? undefined,
-              imageQuality: data.imageQuality ?? undefined,
-              musicDuration: data.musicDuration ?? undefined,
-              systemPromptParams,
-              midStreamCompactingThreshold: tools ? effectiveCompactTrigger : 0,
-              midStreamCompactingParams: {
-                model: data.model,
-                skill: data.skill,
-                threadId: threadResultThreadId,
-                isIncognito,
-                userId,
-                user,
-                providerModel: provider.chat(modelConfig.providerModel),
-                t: aiStreamT,
-              },
-            });
-          }
+            },
+          }).run();
 
           // After stream completes, capture the last assistant message ID from the writer.
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
@@ -1152,14 +1653,25 @@ export class AiStreamRepository {
             capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
             capturedLastGeneratedMediaUrl = ctx.dbWriter.lastGeneratedMediaUrl;
             capturedTotalCreditsDeducted = ctx.dbWriter.totalCreditsDeducted;
-          } else if (headless) {
-            // No assistant message was written - stream may have errored before first emit.
-            // capturedLastAiMessageId falls back to the pre-generated aiMessageId UUID,
-            // which may have no content in DB. Log a warning so callers can detect this.
+          } else if (awaitResult) {
+            // No assistant message was written - the stream errored before the
+            // first emit. The pre-generated aiMessageId never reached the DB,
+            // and callers chain follow-up messages off lastAiMessageId - a
+            // phantom id would force the parent-not-committed fallback on the
+            // next message. Resolve to the thread's newest committed message.
+            const lastCommitted =
+              await findLatestThreadMessage(threadResultThreadId);
+            if (lastCommitted) {
+              capturedLastAiMessageId = lastCommitted.id;
+            }
             logger.warn(
               "[AI Stream] Headless stream completed with no assistant message written - " +
-                "lastAiMessageId falls back to pre-generated ID, content may be absent",
-              { aiMessageId, threadId: threadResultThreadId },
+                "lastAiMessageId resolved to the thread's newest committed message",
+              {
+                aiMessageId,
+                resolvedLastAiMessageId: lastCommitted?.id ?? null,
+                threadId: threadResultThreadId,
+              },
             );
           }
         } catch (error) {
@@ -1193,53 +1705,122 @@ export class AiStreamRepository {
         }
       };
 
-      if (headless) {
-        // Headless path: must await to capture result
-        try {
-          await runStream();
-        } finally {
-          const clearResult = await clearStreamingState(
+      // ─── Shared post-stream finalization (headless AND interactive) ───────
+      // Order matters: cancel the pending timer → clearStreamingState (must run
+      // BEFORE stream-finished so a streaming-state-changed:waiting reaches
+      // clients first) → stream-finished fan-out → wakeUp revival batch (the
+      // dead-stream fallback for payloads prepareStep didn't inject) → queue
+      // processing. Queue draining runs for EVERY turn regardless of how it was
+      // invoked — processNextQueuedMessage is a no-op when nothing is queued, so
+      // a message queued against an ai-run/revival thread is never dropped.
+      const finalizeStream = async (): Promise<void> => {
+        // Cancel any pending stream timeout timer (e.g. wakeUp mode where AI
+        // writes a "task fired" response and the loop ends naturally before the
+        // 90s escalation timeout fires). Without this, the timer would fire
+        // after the stream has already ended and interfere with the revival.
+        streamContext.cancelPendingStreamTimer?.();
+
+        // Skip wakeUp revival if the stream was cancelled by the user; also
+        // filter out payloads intercepted by await-task or already delivered
+        // inline by the prepareStep injection (both mark suppressed).
+        const wasAborted = streamAbortController.signal.aborted;
+        const suppressed = streamContext.suppressedWakeUpToolMessageIds;
+        const pendingWakeUps = suppressed
+          ? capturedWakeUpPayloads.filter(
+              (p) => !suppressed.has(p.toolMessageId),
+            )
+          : capturedWakeUpPayloads;
+
+        const clearResult = await clearStreamingState(
+          threadResultThreadId,
+          logger,
+          user,
+          streamContext.streamRunId,
+        );
+        // Emit STREAM_FINISHED with finalState so the client knows whether to
+        // show the stop button (waiting) or go idle after the stream ends.
+        // Superseded = a newer stream owns the claim; it emits its own events.
+        if (!clearResult.superseded) {
+          await emitStreamFinished({
+            threadId: threadResultThreadId,
+            state: clearResult.state,
+            updatedAt: clearResult.updatedAt,
+            rootFolderId: data.rootFolderId,
+            logger,
+            user,
+            resolvedRelayContext,
+          });
+        }
+
+        // wakeUp revival: insert deferred (single stream = no race) then revive.
+        // Superseded claim = a newer stream is live on this thread — inserting
+        // a deferred at its moving leaf or starting a queued turn now would
+        // recreate the concurrent-stream race; the owner handles its own queue.
+        if (pendingWakeUps.length > 0 && clearResult.superseded) {
+          logger.warn(
+            "[WakeUp] Skipping revival batch - streaming claim superseded by a newer stream",
+            {
+              threadId: threadResultThreadId,
+              pendingWakeUps: pendingWakeUps.length,
+            },
+          );
+        } else if (pendingWakeUps.length > 0 && !wasAborted) {
+          await handleWakeUpRevivalBatch({
+            payloads: pendingWakeUps,
+            threadId: threadResultThreadId,
+            rootFolderId: data.rootFolderId,
+            subAgentDepth,
+            user,
+            locale,
+            logger,
+            aiStreamT,
+            abortSignal: streamAbortController.signal,
+          });
+        } else if (pendingWakeUps.length > 0) {
+          logger.debug("[WakeUp] Skipping revival - stream was aborted", {
+            threadId: threadResultThreadId,
+            pendingWakeUps: pendingWakeUps.length,
+          });
+        }
+
+        // On abort/cancel: clear the in-memory queue so orphaned QueueRegistry
+        // entries don't leak. The DB messages remain (isQueued=true) and will
+        // be picked up by processNextQueuedMessage on the next stream attempt.
+        if (wasAborted) {
+          QueueRegistry.clear(threadResultThreadId);
+        }
+
+        // Queue processing: if the stream completed naturally, check for
+        // queued messages. Skip if prepareStep already injected one
+        // mid-stream (a new stream would double-process it), or if a newer
+        // stream superseded this one's claim (the owner drains the queue).
+        if (!wasAborted && !capturedQueueInjected && !clearResult.superseded) {
+          const { processNextQueuedMessage } = await import("./intake/queue");
+          await processNextQueuedMessage(
             threadResultThreadId,
             logger,
             user,
-            capturedLastAiMessageContent,
-          );
-          // Emit stream-finished so clients subscribed to the sub-thread channel
-          // (e.g. EmbeddedMessagesView after page refresh) get the "done" signal.
-          wsEmit.setStreamPreview({
-            preview: clearResult.preview,
-            updatedAt: clearResult.updatedAt,
+            locale,
+            aiStreamT,
+            data.rootFolderId,
+            subAgentDepth,
+          ).catch((err: Error) => {
+            logger.error("[Queue] Failed to process queued message", {
+              error: err.message,
+              cause: err.cause instanceof Error ? err.cause.message : undefined,
+              threadId: threadResultThreadId,
+            });
           });
-          wsEmit("stream-finished", {
-            streamingState: clearResult.state,
-          });
-          // wakeUp revival: insert deferred (single stream = no race) then revive.
-          // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
-          // Also filter out payloads intercepted by await-task (delivered inline).
-          const headlessSuppressed =
-            streamContext.suppressedWakeUpToolMessageIds;
-          const headlessPendingWakeUps = headlessSuppressed
-            ? capturedWakeUpPayloads.filter(
-                (p) => !headlessSuppressed.has(p.toolMessageId),
-              )
-            : capturedWakeUpPayloads;
-          if (
-            headlessPendingWakeUps.length > 0 &&
-            !streamAbortController.signal.aborted
-          ) {
-            await handleWakeUpRevivalBatch(headlessPendingWakeUps);
-          } else if (
-            headlessPendingWakeUps.length > 0 &&
-            streamAbortController.signal.aborted
-          ) {
-            logger.debug(
-              "[WakeUp] Headless: skipping revival - stream was aborted",
-              {
-                threadId: threadResultThreadId,
-                pendingWakeUps: headlessPendingWakeUps.length,
-              },
-            );
-          }
+        }
+      };
+
+      if (awaitResult) {
+        // Headless path: await the full loop AND finalization — the caller
+        // (relay receiver, cron, ai-run) treats the return as "thread settled".
+        try {
+          await runStream();
+        } finally {
+          await finalizeStream();
         }
 
         logger.debug("[AI Stream] Headless execution complete", {
@@ -1260,12 +1841,9 @@ export class AiStreamRepository {
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }
 
-      // Interactive path: fire-and-forget - stream runs independently of HTTP connection.
-      // Events flow via WebSocket. The POST returns immediately with threadId.
-      // The finally block guarantees isStreaming is cleared even on unhandled crashes.
-      let streamFinishReason: "completed" | "cancelled" | "error" | "timeout" =
-        "completed";
-
+      // Interactive path: fire-and-forget - stream runs independently of HTTP
+      // connection. Events flow via WebSocket; the POST returns immediately
+      // with threadId. The finally guarantees finalization even on crashes.
       void runStream()
         .catch((error) => {
           const msg = error instanceof Error ? error.message : String(error);
@@ -1273,126 +1851,24 @@ export class AiStreamRepository {
             error: msg,
             threadId: threadResultThreadId,
           });
-          streamFinishReason = msg.includes("timeout")
-            ? "timeout"
-            : msg.includes("cancel")
-              ? "cancelled"
-              : "error";
         })
         .finally(() => {
-          // Cancel any pending stream timeout timer (e.g. wakeUp mode where AI
-          // writes a "task fired" response and the loop ends naturally before the
-          // 90s escalation timeout fires). Without this, the timer would fire after
-          // the stream has already ended, potentially interfering with the revival.
-          streamContext.cancelPendingStreamTimer?.();
-
-          // Determine finish reason: if AbortErrorHandler handled it gracefully
-          // (runStream resolved instead of rejecting), check the abort signal.
-          if (
-            streamFinishReason === "completed" &&
-            streamAbortController.signal.aborted
-          ) {
-            const reason = streamAbortController.signal.reason;
-            const reasonMsg =
-              reason instanceof Error ? reason.message : String(reason ?? "");
-            streamFinishReason = reasonMsg.includes("timeout")
-              ? "timeout"
-              : "cancelled";
-          }
-
-          // Skip wakeUp revival if the stream was cancelled by the user.
-          // A wakeUp signal may have arrived mid-stream but the user aborted - don't revive.
-          // Also filter out payloads intercepted by await-task (delivered inline).
-          const wasAborted = streamAbortController.signal.aborted;
-          const suppressed = streamContext.suppressedWakeUpToolMessageIds;
-          const pendingWakeUps = suppressed
-            ? capturedWakeUpPayloads.filter(
-                (p) => !suppressed.has(p.toolMessageId),
-              )
-            : capturedWakeUpPayloads;
-          const shouldReviveWakeUp = pendingWakeUps.length > 0 && !wasAborted;
-
-          // clearStreamingState must run BEFORE STREAM_FINISHED is emitted so that
-          // if it emits streaming-state-changed:waiting, clients receive it first.
-          void clearStreamingState(
-            threadResultThreadId,
-            logger,
-            user,
-            capturedLastAiMessageContent,
-          )
-            .then(async (result) => {
-              // Emit STREAM_FINISHED with finalState so the client knows whether
-              // to show the stop button (waiting) or go idle after stream ends.
-              wsEmit.setStreamPreview({
-                preview: result.preview,
-                updatedAt: result.updatedAt,
-              });
-              wsEmit("stream-finished", {
-                streamingState: result.state,
-              });
-
-              // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
-              // message now (stream is done, single-inserter guarantee holds) then fire revival.
-              if (shouldReviveWakeUp) {
-                return handleWakeUpRevivalBatch(pendingWakeUps);
-              }
-              if (pendingWakeUps.length > 0) {
-                logger.debug(
-                  "[WakeUp] Skipping revival - stream was aborted by user",
-                  {
-                    threadId: threadResultThreadId,
-                    pendingWakeUps: pendingWakeUps.length,
-                  },
-                );
-              }
-
-              // On abort/cancel: clear the in-memory queue so orphaned QueueRegistry
-              // entries don't leak. The DB messages remain (isQueued=true) and will
-              // be picked up by processNextQueuedMessage on the next stream attempt.
-              if (wasAborted) {
-                QueueRegistry.clear(threadResultThreadId);
-              }
-
-              // Queue processing: if stream completed naturally (not aborted)
-              // and no wakeUp revival, check for queued messages.
-              // Skip if prepareStep already injected a queued message mid-stream
-              // (the AI already processed it — starting a new stream would double-process).
-              if (!wasAborted && !capturedQueueInjected) {
-                const { processNextQueuedMessage } =
-                  await import("./core/queue-processor");
-                await processNextQueuedMessage(
-                  threadResultThreadId,
-                  logger,
-                  user,
-                  locale,
-                  aiStreamT,
-                  data.rootFolderId,
-                  subAgentDepth,
-                ).catch((err: Error) => {
-                  logger.error("[Queue] Failed to process queued message", {
-                    error: err.message,
-                    cause:
-                      err.cause instanceof Error
-                        ? err.cause.message
-                        : undefined,
-                    threadId: threadResultThreadId,
-                  });
-                });
-              }
-
-              return Promise.resolve();
-            })
-            .catch((err) => {
-              logger.error("[AI Stream] Failed to clear streaming state", {
-                error: err instanceof Error ? err.message : String(err),
-                threadId: threadResultThreadId,
-              });
-              // Still emit STREAM_FINISHED so the client doesn't stay stuck in
-              // streaming/aborting state if the DB update failed.
-              wsEmit("stream-finished", {
-                streamingState: "idle",
-              });
+          void finalizeStream().catch(async (err) => {
+            logger.error("[AI Stream] Stream finalization failed", {
+              error: err instanceof Error ? err.message : String(err),
+              threadId: threadResultThreadId,
             });
+            // Still emit STREAM_FINISHED so the client doesn't stay stuck in
+            // streaming/aborting state if the DB update failed.
+            await emitStreamFinished({
+              threadId: threadResultThreadId,
+              state: ThreadStreamingState.IDLE,
+              updatedAt: new Date(),
+              rootFolderId: data.rootFolderId,
+              logger,
+              user,
+            });
+          });
         });
 
       logger.debug("[AI Stream] Interactive stream started (fire-and-forget)", {
@@ -1422,7 +1898,7 @@ export class AiStreamRepository {
           threadResultThreadId,
           logger,
           user,
-          capturedLastAiMessageContent,
+          streamContext.streamRunId,
         ).catch((err) => {
           logger.error(
             "[AI Stream] Failed to clear streaming state in outer catch",
@@ -1437,70 +1913,23 @@ export class AiStreamRepository {
       // Emit error to thread so the user always sees what went wrong.
       // Chain as child of the last written message so it never creates a sibling branch.
       const errorThreadId = threadResultThreadId ?? data.threadId;
-      if (errorThreadId) {
-        try {
-          const errorMessageId = crypto.randomUUID();
-          const errorContent = aiStreamT("route.errors.streamCreationFailed");
-          // Chain error as child of the last message written during the stream (assistant/tool/user).
-          // Falls back to data.parentMessageId if the stream never wrote anything.
-          const errorParentId =
-            capturedLastAiMessageId !== aiMessageId
-              ? capturedLastAiMessageId
-              : data.parentMessageId || null;
-          // Persist to DB for non-incognito threads (incognito has no DB row - WS event persists client-side).
-          if (!isIncognito && userId) {
-            await MessagesRepository.createErrorMessage({
-              messageId: errorMessageId,
-              threadId: errorThreadId,
-              content: errorContent,
-              errorType: StreamErrorType.STREAM_ERROR,
-              parentId: errorParentId,
-              user,
-              sequenceId: null,
-              logger,
-            });
-          }
-          // Always emit via WS so every client (incognito or not) sees the error.
-          const outerErrorEmit = createMessagesEmitter(
-            errorThreadId,
-            data.rootFolderId,
-            logger,
-            user,
-          );
-          outerErrorEmit("message-created", {
-            messages: [
-              {
-                id: errorMessageId,
-                threadId: errorThreadId,
-                role: ChatMessageRole.ERROR,
-                content: errorContent,
-                parentId: errorParentId,
-                sequenceId: null,
-                model: null,
-                skill: null,
-                metadata: {},
-                isAI: false,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                authorId: userId ?? null,
-                authorName: null,
-                errorType: StreamErrorType.STREAM_ERROR,
-                errorCode: null,
-                errorMessage: null,
-                upvotes: 0,
-                downvotes: 0,
-                searchVector: null,
-              },
-            ],
-            streamingState: "idle",
-          });
-        } catch (emitErr) {
-          logger.warn("[AiStream] Failed to emit stream error to thread", {
-            threadId: errorThreadId,
-            error: emitErr instanceof Error ? emitErr.message : String(emitErr),
-          });
-        }
-      }
+      // Chain error as child of the last message written during the stream
+      // (assistant/tool/user). Falls back to data.parentMessageId if the stream
+      // never wrote anything.
+      const errorParentId =
+        capturedLastAiMessageId !== aiMessageId
+          ? capturedLastAiMessageId
+          : data.parentMessageId || null;
+      await emitStreamCreationError({
+        errorThreadId,
+        errorParentId,
+        data,
+        user,
+        userId,
+        isIncognito,
+        aiStreamT,
+        logger,
+      });
 
       return fail({
         message: aiStreamT("route.errors.streamCreationFailed"),

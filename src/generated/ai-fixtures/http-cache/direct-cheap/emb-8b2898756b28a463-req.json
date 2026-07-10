@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T6c#3 wakeUp-repeat] Call execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/cb-wakeup-stress-test', 'content':'wakeup-stress-test-payload'}, callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no responsePath yet → end with STEP_OK; OR (b) INLINE - a fast task returns the result immediately (a non-empty responsePath) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor a responsePath. If you got a taskId (deferred), you will be revived when the write is done - on revival confirm the deferred result contains a non-empty responsePath and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no responsePath appears.",
+    "encoding_format": "float"
+  }
+}

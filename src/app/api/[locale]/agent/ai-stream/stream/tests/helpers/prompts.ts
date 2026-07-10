@@ -21,10 +21,10 @@ import type { ModeConfig } from "./config";
  */
 export function toolInstr(cfg: ModeConfig, toolName: string): string {
   if (cfg.remoteInstanceId) {
-    // instanceId is load-bearing for this test cell (tools must run on the
+    // instanceId is load-bearing for this test cell (this tool must run on the
     // REMOTE instance) — spell out the requirement so a live model never
     // silently drops it and runs the tool locally.
-    return `execute-tool with toolName='${toolName}' and instanceId='${cfg.remoteInstanceId}' (instanceId='${cfg.remoteInstanceId}' is REQUIRED on every execute-tool call - never omit it)`;
+    return `execute-tool with toolName='${toolName}' and instanceId='${cfg.remoteInstanceId}' (instanceId='${cfg.remoteInstanceId}' is REQUIRED on this call - never omit it)`;
   }
   return `the ${toolName} tool`;
 }
@@ -85,6 +85,48 @@ export function toolInstrWithArgs(
 }
 
 /**
+ * Strip model reasoning (<think>…</think>) so verdict parsing never reads a
+ * marker the model merely CONTEMPLATED ("I'll answer STEP_OK if…") mid-thought
+ * instead of its actual final verdict.
+ */
+export function stripReasoning(content: string): string {
+  let c = content.replace(/<think>[\s\S]*?<\/think>/g, "");
+  // An unclosed <think> means everything after it is unfinished reasoning —
+  // drop it so a marker the model was still contemplating never counts.
+  const openIdx = c.indexOf("<think>");
+  if (openIdx !== -1) {
+    c = c.slice(0, openIdx);
+  }
+  return c.trim();
+}
+
+/**
+ * Parse the AI's FINAL verdict from a self-report reply.
+ *
+ * The contract: the reply ENDS WITH its verdict — STEP_OK (all good) or
+ * `FAILED: …` (something off) on the final line. We read ONLY the LAST
+ * non-empty line of the visible answer (reasoning stripped): a model routinely
+ * writes "I'll end with STEP_OK unless something is wrong" mid-answer and then
+ * concludes "FAILED: …" on the last line, so matching anywhere would wrongly
+ * pass. FAILED on the last line (or no STEP_OK on it) is a fail.
+ */
+export function parseFinalVerdict(content: string): {
+  ok: boolean;
+  failedText: string | null;
+} {
+  const visible = stripReasoning(content);
+  const lines = visible
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+  const lastLine = lines[lines.length - 1] ?? "";
+  if (lastLine.includes("FAILED")) {
+    return { ok: false, failedText: lastLine };
+  }
+  return { ok: lastLine.includes("STEP_OK"), failedText: null };
+}
+
+/**
  * Assert step completed without the AI reporting issues.
  * Parses the AI's FINAL verdict (reasoning stripped, last token wins): STEP_OK
  * passes only when it is the last verdict and no trailing FAILED follows. A
@@ -99,8 +141,9 @@ export function assertStepOk(
     // oxlint-disable-next-line restricted-syntax
     throw new Error(`[${stepName}] AI returned empty content`);
   }
+  const verdict = parseFinalVerdict(content);
   expect(
-    content.includes("STEP_OK"),
-    `[${stepName}] AI did NOT confirm STEP_OK - reported issues instead:\n\n${content}`,
+    verdict.ok,
+    `[${stepName}] AI did NOT confirm STEP_OK as its final verdict - reported issues instead:\n\n${verdict.failedText ?? stripReasoning(content)}`,
   ).toBe(true);
 }

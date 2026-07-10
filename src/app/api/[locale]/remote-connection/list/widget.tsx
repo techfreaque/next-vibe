@@ -59,6 +59,55 @@ import { envClient } from "@/config/env-client";
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
 
+// ─── Health indicator ─────────────────────────────────────────────────────────
+
+type HealthStatus = "healthy" | "warning" | "critical" | "disconnected";
+
+function HealthDot({ health }: { health: HealthStatus }): JSX.Element {
+  if (health === "healthy") {
+    return <Activity className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />;
+  }
+  if (health === "warning") {
+    return (
+      <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+    );
+  }
+  if (health === "critical") {
+    return <AlertCircle className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />;
+  }
+  return (
+    <WifiOff className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+  );
+}
+
+function healthLabel(
+  health: HealthStatus,
+  transportMode: string | null | undefined,
+  isReverseEntry: boolean,
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>,
+): string {
+  if (health === "disconnected") {
+    return t("widget.health.disconnected");
+  }
+  if (health === "healthy") {
+    if (isReverseEntry) {
+      return t("widget.health.incomingActive");
+    }
+    return transportMode === "reverse-ws"
+      ? t("widget.health.tunnelOpen")
+      : t("widget.health.bridgeActive");
+  }
+  if (health === "warning") {
+    return transportMode === "reverse-ws"
+      ? t("widget.health.tunnelWarning")
+      : t("widget.health.bridgeWarning");
+  }
+  // critical
+  return transportMode === "reverse-ws"
+    ? t("widget.health.tunnelLost")
+    : t("widget.health.bridgeFailed");
+}
+
 // ─── Shared action buttons ────────────────────────────────────────────────────
 
 function AddConnectionButton({
@@ -101,24 +150,57 @@ function AddConnectionButton({
   );
 }
 
-function ViewButton({
+function ReconnectButton({
   conn,
   t,
 }: {
   conn: RemoteConnection;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
-}): JSX.Element {
+}): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(false);
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
+
+  // Incoming entries and healthy connections don't need a reconnect button
+  if (conn.isReverseEntry || conn.healthStatus === "healthy") {
+    return null;
+  }
+
+  const label =
+    conn.healthStatus === "disconnected"
+      ? t("widget.reconnectButton.reconnect")
+      : conn.healthStatus === "critical"
+        ? t("widget.reconnectButton.retry")
+        : t("widget.reconnectButton.resync");
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
     setIsLoading(true);
     try {
       const defs = await import("../[instanceId]/definition");
-      navigate(defs.default.GET, {
-        urlPathParams: { instanceId: conn.instanceId },
-      });
+      await apiClient.mutate(
+        defs.default.PATCH,
+        logger,
+        user,
+        {
+          reconnectNow: true,
+          // The list row carries no stored syncScope; the reconnect only
+          // re-establishes transport, so pass the sensible full default. The
+          // server keeps the persisted scope for anything not overridden.
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
+        },
+        { instanceId: conn.instanceId },
+        locale,
+        availability,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +209,7 @@ function ViewButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={conn.healthStatus === "disconnected" ? "outline" : "destructive"}
       size="sm"
       onClick={handleClick}
       disabled={isLoading}
@@ -136,9 +218,9 @@ function ViewButton({
       {isLoading ? (
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
       ) : (
-        <Eye className="h-3.5 w-3.5" />
+        <RefreshCw className="h-3.5 w-3.5" />
       )}
-      {t("widget.viewButton")}
+      {label}
     </Button>
   );
 }
@@ -288,16 +370,8 @@ function ConnectionRow({
   isPickerMode: boolean;
 }): JSX.Element {
   const isSelf = !conn.hasToken && conn.remoteUrl === "";
-  const badge = conn.hasToken
-    ? t("widget.connectedBadge")
-    : isSelf
-      ? t("widget.selfBadge")
-      : t("widget.registeredBadge");
-  const badgeVariant = conn.hasToken
-    ? "default"
-    : isSelf
-      ? "secondary"
-      : "outline";
+  const health = conn.healthStatus;
+  const isIncoming = conn.isReverseEntry;
 
   const handleRowClick =
     isPickerMode && onPick
@@ -311,46 +385,106 @@ function ConnectionRow({
           })();
         };
 
+  const transportLabel =
+    conn.hasToken && !isIncoming
+      ? conn.isActive
+        ? null // shown via health status
+        : null
+      : null;
+
+  const statusText = isSelf
+    ? t("widget.selfBadge")
+    : !conn.hasToken
+      ? t("widget.registeredBadge")
+      : healthLabel(health, conn.transportMode, isIncoming, t);
+
   return (
     <Div
-      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 cursor-pointer"
+      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 cursor-pointer transition-colors"
       onClick={handleRowClick}
     >
-      <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+      {/* Health / type indicator */}
+      {isSelf ? (
+        <Link2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+      ) : !conn.hasToken ? (
+        <Link2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+      ) : (
+        <HealthDot health={health} />
+      )}
+
       <Div className="flex flex-col min-w-0 flex-1">
-        <Div className="flex items-center gap-2">
+        <Div className="flex items-center gap-2 flex-wrap">
           <Span className="text-sm font-medium">{conn.instanceId}</Span>
-          <Badge variant={badgeVariant} className="text-[10px]">
-            {badge}
-          </Badge>
-          {conn.isReverseEntry && (
+          {isSelf && (
+            <Badge variant="secondary" className="text-[10px]">
+              {t("widget.selfBadge")}
+            </Badge>
+          )}
+          {isIncoming && (
             <Badge variant="outline" className="text-[10px]">
               {t("widget.incomingBadge")}
             </Badge>
           )}
-          {!conn.isActive && (
-            <Badge variant="destructive" className="text-[10px]">
-              {t("widget.inactiveBadge")}
+          {conn.isInferenceProvider && (
+            <Badge variant="outline" className="text-[10px]">
+              {t("widget.inferenceProviderBadge")}
+            </Badge>
+          )}
+          {!isSelf && conn.hasToken && conn.transportMode && (
+            <Badge variant="outline" className="text-[10px]">
+              {t("widget.transportBadge", {
+                out:
+                  conn.transportMode === "reverse-ws"
+                    ? t("widget.transport.reverseWs")
+                    : t("widget.transport.directHttp"),
+                in:
+                  conn.remoteTransportMode === "reverse-ws"
+                    ? t("widget.transport.reverseWs")
+                    : t("widget.transport.directHttp"),
+              })}
             </Badge>
           )}
         </Div>
-        <Span className="text-xs text-muted-foreground font-mono truncate">
-          {conn.remoteUrl || conn.localUrl || "—"}
-        </Span>
-        {conn.lastSyncedAt && (
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.lastSynced")}:{" "}
-            {new Date(conn.lastSyncedAt).toLocaleString()}
-          </Span>
-        )}
+
+        <Div className="flex items-center gap-2 mt-0.5">
+          {!isSelf && conn.hasToken && (
+            <Span
+              className={`text-xs ${
+                health === "healthy"
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : health === "warning"
+                    ? "text-amber-600 dark:text-amber-400"
+                    : health === "critical"
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-muted-foreground"
+              }`}
+            >
+              {statusText}
+            </Span>
+          )}
+          {!isSelf && (conn.remoteUrl || conn.localUrl) && (
+            <Span className="text-xs text-muted-foreground font-mono truncate">
+              {conn.remoteUrl || conn.localUrl}
+            </Span>
+          )}
+          {transportLabel}
+        </Div>
       </Div>
 
       {!isPickerMode && (
         <Div className="flex items-center gap-1 flex-shrink-0">
-          <ViewButton conn={conn} navigate={navigate} t={t} />
+          {!isSelf && conn.hasToken && !isIncoming && (
+            <ReconnectButton conn={conn} t={t} />
+          )}
           <EditButton conn={conn} navigate={navigate} t={t} />
-          <DisconnectButton conn={conn} navigate={navigate} t={t} />
+          {!isSelf && (
+            <DisconnectButton conn={conn} navigate={navigate} t={t} />
+          )}
         </Div>
+      )}
+
+      {isPickerMode && (
+        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       )}
     </Div>
   );
@@ -505,6 +639,12 @@ function LocalView({
   isPickerMode: boolean;
   isAdmin: boolean;
 }): JSX.Element {
+  const hasProblems = connections.some(
+    (c) =>
+      c.isActive &&
+      (c.healthStatus === "critical" || c.healthStatus === "warning"),
+  );
+
   return (
     <Div className="flex flex-col gap-0">
       {/* Connect to cloud pitch — admins only */}
@@ -571,7 +711,7 @@ function LocalView({
         </Card>
       )}
 
-      {/* Connection list */}
+      {/* Connection list header */}
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Link2 className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
@@ -579,6 +719,7 @@ function LocalView({
             ? t("widget.local.connectionsTitle")
             : t("widget.local.noConnectionsYet")}
         </Span>
+        {hasProblems && <AlertTriangle className="h-4 w-4 text-amber-500" />}
       </Div>
 
       {connections.length > 0 ? (

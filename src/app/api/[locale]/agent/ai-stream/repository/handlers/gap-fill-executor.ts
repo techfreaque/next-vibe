@@ -92,6 +92,40 @@ export class GapFillExecutor {
       streamContext: params.streamContext,
     };
 
+    // ── Deterministic fixture ordinals for the parallel fan-out ─────────────
+    // Every bridge call below fires inside Promise.all (kept for prod/dev
+    // throughput), so the ORDER in which their fetches hit the fixture engine
+    // is nondeterministic. We therefore enumerate the bridge jobs in a STABLE
+    // order (message index, then part index), reserve one fixture ordinal per
+    // job UP FRONT, and hand each racing call its own pinned ordinal via a
+    // cloned streamContext. No-op outside a fixture run (reserve returns []).
+    const bridgeKeys = GapFillExecutor.planBridgeKeys(messages, activeModel);
+    const reserved =
+      bridge.streamContext?.threadId && bridgeKeys.length > 0
+        ? await reserveFixtureOrdinals(
+            bridge.streamContext.threadId,
+            bridgeKeys.length,
+          )
+        : [];
+    const ordinalByKey = new Map<string, number>();
+    bridgeKeys.forEach((k, i) => {
+      const ord = reserved[i];
+      if (ord !== undefined) {
+        ordinalByKey.set(k, ord);
+      }
+    });
+    // Clone the shared bridge context, pinning the fixture ordinal for one call.
+    const pinBridge = (key: string): typeof bridge => {
+      const ord = ordinalByKey.get(key);
+      if (ord === undefined || !bridge.streamContext) {
+        return bridge;
+      }
+      return {
+        ...bridge,
+        streamContext: { ...bridge.streamContext, fixtureOrdinal: ord },
+      };
+    };
+
     // Build a lookup from messageId → ChatMessage for variant access
     const chatHistoryById = new Map<string, ChatMessage>(
       chatHistory.map((m) => [m.id, m]),
@@ -162,7 +196,7 @@ export class GapFillExecutor {
         // parallel. Each bridge call takes its pre-reserved ordinal via a
         // pinned context keyed by its STABLE (msgIndex:partIndex) coordinate.
         const newParts = await Promise.all(
-          parts.map(async (part) => {
+          parts.map(async (part, partIndex) => {
             if (part.type === "image") {
               if (activeModel.inputs.includes("image")) {
                 return part;
@@ -173,7 +207,7 @@ export class GapFillExecutor {
                 label: "image",
                 descriptor: "vision",
                 failDescriptor: "vision bridge",
-                bridge,
+                bridge: pinBridge(`p1:${msgIndex}:${partIndex}`),
               });
             }
 
@@ -194,7 +228,7 @@ export class GapFillExecutor {
                 label: modality,
                 descriptor: modality === "video" ? "vision" : "audio",
                 failDescriptor: modality === "video" ? "video vision" : "STT",
-                bridge,
+                bridge: pinBridge(`p1:${msgIndex}:${partIndex}`),
               });
             }
 
@@ -230,14 +264,36 @@ export class GapFillExecutor {
       }
     }
 
+    // Reserve Pass-2 ordinals in stable order (after all Pass-1 ordinals), same
+    // deterministic-parallel-fan-out treatment as Pass 1. Enumerate first so the
+    // reservation order matches the calls that actually fire.
+    const p2Keys = GapFillExecutor.planToolResultKeys(
+      updated,
+      activeModel,
+      MEDIA_TOOL_NAMES,
+    );
+    const p2Reserved =
+      bridge.streamContext?.threadId && p2Keys.length > 0
+        ? await reserveFixtureOrdinals(
+            bridge.streamContext.threadId,
+            p2Keys.length,
+          )
+        : [];
+    p2Keys.forEach((k, i) => {
+      const ord = p2Reserved[i];
+      if (ord !== undefined) {
+        ordinalByKey.set(k, ord);
+      }
+    });
+
     const updatedWithToolResults = await Promise.all(
-      updated.map(async (msg): Promise<ModelMessage> => {
+      updated.map(async (msg, msgIndex): Promise<ModelMessage> => {
         if (msg.role !== "tool" || !Array.isArray(msg.content)) {
           return msg;
         }
 
         const newContent = await Promise.all(
-          msg.content.map(async (part): Promise<typeof part> => {
+          msg.content.map(async (part, partIndex): Promise<typeof part> => {
             const p = part as ToolResultPart;
             if (p.type !== "tool-result") {
               return part;
@@ -318,7 +374,7 @@ export class GapFillExecutor {
               mediaUrl: fileUrl,
               modality,
               chatMessageId,
-              ...bridge,
+              ...pinBridge(`p2:${msgIndex}:${partIndex}`),
             });
 
             if (!description) {
@@ -373,5 +429,111 @@ export class GapFillExecutor {
         ? `[${args.label} attachment - system-injected ${args.descriptor} description (you cannot see the raw file)]:\n${variantText}`
         : `[${args.label} attachment: could not be processed - no ${args.failDescriptor} model configured. Inform the user they can add one in favorite settings.]`,
     };
+  }
+
+  /**
+   * Enumerate the Pass-1 attachment bridge jobs in STABLE order (message index,
+   * then part index), producing one `p1:<msgIndex>:<partIndex>` key per job.
+   * MUST mirror the exact conditions of the Pass-1 parallel map so the reserved
+   * fixture ordinals line up with the calls that actually fire.
+   */
+  private static planBridgeKeys(
+    messages: ModelMessage[],
+    activeModel: ChatModelOption,
+  ): string[] {
+    const keys: string[] = [];
+    messages.forEach((msg, msgIndex) => {
+      if (msg.role !== "user" || !Array.isArray(msg.content)) {
+        return;
+      }
+      msg.content.forEach((part, partIndex) => {
+        if (part.type === "image") {
+          if (!activeModel.inputs.includes("image")) {
+            keys.push(`p1:${msgIndex}:${partIndex}`);
+          }
+          return;
+        }
+        if (part.type === "file") {
+          const mime =
+            "mediaType" in part && typeof part.mediaType === "string"
+              ? part.mediaType
+              : "";
+          const modality: Modality = mime.startsWith("video/")
+            ? "video"
+            : "audio";
+          if (!activeModel.inputs.includes(modality)) {
+            keys.push(`p1:${msgIndex}:${partIndex}`);
+          }
+        }
+      });
+    });
+    return keys;
+  }
+
+  /**
+   * Enumerate the Pass-2 tool-result media bridge jobs in STABLE order. MUST
+   * mirror the exact firing conditions of the Pass-2 map (media tool, no
+   * existing text, a resolvable file URL, and a modality the active model
+   * cannot see) so the reserved ordinals line up with the calls that fire.
+   */
+  private static planToolResultKeys(
+    messages: ModelMessage[],
+    activeModel: ChatModelOption,
+    mediaToolNames: readonly string[],
+  ): string[] {
+    const keys: string[] = [];
+    messages.forEach((msg, msgIndex) => {
+      if (msg.role !== "tool" || !Array.isArray(msg.content)) {
+        return;
+      }
+      msg.content.forEach((part, partIndex) => {
+        const p = part as ToolResultPart;
+        if (p.type !== "tool-result" || !mediaToolNames.includes(p.toolName)) {
+          return;
+        }
+        interface MediaOutputValue {
+          file?: string;
+          imageUrl?: string;
+          videoUrl?: string;
+          audioUrl?: string;
+          text?: string | null;
+        }
+        interface MediaOutput {
+          value?: MediaOutputValue;
+        }
+        const v = (p.output as MediaOutput | undefined)?.value;
+        if (!v || typeof v !== "object") {
+          return;
+        }
+        const fileUrl =
+          typeof v.file === "string"
+            ? v.file
+            : typeof v.imageUrl === "string"
+              ? v.imageUrl
+              : typeof v.videoUrl === "string"
+                ? v.videoUrl
+                : typeof v.audioUrl === "string"
+                  ? v.audioUrl
+                  : undefined;
+        const existingText = typeof v.text === "string" ? v.text : null;
+        if (existingText && existingText.trim().length > 0) {
+          return;
+        }
+        if (!fileUrl) {
+          return;
+        }
+        const modality: Modality =
+          p.toolName === IMAGE_GEN_ALIAS
+            ? "image"
+            : p.toolName === VIDEO_GEN_TOOL_NAME
+              ? "video"
+              : "audio";
+        if (activeModel.inputs.includes(modality)) {
+          return;
+        }
+        keys.push(`p2:${msgIndex}:${partIndex}`);
+      });
+    });
+    return keys;
   }
 }

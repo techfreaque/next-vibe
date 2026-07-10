@@ -211,7 +211,7 @@ const { POST } = createEndpoint({
               label: "run.post.fields.preCalls.args.label",
               description: "run.post.fields.preCalls.args.description",
               columns: 6,
-              schema: z.record(z.string(), z.unknown()).default({}),
+              schema: z.record(z.string(), WidgetDataSchema).default({}),
             }),
           },
         }),

@@ -12,6 +12,7 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import {
+  CHAT_MESSAGE_COLUMNS,
   chatFolders,
   chatMessages,
   chatThreads,
@@ -87,7 +88,7 @@ export async function readThreadPath(
 
   // Fetch messages (most recent 100 for rendering)
   const messages = await db
-    .select()
+    .select(CHAT_MESSAGE_COLUMNS)
     .from(chatMessages)
     .where(eq(chatMessages.threadId, threadId))
     .orderBy(chatMessages.createdAt)

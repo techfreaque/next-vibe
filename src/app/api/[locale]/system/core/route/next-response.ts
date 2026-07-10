@@ -83,7 +83,7 @@ export function wrapErrorResponse(
 ): NextResponse<ErrorResponseType> {
   // Enrich validation errors with compact field-level details for external callers
   const compactDetails = formatValidationErrorCompact(
-    error.messageParams as Record<string, string | number> | undefined,
+    error.messageParams,
     endpoint,
   );
   if (compactDetails) {

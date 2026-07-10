@@ -285,7 +285,10 @@ const { GET } = createEndpoint({
             taskInput: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.task.taskInput",
-              schema: z.record(z.string(), z.unknown()).optional().default({}),
+              schema: z
+                .record(z.string(), WidgetDataSchema)
+                .optional()
+                .default({}),
             }),
             runOnce: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

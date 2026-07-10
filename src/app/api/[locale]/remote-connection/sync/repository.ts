@@ -261,20 +261,11 @@ export class TaskSyncRepository {
     }
 
     // ── 3. Build payloads for enabled domains only ────────────────────────────
-    // null syncScope = no allowlist configured → all domains enabled (open connection).
-    const syncScope = connRow?.syncScope;
-    const domainEnabled = (domain: string): boolean => {
-      if (!syncScope) {
-        return true;
-      }
-      return (
-        (domain === "memories" && !!syncScope.memories) ||
-        (domain === "documents" && !!syncScope.documents) ||
-        (domain === "skills" && !!syncScope.skills) ||
-        (domain === "favorites" && !!syncScope.favorites) ||
-        (domain === "threads" && !!syncScope.threads)
-      );
-    };
+    // null syncScope = no allowlist configured → all domains enabled (open
+    // connection). The scope is passed to buildSyncPayloads/applySyncPayloads,
+    // which gate each domain through the typed isSyncDomainEnabled helper — the
+    // serve + apply sides are the authoritative scope gates.
+    const syncScope = connRow?.syncScope ?? null;
 
     // ── 2b. Apply pushed payloads BEFORE serializing the response ────────────
     // Bidirectional push-pull in one round trip (sync/spec.md): the caller's
@@ -287,54 +278,53 @@ export class TaskSyncRepository {
           typeof data.pushPayloads === "string"
             ? pushedSchema.parse(JSON.parse(data.pushPayloads))
             : pushedSchema.parse(data.pushPayloads);
-        const scopedPushed: Record<string, string> = {};
-        for (const [domain, payload] of Object.entries(pushed)) {
-          if (domainEnabled(domain)) {
-            scopedPushed[domain] = payload;
-          }
-        }
-        if (Object.keys(scopedPushed).length > 0) {
-          const { applySyncPayloads } = await import("./provider");
-          const counts = await applySyncPayloads(scopedPushed, user.id, logger);
-          logger.debug("Applied pushed payloads", { instanceId, counts });
-        }
+        // applySyncPayloads gates each domain by the typed syncScope — disabled
+        // domains are dropped inside the provider dispatch, so a mis-scoped peer
+        // can never land a disabled domain in our DB.
+        const { applySyncPayloads } = await import("./provider");
+        const counts = await applySyncPayloads(
+          pushed,
+          user.id,
+          logger,
+          syncScope,
+        );
+        logger.debug("Applied pushed payloads", { instanceId, counts });
       } catch (error) {
         logger.warn("Failed to apply pushed payloads", parseError(error));
       }
     }
     markPhase("applyPush");
 
-    // Filter cursors to only enabled domains
-    const filteredCursors: Record<string, SyncCursor> = {};
-    for (const [domain, cursor] of Object.entries(incomingCursors)) {
-      if (domainEnabled(domain)) {
-        filteredCursors[domain] = cursor;
-      }
+    let syncPayloads;
+    let syncCounts;
+    let ourCursors;
+    try {
+      // buildSyncPayloads serves ONLY the domains enabled in the typed syncScope
+      // (absent-cursor "full history" for a disabled domain is never served).
+      ({ syncPayloads, syncCounts, ourCursors } = await buildSyncPayloads(
+        incomingCursors,
+        user.id,
+        logger,
+        syncScope,
+      ));
+    } catch (buildErr) {
+      logger.error("[Sync] buildSyncPayloads threw", parseError(buildErr));
+      return fail({
+        message: syncT("taskSync.post.errors.notFound.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
-
-    const { syncPayloads, syncCounts, ourCursors } = await buildSyncPayloads(
-      filteredCursors,
-      user.id,
-      logger,
-    );
     markPhase("serialize");
     const totalPhaseMs = Object.values(phaseMs).reduce((a, b) => a + b, 0);
     if (totalPhaseMs > 5_000) {
       logger.warn("Slow sync exchange", { instanceId, totalPhaseMs, phaseMs });
     }
 
-    // Filter payloads to only enabled domains
-    const filteredPayloads: Record<string, string> = {};
-    const filteredCounts: Record<string, number> = {};
-    const filteredCursorResponse: Record<string, SyncCursor> = {};
-
-    for (const key of Object.keys(syncPayloads)) {
-      if (domainEnabled(key)) {
-        filteredPayloads[key] = syncPayloads[key] ?? "[]";
-        filteredCounts[key] = syncCounts[key] ?? 0;
-        filteredCursorResponse[key] = ourCursors[key]!;
-      }
-    }
+    // buildSyncPayloads already served ONLY the scope-enabled domains, so its
+    // output maps ARE the scoped response — no second filtering pass needed.
+    const filteredPayloads = syncPayloads;
+    const filteredCounts = syncCounts;
+    const filteredCursorResponse = ourCursors;
 
     // ── 4. Build capabilities payload (only if version differs) ───────────────
     let capabilitiesPayload: string | null = null;

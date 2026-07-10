@@ -34,6 +34,7 @@ export const translations = {
         description: "The dispatched tool's input arguments.",
       },
     },
+    dynamicTitle: "Await: {{toolName}}",
     widget: {
       noToolName: "No tool name available.",
       resolving: "Resolving tool...",

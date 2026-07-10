@@ -32,13 +32,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import bridgeDefinition from "next-vibe/realtime/remote-event-bridge/definition";
 import { z } from "zod";
 
-import type {
-  SyncCursor,
-  SyncScope,
-} from "@/app/api/[locale]/remote-connection/db";
 import {
   remoteConnections,
   StandardSyncCursorSchema,
+  SYNC_DOMAINS,
+  type SyncCursor,
+  type SyncScope,
   ThreadsSyncCursorSchema,
 } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
@@ -73,6 +72,10 @@ export interface ConnectionConfig {
   syncScope: SyncScope | null;
   syncCursors: Record<string, SyncCursor> | null;
   pushCursors: Record<string, SyncCursor> | null;
+  /** How WE reach the peer. Null/direct-http ⇒ no outbound socket is opened. */
+  transportMode: string | null;
+  /** How the PEER reaches us. reverse-ws ⇒ we hold an outbound socket for it. */
+  remoteTransportMode: string | null;
 }
 
 /** Handler registered for a channel on a connection */
@@ -284,7 +287,7 @@ class WsConnection {
       .replace(/^https:\/\//, "wss://")
       .replace(/^http:\/\//, "ws://")
       .replace(/\/$/, "");
-    const wsUrl = `${wsBase}/ws?token=${encodeURIComponent(token)}&leadId=${encodeURIComponent(leadId)}`;
+    const wsUrl = `${wsBase}/ws?token=${encodeURIComponent(token)}&leadId=${encodeURIComponent(leadId)}&connectorInstanceId=${encodeURIComponent(this.instanceId)}`;
 
     // Subscribe to the bridge endpoint's user-scoped channel on the peer —
     // the bridge transport is a regular scope:"user" event, so the peer's
@@ -390,8 +393,11 @@ class WsConnection {
         });
       });
 
-    // Flush any tasks queued while offline.
-    void this.flushPendingQueue();
+    // NOTE: pull-on-connect sync is intentionally NOT fired here. onOpen runs on
+    // EVERY WS (re)open; syncing here re-ran a full pull on every reconnect. The
+    // initial cursor-based sync fires EXACTLY ONCE from the connect flow
+    // (openConnection → doPullNow); after that all state rides live WS remote
+    // events. A reconnect only re-subscribes channels (done above), no re-sync.
   }
 
   /** Route an inbound frame (or batch) to remote-event / control / channel handlers. */
@@ -507,11 +513,21 @@ class WsConnection {
     const parsed = z
       .object({
         originInstanceId: z.string(),
-        syncDomain: z.string().optional(),
+        syncDomain: z.enum(SYNC_DOMAINS).optional(),
         envelope: z.custom<AnyEndpointEventEnvelope>(),
+        targetLeadId: z.string().optional(),
       })
-      .safeParse(data.responseData);
+      .safeParse(data.requestData?.["payload"]);
     if (!parsed.success) {
+      return;
+    }
+    // Addressed (point-to-point) frame: the shared hub channel reaches every
+    // peer connector of the account — only the addressed connection applies it
+    // (tool dispatch would otherwise double-execute / leak across peers).
+    if (
+      parsed.data.targetLeadId &&
+      parsed.data.targetLeadId !== this.config.leadId
+    ) {
       return;
     }
     // Per-connection syncScope gate: drop a domained event this connection
@@ -533,13 +549,6 @@ class WsConnection {
     );
   }
 
-  private async flushPendingQueue(): Promise<void> {
-    const { remoteUrl, token, leadId } = this.config;
-
-    // Pull-on-connect: cursor-based catch-up for all enabled sync providers.
-    await this.pullOnConnect(remoteUrl, token, leadId);
-  }
-
   /**
    * Trigger the pull-on-connect exchange immediately via HTTP, without waiting
    * for WS open. This is THE single entry point that starts the initial sync —
@@ -549,9 +558,6 @@ class WsConnection {
    */
   doPullNow(): void {
     const { remoteUrl, token, leadId } = this.config;
-    this.logger.warn("[WsConnection] doPullNow: firing pullOnConnect", {
-      instanceId: this.instanceId,
-    });
     void this.pullOnConnect(remoteUrl, token, leadId);
   }
 
@@ -601,7 +607,9 @@ class WsConnection {
         if (!scope) {
           return true;
         }
-        return !!scope[domain];
+        // A stored cursor for a domain no longer in SyncScope (e.g. the removed
+        // `chat` domain) is simply not allowed.
+        return !!(scope as Record<string, boolean | undefined>)[domain];
       };
       for (const [domain, cursor] of Object.entries(storedCursors)) {
         if (cursor && domainAllowed(domain)) {
@@ -614,15 +622,40 @@ class WsConnection {
       // enabled domains. The remote applies them before serializing its reply.
       const storedPushCursors = conn.pushCursors ?? {};
       const { syncPayloads: allPushPayloads, ourCursors: pushHighWater } =
-        await buildSyncPayloads(storedPushCursors, conn.userId, this.logger);
-      // Push payloads carry everything newer than pushCursors — no size cap.
+        await buildSyncPayloads(
+          storedPushCursors,
+          conn.userId,
+          this.logger,
+          conn.syncScope,
+        );
+      // Cap the combined push body by a byte budget. Each provider's
+      // serializeFromCursor is already page-limited, but on a FRESH connect
+      // (empty pushCursors) many domains × full first pages can exceed the
+      // peer's request-body limit → HTTP 413, failing the whole sync. Include
+      // domains until the budget is hit; DEFER the rest by NOT advancing their
+      // push cursor — the peer's own (paginated) pull fetches them, and the next
+      // connect pushes the remainder. Prevents the 413 without losing data.
+      const PUSH_BODY_BUDGET_BYTES = 4_000_000; // ~4MB, well under typical limits
       const pushPayloads: Record<string, string> = {};
+      let pushBudgetUsed = 0;
       for (const [domain, payload] of Object.entries(allPushPayloads)) {
         // "[]" — nothing new since the last push; skip empty domains.
         if (!domainAllowed(domain) || payload === "[]") {
           continue;
         }
+        const size = Buffer.byteLength(payload, "utf8");
+        if (pushBudgetUsed + size > PUSH_BODY_BUDGET_BYTES) {
+          // Deferred: do NOT advance this domain's push cursor (drop it from
+          // pushHighWater) so a later connect re-pushes it; the peer pulls it now.
+          delete pushHighWater[domain];
+          this.logger.warn(
+            "[WsConnection] push-on-connect: domain deferred (body budget)",
+            { instanceId: this.instanceId, domain, size },
+          );
+          continue;
+        }
         pushPayloads[domain] = payload;
+        pushBudgetUsed += size;
       }
 
       // Send OUR capabilities only when the peer has not yet confirmed
@@ -687,33 +720,22 @@ class WsConnection {
 
       // Typed direct call on the ALREADY-ESTABLISHED connection — no DB reload,
       // no execute()/dispatch re-entry (this runs inside the connector itself).
-      // Retry up to 4× on failure — Vite HMR or transient DB errors can 500
-      // during module reload. 15s between retries, 60s total budget.
-      let syncResult: ResponseType<SyncResponseOutput> | undefined;
-      for (let attempt = 0; attempt <= 4; attempt++) {
-        if (attempt > 0) {
-          this.logger.warn(
-            `[WsConnection] pull-on-connect: retrying after 15s (attempt ${String(attempt)}/4)`,
-            { instanceId: this.instanceId },
-          );
-          await new Promise((resolve) => {
-            setTimeout(resolve, 15_000);
-          });
-        }
-        syncResult = await RemoteTransport.callEndpointDirect({
+      // ONE attempt: pull-on-connect either works or it doesn't. No retry loop —
+      // a retry masks the real failure and stalls the run.
+      const syncResult: ResponseType<SyncResponseOutput> =
+        await RemoteTransport.callEndpointDirect({
           connection: { remoteUrl, token, leadId },
           definition: syncEndpoints.POST,
           input: body,
           locale: defaultLocale,
-          timeoutMs: 30_000,
+          timeoutMs: 60_000,
         });
-        if (syncResult.success) {
-          break;
-        }
-        // Only 401 is terminal (dead token); anything else is worth a retry.
-        if (syncResult.errorType === ErrorResponseTypes.UNAUTHORIZED) {
-          break;
-        }
+      if (!syncResult.success) {
+        this.logger.warn("[WsConnection] pull-on-connect sync failed", {
+          instanceId: this.instanceId,
+          errorType: syncResult.errorType?.errorCode,
+          message: syncResult.message,
+        });
       }
 
       if (!syncResult?.success) {
@@ -751,7 +773,12 @@ class WsConnection {
       }
 
       if (data.syncPayloads) {
-        await applySyncPayloads(data.syncPayloads, conn.userId, this.logger);
+        await applySyncPayloads(
+          data.syncPayloads,
+          conn.userId,
+          this.logger,
+          conn.syncScope,
+        );
       }
 
       const caps = data.capabilities
@@ -877,7 +904,22 @@ async function loadRowByInstanceId(
     syncScope: row.syncScope ?? null,
     syncCursors: row.syncCursors ?? null,
     pushCursors: row.pushCursors ?? null,
+    transportMode: row.transportMode ?? null,
+    remoteTransportMode: row.remoteTransportMode ?? null,
   };
+}
+
+/**
+ * A connection needs an outbound reverse-ws SOCKET only when a leg is reverse-ws
+ * — either WE reach the peer over reverse-ws (our transportMode) or the peer
+ * reaches US over reverse-ws (remoteTransportMode). A fully direct-http pair
+ * never opens a socket: cross-instance events ride the event bridge over HTTP.
+ */
+function configNeedsSocket(config: ConnectionConfig): boolean {
+  return (
+    config.transportMode === "reverse-ws" ||
+    config.remoteTransportMode === "reverse-ws"
+  );
 }
 
 /**
@@ -982,6 +1024,15 @@ export function openConnection(config: ConnectionConfig): void {
     return;
   }
 
+  // Two independent concerns are gated here separately:
+  //   1. the ONE pull-on-connect (HTTP sync exchange) — runs for EVERY
+  //      transport, direct-http included; it never touches the socket.
+  //   2. the persistent outbound WS socket — opened ONLY when a leg is
+  //      reverse-ws (configNeedsSocket). A fully direct-http pair rides the
+  //      event bridge over HTTP and must NEVER open a socket (that is the
+  //      "ws://…/ws closed before established" noise we eliminated).
+  const needsSocket = configNeedsSocket(config);
+
   // Cancel idle close if pending — explicit re-open is a signal to keep alive.
   const timer = _idleTimers.get(config.instanceId);
   if (timer !== undefined) {
@@ -989,18 +1040,37 @@ export function openConnection(config: ConnectionConfig): void {
     _idleTimers.delete(config.instanceId);
   }
 
-  if (_connections.has(config.instanceId)) {
+  // Already have a live (socketed) connection for this instance → nothing to do.
+  // For direct-http there is no registered connection, so this never short-
+  // circuits the pull below.
+  if (needsSocket && _connections.has(config.instanceId)) {
     _logger.debug("[Connector] openConnection: already connected (noop)", {
       instanceId: config.instanceId,
     });
     return;
   }
+
   const conn = new WsConnection(config, _logger);
-  _connections.set(config.instanceId, conn);
-  conn.start();
-  _logger.debug("[Connector] Opened connection (hot)", {
-    instanceId: config.instanceId,
-  });
+  if (needsSocket) {
+    // reverse-ws leg: register + open the persistent socket.
+    _connections.set(config.instanceId, conn);
+    conn.start();
+    _logger.debug("[Connector] Opened connection (hot)", {
+      instanceId: config.instanceId,
+    });
+  } else {
+    _logger.debug(
+      "[Connector] openConnection: direct-http — pull only, no socket",
+      { instanceId: config.instanceId },
+    );
+  }
+  // Fire the ONE pull-on-connect for this fresh connection lifetime, over HTTP,
+  // independent of WS open (which can be delayed/flaky in dev, and absent
+  // entirely for direct-http). This is the sole sync per connect; from here on
+  // state rides live remote events (WS for reverse-ws legs, the HTTP event
+  // bridge for direct-http). For direct-http the transient `conn` exists only
+  // to run this pull and is then discarded (not registered).
+  conn.doPullNow();
 }
 
 /**
@@ -1024,15 +1094,6 @@ export async function restartConnection(instanceId: string): Promise<void> {
   // openConnection fires the single pull-on-connect for the fresh lifetime
   // (over HTTP, independent of WS open) — no separate pull needed here.
   openConnection(config);
-  // Also fire pullOnConnect directly so sync happens even if WS open fails
-  // (e.g. during Vite HMR module invalidation in dev).
-  // Delay 50ms to let stop()'s async forceReleaseSyncSlot complete first.
-  const conn = _connections.get(instanceId);
-  if (conn) {
-    setTimeout(() => {
-      conn.doPullNow();
-    }, 50);
-  }
 }
 
 /**

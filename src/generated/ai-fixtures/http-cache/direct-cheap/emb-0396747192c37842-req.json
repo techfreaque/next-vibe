@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T-SYS] Two questions in this one turn:\n1. From YOUR SYSTEM CONTEXT (not a tool), what is the instance ID that built your system prompt / runs this conversation loop?\n2. Call execute-tool with toolName='self-instance-id' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to read the instance ID the TOOL executes on.\nReply with EXACTLY two lines, nothing else:\nSystemPrompt: <instance id from your context>\nToolExec: <instance id the self-instance-id tool returned>",
+    "encoding_format": "float"
+  }
+}

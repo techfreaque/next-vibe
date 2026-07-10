@@ -18,7 +18,12 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { chatFolders, chatMessages, chatThreads } from "../../../../db";
+import {
+  CHAT_MESSAGE_COLUMNS,
+  chatFolders,
+  chatMessages,
+  chatThreads,
+} from "../../../../db";
 import {
   canDeleteMessage,
   canReadMessage,
@@ -74,7 +79,7 @@ export class MessageRepository {
 
       // Get message
       const [message] = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(
           and(
@@ -164,7 +169,7 @@ export class MessageRepository {
 
       // Verify message exists and belongs to thread
       const [existingMessage] = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(
           and(
@@ -278,7 +283,7 @@ export class MessageRepository {
 
       // Verify message exists
       const [existingMessage] = await db
-        .select()
+        .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(
           and(

@@ -214,7 +214,6 @@ export class TaskExecuteRepository {
     let finalMessage: string | null = null;
     let finalDurationMs = 0;
     let taskSucceeded = false;
-    let finalResult: WidgetData | null = null;
     let firstExecutionId: string | null = null;
     let didLogHistory = false;
 
@@ -230,6 +229,9 @@ export class TaskExecuteRepository {
 
       const attemptStart = Date.now();
       const taskAbortController = new AbortController();
+      abortSignal.addEventListener("abort", () => taskAbortController.abort(), {
+        once: true,
+      });
 
       let typedResult: ResponseType<Record<string, string | number | boolean>>;
       try {
@@ -246,6 +248,7 @@ export class TaskExecuteRepository {
             streamContext: makeHeadlessContext(
               taskAbortController.signal,
               undefined,
+              "UTC",
             ),
           }),
           new Promise<never>((...[, reject]) => {
@@ -320,7 +323,6 @@ export class TaskExecuteRepository {
         taskSucceeded = true;
         finalStatus = CronTaskStatus.COMPLETED;
         finalMessage = null;
-        finalResult = typedResult.data ?? null;
         break;
       }
 
@@ -365,40 +367,6 @@ export class TaskExecuteRepository {
       };
       emitTaskList("task-updated", { responseData: completedPayload });
       emitTaskQueue("task-updated", { responseData: completedPayload });
-    }
-
-    // 8. If task has callback context (set by execute-tool AI path), emit
-    //    TASK_COMPLETED WS event + insert deferred result message for endLoop,
-    //    or schedule resume-stream for wakeUp/wait.
-    // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
-    const taskCallbackMode =
-      (task.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
-    const taskThreadId = task.wakeUpThreadId ?? null;
-    const taskToolMessageId = task.wakeUpToolMessageId ?? null;
-
-    if (taskToolMessageId && taskUserContext) {
-      await TaskCompletion.handle({
-        toolMessageId: taskToolMessageId,
-        threadId: taskThreadId,
-        callbackMode: taskCallbackMode,
-        status: finalStatus,
-        output: taskSucceeded ? finalResult : null,
-        taskId: task.id,
-        modelId: task.wakeUpModelId ?? null,
-        skillId: task.wakeUpSkillId ?? null,
-        favoriteId: task.wakeUpFavoriteId ?? null,
-        leafMessageId: task.wakeUpLeafMessageId ?? null,
-        subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
-        ownerUser: taskUserContext.user,
-        logger,
-        directResumeLocale: taskUserContext.locale,
-        abortSignal,
-      }).catch((completionErr: Error) => {
-        logger.error("handleTaskCompletion failed", {
-          taskId: task.id,
-          error: completionErr.message,
-        });
-      });
     }
 
     if (!taskSucceeded) {

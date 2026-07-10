@@ -37,6 +37,7 @@ export const translations: typeof enTranslations = {
         description: "Die Eingabeargumente des gestarteten Tools.",
       },
     },
+    dynamicTitle: "Abwarten: {{toolName}}",
     widget: {
       noToolName: "Kein Tool-Name verfügbar.",
       resolving: "Tool wird aufgelöst...",

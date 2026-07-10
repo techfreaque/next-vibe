@@ -243,11 +243,21 @@ export class HelpRepository {
   private static getParameterSchema(
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
+    platform: Platform,
   ): HelpToolParameters | null {
     if (!endpoint.fields) {
       return null;
     }
     try {
+      // AI/MCP consumers get the SAME schema the tools-loader exposes:
+      // fields with hiddenForPlatforms[AI] are stripped. Advertising a field
+      // the executor then silently drops (validation strips it, fieldDefaults
+      // fill the favorite's value) sends the model into doomed retries — e.g.
+      // generate_video's model param: the AI picked a valid i2v model, the
+      // request ran with the favorite's t2v default and failed upstream.
+      const schemaPlatform = HelpRepository.isCompactPlatform(platform)
+        ? Platform.AI
+        : undefined;
       const requestDataSchema = generateSchemaForUsage(
         endpoint.fields,
         FieldUsage.RequestData,
@@ -420,8 +430,53 @@ export class HelpRepository {
         : { credits: tool.credits }),
       platforms,
       parameters,
-      examples: includeExamples ? tool.examples : undefined,
+      // Examples must AGREE with the schema the caller sees. On compact
+      // platforms (AI/MCP) `parameters` has AI-hidden fields (e.g. media-gen
+      // model/size/quality) stripped, so raw examples that still show those
+      // fields make the model report a bogus "schema is missing X" mismatch.
+      // Filter each example's inputs to the keys the AI-facing schema advertises.
+      examples: includeExamples
+        ? compact
+          ? HelpRepository.filterExamplesToSchema(tool.examples, parameters)
+          : tool.examples
+        : undefined,
     };
+  }
+
+  /**
+   * Keep only the example INPUT keys that exist in the (already platform-
+   * filtered) parameters schema, so the AI-facing example never references a
+   * field the AI-facing schema hid. Responses are left untouched (output shape).
+   */
+  private static filterExamplesToSchema(
+    examples: EndpointMeta["examples"],
+    parameters: HelpToolParameters | undefined,
+  ): EndpointMeta["examples"] {
+    if (!examples?.inputs || !parameters) {
+      return examples;
+    }
+    // `parameters` is a JSON schema object (Record<string, WidgetData>); its
+    // `properties` sub-object lists the AI-visible field names.
+    const propsValue = parameters["properties"];
+    if (
+      propsValue === null ||
+      typeof propsValue !== "object" ||
+      Array.isArray(propsValue)
+    ) {
+      return examples;
+    }
+    const allowed = new Set(Object.keys(propsValue));
+    const filteredInputs: Record<string, Record<string, WidgetData>> = {};
+    for (const [name, input] of Object.entries(examples.inputs)) {
+      const kept: Record<string, WidgetData> = {};
+      for (const [key, value] of Object.entries(input)) {
+        if (allowed.has(key)) {
+          kept[key] = value;
+        }
+      }
+      filteredInputs[name] = kept;
+    }
+    return { ...examples, inputs: filteredInputs };
   }
 
   private static serializeMetaMinimal(
@@ -749,7 +804,12 @@ export class HelpRepository {
         return {
           ...tool,
           parameters,
-          examples: cap?.examples,
+          // Same schema/example consistency as the local path: strip example
+          // input keys the (platform-filtered) parameters schema doesn't advertise.
+          examples: HelpRepository.filterExamplesToSchema(
+            cap?.examples,
+            parameters,
+          ),
         };
       });
 
@@ -793,6 +853,10 @@ export class HelpRepository {
     platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
+    logger.debug("[HelpTool] PROBE getTools entry", {
+      instanceId: data.instanceId ?? null,
+      platform,
+    });
     // Remote instance tool discovery - bypass local registry
     if (data.instanceId) {
       // The local instance's own name resolves to the local listing — callers
@@ -843,12 +907,15 @@ export class HelpRepository {
       "pl-PL": "pl",
     };
     const localeFile = localeToFile[locale] ?? "en";
+    logger.debug("[HelpTool] PROBE importing meta module", { localeFile });
     const metaModule = await (localeFile === "de"
       ? import("@/generated/endpoints/meta/de")
       : localeFile === "pl"
         ? import("@/generated/endpoints/meta/pl")
         : import("@/generated/endpoints/meta/en"));
+    logger.debug("[HelpTool] PROBE meta module imported", { localeFile });
     const allMeta = metaModule.endpointsMeta as EndpointMeta[];
+    logger.debug("[HelpTool] PROBE meta parsed", { count: allMeta.length });
 
     // Discovery platform - what platform context are we listing tools for?
     // Compact (AI/MCP/CRON): always the actual platform so counts/filtering match
@@ -943,7 +1010,9 @@ export class HelpRepository {
         const { getDefaultToolIdsForUser, getDefaultWebPinnedIdsForUser } =
           await import("@/app/api/[locale]/agent/chat/constants");
 
+        logger.debug("[HelpTool] PROBE chat constants imported", {});
         const { db } = await import("next-vibe/database");
+        logger.debug("[HelpTool] PROBE db imported", {});
         const { chatSettings } =
           await import("@/app/api/[locale]/agent/chat/settings/db");
         const { DefaultFolderId } =
@@ -956,6 +1025,7 @@ export class HelpRepository {
         let dbWebPinned: string[] | null = null;
         let dbPinned: Array<{ toolId: string }> | null = null;
 
+        logger.debug("[HelpTool] PROBE loading settings row", {});
         const [settingsRow] = await db
           .select({
             activeFavoriteId: chatSettings.activeFavoriteId,
@@ -970,34 +1040,21 @@ export class HelpRepository {
         }
 
         if (settingsRow?.activeFavoriteId) {
-          const { isUuid } =
-            await import("@/app/api/[locale]/agent/chat/slugify");
-          const { resolveToolCascade } =
-            await import("@/app/api/[locale]/agent/skills/tools-cascade");
-          const [fav] = await db
-            .select({
-              availableTools: chatFavorites.availableTools,
-              pinnedTools: chatFavorites.pinnedTools,
-              skillId: chatFavorites.skillId,
-            })
-            .from(chatFavorites)
-            .where(
-              isUuid(settingsRow.activeFavoriteId)
-                ? eq(chatFavorites.id, settingsRow.activeFavoriteId)
-                : eq(chatFavorites.slug, settingsRow.activeFavoriteId),
-            )
-            .limit(1);
-          if (fav) {
-            const resolved = await resolveToolCascade({
-              favoriteAvailableTools: fav.availableTools,
-              favoritePinnedTools: fav.pinnedTools,
-              skillId: fav.skillId,
-            });
-            // Use resolved effective lists for both (cascade: fav → skill → null/defaults)
-            dbPinned = resolved.pinnedTools;
-            cascadeBase = resolved.cascadeBase;
-            pinnedBase = resolved.pinnedBase;
-          }
+          const { resolveAgentContext } =
+            await import("@/app/api/[locale]/agent/skills/resolve-context");
+          // Central cascade (favorite → skill → NO_SKILL/role defaults). The
+          // help tool only needs the effective PINNED list + the pre-union
+          // skill bases (cascadeBase/pinnedBase) for its toggle-off materialize.
+          const resolved = await resolveAgentContext({
+            favoriteId: settingsRow.activeFavoriteId,
+            skillId: undefined,
+            user,
+            rootFolderId: DefaultFolderId.PRIVATE,
+            logger,
+          });
+          dbPinned = resolved.pinnedTools;
+          cascadeBase = resolved.cascadeBase;
+          pinnedBase = resolved.pinnedBase;
         }
 
         // When viewing as a different role, use that role's defaults for pins
@@ -1179,7 +1236,8 @@ export class HelpRepository {
       }
       const endpoint = await HelpRepository.loadEndpointForMeta(matchedTool);
       const parameters = endpoint
-        ? (HelpRepository.getParameterSchema(endpoint, locale) ?? undefined)
+        ? (HelpRepository.getParameterSchema(endpoint, locale, platform) ??
+          undefined)
         : undefined;
       const callAs = matchedTool.toolName;
       return success({
@@ -1224,7 +1282,8 @@ export class HelpRepository {
       if (exactMatch) {
         const endpoint = await HelpRepository.loadEndpointForMeta(exactMatch);
         const parameters = endpoint
-          ? (HelpRepository.getParameterSchema(endpoint, locale) ?? undefined)
+          ? (HelpRepository.getParameterSchema(endpoint, locale, platform) ??
+            undefined)
           : undefined;
         const callAs = exactMatch.toolName;
         return success({
@@ -1349,8 +1408,11 @@ export class HelpRepository {
           pageSlice.map(async (m) => {
             const endpoint = await HelpRepository.loadEndpointForMeta(m);
             const parameters = endpoint
-              ? (HelpRepository.getParameterSchema(endpoint, locale) ??
-                undefined)
+              ? (HelpRepository.getParameterSchema(
+                  endpoint,
+                  locale,
+                  platform,
+                ) ?? undefined)
               : undefined;
             return HelpRepository.serializeMeta(
               m,
@@ -1429,7 +1491,8 @@ export class HelpRepository {
         pageSlice.map(async (m) => {
           const endpoint = await HelpRepository.loadEndpointForMeta(m);
           const parameters = endpoint
-            ? (HelpRepository.getParameterSchema(endpoint, locale) ?? undefined)
+            ? (HelpRepository.getParameterSchema(endpoint, locale, platform) ??
+              undefined)
             : undefined;
           return HelpRepository.serializeMeta(
             m,
@@ -1452,6 +1515,7 @@ export class HelpRepository {
       });
     }
 
+    logger.debug("[HelpTool] PROBE list return (categories fallback)", {});
     return success({
       tools: pageSlice.map((m) =>
         HelpRepository.serializeMeta(

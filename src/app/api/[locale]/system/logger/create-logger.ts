@@ -55,7 +55,21 @@ function getTimePrefix(): string {
   if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
     return new Date().toISOString().slice(11, 23);
   }
-  return `${((Date.now() - Number(process.env["VIBE_START_TIME"])) / 1000).toFixed(3)}s`;
+  const totalSec = (Date.now() - Number(process.env["VIBE_START_TIME"])) / 1000;
+  if (totalSec < 60) {
+    return `${totalSec.toFixed(3)}s`;
+  }
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+  const secs = Math.floor(totalSec % 60);
+  if (days > 0) {
+    return `${days}d${hours}h${minutes}m${secs}s`;
+  }
+  if (hours > 0) {
+    return `${hours}h${minutes}m${secs}s`;
+  }
+  return `${minutes}m${secs}s`;
 }
 
 export function formatLogPrefix(): string {

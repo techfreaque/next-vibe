@@ -46,6 +46,7 @@ import type {
   RemoteEventBridgeResponseOutput,
 } from "./definition";
 import { dispatchRemoteEvent } from "./registry";
+import type { ResolvedRelayContext } from "./relay-context";
 
 /**
  * The generic remote-event wire payload. The envelope carries all 4 event fields
@@ -86,8 +87,62 @@ export class RemoteEventBridgeRepository {
    * The peer's bridge runs the event via the target route's onRemoteEvent.
    * Fire-and-forget: errors are logged, not thrown.
    */
+  /**
+   * Resolve the relay context for a user once — call at stream/session start
+   * and pass the result into every emitter's resolvedRelayContext option.
+   * Eliminates per-event DB queries for originInstanceId + activeConnections.
+   */
+  static async resolveRemoteEventContext(
+    userId: string,
+  ): Promise<ResolvedRelayContext> {
+    const originInstanceId =
+      await RemoteConnectionRepository.getLocalInstanceId(userId);
+    let connections: ResolvedRelayContext["connections"] = [];
+    try {
+      const rows = await db
+        .select({
+          instanceId: remoteConnections.instanceId,
+          token: remoteConnections.token,
+          tokenLeadId: remoteConnections.leadId,
+          remoteUserId: remoteConnections.remoteUserId,
+          isReverseEntry: remoteConnections.isReverseEntry,
+          transportMode: remoteConnections.transportMode,
+          remoteTransportMode: remoteConnections.remoteTransportMode,
+          syncScope: remoteConnections.syncScope,
+        })
+        .from(remoteConnections)
+        .where(
+          and(
+            eq(remoteConnections.userId, userId),
+            eq(remoteConnections.isActive, true),
+          ),
+        );
+      connections = rows
+        .filter((r) => r.token)
+        .map((r) => ({
+          instanceId: r.instanceId,
+          tokenLeadId: r.tokenLeadId,
+          remoteUserId: r.remoteUserId,
+          isReverseEntry: r.isReverseEntry,
+          transportMode: r.transportMode,
+          remoteTransportMode: r.remoteTransportMode ?? null,
+          syncScope: r.syncScope,
+        }));
+    } catch {
+      // Non-fatal: falls back to per-event queries inside pushRemoteEvent.
+    }
+    return { originInstanceId, connections };
+  }
+
   static async pushRemoteEvent(params: RemoteEventRelayPayload): Promise<void> {
-    const { userId, logger, syncDomain, envelope, targetInstanceId } = params;
+    const {
+      userId,
+      logger,
+      syncDomain,
+      envelope,
+      targetInstanceId,
+      resolvedRelayContext,
+    } = params;
 
     // Domain relay gate: the OWNING domain decides whether an event tagged
     // with its syncDomain may leave the instance (e.g. threads gate incognito
@@ -116,10 +171,10 @@ export class RemoteEventBridgeRepository {
       }
     }
 
-    // Stamp the user's CONFIGURED self-instance-id (which the user may have set
-    // explicitly) — never a derived default. Peers echo-guard against it.
+    // Use pre-resolved context when available (eliminates per-event DB queries).
     const originInstanceId =
-      await RemoteConnectionRepository.getLocalInstanceId(userId);
+      resolvedRelayContext?.originInstanceId ??
+      (await RemoteConnectionRepository.getLocalInstanceId(userId));
 
     const wire: RemoteEventWirePayload = {
       originInstanceId,
@@ -128,49 +183,48 @@ export class RemoteEventBridgeRepository {
       ...(targetInstanceId ? { targetInstanceId } : {}),
     };
 
-    let connections: Array<{
-      instanceId: string;
-      tokenLeadId: string;
-      remoteUserId: string | null;
-      isReverseEntry: boolean;
-      transportMode: string | null;
-      syncScope: Record<string, boolean> | null;
-    }>;
+    let connections: ResolvedRelayContext["connections"];
 
-    try {
-      const rows = await db
-        .select({
-          instanceId: remoteConnections.instanceId,
-          token: remoteConnections.token,
-          tokenLeadId: remoteConnections.leadId,
-          remoteUserId: remoteConnections.remoteUserId,
-          isReverseEntry: remoteConnections.isReverseEntry,
-          transportMode: remoteConnections.transportMode,
-          syncScope: remoteConnections.syncScope,
-        })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, userId),
-            eq(remoteConnections.isActive, true),
-          ),
-        );
+    if (resolvedRelayContext) {
+      connections = resolvedRelayContext.connections;
+    } else {
+      try {
+        const rows = await db
+          .select({
+            instanceId: remoteConnections.instanceId,
+            token: remoteConnections.token,
+            tokenLeadId: remoteConnections.leadId,
+            remoteUserId: remoteConnections.remoteUserId,
+            isReverseEntry: remoteConnections.isReverseEntry,
+            transportMode: remoteConnections.transportMode,
+            remoteTransportMode: remoteConnections.remoteTransportMode,
+            syncScope: remoteConnections.syncScope,
+          })
+          .from(remoteConnections)
+          .where(
+            and(
+              eq(remoteConnections.userId, userId),
+              eq(remoteConnections.isActive, true),
+            ),
+          );
 
-      connections = rows
-        .filter((r) => r.token)
-        .map((r) => ({
-          instanceId: r.instanceId,
-          tokenLeadId: r.tokenLeadId,
-          remoteUserId: r.remoteUserId,
-          isReverseEntry: r.isReverseEntry,
-          transportMode: r.transportMode,
-          syncScope: r.syncScope,
-        }));
-    } catch (err) {
-      logger.warn("[RemoteEventBridge] pushRemoteEvent: DB lookup failed", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-      return;
+        connections = rows
+          .filter((r) => r.token)
+          .map((r) => ({
+            instanceId: r.instanceId,
+            tokenLeadId: r.tokenLeadId,
+            remoteUserId: r.remoteUserId,
+            isReverseEntry: r.isReverseEntry,
+            transportMode: r.transportMode,
+            remoteTransportMode: r.remoteTransportMode ?? null,
+            syncScope: r.syncScope,
+          }));
+      } catch (err) {
+        logger.warn("[RemoteEventBridge] pushRemoteEvent: DB lookup failed", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        return;
+      }
     }
 
     if (connections.length === 0) {
@@ -257,7 +311,6 @@ export class RemoteEventBridgeRepository {
         logger,
         input: {
           eventName: BRIDGE_TRANSPORT_EVENT,
-          leadId: conn.tokenLeadId,
           payload: wire,
         },
       }).catch((err) => {
@@ -304,11 +357,13 @@ export class RemoteEventBridgeRepository {
       logger,
       peerUser,
     )("remote-event", {
-      responseData: {
-        originInstanceId: wire.originInstanceId,
-        syncDomain: wire.syncDomain,
-        envelope: wire.envelope,
-        targetLeadId: wire.targetLeadId,
+      requestData: {
+        payload: {
+          originInstanceId: wire.originInstanceId,
+          syncDomain: wire.syncDomain,
+          envelope: wire.envelope,
+          targetLeadId: wire.targetLeadId,
+        },
       },
     });
   }
@@ -335,7 +390,7 @@ export class RemoteEventBridgeRepository {
       });
     }
 
-    return success({ received: true });
+    return success();
   }
 
   /**

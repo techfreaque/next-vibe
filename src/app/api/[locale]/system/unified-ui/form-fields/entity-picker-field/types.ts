@@ -43,4 +43,9 @@ export interface EntityPickerFieldWidgetConfig<
    * Falls back to "name" / "title" / "label" / "id".
    */
   labelField?: string;
+  /**
+   * Field name in each list item used as the form value.
+   * Falls back to "id".
+   */
+  valueField?: string;
 }

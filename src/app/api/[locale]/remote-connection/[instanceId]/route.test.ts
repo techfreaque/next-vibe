@@ -71,7 +71,16 @@ describe("Remote Connection [instanceId]", () => {
       streamContext: undefined,
       endpoint: definitions.PATCH,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
-      data: { forceSystemProvider: true },
+      data: {
+        forceSystemProvider: true,
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
       user: customerUser,
     });
 
@@ -85,7 +94,15 @@ describe("Remote Connection [instanceId]", () => {
       streamContext: undefined,
       endpoint: definitions.PATCH,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
-      data: {},
+      data: {
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
+      },
     });
 
     // No row exists → NOT_FOUND

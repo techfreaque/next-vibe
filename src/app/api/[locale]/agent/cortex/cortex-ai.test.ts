@@ -410,12 +410,15 @@ describe("Cortex AI Integration", () => {
 
   // ── C1: Write via AI ───────────────────────────────────────────────────────
   fit("C1: AI writes a file via cortex-write", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-write" };
+    const { threadId: seededThreadId, streamContext } =
+      await seedCaseThread("cortex-ai-write");
+    threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n${INITIAL_CONTENT}\n\nAfter writing, confirm what you did.${VERDICT_INSTRUCTION}`,
     });
 
@@ -482,13 +485,16 @@ describe("Cortex AI Integration", () => {
 
   // ── C2: Read via AI ────────────────────────────────────────────────────────
   fit("C2: AI reads the file via cortex-read", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it - quote the exact content you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -540,13 +546,16 @@ describe("Cortex AI Integration", () => {
 
   // ── C3: Edit via AI ───────────────────────────────────────────────────────
   fit("C3: AI edits the file via cortex-edit", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-edit" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-edit to replace the word "${ORIGINAL_WORD}" with "${EDITED_CONTENT_FRAGMENT}" in /documents/ai-test/notes.md. Report exactly how many replacements were made.${VERDICT_INSTRUCTION}`,
     });
 
@@ -595,13 +604,16 @@ describe("Cortex AI Integration", () => {
 
   // ── C3.5: Verify edit via read ─────────────────────────────────────────────
   fit("C3.5: AI reads back file and confirms edit took effect", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-verify-edit" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-read to read /documents/ai-test/notes.md again. Confirm that the word "${EDITED_CONTENT_FRAGMENT}" appears in the content and that "${ORIGINAL_WORD}" no longer appears. Quote the relevant line.${VERDICT_INSTRUCTION}`,
     });
 
@@ -646,13 +658,16 @@ describe("Cortex AI Integration", () => {
 
   // ── C4: Tree via AI ───────────────────────────────────────────────────────
   fit("C4: AI shows directory tree via cortex-tree", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-tree" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use the cortex-tree tool (not cortex-list) to display the directory tree starting at /documents/ai-test/. I need the tree view specifically. Tell me exactly what files and directories you see.${VERDICT_INSTRUCTION}`,
     });
 
@@ -698,13 +713,16 @@ describe("Cortex AI Integration", () => {
 
   // ── C5: Context awareness ─────────────────────────────────────────────────
   fit("C5: AI remembers workspace context from conversation", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-context" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Without using any tools, answer from memory:
 1. What is the exact path of the file you created?
 2. What is the title of that file (the # heading)?
@@ -764,13 +782,16 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C6: Move via AI ────────────────────────────────────────────────────────
   fit("C6: AI moves the file via cortex-move", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-move" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-move to rename /documents/ai-test/notes.md to /documents/ai-test/renamed-notes.md. Confirm the move succeeded and both the source and destination paths.${VERDICT_INSTRUCTION}`,
     });
 
@@ -821,13 +842,16 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C7: Delete via AI ─────────────────────────────────────────────────────
   fit("C7: AI deletes the test directory via cortex-delete", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-delete" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-delete to delete /documents/ai-test/ recursively. Confirm what was deleted and how many nodes were removed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -879,13 +903,16 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
 
   // ── C8: Post-delete verification ──────────────────────────────────────────
   fit("C8: AI confirms deleted path returns NOT_FOUND", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-ai-post-delete" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.
 
 ---
@@ -1080,12 +1107,16 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M1: List /threads root ──────────────────────────────────────────────────
   fit("M1: AI lists /threads root via cortex-list", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-threads-list" };
+    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+      "cortex-mount-threads-list",
+    );
+    threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Use cortex-list to list the directory at /threads. Tell me what root folders you see (private, cron, shared, public, or similar). List every entry name you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1132,13 +1163,16 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M2: Read a thread as markdown ──────────────────────────────────────────
   fit("M2: AI reads a thread file from /threads via cortex-read", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-threads-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-list on /threads/private to find a thread file (it will end in .md). Then use cortex-read to read it. Confirm the file has frontmatter with threadId and a conversation body. Quote the threadId from the frontmatter.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1180,15 +1214,16 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M3: /threads is read-only ───────────────────────────────────────────────
   fit("M3: AI cannot write to /threads (read-only mount)", async () => {
-    const fixtureCtx: FixtureContext = {
-      name: "cortex-mount-threads-readonly",
-    };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Try to use cortex-write to create a file at /threads/test-file.md with content "test". Report exactly what error you get. Do not retry.
 
 ---
@@ -1381,12 +1416,16 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S1: List /skills ─────────────────────────────────────────────────────
   fit("S1: AI lists /skills and finds the test skill", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-list" };
+    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+      "cortex-mount-skills-list",
+    );
+    threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Use cortex-list to list /skills. Tell me how many skills you see and confirm one is named "${testSkillSlug}.md".${VERDICT_INSTRUCTION}`,
     });
 
@@ -1438,13 +1477,16 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S2: Read the test skill file ─────────────────────────────────────────
   fit("S2: AI reads the test skill and sees system prompt in frontmatter", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-read" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-read to read /skills/${testSkillSlug}.md. Confirm the file has a YAML frontmatter header with skillId and a system prompt body. Quote the first sentence of the system prompt.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1484,13 +1526,16 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S3: /skills tree via cortex-tree ────────────────────────────────────
   fit("S3: AI gets /skills tree and finds .md files", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-skills-tree" };
     // Fresh thread - force the AI to actually call cortex-tree rather than reuse S1 context
+    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+      "cortex-mount-skills-tree",
+    );
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Call cortex-tree with path=/skills and depth=2. You MUST call the tool - do not rely on any prior context. Report the exact tree output and count how many .md files are listed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1575,12 +1620,15 @@ describe("Cortex Mount: /tasks", () => {
   it(
     "T1: AI lists /tasks and reads a task file",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "cortex-mount-tasks-list" };
+      const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+        "cortex-mount-tasks-list",
+      );
       const { result, messages } = await runTestStream({
         user: testUser,
         favoriteId: mainFavoriteId,
         subFolderId: testSubFolderId,
-        streamContext: fixtureCtx,
+        threadId: seededThreadId,
+        streamContext,
         prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
       });
 
@@ -1727,12 +1775,16 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR1: Write a searchable document ────────────────────────────────────
   fit("SR1: AI writes a uniquely searchable document", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-write" };
+    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+      "cortex-mount-search-write",
+    );
+    threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Use cortex-write to create /documents/search-test/quantum-flux.md with this content:\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\n\nConfirm the file was created.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1772,13 +1824,16 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR2: cortex-search finds the document ────────────────────────────────
   fit("SR2: AI searches for the document via cortex-search", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-query" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-search to search for "quantum flux resonance". Report how many results you find, the path of the first result, and its relevance score. The file should be in /documents/search-test/.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1859,13 +1914,16 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR3: cortex-search scoped to path ────────────────────────────────────
   fit("SR3: AI searches within a specific path prefix", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-search-scoped" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-search to search for "quantum" but limit the search to the path /documents/search-test/. Report how many results are found and confirm they are all within that path.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1912,13 +1970,16 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR4: /searches mount reflects recent searches ────────────────────────
   fit("SR4: AI lists /searches to see search history", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-mount-searches-list" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-list on /searches to see the search history. If there are month folders, list one. Report how the searches are organized and how many entries you see at the top level.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2047,12 +2108,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E1: List root / ──────────────────────────────────────────────────────
   fit("E1: AI lists root / and sees all mount points", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-edge-root-list" };
+    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
+      "cortex-edge-root-list",
+    );
+    threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
-      streamContext: fixtureCtx,
+      threadId: seededThreadId,
+      streamContext,
       prompt: `Use cortex-list on the root path "/" to see all available mounts and directories. List every entry you see and identify which are virtual mounts vs native storage.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2094,13 +2159,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E2: mkdir + nested write ─────────────────────────────────────────────
   fit("E2: AI creates nested directory structure via mkdir then write", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-edge-mkdir-nested" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-mkdir to create /documents/edge-test/deep/nested/. Then use cortex-write to create /documents/edge-test/deep/nested/leaf.md with content "# Leaf Node\n\nDeep file." Confirm both operations succeeded.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2137,13 +2205,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E3: Overwrite (upsert) ───────────────────────────────────────────────
   fit("E3: AI overwrites an existing file (created=false on second write)", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-edge-overwrite" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-write to create /documents/edge-test/overwrite-me.md with content "Version 1". Then immediately use cortex-write again on the same path with content "Version 2". Report what 'created' was for each write - first should be true, second should be false.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2184,13 +2255,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E4: Path traversal rejection ─────────────────────────────────────────
   fit("E4: AI cannot traverse paths with .. (security check)", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-edge-traversal" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Try to use cortex-read on the path "/documents/../etc/passwd". Report what error you receive. Do not retry.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2229,13 +2303,16 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E5: Cleanup via recursive delete ─────────────────────────────────────
   fit("E5: AI deletes entire edge-test directory tree recursively", async () => {
-    const fixtureCtx: FixtureContext = { name: "cortex-edge-cleanup" };
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: fixtureCtx,
+      streamContext: makeHeadlessContext(
+        undefined,
+        threadId,
+        /* no user context — UTC (dates not user-facing here) */ "UTC",
+      ),
       prompt: `Use cortex-delete to recursively delete /documents/edge-test/. Confirm how many nodes were deleted.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2351,7 +2428,7 @@ describe("Cortex System Prompt Injection", () => {
 
   // ── SP1: cortexFragment.build returns test-created memories ──────────────
   it(
-    "SP1: loadCortexData returns memories with correct structure",
+    "SP1: cortexFragment.build renders memories with correct structure",
     async () => {
       expect(testUser, "SP1: admin user not resolved").toBeTruthy();
       if (!testUser) {
@@ -2361,8 +2438,8 @@ describe("Cortex System Prompt Injection", () => {
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
-      const data = await loadCortexData({
-        streamContext: undefined,
+      const prompt = await cortexFragment.build({
+        streamContext: rootlessStreamContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2374,51 +2451,35 @@ describe("Cortex System Prompt Injection", () => {
         subAgentDepth: 0,
       });
 
-      // Must have memories dir in tree
-      const memDir = data.tree.find(
-        (e) => e.kind === "dir" && e.path.includes("memories"),
-      );
-      expect(memDir, "SP1: memories dir must be in tree").toBeTruthy();
-      if (!memDir || memDir.kind !== "dir") {
+      expect(prompt, "SP1: fragment must produce output").toBeTruthy();
+      if (!prompt) {
         return;
       }
-      expect(
-        memDir.totalCount,
-        "SP1: must have active memories",
-      ).toBeGreaterThan(0);
-      expect(
-        memDir.children.length,
-        "SP1: memories children must be non-empty",
-      ).toBeGreaterThan(0);
 
-      // Test-inserted identity/name.md must be present in children
-      const nameChild = memDir.children.find(
-        (c) => c.kind === "file" && c.path === "/memories/identity/name.md",
+      // Must reference the memories mount
+      expect(prompt, "SP1: memories dir must appear in prompt").toContain(
+        "/memories/",
       );
-      expect(
-        nameChild,
-        "SP1: identity/name.md must be in memories",
-      ).toBeTruthy();
-      if (!nameChild || nameChild.kind !== "file") {
-        return;
-      }
-      expect(
-        nameChild.excerpt.length,
-        "SP1: name.md must have real excerpt",
-      ).toBeGreaterThan(5);
-      expect(
-        nameChild.excerpt,
-        "SP1: must contain test identity text",
-      ).toContain("integration test identity");
+
+      // Must show a count badge for the memories dir (e.g. "memories/ (3)")
+      expect(prompt, "SP1: memories must show a file count badge").toMatch(
+        /memories\/.*\(\d+\)/,
+      );
+
+      // Test-inserted identity/name.md must appear
+      expect(prompt, "SP1: identity/name.md must be in prompt").toContain(
+        "name.md",
+      );
+
+      // The excerpt must contain the identity text we seeded
+      expect(prompt, "SP1: must contain test identity text").toContain(
+        "integration test identity",
+      );
 
       // Skills memory must also be present
-      const skillsChild = memDir.children.find(
-        (c) => c.kind === "file" && c.path === "/memories/expertise/skills.md",
+      expect(prompt, "SP1: expertise/skills.md must be in prompt").toContain(
+        "skills.md",
       );
-      expect(
-        skillsChild,
-        "SP1: expertise/skills.md must be in memories",
-      ).toBeTruthy();
     },
     SP_TIMEOUT,
   );
@@ -2435,8 +2496,8 @@ describe("Cortex System Prompt Injection", () => {
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
-      const data = await loadCortexData({
-        streamContext: undefined,
+      const prompt = await cortexFragment.build({
+        streamContext: rootlessStreamContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2447,8 +2508,6 @@ describe("Cortex System Prompt Injection", () => {
         isExposedFolder: false,
         subAgentDepth: 0,
       });
-
-      const prompt = cortexFragment.build(data);
       expect(prompt, "SP2: fragment must produce output").toBeTruthy();
       if (!prompt) {
         return;
@@ -2491,7 +2550,7 @@ describe("Cortex System Prompt Injection", () => {
 
   // ── SP3: incognito returns unavailable note (no memory leak) ─────────────
   it(
-    "SP3: incognito mode returns empty CortexData (memory isolation)",
+    "SP3: incognito mode returns unavailable note (memory isolation)",
     async () => {
       expect(testUser, "SP3: admin user not resolved").toBeTruthy();
       if (!testUser) {
@@ -2501,8 +2560,8 @@ describe("Cortex System Prompt Injection", () => {
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
-      const data = await loadCortexData({
-        streamContext: undefined,
+      const prompt = await cortexFragment.build({
+        streamContext: rootlessStreamContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2514,13 +2573,49 @@ describe("Cortex System Prompt Injection", () => {
         subAgentDepth: 0,
       });
 
-      expect(data.tree.length, "SP3: incognito must return empty tree").toBe(0);
-      expect(data.totalThreads, "SP3: incognito totalThreads must be 0").toBe(
-        0,
+      expect(prompt, "SP3: incognito must produce a prompt").toBeTruthy();
+      if (!prompt) {
+        return;
+      }
+
+      // Incognito path returns the cortex header + an unavailableNote, no tree data
+      expect(prompt, "SP3: must start with ## Cortex header").toContain(
+        "## Cortex",
       );
+      expect(
+        prompt,
+        "SP3: must contain incognito unavailability message",
+      ).toContain("incognito");
     },
     SP_TIMEOUT,
   );
+
+  // Seed a thread whose last user message is `query`, EMBEDDED — cortex search
+  // reads a thread's stored message vectors, so the query rides a real message
+  // (no query string is passed to the fragment anymore).
+  const seedQueryThread = async (
+    query: string,
+    label: string,
+  ): Promise<string> => {
+    const { threadId: seededThreadId, streamContext: seedCtx } =
+      await seedCaseThread(label);
+    const { MessagesRepository } = await import(
+      "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository"
+    );
+    await MessagesRepository.createUserMessage({
+      messageId: crypto.randomUUID(),
+      threadId: seededThreadId,
+      rootFolderId: DefaultFolderId.PRIVATE,
+      role: ChatMessageRole.USER,
+      content: query,
+      parentId: null,
+      userId: testUser?.id,
+      authorName: null,
+      logger: createEndpointLogger(false, defaultLocale),
+      streamContext: seedCtx,
+    });
+    return seededThreadId;
+  };
 
   // ── SP4: vector search returns relevant context for a query ───────────────
   it(
@@ -2530,13 +2625,17 @@ describe("Cortex System Prompt Injection", () => {
       if (!testUser) {
         return;
       }
+      const sp4ThreadId = await seedQueryThread(
+        "what TypeScript skills and expertise does the user have?",
+        "cortex-sp4-query",
+      );
 
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
       // Query something that should match our test-inserted skills.md
-      const data = await loadCortexData({
-        streamContext: undefined,
+      const prompt = await cortexFragment.build({
+        streamContext: rootlessStreamContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2546,47 +2645,21 @@ describe("Cortex System Prompt Injection", () => {
         isIncognito: false,
         isExposedFolder: false,
         subAgentDepth: 0,
-        lastUserMessage:
-          "what TypeScript skills and expertise does the user have?",
+        threadId: sp4ThreadId,
       });
 
-      // Relevant context is shown inline in the tree as file entries with score.
-      // Check all file entries with scores across the tree as proxy for embeddings working.
-      const allFileEntries = data.tree.flatMap((e) =>
-        e.kind === "dir"
-          ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
-          : [],
-      );
+      expect(prompt, "SP4: fragment must produce output").toBeTruthy();
+      if (!prompt) {
+        return;
+      }
 
       // The beforeAll embedded TypeScript/React expertise memories, so a query
       // about TypeScript skills MUST surface relevant scored files with score badges.
       // No skipping — embeddings must be present.
       expect(
-        allFileEntries.length,
-        "SP4: vector search must return scored relevant files for the query",
-      ).toBeGreaterThan(0);
-
-      // Scores must be in valid range
-      for (const node of allFileEntries) {
-        if (node.kind !== "file" || node.score === undefined) {
-          continue;
-        }
-        expect(
-          node.score,
-          `SP4: score for ${node.path} must be > 0`,
-        ).toBeGreaterThan(0);
-        expect(
-          node.score,
-          `SP4: score for ${node.path} must be <= 2`,
-        ).toBeLessThanOrEqual(2);
-        // Skill nodes are virtual-mounts with NULL content — they have no excerpt by design.
-        if (!node.path.startsWith("/skills/")) {
-          expect(
-            node.excerpt.length,
-            `SP4: excerpt for ${node.path} must be non-empty`,
-          ).toBeGreaterThan(0);
-        }
-      }
+        prompt,
+        "SP4: vector search must render score badges in the prompt",
+      ).toMatch(/\[\d+%\]/);
     },
     SP_TIMEOUT,
   );
@@ -2599,12 +2672,16 @@ describe("Cortex System Prompt Injection", () => {
       if (!testUser) {
         return;
       }
+      const sp5ThreadId = await seedQueryThread(
+        "TypeScript React expertise and technical skills",
+        "cortex-sp5-query",
+      );
 
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
-      const data = await loadCortexData({
-        streamContext: undefined,
+      const prompt = await cortexFragment.build({
+        streamContext: rootlessStreamContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2614,43 +2691,17 @@ describe("Cortex System Prompt Injection", () => {
         isIncognito: false,
         isExposedFolder: false,
         subAgentDepth: 0,
-        lastUserMessage: "TypeScript React expertise and technical skills",
+        threadId: sp5ThreadId,
       });
 
-      // A score badge renders only for NON-pinned scored files (pinned files
-      // suppress the score — see renderFileEntryLines). Count those, since they
-      // are exactly the entries that must produce a `[NN%]` badge.
-      const { renderCortexTree } = await import("./system-prompt");
-      const renderedTree = renderCortexTree(data);
-      const scoredRenderableFiles = data.tree.flatMap((e) =>
-        e.kind === "dir"
-          ? e.children.filter(
-              (c) =>
-                c.kind === "file" && c.score !== undefined && c.pinned !== true,
-            )
-          : [],
-      );
-
-      // Embeddings MUST be present for the admin user in the dev DB (the suite
-      // materializes + backfills them). Assert relevance actually surfaced —
-      // do not silently skip.
-      expect(
-        scoredRenderableFiles.length,
-        "SP5: at least one non-pinned scored (relevant) file must surface — embeddings missing? run cortex-embed-backfill",
-      ).toBeGreaterThan(0);
-
-      const prompt = cortexFragment.build(data);
       expect(prompt, "SP5: prompt must be non-null").toBeTruthy();
       if (!prompt) {
         return;
       }
 
-      // Both the standalone tree render and the full fragment must show the
-      // relevant results inline with the current `[NN%]` score badge.
-      expect(
-        renderedTree,
-        "SP5: renderCortexTree must show a [NN%] score badge",
-      ).toMatch(/\[\d+%\]/);
+      // Embeddings MUST be present for the admin user in the dev DB (the suite
+      // materializes + backfills them). The full fragment must show relevant
+      // results inline with the `[NN%]` score badge — do not silently skip.
       expect(
         prompt,
         "SP5: cortexFragment must show a [NN%] score badge",
@@ -2671,33 +2722,21 @@ describe("Cortex System Prompt Injection", () => {
       const { cortexFragment } = await import("./system-prompt");
       const logger = createEndpointLogger(false, defaultLocale);
 
-      const data = await loadCortexData({
-        streamContext: undefined,
-        user: testUser,
-        logger,
-        locale: defaultLocale,
-        rootFolderId: DefaultFolderId.PRIVATE,
-        subFolderId: null,
-        skillId: null,
-        isIncognito: false,
-        isExposedFolder: false,
-        subAgentDepth: 0,
-      });
-
-      const memDir6 = data.tree.find(
-        (e) => e.kind === "dir" && e.path.includes("memories"),
-      );
-      expect(memDir6, "SP6: must have memories dir in tree").toBeTruthy();
-      if (!memDir6 || memDir6.kind !== "dir") {
-        return;
-      }
-      expect(
-        memDir6.children.length,
-        "SP6: must have memories",
-      ).toBeGreaterThan(0);
+      const prompt =
+        (await cortexFragment.build({
+          streamContext: rootlessStreamContext(),
+          user: testUser,
+          logger,
+          locale: defaultLocale,
+          rootFolderId: DefaultFolderId.PRIVATE,
+          subFolderId: null,
+          skillId: null,
+          isIncognito: false,
+          isExposedFolder: false,
+          subAgentDepth: 0,
+        })) ?? "";
 
       // The fragment builds sorted memories - check name.md (P:100) appears before background.md (P:70)
-      const prompt = cortexFragment.build(data) ?? "";
       const nameIdx = prompt.indexOf("name.md");
       const backgroundIdx = prompt.indexOf("background.md");
 

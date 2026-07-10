@@ -81,6 +81,130 @@ interface RemoteConnectionByIdWidgetProps {
   field: (typeof definitionsType.PATCH)["fields"];
 }
 
+// ─── Connection state helpers ─────────────────────────────────────────────────
+
+type ConnectionState =
+  | "healthy-tunnel"
+  | "healthy-bridge"
+  | "warning"
+  | "critical"
+  | "inactive";
+
+function deriveConnectionState(status: {
+  isActive: boolean | null;
+  transportMode: string | null;
+  wsConnectedAt: string | null;
+}): ConnectionState {
+  if (!status.isActive) {
+    return "inactive";
+  }
+  if (status.wsConnectedAt) {
+    return status.transportMode === "reverse-ws"
+      ? "healthy-tunnel"
+      : "healthy-bridge";
+  }
+  // Active but no WS — critical (initial sync not yet done or dropped)
+  return "critical";
+}
+
+function ConnectionStateBar({
+  state,
+  wsConnectedAt,
+  lastSyncedAt,
+  locale,
+  t,
+}: {
+  state: ConnectionState;
+  wsConnectedAt: string | null;
+  lastSyncedAt: string | null;
+  locale: string;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+}): JSX.Element {
+  const iconClass = "h-4 w-4 flex-shrink-0";
+
+  if (state === "healthy-tunnel") {
+    const connectedSince = wsConnectedAt
+      ? new Date(wsConnectedAt).toLocaleString(locale)
+      : null;
+    return (
+      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+        <Activity
+          className={`${iconClass} text-emerald-600 dark:text-emerald-400`}
+        />
+        <Div className="flex flex-col gap-0.5 min-w-0">
+          <P className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            {t("widget.state.tunnelActive")}
+          </P>
+          {connectedSince && (
+            <P className="text-xs text-emerald-700/70 dark:text-emerald-400/70">
+              {t("widget.state.connectedSince")} {connectedSince}
+            </P>
+          )}
+        </Div>
+      </Div>
+    );
+  }
+
+  if (state === "healthy-bridge") {
+    const syncedAt = lastSyncedAt
+      ? new Date(lastSyncedAt).toLocaleString(locale)
+      : null;
+    return (
+      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+        <Activity
+          className={`${iconClass} text-emerald-600 dark:text-emerald-400`}
+        />
+        <Div className="flex flex-col gap-0.5 min-w-0">
+          <P className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            {t("widget.state.bridgeActive")}
+          </P>
+          {syncedAt && (
+            <P className="text-xs text-emerald-700/70 dark:text-emerald-400/70">
+              {t("widget.state.initialSync")} {syncedAt}
+            </P>
+          )}
+        </Div>
+      </Div>
+    );
+  }
+
+  if (state === "warning") {
+    return (
+      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+        <AlertTriangle
+          className={`${iconClass} text-amber-600 dark:text-amber-400`}
+        />
+        <P className="text-sm font-medium text-amber-800 dark:text-amber-300">
+          {t("widget.state.degraded")}
+        </P>
+      </Div>
+    );
+  }
+
+  if (state === "critical") {
+    return (
+      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
+        <AlertCircle
+          className={`${iconClass} text-red-600 dark:text-red-400`}
+        />
+        <P className="text-sm font-medium text-red-800 dark:text-red-300">
+          {t("widget.state.connectionLost")}
+        </P>
+      </Div>
+    );
+  }
+
+  // inactive
+  return (
+    <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-muted/50 border">
+      <WifiOff className={`${iconClass} text-muted-foreground`} />
+      <P className="text-sm font-medium text-muted-foreground">
+        {t("widget.state.inactive")}
+      </P>
+    </Div>
+  );
+}
+
 // ─── Sync scope editor (form-context aware, provider-driven) ──────────────────
 
 function SyncScopeEditor({
@@ -102,8 +226,9 @@ function SyncScopeEditor({
     syncProvidersEndpoint.read?.data?.providers ?? [];
 
   const current: Record<string, boolean> = {};
+  const scopeRecord = syncScope as Record<string, boolean | undefined> | null;
   for (const p of providers) {
-    current[p.key] = syncScope?.[p.key] ?? false;
+    current[p.key] = scopeRecord?.[p.key] ?? false;
   }
 
   const toggle = (key: string): void => {
@@ -175,8 +300,16 @@ function SyncScopeViewSection({
             label={p.label}
             value={
               <StatusPill
-                status={syncScope[p.key] ? "on" : "off"}
-                variant={syncScope[p.key] ? "success" : "default"}
+                status={
+                  (syncScope as Record<string, boolean | undefined>)[p.key]
+                    ? "on"
+                    : "off"
+                }
+                variant={
+                  (syncScope as Record<string, boolean | undefined>)[p.key]
+                    ? "success"
+                    : "default"
+                }
               />
             }
           />
@@ -196,8 +329,11 @@ function ViewWidget({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const { push: navigate, pop, canGoBack, current } = useWidgetNavigation();
   const endpointMutations = useWidgetEndpointMutations();
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const availability = useProviderAvailability();
 
   const status = useWidgetValue<typeof definitionsType.GET>();
   const instanceId =
@@ -283,9 +419,50 @@ function ViewWidget({
     );
   }
 
+  const connState = deriveConnectionState({
+    isActive: status.isActive,
+    transportMode: status.transportMode,
+    wsConnectedAt: status.wsConnectedAt,
+  });
+
+  const isUnhealthy =
+    connState === "critical" ||
+    connState === "inactive" ||
+    connState === "warning";
+
   const handleRefresh = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void endpointMutations?.read?.refetch();
+  };
+
+  const handleReconnect = (e: ButtonMouseEvent): void => {
+    e.stopPropagation();
+    setIsReconnecting(true);
+    void (async (): Promise<void> => {
+      try {
+        await apiClient.mutate(
+          definitions.PATCH,
+          logger,
+          user,
+          {
+            reconnectNow: true,
+            syncScope: status.syncScope ?? {
+              memories: true,
+              documents: true,
+              skills: true,
+              favorites: true,
+              threads: false,
+            },
+          },
+          { instanceId },
+          locale,
+          availability,
+        );
+        void endpointMutations?.read?.refetch();
+      } finally {
+        setIsReconnecting(false);
+      }
+    })();
   };
 
   const handleEdit = (e: ButtonMouseEvent): void => {
@@ -347,14 +524,30 @@ function ViewWidget({
         }
         actions={
           <Div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-            >
-              {t("widget.connected.refresh")}
-            </Button>
+            {isUnhealthy ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReconnect}
+                disabled={isReconnecting}
+                className="gap-1.5"
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5${isReconnecting ? " animate-spin" : ""}`}
+                />
+                {t("widget.reconnectButton")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+              >
+                {t("widget.connected.refresh")}
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -377,7 +570,18 @@ function ViewWidget({
         }
       />
 
-      {/* ── Status ─────────────────────────────────────────────────────── */}
+      {/* ── Connection state banner ────────────────────────────────────── */}
+      <Div className="px-4 pt-4">
+        <ConnectionStateBar
+          state={connState}
+          wsConnectedAt={status.wsConnectedAt ?? null}
+          lastSyncedAt={status.lastSyncedAt ?? null}
+          locale={locale}
+          t={t}
+        />
+      </Div>
+
+      {/* ── Connection details ─────────────────────────────────────────── */}
       <SectionGroup title={t("widget.statusSection")}>
         <DetailGrid columns={2}>
           <DetailField
@@ -385,27 +589,24 @@ function ViewWidget({
             value={status.remoteUrl ?? "—"}
             mono
           />
-          <DetailField
-            label={t("widget.statusSection")}
-            value={
-              <StatusPill
-                status={status.isActive ? "active" : "inactive"}
-                variant={status.isActive ? "success" : "danger"}
-              />
-            }
-          />
           {status.transportMode && (
             <DetailField
               label={t("widget.connected.transport")}
-              value={status.transportMode}
-              mono
+              value={
+                status.transportMode === "reverse-ws"
+                  ? t("widget.connected.transportReverseWs")
+                  : t("widget.connected.transportDirectHttp")
+              }
             />
           )}
           {status.remoteTransportMode && (
             <DetailField
               label={t("widget.connected.remoteTransport")}
-              value={status.remoteTransportMode}
-              mono
+              value={
+                status.remoteTransportMode === "reverse-ws"
+                  ? t("widget.connected.transportReverseWs")
+                  : t("widget.connected.transportDirectHttp")
+              }
             />
           )}
           {status.capabilitiesVersion && (
@@ -535,6 +736,7 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
 
   return (
     <WidgetShell>
+      {/* Sticky header */}
       <Div className="flex items-center gap-2 px-4 pt-4 pb-3 sticky top-0 bg-background z-10 border-b">
         {canGoBack ? (
           <Button
@@ -558,8 +760,8 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
       <FormAlertWidget field={emptyField} />
 
       <Div className="px-4 py-4 flex flex-col gap-6">
-        {/* ── Rename ────────────────────────────────────────────────── */}
-        <SectionGroup title={t("patch.newInstanceId.label")}>
+        {/* ── Identity ─────────────────────────────────────────────── */}
+        <SectionGroup title={t("widget.edit.identitySection")}>
           <TextFieldWidget
             fieldName="newInstanceId"
             field={children.newInstanceId}
@@ -567,7 +769,7 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
         </SectionGroup>
 
         {/* ── Re-authenticate ───────────────────────────────────────── */}
-        <SectionGroup title={t("widget.reauthButton")}>
+        <SectionGroup title={t("widget.edit.reauthSection")}>
           <P className="text-xs text-muted-foreground mb-3">
             {t("patch.email.description")}
           </P>
@@ -580,22 +782,36 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
           </Div>
         </SectionGroup>
 
-        {/* ── Behavior + Sync — admin only, always visible ──────────── */}
+        {/* ── Admin-only: Transport, Behavior & Sync ────────────────── */}
         {isAdmin && (
           <>
-            <SectionGroup title={t("widget.behaviorSection")}>
+            <SectionGroup title={t("widget.edit.transportSection")}>
+              <P className="text-xs text-muted-foreground mb-3">
+                {t("patch.transportMode.description")}
+              </P>
+              <SelectFieldWidget
+                fieldName="transportMode"
+                field={children.transportMode}
+              />
+            </SectionGroup>
+
+            <SectionGroup title={t("widget.edit.behaviorSection")}>
               <Div className="flex flex-col gap-3">
                 <BooleanFieldWidget
                   fieldName="isInferenceProvider"
                   field={children.isInferenceProvider}
                 />
-                <SelectFieldWidget
-                  fieldName="transportMode"
-                  field={children.transportMode}
-                />
                 <BooleanFieldWidget
                   fieldName="forceSystemProvider"
                   field={children.forceSystemProvider}
+                />
+                <SelectFieldWidget
+                  fieldName="threadMirrorMode"
+                  field={children.threadMirrorMode}
+                />
+                <SelectFieldWidget
+                  fieldName="loopLocation"
+                  field={children.loopLocation}
                 />
               </Div>
             </SectionGroup>

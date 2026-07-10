@@ -107,8 +107,9 @@ export class ThreadByIdRepository {
         pinned: thread.pinned,
         archived: thread.archived,
         tags: thread.tags ?? [],
-        preview: thread.preview,
-        metadata: thread.metadata ?? {},
+        description: thread.description,
+        // No durable per-thread stream state to expose here.
+        metadata: {},
         createdAt: thread.createdAt,
         updatedAt: thread.updatedAt,
         leadId: thread.leadId,
@@ -243,7 +244,7 @@ export class ThreadByIdRepository {
                 title: updatedThread.title,
                 folderId: updatedThread.folderId,
                 status: updatedThread.status,
-                preview: updatedThread.preview,
+                description: updatedThread.description,
                 rootFolderId: updatedThread.rootFolderId,
                 updatedAt: updatedThread.updatedAt,
               },
@@ -415,7 +416,7 @@ export class ThreadByIdRepository {
         rootFolderId: deletedThread.rootFolderId,
         folderId: deletedThread.folderId,
         status: deletedThread.status,
-        preview: deletedThread.preview,
+        description: deletedThread.description,
         createdAt: deletedThread.createdAt,
         updatedAt: deletedThread.updatedAt,
       });
@@ -503,9 +504,25 @@ export class ThreadByIdRepository {
     } else if (userId && !existingThread) {
       // Brand-new mirror: the sender IS the origin for a first-contact
       // thread-updated. Place by the wire folderId when the (same-id) folder
-      // already synced; otherwise unplaced — folder events / pull heal it.
+      // already synced; fall back to the scaffold (REMOTE/<origin>/private|
+      // background) so the thread always lands in the correct instance subtree
+      // rather than at the REMOTE root — folder events / pull heal the precise
+      // sub-folder placement on the next exchange.
       const placeable = await wireFolderExists();
-      const mirrorFolderId = placeable ? (parsed.data.folderId ?? null) : null;
+      let mirrorFolderId: string | null = placeable
+        ? (parsed.data.folderId ?? null)
+        : null;
+      if (mirrorFolderId === null && props.originInstanceId) {
+        const { resolveScaffoldFolderId } =
+          await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+        const senderRootFolderId =
+          parsed.data.rootFolderId ?? DefaultFolderId.PRIVATE;
+        mirrorFolderId = await resolveScaffoldFolderId(
+          userId,
+          props.originInstanceId,
+          senderRootFolderId,
+        );
+      }
       const [createdMirror] = await db
         .insert(chatThreads)
         .values({

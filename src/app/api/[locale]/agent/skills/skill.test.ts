@@ -256,7 +256,7 @@ describe("Skill Creator E2E", () => {
   it(
     "SC1: Thea delegates to skill-creator via ai-run → tool-help → skill-create → favorite-create (no retries)",
     async () => {
-      const fixtureCtx: FixtureContext = { name: "skill-creator-sc1-create" };
+      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       /**
        * Prompt is sent to Thea (default skill). Thea should delegate to

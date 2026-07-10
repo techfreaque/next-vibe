@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T5b await-task] Call the local await-task tool (do NOT use execute-tool for this - call await-task directly) with taskId='remote-ws-hermes-call-397bdac2182a41b4b934c023'. Check that the result contains a responsePath string (either directly or nested in a result field). End your reply with STEP_OK if responsePath is present, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -88,10 +88,14 @@ export class TaskReportRepository {
       });
       return success({ processed: true });
     }
-    const revival = outcome.kind === "completed" ? outcome.revival : null;
+    // The registry outcome carries only the anchor (threadId + toolMessageId)
+    // of the waiter that parked this call; everything else (model/skill/etc.)
+    // comes from the wire context. The anchor wins so the correct tool message
+    // is backfilled even if the wire context points elsewhere.
+    const completed = outcome.kind === "completed" ? outcome : null;
 
-    const revivalThreadId = revival?.threadId ?? ctx.threadId;
-    const revivalToolMessageId = revival?.toolMessageId ?? ctx.toolMessageId;
+    const revivalThreadId = completed?.threadId ?? ctx.threadId;
+    const revivalToolMessageId = completed?.toolMessageId ?? ctx.toolMessageId;
 
     if (!revivalToolMessageId && !revivalThreadId) {
       logger.warn("Task report (context): no revival target in context", {
@@ -120,26 +124,18 @@ export class TaskReportRepository {
           ? await RemoteConnectionRepository.getLocalInstanceId(owner.userId)
           : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
-      // Revival override from await-task (registry) wins over the wire
-      // context — the waiter's tool message is what must be backfilled.
-      const revivalMode: CallbackModeValue | null = revival
-        ? revival.callbackMode === CallbackMode.WAIT
-          ? CallbackMode.WAIT
-          : CallbackMode.WAKE_UP
-        : callbackMode;
-
       await TaskCompletion.handle({
         toolMessageId: revivalToolMessageId ?? "",
         threadId: revivalThreadId,
-        callbackMode: revivalMode,
+        callbackMode,
         status: finalStatus,
         output: data.output ?? null,
         taskId: data.taskId,
-        modelId: revival?.modelId ?? ctx.modelId,
-        skillId: revival?.skillId ?? ctx.skillId,
-        favoriteId: revival?.favoriteId ?? ctx.favoriteId,
-        leafMessageId: revival?.leafMessageId ?? ctx.leafMessageId,
-        subAgentDepth: revival?.subAgentDepth ?? ctx.subAgentDepth,
+        modelId: ctx.modelId,
+        skillId: ctx.skillId,
+        favoriteId: ctx.favoriteId,
+        leafMessageId: ctx.leafMessageId,
+        subAgentDepth: ctx.subAgentDepth,
         ownerUser: ownerContext.user,
         logger,
         selfInstanceId,
@@ -273,9 +269,7 @@ export class TaskReportRepository {
                 ? CronTaskStatus.TIMEOUT
                 : CronTaskStatus.FAILED;
 
-        const updates: Partial<NewCronTask<Record<string, WidgetData>>> & {
-          updatedAt: Date;
-        } = {
+        const updates: Partial<CronTaskRow> & { updatedAt: Date } = {
           lastExecutedAt: now,
           lastExecutionStatus: finalStatus,
           lastExecutionDuration: data.durationMs ?? null,
@@ -341,65 +335,16 @@ export class TaskReportRepository {
           serverTz: data.serverTimezone,
         });
 
-        // Read revival context from typed wakeUp* columns - not from untyped taskInput JSON.
-        const toolMessageId = task.wakeUpToolMessageId ?? null;
-        const threadId = task.wakeUpThreadId ?? null;
-        const rawCallbackMode = task.wakeUpCallbackMode;
-        const callbackMode: CallbackModeValue | null =
-          rawCallbackMode === CallbackMode.WAIT
-            ? CallbackMode.WAIT
-            : rawCallbackMode === CallbackMode.DETACH
-              ? CallbackMode.DETACH
-              : rawCallbackMode === CallbackMode.END_LOOP
-                ? CallbackMode.END_LOOP
-                : rawCallbackMode === CallbackMode.WAKE_UP
-                  ? CallbackMode.WAKE_UP
-                  : rawCallbackMode === CallbackMode.APPROVE
-                    ? CallbackMode.APPROVE
-                    : null;
-
-        const owner = dbUserIdToOwner(task.userId);
-
-        if (toolMessageId ?? threadId) {
-          const ownerContext = await resolveTaskOwnerUser(
-            owner,
-            locale,
-            logger,
-          );
-          if (ownerContext) {
-            const { RemoteConnectionRepository } =
-              await import("@/app/api/[locale]/remote-connection/repository");
-            // getLocalInstanceId respects user-configured instance identity (DB);
-            // falls back to deriveDefaultSelfInstanceId() (env-based) when no
-            // record exists - on Thea (prod) this resolves to "thea".
-            const selfInstanceId =
-              owner.type === "user"
-                ? await RemoteConnectionRepository.getLocalInstanceId(
-                    owner.userId,
-                  )
-                : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-
-            await TaskCompletion.handle({
-              toolMessageId: toolMessageId ?? "",
-              threadId,
-              callbackMode,
-              status: finalStatus,
-              output: data.output ?? null,
-              taskId: task.id,
-              modelId: task.wakeUpModelId ?? null,
-              skillId: task.wakeUpSkillId ?? null,
-              favoriteId: task.wakeUpFavoriteId ?? null,
-              leafMessageId: task.wakeUpLeafMessageId ?? null,
-              subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
-              ownerUser: ownerContext.user,
-              logger,
-              // Pin resume-stream to THIS instance so Hermes (remote) doesn't
-              // steal the revival cron task that must run on Thea (prod).
-              selfInstanceId,
-              abortSignal,
-            });
-          }
-        }
+        // Merge result into the parked resume-stream task and fire it.
+        await TaskCompletion.enableAndFireParkedResumeTask({
+          taskId: task.id,
+          status:
+            finalStatus === CronTaskStatus.COMPLETED ? "completed" : "failed",
+          output: data.output ?? null,
+          locale,
+          logger,
+          abortSignal,
+        });
       }
 
       return success({ processed: true });

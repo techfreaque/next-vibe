@@ -112,6 +112,12 @@ const nextConfig: NextConfig = {
       "src/app/api/**/generators/**": {
         loaders: ["ignore-loader"],
       },
+      "src/app/api/**/generator.ts": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/seeds.ts": {
+        loaders: ["ignore-loader"],
+      },
       // CLI install uses process.cwd() + path.join() which causes full project trace
       "src/app/api/**/cli/setup/install/**": {
         loaders: ["ignore-loader"],
@@ -124,6 +130,11 @@ const nextConfig: NextConfig = {
         loaders: ["ignore-loader"],
       },
       "src/generated/app-tanstack/**": {
+        loaders: ["ignore-loader"],
+      },
+      // AI test fixtures (recorded HTTP/WS/claude-code exchanges + media) —
+      // 1.5G of JSON/binary read via fs at runtime, never imported.
+      "src/generated/ai-fixtures/**": {
         loaders: ["ignore-loader"],
       },
     },
@@ -178,7 +189,7 @@ const nextConfig: NextConfig = {
     if (isServer) {
       config.module.rules.push(
         {
-          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install|tanstack-start[\\/]generate)[\\/]/,
+          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install|tanstack-start[\\/]generate)[\\/]|[\\/]src[\\/]app[\\/]api[\\/].*[\\/](generator|seeds)\.ts$/,
           loader: "null-loader",
         },
         // CLI/MCP renderers use React hooks - stub them out for server builds

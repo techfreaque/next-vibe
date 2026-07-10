@@ -117,7 +117,7 @@ async function assertNoPendingTasks(threadId: string): Promise<void> {
     last_execution_status: string | null;
   }>(
     sql`SELECT id, last_execution_status FROM cron_tasks
-        WHERE wake_up_thread_id = ${threadId}
+        WHERE task_input->>'threadId' = ${threadId}
           AND enabled = true
           AND (last_execution_status IS NULL
                OR last_execution_status NOT IN ('completed', 'cancelled', 'failed', 'stopped'))`,
@@ -329,8 +329,8 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         mainFavoriteId = MAIN_FAVORITE_ID;
       }
 
-      // All suite threads land in BACKGROUND -> tests -> <testCaseName>.
-      const suiteRootFolderId = DefaultFolderId.BACKGROUND;
+      // All suite threads land in PRIVATE -> tests -> <testCaseName>.
+      const suiteRootFolderId = DefaultFolderId.PRIVATE;
       const testCaseName =
         cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
         "coding-agent";
@@ -390,7 +390,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             .where(
               and(
                 like(cronTasks.routeId, "resume-stream%"),
-                sql`(${cronTasks.wakeUpThreadId} IS NULL OR ${cronTasks.wakeUpThreadId} != ${tid})`,
+                sql`(${cronTasks.taskInput}->>'threadId' IS NULL OR ${cronTasks.taskInput}->>'threadId' != ${tid})`,
               ),
             );
 
@@ -457,7 +457,10 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+              expect(
+                false,
+                `[${name}] Previous test in suite failed — aborting dependent tests`,
+              ).toBe(true);
               return;
             }
             try {
@@ -478,13 +481,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA1: batch WAIT - coding-agent output backfilled in original tool message",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca1-batch-wait`,
-          };
+          const { threadId: seededThreadId, streamContext } =
+            await seedCaseThread(`${cfg.cachePrefix}ca1-batch-wait`, true);
 
           const { result, messages } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            threadId: seededThreadId,
+            streamContext,
             favoriteId: mainFavoriteId,
             prompt: `[CA1] Call ${agentInstr(cfg, "echo hello-ca1", false, "wait")}. After the tool returns, verify the result has an 'output' string containing "hello-ca1". Reply with STEP_OK and quote the exact output value.`,
           });
@@ -544,7 +547,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           // execute-tool wraps synchronous results in {result: <innerData>}
           const inner =
             res !== null && "result" in (res ?? {})
-              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              ? (toolResultRecord(
+                  res!["result"] as Record<string, WidgetData>,
+                ) ?? res)
               : res;
 
           // WAIT: inner result must have exactly {output, durationMs} - no extra keys
@@ -597,13 +602,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA2: batch END_LOOP - result backfilled, no deferred child, no revival",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca2-batch-endloop`,
-          };
-
           const { result, messages } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA2] Call ${agentInstr(cfg, "echo hello-ca2-endloop", false, "endLoop")}. Stream stops after the tool call. Confirm you received output containing "hello-ca2-endloop". Reply with STEP_OK.`,
@@ -628,7 +633,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const inner =
             res !== null && "result" in (res ?? {})
-              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              ? (toolResultRecord(
+                  res!["result"] as Record<string, WidgetData>,
+                ) ?? res)
               : res;
 
           // END_LOOP: inner result must have exactly {output, durationMs} - no extra keys
@@ -678,13 +685,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA3: batch DETACH - taskId returned immediately, result NOT injected into thread",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca3-batch-detach`,
-          };
-
           const { result, messages } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA3] Call ${agentInstr(cfg, "echo hello-ca3-detach", false, "detach")}. The tool must return a taskId immediately without waiting. Confirm you received a taskId string. Reply with STEP_OK and include the taskId value.`,
@@ -704,7 +711,10 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           ).toBeDefined();
 
           const res = toolResultRecord(toolMsg?.toolCall?.result);
-          expect(res, `CA3: result must be an object (got: ${JSON.stringify(toolMsg?.toolCall?.result)})`).not.toBeNull();
+          expect(
+            res,
+            `CA3: result must be an object (got: ${JSON.stringify(toolMsg?.toolCall?.result)})`,
+          ).not.toBeNull();
 
           // DETACH: execute-tool initially returns {hint, taskId}. But the goroutine
           // may complete before fetchThreadMessages runs, causing handleTaskCompletion
@@ -720,7 +730,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           if (isDetachInitial) {
             const taskId = res?.["taskId"];
             expect(taskId, "CA3: taskId must be present").toBeTruthy();
-            expect(typeof taskId, "CA3: taskId must be a string").toBe("string");
+            expect(typeof taskId, "CA3: taskId must be a string").toBe(
+              "string",
+            );
             expect(
               String(taskId).length,
               "CA3: taskId must be non-empty",
@@ -731,8 +743,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             expect(typeof hint, "CA3: hint must be a string").toBe("string");
           } else {
             // Backfilled: goroutine completed before test read messages
-            const inner = toolResultRecord(res?.["result"] as Record<string, WidgetData>);
-            expect(inner, "CA3: backfilled result must have {output, durationMs}").not.toBeNull();
+            const inner = toolResultRecord(
+              res?.["result"] as Record<string, WidgetData>,
+            );
+            expect(
+              inner,
+              "CA3: backfilled result must have {output, durationMs}",
+            ).not.toBeNull();
             expect(
               String(inner?.["output"] ?? ""),
               "CA3: backfilled output must contain hello-ca3-detach",
@@ -766,13 +783,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA4: batch WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca4-batch-wakeup`,
-          };
-
           const { result } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA4] Call ${agentInstr(cfg, "echo hello-ca4-wakeup", false, "wakeUp")} ONCE. After the tool returns a taskId, call the await-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca4-wakeup" then reply STEP_OK quoting the exact output value.`,
@@ -833,10 +850,18 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           function findOutputInResult(
             r: Record<string, WidgetData> | null,
           ): Record<string, WidgetData> | null {
-            if (!r) {return null;}
-            if ("output" in r && "durationMs" in r) {return r;}
-            const inner = toolResultRecord(r["result"] as Record<string, WidgetData>);
-            if (inner) {return findOutputInResult(inner);}
+            if (!r) {
+              return null;
+            }
+            if ("output" in r && "durationMs" in r) {
+              return r;
+            }
+            const inner = toolResultRecord(
+              r["result"] as Record<string, WidgetData>,
+            );
+            if (inner) {
+              return findOutputInResult(inner);
+            }
             return null;
           }
           const waitInner = findOutputInResult(waitRawRes);
@@ -914,7 +939,10 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+              expect(
+                false,
+                `[${name}] Previous test in suite failed — aborting dependent tests`,
+              ).toBe(true);
               return;
             }
             try {
@@ -935,13 +963,16 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA5: interactive WAIT - escalates, stream waits, complete-task → backfill + revival",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca5-interactive-wait`,
-          };
+          const { threadId: seededThreadId, streamContext } =
+            await seedCaseThread(
+              `${cfg.cachePrefix}ca5-interactive-wait`,
+              true,
+            );
 
           const { result } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            threadId: seededThreadId,
+            streamContext,
             favoriteId: mainFavoriteId,
             prompt: `[CA5] Call ${agentInstr(cfg, "echo hello-ca5-wait", true, "wait")}. The tool escalates to a background task. After revival verify the result output contains "hello-ca5-wait". Reply with STEP_OK and quote the exact output.`,
           });
@@ -973,7 +1004,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const inner =
             res !== null && "result" in (res ?? {})
-              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              ? (toolResultRecord(
+                  res!["result"] as Record<string, WidgetData>,
+                ) ?? res)
               : res;
 
           // Interactive WAIT: inner result must have exactly {output, durationMs}
@@ -1031,13 +1064,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA6: interactive END_LOOP - escalates, stream stops, result backfilled, no deferred",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca6-interactive-endloop`,
-          };
-
           const { result, messages } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA6] Call ${agentInstr(cfg, "echo hello-ca6-endloop", true, "endLoop")}. Stream stops after execution. Confirm output contains "hello-ca6-endloop". Reply with STEP_OK.`,
@@ -1062,7 +1095,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const inner =
             res !== null && "result" in (res ?? {})
-              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              ? (toolResultRecord(
+                  res!["result"] as Record<string, WidgetData>,
+                ) ?? res)
               : res;
 
           // Interactive END_LOOP: inner result must have exactly {output, durationMs}
@@ -1119,13 +1154,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA7: interactive DETACH - taskId returned immediately, no result injection",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca7-interactive-detach`,
-          };
-
           const { result, messages } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA7] Call ${agentInstr(cfg, "echo hello-ca7-detach", true, "detach")}. Must return taskId immediately. Confirm you got a taskId string. Reply with STEP_OK including the taskId.`,
@@ -1161,7 +1196,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           if (isDetachInitial) {
             const taskId = res?.["taskId"];
             expect(taskId, "CA7: taskId must be present").toBeTruthy();
-            expect(typeof taskId, "CA7: taskId must be a string").toBe("string");
+            expect(typeof taskId, "CA7: taskId must be a string").toBe(
+              "string",
+            );
             expect(
               String(taskId).length,
               "CA7: taskId must be non-empty",
@@ -1172,8 +1209,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             expect(typeof hint, "CA7: hint must be a string").toBe("string");
           } else {
             // Backfilled: goroutine completed before test read messages
-            const inner = toolResultRecord(res?.["result"] as Record<string, WidgetData>);
-            expect(inner, "CA7: backfilled result must have {output, durationMs}").not.toBeNull();
+            const inner = toolResultRecord(
+              res?.["result"] as Record<string, WidgetData>,
+            );
+            expect(
+              inner,
+              "CA7: backfilled result must have {output, durationMs}",
+            ).not.toBeNull();
             expect(
               String(inner?.["output"] ?? ""),
               "CA7: backfilled output must contain hello-ca7-detach",
@@ -1214,13 +1256,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA8: interactive WAKE_UP - AI dispatches task, calls await-task, result backfilled on revival",
         async () => {
-          const fixtureCtx: FixtureContext = {
-            name: `${cfg.cachePrefix}ca8-interactive-wakeup`,
-          };
-
           const { result } = await runStream({
             user: testUser,
-            fixtureContext: fixtureCtx,
+            streamContext: makeHeadlessContext(
+              undefined,
+              threadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
             threadId,
             favoriteId: mainFavoriteId,
             prompt: `[CA8] Call ${agentInstr(cfg, "echo hello-ca8-wakeup", true, "wakeUp")} ONCE. After the tool returns a taskId, call await-task ONCE with that taskId. Do NOT call execute-tool again under any circumstances. When await-task returns with output, verify it contains "hello-ca8-wakeup" then reply STEP_OK quoting the exact output value.`,
@@ -1279,10 +1321,18 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           function findOutputInResultCA8(
             r: Record<string, WidgetData> | null,
           ): Record<string, WidgetData> | null {
-            if (!r) {return null;}
-            if ("output" in r && "durationMs" in r) {return r;}
-            const inner = toolResultRecord(r["result"] as Record<string, WidgetData>);
-            if (inner) {return findOutputInResultCA8(inner);}
+            if (!r) {
+              return null;
+            }
+            if ("output" in r && "durationMs" in r) {
+              return r;
+            }
+            const inner = toolResultRecord(
+              r["result"] as Record<string, WidgetData>,
+            );
+            if (inner) {
+              return findOutputInResultCA8(inner);
+            }
             return null;
           }
           const waitInner = findOutputInResultCA8(waitRawRes);

@@ -735,6 +735,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
       errorMessage: null,
       errorCode: null,
       searchVector: null,
+      embedding: null,
+      embeddingHash: null,
       createdAt: now,
       updatedAt: now,
     };

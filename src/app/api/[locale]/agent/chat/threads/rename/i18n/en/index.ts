@@ -82,5 +82,13 @@ export const translations = {
       title: "Thread renamed",
       description: "The thread title and preview have been updated",
     },
+    backButton: {
+      label: "Cancel",
+    },
+    submitButton: {
+      label: "Save",
+      loadingText: "Saving...",
+    },
+    dynamicTitle: "Rename Thread: {{title}}",
   },
 };

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result has a `taskId` string and no `responsePath` — correct detached behavior.\n\nSTEP_OK taskId=remote-ws-hermes-call-397bdac2182a41b4b934c023",
+    "encoding_format": "float"
+  }
+}

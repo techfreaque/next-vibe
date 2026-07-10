@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Contact form submitted successfully with the automated test message. The tool handled the confirmation prompt internally as expected — result came back clean.\n\n**Test result:** **PASS** — CF1: contact-form accepts exact arguments and routes through approval flow correctly.",
+    "encoding_format": "float"
+  }
+}
