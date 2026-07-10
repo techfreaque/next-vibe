@@ -108,7 +108,6 @@ export class PendingCalls {
       createdAt: Date.now(),
       deadlineTimer: null,
       result: null,
-      revival: null,
       waiters: [],
       tombstoneTimer: null,
       onSettled: onSettled ?? null,
@@ -164,7 +163,6 @@ export class PendingCalls {
     }, PendingCalls.TOMBSTONE_TTL_MS);
     return {
       kind: "completed",
-      revival: entry.revival,
       threadId: entry.threadId,
       toolMessageId: entry.toolMessageId,
     };
@@ -203,91 +201,6 @@ export class PendingCalls {
     return PendingCalls.get(callId);
   }
 
-  /**
-   * Attach a revival target to an unresolved call (await-task path: the
-   * completion should revive the await-task tool message, not the original
-   * dispatch context). Returns false if the call is unknown or already resolved.
-   */
-  static setRevival(callId: string, revival: PendingCallRevival): boolean {
-    const entry = PendingCalls.registry.get(callId);
-    if (!entry || entry.result !== null) {
-      return false;
-    }
-    entry.revival = revival;
-    return true;
-  }
-
-  /**
-   * Block until the call completes (any process path: socket reply, /report,
-   * deadline) or timeoutMs elapses. Null on timeout/unknown call.
-   * Used by execute-tool's WAIT/END_LOOP inline path (remote-call/spec.md:
-   * "caller blocks on tool-execute-result keyed by callId").
-   */
-  static awaitResult(
-    callId: string,
-    timeoutMs: number,
-  ): Promise<PendingCallResult | null> {
-    const entry = PendingCalls.registry.get(callId);
-    if (!entry) {
-      return Promise.resolve(null);
-    }
-    if (entry.result !== null) {
-      return Promise.resolve(entry.result);
-    }
-    const resolved = new Promise<PendingCallResult | null>((resolve) => {
-      entry.waiters.push(resolve);
-    });
-    const timedOut = new Promise<PendingCallResult | null>((resolve) => {
-      setTimeout((): void => {
-        resolve(null);
-      }, timeoutMs);
-    });
-    // DB fallback: the tool-execute-result event can land in a SIBLING process
-    // of this instance (dev server vs CLI vs tests share one DB) — that process
-    // persists the outcome to pending_call_results. Poll it so the WAIT
-    // resolves regardless of which process received the wire event.
-    let pollStopped = false;
-    const dbResolved = (async (): Promise<PendingCallResult | null> => {
-      const { db } = await import("next-vibe/database");
-      const { pendingCallResults } = await import("../db");
-      const { eq: eqOp } = await import("drizzle-orm");
-      for (;;) {
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, 750);
-        });
-        if (pollStopped) {
-          return null;
-        }
-        const [row] = await db
-          .select({
-            status: pendingCallResults.status,
-            output: pendingCallResults.output,
-          })
-          .from(pendingCallResults)
-          .where(eqOp(pendingCallResults.callId, callId))
-          .limit(1)
-          .catch((): [] => []);
-        if (row) {
-          // Consume the handoff row, then complete through the normal path so
-          // every in-memory waiter (and revival semantics) fires exactly once.
-          await db
-            .delete(pendingCallResults)
-            .where(eqOp(pendingCallResults.callId, callId))
-            .catch(() => undefined);
-          PendingCalls.complete(callId, {
-            status: row.status,
-            output: row.output ?? null,
-          });
-          return { status: row.status, output: row.output ?? null };
-        }
-      }
-    })();
-    return Promise.race([resolved, timedOut, dbResolved]).then((result) => {
-      pollStopped = true;
-      return result;
-    });
-  }
-
   /** Remove a tombstoned (or stale) entry immediately after inline delivery. */
   static discard(callId: string): void {
     const entry = PendingCalls.registry.get(callId);
@@ -312,8 +225,7 @@ export class PendingCalls {
    */
   static async hasForThread(threadId: string): Promise<boolean> {
     for (const entry of PendingCalls.registry.values()) {
-      const matchesThread =
-        entry.threadId === threadId || entry.revival?.threadId === threadId;
+      const matchesThread = entry.threadId === threadId;
       if (matchesThread && entry.result === null) {
         const completedElsewhere = await PendingCalls.reconcileWithDb(entry);
         if (!completedElsewhere) {
@@ -322,6 +234,23 @@ export class PendingCalls {
       }
     }
     return false;
+  }
+
+  /**
+   * Cancel all unresolved pending calls for a thread by completing them with
+   * `failed` status. Called when the stream is user-cancelled so that
+   * clearStreamingState sees no pending work and sets the thread to IDLE
+   * instead of WAITING.
+   */
+  static cancelAllForThread(threadId: string): void {
+    for (const entry of PendingCalls.registry.values()) {
+      if (entry.threadId === threadId && entry.result === null) {
+        PendingCalls.complete(entry.callId, {
+          status: "failed",
+          output: { message: "Stream cancelled by user" },
+        });
+      }
+    }
   }
 
   /**
@@ -436,7 +365,7 @@ export class PendingCalls {
             .delete(pendingCallResults)
             .where(eq(pendingCallResults.callId, entry.callId))
             .catch(() => undefined);
-          await PendingCalls.completeWithRevival(entry.callId, {
+          PendingCalls.complete(entry.callId, {
             status: row.status,
             output: row.output ?? null,
           });
@@ -459,7 +388,7 @@ export class PendingCalls {
       if (status === "completed" || status === "failed") {
         // Carry the backfilled result — completing with null would lose the
         // actual output (await-task delivers it inline to the AI).
-        await PendingCalls.completeWithRevival(entry.callId, {
+        PendingCalls.complete(entry.callId, {
           status,
           output: PendingCalls.toOutputObject(msg?.metadata?.toolCall?.result),
         });
@@ -502,36 +431,5 @@ export class PendingCalls {
       // DB unavailable — keep the entry pending; the deadline still backstops.
     }
     return false;
-  }
-
-  /**
-   * Complete an entry and fire an attached await-task revival. The revival
-   * target lives in THIS process's registry — the /report or result event that
-   * settled the call may have landed in another process which could not see
-   * it, so reconciliation must fire it here. Best-effort: the deadline/idle
-   * reconciliation still prevents hangs.
-   */
-  private static async completeWithRevival(
-    callId: string,
-    result: PendingCallResult,
-  ): Promise<void> {
-    const outcome = PendingCalls.complete(callId, result);
-    if (outcome.kind !== "completed" || !outcome.revival) {
-      return;
-    }
-    try {
-      const { TaskCompletion } = await import("./completion");
-      const { createEndpointLogger } = await import("next-vibe/logger/server");
-      const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-      await TaskCompletion.fireRevivalForOwner({
-        revival: outcome.revival,
-        status: result.status,
-        output: result.output,
-        taskId: callId,
-        logger: createEndpointLogger(false, defaultLocale),
-      });
-    } catch {
-      // Best-effort: the deadline/idle reconciliation still prevents hangs.
-    }
   }
 }

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T10a — PASSED ✓**\n\nThe image depicts a **minimalist graphic** — a large, solid bright red circle centered on a pure white background. The colors are flat and saturated with no gradients, textures, or shadows. The composition is bold, clean, and symmetrical, resembling a flag or iconic symbol.\n\nInjected vision description was present and I've described it.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

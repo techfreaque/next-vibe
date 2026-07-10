@@ -6,7 +6,7 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import { and, eq, or } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -39,6 +39,7 @@ import {
 } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
 import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
+import { isSkillVariantId, isUuid, parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
   type MessagesWsEmit,

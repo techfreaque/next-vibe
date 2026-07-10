@@ -34,7 +34,6 @@ import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availabi
 import type { ChatModelId } from "../ai-stream/models";
 import type { DefaultFolderId } from "../chat/config";
 import { FOLDER_DENIED_TOOL_IDS } from "../chat/config";
-import { getDefaultToolIdsForFolder } from "../chat/constants";
 import type { ToolConfigItem } from "../chat/settings/definition";
 import { DEFAULT_SKILLS } from "./config";
 import { NO_SKILL_ID } from "./constants";
@@ -215,17 +214,14 @@ export async function resolveAgentContext(
 
   let availableTools: NormalizedTools = null;
   if (cascadeBase !== null) {
-    // Restricted: the callable superset = the declared available list ∪ the
-    // pinned set ∪ the role defaults (so pinned/default housekeeping tools stay
-    // callable even under an explicit availableTools restriction).
-    const roleDefaults: NormalizedTools = getDefaultToolIdsForFolder(
-      user,
-      rootFolderId,
-    ).map((toolId) => ({ toolId, requiresConfirmation: false }));
-    availableTools = unionTools(
-      unionTools(cascadeBase, pinnedBase),
-      roleDefaults,
-    );
+    // An explicit availableTools list is the TRUTH: it IS the callable set (the
+    // user/skill deliberately restricted it). Only PINNED tools are added on top
+    // — a pinned tool is loaded as a real AI-SDK tool so it must also be callable
+    // (a pin counts as allowed). Role defaults are NOT unioned in: that would
+    // re-expose everything the restriction removed AND clobber the per-tool
+    // requiresConfirmation flags the list carries. `null` (no restriction at any
+    // level) still means "all allowed for the role".
+    availableTools = unionTools(cascadeBase, pinnedBase);
   }
 
   const promptAppend = ctx.favorite?.promptAppend ?? null;

@@ -23,7 +23,8 @@ export const translations = {
     },
     model: {
       label: "Model",
-      description: "Select an image generation model",
+      description:
+        "Image generation model. Leave blank to use the user's configured default.",
     },
     approxCost: "~credits",
     size: {

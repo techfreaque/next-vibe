@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T10d — PASSED ✓**\n\nThe video is a high-definition close-up of hands manipulating a **Rubik's Cube** under dramatic, high-contrast lighting. The cube is partially scrambled with colored stickers (white, blue, orange, red, yellow) and a small \"T\" or cross icon on the white center. The hands rotate the layers with precise, fluid movements — clearly a skilled operator.\n\nThe background is a shallow-depth-of-field blur of dozens of other scattered Rubik's Cubes on a dark surface, creating a bokeh effect. The camera is fixed, continuous, no cuts. The audio features crisp mechanical *click-clack* sounds of the cube turning, over a faint pulsing electronic track. No speech.\n\nThe ~5-second clip gives an intellectual, satisfying, focused vibe — like a product demo or tutorial intro for puzzle enthusiasts.\n\nThe system-injected video description was present and successfully processed.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

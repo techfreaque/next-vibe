@@ -49,6 +49,24 @@ export const translations = {
         description: "Optional sub-folder UUID",
         placeholder: "uuid or leave blank",
       },
+      imageGenModelSelection: {
+        label: "Image Gen Selection",
+        description:
+          "Image gen model selection from the active favorite/chat UI (leave blank to use user default)",
+        placeholder: "leave blank for user default",
+      },
+      musicGenModelSelection: {
+        label: "Music Gen Selection",
+        description:
+          "Music gen model selection from the active favorite/chat UI (leave blank to use user default)",
+        placeholder: "leave blank for user default",
+      },
+      videoGenModelSelection: {
+        label: "Video Gen Selection",
+        description:
+          "Video gen model selection from the active favorite/chat UI (leave blank to use user default)",
+        placeholder: "leave blank for user default",
+      },
     },
     response: {
       systemPrompt: { text: "System Prompt" },

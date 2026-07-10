@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Write succeeded (`size: 11`, `updatedAt` set) and read confirmed the content is exactly **\"T2_CHEAP_OK\"** (11 chars, not truncated, no extra whitespace or formatting).\n\n**Minor observation:** The cortex tree in the system context shows `t2-cheap-test [103%]` — a percentage over 100% is mathematically odd. Likely a display quirk from multiple writes, but worth noting.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -17,7 +17,11 @@ export interface ModeConfig {
   /** Human-readable label used in describe() title */
   label: string;
   /** Cache prefix = ONE fixture folder for the whole test file (e.g. "cheap-",
-   *  "direct-cheap-"). Replay is ordinal-driven within this folder. */
+   *  "direct-cheap-"). Replay is ordinal-driven within this folder. Two suites
+   *  running the IDENTICAL conversation (e.g. direct vs reverse-ws — same model
+   *  calls, only the transport differs) SHARE this so the AI/embedding fixtures
+   *  are recorded once and replayed by both; they distinguish their THREAD
+   *  folders via threadCasePrefix. */
   cachePrefix: string;
   /**
    * Cheap variant: media-gen steps swap to cortex/tool-help equivalents with

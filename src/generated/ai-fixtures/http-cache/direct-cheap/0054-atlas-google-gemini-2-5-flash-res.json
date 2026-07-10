@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2f7bdccbdcae-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:37:17 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651036-juW1HzH80u7Hi6p4lJQO"
+  },
+  "body": {
+    "id": "gen-1783651036-juW1HzH80u7Hi6p4lJQO",
+    "object": "chat.completion",
+    "created": 1783651036,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip, 16 seconds in duration, exhibiting a polished production style and good sound quality. It features several musical elements and one distinct sound effect.\n\n**Musical Elements:**\n- **Genre:** This appears to be a light, upbeat instrumental piece, possibly an outro or a short jingle, with strong elements of funk and soul.\n- **Tempo:** The tempo is moderately fast, estimated around 120-130 BPM.\n- **Instruments:**\n    - **Electric Guitar:** Plays a clean, rhythmic riff with a distinct funk/soul feel. It's prominent throughout the clip.\n    - **Bass Guitar:** Provides a groovy, walking bassline, complementing the guitar and driving the rhythm.\n    - **Drums:** A standard drum kit provides a steady, upbeat rhythm with a clear snare hit, hi-hats, and kick drum.\n    - **Organ/Keyboard:** Plays a sustained chord, adding a warm, harmonic layer to the background, particularly noticeable in the second half of the clip.\n- **Interaction:** The guitar, bass, and drums form a cohesive, bouncy rhythm section. The organ adds harmonic richness without dominating.\n- **Mood:** The music is cheerful, light, and somewhat nostalgic, evoking a retro vibe.\n\n**Non-Musical Audio Events:**\n- **Sound Effect:** At 0:01, there is a distinct \"boing\" sound, similar to that of a spring or an eccentric cartoon sound effect. It stands out against the musical background.\n\n**Structure:**\nThe clip is too short to discern a full song structure, but it feels like a self-contained musical snippet, potentially an outro theme given its conclusive feel towards the end.\n\n**Overall:**\nThe audio combines a playful sound effect with a well-produced, upbeat funk/soul instrumental, creating an engaging and lighthearted atmosphere.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 391,
+      "total_tokens": 1463,
+      "cost": 0.0018241,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018241,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0009775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

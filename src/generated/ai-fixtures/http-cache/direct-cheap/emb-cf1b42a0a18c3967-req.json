@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T11c — PASSED ✓**\n\nThe `inventory-warehouses` tool on `hermes` returned a `warehouses` array with **2 entries**:\n\n| Warehouse | Code | Address | Default | Active |\n|-----------|:----:|---------|:-------:|:------:|\n| Main Warehouse | WH-01 | 1 Storage Drive, Warehouse District | ✅ | ✅ |\n| Secondary Warehouse | WH-02 | 2 Overflow Road, Storage Park | ❌ | ✅ |\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

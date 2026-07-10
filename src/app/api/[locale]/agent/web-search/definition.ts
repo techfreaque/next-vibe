@@ -76,6 +76,11 @@ const { GET } = createEndpoint({
     UserRole.CUSTOMER,
     UserRole.ADMIN,
   ] as const,
+  defaultAiPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
 
   aliases: [WEB_SEARCH_ALIAS] as const,
   cli: {

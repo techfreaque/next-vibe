@@ -6,6 +6,8 @@ import {
 import type { VoiceModelSelection } from "../text-to-speech/models";
 import { TtsModelId } from "./models";
 
+export const TEXT_TO_SPEECH_ALIAS = "text-to-speech" as const;
+
 /** System default TTS voice ID */
 export const DEFAULT_TTS_VOICE_ID: TtsModelId = TtsModelId.OPENAI_NOVA;
 

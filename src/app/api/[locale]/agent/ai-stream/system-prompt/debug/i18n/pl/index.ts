@@ -50,6 +50,24 @@ export const translations: typeof enTranslations = {
         description: "Opcjonalne UUID podfolderu",
         placeholder: "UUID lub puste",
       },
+      imageGenModelSelection: {
+        label: "Wybór modelu obrazów",
+        description:
+          "Wybór modelu generowania obrazów z aktywnego ulubionego/UI czatu (puste = domyślny użytkownika)",
+        placeholder: "puste = domyślny użytkownika",
+      },
+      musicGenModelSelection: {
+        label: "Wybór modelu muzyki",
+        description:
+          "Wybór modelu generowania muzyki z aktywnego ulubionego/UI czatu (puste = domyślny użytkownika)",
+        placeholder: "puste = domyślny użytkownika",
+      },
+      videoGenModelSelection: {
+        label: "Wybór modelu wideo",
+        description:
+          "Wybór modelu generowania wideo z aktywnego ulubionego/UI czatu (puste = domyślny użytkownika)",
+        placeholder: "puste = domyślny użytkownika",
+      },
     },
     response: {
       systemPrompt: { text: "System Prompt" },

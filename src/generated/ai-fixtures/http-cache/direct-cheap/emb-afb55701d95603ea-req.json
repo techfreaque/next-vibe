@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both tools ran in parallel and returned successfully:\n\n**cortex-write** → `responsePath: \"/memories/t8-parallel-test\"` (content written, 14 bytes)\n\n**chat-settings** → `selectedSkill: \"thea\"`, `selectedModel: \"kimi-k2.6\"`\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

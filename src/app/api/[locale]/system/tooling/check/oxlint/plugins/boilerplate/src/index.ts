@@ -165,7 +165,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
   routeHandlerHasBlock:
     "Handler body must be a single expression (no block body `=> { ... }`), no logic allowed.",
   routeHandlerExtraProperty:
-    "Handler object may only contain 'handler', 'email', 'sms', 'fieldDefaults', 'resolveChannel', and 'onRemoteEvent' properties.",
+    "Handler object may only contain 'handler', 'email', 'sms', 'requestDefaults', 'fieldDefaults', 'resolveChannel', and 'onRemoteEvent' properties.",
   routeOnRemoteEventNotObject:
     'onRemoteEvent must be an object literal `{ "event-name": (payload, ctx) => Repo.method(payload, ctx) }`.',
   routeOnRemoteEventHandlerNotArrow:
@@ -550,6 +550,7 @@ const routePatternRule = {
               "handler",
               "email",
               "sms",
+              "requestDefaults",
               "fieldDefaults",
               "resolveChannel",
               "onRemoteEvent",

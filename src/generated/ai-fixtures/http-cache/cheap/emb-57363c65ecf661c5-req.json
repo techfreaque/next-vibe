@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T5 detach-dispatch] Call the cortex-write tool with path='/memories/cb-await-task-test' and content='await-task-test-payload' and callbackMode='detach'. Check that the immediate result has a taskId string and does NOT have a responsePath (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c31d58e1fd349-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:38:54 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651132-vRhSxRQWgLRv2G2IektF"
+  },
+  "body": {
+    "id": "gen-1783651132-vRhSxRQWgLRv2G2IektF",
+    "object": "chat.completion",
+    "created": 1783651132,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short recording of an instrumental track, lasting approximately 24 seconds. The sound quality is clear and well-produced, suggesting a studio recording.\n\nThe music is a groovy, upbeat, and somewhat melancholic instrumental.\n**Tempo:** Roughly 100-110 BPM.\n**Time Signature:** 4/4.\n**Instruments:**\n- **Electric Guitar:** Plays a clean, crisp, and slightly jazzy melody with a distinct bluesy influence. It is the primary melodic instrument, prominent in the mix, and features a subtle reverb effect. The guitar sounds like it has fretboard slides and vibrato, adding to its expressive quality.\n- **Bass Guitar:** Provides a smooth, walking bass line that underpins the harmony and contributes to the groovy feel. It's well-defined and blends effectively with the drums.\n- **Drums (and/or Drum Machine):** A light but steady rhythm section. It includes a kick drum, snare drum, and hi-hats. The hi-hats are playing a consistent eighth-note pattern, while the snare adds a gentle backbeat, contributing to the laid-back and somewhat melancholic vibe. There's a slight 'clicky' or percussive sound evident in the drum track, which could be an effect or part of the drum kit.\n\n**Interactions:** The guitar leads the melody, maintaining a slightly improvisational feel, while the bass and drums provide a solid, understated foundation. There are no vocals.\n\n**Mood:** The overall mood is cool, somewhat relaxed but with an underlying touch of melancholy or introspection, perhaps due to the minor key tonality of the guitar melody. It evokes a feeling of late-night contemplation or a smooth lounge atmosphere.\n\nThe audio fades out at the end, suggesting it's an excerpt from a longer track.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 384,
+      "total_tokens": 1456,
+      "cost": 0.0018066,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0018066,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00096
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

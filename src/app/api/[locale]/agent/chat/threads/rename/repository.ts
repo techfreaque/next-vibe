@@ -38,35 +38,61 @@ export class ThreadRenameRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<ThreadRenameResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { threadId, title, preview } = data;
+      const { title, description } = data;
 
+      // The thread comes from the active conversation's stream context (AI
+      // turns) or explicit caller input (CLI/MCP/web — the definition's
+      // serverDefault copies streamContext.threadId into data). Required.
+      const threadId = data.threadId ?? streamContext.threadId;
       if (!threadId) {
         return fail({
           message: t("patch.errors.validation.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: "threadId is required" },
+          messageParams: { error: "no active thread in stream context" },
         });
       }
+
+      // The FOLDER prefers the stream context. If it's missing we can still
+      // recover it for a NON-PUBLIC user by reading the thread's own row (the
+      // folder is derivable from the threadId). Public users have no DB thread
+      // to fall back to, so a missing folder there is a hard error.
+      let rootFolderId = streamContext.rootFolderId;
 
       logger.debug("Renaming thread", {
         threadId,
         rootFolderId,
         userId: user.id,
         isPublic: user.isPublic,
-        hasTitle: title !== undefined,
-        hasPreview: preview !== undefined,
       });
 
-      if (title === undefined && preview === undefined) {
-        return fail({
-          message: t("patch.errors.validation.title"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: {
-            error: "At least one of title or preview must be provided",
-          },
+      // ── Incognito: storage is FRONTEND-ONLY ──────────────────────────────
+      // Incognito threads never touch the server DB (nothing leaves the
+      // browser by design), so there is no row to read, permission-check, or
+      // write. Rename is purely a client-side title change: skip the DB
+      // entirely and emit the same `thread-updated` event so the sidebar's
+      // onEvent handler updates its localStorage-backed list optimistically.
+      if (rootFolderId === DefaultFolderId.INCOGNITO) {
+        const now = new Date();
+        emitThreadRenamed({
+          logger,
+          user,
+          threadId,
+          title,
+          description: description ?? null,
+          folderId: null,
+          status: null,
+          rootFolderId: DefaultFolderId.INCOGNITO,
+          updatedAt: now,
+        });
+        return success({
+          updatedThreadId: threadId,
+          updatedTitle: title,
+          updatedPreview: description ?? null,
+          updatedAt: now,
         });
       }
 
@@ -83,6 +109,39 @@ export class ThreadRenameRepository {
           message: t("patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId },
+        });
+      }
+
+      // Recover the folder from the thread when the context lacked it.
+      rootFolderId = rootFolderId ?? existingThread.rootFolderId;
+      if (!rootFolderId) {
+        return fail({
+          message: t("patch.errors.validation.title"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+          messageParams: { error: "could not resolve the thread's folder" },
+        });
+      }
+
+      // A thread whose folder resolves to incognito must never have a DB row
+      // (frontend-only) — if the context lied, honour the DB reality below.
+      if (existingThread.rootFolderId === DefaultFolderId.INCOGNITO) {
+        const now = new Date();
+        emitThreadRenamed({
+          logger,
+          user,
+          threadId,
+          title,
+          description: description ?? null,
+          folderId: null,
+          status: null,
+          rootFolderId: DefaultFolderId.INCOGNITO,
+          updatedAt: now,
+        });
+        return success({
+          updatedThreadId: threadId,
+          updatedTitle: title,
+          updatedPreview: description ?? null,
+          updatedAt: now,
         });
       }
 
@@ -106,17 +165,9 @@ export class ThreadRenameRepository {
         });
       }
 
-      const updateData: Partial<{ title: string; preview: string | null }> = {};
-      if (title !== undefined) {
-        updateData.title = title;
-      }
-      if (preview !== undefined) {
-        updateData.preview = preview;
-      }
-
       const [updatedThread] = await db
         .update(chatThreads)
-        .set(updateData)
+        .set({ title, description })
         .where(eq(chatThreads.id, threadId))
         .returning();
 
@@ -124,51 +175,32 @@ export class ThreadRenameRepository {
         threadId: updatedThread.id,
       });
 
-      // Rename is a thread update — emit the [threadId] PATCH `thread-updated`
-      // event (the changed fields the user submitted + updatedAt). The client
-      // onEvent merges them into the sidebar list cache; cross-instance the peer
-      // re-applies the update.
-      createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
-        urlPathParams: { threadId: updatedThread.id },
-      })("thread-updated", {
-        requestData: {
-          title: updatedThread.title,
-          folderId: updatedThread.folderId,
-          status: updatedThread.status,
-          rootFolderId: updatedThread.rootFolderId,
-        },
-        responseData: {
-          updatedAt: updatedThread.updatedAt,
-        },
+      // Emit the thread-update event(s) so the sidebar + folder-contents caches
+      // update. Same event the incognito path emits — one code path for both.
+      emitThreadRenamed({
+        logger,
+        user,
+        threadId: updatedThread.id,
+        title: updatedThread.title,
+        description: updatedThread.description,
+        folderId: updatedThread.folderId,
+        status: updatedThread.status,
+        rootFolderId: updatedThread.rootFolderId,
+        updatedAt: updatedThread.updatedAt,
       });
 
-      if (updatedThread.rootFolderId) {
-        const emitFolderContents = createFolderContentsEmitter(
-          logger,
-          user,
-          updatedThread.rootFolderId,
-        );
-        emitFolderContents("thread-updated", {
-          responseData: {
-            items: [
-              {
-                id: updatedThread.id,
-                title: updatedThread.title,
-                folderId: updatedThread.folderId,
-                status: updatedThread.status,
-                preview: updatedThread.preview,
-                rootFolderId: updatedThread.rootFolderId,
-                updatedAt: updatedThread.updatedAt,
-              },
-            ],
-          },
-        });
+      if (!user.isPublic) {
+        void import("@/app/api/[locale]/agent/ai-stream/repository/core/db-writer/embedding-sync")
+          .then(({ syncThreadEmbedding }) =>
+            syncThreadEmbedding(updatedThread.id, streamContext),
+          )
+          .catch(() => undefined);
       }
 
       return success({
         updatedThreadId: updatedThread.id,
         updatedTitle: updatedThread.title,
-        updatedPreview: updatedThread.preview,
+        updatedPreview: updatedThread.description,
         updatedAt: updatedThread.updatedAt,
       });
     } catch (error) {
@@ -179,5 +211,76 @@ export class ThreadRenameRepository {
         messageParams: { error: parseError(error).message },
       });
     }
+  }
+}
+
+/**
+ * Emit the thread rename as a `thread-updated` event on the [threadId] PATCH
+ * channel AND (when the thread has a root folder) the folder-contents channel.
+ * The client onEvent handlers merge the changed fields into their caches —
+ * localStorage-backed for incognito, server-cache for persisted threads — so the
+ * sidebar updates optimistically either way. One emit path for both.
+ */
+function emitThreadRenamed(args: {
+  logger: EndpointLogger;
+  user: JwtPayloadType;
+  threadId: string;
+  title: string;
+  description: string | null;
+  folderId: string | null;
+  status: (typeof chatThreads.$inferSelect)["status"] | null;
+  rootFolderId: DefaultFolderId;
+  updatedAt: Date;
+}): void {
+  const {
+    logger,
+    user,
+    threadId,
+    title,
+    description,
+    folderId,
+    status,
+    rootFolderId,
+    updatedAt,
+  } = args;
+
+  createEndpointEmitter(threadsByIdDefinitions.PATCH, logger, user, {
+    urlPathParams: { threadId },
+  })("thread-updated", {
+    requestData: {
+      title,
+      folderId,
+      status: status ?? undefined,
+      rootFolderId,
+    },
+    responseData: {
+      updatedAt,
+    },
+  });
+
+  {
+    // Target the thread's own folder channel (folderId) so a nested-folder
+    // viewer receives the rename — the root view's channel would miss it.
+    const emitFolderContents = createFolderContentsEmitter(
+      logger,
+      user,
+      rootFolderId,
+      { subFolderId: folderId },
+    );
+    emitFolderContents("thread-updated", {
+      responseData: {
+        items: [
+          {
+            id: threadId,
+            title,
+            folderId,
+            status,
+            description,
+            rootFolderId,
+            updatedAt,
+          },
+        ],
+      },
+    });
   }
 }

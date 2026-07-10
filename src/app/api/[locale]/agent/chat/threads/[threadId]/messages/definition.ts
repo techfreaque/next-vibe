@@ -22,11 +22,11 @@ import {
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import {

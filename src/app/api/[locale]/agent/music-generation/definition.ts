@@ -10,7 +10,6 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   backButton,
@@ -19,9 +18,9 @@ import {
   responseField,
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
+import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { MUSIC_GEN_ALIAS } from "./constants";
 import {
   DEFAULT_MUSIC_DURATION,
@@ -92,7 +91,6 @@ const { POST } = createEndpoint({
         columns: 6,
         options: MusicGenModelIdOptions,
         schema: z.enum(MusicGenModelId).optional(),
-        hiddenForPlatforms: [Platform.AI],
       }),
       duration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -201,7 +199,6 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "Upbeat electronic music with a catchy melody",
-        model: MusicGenModelId.LYRIA_3,
         duration: DEFAULT_MUSIC_DURATION,
       },
     },

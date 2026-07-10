@@ -87,6 +87,11 @@ export const translations = {
         utilities: "Capabilities",
         inputs: "Inputs",
         outputs: "Outputs",
+        supportedDurations: "Durations (s)",
+        supportedAspectRatios: "Aspect Ratios",
+        supportedResolutions: "Resolutions",
+        supportedFrameImages: "Frame Image Types",
+        generateAudio: "Generates Audio",
       },
     },
 

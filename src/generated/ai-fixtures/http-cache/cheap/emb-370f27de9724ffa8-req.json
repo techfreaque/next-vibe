@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The video is a high-definition close-up of a pair of tan-skinned **human hands manipulating a Rubik's Cube** on a tabletop covered in dozens of other cubes (solved and unsolved). The central cube has a distinctive **black logo — a stylized \"X\" inside a circle** — on the white center square. The hands rotate the top layer 90° left, then turn a vertical column, producing crisp **plastic clicking sounds** (no speech, no music). The shallow depth of field keeps the held cube in sharp focus while the background cubes blur into a colorful scatter. The mood is calm, focused, and meditative — a demo-quality product showcase.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

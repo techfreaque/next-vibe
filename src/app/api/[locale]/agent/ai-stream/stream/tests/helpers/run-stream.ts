@@ -673,7 +673,13 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
               : undefined;
           }
         }
-        // Sum credits from all messages (initial stream charges tool credits; revival charges AI credits).
+        // Sum credits for THIS turn only — the messages created since the send
+        // (initial stream tool credits + revival AI credits). `revivedMessages`
+        // is the WHOLE thread; without the preStreamMessageIds filter this summed
+        // every prior turn's cost too (e.g. a 30-turn shared thread reported the
+        // cumulative ~7.7 instead of the turn's ~0.7), which the C1 truthful-
+        // accounting assert then compared against a single-turn ledger window and
+        // failed. Matches the settledTurnCredits / headless-runner semantics.
         const totalCredits = revivedMessages.reduce(
           (sum, m) => sum + (m.creditCost ?? 0),
           0,

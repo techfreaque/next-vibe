@@ -1690,6 +1690,20 @@ export const translations = {
           "Grok T2V - xAI's Grok text-to-video generation model via ModelsLab",
         modelsLabGrokI2V:
           "Grok I2V - xAI's Grok image-to-video generation model via ModelsLab",
+        klingV30Std:
+          "Kling 3.0 Standard - Kuaishou's standard-tier video model with T2V and I2V via OpenRouter",
+        klingVideoO1:
+          "Kling Video O1 - Kuaishou's reasoning-enhanced video generation model via OpenRouter",
+        veo31Lite:
+          "Veo 3.1 Lite - Google's cost-effective video model for high-volume generation via OpenRouter",
+        seedance2:
+          "Seedance 2.0 - ByteDance's next-gen video model with character consistency and reference-to-video via OpenRouter",
+        seedance2Fast:
+          "Seedance 2.0 Fast - ByteDance's fast video generation model via OpenRouter",
+        happyhorse11:
+          "HappyHorse 1.1 - Alibaba's video generation model with T2V, I2V, and reference image support via OpenRouter",
+        happyhorse10:
+          "HappyHorse 1.0 - Alibaba's video generation model with T2V, I2V, and reference image support via OpenRouter",
         modelsLabGen4T2ITurbo:
           "Gen4 T2I Turbo - Runway's fast text-to-image generation model via ModelsLab",
         modelsLabGen4Image:

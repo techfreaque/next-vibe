@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T11c inventory-warehouses] Call execute-tool with toolName='inventory-warehouses' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

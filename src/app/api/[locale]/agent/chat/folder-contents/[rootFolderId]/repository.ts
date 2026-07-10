@@ -1121,21 +1121,29 @@ export class FolderContentsRepository {
     if (!item?.id || !item.title) {
       return;
     }
-    await db
+    const updatedRows = await db
       .update(chatThreads)
       .set({ title: item.title, updatedAt: new Date() })
       .where(eq(chatThreads.id, item.id))
+      .returning({ folderId: chatThreads.folderId })
       .catch((err: Error) => {
         logger.warn(
           "[folder-contents/repository] thread-title-updated: DB update failed",
           { threadId: item.id, error: err.message },
         );
+        return [];
       });
+    if (!updatedRows[0]) {
+      return;
+    }
     const { createEndpointEmitter } =
       await import("next-vibe/realtime/emitter");
     createEndpointEmitter(definitions.GET, logger, user, {
       urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
-      requestData: { subFolderId: undefined, threadIds: undefined },
+      requestData: {
+        subFolderId: updatedRows[0]?.folderId ?? undefined,
+        threadIds: undefined,
+      },
       kindOverride: FolderContentsRepository.emitChannelForFolder(
         urlPathParams.rootFolderId,
       ).kind,

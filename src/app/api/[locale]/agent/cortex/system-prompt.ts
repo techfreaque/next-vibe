@@ -61,14 +61,203 @@ export interface CortexDirEntry {
 
 export type CortexEntry = CortexFileEntry | CortexDirEntry;
 
-export interface CortexData {
-  /**
-   * Set when cortex is not available in this context (incognito/public).
-   * The value is a context-appropriate one-liner to include in the fragment.
-   * When absent, cortex is fully available.
-   */
-  unavailableNote: string;
-  /** Root-level dirs: memories, documents, threads, skills, tasks, favorites */
+// ─── Fragment ─────────────────────────────────────────────────────────────────
+
+export const cortexFragment: SystemPromptFragment = {
+  id: "cortex",
+  placement: "trailing",
+  priority: 190,
+  build: async (params) => {
+    const { user, logger, isIncognito, locale, headless, rootFolderId } =
+      params;
+
+    const { country } = getLanguageAndCountryFromLocale(locale);
+    const countryInfo = languageConfig.countryInfo[country];
+    const languageName = countryInfo?.langName;
+    const userId = user.isPublic ? undefined : user.id;
+
+    const { getLocaleRoots } = await import("./seeds/templates");
+    const localeRoots = getLocaleRoots(locale);
+
+    const emptyBase = {
+      tree: [] as CortexEntry[],
+      threadCounts: {} as Record<string, number>,
+      totalThreads: 0,
+      uploadCount: 0,
+      searchCount: 0,
+      genCount: 0,
+      taskCount: 0,
+      languageName,
+      localeRoots,
+    };
+
+    const isPublicFolder = rootFolderId === "public";
+    const blockCortex =
+      !userId || (!headless && (isIncognito || isPublicFolder));
+
+    if (blockCortex) {
+      let unavailableNote: string;
+      if (isIncognito && userId) {
+        unavailableNote =
+          "Not available in incognito - nothing leaves the browser by design. Switch to your private folder to access memories and tasks.";
+      } else if (isIncognito) {
+        unavailableNote =
+          "Not available in incognito. Create a free account and use the private folder to get persistent memory across conversations.";
+      } else if (isPublicFolder && userId) {
+        unavailableNote =
+          "Not available in the public folder. Switch to your private folder to access memories and tasks.";
+      } else {
+        unavailableNote =
+          "Not available without an account. Sign in and use the private folder to access persistent memory.";
+      }
+      return renderCortexFragment({ unavailableNote });
+    }
+
+    try {
+      const { getVirtualMountCounts } = await import("./mounts/resolver");
+      const currentThreadId = params.threadId;
+
+      // Exclude the current thread from results via clean path prefix match.
+      const threadExcludePrefixes = currentThreadId
+        ? [
+            `/threads/private/${currentThreadId}`,
+            `/threads/shared/${currentThreadId}`,
+            `/threads/public/${currentThreadId}`,
+          ]
+        : [];
+
+      // Await the just-written user message's embed (FIRED at write time,
+      // overlapped with setup work) so its stored vector is present for the
+      // search below — no race, and the message write itself never blocked on
+      // the embedding. Best-effort: a failed embed just means one fewer vector.
+      if (params.messageEmbedReady) {
+        await params.messageEmbedReady.catch(() => undefined);
+      }
+
+      // Cortex search uses this thread's STORED message embeddings (written at
+      // message-write time) as its query vectors — no embedding is generated
+      // here. It's a single SQL query; an empty thread (no vectors yet) yields
+      // no relevant nodes, which is fine (cortex data is optional).
+      const allRelevant = currentThreadId
+        ? await vectorSearch({
+            userId,
+            threadId: currentThreadId,
+            excludePrefixes: threadExcludePrefixes,
+            limit: 40,
+            threshold: 0.4,
+            excerptLen: 200,
+            logger,
+          })
+        : [];
+
+      const memRelevant = allRelevant.filter((n) =>
+        n.path.startsWith("/memories"),
+      );
+      const docRelevant = allRelevant.filter((n) =>
+        n.path.startsWith("/documents"),
+      );
+      // Thread exclusion is now handled in vectorSearch via excludePrefixes —
+      // the path prefix cleanly covers all thread chunk paths.
+      const threadRelevant = allRelevant.filter(
+        (n) =>
+          /^\/threads\/(private|shared|public)\//.test(n.path) &&
+          n.score >= 0.65,
+      );
+      const skillRelevant = allRelevant.filter(
+        (n) => n.path.startsWith("/skills") && n.score >= 0.7,
+      );
+
+      await import("@/app/api/[locale]/agent/skills/db").catch(() => null);
+
+      const [
+        counts,
+        memCtx,
+        docTree,
+        threadPinned,
+        skillsFaved,
+        skillsCreated,
+        tasks,
+        favs,
+      ] = await Promise.all([
+        getVirtualMountCounts(
+          userId,
+          !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
+        ),
+        loadMemoryContext(userId, localeRoots.memories, locale),
+        buildTrimmedDocTree(userId, localeRoots.documents, locale),
+        loadPinnedThreads(userId),
+        loadFavedSkills(userId),
+        loadCreatedSkills(userId),
+        loadTasksForCortex(userId, logger),
+        loadFavoritesForCortex(userId, logger),
+      ]);
+
+      const uploadCount = counts.uploads;
+      const searchCount = counts.searches;
+      const genCount = counts.gens ?? 0;
+      const taskCount = tasks.totalCount;
+
+      const memoriesDir = buildMemoriesDir(
+        memCtx,
+        memRelevant,
+        CHAR_BUDGET.memories,
+        localeRoots.memories,
+      );
+      const memoriesUsed = memoriesDir.children.reduce(
+        (sum, c) => sum + (c.kind === "file" ? c.excerpt.length + 30 : 0),
+        0,
+      );
+      const docBudget = Math.min(
+        CHAR_BUDGET.memoriesAndDocuments - memoriesUsed,
+        CHAR_BUDGET.documents,
+      );
+      const documentsDir = buildDocumentsDir(
+        docRelevant,
+        docTree,
+        Math.max(0, docBudget),
+        localeRoots.documents,
+        counts.documents ?? 0,
+      );
+      const tree: CortexEntry[] = [
+        memoriesDir,
+        documentsDir,
+        buildThreadsDir(threadPinned, threadRelevant, counts.threads),
+        buildSkillsDir(
+          skillsFaved,
+          skillsCreated,
+          skillRelevant,
+          CHAR_BUDGET.skills,
+        ),
+        buildTasksDir(tasks),
+        buildFavoritesDir(favs.items, favs.activeId),
+      ];
+
+      const data = {
+        ...emptyBase,
+        tree,
+        threadCounts: counts.threads.byRoot,
+        totalThreads: counts.threads.total,
+        uploadCount,
+        searchCount,
+        genCount,
+        taskCount,
+      };
+
+      return renderCortexFragment(data);
+    } catch (error) {
+      logger.error("Failed to load Cortex data for system prompt", {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  },
+};
+
+// ─── Render Data Type + Pure Renderer ────────────────────────────────────────
+
+/** Data shape produced internally by cortexFragment.build — testable without full params */
+export interface CortexRenderData {
   tree: CortexEntry[];
   threadCounts: Record<string, number>;
   totalThreads: number;
@@ -76,66 +265,59 @@ export interface CortexData {
   searchCount: number;
   genCount: number;
   taskCount: number;
-  languageName?: string;
-  localeRoots?: { memories: string; documents: string };
+  languageName: string | undefined;
+  localeRoots: { memories: string; documents: string };
 }
 
-// ─── Fragment ─────────────────────────────────────────────────────────────────
+/** Unavailable cortex state — no data, just a reason string */
+export interface CortexUnavailableData {
+  unavailableNote: string;
+}
 
-export const cortexFragment: SystemPromptFragment<CortexData> = {
-  id: "cortex",
-  placement: "trailing",
-  priority: 190,
-  build: (data) => {
-    if (data.unavailableNote) {
-      return `## Cortex\n${data.unavailableNote}`;
-    }
+/** Pure renderer: called by cortexFragment.build after data assembly, exported for tests */
+export function renderCortexFragment(
+  data: CortexRenderData | CortexUnavailableData,
+): string {
+  if ("unavailableNote" in data) {
+    return `## Cortex\n${data.unavailableNote}`;
+  }
 
-    const {
-      tree,
-      uploadCount,
-      searchCount,
-      totalThreads,
-      languageName,
-      localeRoots,
-    } = data;
+  const memoriesPath = data.localeRoots.memories;
+  const documentsPath = data.localeRoots.documents;
 
-    const memoriesPath = localeRoots?.memories ?? "/memories";
-    const documentsPath = localeRoots?.documents ?? "/documents";
+  const memDir = data.tree.find(
+    (e) => e.kind === "dir" && e.path === memoriesPath,
+  ) as CortexDirEntry | undefined;
+  const docDir = data.tree.find(
+    (e) => e.kind === "dir" && e.path === documentsPath,
+  ) as CortexDirEntry | undefined;
+  const skillDir = data.tree.find(
+    (e) => e.kind === "dir" && e.path === "/skills",
+  ) as CortexDirEntry | undefined;
+  const favDir = data.tree.find(
+    (e) => e.kind === "dir" && e.path === "/favorites",
+  ) as CortexDirEntry | undefined;
 
-    const memDir = tree.find(
-      (e) => e.kind === "dir" && e.path === memoriesPath,
-    ) as CortexDirEntry | undefined;
-    const docDir = tree.find(
-      (e) => e.kind === "dir" && e.path === documentsPath,
-    ) as CortexDirEntry | undefined;
-    const skillDir = tree.find(
-      (e) => e.kind === "dir" && e.path === "/skills",
-    ) as CortexDirEntry | undefined;
-    const favDir = tree.find(
-      (e) => e.kind === "dir" && e.path === "/favorites",
-    ) as CortexDirEntry | undefined;
+  const isEmptyWorkspace =
+    (memDir?.totalCount ?? 0) === 0 &&
+    (docDir?.totalCount ?? 0) === 0 &&
+    data.totalThreads === 0 &&
+    (skillDir?.totalCount ?? 0) === 0 &&
+    (favDir?.totalCount ?? 0) === 0 &&
+    data.uploadCount === 0 &&
+    data.searchCount === 0;
 
-    const isEmptyWorkspace =
-      (memDir?.totalCount ?? 0) === 0 &&
-      (docDir?.totalCount ?? 0) === 0 &&
-      totalThreads === 0 &&
-      (skillDir?.totalCount ?? 0) === 0 &&
-      (favDir?.totalCount ?? 0) === 0 &&
-      uploadCount === 0 &&
-      searchCount === 0;
+  const langNote = data.languageName
+    ? `**Language:** Write all content in ${data.languageName} - the user's language.\n`
+    : "";
 
-    const langNote = languageName
-      ? `**Language:** Write all content in ${languageName} - the user's language.\n`
-      : "";
+  const emptyNotice = isEmptyWorkspace
+    ? `\n> Empty workspace - learn the user's name, role, goals. Write to ${memoriesPath}/identity/ right now.\n`
+    : "";
 
-    const emptyNotice = isEmptyWorkspace
-      ? `\n> Empty workspace - learn the user's name, role, goals. Write to ${memoriesPath}/identity/ right now.\n`
-      : "";
+  const treeStr = renderCortexTree(data);
 
-    const treeStr = renderCortexTree(data);
-
-    return `## Cortex (Your Persistent Brain)
+  return `## Cortex (Your Persistent Brain)
 Shared memory between you and the user. Persists across conversations. You read and write files directly.
 ${langNote}${emptyNotice}
 ${treeStr}
@@ -146,8 +328,7 @@ ${treeStr}
 **Writable:** ${memoriesPath}/ (knowledge) · ${documentsPath}/ (working files) · /skills/ (custom skills)
 **Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only
 **SSH/Machines:** \`${CORTEX_LIST_ALIAS}(path="/ssh")\` → machines + their mounts. \`${CORTEX_EXEC_ALIAS}(path="/ssh/<machine>", command="...")\` → run commands (only /ssh/ paths). \`${CORTEX_TERMINALS_ALIAS}\` → active terminals with cwd. Mounts at \`/ssh/<machine>/<mount>/\` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. \`${CORTEX_LIST_ALIAS}(path="/ssh/<machine>/<mount>/")\` → browse mount. \`${CORTEX_READ_ALIAS}(path="/ssh/<machine>/path")\` → read file.`;
-  },
-};
+}
 
 // ─── Shared Utilities ─────────────────────────────────────────────────────────
 
@@ -175,7 +356,12 @@ const TREE_SPACE = "    ";
  * Files without content show just the filename:
  *   ├── name.md [80%]
  */
-export function renderCortexTree(data: CortexData): string {
+export function renderCortexTree(data: {
+  tree: CortexEntry[];
+  uploadCount: number;
+  searchCount: number;
+  genCount: number;
+}): string {
   const { tree, uploadCount, searchCount, genCount } = data;
 
   // Only show non-empty dirs
@@ -311,284 +497,13 @@ function renderFileEntryLines(entry: CortexFileEntry): string[] {
 // a small always-current slice. Sum of individual caps ≈ 113k chars ≈ 28k
 // tokens, with memoriesAndDocuments holding that pair to 45k chars.
 const CHAR_BUDGET = {
-  memories: 12000,
-  documents: 8000,
-  memoriesAndDocuments: 20000,
-  threads: 12000,
-  skills: 12000,
-  tasks: 4000,
+  memories: 30000,
+  documents: 20000,
+  memoriesAndDocuments: 45000,
+  threads: 30000,
+  skills: 25000,
+  tasks: 8000,
 } as const;
-
-// ─── Server Loader ─────────────────────────────────────────────────────────────
-
-/**
- * Load Cortex data for the system prompt fragment.
- * Single vector search → partition by mount → parallel DB loads → build unified tree.
- */
-export async function loadCortexData(
-  params: SystemPromptServerParams,
-): Promise<CortexData> {
-  const {
-    user,
-    logger,
-    isIncognito,
-    lastUserMessage,
-    locale,
-    headless,
-    rootFolderId,
-    streamContext,
-  } = params;
-
-  const { country } = getLanguageAndCountryFromLocale(locale);
-  const countryInfo = languageConfig.countryInfo[country];
-  const languageName = countryInfo?.langName;
-  const userId = user.isPublic ? undefined : user.id;
-
-  const { getLocaleRoots } = await import("./seeds/templates");
-  const localeRoots = getLocaleRoots(locale);
-
-  const emptyBase: Omit<CortexData, "unavailableNote"> = {
-    tree: [],
-    threadCounts: {},
-    totalThreads: 0,
-    uploadCount: 0,
-    searchCount: 0,
-    genCount: 0,
-    taskCount: 0,
-    languageName,
-    localeRoots,
-  };
-
-  // Headless agents always get cortex if authenticated (they need memory to do their job)
-  const isPublicFolder = rootFolderId === "public";
-  const blockCortex = !userId || (!headless && (isIncognito || isPublicFolder));
-
-  if (blockCortex) {
-    let unavailableNote: string;
-    if (isIncognito && userId) {
-      unavailableNote =
-        "Not available in incognito - nothing leaves the browser by design. Switch to your private folder to access memories and tasks.";
-    } else if (isIncognito) {
-      unavailableNote =
-        "Not available in incognito. Create a free account and use the private folder to get persistent memory across conversations.";
-    } else if (isPublicFolder && userId) {
-      unavailableNote =
-        "Not available in the public folder. Switch to your private folder to access memories and tasks.";
-    } else {
-      unavailableNote =
-        "Not available without an account. Sign in and use the private folder to access persistent memory.";
-    }
-    return { ...emptyBase, unavailableNote };
-  }
-
-  try {
-    const { getVirtualMountCounts } = await import("./mounts/resolver");
-
-    // 1. Single vector search across all paths (no path filter)
-    const allRelevant = lastUserMessage
-      ? await vectorSearch({
-          userId,
-          streamContext,
-          query: lastUserMessage,
-          limit: 40,
-          threshold: 0.4,
-          excerptLen: 200,
-          logger,
-        })
-      : [];
-
-    // Partition by mount with per-mount thresholds
-    const memRelevant = allRelevant.filter((n) =>
-      n.path.startsWith("/memories"),
-    );
-    const docRelevant = allRelevant.filter((n) =>
-      n.path.startsWith("/documents"),
-    );
-    // Exclude the CURRENT thread: listing the conversation you are inside as a
-    // "related thread" is self-reference noise — and whether it appears at all
-    // depends on the async embedding sync racing this turn, which makes the
-    // prompt nondeterministic for the same conversation state.
-    const currentThreadId = params.threadId;
-    const threadRelevant = allRelevant.filter(
-      (n) =>
-        /^\/threads\/(private|shared|public)\//.test(n.path) &&
-        n.score >= 0.65 &&
-        (!currentThreadId || !n.path.includes(currentThreadId)),
-    );
-    const skillRelevant = allRelevant.filter(
-      (n) => n.path.startsWith("/skills") && n.score >= 0.7,
-    );
-
-    // Pre-warm skills/db so it's in the module cache before getVirtualMountCounts
-    // calls getSkillCount - otherwise we hit a TDZ circular-dep crash.
-    await import("@/app/api/[locale]/agent/skills/db").catch(() => null);
-
-    // 2. Parallel loads - all mounts independent
-    const [
-      counts,
-      memCtx,
-      docTree,
-      threadPinned,
-      skillsFaved,
-      skillsCreated,
-      tasks,
-      favs,
-    ] = await Promise.all([
-      getVirtualMountCounts(
-        userId,
-        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
-      ),
-      loadMemoryContext(userId, localeRoots.memories, locale),
-      buildTrimmedDocTree(userId, localeRoots.documents, locale),
-      loadPinnedThreads(userId),
-      loadFavedSkills(userId),
-      loadCreatedSkills(userId),
-      loadTasksForCortex(userId, logger),
-      loadFavoritesForCortex(userId, logger),
-    ]);
-
-    const uploadCount = counts.uploads;
-    const searchCount = counts.searches;
-    const genCount = counts.gens ?? 0;
-    const taskCount = tasks.totalCount;
-
-    // 3. Build unified tree — memories and documents share a 20k pool (12k/8k split when both full)
-    const memoriesDir = buildMemoriesDir(
-      memCtx,
-      memRelevant,
-      CHAR_BUDGET.memories,
-      localeRoots.memories,
-    );
-    const memoriesUsed = memoriesDir.children.reduce(
-      (sum, c) => sum + (c.kind === "file" ? c.excerpt.length + 30 : 0),
-      0,
-    );
-    const docBudget = Math.min(
-      CHAR_BUDGET.memoriesAndDocuments - memoriesUsed,
-      CHAR_BUDGET.documents,
-    );
-    const documentsDir = buildDocumentsDir(
-      docRelevant,
-      docTree,
-      Math.max(0, docBudget),
-      localeRoots.documents,
-      counts.documents ?? 0,
-    );
-    const tree: CortexEntry[] = [
-      memoriesDir,
-      documentsDir,
-      buildThreadsDir(threadPinned, threadRelevant, counts.threads),
-      buildSkillsDir(
-        skillsFaved,
-        skillsCreated,
-        skillRelevant,
-        CHAR_BUDGET.skills,
-      ),
-      buildTasksDir(tasks),
-      buildFavoritesDir(favs.items, favs.activeId),
-    ];
-
-    return {
-      unavailableNote: "",
-      tree,
-      threadCounts: counts.threads.byRoot,
-      totalThreads: counts.threads.total,
-      uploadCount,
-      searchCount,
-      genCount,
-      taskCount,
-      languageName,
-      localeRoots,
-    };
-  } catch (error) {
-    logger.error("Failed to load Cortex data for system prompt", {
-      userId,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return { ...emptyBase, unavailableNote: "" };
-  }
-}
-
-// ─── Embedding Query Builder ──────────────────────────────────────────────────
-
-const EMBEDDING_QUERY_MAX_MESSAGES = 8;
-const EMBEDDING_QUERY_PER_MESSAGE_BUDGET = 800;
-
-function extractTextFromMessage(msg: ModelMessage): string {
-  if (msg.role === "system") {
-    return msg.content;
-  }
-  if (msg.role === "user" || msg.role === "assistant") {
-    const c = msg.content;
-    if (typeof c === "string") {
-      return c;
-    }
-    if (!Array.isArray(c)) {
-      return "";
-    }
-    const parts: string[] = [];
-    for (const part of c) {
-      if (part.type === "text") {
-        parts.push(part.text);
-      } else if (part.type === "tool-call") {
-        parts.push(
-          `[tool:${part.toolName}] ${JSON.stringify(part.input).slice(0, 200)}`,
-        );
-      } else if (part.type === "tool-result") {
-        const output = part.output;
-        if (output.type === "text") {
-          parts.push(`[result:${part.toolName}] ${output.value}`);
-        } else if (output.type === "json") {
-          parts.push(
-            `[result:${part.toolName}] ${JSON.stringify(output.value).slice(0, 300)}`,
-          );
-        }
-      }
-    }
-    return parts.join(" ");
-  }
-  if (msg.role === "tool") {
-    const parts: string[] = [];
-    for (const part of msg.content) {
-      if (part.type === "tool-result") {
-        const output = part.output;
-        if (output.type === "text") {
-          parts.push(`[result:${part.toolName}] ${output.value}`);
-        } else if (output.type === "json") {
-          parts.push(
-            `[result:${part.toolName}] ${JSON.stringify(output.value).slice(0, 300)}`,
-          );
-        }
-      }
-    }
-    return parts.join(" ");
-  }
-  return "";
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  user: "User",
-  assistant: "Assistant",
-  tool: "Tool",
-  system: "System",
-};
-
-export function buildEmbeddingQuery(
-  messages: ReadonlyArray<ModelMessage>,
-): string {
-  return messages
-    .slice(-EMBEDDING_QUERY_MAX_MESSAGES)
-    .map((m) => {
-      const text = extractTextFromMessage(m).trim();
-      if (!text) {
-        return null;
-      }
-      const label = ROLE_LABELS[m.role] ?? m.role;
-      return `${label}: ${text.slice(0, EMBEDDING_QUERY_PER_MESSAGE_BUDGET)}`;
-    })
-    .filter(Boolean)
-    .join("\n\n");
-}
 
 // ─── Shared Vector Search ─────────────────────────────────────────────────────
 
@@ -618,10 +533,16 @@ interface RelevantNode {
 }
 
 interface VectorSearchOpts {
-  /** Fixture chain of the stream — the query embedding binds it. */
-  streamContext: ToolExecutionContext;
+  /**
+   * The current thread. Its recent (post-compaction) user/assistant message
+   * embeddings — written AT MESSAGE-WRITE TIME — are the query vectors. The
+   * search NEVER generates a query embedding: message vectors already exist in
+   * chatMessages.embedding, joined directly in the search SQL below.
+   */
+  threadId: string | null | undefined;
+  /** How many recent message vectors to use as the MaxSim query set. */
+  queryVectorLimit?: number;
   userId: string;
-  query: string;
   pathPrefix?: string;
   pathPrefixes?: string[];
   excludePrefixes?: string[];
@@ -642,8 +563,8 @@ interface VectorSearchOpts {
 async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
   const {
     userId,
-    messageEmbeddings,
-    fallbackQuery,
+    threadId,
+    queryVectorLimit = 4,
     pathPrefix,
     pathPrefixes,
     excludePrefixes = [],
@@ -653,60 +574,90 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
     logger,
   } = opts;
 
-  try {
-    const { generateEmbedding } = await import("./embeddings/service");
-    const queryEmbedding = await generateEmbedding(query, opts.streamContext);
-    if (!queryEmbedding) {
-      return [];
-    }
+  if (!threadId) {
+    return [];
+  }
 
+  try {
     const { db } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
     const { chatMessages } = await import("../chat/db");
     const { CortexNodeType } = await import("./enum");
-    const { eq, and, isNotNull, notLike, like, or, sql } =
-      await import("drizzle-orm");
+    const { ChatMessageRole } = await import("../chat/enum");
+    const { sql } = await import("drizzle-orm");
 
-    const embeddingStr = `[${queryEmbedding.join(",")}]`;
+    // Path filters as raw SQL fragments (fed into the single statement below).
+    const pathFilter =
+      pathPrefix !== undefined
+        ? sql`AND n.path LIKE ${`${pathPrefix}/%`}`
+        : pathPrefixes && pathPrefixes.length > 0
+          ? sql`AND (${sql.join(
+              pathPrefixes.map((p) => sql`n.path LIKE ${`${p}/%`}`),
+              sql` OR `,
+            )})`
+          : sql``;
+    const excludeFilter =
+      excludePrefixes.length > 0
+        ? sql`AND ${sql.join(
+            excludePrefixes.map((p) => sql`n.path NOT LIKE ${`${p}/%`}`),
+            sql` AND `,
+          )}`
+        : sql``;
 
-    // Build path filter conditions
-    const pathConditions = [];
-    if (pathPrefix) {
-      pathConditions.push(like(cortexNodes.path, `${pathPrefix}/%`));
-    } else if (pathPrefixes && pathPrefixes.length > 0) {
-      pathConditions.push(
-        or(...pathPrefixes.map((p) => like(cortexNodes.path, `${p}/%`))),
-      );
-    }
-
-    const excludeConditions = excludePrefixes.map((p) =>
-      notLike(cortexNodes.path, `${p}/%`),
-    );
-
-    const rows = await db
-      .select({
-        path: cortexNodes.path,
-        content: cortexNodes.content,
-        updatedAt: cortexNodes.updatedAt,
-        similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
-      })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-          isNotNull(cortexNodes.embedding),
-          ...pathConditions,
-          ...excludeConditions,
-        ),
+    // ONE query: `qv` = this thread's recent post-compaction user/assistant
+    // message embeddings (written at message-write time). MaxSim scores each
+    // cortex node against them via a LATERAL max over qv — no vectors ever leave
+    // the DB, and no query embedding is generated. `boundary` excludes messages
+    // at/before the last compaction (already summarized in the prompt).
+    // db.execute returns RAW pg rows — timestamps arrive as strings and numerics
+    // may arrive as strings too (unlike drizzle's typed .select()). Type them as
+    // such and coerce at the use site.
+    const rows = await db.execute<{
+      path: string;
+      content: string | null;
+      updatedAt: string;
+      similarity: string | number;
+    }>(sql`
+      WITH boundary AS (
+        SELECT max(created_at) AS ts
+        FROM ${chatMessages}
+        WHERE thread_id = ${threadId}
+          AND role = ${ChatMessageRole.ASSISTANT}
+          AND (metadata->>'isCompacting')::boolean = true
+      ),
+      qv AS (
+        SELECT embedding
+        FROM ${chatMessages}, boundary
+        WHERE thread_id = ${threadId}
+          AND embedding IS NOT NULL
+          AND role IN (${ChatMessageRole.USER}, ${ChatMessageRole.ASSISTANT})
+          AND (boundary.ts IS NULL OR created_at > boundary.ts)
+        ORDER BY created_at DESC
+        LIMIT ${queryVectorLimit}
       )
-      .orderBy(
-        sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
-      )
-      .limit(limit * 3); // fetch extra, filter after scoring
+      SELECT n.path AS path,
+             n.content AS content,
+             n.updated_at AS "updatedAt",
+             (SELECT max(1 - (n.embedding <=> qv.embedding)) FROM qv) AS similarity
+      FROM ${cortexNodes} n
+      WHERE n.user_id = ${userId}
+        AND n.node_type = ${CortexNodeType.FILE}
+        AND n.embedding IS NOT NULL
+        AND EXISTS (SELECT 1 FROM qv)
+        ${pathFilter}
+        ${excludeFilter}
+      ORDER BY (SELECT min(n.embedding <=> qv.embedding) FROM qv) ASC
+      LIMIT ${limit * 3}
+    `);
 
-    return rows
-      .filter((r) => r.similarity > threshold) // filter on raw similarity before boosts
+    return rows.rows
+      .map((r) => ({
+        path: r.path,
+        content: r.content,
+        similarity: Number(r.similarity),
+        updatedAt: new Date(r.updatedAt),
+      }))
+      .filter((r) => r.similarity > threshold)
       .map((r) => {
         const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
         const pathWeight = getPathTypeWeight(r.path);
@@ -724,7 +675,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
       .toSorted((a, b) => b.score - a.score)
       .slice(0, limit);
   } catch (error) {
-    logger.warn("Vector search failed - skipping", {
+    logger.error("Vector search failed — memories skipped for this turn", {
       error: error instanceof Error ? error.message : String(error),
     });
     return [];
@@ -977,7 +928,7 @@ async function buildTrimmedDocTree(
 interface PinnedThread {
   id: string;
   title: string;
-  preview: string | null;
+  description: string | null;
   rootFolderId: string;
 }
 
@@ -991,7 +942,7 @@ async function loadPinnedThreads(userId: string): Promise<PinnedThread[]> {
       .select({
         id: chatThreads.id,
         title: chatThreads.title,
-        preview: chatThreads.preview,
+        description: chatThreads.description,
         rootFolderId: chatThreads.rootFolderId,
       })
       .from(chatThreads)
@@ -1392,7 +1343,9 @@ function buildThreadsDir(
 
   // Pinned threads
   for (const t of pinned) {
-    const excerpt = t.preview ? cleanExcerpt(t.preview).slice(0, 150) : "";
+    const excerpt = t.description
+      ? cleanExcerpt(t.description).slice(0, 150)
+      : "";
     children.push({
       kind: "file",
       path: `/threads/${t.rootFolderId}/${t.id}`,
@@ -1664,7 +1617,8 @@ export async function loadRawEmbeddingScores(
     const { makeHeadlessContext } = await import("../chat/config");
     const queryEmbedding = await generateEmbedding(
       userMessage,
-      makeHeadlessContext(undefined, undefined),
+      // no user context — UTC (dates not user-facing here)
+      makeHeadlessContext(undefined, undefined, "UTC"),
     );
     if (!queryEmbedding) {
       return { scores: [], embeddingGenerated: false };

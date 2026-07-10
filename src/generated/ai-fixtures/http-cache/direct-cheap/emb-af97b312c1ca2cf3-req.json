@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "This is a **professional, cinematic 5-second close-up** of a person's hands rapidly solving a standard 3×3 Rubik's Cube. Key details:\n\n**Visual:**\n- Medium-tan skin tone, dark long-sleeved garment\n- Brightly colored cube stickers: white, blue, orange, red, green, yellow\n- Small black \"X\" logo inside a circle on the white center face\n- Background filled with dozens of blurred (bokeh) Rubik's Cubes in various solved/unsolved states\n- Studio-lit with shallow depth of field, static camera shot\n\n**Audio:**\n- No dialogue or music\n- Crisp, high-fidelity ASMR-style sounds — rhythmic \"clicks\" and \"clacks\" of the cube being manipulated\n\n**Mood:** Focused, calm, satisfying — a showcase of skill and the iconic puzzle aesthetic.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

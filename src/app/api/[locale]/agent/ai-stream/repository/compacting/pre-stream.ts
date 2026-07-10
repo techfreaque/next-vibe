@@ -121,6 +121,15 @@ export class CompactingHandler {
     metadataParts.push(`Posted:${timestamp}`);
     const finalContextMessage = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;
 
+    // The summarization ASK must be the LAST message. A trailing system/context
+    // message after it makes the model treat the request as "continue the
+    // conversation" — and because the history is full of structured tool turns,
+    // it imitates them and emits a (dead) tool call instead of prose, finishing
+    // with reasoning + a tool-call part and ZERO text (empty summary). Keeping
+    // the user instruction last is the same principle the toolless native-gen
+    // path relies on (see convert.ts appendTrailingSystemMessages): the ask
+    // stays LAST so the model answers it. Provenance context therefore precedes
+    // the instruction.
     const compactingMessages: ModelMessage[] = [
       ...historyMessages,
       { role: "system" as const, content: compactingModeContext },

@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Model",
-      description: "Wybierz model do generowania wideo",
+      description:
+        "Model generowania wideo. Pozostaw puste, by użyć domyślnego modelu użytkownika.",
     },
     duration: {
       label: "Czas trwania",
@@ -39,10 +40,17 @@ export const translations: typeof enTranslations = {
       label: "Rozdzielczość",
       description: "Rozdzielczość wyjściowego wideo",
     },
-    inputMediaUrl: {
-      label: "URL obrazu wejściowego",
-      description: "Obraz do animowania. Model wygeneruje ruch z tej klatki.",
-      placeholder: "https://przyklad.pl/obraz.jpg",
+    firstFrameUrl: {
+      label: "URL pierwszej klatki",
+      description:
+        "Obraz dla pierwszej klatki. Model animuje do przodu od tego obrazu.",
+      placeholder: "https://przyklad.pl/pierwsza-klatka.jpg",
+    },
+    lastFrameUrl: {
+      label: "URL ostatniej klatki",
+      description:
+        "Obraz dla ostatniej klatki. Model animuje wstecz do tego obrazu.",
+      placeholder: "https://przyklad.pl/ostatnia-klatka.jpg",
     },
     download: "Pobierz",
     generatingNote: "Generowanie wideo może zająć 1–3 minuty",

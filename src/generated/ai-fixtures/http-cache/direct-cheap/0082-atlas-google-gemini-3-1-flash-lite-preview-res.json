@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c316a5ebddcae-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:38:37 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651115-74lXi4eAoy6hbvcaFpn6"
+  },
+  "body": {
+    "id": "gen-1783651115-74lXi4eAoy6hbvcaFpn6",
+    "object": "chat.completion",
+    "created": 1783651115,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a short, cinematic-style clip featuring a close-up, high-definition perspective of a person solving a Rubik’s cube amidst a large collection of other cubes.\n\n**Visual Content and Setting:**\nThe scene is set indoors, in what appears to be a dimly lit, tabletop environment. The background is a dense, out-of-focus sprawl of dozens of Rubik's cubes scattered across a dark surface. The cubes vary in color and condition; some appear standard, while others are slightly worn.\n\nThe video features a single person's hands—specifically, a light-to-medium-toned skin complexion—positioned in the center frame. The camera is a static close-up, focusing entirely on the hands and the cube being manipulated. The featured cube is a standard 3x3 model. One of its white-center face pieces has a small, black graphical logo printed on it, resembling a stylized \"X\" or a minimalist character. \n\nThroughout the duration of the clip, the subject’s fingers rhythmically turn the sides and rows of the cube with practiced, fluid efficiency. The colors of the cube—white, red, blue, green, orange, and yellow—flicker and rotate as the hands navigate the puzzle, but the cube does not reach a fully \"solved\" state in this specific segment.\n\n**Camera Work and Lighting:**\nThe camera work is professional and stable. It is a macro-style shot designed to emphasize the intricate textures of the plastic cube and the fine movements of the skin. The lighting is low-key, creating a moody, focused atmosphere, likely highlighting the vibrant colors of the cube against a backdrop of muted shadows. There are no cuts; the video is a single, continuous shot.\n\n**Audio:**\nThere is no diegetic speech within the video. The background audio consists of a brisk, rhythmic track featuring a blend of electronic percussion and a slightly tense, inquisitive synth melody. The sound effects are crisp and prominent: every turn of the cube produces a mechanical, satisfying \"click-clack\" sound, emphasizing the tactile nature of the object. These sounds are clearly captured with high-quality audio equipment, sounding sharp and detailed.\n\n**Style, Production, and Mood:**\nThe production quality is professional, likely intended for a social media short, an advertisement, or a B-roll segment for a documentary or tutorial about cubing. The visual style is realistic and highly polished, using shallow depth of field (bokeh effect) to draw total attention to the hands and the cube.\n\nThe mood is meditative and focused. There is no explicit narrative arc other than the demonstration of skill and the tactile exploration of the puzzle. The pace is steady, fast-moving, and rhythmic, synchronized with the audio track.\n\n**Duration:**\nThe clip lasts approximately 00:05 seconds. The pacing is consistent throughout, maintaining a steady, hypnotic flow of movement.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgERTTIPUDYlXM9C0wHXSf8VhgBGlj9R0zDWy2sO2Zdy6ptOpvgxWG/InJjWOPZboeA8",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 602,
+      "total_tokens": 1011,
+      "cost": 0.00100525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00100525,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.000903
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

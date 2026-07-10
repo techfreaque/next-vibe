@@ -48,6 +48,11 @@ import {
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import {
+  bold,
+  maybeColorize,
+  semantic,
+} from "@/app/api/[locale]/system/logger/colors";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode, CallbackModeDB } from "../constants";

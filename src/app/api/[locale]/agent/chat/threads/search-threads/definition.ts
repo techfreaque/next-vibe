@@ -136,7 +136,7 @@ const { GET } = createEndpoint({
               label: "search.get.response.results.thread.title.label" as const,
               schema: z.string(),
             }),
-            preview: responseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
               label:
@@ -266,7 +266,7 @@ const { GET } = createEndpoint({
           {
             id: "123e4567-e89b-12d3-a456-426614174000",
             threadTitle: "Machine Learning Discussion",
-            preview: "Let's discuss machine learning algorithms...",
+            description: "Let's discuss machine learning algorithms...",
             rank: 0.95,
             headline:
               "<b>Machine learning</b> algorithms are powerful tools...",
@@ -282,7 +282,7 @@ const { GET } = createEndpoint({
           {
             id: "123e4567-e89b-12d3-a456-426614174000",
             threadTitle: "Machine Learning Discussion",
-            preview: "Let's discuss machine learning algorithms...",
+            description: "Let's discuss machine learning algorithms...",
             rank: 0.95,
             headline:
               "<b>Machine learning</b> algorithms are powerful tools...",

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "You're welcome! 🙌 That was a solid test run — all 10+ tests executed cleanly across tool-help, callback modes, parallel calls, media attachments, and the contact form.\n\n**Summary of results:**\n\n| Test | Result |\n|------|--------|\n| T1–T7 (tool-help, callbacks, approve, wakeUp, etc.) | ✅ All passed |\n| T8 (parallel tools) | ✅ STEP_OK |\n| T9 (product categories) | ✅ STEP_OK |\n| T10a (image describe) | ✅ STEP_OK |\n| T10b (multi-attach) | ✅ STEP_OK |\n| T10c (audio attach) | ✅ STEP_OK |\n| CF1 (contact form) | ✅ Submitted |\n\nEverything's looking good on the platform. Catch you on the next round! 🚀",
+    "encoding_format": "float"
+  }
+}

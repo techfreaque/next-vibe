@@ -1323,7 +1323,7 @@ async function seedTemplate(
 
   await db.insert(coaTemplateNodes).values(nodeValues);
 
-  logger.info(
+  logger.debug(
     `Seeded CoA template: ${template.country} (${template.name}) with ${nodeValues.length} accounts`,
   );
 }
@@ -1389,7 +1389,7 @@ async function setupDemoCompanyCoA(
 
   await db.insert(accountNodes).values(insertValues);
 
-  logger.info(
+  logger.debug(
     `CoA setup for demo company: ${insertValues.length} accounts created`,
   );
 }
@@ -1409,9 +1409,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
   if (demoCompany.length > 0 && demoCompany[0]) {
     await setupDemoCompanyCoA(logger, demoCompany[0].id);
-  } else {
-    logger.info("No demo company found — skipping CoA setup for demo company");
   }
+  logger.info(
+    formatDatabase(`CoA templates: ${TEMPLATES.length} countries`, "📊"),
+  );
 }
 
 export async function prod(logger: EndpointLogger): Promise<void> {

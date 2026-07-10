@@ -424,7 +424,7 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve image gen selection via cascade without resolving to a model (skill → favorite → default). */
+  /** Resolve image gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveImageGenSelection(ctx: BridgeContext): ImageGenModelSelection {
     return (
       ctx.skill?.imageGenModelSelection ??
@@ -433,7 +433,7 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve music gen selection via cascade without resolving to a model (skill → favorite → default). */
+  /** Resolve music gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveMusicGenSelection(ctx: BridgeContext): MusicGenModelSelection {
     return (
       ctx.skill?.musicGenModelSelection ??
@@ -442,7 +442,7 @@ export class ModalityResolver {
     );
   }
 
-  /** Resolve video gen selection via cascade without resolving to a model (skill → favorite → default). */
+  /** Resolve video gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveVideoGenSelection(ctx: BridgeContext): VideoGenModelSelection {
     return (
       ctx.skill?.videoGenModelSelection ??

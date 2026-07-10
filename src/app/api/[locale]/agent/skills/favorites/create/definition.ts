@@ -22,7 +22,6 @@ import {
   responseField,
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -41,6 +40,7 @@ import {
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 import { parseSkillId } from "../../../chat/slugify";
 import type {
   FiltersModelSelection,

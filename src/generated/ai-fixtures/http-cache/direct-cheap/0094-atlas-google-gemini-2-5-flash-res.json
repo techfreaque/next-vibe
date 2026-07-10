@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c326728a3d259-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:39:17 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651155-576iJrNnrN4VIpuQcHLa"
+  },
+  "body": {
+    "id": "gen-1783651155-576iJrNnrN4VIpuQcHLa",
+    "object": "chat.completion",
+    "created": 1783651155,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 24-second audio clip of a piece of smooth jazz music.\nThe tempo is approximately 98 BPM, and the time signature is 4/4.\nThe genre is smooth jazz, with elements of funk and soul.\n\nInstruments heard:\n- Electric piano (likely a Fender Rhodes or Wurlitzer emulation): Plays the main melody and harmonic progressions. The tone is warm and slightly vibrato-laden, typical of smooth jazz.\n- Electric bass: Plays a walking bass line that is groovy and provides harmonic support. The bass has a clean, rounded tone.\n- Drums: A standard drum kit with a tight, clean sound. The rhythm consists of a gentle shuffle feel with hi-hats on the eighth notes, a kick drum on the downbeats, and occasional snare hits. There's a noticeable snare fill at 0:13.\n- Synthesizer brass section: Plays sustained chords and fills, adding a rich, warm layer to the harmony.\n- Guitar: Briefly enters with a clean, arpeggiated riff from 0:00 to 0:02, and then sparingly provides rhythmic fills throughout the clip with a wah effect applied.\n\nThe song structure appears to be part of a verse or instrumental section.\nThe mood is relaxed, sophisticated, and groovy. The piece is well-produced, with a polished studio sound. There are no vocals or speech present in this clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 299,
+      "total_tokens": 1371,
+      "cost": 0.0015941,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015941,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0007475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

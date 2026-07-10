@@ -697,9 +697,26 @@ export function ToolCallRenderer({
     if (innerToolDefinition) {
       const innerScopedT =
         innerToolDefinition.scopedTranslation.scopedT(locale);
-      const innerTitle = innerToolDefinition.title
+      const innerStaticTitle = innerToolDefinition.title
         ? (innerScopedT?.t(innerToolDefinition.title) ?? toolCall.toolName)
         : toolCall.toolName;
+      const innerDynamicFn = innerToolDefinition.dynamicTitle as
+        | DynamicTitleFn
+        | undefined;
+      const innerDynamic = innerDynamicFn?.({
+        request:
+          toolCall.args && typeof toolCall.args === "object"
+            ? toolCall.args
+            : undefined,
+        response:
+          toolCall.result && typeof toolCall.result === "object"
+            ? toolCall.result
+            : undefined,
+      });
+      const innerTitle = innerDynamic
+        ? (innerScopedT?.t(innerDynamic.message, innerDynamic.messageParams) ??
+          innerStaticTitle)
+        : innerStaticTitle;
       return {
         displayName: innerTitle,
         icon: innerToolDefinition.icon ?? definition?.icon,

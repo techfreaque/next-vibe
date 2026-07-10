@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Done. The contact form was submitted successfully:\n\n> **Name:** Test User\n> **Subject:** General Inquiry\n> **Message:** Automated integration test. Please ignore.\n\nThe system confirmed receipt and will get back to you.",
+    "encoding_format": "float"
+  }
+}

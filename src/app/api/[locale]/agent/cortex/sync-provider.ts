@@ -28,7 +28,7 @@ const syncedNodeSchema = z.object({
     z.union([z.string(), z.number(), z.boolean(), z.null()]),
   ),
   tags: z
-    .union([z.array(z.string()), z.record(z.string(), z.unknown())])
+    .union([z.array(z.string()), z.record(z.string(), WidgetDataSchema)])
     .transform((v) => (Array.isArray(v) ? v : [])),
   nodeType: z.enum([CortexNodeType.FILE, CortexNodeType.DIR]),
   updatedAt: z.string(),

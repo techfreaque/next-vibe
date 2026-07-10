@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Write:** `cortex-write` at `/memories/t2-cheap-test` — returned `updatedAt: 2026-07-08T20:03:40.150Z`, size 11.\n\n**Read:** `cortex-read` at `/memories/t2-cheap-test` — returned `content: \"T2_CHEAP_OK\"`, size 11, not truncated.\n\nContent matches exactly. No errors, no anomalies.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

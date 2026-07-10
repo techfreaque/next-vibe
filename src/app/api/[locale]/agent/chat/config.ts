@@ -27,6 +27,9 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "@/app/api/[locale]/agent/cortex/constants";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 
 /**
  * Default folder IDs
@@ -253,6 +256,18 @@ export interface ToolExecutionContext {
    * This is the post-resolution value (from favorite or explicit override).
    */
   skillId: string | undefined;
+
+  /**
+   * Pre-resolved media model selections from setup — the exact same cascade
+   * (mediaModelOverrides → favorite → skill → default) that the system prompt
+   * uses. Stored here so generate_music/image/video requestDefaults can inject
+   * the right model without re-running the cascade or touching the DB again.
+   */
+  resolvedMediaSelections?: {
+    musicGenModelSelection: MusicGenModelSelection;
+    imageGenModelSelection: ImageGenModelSelection;
+    videoGenModelSelection: VideoGenModelSelection;
+  };
 
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;

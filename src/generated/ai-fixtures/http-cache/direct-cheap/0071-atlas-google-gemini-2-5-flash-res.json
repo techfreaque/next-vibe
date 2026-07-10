@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c309d0c8050be-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:38:03 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651082-g0vDl9crZ8vG9XQtbmGR"
+  },
+  "body": {
+    "id": "gen-1783651082-g0vDl9crZ8vG9XQtbmGR",
+    "object": "chat.completion",
+    "created": 1783651082,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio features a male voice speaking at a slow, deliberate pace, with a slight accent that is difficult to pinpoint specifically but leans perhaps Eastern European, possibly German. His tone is calm and instructional. The recording quality sounds like an indoor environment, possibly a room, and the audio is clear. There's a slight echo or room reverberation present.\n\nThe speaker begins: \"If you hear this, exactly transcribe the whole message exactly as I say it.\" He continues, \"including the magic keyword. Banana banana. And I need to fill up the last few seconds and it will be...\" The audio cuts off abruptly at this point. The total duration of the audio is approximately 19 seconds. No background music or other significant sounds are present besides the speaker's voice.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 158,
+      "total_tokens": 980,
+      "cost": 0.0009916,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009916,
+        "upstream_inference_prompt_cost": 0.0005966,
+        "upstream_inference_completions_cost": 0.000395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

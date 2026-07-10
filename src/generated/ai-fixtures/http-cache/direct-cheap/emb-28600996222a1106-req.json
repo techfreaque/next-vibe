@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "- The conversation is part of a test suite called \"direct-cheap-\" with the user acting as a quality gate tester, checking for tool errors, broken URLs, wrong credit costs, raw internals, etc.\n- The system prompt instance ID is **atlas**, while the tool `self-instance-id` on the `hermes` instance returned **hermes**.\n- Three parallel `tool-help` calls on `hermes` succeeded: category `ai` returned 12 tools, keyword `search` returned 2 tools (`users-list`, `web-search`), and `toolName='generate_image'` returned the full schema with parameters (prompt, model, size, quality, aspectRatio, inputMediaUrl).\n- `credits-balance` on `hermes` returned total: 1200020 (a numeric value).\n- `favorites` on `hermes` returned a favorites array with 2 entries.\n- `cortex-write` with `detach` mode returned a `taskId` (`remote-ws-hermes-call-397bdac2182a41b4b934c023`) and no `responsePath`.\n- `await-task` on that taskId returned a `responsePath` (`/memories/cb-await-task-test`).\n- `cortex-write` with `wait` mode returned a `responsePath` (`/memories/cb-wait-inline-test`).\n- `cortex-write` with `wakeUp` mode returned a `responsePath` immediately (inline) on multiple test writes (`/memories/cb-wakeup-test`, `/memories/cb-wakeup-repeat-test`, `/memories/cb-wakeup-stress-test`).\n- `cortex-write` with `approve` mode wrote to `/memories/t7-approve-test` with content `T7_APPROVE_OK`; the user confirmed execution, and the write succeeded with `responsePath: \"/memories/t7-approve-test\"`.\n- The thread was renamed to \"Tool Catalog Explorer\" with description \"Testing tool-help with category, keyword, and schema queries on hermes instance.\"",
+    "encoding_format": "float"
+  }
+}

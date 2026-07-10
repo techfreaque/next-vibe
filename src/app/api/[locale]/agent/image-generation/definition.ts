@@ -19,9 +19,9 @@ import {
   responseField,
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
+import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   ImageQuality,
@@ -93,7 +93,6 @@ const { POST } = createEndpoint({
         columns: 6,
         options: ImageGenModelIdOptions,
         schema: z.enum(ImageGenModelId).optional(),
-        hiddenForPlatforms: [Platform.AI],
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -218,7 +217,6 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A photorealistic sunset over a mountain lake",
-        model: ImageGenModelId.GPT_5_IMAGE,
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },

@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2dee7955d349-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:36:19 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783650971-ZUGMdK1tuqvcu9OiCj5S"
+  },
+  "body": {
+    "id": "gen-1783650971-ZUGMdK1tuqvcu9OiCj5S",
+    "object": "chat.completion",
+    "created": 1783650971,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic illustration, centered on a plain, uniform white background, shows a single, large, solid crimson red circle. The circle is perfectly round and dominates the frame, occupying the middle portion of the square composition. Its edges are clean and sharp against the stark white field, with no gradients, shadows, or textures visible within the red disc or the surrounding white area. The overall impression is one of simplicity, balance, and strong geometric contrast, recognized internationally as the national flag of Japan, known as the Nisshōki or Hinomaru.",
+          "refusal": null,
+          "reasoning": "**Analyzing the Composition**\n\nMy focus is on dissecting the visual elements present. I'm identifying the core components, noting the central placement of the prominent red circle against the stark white backdrop to inform the detailed description.\n\n**Observing the Structure**\n\nI am currently processing the fundamental visual information: a striking red disc, perfectly positioned at the core of an unblemished white canvas, forming the entirety of the presented subject.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing the Composition**\n\nMy focus is on dissecting the visual elements present. I'm identifying the core components, noting the central placement of the prominent red circle against the stark white backdrop to inform the detailed description.\n\n**Observing the Structure**\n\nI am currently processing the fundamental visual information: a striking red disc, perfectly positioned at the core of an unblemished white canvas, forming the entirety of the presented subject.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CuoJAY89a18xxLSoljOA8NOyxgp6QaeQyV/lKl9b9uVEUnge6p6vjfoTu//ugDuGNucXvNSLHtnYgEn4kU4Bs/abZ/vwWRS6A9tMRqnfMihJKgBfm+ZbqDqPASclLUXFd1+VynwJz5QJOiCGJ2Mgd6IMx5qhFVa3OstwiAvxA4Djvtm5GkwlEUZyUOANxTAelNQHYkBztLkmTXbyKezwoBEIWEVzLH/ZAWnJtkVRhHnC3wFrsDYRzclOL6/4m6Y1uv3YY7uFDwcumr/b5BiedMD4QOdLMdAtnININFoWXFkVz8XOGvxY4kCGGOcUZmX02nrcAz3R0qSShJ6+bmY5WQY6PAA/sSz25D4cn/qVE3mkuDwWyLt7UhLEn2Gf24J0+WC8nXXoqOfhHDO/KH1PgcsRFPs/yfG2Y11nBoMi6hsmEwWWC2zKjAqY6uhZ/Uw8T65NNygXhr8Fc6er2PvYelyB3/e/iYN1TMt0iacdAfcFVu2WKMXgIaNhELESggY3vWjmGQgSzUHrGS2dAKwll3itCBi9vyC6YLd0V1HWv51f2vbjyCSpJ6T1K26jtHZ6VAOSSq/5knEbzVzAoCn1RnMprgOm9c7/X+Z1ZCm5RoqlEDMrEHX5YScfqUlr5PA80ukQ4IRBqhUrvuvbAjQZSAg9B7NMs4Ftf2VJUskJ/VzzgjYo+eQBg11OsOaQIeU5co3iU1G26PbcoWHzKqGz4APWKkNOxlgzY9HxbVkI0FGxfZ7nB3ArGqju0bCVuxJUn9m0OCcR2AkV748TI7gjaAg2trvtizgCo/t7acEsjl1DZpxuDEdVGo9pKYYYCKGyNgB2N0mOgtDqIa5ro5c7b+60IpQA6H8BI3TOgAmZi0QfpWSqX6IP0Zfp7jU7i5h8B6rH1aUw2Ri0ugnABhR1JotR5rgTz5APlYyvnAE5NISxLcYMv8zJDEsZHT10Pmv/ppIDgBWPkreE2C0KmuyFn5YGcfdD7+ai0v+YtNaAGZpyhCmT1yd8n/AQgTrnwawHtsaS1Yowpxw6NP9QAI7yJ/7pnOmGZ776zTmQMrN5dN5nBDR5riZhzg17bcQGHYyf6WykbTeJwrm/jYIpSxGPMhL48DIlFNSuAKFdOt7R9P4lxUJZHWNkEfgQucL1ryzM9X6dmEwiFoJVYZgjsyn17uOMJYMuHpfXAubjzVGyYExByNU/09jfnvKPIOTlpwnVLLMd4qHx6tqxv6pvQiaQW4RD/G9Pg78JUTpwCiupifNFwmEUXjeFMQ5bAYy4Tfwm0YfSTSbSSxslJTv2/TUqVmk6KbZ4BI+DrccMSCKhORePEL+VIssvkb2E2uKg+h+PKvkOR040lvjq4qTbsfyM8Yi9WDpBpUYlyAU9Vjt59JWAwi2scULObmOEfI12a5E0DUJihiAsQ3qYaBxMDFfGTvyJdxdz4SqKp3J/GjmNuZhEN5SFIEFg2umjQ9Vo3mrIKA5U0iFYsiavQg1hR81vDQmWLQXM/nkh8zQ9tJf793VDOwy0VX0KihPiD5VgsoV6b5zDbiRHeBa7TL42NxEXDV+z0cAO4kzO8852LwviML2eTxcQb4hnAWwUK1Q/hFJBY+fYT18fup1bpm7aLdfMsxVihTY7pN4w94jQyxhkVBb6ZI8Fnt3dNMXhLezrWg0v4IYv9OX7xdygJolNbw=="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 358,
+      "total_tokens": 1195,
+      "cost": 0.00597,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00597,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.004296
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 246,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

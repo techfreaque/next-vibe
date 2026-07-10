@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2e47b8df50be-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:36:33 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783650986-tRVRB3oSggAU95ksAvO3"
+  },
+  "body": {
+    "id": "gen-1783650986-tRVRB3oSggAU95ksAvO3",
+    "object": "chat.completion",
+    "created": 1783650986,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This image depicts the national flag of Japan, known as the \"Nisshōki\" (日章旗), or more commonly as the \"Hinomaru\" (日の丸 - \"circle of the sun\").\n\nThe image presents a large, centered, solid red circle against a plain white rectangular background. The red circle is a vibrant, deep shade of red, and its edges are smooth and precisely defined. It occupies a significant portion of the frame, fulfilling the flag's design elements. The white background is uniform and devoid of any texture, pattern, or gradient. The entire composition is clean, simple, and two-dimensional, characteristic of a flat graphic representation of a flag. There are no text, symbols, or any other objects present in the image. The lighting is even and neutral, casting no shadows, as expected in a digital illustration of a flag.",
+          "refusal": null,
+          "reasoning": "**Describing the Image**\n\nI'm focusing on meticulously detailing the visual elements within the provided image. Currently, my efforts are concentrated on articulating the subject matter and the compositional arrangement, noting the prominent red circle against the stark white background.\n\n**Detailing the Japanese Flag**\n\nI'm currently analyzing the key components of the Japanese flag. My focus is on accurately describing the centralized crimson disc against its pure white, rectangular field, noting the absence of any textual elements and the overall clean, graphic presentation.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Describing the Image**\n\nI'm focusing on meticulously detailing the visual elements within the provided image. Currently, my efforts are concentrated on articulating the subject matter and the compositional arrangement, noting the prominent red circle against the stark white background.\n\n**Detailing the Japanese Flag**\n\nI'm currently analyzing the key components of the Japanese flag. My focus is on accurately describing the centralized crimson disc against its pure white, rectangular field, noting the absence of any textual elements and the overall clean, graphic presentation.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "Cs8HAY89a198i0vRdm2EkZFWLQJXDUeAdfi0mXH+a70awjTRleUzUDReLOdDNrli3bu36vhHpQNXbAo09cwocL0Y31EQZbCt9e8hXZKUgxLlpT1fYXKz8fpUnWwujiu/dZg5gP88XGP3Ob3xpTJUBdUZqKFeuVS7ax8XkHszFoZHVCQLpDz5RvL0r0paAVioo9gFELSntpU8nhOop07AAFjZYRJYkKGSiKWBJhV5yg+xUjPLZoJtW0rSzU4DmnWFKwhVage9QAs4+t7sZm+YUoFq/Y3qxQ+Nrf8JQnkVByQV3NDchORjQI7btFkeUVgzWHBvef2lpizg31POGpx2FNuYwQXVDydc1KeUnwbxfZS32819G1+ptV5nUtxdDUFojTf49kptcE0VtNNoPTkSUnyEy3enhFAyqFQPCGLsdjezXMgZ7J7ZN5avt1dd073fcQaZZvglrHKY2/Z2e72w7JyIcTROmshXFqM3++YIcPNaFqSZlai1D/LfukRrOccQalqC0xQARfPY7yBZEX9+DvF3KqWiOPcbvFNbabSfn2daRm6WklN5dHz1B+C+wXphmmXoQTHINFkDlGEwwrPpWB7r9Qt8PhrP5M44ewnti11hnsEjB18dfREz5MwMqu64YDaT0m5k7iXeANoyQ7PCZnL1wxaaalqH24Ss1Yry894zysg7KtokjG04nQrZc56nKgXixar8Obd7i/2uoqtcJeMGbv4xRoKH18/XVq7fmMVG7EK5IwGTQf3b4BHCJN0DCxI8mAkmzNsiTUDIasuWTMk3Hoi2rEDFLGmn0ZkwfOLr1USBzbztlHix2QQF+CaUP2WOqfxJCRHsT7NA8qkppq8geJf3whmJQLvJ07Z/S6Z62i8BkHmq2uigyEubUIcx52nmZc8qMhM3DbGSQYjIWMr3no3FZGKuCSzB3IbiTbfdvoxo7s3emXrViZu06IWl84EHQ9WdJsEGdr2vfbTYOfaomcR1G2/DYxNhnHpzUjufrFJtlnJ6Rl6Qv1ThfcRn2CpQnLXtruD4jZtEnhtssqZtBlho+lmjwEuw3GPsdkRHhcXji0nFygjYso8QOeoq+qqJ/MnW7H0cokrnsgKgmRY/tgV/Tbx7qcRk5U8hvPd9TbvsVvwQBUkdntJ3TplmLLlcHemqNMHlP5CkLDlWd6hi6hgcVVebtLnssJJUHl+cAhgRUuNaOWuTGm42KxYXSSsQdexwdZMlPiAb+gOfwG2x8l1ROLIGnamEzRb92lhsk975DDzzlMs4OPoFU1RmpG+cnv0cvN3N0xZhmwQww94M"
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 375,
+      "total_tokens": 1212,
+      "cost": 0.006174,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.006174,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.0045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 198,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

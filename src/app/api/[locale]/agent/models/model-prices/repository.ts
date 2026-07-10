@@ -46,6 +46,7 @@ import { OpenAiSttPriceFetcher } from "./providers/openai-stt";
 import { OpenAiTtsPriceFetcher } from "./providers/openai-tts";
 import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
+import { OpenRouterVideoPriceFetcher } from "./providers/openrouter-video";
 import { ReplicatePriceFetcher } from "./providers/replicate";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
@@ -253,7 +254,6 @@ function applySettingsUpdate(
       // eslint-disable-next-line no-unused-vars
       (_: string, prefix: string, fieldLine: string) => {
         const newLine = `${update.field}: ${update.tsLiteral}, ${comment}`;
-        // Check if already up to date (same value)
         if (
           fieldLine.includes(update.tsLiteral) &&
           fieldLine.includes("updated:")

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The image depicts a minimalist composition: a **single, large, solid crimson red circle** centered on a plain white background. The circle is perfectly round with clean, sharp edges — no gradients, shadows, or textures. The overall impression is one of strong geometric contrast and simplicity.\n\nThis is the **national flag of Japan** (the *Nisshōki* or *Hinomaru*).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

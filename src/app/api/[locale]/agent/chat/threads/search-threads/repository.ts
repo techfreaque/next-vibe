@@ -64,7 +64,7 @@ export class SearchThreadsRepository {
       // Generate headline (snippet with highlighted matches)
       const headlineExpression = sql<string>`ts_headline(
     'english',
-    COALESCE(${chatThreads.title}, '') || ' ' || COALESCE(${chatThreads.preview}, ''),
+    COALESCE(${chatThreads.title}, '') || ' ' || COALESCE(${chatThreads.description}, ''),
     ${searchQuery},
     'MaxWords=50, MinWords=25, ShortWord=3, HighlightAll=false, MaxFragments=3'
   )`;
@@ -80,7 +80,7 @@ export class SearchThreadsRepository {
         .select({
           id: chatThreads.id,
           title: chatThreads.title,
-          preview: chatThreads.preview,
+          description: chatThreads.description,
           rank: rankExpression,
           headline: headlineExpression,
           status: chatThreads.status,
@@ -105,7 +105,7 @@ export class SearchThreadsRepository {
       const formattedResults = results.map((result) => ({
         id: result.id,
         threadTitle: result.title,
-        preview: result.preview,
+        description: result.description,
         rank: result.rank,
         headline: result.headline,
         status: result.status,

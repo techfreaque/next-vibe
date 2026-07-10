@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T10d — PASSED ✓**\n\n**Video description:** A 10-second high-definition close-up of a person's hands manipulating a Rubik's Cube. The hands (medium-brown skin tone) perform fluid, expert-level rotations on the cube, which has a small black \"X\" logo on the white center piece. The background is densely filled with dozens of other Rubik's Cubes (some solved, some scrambled) fading into a soft bokeh blur. Studio-quality lighting, professional depth-of-field. A pulsing electronic synth soundtrack with amplified click sounds from each cube rotation. Mood is calm, focused, and hypnotic — conveying competence and precision.\n\nThe system-injected video description was present and successfully processed.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

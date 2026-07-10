@@ -19,6 +19,11 @@ import {
 } from "@/app/api/[locale]/products/repository-client";
 import { envClient } from "@/config/env-client";
 
+import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";
+import { DESCRIBE_VIDEO_ALIAS } from "../../describe-video/constants";
+import { MUSIC_GEN_ALIAS } from "../../music-generation/constants";
+import { TRANSCRIBE_AUDIO_ALIAS } from "../../speech-to-text/constants";
+import { TEXT_TO_SPEECH_ALIAS } from "../../text-to-speech/constants";
 import { FEATURED_MODELS } from "../models";
 import type { SystemPromptFragment } from "./types";
 

@@ -25,7 +25,6 @@ import {
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -35,7 +34,9 @@ import {
   SkillTrustLevelDB,
 } from "@/app/api/[locale]/agent/skills/enum";
 
+import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { USER_ME_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const MeUpdateWidget = lazy(() =>
   import("./widget").then((m) => ({ default: m.MeUpdateWidget })),

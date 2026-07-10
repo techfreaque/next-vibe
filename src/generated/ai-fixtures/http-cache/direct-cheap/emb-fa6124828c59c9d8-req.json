@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**CF1 — PASSED ✓**\n\nThe contact-form tool was invoked with the exact arguments specified:\n- `name`: \"Test User\"\n- `subject`: \"subject.generalInquiry\"\n- `message`: \"Automated integration test. Please ignore.\"\n\nThe tool's built-in confirmation prompt (`callbackMode: \"approve\"`) was triggered, the user confirmed, and the submission succeeded with the expected response: *\"Thank you for contacting us! We've received your message and will get back to you soon.\"*",
+    "encoding_format": "float"
+  }
+}

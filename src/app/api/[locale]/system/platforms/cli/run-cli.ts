@@ -5,6 +5,14 @@
  * function. All entry points set these then call runCli().
  */
 
+// environment must be the FIRST import — its module-level loadEnvironment() call
+// sets process.env (NODE_ENV, NEXT_PUBLIC_AGENT_*, DATABASE_URL overrides) before
+// any other module that reads those values (env-client, constants, etc.) is evaluated.
+import {
+  type EnvironmentResult,
+  loadEnvironment,
+} from "next-vibe/platforms/cli/runtime/environment";
+
 import { Command } from "commander";
 import {
   DefinitionLoader,
@@ -20,13 +28,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { enableMcpSilentMode } from "next-vibe/logger/debug";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-// environment must be imported BEFORE @/config/constants - it sets NODE_ENV=production
-// at module load time for preview mode (vibe start/build/rebuild), and constants.ts
-// reads NODE_ENV to compute cookie name suffixes.
-import {
-  type EnvironmentResult,
-  loadEnvironment,
-} from "next-vibe/platforms/cli/runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,

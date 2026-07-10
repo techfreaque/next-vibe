@@ -26,12 +26,18 @@ import {
   deductMediaCredits,
 } from "../shared/media-generation";
 import {
+  type VideoGenerationPostRequestInput,
   type VideoGenerationPostRequestOutput,
   type VideoGenerationPostResponseOutput,
 } from "./definition";
 import type { VideoGenerationT } from "./i18n";
-import { getVideoGenModelById } from "./models";
+import {
+  filterVideoGenModels,
+  getVideoGenModelById,
+  type VideoGenModelSelection,
+} from "./models";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
+import { generateVideoWithOpenRouter } from "./providers/openrouter";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
 
 export class VideoGenerationRepository {
@@ -220,6 +226,20 @@ export class VideoGenerationRepository {
           logger,
           featureLabel: t("post.title"),
           streamContext,
+        });
+        break;
+
+      case ApiProvider.OPENROUTER:
+        generationResult = await generateVideoWithOpenRouter({
+          providerModel: videoModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds: durationSeconds,
+          aspectRatio: data.aspectRatio,
+          resolution: data.resolution,
+          inputImageUrl: data.inputMediaUrl,
+          logger,
+          locale,
+          fetchImpl,
         });
         break;
 

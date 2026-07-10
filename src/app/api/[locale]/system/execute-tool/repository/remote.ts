@@ -46,6 +46,7 @@ import { emitToolRequest } from "./transport/events";
 import {
   marshalFilesForWire,
   resolveCallerFieldDefaults,
+  resolveCallerRequestDefaults,
 } from "./transport/wire";
 import type {
   PendingCallResult,
@@ -91,9 +92,15 @@ export class RemoteDispatch {
     let strippedInput: Record<string, WidgetData> | null =
       Object.keys(remoteInput).length > 0 ? remoteInput : null;
 
-    // Pre-resolve the target's caller-context field defaults before dispatch —
-    // uniformly for every tool that declares fieldDefaults (no special cases).
+    // Pre-resolve the target's requestDefaults (patch always wins — replaces
+    // stale AI example values) then fieldDefaults (only fills absent fields).
+    // Both run with CALLER context so the peer gets the resolved values.
     const preferredName = getPreferredName(ctx.toolName);
+    strippedInput = await resolveCallerRequestDefaults({
+      ctx,
+      toolName: preferredName,
+      input: strippedInput,
+    });
     strippedInput = await resolveCallerFieldDefaults({
       ctx,
       toolName: preferredName,

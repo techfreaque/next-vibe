@@ -261,6 +261,16 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  noEmail: {
+    warning: {
+      title: "Brak adresu do odpowiedzi",
+      description:
+        "Bez e-maila możemy przeczytać Twoją wiadomość, ale nie możemy odpisać. Wyślij mimo to, jeśli to nie przeszkadza.",
+      addEmail: "Dodaj e-mail",
+      sendAnyway: "Wyślij mimo to",
+    },
+  },
+
   success: {
     title: "Wiadomość wysłana",
     description: "Twoja wiadomość dotarła. Prawdziwa osoba odpowie.",

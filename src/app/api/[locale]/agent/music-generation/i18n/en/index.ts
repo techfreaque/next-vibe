@@ -20,7 +20,7 @@ export const translations = {
     },
     model: {
       label: "Model",
-      description: "Select a music generation model",
+      description: "Music generation model. Leave blank to use the user's configured default.",
     },
     duration: {
       label: "Duration",
@@ -88,6 +88,8 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred during music generation",
       },
+      noModelConfigured:
+        "No music model configured. Set a music model in your favorite settings.",
       notAnAudioModel:
         "The selected model does not support music generation. Please select a music model.",
       notConfigured:

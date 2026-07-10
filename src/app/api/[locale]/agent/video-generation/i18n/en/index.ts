@@ -20,7 +20,8 @@ export const translations = {
     },
     model: {
       label: "Model",
-      description: "Select a video generation model",
+      description:
+        "Video generation model. Leave blank to use the user's configured default.",
     },
     duration: {
       label: "Duration",
@@ -37,11 +38,17 @@ export const translations = {
       label: "Resolution",
       description: "Output video resolution",
     },
-    inputMediaUrl: {
-      label: "Input Image URL",
+    firstFrameUrl: {
+      label: "First Frame URL",
       description:
-        "Image to animate. The model will generate motion from this frame.",
-      placeholder: "https://example.com/image.jpg",
+        "Image to use as the first frame. The model animates forward from this.",
+      placeholder: "https://example.com/first-frame.jpg",
+    },
+    lastFrameUrl: {
+      label: "Last Frame URL",
+      description:
+        "Image to use as the last frame. The model animates backward to this.",
+      placeholder: "https://example.com/last-frame.jpg",
     },
     download: "Download",
     generatingNote: "Video generation can take 1–3 minutes",

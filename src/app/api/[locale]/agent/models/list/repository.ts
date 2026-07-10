@@ -16,7 +16,10 @@ import { musicGenModelOptions } from "../../music-generation/models";
 import { IntelligenceLevelDB } from "../../skills/enum";
 import { sttModelOptions } from "../../speech-to-text/models";
 import { ttsModelOptions } from "../../text-to-speech/models";
-import { videoGenModelOptions } from "../../video-generation/models";
+import {
+  videoGenModelDefinitions,
+  videoGenModelOptions,
+} from "../../video-generation/models";
 import { allModelDefinitions } from "../all-models";
 import { ModelUtility } from "../enum";
 import type { AnyModelOption, ModelDefinition } from "../models";

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c316a5ca9d259-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:38:36 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651115-OJ4XwtjKv0RueLdzLtUk"
+  },
+  "body": {
+    "id": "gen-1783651115-OJ4XwtjKv0RueLdzLtUk",
+    "object": "chat.completion",
+    "created": 1783651115,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short recording of a song, lasting 18 seconds. It primarily features instrumental music.\n\n**Music Description:**\n\n*   **Genre:** The song leans towards a light, upbeat instrumental genre, possibly an acoustic pop or easy-listening style with a playful feel.\n*   **Tempo:** The tempo is moderately fast, estimated around 120-130 BPM.\n*   **Instruments:**\n    *   **Electric Guitar (clean/lightly overdriven):** Plays a prominent role, performing a bright, simple melody. It has a slightly \"twangy\" or country-pop feel, suggesting single-note lines with some vibrato. There might be two guitar parts, one playing the melody and another playing a rhythmic accompaniment or counter-melody. The sound is clean and clear.\n    *   **Bass Guitar:** Provides a steady, walking bass line that underpins the melody. It's not overly complex but keeps the rhythm moving.\n    *   **Drums (Kit):** Consist of a standard drum kit with a clear, crisp snare drum, light hi-hats, and a bass drum. The drumming is relatively simple, following a consistent beat without complex fills or syncopation in this clip.\n*   **Interaction:** The electric guitar plays the main melodic theme, which is quite catchy. The bass guitar and drums form a solid, consistent rhythmic foundation, allowing the guitar to shine. The interplay is clean and well-balanced.\n*   **Production Style:** The production sounds clean and polished, suggesting a studio recording. There's a moderate amount of reverb on the guitar, giving it some air.\n*   **Mood:** The mood is cheerful, lighthearted, and optimistic. The melody is uplifting and a bit quirky.\n\n**Notable Audio Events:**\n\n*   The clip begins shortly after the music has started, suggesting it's part of a larger track rather than an intro.\n*   The music maintains a consistent structure and mood throughout the 18 seconds.\n*   The audio fades out at the very end, indicating the end of the clip rather than the end of the song.\n\n**Overall Impression:**\n\nThis is a snippet of a clean, pleasant, and optimistic instrumental track, possibly intended for background music, a jingle, or a lighthearted scene in media. The sound quality is good, and the recording environment appears to be professional.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 502,
+      "total_tokens": 1574,
+      "cost": 0.0021016,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0021016,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

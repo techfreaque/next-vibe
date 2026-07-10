@@ -27,26 +27,38 @@ import { z } from "zod";
 import { THREAD_RENAME_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
+const ThreadRenameContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ThreadRenameContainer })),
+);
+
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "rename"],
+  aliases: [THREAD_RENAME_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
   titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "pencil",
+  dynamicTitle: ({ request, response }) => {
+    const title = response?.updatedTitle ?? request?.title;
+    if (!title) {
+      return undefined;
+    }
+    return {
+      message: "patch.dynamicTitle" as const,
+      messageParams: { title },
+    };
+  },
   category: "ai",
   subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "patch.container.title" as const,
-    description: "patch.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ThreadRenameContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       // threadId is provided by CLI/MCP/web callers.
@@ -70,10 +82,10 @@ const { PATCH } = createEndpoint({
         label: "patch.threadTitle.label" as const,
         description: "patch.threadTitle.description" as const,
         columns: 12,
-        schema: z.string().min(1).max(255).optional(),
+        schema: z.string().min(1).max(255),
       }),
 
-      preview: requestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.preview.label" as const,
@@ -105,6 +117,20 @@ const { PATCH } = createEndpoint({
         type: WidgetType.TEXT,
         label: "patch.response.updatedAt.content" as const,
         schema: dateSchema,
+      }),
+
+      // === BUTTONS ===
+      backButton: backButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
+        variant: "outline",
+        usage: { request: "data" },
+      }),
+
+      submitButton: submitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
+        variant: "primary",
+        usage: { request: "data" },
       }),
     },
   }),
@@ -158,7 +184,7 @@ const { PATCH } = createEndpoint({
       default: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         title: "My Renamed Thread",
-        preview: "A short description of this conversation",
+        description: "A short description of this conversation",
       },
     },
     responses: {
@@ -166,7 +192,7 @@ const { PATCH } = createEndpoint({
         updatedThreadId: "550e8400-e29b-41d4-a716-446655440000",
         updatedTitle: "My Renamed Thread",
         updatedPreview: "A short description of this conversation",
-        updatedAt: "2024-01-15T10:00:00.000Z",
+        updatedAt: new Date("2024-01-15T10:00:00.000Z"),
       },
     },
   },

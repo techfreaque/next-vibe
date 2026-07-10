@@ -9,8 +9,7 @@ import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { scopedTranslation } from "next-vibe/execute-tool/await-task/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { taskInputSchema } from "next-vibe/tasks/cron/db";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
-import { CronTaskStatusDB } from "next-vibe/tasks/enum";
+import { CronTaskStatus, CronTaskStatusDB } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
@@ -18,6 +17,8 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
+
+import { AWAIT_TASK_ALIAS } from "./constants";
 
 const AwaitTaskWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -61,8 +62,7 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ] as const,
-  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-  aliases: ["await-task", "wait-for-task"],
+  aliases: [AWAIT_TASK_ALIAS, "wait-for-task"],
   // Awaiting an arbitrary task is unbounded by nature (media generation can
   // run for many minutes) — cross-instance callers must keep their inline
   // WAIT open instead of falling to the 90s default.

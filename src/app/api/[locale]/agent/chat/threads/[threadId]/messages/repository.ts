@@ -269,13 +269,24 @@ export class MessagesRepository {
      * callers (rare) can skip embedding; those messages simply carry no vector.
      */
     streamContext: ToolExecutionContext | undefined;
-  }): Promise<{ resolvedParentId: string | null }> {
+  }): Promise<{
+    resolvedParentId: string | null;
+    /**
+     * In-flight embed of the just-written user message (fired, not awaited). The
+     * caller awaits it only where the vector is needed (cortex search). Resolved
+     * (no-op) for incognito / no-streamContext writes.
+     */
+    embedPromise: Promise<void>;
+  }> {
     // Incognito threads live in client storage only — no DB row exists or should be created.
     if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
       params.logger.debug(
         "createUserMessage skipped: incognito folder (expected - no DB persistence for incognito)",
       );
-      return { resolvedParentId: params.parentId };
+      return {
+        resolvedParentId: params.parentId,
+        embedPromise: Promise.resolve(),
+      };
     }
 
     const metadata = {
@@ -304,7 +315,10 @@ export class MessagesRepository {
           isQueued: params.extraMetadata?.isQueued ?? false,
         },
       );
-      return { resolvedParentId: params.parentId };
+      return {
+        resolvedParentId: params.parentId,
+        embedPromise: Promise.resolve(),
+      };
     }
 
     // Verify parent exists - the client may reference an optimistic message that was never
@@ -338,32 +352,6 @@ export class MessagesRepository {
       }
     }
 
-    // Embed the message content AT WRITE TIME so the row lands with its search
-    // vector — cortex search reads stored vectors only and never re-embeds a
-    // query. Best-effort: a missing API key or embed failure leaves the row
-    // vectorless (search just has one fewer query vector) but NEVER blocks the
-    // write. Runs before the insert so it rides the same row.
-    let embeddingFields:
-      | { embedding: number[]; embeddingHash: string }
-      | undefined;
-    if (params.streamContext) {
-      try {
-        const { embedMessageContent } =
-          await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
-        embeddingFields =
-          (await embedMessageContent(
-            { role: params.role, content: params.content, metadata: null },
-            params.streamContext,
-          )) ?? undefined;
-      } catch (embedErr) {
-        params.logger.warn("createUserMessage: embed failed (non-fatal)", {
-          messageId: params.messageId,
-          error:
-            embedErr instanceof Error ? embedErr.message : String(embedErr),
-        });
-      }
-    }
-
     const now = new Date();
     await db
       .insert(chatMessages)
@@ -377,11 +365,41 @@ export class MessagesRepository {
         authorName: params.authorName ?? null,
         isAI: false,
         metadata: hasMetadata ? metadata : undefined,
-        ...(embeddingFields ?? {}),
       })
       // Queue processor already inserted + updated this message before calling
       // createAiStream — skip the duplicate rather than failing the stream.
       .onConflictDoNothing();
+
+    // Embed the message content — FIRED here (as soon as the row exists) but NOT
+    // awaited: the message write must not wait on a network embedding. The
+    // caller holds the returned `embedPromise` and awaits it only where the
+    // vector is needed (the cortex search in the system prompt), overlapping the
+    // embed with all the setup work in between. Best-effort + non-fatal.
+    const streamContext = params.streamContext;
+    const embedPromise: Promise<void> = streamContext
+      ? (async (): Promise<void> => {
+          try {
+            const { embedMessageContent } =
+              await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
+            const fields = await embedMessageContent(
+              { role: params.role, content: params.content, metadata: null },
+              streamContext,
+            );
+            if (fields) {
+              await db
+                .update(chatMessages)
+                .set(fields)
+                .where(eq(chatMessages.id, params.messageId));
+            }
+          } catch (embedErr) {
+            params.logger.warn("createUserMessage: embed failed (non-fatal)", {
+              messageId: params.messageId,
+              error:
+                embedErr instanceof Error ? embedErr.message : String(embedErr),
+            });
+          }
+        })()
+      : Promise.resolve();
 
     // Update thread's updatedAt and bubble activity to parent folder
     const [updatedThread] = await db
@@ -407,7 +425,7 @@ export class MessagesRepository {
     // The parent the row ACTUALLY got — callers must emit THIS, not the
     // requested one, or mirrors rebuild a different chain (and materialize a
     // phantom stub for a never-committed parent id).
-    return { resolvedParentId };
+    return { resolvedParentId, embedPromise };
   }
 
   /**

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Tool ran successfully. The `stockLevels` array contains **3 products**:\n\n| Product | Qty Available | Unit Cost | Low Stock? |\n|---------|:------------:|:---------:|:----------:|\n| **Consulting Hour** | 80 | €54.89 | ✅ No |\n| **Laptop Stand** | 17 | €42.77 | ✅ No |\n| **Design Template Pack** | 33 | €32.98 | ✅ No |\n\nAll stored at **Main Warehouse** — none flagged as low stock.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

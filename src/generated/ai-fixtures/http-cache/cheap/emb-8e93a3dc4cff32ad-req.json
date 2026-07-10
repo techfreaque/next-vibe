@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/quality-gate-tool-help-verification-744cb729-7cf7-4a07-8254-779e6740b173.md\n\n# Quality Gate Tool-Help Verification\nFolder: private\nDescription: Testing the quality gate system by verifying tool-help returns correct results across category, search query, and specific tool name modes.",
+    "encoding_format": "float"
+  }
+}

@@ -378,12 +378,43 @@ export type ChannelResolverField<TEndpoint extends CreateApiEndpointAny> =
       : { resolveChannel?: never };
 
 /**
+ * Context passed to `requestDefaults` callbacks.
+ * Same shape as ServerDefaultContext — reused for consistency.
+ */
+export type RequestDefaultsContext = ServerDefaultContext;
+
+/**
+ * Pre-parse request defaults callback.
+ * Receives raw (pre-validation) request and url params, returns a patch
+ * merged into the request data BEFORE Zod validation. The patch wins over
+ * whatever the caller provided — use for server-authoritative values (e.g.
+ * resolving the active favorite's model for AI-hidden fields where the AI
+ * may pass a stale example value).
+ */
+export type RequestDefaultsFn<TEndpoint extends CreateApiEndpointAny> = (
+  ctx: RequestDefaultsContext,
+  raw: {
+    requestData: Partial<TEndpoint["types"]["RequestInput"]>;
+    urlPathParams: Partial<TEndpoint["types"]["UrlVariablesInput"]>;
+  },
+) =>
+  | Promise<Partial<TEndpoint["types"]["RequestInput"]>>
+  | Partial<TEndpoint["types"]["RequestInput"]>;
+
+/**
  * Handler configuration for a single method.
  */
 export type MethodHandlerConfig<TEndpoint extends CreateApiEndpointAny> = {
   handler: ApiHandlerFunction<TEndpoint>;
   email?: EmailHandler<TEndpoint>[];
   sms?: SMSHandler<TEndpoint>[];
+  /**
+   * Pre-parse defaults. Runs BEFORE Zod validation. The returned patch is
+   * merged over the raw request so missing required fields can be filled in
+   * (validation catches anything still absent). The patch always wins — use
+   * for server-authoritative values like resolving the active favorite's model.
+   */
+  requestDefaults?: RequestDefaultsFn<TEndpoint>;
   fieldDefaults?: Partial<
     Record<
       keyof TEndpoint["types"]["RequestOutput"] & string,
@@ -404,6 +435,13 @@ export interface ApiHandlerOptions<TEndpoint extends CreateApiEndpointAny> {
   sms?: {
     afterHandlerSms?: SMSHandler<TEndpoint>[];
   };
+  /**
+   * Pre-parse defaults. Runs BEFORE Zod validation. The returned patch is
+   * merged over the raw request so missing required fields can be filled in
+   * (validation catches anything still absent). The patch always wins — use
+   * for server-authoritative values like resolving the active favorite's model.
+   */
+  requestDefaults?: RequestDefaultsFn<TEndpoint>;
   /**
    * Server-side field defaults for fields hidden from this platform.
    * Runs after validation, before the handler. Values from here take precedence
@@ -437,6 +475,9 @@ export type GenericHandlerReturnType<TEndpoint extends CreateApiEndpointAny> =
     // via MethodHandlerConfig → ChannelResolverField / OnRemoteEventField.
     resolveChannel?: ChannelResolverFn<TEndpoint>;
     onRemoteEvent?: OnRemoteEventMap<TEndpoint>;
+    /** Pre-parse defaults exposed so dispatchers (e.g. execute-tool remote dispatch)
+     *  can apply them at the caller before shipping the call to a peer. */
+    requestDefaults?: RequestDefaultsFn<CreateApiEndpointAny>;
     /** Server-side field-default resolvers, exposed so dispatchers (execute-tool
      *  remote dispatch) can pre-resolve caller-context defaults before sending
      *  the call to a peer that lacks the caller's skill/favorite context. The
@@ -478,9 +519,10 @@ function makeTimeoutRace<T>(promise: Promise<T>, ms: number): Promise<T> {
 export function createGenericHandler<T extends CreateApiEndpointAny>(
   options: ApiHandlerOptions<T>,
 ): GenericHandlerReturnType<T> {
-  const { endpoint, handler, email, sms, fieldDefaults } = options;
+  const { endpoint, handler, email, sms, requestDefaults, fieldDefaults } =
+    options;
 
-  return async ({
+  const genericHandler: GenericHandlerReturnType<T> = async ({
     data,
     urlPathParams,
     user: providedUser,
@@ -547,6 +589,30 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       permissionRoles,
       platform,
     );
+
+    // 3a. Apply pre-parse requestDefaults — runs BEFORE validation so the patch
+    // can fill in fields that would otherwise fail required-field checks. The patch
+    // wins over whatever the caller provided (e.g. stale AI example values for
+    // platform-hidden fields get replaced with server-resolved favorites/skill values).
+    let resolvedData = data;
+    if (requestDefaults) {
+      const defaultsCtx: RequestDefaultsContext = {
+        user,
+        locale,
+        platform,
+        streamContext,
+      };
+      const patch = await requestDefaults(defaultsCtx, {
+        requestData: data as Partial<T["types"]["RequestInput"]>,
+        urlPathParams: urlPathParams as Partial<
+          T["types"]["UrlVariablesInput"]
+        >,
+      });
+      if (patch && Object.keys(patch).length > 0) {
+        resolvedData = { ...data, ...patch } as typeof data;
+      }
+    }
+
     const validationResult = validateHandlerRequestData(
       {
         requestSchema: roleFilteredRequestSchema,
@@ -554,7 +620,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       },
       {
         method: endpoint.method,
-        requestData: data as z.input<typeof roleFilteredRequestSchema>,
+        requestData: resolvedData as z.input<typeof roleFilteredRequestSchema>,
         urlParameters: urlPathParams as z.input<
           typeof endpoint.requestUrlPathParamsSchema
         >,
@@ -773,4 +839,14 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       ...(result.performance && { performance: result.performance }),
     };
   };
+
+  if (requestDefaults) {
+    genericHandler.requestDefaults =
+      requestDefaults as RequestDefaultsFn<CreateApiEndpointAny>;
+  }
+  if (fieldDefaults) {
+    genericHandler.fieldDefaults = fieldDefaults;
+  }
+
+  return genericHandler;
 }

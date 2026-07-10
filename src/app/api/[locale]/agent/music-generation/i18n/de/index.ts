@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Modell",
-      description: "Wähle ein Musikgenerierungsmodell",
+      description: "Musikgenerierungsmodell. Leer lassen, um das konfigurierte Standardmodell zu verwenden.",
     },
     duration: {
       label: "Dauer",
@@ -91,6 +91,8 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Bei der Musikgenerierung ist ein Konflikt aufgetreten",
       },
+      noModelConfigured:
+        "Kein Musikmodell konfiguriert. Lege ein Musikmodell in deinen Favoriten-Einstellungen fest.",
       notAnAudioModel:
         "Das ausgewählte Modell unterstützt keine Musikgenerierung. Bitte wähle ein Musikmodell.",
       notConfigured:

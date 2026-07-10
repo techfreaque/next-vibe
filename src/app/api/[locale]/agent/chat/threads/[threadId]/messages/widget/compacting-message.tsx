@@ -105,33 +105,34 @@ export function CompactingMessage({
               </Span>
             )}
 
-            {/* Expand/collapse only when done */}
-            {!isStreaming &&
-              (isExpanded ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              ))}
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            )}
           </Div>
         </Div>
       </Button>
 
       {/* Expandable content */}
-      {!isStreaming && (
-        <Div
-          className={`transition-all duration-300 ease-in-out ${
-            isExpanded ? "opacity-100" : "max-h-0 opacity-0 overflow-hidden"
-          }`}
-        >
-          <Div className="px-4 pb-4 pt-0 border-t border-purple-500/10">
-            <Div className="mt-3 text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none">
-              {content ? (
-                <Markdown content={content} messageId="compacting" />
-              ) : null}
-            </Div>
+      <Div
+        className={`transition-all duration-300 ease-in-out ${
+          isExpanded ? "opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+        }`}
+      >
+        <Div className="px-4 pb-4 pt-0 border-t border-purple-500/10">
+          <Div className="mt-3 text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none">
+            {isStreaming && !content ? (
+              <Div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <Span className="text-sm">Summarizing conversation...</Span>
+              </Div>
+            ) : content ? (
+              <Markdown content={content} messageId="compacting" />
+            ) : null}
           </Div>
         </Div>
-      )}
+      </Div>
     </Div>
   );
 }

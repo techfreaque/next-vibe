@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -14,6 +14,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
+  type BridgeContext,
+  ModalityResolver,
+} from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
+import {
   buildSystemPrompt,
   createMetadataSystemMessage,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/builder";
@@ -25,7 +29,31 @@ import {
   CHAT_MESSAGE_COLUMNS,
   chatMessages,
 } from "@/app/api/[locale]/agent/chat/db";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import {
+  isSkillVariantId,
+  isUuid,
+  parseSkillId,
+} from "@/app/api/[locale]/agent/chat/slugify";
 import { loadRawEmbeddingScores } from "@/app/api/[locale]/agent/cortex/system-prompt";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import {
+  getBestImageGenModel,
+  type ImageGenModelSelection,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+  type FavoriteConfig,
+} from "@/app/api/[locale]/agent/skills/favorites/db";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
+} from "@/app/api/[locale]/agent/video-generation/models";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -36,6 +64,9 @@ export async function buildDebugSystemPrompt({
   threadId,
   skillId,
   subFolderId,
+  imageGenModelSelection,
+  musicGenModelSelection,
+  videoGenModelSelection,
   user,
   locale,
   logger,

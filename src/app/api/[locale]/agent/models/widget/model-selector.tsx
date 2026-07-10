@@ -1443,8 +1443,16 @@ export function ModelSelector({
           !modelMatchesRoleLocal(m, "tts") &&
           !modelMatchesRoleLocal(m, "stt")));
 
+    // When a specific role is requested, restrict to models matching that role.
+    // Without this, admin extras and unfiltered views bleed TTS into audio-gen
+    // selectors (both map to the "audio" tab type).
+    const roleFilter = (m: AnyModelOptionWithVision): boolean =>
+      !allowedRoles || allowedRoles.some((r) => modelMatchesRoleLocal(m, r));
+
     if (showUnfilteredModels) {
-      const all = getAllModelOptions().filter(typeFilter);
+      const all = getAllModelOptions().filter(
+        (m) => typeFilter(m) && roleFilter(m),
+      );
       return isAdmin
         ? all
         : all.filter((m) => isProviderAvailable(m, availability));
@@ -1460,6 +1468,7 @@ export function ModelSelector({
     const adminExtras = getAllModelOptions().filter(
       (m) =>
         typeFilter(m) &&
+        roleFilter(m) &&
         !filteredIds.has(m.id) &&
         !isProviderAvailable(m, availability),
     );
@@ -1468,6 +1477,7 @@ export function ModelSelector({
     showUnfilteredModels,
     filteredModels,
     isAdmin,
+    allowedRoles,
     modelTypeTab,
     availability,
   ]);
@@ -1514,15 +1524,25 @@ export function ModelSelector({
           !modelMatchesRoleLocal(m, "audio-gen") &&
           !modelMatchesRoleLocal(m, "tts") &&
           !modelMatchesRoleLocal(m, "stt")));
+    const roleFilter = (m: AnyModelOptionWithVision): boolean =>
+      !allowedRoles || allowedRoles.some((r) => modelMatchesRoleLocal(m, r));
     return getAllModelOptions().filter(
       (m) =>
         !shownIds.has(m.id) &&
         typeFilter(m) &&
+        roleFilter(m) &&
         (isAdmin || isProviderAvailable(m, availability)) &&
         (m.name.toLowerCase().includes(q) ||
           modelProviders[m.provider]?.name.toLowerCase().includes(q)),
     );
-  }, [searchQuery, searchFilteredModels, modelTypeTab, isAdmin, availability]);
+  }, [
+    searchQuery,
+    searchFilteredModels,
+    allowedRoles,
+    modelTypeTab,
+    isAdmin,
+    availability,
+  ]);
 
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {

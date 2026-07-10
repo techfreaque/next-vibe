@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The audio is a **28-second synth-funk instrumental track** with a mid-tempo groove (~110–120 BPM, 4/4). The arrangement features:\n\n- **Drums** — electronic kit with a groovy kick/snare/hi-hat pattern, occasional open hi-hat accents\n- **Synth bass** — walking, melodic funk bassline\n- **Lead synth** — bright, staccato melody reminiscent of FM synthesis (DX7-style)\n- **Pad synth** — warm, sustained harmonic support\n- **Electric guitar** — clean, percussive chord stabs adding funk texture\n\nThe production is polished and clean with a retro 80s electronic feel, some reverb on the lead and snare for space. The mood is upbeat, funky, and groovy — no vocals, speech, or non-musical sounds.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

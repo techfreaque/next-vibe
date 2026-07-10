@@ -126,6 +126,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         sms: methodConfig.sms
           ? { afterHandlerSms: methodConfig.sms }
           : undefined,
+        requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.GET] = handler[Methods.GET];
@@ -167,6 +168,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         sms: methodConfig.sms
           ? { afterHandlerSms: methodConfig.sms }
           : undefined,
+        requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.POST] = handler[Methods.POST];
@@ -203,6 +205,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         sms: methodConfig.sms
           ? { afterHandlerSms: methodConfig.sms }
           : undefined,
+        requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.PUT] = handler[Methods.PUT];
@@ -239,6 +242,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         sms: methodConfig.sms
           ? { afterHandlerSms: methodConfig.sms }
           : undefined,
+        requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.PATCH] = handler[Methods.PATCH];
@@ -276,6 +280,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         sms: methodConfig.sms
           ? { afterHandlerSms: methodConfig.sms }
           : undefined,
+        requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.DELETE] = handler[Methods.DELETE];

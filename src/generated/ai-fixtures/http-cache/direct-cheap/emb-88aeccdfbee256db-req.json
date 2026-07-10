@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T11b — PASSED ✓**\n\nThe `cron-stats` tool on `hermes` returned successfully with `totalTasks: 19` (numeric).\n\nKey stats from the result:\n- **System status:** healthy\n- **Uptime:** 0d 0h 51m\n- **Total executions:** 274 (99% success rate)\n- **Active tasks:** 9\n- **Problem tasks:** `db-health` (14% failure rate — flagged as \"degraded\")\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T9 report — PASSED ✓**\n\nThe `products-category-list` result is visible in the immediate context above. I can see the `categories` array containing **3 categories**:\n\n- **Services**\n- **Physical Goods**\n- **Digital Products**\n\nAll three are active (`isActive: true`), have `sortOrder: 0`, and no parent category.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

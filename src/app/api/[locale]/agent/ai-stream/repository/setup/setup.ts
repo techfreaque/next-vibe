@@ -6,7 +6,7 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -45,7 +45,7 @@ import { type ToolCall } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { ThreadStreamingState } from "../../../chat/enum";
 import { chatSettings } from "../../../chat/settings/db";
-import { isUuid } from "../../../chat/slugify";
+import { isSkillVariantId, isUuid, parseSkillId } from "../../../chat/slugify";
 import { ThreadsRepository } from "../../../chat/threads/repository";
 import { DEFAULT_SKILLS } from "../../../skills/config";
 import {
@@ -282,6 +282,9 @@ function resolveBridgeModelSelections(params: {
     effectiveImageGenModel,
     effectiveMusicGenModel,
     effectiveVideoGenModel,
+    effectiveImageGenSelection,
+    effectiveMusicGenSelection,
+    effectiveVideoGenSelection,
   };
 }
 
@@ -845,6 +848,9 @@ export async function setupAiStream(params: {
     effectiveImageGenModel,
     effectiveMusicGenModel,
     effectiveVideoGenModel,
+    effectiveImageGenSelection,
+    effectiveMusicGenSelection,
+    effectiveVideoGenSelection,
   } = resolveBridgeModelSelections({
     bridgeContext,
     mediaModelOverrides,

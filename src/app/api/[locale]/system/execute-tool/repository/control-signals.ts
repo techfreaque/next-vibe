@@ -1,157 +1,107 @@
 /**
- * ControlSignals — the DEFINITION-DRIVEN server↔server (cross-PROCESS, same-
- * instance) `tool-control` signal for a single in-flight tool call.
+ * ControlSignals — the mid-execution control signal (`cancel` / `detach` /
+ * `wakeUp`) for a single in-flight tool call, keyed by callId.
  *
- * The `tool-control` event is declared on the execute-tool definition. Both sides
- * ride that definition:
- *   - EMIT VIA THE TOOLS — the call-control tools call ControlSignals.deliver,
- *     which emits through createEndpointEmitter(executeDefinition.POST) — the
- *     channel + envelope are derived from the definition, never hand-rolled.
+ * A thin wrapper over KeyedRemoteSignal (the one WS-hub + bridge primitive):
  *   - SUBSCRIBE IN THE TOOL CALL — the running WAIT execution subscribes to the
- *     SAME definition-derived channel on the pub/sub bus and reacts.
+ *     execute-tool definition's `tool-control` channel for its callId and reacts.
+ *   - DELIVER VIA THE TOOLS — the call-control tools publish a `tool-control`
+ *     event to that per-callId channel.
  *
- * The pub/sub bus crosses PROCESSES (proxy ↔ app) in a cluster / redis mode —
- * which is the split here. NOT cross-INSTANCE (that is remoteEvent). NO in-memory
- * map, NO DB. execute-tool has no per-call channel key, so all in-flight calls
- * share the endpoint channel and each subscriber filters by its own callId.
- *
- * Actions MIRROR the callback modes — the running WAIT call converts itself:
- *   - `cancel` INTERRUPTS: abort the call, return the error as its result.
- *   - `detach` (= CallbackMode.DETACH): keep running, discard result, unblock now.
- *   - `wakeUp` (= CallbackMode.WAKE_UP): keep running, revive with the result.
+ * The primitive spans PROCESSES (proxy ↔ app, out-of-server callers) and, with a
+ * targetInstanceId, INSTANCES — so a call running on another instance (a
+ * remote-folder loop) is reachable with no bespoke forwarding, in local mode
+ * too. Actions MIRROR the callback modes; the running WAIT call converts itself.
  */
 
 import "server-only";
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { buildWsChannel } from "next-vibe/realtime/channel";
-import { getPubSubAdapter } from "next-vibe/realtime/pubsub/index";
-import type { AnyEndpointEventEnvelope } from "next-vibe/realtime/structured-events";
+import {
+  KeyedRemoteSignal,
+  type KeyedSignalSubscription,
+} from "next-vibe/realtime/keyed-signal";
+import type { WsWireMessage } from "next-vibe/realtime/types";
 
 import executeDefinition from "../definition";
 
 export type ControlAction = "cancel" | "detach" | "wakeUp";
 
-/** The event name declared on the execute-tool definition (single source). */
 const CONTROL_EVENT = "tool-control" as const;
 
-/**
- * The channel a call's control signals ride on: the execute-tool definition's own
- * ws channel (so the namespace is the endpoint's, DERIVED from the definition —
- * not a magic string) suffixed by the event name + callId, so each in-flight call
- * has its OWN channel. Per-call isolation matters because the pub/sub adapter
- * holds one handler per channel — parallel calls must not share.
- */
-function controlChannel(callId: string, logger: EndpointLogger): string {
-  const base = buildWsChannel(
-    executeDefinition.POST,
-    {} as never,
-    {} as never,
-    logger,
-  );
-  return `${base}/${CONTROL_EVENT}/${callId}`;
-}
-
-/** Build the definition-sourced envelope (path/method/eventName from the def). */
-function controlEnvelope(
+/** Narrow a wire payload to a control action for the given callId. */
+function parseFor(
   callId: string,
-  action: ControlAction,
-  channel: string,
-): AnyEndpointEventEnvelope {
-  return {
-    endpointPath: executeDefinition.POST.path,
-    endpointMethod: executeDefinition.POST.method,
-    eventName: CONTROL_EVENT,
-    responseData: {},
-    requestData: {},
-    urlPathParams: {},
-    payload: { callId, action },
-    channel,
-  };
-}
-
-/** Read + validate {callId, action} off a control envelope's payload. */
-function controlFromEnvelope(
-  data: AnyEndpointEventEnvelope,
-): { callId: string; action: ControlAction } | null {
-  const payload = data.payload;
-  if (
-    payload === null ||
-    typeof payload !== "object" ||
-    Array.isArray(payload)
-  ) {
+): (payload: WsWireMessage["data"]["payload"]) => ControlAction | null {
+  return (payload) => {
+    if (
+      payload === null ||
+      typeof payload !== "object" ||
+      Array.isArray(payload)
+    ) {
+      return null;
+    }
+    const p = payload as { callId?: string; action?: ControlAction };
+    if (p.callId !== callId) {
+      return null;
+    }
+    if (
+      p.action === "cancel" ||
+      p.action === "detach" ||
+      p.action === "wakeUp"
+    ) {
+      return p.action;
+    }
     return null;
-  }
-  const { callId, action } = payload as {
-    callId?: string;
-    action?: ControlAction;
   };
-  if (
-    typeof callId === "string" &&
-    (action === "cancel" || action === "detach" || action === "wakeUp")
-  ) {
-    return { callId, action };
-  }
-  return null;
 }
 
 export class ControlSignals {
   /**
-   * Subscribe to the next control signal for a callId. Subscribes to the
-   * execute-tool definition's channel on the pub/sub bus and resolves when a
-   * `tool-control` event for THIS callId arrives. cancel() unsubscribes when the
-   * tool finishes on its own. The caller races the promise against execution.
+   * Subscribe to the next control signal for a callId. Resolves when a
+   * `tool-control` event for THIS callId arrives (from whatever process/instance
+   * emitted it). The caller races the promise against execution.
    */
   static subscribe(
     callId: string,
+    user: JwtPayloadType,
     logger: EndpointLogger,
-  ): {
-    signal: Promise<ControlAction>;
-    cancel: () => void;
-  } {
-    const channel = controlChannel(callId, logger);
-    const adapter = getPubSubAdapter();
-    let settled = false;
-    const signal = new Promise<ControlAction>((resolve) => {
-      adapter.subscribe(channel, (event, data) => {
-        if (settled || event !== CONTROL_EVENT) {
-          return;
-        }
-        const control = controlFromEnvelope(data);
-        if (control && control.callId === callId) {
-          settled = true;
-          adapter.unsubscribe(channel);
-          resolve(control.action);
-        }
-      });
+  ): KeyedSignalSubscription<ControlAction> {
+    return KeyedRemoteSignal.subscribe({
+      ref: {
+        endpoint: executeDefinition.POST,
+        eventName: CONTROL_EVENT,
+        key: callId,
+      },
+      user,
+      parse: parseFor(callId),
+      logger,
     });
-    const cancel = (): void => {
-      if (!settled) {
-        settled = true;
-        adapter.unsubscribe(channel);
-      }
-    };
-    return { signal, cancel };
   }
 
   /**
-   * Emit the `tool-control` event to a call's control channel. Channel + envelope
-   * are DERIVED from the execute-tool definition (its ws channel + declared event
-   * name/payload); a per-callId suffix isolates parallel calls, which is why this
-   * publishes to the bus directly rather than via createEndpointEmitter (whose
-   * channel is fixed per endpoint and cannot be keyed by callId). The running
-   * tool's subscription (in whatever process it runs) reacts. Fire-and-forget.
+   * Emit a control signal to a call's channel. Set `targetInstanceId` to reach a
+   * call running on another instance. The running tool's subscription reacts.
+   * Fire-and-forget.
    */
   static deliver(
     callId: string,
     action: ControlAction,
+    user: JwtPayloadType,
     logger: EndpointLogger,
+    targetInstanceId?: string,
   ): void {
-    const channel = controlChannel(callId, logger);
-    getPubSubAdapter().publish(
-      channel,
-      CONTROL_EVENT,
-      controlEnvelope(callId, action, channel),
-    );
+    KeyedRemoteSignal.deliver({
+      ref: {
+        endpoint: executeDefinition.POST,
+        eventName: CONTROL_EVENT,
+        key: callId,
+      },
+      payload: { callId, action },
+      user,
+      ...(targetInstanceId ? { targetInstanceId } : {}),
+      logger,
+    });
   }
 }

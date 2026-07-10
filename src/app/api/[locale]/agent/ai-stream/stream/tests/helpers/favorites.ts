@@ -19,6 +19,8 @@ import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
 import { resolveFavorite } from "@/app/api/[locale]/agent/skills/resolver";
 
 /**

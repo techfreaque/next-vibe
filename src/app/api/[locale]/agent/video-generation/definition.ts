@@ -19,9 +19,9 @@ import {
   responseField,
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
+import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";
@@ -86,7 +86,6 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 12,
         options: [],
-        hiddenForPlatforms: [Platform.AI],
         schema: z.enum(VideoGenModelId).optional(),
       }),
       duration: requestField(scopedTranslation, {

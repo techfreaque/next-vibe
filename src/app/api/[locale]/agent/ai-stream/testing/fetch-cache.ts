@@ -656,20 +656,16 @@ async function engineFetch(
   }
 
   // ── Ordinal vs content-addressing ──────────────────────────────────────────
-  // ORDINAL (default): conversational chat/agent turns. Their body depends on
-  // the PRIOR turn's response, so identity = position in the call sequence
-  // (the shared per-thread counter orders them).
+  // ORDINAL (default): conversational chat/agent turns — AND compacting and
+  // media-gen (submit + poll), which are ordinary external calls the stream makes
+  // in sequence. Their body depends on the PRIOR turn's response, so identity =
+  // position in the call sequence (the shared per-thread counter orders them).
   //
   // CONTENT-ADDRESSED (hash of body, OFF the shared ordinal): calls whose body
   // is a PURE FUNCTION of their own input, fired fire-and-forget with a
   // run-to-run-varying count/interleaving. Keeping them off the ordinal means
   // they can't desync the conversational chain. Detected from the request
-  // alone (no markers):
-  //   1. Embeddings (URL).
-  //   2. Auto-title (fixed AUTO_TITLE_SYSTEM_PROMPT marker in a system message)
-  //      — a fire-and-forget background summary fired after the turn finalizes;
-  //      it must NOT consume a conversational ordinal or every suite's fixtures
-  //      would shift by one call per new-thread turn.
+  // alone (no markers): Embeddings (URL).
   const isEmbeddingCall = /\/embeddings\b/.test(url);
   const isContentAddressed = isEmbeddingCall;
 
@@ -694,8 +690,8 @@ async function engineFetch(
     // per-message context metadata that is VOLATILE across runs — the auto-added
     // `[Context: ID:<shortId> | ... | Posted:<timestamp>]` line has a fresh random
     // shortId and a wall-clock timestamp every run. Hashing the raw body made the
-    // SAME semantic content miss every time → the embedding went LIVE and stalled
-    // the run on the fetch watchdog. Strip those volatile tokens before hashing so
+    // SAME semantic content miss every time → the call went LIVE and stalled the
+    // run on the fetch watchdog. Strip those volatile tokens before hashing so
     // identical content always resolves to the same fixture.
     const bodyHash = createHash("sha256")
       .update(normalizeEmbeddingBodyForHash(bodyStr))

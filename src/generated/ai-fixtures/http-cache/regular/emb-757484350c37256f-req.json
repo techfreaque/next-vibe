@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-qa-suite-23a86f26-912f-4be4-9e87-22043aa25a0d.md\n\n# Tool Help QA Suite\nFolder: private\nDescription: Running quality gate verification on tool-help across search, category, and detail modes.",
+    "encoding_format": "float"
+  }
+}

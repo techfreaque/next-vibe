@@ -260,6 +260,16 @@ export const translations = {
     },
   },
 
+  noEmail: {
+    warning: {
+      title: "No reply address",
+      description:
+        "Without an email, we can read your message but can't get back to you. Send anyway if that's fine.",
+      addEmail: "Add email",
+      sendAnyway: "Send anyway",
+    },
+  },
+
   success: {
     title: "Message sent",
     description: "Your message has been received. A real person will reply.",

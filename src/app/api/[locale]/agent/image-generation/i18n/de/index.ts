@@ -25,7 +25,8 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Modell",
-      description: "Wähle ein Bildgenerierungsmodell",
+      description:
+        "Bildgenerierungsmodell. Leer lassen, um das konfigurierte Standardmodell zu verwenden.",
     },
     approxCost: "~Credits",
     size: {

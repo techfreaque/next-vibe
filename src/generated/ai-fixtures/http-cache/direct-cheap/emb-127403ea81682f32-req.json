@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The audio is a **35-second upbeat EDM/funk/house instrumental** with a polished studio production. Key elements:\n\n- **Tempo:** ~120-125 BPM\n- **Drums:** Electronic kit with a driving 4/4 beat — kick on every beat, snare on 2 & 4, closed hi-hat eighth notes, occasional open hi-hat accents\n- **Bass:** Melodic, funky synth bass line — groovy and rhythmic\n- **Synth 1 (Melody):** Bright, bell-like/xylophone-style synth playing a catchy, cheerful main melody\n- **Synth 2 (Chords):** Sustained chords and rhythmic stabs filling out the harmonic space\n\nThe track starts immediately with full instrumentation, maintains consistent energy throughout, and has a cheerful, danceable mood. No vocals or speech.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

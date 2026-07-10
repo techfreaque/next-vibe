@@ -79,6 +79,11 @@ function buildTrailingSystemMessage(params: {
   const allParts = [...currentParts];
 
   if (stateParts.length > 0) {
+    // This trailing block is REBUILT every turn from live state — it is CURRENT,
+    // not a stale earlier-turn snapshot. Framing it as "captured before this turn"
+    // made the model treat live duties here (e.g. the thread-rename requirement)
+    // as ignorable old state. Present it as the current context + duties for THIS
+    // turn so they are acted on, not dismissed.
     allParts.push(
       `[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n${stateParts.join("\n\n")}`,
     );

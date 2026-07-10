@@ -25,7 +25,8 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Model",
-      description: "Wybierz model do generowania obrazów",
+      description:
+        "Model generowania obrazów. Pozostaw puste, by użyć domyślnego modelu użytkownika.",
     },
     approxCost: "~kredyty",
     size: {

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls returned successfully:\n\n1. **tool-help** — returned 528 tools across 22 categories with sub-categories. ✓\n2. **cortex-write** — required user confirmation (approve mode auto-triggered), user confirmed, and the write completed with `responsePath: \"/memories/t7-approve-test\"`. ✓\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

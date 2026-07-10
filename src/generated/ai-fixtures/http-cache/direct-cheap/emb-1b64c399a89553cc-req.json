@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T10b — PASSED ✓**\n\n**Image description:** The Japanese national flag (*Hinomaru*) — a minimalist design with a large, solid red circle (representing the sun) centered on a plain white rectangular field. Flat, vibrant colors, no text or textures, clean sharp edges.\n\n**Audio description:** A ~29-second upbeat funk/soul instrumental with a retro 70s TV show theme feel (~100-110 BPM, 4/4). Features crisp drums, a funky rhythm guitar with wah effect, a clean lead guitar melody, walking bass line, and smooth organ pads. Polished studio production, lighthearted and groovy — likely intended as background music or a loop.\n\nBoth descriptions were present via system-injected content.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

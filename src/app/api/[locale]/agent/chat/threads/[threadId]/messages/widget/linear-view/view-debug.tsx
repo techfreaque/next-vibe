@@ -102,12 +102,12 @@ export const DebugLinearMessageView = React.memo(
             enabled: true,
             staleTime: 10_000,
           },
-          queryParams: {
+          initialState: {
             rootFolderId,
             userMessage: userMessage || undefined,
             subFolderId: subFolderId ?? undefined,
             skillId: selectedSkill ?? undefined,
-            threadId,
+            threadId: threadId ?? undefined,
           },
         },
       }),

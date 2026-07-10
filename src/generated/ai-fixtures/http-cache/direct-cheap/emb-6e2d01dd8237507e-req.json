@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T11e payment-invoice-list] Call execute-tool with toolName='payment-invoice-list' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

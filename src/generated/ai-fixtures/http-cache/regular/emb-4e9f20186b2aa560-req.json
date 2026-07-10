@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Generated image successfully. Let me verify the result:\n\n- **imageUrl**: `http://localhost:3000/api/.../dfc24e3b-...png` — non-empty ✅\n- **creditCost**: `3.99` — positive ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

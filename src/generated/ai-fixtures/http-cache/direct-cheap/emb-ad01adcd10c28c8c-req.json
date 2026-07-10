@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** The Japanese flag (*Hinomaru*) — a large, vibrant crimson red circle centered on a plain white rectangular background. Clean, flat, two-dimensional graphic with no textures, gradients, or shadows.\n\n**Audio:** A 23-second upbeat instrumental clip blending Pop and light Funk. Features a bright electric piano melody, steady electronic drums (4/4 time, ~110-120 BPM), a rubbery synth bass line, and subtle synth pad layers. Polished production, cheerful and optimistic mood — no vocals.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

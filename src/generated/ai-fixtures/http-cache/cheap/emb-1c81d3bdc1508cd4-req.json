@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T5a endLoop] Call the self-instance-id tool with callbackMode='endLoop' EXACTLY ONCE. Do not call it again and do nothing with its result — endLoop ends the turn after the tool runs.",
+    "encoding_format": "float"
+  }
+}

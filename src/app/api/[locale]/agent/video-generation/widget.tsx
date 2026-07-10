@@ -36,6 +36,7 @@ import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 import { useProviderAvailability } from "../env-availability-context";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
+import type { VideoGenerationPostRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 import type { VideoGenModelSelection } from "./models";
 import {

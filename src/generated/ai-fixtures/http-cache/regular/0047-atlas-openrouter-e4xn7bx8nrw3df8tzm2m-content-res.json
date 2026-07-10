@@ -1,0 +1,24 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/videos/e4xn7BX8nrw3Df8Tzm2M/content?index=0",
+  "status": 401,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18fa0d62b771b48-FRA",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 12:38:55 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff"
+  },
+  "body": {
+    "error": {
+      "message": "No cookie auth credentials found",
+      "code": 401
+    }
+  }
+}

@@ -41,7 +41,6 @@ const { POST } = createEndpoint({
     UserRole.PRODUCTION_OFF,
   ],
   // Local/dev mode only - generator includes ADMIN but constants.ts guards with LOCAL_MODE
-  defaultAiPinned: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
   aliases: [SQL_ALIAS] as const,
   cli: {

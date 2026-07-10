@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T8 — PASSED ✓**\n\nBoth tools ran in parallel and returned their expected results:\n\n| Tool | Expected shape | Result |\n|------|---------------|--------|\n| `cortex-write` → hermes | `responsePath` present | `\"/memories/t8-parallel-test\"` ✅ |\n| `chat-settings` → hermes | `selectedSkill` present | `\"thea\"` ✅ |\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

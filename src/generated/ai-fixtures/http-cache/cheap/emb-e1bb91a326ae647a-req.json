@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T5b await-task] Call await-task with taskId='local-bg-call-7144c6e2d9434787b7705e64'. Check that the result contains a responsePath string (either directly or nested in a result field). End your reply with STEP_OK if responsePath is present, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -265,6 +265,16 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  noEmail: {
+    warning: {
+      title: "Keine Antwortadresse",
+      description:
+        "Ohne E-Mail können wir Ihre Nachricht lesen – aber nicht antworten. Senden Sie trotzdem, wenn das in Ordnung ist.",
+      addEmail: "E-Mail hinzufügen",
+      sendAnyway: "Trotzdem senden",
+    },
+  },
+
   success: {
     title: "Nachricht gesendet",
     description:

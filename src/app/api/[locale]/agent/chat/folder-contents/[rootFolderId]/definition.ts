@@ -33,9 +33,9 @@ import {
   responseArrayOptionalField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 import { DefaultFolderId } from "../../config";
 import {
   ThreadStatusDB,

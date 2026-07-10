@@ -46,11 +46,17 @@ import {
 import { NO_SKILL_ID } from "../skills/constants";
 import { buildFavoriteConfig } from "../skills/favorites/repository";
 import {
+  type ImageGenerationPostRequestInput,
   type ImageGenerationPostRequestOutput,
   type ImageGenerationPostResponseOutput,
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
-import { getImageGenModelById, type ImageGenModelId } from "./models";
+import {
+  filterImageGenModels,
+  getImageGenModelById,
+  type ImageGenModelId,
+  type ImageGenModelSelection,
+} from "./models";
 import { generateWithFalAi } from "./providers/fal-ai";
 import { generateImageWithModelsLab } from "./providers/modelslab";
 import { generateWithOpenAI } from "./providers/openai";
@@ -420,7 +426,10 @@ export class ImageGenerationRepository {
         .catch(() => undefined);
     }
 
-    return success({ imageUrl, creditCost: finalCreditCost });
+    return success({
+      imageUrl,
+      creditCost: finalCreditCost,
+    });
   }
 
   /**
@@ -578,5 +587,36 @@ export class ImageGenerationRepository {
     // actual cost so the UI displays it the same way as fixed-price image gen models.
     const creditCost = result.data.totalCreditsDeducted ?? 0;
     return success({ imageUrl, creditCost });
+  }
+
+  static async getRequestDefaults(ctx: {
+    user: JwtPayloadType;
+    streamContext: ToolExecutionContext;
+  }): Promise<Partial<ImageGenerationPostRequestInput>> {
+    const { getInstanceAvailability } = await import("../env-availability");
+    const availability = await getInstanceAvailability();
+    const userId =
+      ctx.user && !ctx.user.isPublic && "id" in ctx.user
+        ? ctx.user.id
+        : undefined;
+    let sel: ImageGenModelSelection | undefined;
+    if (userId) {
+      const { resolveSkillFavoriteContext } =
+        await import("@/app/api/[locale]/agent/skills/resolver");
+      const { ModalityResolver } =
+        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+      const { favorite, skill } = await resolveSkillFavoriteContext({
+        favoriteId: ctx.streamContext.favoriteId ?? null,
+        skillId: ctx.streamContext.skillId ?? null,
+        userId,
+      });
+      sel = ModalityResolver.resolveImageGenSelection({ favorite, skill });
+    }
+    sel ??= ctx.streamContext.resolvedMediaSelections?.imageGenModelSelection;
+    const model = filterImageGenModels(sel, ctx.user, availability)[0]?.id;
+    if (!model) {
+      return {};
+    }
+    return { model };
   }
 }

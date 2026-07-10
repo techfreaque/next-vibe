@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T11 companies-list] Call execute-tool with toolName='companies-list' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list the companies. Check that the result has a companies array. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

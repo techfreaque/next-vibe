@@ -16,10 +16,10 @@ import {
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
-import { DEFAULT_TTS_VOICE_ID } from "./constants";
+import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
+import { DEFAULT_TTS_VOICE_ID, TEXT_TO_SPEECH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { TtsModelId, TtsModelIdOptions } from "./models";
 
@@ -51,6 +51,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",
+  aliases: [TEXT_TO_SPEECH_ALIAS],
   icon: "volume-2",
   category: "ai",
   subCategory: "Generation",

@@ -50,6 +50,24 @@ export const translations: typeof enTranslations = {
         description: "Optionale Unterordner-UUID",
         placeholder: "UUID oder leer lassen",
       },
+      imageGenModelSelection: {
+        label: "Bildgenerierungs-Auswahl",
+        description:
+          "Bildgenerierungs-Modellauswahl aus dem aktiven Favoriten/Chat-UI (leer lassen für Nutzer-Standard)",
+        placeholder: "leer für Nutzer-Standard",
+      },
+      musicGenModelSelection: {
+        label: "Musikgenerierungs-Auswahl",
+        description:
+          "Musikgenerierungs-Modellauswahl aus dem aktiven Favoriten/Chat-UI (leer lassen für Nutzer-Standard)",
+        placeholder: "leer für Nutzer-Standard",
+      },
+      videoGenModelSelection: {
+        label: "Videogenerierungs-Auswahl",
+        description:
+          "Videogenerierungs-Modellauswahl aus dem aktiven Favoriten/Chat-UI (leer lassen für Nutzer-Standard)",
+        placeholder: "leer für Nutzer-Standard",
+      },
     },
     response: {
       systemPrompt: { text: "System-Prompt" },

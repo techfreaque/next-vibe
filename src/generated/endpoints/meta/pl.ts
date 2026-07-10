@@ -2714,7 +2714,6 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: {
         default: {
           prompt: "A photorealistic sunset over a mountain lake",
-          model: "gpt-5-image",
           size: "post.size.square1024",
           quality: "post.quality.standard",
         },
@@ -2846,7 +2845,6 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: {
         default: {
           prompt: "Upbeat electronic music with a catchy melody",
-          model: "lyria-3",
           duration: "post.duration.medium",
         },
       },
@@ -3678,7 +3676,7 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_text-to-speech_POST",
+    toolName: "text-to-speech",
     method: "POST",
     path: ["agent", "text-to-speech"],
     allowedRoles: [
@@ -3862,6 +3860,11 @@ export const endpointsMeta: EndpointMeta[] = [
     subCategory: "Search",
     tags: ["Wyszukiwanie", "Sieć", "Internet"],
     credits: 0.65,
+    defaultAiPinned: [
+      "enums.userRole.public",
+      "enums.userRole.customer",
+      "enums.userRole.admin",
+    ],
     defaultWebPinned: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -9433,7 +9436,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-09T21:26:47.282Z",
+          createdAt: "2026-07-10T12:01:20.277Z",
         },
       },
     },
@@ -9458,7 +9461,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-09T21:26:47.282Z",
+          updatedAt: "2026-07-10T12:01:20.278Z",
         },
       },
     },
@@ -17139,7 +17142,6 @@ export const endpointsMeta: EndpointMeta[] = [
     category: "database",
     subCategory: "Tools",
     tags: ["sql"],
-    defaultAiPinned: ["enums.userRole.admin"],
     defaultWebPinned: ["enums.userRole.admin"],
     examples: {
       inputs: {
@@ -17865,7 +17867,6 @@ export const endpointsMeta: EndpointMeta[] = [
     category: "devTools",
     subCategory: "tasksCron",
     tags: ["Oczekuj na zadanie"],
-    defaultAiPinned: ["enums.userRole.customer", "enums.userRole.admin"],
     examples: {
       inputs: { default: { taskId: "local-bg-1234567890-abc123" } },
       responses: {

@@ -88,6 +88,11 @@ export const translations: typeof enTranslations = {
         utilities: "Fähigkeiten",
         inputs: "Eingaben",
         outputs: "Ausgaben",
+        supportedDurations: "Dauern (s)",
+        supportedAspectRatios: "Seitenverhältnisse",
+        supportedResolutions: "Auflösungen",
+        supportedFrameImages: "Einzelbild-Typen",
+        generateAudio: "Erzeugt Audio",
       },
     },
 

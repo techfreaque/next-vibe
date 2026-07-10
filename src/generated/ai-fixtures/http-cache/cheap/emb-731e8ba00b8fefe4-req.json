@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached image is the national flag of Japan (Nisshōki) — a clean white rectangular field with a solid crimson red disc centered precisely in the middle, representing the sun. The colors are uniform with sharp, defined edges and no gradients or textures.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

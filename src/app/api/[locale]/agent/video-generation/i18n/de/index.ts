@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Modell",
-      description: "Wähle ein Videogenerierungsmodell",
+      description:
+        "Videogenerierungsmodell. Leer lassen, um das konfigurierte Standardmodell zu verwenden.",
     },
     duration: {
       label: "Dauer",
@@ -39,11 +40,17 @@ export const translations: typeof enTranslations = {
       label: "Auflösung",
       description: "Auflösung des Ausgabevideos",
     },
-    inputMediaUrl: {
-      label: "Bild-URL",
+    firstFrameUrl: {
+      label: "Erster Frame URL",
       description:
-        "Bild, das animiert werden soll. Das Modell erzeugt Bewegung aus diesem Frame.",
-      placeholder: "https://beispiel.de/bild.jpg",
+        "Bild für den ersten Frame. Das Modell animiert von diesem Bild vorwärts.",
+      placeholder: "https://beispiel.de/erster-frame.jpg",
+    },
+    lastFrameUrl: {
+      label: "Letzter Frame URL",
+      description:
+        "Bild für den letzten Frame. Das Modell animiert rückwärts zu diesem Bild.",
+      placeholder: "https://beispiel.de/letzter-frame.jpg",
     },
     download: "Herunterladen",
     generatingNote: "Videogenerierung kann 1–3 Minuten dauern",

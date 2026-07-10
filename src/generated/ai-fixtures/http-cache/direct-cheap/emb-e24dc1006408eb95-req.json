@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The tool ran successfully. Key cron stats:\n\n- **Total tasks:** 19 (numeric)\n- **Executed tasks:** 404 total executions\n- **Active tasks:** 9\n- **Success rate:** 99%\n- **System status:** `healthy`\n- **Problem tasks:** `db-health` (89% success rate, 4 failures out of 35 executions)\n- **Uptime:** 0d 0h 51m\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

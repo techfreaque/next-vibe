@@ -17,9 +17,9 @@ import {
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
+import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { DESCRIBE_VIDEO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

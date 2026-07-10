@@ -29,12 +29,6 @@ import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";
 
-const EndpointsPage = lazy(() =>
-  import("next-vibe/unified-ui/renderers/react/EndpointsPage").then((m) => ({
-    default: m.EndpointsPage,
-  })),
-);
-
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
   rootFolderId: DefaultFolderId;
@@ -268,17 +262,15 @@ export function ErrorMessageBubble({
                 </Span>
               </Div>
             ) : (
-              <Suspense fallback={null}>
-                <EndpointsPage
-                  endpoint={{ POST: contactEndpoint }}
-                  locale={locale}
-                  user={user}
-                  endpointOptions={{
-                    create: { autoPrefillData: contactPrefill as never },
-                  }}
-                  className="mt-2"
-                />
-              </Suspense>
+              <EndpointsPage
+                endpoint={{ POST: contactEndpoint }}
+                locale={locale}
+                user={user}
+                endpointOptions={{
+                  create: { autoPrefillData: contactPrefill as never },
+                }}
+                className="mt-2"
+              />
             )}
           </Div>
         </Div>

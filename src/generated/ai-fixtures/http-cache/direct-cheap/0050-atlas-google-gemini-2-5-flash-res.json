@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2f22c9e650be-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:37:02 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651021-AqCbN0Ufb9HpdGlSJeNO"
+  },
+  "body": {
+    "id": "gen-1783651021-AqCbN0Ufb9HpdGlSJeNO",
+    "object": "chat.completion",
+    "created": 1783651021,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip of a groovy, chill-out instrumental hip-hop track, likely lasting about one minute based on the provided audio.\n\n**Music:**\n*   **Genre:** Instrumental Hip-Hop / Chill-Hop / Lo-Fi Beats\n*   **Tempo:** Approximately 80-85 BPM (a relaxed, laid-back pace)\n*   **Time Signature:** 4/4\n*   **Instruments:**\n    *   **Drums:** A classic hip-hop drum beat with a tight, snappy snare drum on beats 2 and 4, a deep kick drum providing a solid foundation, and a consistent hi-hat pattern creating a gentle, swinging rhythm. The hi-hats have a slightly open, airy quality.\n    *   **Bass:** A smooth, deep, and melodic electric bass line, possibly synthesized or heavily processed, playing a simple, repetitive groove that underpins the harmony. It's a driving yet understated element.\n    *   **Electric Guitar:** A clean-toned electric guitar plays a simple, jazzy, and slightly melancholic melody. It uses single notes rather than chords and has a relaxed, almost improvisational feel. The guitar has a subtle amount of reverb, giving it a bit of space.\n    *   **Keyboard/Synth:** A bright, bell-like synth or keyboard sound plays a simple, catchy melodic phrase that repeats throughout the clip. It adds a sparkling, slightly optimistic layer over the other instruments.\n    *   **Percussion:** There are subtle, almost imperceptible additional percussion elements, possibly shakers or a very light tambourine, adding texture to the drum beat without being prominent.\n*   **Interaction:** The drum beat provides the steady foundation, the bass lays down the harmonic groove, the guitar offers a relaxed counter-melody, and the synth adds a memorable, shimmering hook. All elements work together to create a cohesive, mellow atmosphere.\n*   **Production Style:** Clean and polished, but with a warm, slightly analog feel. There's a subtle use of reverb on the melodic instruments, and the overall mix is balanced and clear. It leans towards a modern lo-fi aesthetic without being overly raw.\n*   **Mood:** Relaxed, calm, contemplative, and slightly upbeat. It evokes a feeling of gentle movement or easy listening.\n\n**Sound Quality and Environment:**\n*   **Sound Quality:** High fidelity, clear, and well-produced.\n*   **Recording Environment:** Sounds like a professional studio recording or a very high-quality digital production.\n\n**No speech or other notable sound effects are present.**",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 542,
+      "total_tokens": 1614,
+      "cost": 0.0022016,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022016,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001355
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

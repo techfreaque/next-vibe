@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/video/quality-gate-tool-help-verification-33ddc8a9-b917-4961-96ec-46e0642bf336/test-video.mp4.md\n\n---\nfilename: \"test-video.mp4\"\nembedded: true\nmimeType: \"video/mp4\"\nsize: \"1.1 MB\"\nthreadId: \"33ddc8a9-b917-4961-96ec-46e0642bf336\"\nthreadTitle: \"Quality Gate Tool-Help Verification\"\nuploadedAt: \"2026-07-10T03:55:34.670Z\"\n---\n\n# test-video.mp4\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `video/mp4` |\n| Size | 1.1 MB |\n| Thread | Quality Gate Tool-Help Verification |\n| Uploaded | 2026-07-10 |\n\n## Message Context\n\n[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

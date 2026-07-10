@@ -11,9 +11,6 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import endpoints from "./definition";
 import { ImageGenerationRepository } from "./repository";
 
-/**
- * Export endpoint handlers
- */
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
@@ -26,37 +23,6 @@ export const { POST, tools } = endpointsHandler({
         t,
         streamContext,
       ),
-    fieldDefaults: {
-      model: async (ctx) => {
-        if (!ctx.user) {
-          return undefined;
-        }
-        const { resolveFavoriteConfig } =
-          await import("@/app/api/[locale]/agent/skills/favorites/repository");
-        const { resolveSkillVariant } =
-          await import("@/app/api/[locale]/agent/skills/resolver");
-        const userId =
-          !ctx.user.isPublic && "id" in ctx.user ? ctx.user.id : undefined;
-        const fav = await resolveFavoriteConfig(
-          ctx.streamContext.favoriteId,
-          userId,
-        );
-        const { parseSkillId } =
-          await import("@/app/api/[locale]/agent/chat/slugify");
-        const skill = await resolveSkillVariant(
-          ctx.streamContext.skillId,
-          fav ? parseSkillId(fav.skillId).variantId : null,
-        );
-        const sel =
-          skill?.imageGenModelSelection ?? fav?.imageGenModelSelection;
-        if (!sel) {
-          return undefined;
-        }
-        const { getInstanceAvailability } = await import("../env-availability");
-        const _routeAvailability = await getInstanceAvailability();
-        const { getBestImageGenModel } = await import("./models");
-        return getBestImageGenModel(sel, ctx.user, _routeAvailability)?.id;
-      },
-    },
+    requestDefaults: (ctx) => ImageGenerationRepository.getRequestDefaults(ctx),
   },
 });

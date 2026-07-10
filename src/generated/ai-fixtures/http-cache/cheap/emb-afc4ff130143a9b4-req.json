@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Here's what I received:\n\n**Image:** A photograph of the Japanese national flag (Nisshōki/Hinomaru) — white rectangular fabric with a centered deep crimson disc, laid flat against a neutral out-of-focus background. The fabric weave texture is partially visible, with precise edges and even lighting.\n\n**Audio:** A 30-second uplifting funk/jazz fusion instrumental track (~110–120 BPM) featuring electric guitar, electric bass, drums, and synthesizer/keys. Clean, polished production with a groovy, laid-back feel — suitable for lounge or cafe background music.\n\nBoth the image description and the audio description were present and successfully processed.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

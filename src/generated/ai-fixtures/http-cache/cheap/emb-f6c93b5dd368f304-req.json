@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result has a `favorites` array with **8 entries**, all with proper fields (`id`, `name`, `description`, `modelId`, `skillId`, `tagline`, etc.). The active favorite (`thea-cheap` with `activeBadge: \"active\"`) matches the system context. No errors, no missing fields, no raw IDs or stack traces.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

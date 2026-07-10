@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls returned successfully. Let me verify each:\n\n**Call 1 — category='ai':** Returns 71 tools (filtered from 528 total). Every entry has a `name` and `description`. ✓\n\n**Call 2 — query='search':** Returns 12 tools across categories (ai, account, cortex, leads, pos). All have `name` + `description`. Includes `web-search`, `brave-search`, `kagi-search`, `agent-search-messages`, `cortex-search`, etc. ✓\n\n**Call 3 — toolName='generate_image':** Returns 1 tool with:\n- `name`: \"generate_image\" ✓\n- `description`: \"Generate an image from a text prompt using AI\" ✓\n- `parameters`: full JSON schema with `prompt` (required), `model` (enum of 25 models), and `inputMediaUrl` (optional) ✓\n- `examples` showing expected input/output shape ✓\n\nNo errors, no empty results, no nonsensical output, no raw IDs or stack traces in user-facing content, no confusing parameters. Everything checks out.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

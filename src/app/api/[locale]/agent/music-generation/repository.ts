@@ -51,10 +51,10 @@ export class MusicGenerationRepository {
     t: MusicGenerationT,
     streamContext: ToolExecutionContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
-    // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
+    // model is resolved via requestDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
       return fail({
-        message: t("post.errors.not_found.title"),
+        message: t("post.errors.noModelConfigured"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -62,7 +62,7 @@ export class MusicGenerationRepository {
 
     if (!audioModel) {
       return fail({
-        message: t("post.errors.not_found.title"),
+        message: t("post.errors.not_found.description"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }

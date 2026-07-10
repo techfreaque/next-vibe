@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T11c — PASSED ✓**\n\nThe `inventory-stock` tool on `hermes` returned a `stockLevels` array with **3 items**:\n\n| Product | Qty Available | Unit Cost | Warehouse |\n|---------|:------------:|:---------:|----------|\n| Consulting Hour | 80 | $54.89 | Main Warehouse |\n| Laptop Stand | 17 | $42.77 | Main Warehouse |\n| Design Template Pack | 33 | $32.98 | Main Warehouse |\n\nAll items are above their reorder points (no low stock alerts).\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T10c — PASSED ✓**\n\n**Audio description:** A ~28-second upbeat instrumental hip-hop track (~95-100 BPM, major key). Features a mid-tempo drum beat (tight snare, light kick, syncopated hi-hats), a smooth groovy electric bass line, a bright plucked synth/guitar playing a catchy repeating motif, and a soft sustained synth/flute providing a gentle counter-melody. The production is polished with clear separation and subtle reverb. The mood is light, cheerful, and the track is a continuous loop with no distinct verse/chorus structure.\n\nThe system-injected audio description was present and successfully processed.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

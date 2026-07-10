@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2e47bbc1d349-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:36:27 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783650986-eAl66o4sOm5CH5kRXNp6"
+  },
+  "body": {
+    "id": "gen-1783650986-eAl66o4sOm5CH5kRXNp6",
+    "object": "chat.completion",
+    "created": 1783650986,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short, upbeat instrumental clip that's likely part of a song or a jingle. It spans 23 seconds. The sound quality is clear, suggesting a studio recording environment.\n\n**Musical Elements:**\n\n*   **Genre:** The upbeat tempo, clean production, and use of piano and electronic drums suggest a blend of Pop and light Funk, possibly even reminiscent of early 2000s Pop instrumentals.\n*   **Tempo:** Approximately 110-120 BPM (Andante to Moderato).\n*   **Instruments:**\n    *   **Electric Piano/Keyboard:** Plays the main melody, which is bright and rhythmic. It has a clean, slightly processed sound, possibly a Rhodes or Wurlitzer type patch. The pattern is staccato and playful.\n    *   **Electronic Drums:** Provide a steady, driving beat with a clean snare drum hit, a tight kick drum, and a closed hi-hat. They maintain a consistent 4/4 time signature.\n    *   **Bass Guitar (Synth Bass):** A clean, almost rubbery synthesized bass provides a steady, rhythmic foundation, outlining the chord progression. It plays a relatively simple, walking-style line.\n    *   **Synth Pads/Strings:** Subtly in the background, providing harmonic filler and adding a touch of fullness to the sound.\n\n*   **Structure/Interaction:**\n    *   The electric piano introduces a catchy, repetitive melodic phrase from the beginning, which continues throughout the clip.\n    *   The drums and bass kick in almost immediately, establishing the groove.\n    *   The synth pads contribute to the overall texture without being prominent.\n    *   There's no clear verse/chorus structure in this short clip; it feels like a repeating instrumental loop, possibly a main theme or a backing track.\n\n*   **Production:** The production is polished and clean, with a good balance between instruments. There is some subtle reverb on the piano, but generally, it's a dry and direct sound. The instruments are well mixed.\n\n*   **Mood:** The music is cheerful, lighthearted, and optimistic. It evokes a feeling of positivity and energy.\n\nThere is no speech, vocals, or specific sound effects other than the musical instruments themselves.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 477,
+      "total_tokens": 1549,
+      "cost": 0.0020391,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020391,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0011925
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

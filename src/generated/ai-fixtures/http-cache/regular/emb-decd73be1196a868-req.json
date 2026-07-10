@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All checks passed:\n\n| Check | Result |\n|-------|--------|\n| `audioUrl` non-empty | ✅ `http://localhost:3000/.../a667aae5-...mp3` |\n| `creditCost` positive | ✅ `10.4` credits |\n| `durationSeconds` between 8–120 | ✅ `8` seconds (inclusive) |\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

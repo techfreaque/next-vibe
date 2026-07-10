@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**FAILURE REPORT**\n\n1. **What was asked:** Generate a \"jazzy outro music\" track using the `generate_music` tool (Sonauto Song).\n\n2. **What happened:** The tool is listed in the catalog (tool-help returns its full schema) but returns `\"Not Found\"` on execution — both on the local instance (`atlas`) and the remote instance (`hermes`).\n\n3. **Exact error:**\n   - `{\"message\":\"Not Found\",\"success\":false}` — on `atlas`\n   - `{\"message\":\"Remote tool failed: Not Found\",\"success\":false}` — on `hermes`\n\n4. **Severity:** **BLOCKER** — The tool is advertised as available (documented in the system prompt *and* listed in the tool catalog with full schema and examples), but the actual endpoint returns 404. Users cannot generate audio/music at all via this tool despite clear documentation saying \"Sonauto Song available.\"",
+    "encoding_format": "float"
+  }
+}

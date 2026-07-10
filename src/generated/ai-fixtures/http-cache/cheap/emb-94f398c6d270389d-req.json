@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I can see the categories array clearly in my context from the previous turn — it contains **3 categories**: \"Services\", \"Physical Goods\", and \"Digital Products\".\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

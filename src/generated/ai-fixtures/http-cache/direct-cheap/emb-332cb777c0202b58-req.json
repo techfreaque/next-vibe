@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "🎵 **Jazzy Outro — locked in!**\n\nAn 8-second smooth jazz outro with warm sax, walking bass, and soft brushes on the drums. That late-night, dimly-lit-club vibe.\n\n[Download / Listen](http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/fb86c55a-69ef-4f19-9871-87a70f8d65f9/48ff021e-4622-4624-826b-02f24802ea3e.mp3)\n\n*(10.4 credits consumed — short duration, fully generated)*",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c2ea6ec4bd349-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:36:43 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651002-q7i6Jaw5Q6gGA5otk1YW"
+  },
+  "body": {
+    "id": "gen-1783651002-q7i6Jaw5Q6gGA5otk1YW",
+    "object": "chat.completion",
+    "created": 1783651002,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio segment features upbeat, jazzy background music with a vintage feel, ideal for a game show or a lighthearted scene. The duration is a short clip, lasting approximately 47 seconds. The sound quality is clear and polished, suggesting a studio recording environment.\n\nHere's a breakdown of the musical elements:\n\n**Genre/Subgenre:** Jazz, specifically a subgenre that blends elements of big band, swing, and game show music. It has a slightly retro, 1960s feel.\n\n**Tempo:** Approximately 120-130 BPM, giving it a moderate to upbeat pace.\n\n**Instruments and Interaction:**\n\n*   **Drums:** The primary rhythmic drive comes from a drum kit playing a steady, swinging beat. The hi-hat and ride cymbal are prominent, providing a light, crisp foundation. There are occasional classic-sounding drum fills that add to the game show aesthetic.\n*   **Bass Guitar:** A smooth, walking bass line underpins the harmony, played on an electric bass. It provides a solid, groovy foundation.\n*   **Electric Guitar:** A clean, slightly twangy electric guitar plays short, catchy melodic phrases and rhythmic chords, often in unison with other instruments, contributing to the bright, cheerful feel.\n*   **Keyboard/Synth:** A bright, bell-like or chime-like synth sound is used to play the main melody line. It has a distinctive, almost 'video game' quality, further reinforcing the game show vibe.\n*   **Trumpet/Brass Section:** There are bright, staccato trumpet or brass section stabs that punctuate the melody and add a classic big-band flavor. These are not continuously playing but rather provide accentuation.\n\n**Song Structure:**\nThe clip is too short to discern a full song structure, but it seems to be a repeating loop of a melodic phrase with variations. There's an introductory feel, followed by the main theme.\n\n**Production Style:**\nThe production is polished and clean, with a bright mix. There's a subtle use of reverb that gives the instruments a cohesive, slightly spacious feel. The overall sound is designed to be engaging and attention-grabbing without being overly complex.\n\n**Mood and Emotional Arc:**\nThe music consistently evokes a mood of excitement, anticipation, and lighthearted fun. It's cheerful, optimistic, and slightly comedic, perfectly suited for a segment that needs to convey energy or a sense of beginning.\n\n**Non-musical audio events:** None. The entire clip is music.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 528,
+      "total_tokens": 1600,
+      "cost": 0.0021666,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0021666,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00132
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**T9 — PASSED ✓**\n\nThe `products-category-list` tool on `hermes` returned a `categories` array with 3 entries:\n\n| Name | Active |\n|------|--------|\n| Services | ✅ |\n| Physical Goods | ✅ |\n| Digital Products | ✅ |\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

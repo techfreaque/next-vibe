@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All checks passed:\n\n| Check | Result |\n|-------|--------|\n| `videoUrl` non-empty | ✅ `http://localhost:3000/.../ddc1c2c6-...mp4` |\n| `creditCost` positive | ✅ `48` credits |\n| `durationSeconds` positive | ✅ `4` seconds |\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

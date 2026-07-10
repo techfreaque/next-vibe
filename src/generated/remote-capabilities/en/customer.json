@@ -31315,7 +31315,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Select an image generation model",
+          "description": "Image generation model. Leave blank to use the user's configured default.",
           "columns": 6,
           "options": [
             {
@@ -31533,7 +31533,6 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": ["ai"],
           "usage": {
             "request": "data"
           },
@@ -31867,7 +31866,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Select a music generation model",
+          "description": "Music generation model. Leave blank to use the user's configured default.",
           "columns": 6,
           "options": [
             {
@@ -31931,7 +31930,6 @@
             },
             "type": "optional"
           },
-          "hiddenForPlatforms": ["ai"],
           "usage": {
             "request": "data"
           },
@@ -37431,7 +37429,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             }
                                           },
                                           "type": "enum",
@@ -37458,7 +37463,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           },
                                           "options": [
                                             "wan-2-7-t2v",
@@ -37483,7 +37495,14 @@
                                             "gen4-aleph",
                                             "lipsync-2",
                                             "grok-t2v",
-                                            "grok-i2v"
+                                            "grok-i2v",
+                                            "kling-v3-std-t2v",
+                                            "kling-video-o1",
+                                            "veo-3-1-lite",
+                                            "seedance-2",
+                                            "seedance-2-fast",
+                                            "happyhorse-1-1",
+                                            "happyhorse-1-0"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -38168,7 +38187,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           }
                                         },
                                         "type": "enum",
@@ -38195,7 +38221,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         },
                                         "options": [
                                           "wan-2-7-t2v",
@@ -38220,7 +38253,14 @@
                                           "gen4-aleph",
                                           "lipsync-2",
                                           "grok-t2v",
-                                          "grok-i2v"
+                                          "grok-i2v",
+                                          "kling-v3-std-t2v",
+                                          "kling-video-o1",
+                                          "veo-3-1-lite",
+                                          "seedance-2",
+                                          "seedance-2-fast",
+                                          "happyhorse-1-1",
+                                          "happyhorse-1-0"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -50763,7 +50803,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           }
                                         },
                                         "type": "enum",
@@ -50790,7 +50837,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         },
                                         "options": [
                                           "wan-2-7-t2v",
@@ -50815,7 +50869,14 @@
                                           "gen4-aleph",
                                           "lipsync-2",
                                           "grok-t2v",
-                                          "grok-i2v"
+                                          "grok-i2v",
+                                          "kling-v3-std-t2v",
+                                          "kling-video-o1",
+                                          "veo-3-1-lite",
+                                          "seedance-2",
+                                          "seedance-2-fast",
+                                          "happyhorse-1-1",
+                                          "happyhorse-1-0"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -51498,7 +51559,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         }
                                       },
                                       "type": "enum",
@@ -51525,7 +51593,14 @@
                                         "GEN4_ALEPH": "gen4-aleph",
                                         "LIPSYNC_2": "lipsync-2",
                                         "GROK_T2V": "grok-t2v",
-                                        "GROK_I2V": "grok-i2v"
+                                        "GROK_I2V": "grok-i2v",
+                                        "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                        "KLING_VIDEO_O1": "kling-video-o1",
+                                        "VEO_3_1_LITE": "veo-3-1-lite",
+                                        "SEEDANCE_2": "seedance-2",
+                                        "SEEDANCE_2_FAST": "seedance-2-fast",
+                                        "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                        "HAPPYHORSE_1_0": "happyhorse-1-0"
                                       },
                                       "options": [
                                         "wan-2-7-t2v",
@@ -51550,7 +51625,14 @@
                                         "gen4-aleph",
                                         "lipsync-2",
                                         "grok-t2v",
-                                        "grok-i2v"
+                                        "grok-i2v",
+                                        "kling-v3-std-t2v",
+                                        "kling-video-o1",
+                                        "veo-3-1-lite",
+                                        "seedance-2",
+                                        "seedance-2-fast",
+                                        "happyhorse-1-1",
+                                        "happyhorse-1-0"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -64761,7 +64843,14 @@
                                                   "GEN4_ALEPH": "gen4-aleph",
                                                   "LIPSYNC_2": "lipsync-2",
                                                   "GROK_T2V": "grok-t2v",
-                                                  "GROK_I2V": "grok-i2v"
+                                                  "GROK_I2V": "grok-i2v",
+                                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                                  "SEEDANCE_2": "seedance-2",
+                                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                                 }
                                               },
                                               "type": "enum",
@@ -64788,7 +64877,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               },
                                               "options": [
                                                 "wan-2-7-t2v",
@@ -64813,7 +64909,14 @@
                                                 "gen4-aleph",
                                                 "lipsync-2",
                                                 "grok-t2v",
-                                                "grok-i2v"
+                                                "grok-i2v",
+                                                "kling-v3-std-t2v",
+                                                "kling-video-o1",
+                                                "veo-3-1-lite",
+                                                "seedance-2",
+                                                "seedance-2-fast",
+                                                "happyhorse-1-1",
+                                                "happyhorse-1-0"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -65498,7 +65601,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               }
                                             },
                                             "type": "enum",
@@ -65525,7 +65635,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -65550,7 +65667,14 @@
                                               "gen4-aleph",
                                               "lipsync-2",
                                               "grok-t2v",
-                                              "grok-i2v"
+                                              "grok-i2v",
+                                              "kling-v3-std-t2v",
+                                              "kling-video-o1",
+                                              "veo-3-1-lite",
+                                              "seedance-2",
+                                              "seedance-2-fast",
+                                              "happyhorse-1-1",
+                                              "happyhorse-1-0"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -78097,7 +78221,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               }
                                             },
                                             "type": "enum",
@@ -78124,7 +78255,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -78149,7 +78287,14 @@
                                               "gen4-aleph",
                                               "lipsync-2",
                                               "grok-t2v",
-                                              "grok-i2v"
+                                              "grok-i2v",
+                                              "kling-v3-std-t2v",
+                                              "kling-video-o1",
+                                              "veo-3-1-lite",
+                                              "seedance-2",
+                                              "seedance-2-fast",
+                                              "happyhorse-1-1",
+                                              "happyhorse-1-0"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -78834,7 +78979,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             }
                                           },
                                           "type": "enum",
@@ -78861,7 +79013,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           },
                                           "options": [
                                             "wan-2-7-t2v",
@@ -78886,7 +79045,14 @@
                                             "gen4-aleph",
                                             "lipsync-2",
                                             "grok-t2v",
-                                            "grok-i2v"
+                                            "grok-i2v",
+                                            "kling-v3-std-t2v",
+                                            "kling-video-o1",
+                                            "veo-3-1-lite",
+                                            "seedance-2",
+                                            "seedance-2-fast",
+                                            "happyhorse-1-1",
+                                            "happyhorse-1-0"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -98608,7 +98774,14 @@
                                     "GEN4_ALEPH": "gen4-aleph",
                                     "LIPSYNC_2": "lipsync-2",
                                     "GROK_T2V": "grok-t2v",
-                                    "GROK_I2V": "grok-i2v"
+                                    "GROK_I2V": "grok-i2v",
+                                    "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                    "KLING_VIDEO_O1": "kling-video-o1",
+                                    "VEO_3_1_LITE": "veo-3-1-lite",
+                                    "SEEDANCE_2": "seedance-2",
+                                    "SEEDANCE_2_FAST": "seedance-2-fast",
+                                    "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                    "HAPPYHORSE_1_0": "happyhorse-1-0"
                                   }
                                 },
                                 "type": "enum",
@@ -98635,7 +98808,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -98660,7 +98840,14 @@
                                   "gen4-aleph",
                                   "lipsync-2",
                                   "grok-t2v",
-                                  "grok-i2v"
+                                  "grok-i2v",
+                                  "kling-v3-std-t2v",
+                                  "kling-video-o1",
+                                  "veo-3-1-lite",
+                                  "seedance-2",
+                                  "seedance-2-fast",
+                                  "happyhorse-1-1",
+                                  "happyhorse-1-0"
                                 ]
                               },
                               "intelligenceRange": {
@@ -99341,7 +99528,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 }
                               },
                               "type": "enum",
@@ -99368,7 +99562,14 @@
                                 "GEN4_ALEPH": "gen4-aleph",
                                 "LIPSYNC_2": "lipsync-2",
                                 "GROK_T2V": "grok-t2v",
-                                "GROK_I2V": "grok-i2v"
+                                "GROK_I2V": "grok-i2v",
+                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                "KLING_VIDEO_O1": "kling-video-o1",
+                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                "SEEDANCE_2": "seedance-2",
+                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -99393,7 +99594,14 @@
                                 "gen4-aleph",
                                 "lipsync-2",
                                 "grok-t2v",
-                                "grok-i2v"
+                                "grok-i2v",
+                                "kling-v3-std-t2v",
+                                "kling-video-o1",
+                                "veo-3-1-lite",
+                                "seedance-2",
+                                "seedance-2-fast",
+                                "happyhorse-1-1",
+                                "happyhorse-1-0"
                               ]
                             },
                             "intelligenceRange": {
@@ -104825,7 +105033,14 @@
                                                   "GEN4_ALEPH": "gen4-aleph",
                                                   "LIPSYNC_2": "lipsync-2",
                                                   "GROK_T2V": "grok-t2v",
-                                                  "GROK_I2V": "grok-i2v"
+                                                  "GROK_I2V": "grok-i2v",
+                                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                                  "SEEDANCE_2": "seedance-2",
+                                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                                 }
                                               },
                                               "type": "enum",
@@ -104852,7 +105067,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               },
                                               "options": [
                                                 "wan-2-7-t2v",
@@ -104877,7 +105099,14 @@
                                                 "gen4-aleph",
                                                 "lipsync-2",
                                                 "grok-t2v",
-                                                "grok-i2v"
+                                                "grok-i2v",
+                                                "kling-v3-std-t2v",
+                                                "kling-video-o1",
+                                                "veo-3-1-lite",
+                                                "seedance-2",
+                                                "seedance-2-fast",
+                                                "happyhorse-1-1",
+                                                "happyhorse-1-0"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -105562,7 +105791,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               }
                                             },
                                             "type": "enum",
@@ -105589,7 +105825,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -105614,7 +105857,14 @@
                                               "gen4-aleph",
                                               "lipsync-2",
                                               "grok-t2v",
-                                              "grok-i2v"
+                                              "grok-i2v",
+                                              "kling-v3-std-t2v",
+                                              "kling-video-o1",
+                                              "veo-3-1-lite",
+                                              "seedance-2",
+                                              "seedance-2-fast",
+                                              "happyhorse-1-1",
+                                              "happyhorse-1-0"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -118161,7 +118411,14 @@
                                                 "GEN4_ALEPH": "gen4-aleph",
                                                 "LIPSYNC_2": "lipsync-2",
                                                 "GROK_T2V": "grok-t2v",
-                                                "GROK_I2V": "grok-i2v"
+                                                "GROK_I2V": "grok-i2v",
+                                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                                "KLING_VIDEO_O1": "kling-video-o1",
+                                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                                "SEEDANCE_2": "seedance-2",
+                                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                                               }
                                             },
                                             "type": "enum",
@@ -118188,7 +118445,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -118213,7 +118477,14 @@
                                               "gen4-aleph",
                                               "lipsync-2",
                                               "grok-t2v",
-                                              "grok-i2v"
+                                              "grok-i2v",
+                                              "kling-v3-std-t2v",
+                                              "kling-video-o1",
+                                              "veo-3-1-lite",
+                                              "seedance-2",
+                                              "seedance-2-fast",
+                                              "happyhorse-1-1",
+                                              "happyhorse-1-0"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -118898,7 +119169,14 @@
                                               "GEN4_ALEPH": "gen4-aleph",
                                               "LIPSYNC_2": "lipsync-2",
                                               "GROK_T2V": "grok-t2v",
-                                              "GROK_I2V": "grok-i2v"
+                                              "GROK_I2V": "grok-i2v",
+                                              "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                              "KLING_VIDEO_O1": "kling-video-o1",
+                                              "VEO_3_1_LITE": "veo-3-1-lite",
+                                              "SEEDANCE_2": "seedance-2",
+                                              "SEEDANCE_2_FAST": "seedance-2-fast",
+                                              "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                              "HAPPYHORSE_1_0": "happyhorse-1-0"
                                             }
                                           },
                                           "type": "enum",
@@ -118925,7 +119203,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           },
                                           "options": [
                                             "wan-2-7-t2v",
@@ -118950,7 +119235,14 @@
                                             "gen4-aleph",
                                             "lipsync-2",
                                             "grok-t2v",
-                                            "grok-i2v"
+                                            "grok-i2v",
+                                            "kling-v3-std-t2v",
+                                            "kling-video-o1",
+                                            "veo-3-1-lite",
+                                            "seedance-2",
+                                            "seedance-2-fast",
+                                            "happyhorse-1-1",
+                                            "happyhorse-1-0"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -127364,7 +127656,7 @@
           "variant": "muted",
           "label": "Choose from {{count}} models with fine-tuned control over intelligence, content, and cost",
           "contentParams": {
-            "count": 134
+            "count": 141
           },
           "usage": {
             "response": true
@@ -143156,7 +143448,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           }
                                         },
                                         "type": "enum",
@@ -143183,7 +143482,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         },
                                         "options": [
                                           "wan-2-7-t2v",
@@ -143208,7 +143514,14 @@
                                           "gen4-aleph",
                                           "lipsync-2",
                                           "grok-t2v",
-                                          "grok-i2v"
+                                          "grok-i2v",
+                                          "kling-v3-std-t2v",
+                                          "kling-video-o1",
+                                          "veo-3-1-lite",
+                                          "seedance-2",
+                                          "seedance-2-fast",
+                                          "happyhorse-1-1",
+                                          "happyhorse-1-0"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -143891,7 +144204,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         }
                                       },
                                       "type": "enum",
@@ -143918,7 +144238,14 @@
                                         "GEN4_ALEPH": "gen4-aleph",
                                         "LIPSYNC_2": "lipsync-2",
                                         "GROK_T2V": "grok-t2v",
-                                        "GROK_I2V": "grok-i2v"
+                                        "GROK_I2V": "grok-i2v",
+                                        "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                        "KLING_VIDEO_O1": "kling-video-o1",
+                                        "VEO_3_1_LITE": "veo-3-1-lite",
+                                        "SEEDANCE_2": "seedance-2",
+                                        "SEEDANCE_2_FAST": "seedance-2-fast",
+                                        "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                        "HAPPYHORSE_1_0": "happyhorse-1-0"
                                       },
                                       "options": [
                                         "wan-2-7-t2v",
@@ -143943,7 +144270,14 @@
                                         "gen4-aleph",
                                         "lipsync-2",
                                         "grok-t2v",
-                                        "grok-i2v"
+                                        "grok-i2v",
+                                        "kling-v3-std-t2v",
+                                        "kling-video-o1",
+                                        "veo-3-1-lite",
+                                        "seedance-2",
+                                        "seedance-2-fast",
+                                        "happyhorse-1-1",
+                                        "happyhorse-1-0"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -157066,7 +157400,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           }
                                         },
                                         "type": "enum",
@@ -157093,7 +157434,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         },
                                         "options": [
                                           "wan-2-7-t2v",
@@ -157118,7 +157466,14 @@
                                           "gen4-aleph",
                                           "lipsync-2",
                                           "grok-t2v",
-                                          "grok-i2v"
+                                          "grok-i2v",
+                                          "kling-v3-std-t2v",
+                                          "kling-video-o1",
+                                          "veo-3-1-lite",
+                                          "seedance-2",
+                                          "seedance-2-fast",
+                                          "happyhorse-1-1",
+                                          "happyhorse-1-0"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -157801,7 +158156,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         }
                                       },
                                       "type": "enum",
@@ -157828,7 +158190,14 @@
                                         "GEN4_ALEPH": "gen4-aleph",
                                         "LIPSYNC_2": "lipsync-2",
                                         "GROK_T2V": "grok-t2v",
-                                        "GROK_I2V": "grok-i2v"
+                                        "GROK_I2V": "grok-i2v",
+                                        "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                        "KLING_VIDEO_O1": "kling-video-o1",
+                                        "VEO_3_1_LITE": "veo-3-1-lite",
+                                        "SEEDANCE_2": "seedance-2",
+                                        "SEEDANCE_2_FAST": "seedance-2-fast",
+                                        "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                        "HAPPYHORSE_1_0": "happyhorse-1-0"
                                       },
                                       "options": [
                                         "wan-2-7-t2v",
@@ -157853,7 +158222,14 @@
                                         "gen4-aleph",
                                         "lipsync-2",
                                         "grok-t2v",
-                                        "grok-i2v"
+                                        "grok-i2v",
+                                        "kling-v3-std-t2v",
+                                        "kling-video-o1",
+                                        "veo-3-1-lite",
+                                        "seedance-2",
+                                        "seedance-2-fast",
+                                        "happyhorse-1-1",
+                                        "happyhorse-1-0"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -170774,7 +171150,14 @@
                                             "GEN4_ALEPH": "gen4-aleph",
                                             "LIPSYNC_2": "lipsync-2",
                                             "GROK_T2V": "grok-t2v",
-                                            "GROK_I2V": "grok-i2v"
+                                            "GROK_I2V": "grok-i2v",
+                                            "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                            "KLING_VIDEO_O1": "kling-video-o1",
+                                            "VEO_3_1_LITE": "veo-3-1-lite",
+                                            "SEEDANCE_2": "seedance-2",
+                                            "SEEDANCE_2_FAST": "seedance-2-fast",
+                                            "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                            "HAPPYHORSE_1_0": "happyhorse-1-0"
                                           }
                                         },
                                         "type": "enum",
@@ -170801,7 +171184,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         },
                                         "options": [
                                           "wan-2-7-t2v",
@@ -170826,7 +171216,14 @@
                                           "gen4-aleph",
                                           "lipsync-2",
                                           "grok-t2v",
-                                          "grok-i2v"
+                                          "grok-i2v",
+                                          "kling-v3-std-t2v",
+                                          "kling-video-o1",
+                                          "veo-3-1-lite",
+                                          "seedance-2",
+                                          "seedance-2-fast",
+                                          "happyhorse-1-1",
+                                          "happyhorse-1-0"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -171509,7 +171906,14 @@
                                           "GEN4_ALEPH": "gen4-aleph",
                                           "LIPSYNC_2": "lipsync-2",
                                           "GROK_T2V": "grok-t2v",
-                                          "GROK_I2V": "grok-i2v"
+                                          "GROK_I2V": "grok-i2v",
+                                          "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                          "KLING_VIDEO_O1": "kling-video-o1",
+                                          "VEO_3_1_LITE": "veo-3-1-lite",
+                                          "SEEDANCE_2": "seedance-2",
+                                          "SEEDANCE_2_FAST": "seedance-2-fast",
+                                          "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                          "HAPPYHORSE_1_0": "happyhorse-1-0"
                                         }
                                       },
                                       "type": "enum",
@@ -171536,7 +171940,14 @@
                                         "GEN4_ALEPH": "gen4-aleph",
                                         "LIPSYNC_2": "lipsync-2",
                                         "GROK_T2V": "grok-t2v",
-                                        "GROK_I2V": "grok-i2v"
+                                        "GROK_I2V": "grok-i2v",
+                                        "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                        "KLING_VIDEO_O1": "kling-video-o1",
+                                        "VEO_3_1_LITE": "veo-3-1-lite",
+                                        "SEEDANCE_2": "seedance-2",
+                                        "SEEDANCE_2_FAST": "seedance-2-fast",
+                                        "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                        "HAPPYHORSE_1_0": "happyhorse-1-0"
                                       },
                                       "options": [
                                         "wan-2-7-t2v",
@@ -171561,7 +171972,14 @@
                                         "gen4-aleph",
                                         "lipsync-2",
                                         "grok-t2v",
-                                        "grok-i2v"
+                                        "grok-i2v",
+                                        "kling-v3-std-t2v",
+                                        "kling-video-o1",
+                                        "veo-3-1-lite",
+                                        "seedance-2",
+                                        "seedance-2-fast",
+                                        "happyhorse-1-1",
+                                        "happyhorse-1-0"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -188954,7 +189372,14 @@
                                     "GEN4_ALEPH": "gen4-aleph",
                                     "LIPSYNC_2": "lipsync-2",
                                     "GROK_T2V": "grok-t2v",
-                                    "GROK_I2V": "grok-i2v"
+                                    "GROK_I2V": "grok-i2v",
+                                    "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                    "KLING_VIDEO_O1": "kling-video-o1",
+                                    "VEO_3_1_LITE": "veo-3-1-lite",
+                                    "SEEDANCE_2": "seedance-2",
+                                    "SEEDANCE_2_FAST": "seedance-2-fast",
+                                    "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                    "HAPPYHORSE_1_0": "happyhorse-1-0"
                                   }
                                 },
                                 "type": "enum",
@@ -188981,7 +189406,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -189006,7 +189438,14 @@
                                   "gen4-aleph",
                                   "lipsync-2",
                                   "grok-t2v",
-                                  "grok-i2v"
+                                  "grok-i2v",
+                                  "kling-v3-std-t2v",
+                                  "kling-video-o1",
+                                  "veo-3-1-lite",
+                                  "seedance-2",
+                                  "seedance-2-fast",
+                                  "happyhorse-1-1",
+                                  "happyhorse-1-0"
                                 ]
                               },
                               "intelligenceRange": {
@@ -189687,7 +190126,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 }
                               },
                               "type": "enum",
@@ -189714,7 +190160,14 @@
                                 "GEN4_ALEPH": "gen4-aleph",
                                 "LIPSYNC_2": "lipsync-2",
                                 "GROK_T2V": "grok-t2v",
-                                "GROK_I2V": "grok-i2v"
+                                "GROK_I2V": "grok-i2v",
+                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                "KLING_VIDEO_O1": "kling-video-o1",
+                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                "SEEDANCE_2": "seedance-2",
+                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -189739,7 +190192,14 @@
                                 "gen4-aleph",
                                 "lipsync-2",
                                 "grok-t2v",
-                                "grok-i2v"
+                                "grok-i2v",
+                                "kling-v3-std-t2v",
+                                "kling-video-o1",
+                                "veo-3-1-lite",
+                                "seedance-2",
+                                "seedance-2-fast",
+                                "happyhorse-1-1",
+                                "happyhorse-1-0"
                               ]
                             },
                             "intelligenceRange": {
@@ -208977,7 +209437,14 @@
                                     "GEN4_ALEPH": "gen4-aleph",
                                     "LIPSYNC_2": "lipsync-2",
                                     "GROK_T2V": "grok-t2v",
-                                    "GROK_I2V": "grok-i2v"
+                                    "GROK_I2V": "grok-i2v",
+                                    "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                    "KLING_VIDEO_O1": "kling-video-o1",
+                                    "VEO_3_1_LITE": "veo-3-1-lite",
+                                    "SEEDANCE_2": "seedance-2",
+                                    "SEEDANCE_2_FAST": "seedance-2-fast",
+                                    "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                    "HAPPYHORSE_1_0": "happyhorse-1-0"
                                   }
                                 },
                                 "type": "enum",
@@ -209004,7 +209471,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -209029,7 +209503,14 @@
                                   "gen4-aleph",
                                   "lipsync-2",
                                   "grok-t2v",
-                                  "grok-i2v"
+                                  "grok-i2v",
+                                  "kling-v3-std-t2v",
+                                  "kling-video-o1",
+                                  "veo-3-1-lite",
+                                  "seedance-2",
+                                  "seedance-2-fast",
+                                  "happyhorse-1-1",
+                                  "happyhorse-1-0"
                                 ]
                               },
                               "intelligenceRange": {
@@ -209710,7 +210191,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 }
                               },
                               "type": "enum",
@@ -209737,7 +210225,14 @@
                                 "GEN4_ALEPH": "gen4-aleph",
                                 "LIPSYNC_2": "lipsync-2",
                                 "GROK_T2V": "grok-t2v",
-                                "GROK_I2V": "grok-i2v"
+                                "GROK_I2V": "grok-i2v",
+                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                "KLING_VIDEO_O1": "kling-video-o1",
+                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                "SEEDANCE_2": "seedance-2",
+                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -209762,7 +210257,14 @@
                                 "gen4-aleph",
                                 "lipsync-2",
                                 "grok-t2v",
-                                "grok-i2v"
+                                "grok-i2v",
+                                "kling-v3-std-t2v",
+                                "kling-video-o1",
+                                "veo-3-1-lite",
+                                "seedance-2",
+                                "seedance-2-fast",
+                                "happyhorse-1-1",
+                                "happyhorse-1-0"
                               ]
                             },
                             "intelligenceRange": {
@@ -225069,7 +225571,14 @@
                                     "GEN4_ALEPH": "gen4-aleph",
                                     "LIPSYNC_2": "lipsync-2",
                                     "GROK_T2V": "grok-t2v",
-                                    "GROK_I2V": "grok-i2v"
+                                    "GROK_I2V": "grok-i2v",
+                                    "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                    "KLING_VIDEO_O1": "kling-video-o1",
+                                    "VEO_3_1_LITE": "veo-3-1-lite",
+                                    "SEEDANCE_2": "seedance-2",
+                                    "SEEDANCE_2_FAST": "seedance-2-fast",
+                                    "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                    "HAPPYHORSE_1_0": "happyhorse-1-0"
                                   }
                                 },
                                 "type": "enum",
@@ -225096,7 +225605,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -225121,7 +225637,14 @@
                                   "gen4-aleph",
                                   "lipsync-2",
                                   "grok-t2v",
-                                  "grok-i2v"
+                                  "grok-i2v",
+                                  "kling-v3-std-t2v",
+                                  "kling-video-o1",
+                                  "veo-3-1-lite",
+                                  "seedance-2",
+                                  "seedance-2-fast",
+                                  "happyhorse-1-1",
+                                  "happyhorse-1-0"
                                 ]
                               },
                               "intelligenceRange": {
@@ -225802,7 +226325,14 @@
                                   "GEN4_ALEPH": "gen4-aleph",
                                   "LIPSYNC_2": "lipsync-2",
                                   "GROK_T2V": "grok-t2v",
-                                  "GROK_I2V": "grok-i2v"
+                                  "GROK_I2V": "grok-i2v",
+                                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                  "KLING_VIDEO_O1": "kling-video-o1",
+                                  "VEO_3_1_LITE": "veo-3-1-lite",
+                                  "SEEDANCE_2": "seedance-2",
+                                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                                 }
                               },
                               "type": "enum",
@@ -225829,7 +226359,14 @@
                                 "GEN4_ALEPH": "gen4-aleph",
                                 "LIPSYNC_2": "lipsync-2",
                                 "GROK_T2V": "grok-t2v",
-                                "GROK_I2V": "grok-i2v"
+                                "GROK_I2V": "grok-i2v",
+                                "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                                "KLING_VIDEO_O1": "kling-video-o1",
+                                "VEO_3_1_LITE": "veo-3-1-lite",
+                                "SEEDANCE_2": "seedance-2",
+                                "SEEDANCE_2_FAST": "seedance-2-fast",
+                                "HAPPYHORSE_1_1": "happyhorse-1-1",
+                                "HAPPYHORSE_1_0": "happyhorse-1-0"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -225854,7 +226391,14 @@
                                 "gen4-aleph",
                                 "lipsync-2",
                                 "grok-t2v",
-                                "grok-i2v"
+                                "grok-i2v",
+                                "kling-v3-std-t2v",
+                                "kling-video-o1",
+                                "veo-3-1-lite",
+                                "seedance-2",
+                                "seedance-2-fast",
+                                "happyhorse-1-1",
+                                "happyhorse-1-0"
                               ]
                             },
                             "intelligenceRange": {
@@ -229753,10 +230297,9 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Select a video generation model",
+          "description": "Video generation model. Leave blank to use the user's configured default.",
           "columns": 12,
           "options": [],
-          "hiddenForPlatforms": ["ai"],
           "schema": {
             "def": {
               "type": "optional",
@@ -229786,7 +230329,14 @@
                     "GEN4_ALEPH": "gen4-aleph",
                     "LIPSYNC_2": "lipsync-2",
                     "GROK_T2V": "grok-t2v",
-                    "GROK_I2V": "grok-i2v"
+                    "GROK_I2V": "grok-i2v",
+                    "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                    "KLING_VIDEO_O1": "kling-video-o1",
+                    "VEO_3_1_LITE": "veo-3-1-lite",
+                    "SEEDANCE_2": "seedance-2",
+                    "SEEDANCE_2_FAST": "seedance-2-fast",
+                    "HAPPYHORSE_1_1": "happyhorse-1-1",
+                    "HAPPYHORSE_1_0": "happyhorse-1-0"
                   }
                 },
                 "type": "enum",
@@ -229813,7 +230363,14 @@
                   "GEN4_ALEPH": "gen4-aleph",
                   "LIPSYNC_2": "lipsync-2",
                   "GROK_T2V": "grok-t2v",
-                  "GROK_I2V": "grok-i2v"
+                  "GROK_I2V": "grok-i2v",
+                  "KLING_V3_STD_T2V": "kling-v3-std-t2v",
+                  "KLING_VIDEO_O1": "kling-video-o1",
+                  "VEO_3_1_LITE": "veo-3-1-lite",
+                  "SEEDANCE_2": "seedance-2",
+                  "SEEDANCE_2_FAST": "seedance-2-fast",
+                  "HAPPYHORSE_1_1": "happyhorse-1-1",
+                  "HAPPYHORSE_1_0": "happyhorse-1-0"
                 },
                 "options": [
                   "wan-2-7-t2v",
@@ -229838,7 +230395,14 @@
                   "gen4-aleph",
                   "lipsync-2",
                   "grok-t2v",
-                  "grok-i2v"
+                  "grok-i2v",
+                  "kling-v3-std-t2v",
+                  "kling-video-o1",
+                  "veo-3-1-lite",
+                  "seedance-2",
+                  "seedance-2-fast",
+                  "happyhorse-1-1",
+                  "happyhorse-1-0"
                 ]
               }
             },

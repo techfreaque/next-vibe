@@ -60,11 +60,11 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerSecond: 0.0106, // updated: 2026-04-03 from api.edenai.run
       },
-      {
+          {
         id: SttModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-whisper",
-        creditCostPerSecond: 0.013, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerSecond: 0.013, // updated: 2026-07-10 from unbottled.ai
       },
     ],
   },
@@ -94,11 +94,11 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "nova-2",
         creditCostPerSecond: 0.0097, // updated: 2026-03-31 from deepgram.com
       },
-      {
+          {
         id: SttModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepgram-nova-2",
-        creditCostPerSecond: 0.0126, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerSecond: 0.0126, // updated: 2026-07-10 from unbottled.ai
       },
     ],
   },

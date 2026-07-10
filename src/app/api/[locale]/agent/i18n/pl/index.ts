@@ -1668,6 +1668,20 @@ export const translations: typeof enTranslations = {
           "Grok T2V - Model tekst-na-wideo Grok xAI via ModelsLab",
         modelsLabGrokI2V:
           "Grok I2V - Model obraz-na-wideo Grok xAI via ModelsLab",
+        klingV30Std:
+          "Kling 3.0 Standard – standardowy model wideo Kuaishou z T2V i I2V via OpenRouter",
+        klingVideoO1:
+          "Kling Video O1 – model generowania wideo Kuaishou z rozumowaniem via OpenRouter",
+        veo31Lite:
+          "Veo 3.1 Lite – ekonomiczny model wideo Google do generowania na dużą skalę via OpenRouter",
+        seedance2:
+          "Seedance 2.0 – model wideo ByteDance ze spójnością postaci i wideo z referencji via OpenRouter",
+        seedance2Fast:
+          "Seedance 2.0 Fast – szybki model generowania wideo ByteDance via OpenRouter",
+        happyhorse11:
+          "HappyHorse 1.1 – model wideo Alibaba z obsługą T2V, I2V i obrazu referencyjnego via OpenRouter",
+        happyhorse10:
+          "HappyHorse 1.0 – model wideo Alibaba z obsługą T2V, I2V i obrazu referencyjnego via OpenRouter",
         modelsLabGen4T2ITurbo:
           "Gen4 T2I Turbo - Szybki model tekst-na-obraz Runway via ModelsLab",
         modelsLabGen4Image:

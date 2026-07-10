@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c31d59d45d259-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:38:54 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651132-yP93WPlYKCRGOVZFTbRV"
+  },
+  "body": {
+    "id": "gen-1783651132-yP93WPlYKCRGOVZFTbRV",
+    "object": "chat.completion",
+    "created": 1783651132,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a highly polished, professional-quality close-up sequence likely serving as an introduction or aesthetic B-roll for a Rubik's Cube tutorial or documentary. The lighting is dramatic and moody, with a shallow depth of field focusing sharply on the subject’s hands while the background remains softly blurred.\n\n**Visual Content and Progression:**\nThe scene features a pair of medium-brown-skinned hands holding a standard 3x3 Rubik's Cube. The environment is filled with dozens of other Rubik's Cubes scattered across a dark, reflective surface, creating a \"sea of cubes\" effect. The cubes in the background are out of focus, while the one in the center is crisp and vibrant.\n\n*   **00:00–00:03:** The hands are rotating the cube clockwise, showcasing the mechanical movement of the colored squares. The cube features white, blue, orange, red, green, and yellow faces. A small, black, stylized circular logo is printed on the white center square of the front-facing side.\n*   **00:03–00:06:** The hands execute a quick, rhythmic turning motion. The movement is fluid, indicating a skilled user.\n*   **00:06–00:09:** The cube is rotated, and the hands reposition their grip. The camera remains in a steady, close-up, top-down perspective focused on the center cube.\n*   **00:09 onward:** The motion continues, displaying the intricate mechanics of the puzzle pieces as they glide past one another. The background cubes remain stationary.\n\n**Camera Work and Setting:**\nThe shot is a tight close-up, maintaining a steady, handheld-but-stable aesthetic. The lighting is cinematic, utilizing a high-contrast setup with soft key lighting that highlights the texture of the plastic cubes and the skin of the hands. There are no pans or zooms; the perspective is fixed.\n\n**Audio:**\nThe video features a rhythmic, high-energy electronic music track. The style is modern, percussive, and fast-paced, incorporating subtle \"snapping\" or \"clicking\" synthetic sounds that sync perfectly with the mechanical flicking of the Rubik's Cube pieces. There is no dialogue or narration.\n\n**Style and Mood:**\n*   **Style:** Professional, realistic, high-definition digital video.\n*   **Production Quality:** High-end, resembling a commercial advertisement or a high-production YouTube tech/lifestyle channel.\n*   **Mood:** Focused, intellectual, and satisfying. The visual repetition of the cubes combined with the rhythmic audio creates an ASMR-adjacent, calming, yet stimulating atmosphere.\n*   **Narrative:** The video serves as a demonstration of dexterity and the classic nature of the Rubik’s Cube. It implies themes of mastery, logic, and complexity.\n\n**Duration:**\nThe clip is approximately 10 seconds long. The pacing is consistent and snappy, driven by the rhythmic cuts and the fast-paced sound effects of the cube’s rotation.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgERTTIP/VbVtv0qdatPP6HJXxnYPv+dFwhvm+7g3jGtLMhV9uWCJG1RMA7poDqT8Rb2",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 643,
+      "total_tokens": 1052,
+      "cost": 0.00106675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00106675,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.0009645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

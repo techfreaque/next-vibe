@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a18c302f282cdcae-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 02:37:46 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783651065-V8GPzeflzG2U8mFe2D7d"
+  },
+  "body": {
+    "id": "gen-1783651065-V8GPzeflzG2U8mFe2D7d",
+    "object": "chat.completion",
+    "created": 1783651065,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio segment features a 22-second clip of upbeat electronic music, heavily driven by percussion.\n\n**Music Description:**\n- **Genre:** Electronic, possibly a subgenre of dance music like house or techno, but without a discernable bassline or melody to fully confirm.\n- **Tempo:** Medium-fast, estimated around 120-130 BPM.\n- **Time Signature:** Common Time (4/4).\n- **Instruments:**\n    - **Electronic Drums:** The primary element, consisting of:\n        - A very prominent, sharp, and consistent kick drum on every beat.\n        - A bright, crisp closed hi-hat playing a fast, consistent 16th-note rhythm, creating a driving and energetic feel.\n        - A snappy snare drum, primarily on beats 2 and 4, accentuating the rhythm.\n        - An occasional open hi-hat that adds a bit of variation and airiness to the percussion.\n        - What sounds like a reversed cymbal or crash effect at the 0:00 mark, marking the start of the loop. There's also a crash cymbal that sounds every 4 measures, specifically at 0:06, 0:13, and 0:20.\n    - **Synthesizer/Pads:** A sustained, bright, and slightly airy synth pad enters at 0:06, adding a subtle harmonic layer without a strong melodic line. It continues for the remainder of the clip, providing a sense of space and energy. At 0:20, this synth pad seems to swell slightly before the audio cuts.\n- **Interaction:** The drums lay down a high-energy, infectious groove. The consistent hi-hats create a relentless forward momentum, while the kick and snare provide the core pulse. The synth pad is secondary, adding atmosphere rather than melody, blending into the background of the rhythmic drive.\n- **Production Style:** Clean and polished, with clear separation between instruments. The drums have a tight, punchy sound. There's a minimal amount of reverb, giving the drums a somewhat dry but impactful presence.\n- **Mood:** Energetic, bright, and danceable. It evokes a feeling of anticipation or the build-up within a longer track.\n\n**Overall Impression:**\n- **Duration Impression:** This sounds like a short loop or a section from a longer track, designed to create a consistent rhythmic background.\n- **Sound Quality:** High quality, indicative of a studio recording or well-produced electronic music.\n- **Non-musical audio events:** None.\n- **Silence:** No significant periods of silence, the music plays continuously until it cuts abruptly at the 0:22 mark.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 572,
+      "total_tokens": 1644,
+      "cost": 0.0022766,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022766,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.00143
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

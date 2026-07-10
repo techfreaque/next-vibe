@@ -32,7 +32,6 @@ import {
   submitButton,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { lazy } from "react";
 import { z } from "zod";
 
 import {
@@ -54,6 +53,7 @@ import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 import { ChatModelId } from "../../../ai-stream/models";
 import type {
   FiltersModelSelection,
