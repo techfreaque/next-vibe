@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls completed in parallel. The `tool-help` returned the full catalog listing (528 tools across 22 categories), and the `generate_image` call returned an image.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

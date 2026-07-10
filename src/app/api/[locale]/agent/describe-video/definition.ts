@@ -23,7 +23,7 @@ import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { DESCRIBE_VIDEO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const DescribeVideoContainer = lazy(() =>
+const DescribeVideoContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.DescribeVideoContainer })),
 );
 

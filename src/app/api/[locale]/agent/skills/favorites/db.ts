@@ -169,6 +169,7 @@ export type FavoriteConfig = Pick<
   ChatFavorite,
   | "id"
   | "skillId"
+  | "variantId"
   | "modelSelection"
   | "voiceModelSelection"
   | "sttModelSelection"
@@ -189,6 +190,12 @@ export type FavoriteConfig = Pick<
 export const FAVORITE_CONFIG_COLUMNS = {
   id: chatFavorites.id,
   skillId: chatFavorites.skillId,
+  // variantId is load-bearing for model resolution: resolveFavorite passes it
+  // to the skill-variant cascade to pick THIS favorite's variant (e.g.
+  // native-image → gemini-3.1-flash-image-preview). Omitting it made the cascade
+  // fall back to the skill's DEFAULT variant (budget → deepseek), so a favorite's
+  // resolved chat model silently diverged from the model the stream actually ran.
+  variantId: chatFavorites.variantId,
   modelSelection: chatFavorites.modelSelection,
   voiceModelSelection: chatFavorites.voiceModelSelection,
   sttModelSelection: chatFavorites.sttModelSelection,

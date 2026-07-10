@@ -114,9 +114,10 @@ const { GET } = createEndpoint({
           (await import("@/app/api/[locale]/agent/skills/definition")).default
             .GET,
         labelField: "name",
+        valueField: "skillId",
         label: "get.fields.skillId.label" as const,
         description: "get.fields.skillId.description" as const,
-        schema: z.string().uuid().optional().describe("Skill ID to inject"),
+        schema: z.string().optional().describe("Skill ID to inject"),
       }),
       subFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -125,6 +126,39 @@ const { GET } = createEndpoint({
         description: "get.fields.subFolderId.description" as const,
         placeholder: "get.fields.subFolderId.placeholder" as const,
         schema: z.string().uuid().optional().describe("Sub-folder UUID"),
+      }),
+      imageGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.imageGenModelSelection.label" as const,
+        description: "get.fields.imageGenModelSelection.description" as const,
+        placeholder: "get.fields.imageGenModelSelection.placeholder" as const,
+        schema: imageGenModelSelectionSchema
+          .nullable()
+          .optional()
+          .describe("Image gen model selection (from active favorite/chat UI)"),
+      }),
+      musicGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.musicGenModelSelection.label" as const,
+        description: "get.fields.musicGenModelSelection.description" as const,
+        placeholder: "get.fields.musicGenModelSelection.placeholder" as const,
+        schema: musicGenModelSelectionSchema
+          .nullable()
+          .optional()
+          .describe("Music gen model selection (from active favorite/chat UI)"),
+      }),
+      videoGenModelSelection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.videoGenModelSelection.label" as const,
+        description: "get.fields.videoGenModelSelection.description" as const,
+        placeholder: "get.fields.videoGenModelSelection.placeholder" as const,
+        schema: videoGenModelSelectionSchema
+          .nullable()
+          .optional()
+          .describe("Video gen model selection (from active favorite/chat UI)"),
       }),
 
       // === RESPONSE ===

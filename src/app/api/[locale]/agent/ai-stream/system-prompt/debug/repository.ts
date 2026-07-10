@@ -58,6 +58,39 @@ import {
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
+async function loadActiveFavorite(
+  userId: string,
+): Promise<FavoriteConfig | null> {
+  const [settingsRow] = await db
+    .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+    .from(chatSettings)
+    .where(eq(chatSettings.userId, userId))
+    .limit(1);
+  const effectiveFavoriteId = settingsRow?.activeFavoriteId;
+  if (!effectiveFavoriteId) {
+    return null;
+  }
+  const { skillId: sid, variantId } = isSkillVariantId(effectiveFavoriteId)
+    ? parseSkillId(effectiveFavoriteId)
+    : { skillId: null, variantId: null };
+  const favIdCondition = isUuid(effectiveFavoriteId)
+    ? eq(chatFavorites.id, effectiveFavoriteId)
+    : sid !== null
+      ? and(
+          eq(chatFavorites.skillId, sid),
+          variantId !== null
+            ? eq(chatFavorites.variantId, variantId)
+            : sql`${chatFavorites.variantId} IS NULL`,
+        )
+      : eq(chatFavorites.slug, effectiveFavoriteId);
+  const [favRow] = await db
+    .select(FAVORITE_CONFIG_COLUMNS)
+    .from(chatFavorites)
+    .where(and(favIdCondition, eq(chatFavorites.userId, userId)))
+    .limit(1);
+  return favRow ?? null;
+}
+
 export async function buildDebugSystemPrompt({
   rootFolderId,
   userMessage,
@@ -76,12 +109,45 @@ export async function buildDebugSystemPrompt({
   threadId?: string;
   skillId?: string;
   subFolderId?: string;
+  imageGenModelSelection: ImageGenModelSelection | null;
+  musicGenModelSelection: MusicGenModelSelection | null;
+  videoGenModelSelection: VideoGenModelSelection | null;
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
   const { t } = scopedTranslation.scopedT(locale);
   try {
+    // Load user's active favorite for cascade resolution (same as stream setup)
+    const userId = user.isPublic ? undefined : user.id;
+    const [favorite, availability] = await Promise.all([
+      userId ? loadActiveFavorite(userId) : Promise.resolve(null),
+      getInstanceAvailability(),
+    ]);
+
+    const bridgeContext: BridgeContext = {
+      skill: null,
+      favorite: favorite ?? null,
+    };
+    const effectiveImageGenModel = getBestImageGenModel(
+      imageGenModelSelection ??
+        ModalityResolver.resolveImageGenSelection(bridgeContext),
+      user,
+      availability,
+    );
+    const effectiveMusicGenModel = getBestMusicGenModel(
+      musicGenModelSelection ??
+        ModalityResolver.resolveMusicGenSelection(bridgeContext),
+      user,
+      availability,
+    );
+    const effectiveVideoGenModel = getBestVideoGenModel(
+      videoGenModelSelection ??
+        ModalityResolver.resolveVideoGenSelection(bridgeContext),
+      user,
+      availability,
+    );
+
     const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
@@ -96,6 +162,28 @@ export async function buildDebugSystemPrompt({
           headless: false,
           subAgentDepth: 0,
           threadId: threadId ?? null,
+          mediaCapabilities: {
+            nativeOutputs: [],
+            imageGenModelName: effectiveImageGenModel?.name ?? null,
+            musicGenModelName: effectiveMusicGenModel?.name ?? null,
+            videoGenModelName: effectiveVideoGenModel?.name ?? null,
+            imageGenIsSameAsChatModel: false,
+            musicGenIsSameAsChatModel: false,
+            videoGenIsSameAsChatModel: false,
+            videoGenCapabilities: effectiveVideoGenModel
+              ? {
+                  supportedDurations: effectiveVideoGenModel.supportedDurations,
+                  supportedAspectRatios:
+                    effectiveVideoGenModel.supportedAspectRatios,
+                  supportedResolutions:
+                    effectiveVideoGenModel.supportedResolutions,
+                  supportedFrameImages:
+                    effectiveVideoGenModel.supportedFrameImages,
+                  allowedPassthroughParameters:
+                    effectiveVideoGenModel.allowedPassthroughParameters,
+                }
+              : null,
+          },
         }),
         userMessage && user.id
           ? loadRawEmbeddingScores(user.id, userMessage, logger)

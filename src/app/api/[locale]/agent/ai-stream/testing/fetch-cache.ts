@@ -77,17 +77,17 @@ export const HTTP_CACHE_DIR = join(
 /**
  * The ONE fixture switch.
  *
- * `true`  → REPLAY-ONLY: a cache miss on an ORDINAL (conversational) call
- *           throws instead of going live. This proves every conversational AI
- *           call site routes through the engine — a missed path would go live
- *           and this catches it. CONTENT-ADDRESSED calls (embeddings + modality
- *           bridges) are exempt: keyed by input hash, a miss just means a new
- *           input, so they re-record silently.
- * `false` → RECORD: a miss falls through to a live fetch and records the file.
+ * `true`  → REPLAY-ONLY: the engine NEVER hits a live API. ANY path that would
+ *           otherwise go live throws — a cache miss (ordinal OR content-addressed)
+ *           AND the "no fixture prefix for this thread" escape hatches. No
+ *           exemptions, no matter the fixture context: if a call would reach a
+ *           real API and not a cached file, it fails loudly.
+ * `false` → RECORD: a miss (or unrecorded thread) falls through to a live fetch
+ *           and records the file.
  *
  * Flip to `false` for a recording pass, back to `true` to enforce replay.
  */
-export const FIXTURE_STRICT = true;
+export const FIXTURE_STRICT = false;
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
@@ -188,6 +188,15 @@ export function slugify(s: string): string {
 }
 
 /**
+ * A STABLE URL segment for fixture naming: pure letters + dashes only. Any
+ * segment with a digit (job ids, uuids, account hashes) is volatile and must
+ * NEVER enter a fixture filename — see deriveModelName.
+ */
+function isStableWord(p: string): boolean {
+  return /^[a-z]+(-[a-z]+)*$/i.test(p);
+}
+
+/**
  * Derive a human-readable name from the request.
  * Priority: body "model" field → last meaningful URL path segments.
  */
@@ -215,12 +224,30 @@ function deriveModelName(url: string, bodyStr: string): string {
       "chat",
       "completions",
     ]);
-    const parts = u.pathname.split("/").filter((p) => p && !noise.has(p));
-    const slug = parts.slice(-2).join("-");
+    // NO HASH in the filename — EVER. Provider poll URLs (`/api/v1/videos/<jobId>`)
+    // and media-download URLs (`https://pub-<hex>.r2.dev/generations/<uuid>.mp3`)
+    // carry run-random ids in BOTH the path AND the hostname. Any such id baked a
+    // hash into the fixture stem → replay never matched → the call went LIVE. So
+    // keep ONLY stable pure-word segments (letters + dashes: videos, images, fetch,
+    // generations, r2, dev) and DROP every segment containing a digit — job ids,
+    // uuids, account hashes all have digits; real resource/host words do not. The
+    // ordinal alone disambiguates repeated calls; this segment is just a label.
+    const hostWord =
+      u.hostname
+        .split(".")
+        .filter((p) => p && isStableWord(p))
+        .slice(-2)
+        .join("-") ||
+      u.hostname.split(".")[0]?.replace(/[^a-z]+/gi, "") ||
+      "host";
+    const pathParts = u.pathname
+      .split("/")
+      .filter((p) => p && !noise.has(p) && isStableWord(p));
+    const slug = pathParts.slice(-2).join("-");
     if (slug) {
-      return slugify(`${u.hostname.split(".")[0]}-${slug}`);
+      return slugify(`${hostWord}-${slug}`);
     }
-    return slugify(u.hostname.split(".")[0] ?? "request");
+    return slugify(hostWord);
   } catch {
     return "request";
   }
@@ -473,9 +500,14 @@ function sseEventsToTickingStream(
   return new ReadableStream<Uint8Array>({
     pull(controller): Promise<void> {
       return new Promise<void>((resolve) => {
-        // Yield to the macrotask queue between events so the consumer's
-        // for-await loop gets a chance to run between SSE chunks.
-        setTimeout(() => {
+        // Yield between events so the consumer's for-await loop runs between SSE
+        // chunks — but via a MICROTASK, not setTimeout(0). A recorded chat turn
+        // can carry 500-600 SSE events; a real macrotask per event (Bun clamps
+        // nested timers to ~1ms) added seconds of pure tick overhead to every
+        // replayed turn — the dominant fixture-replay wall-clock cost.
+        // queueMicrotask still breaks the synchronous run (the SDK parser consumes
+        // each chunk between events) but drains far faster than the timer queue.
+        queueMicrotask(() => {
           if (index >= events.length) {
             controller.close();
           } else {
@@ -490,7 +522,7 @@ function sseEventsToTickingStream(
             }
           }
           resolve();
-        }, 0);
+        });
       });
     },
   });
@@ -678,11 +710,27 @@ async function engineFetch(
   //     settles first -- keeps gap-fill parallel in prod/dev yet deterministic
   //     under fixtures (the T10e banana-vs-music desync).
   //   - Otherwise: the shared ordinal (read + bump).
+  // STRICT means: NEVER hit a live API. A missing fixture prefix means this
+  // thread isn't a recorded fixture run — in a recording pass we'd fall through
+  // to a live fetch, but under STRICT that IS an API hit and must fail loudly,
+  // regardless of fixture context. Centralised so every "would go live" escape
+  // hatch below honours it identically.
+  const strictNoLive = (): never => {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw: STRICT forbids any live fetch
+    throw new Error(
+      // eslint-disable-next-line i18next/no-literal-string
+      `[FetchCache STRICT] live fetch blocked (no fixture prefix for thread ${threadId}) for ${init?.method ?? "GET"} ${url}`,
+    );
+  };
+
   let prefix: string;
   let ordinalStem: string;
   if (isContentAddressed) {
     const p = await readFixturePrefix(threadId);
     if (!p) {
+      if (FIXTURE_STRICT) {
+        strictNoLive();
+      }
       return originalFetch(input, init);
     }
     prefix = p;
@@ -701,6 +749,9 @@ async function engineFetch(
   } else if (pinnedOrdinal !== undefined) {
     const p = await readFixturePrefix(threadId);
     if (!p) {
+      if (FIXTURE_STRICT) {
+        strictNoLive();
+      }
       return originalFetch(input, init);
     }
     prefix = p;
@@ -710,6 +761,9 @@ async function engineFetch(
   } else {
     const fx = await readAndBumpFixture(threadId);
     if (!fx) {
+      if (FIXTURE_STRICT) {
+        strictNoLive();
+      }
       return originalFetch(input, init);
     }
     prefix = fx.prefix;

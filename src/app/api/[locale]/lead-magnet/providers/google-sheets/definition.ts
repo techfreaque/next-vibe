@@ -16,7 +16,7 @@ import { z } from "zod";
 import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { scopedTranslation } from "../../i18n";
 
-const GoogleSheetsWidget = lazy(() =>
+const GoogleSheetsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GoogleSheetsWidget })),
 );
 

@@ -32,7 +32,7 @@ import {
 import { scopedTranslation } from "./i18n";
 import { ImageGenModelId, ImageGenModelIdOptions } from "./models";
 
-const ImageGenerationContainer = lazy(() =>
+const ImageGenerationContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImageGenerationContainer })),
 );
 

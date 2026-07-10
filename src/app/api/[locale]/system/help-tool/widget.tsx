@@ -3183,9 +3183,9 @@ export function HelpToolsWidget(): JSX.Element {
                                   </Span>
                                 </Div>
                                 <Div className="divide-y">
-                                  {subTools.map((tool) => (
+                                  {subTools.map((tool, idx) => (
                                     <ToolRow
-                                      key={tool.id ?? tool.name}
+                                      key={`${tool.id ?? tool.name}-${idx}`}
                                       tool={tool}
                                       effectiveEnabledTools={
                                         effectiveEnabledTools
@@ -3211,9 +3211,9 @@ export function HelpToolsWidget(): JSX.Element {
                             ))
                           ) : (
                             <Div className="divide-y">
-                              {tools.map((tool) => (
+                              {tools.map((tool, idx) => (
                                 <ToolRow
-                                  key={tool.id ?? tool.name}
+                                  key={`${tool.id ?? tool.name}-${idx}`}
                                   tool={tool}
                                   effectiveEnabledTools={effectiveEnabledTools}
                                   onToggleEnabled={handleToggleEnabled}

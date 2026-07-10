@@ -442,12 +442,27 @@ export async function searchGens(
 export async function getGenCounts(
   userId: string,
 ): Promise<{ total: number; byType: Record<string, number> }> {
-  const allGens = await loadUserGens(userId);
+  // COUNT in SQL — the previous impl loaded up to 500 FULL metadata rows just to
+  // take `.length` for a per-turn "gens: N" system-prompt number. Callers only
+  // read `.total`; byType is left empty rather than paying the row scan.
+  const toolNames = getGenToolNames();
+  const [row] = await db
+    .select({ total: sql<number>`COUNT(*)` })
+    .from(chatMessages)
+    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
+    .where(
+      and(
+        eq(chatThreads.userId, userId),
+        isNotNull(chatMessages.metadata),
+        or(
+          ...toolNames.map(
+            (name) =>
+              sql`${chatMessages.metadata}->'toolCall'->>'toolName' = ${name}`,
+          ),
+        ),
+        sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
+      ),
+    );
 
-  const byType: Record<string, number> = {};
-  for (const g of allGens) {
-    byType[g.mediaType] = (byType[g.mediaType] ?? 0) + 1;
-  }
-
-  return { total: allGens.length, byType };
+  return { total: Number(row?.total ?? 0), byType: {} };
 }

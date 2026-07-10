@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Task completed. Let me verify:\n\n- **imageUrl**: `\"http://localhost:3000/.../7f4ccda6-...png\"` — present and non-empty, nested inside `result` ✅\n- **status**: `\"status.completed\"` ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

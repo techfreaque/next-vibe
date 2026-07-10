@@ -31,6 +31,7 @@ import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/reposito
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
+import { bubbleFolderActivity } from "../../../bubble-folder-activity";
 import { DefaultFolderId } from "../../../config";
 import {
   CHAT_MESSAGE_COLUMNS,

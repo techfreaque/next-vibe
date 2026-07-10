@@ -39,8 +39,8 @@ import {
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-
 import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
+
 import { parseSkillId } from "../../../chat/slugify";
 import type {
   FiltersModelSelection,
@@ -50,7 +50,7 @@ import { IntelligenceLevel, ModelSelectionType } from "../../enum";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
 
-const FavoriteCreateContainer = lazy(() =>
+const FavoriteCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FavoriteCreateContainer })),
 );
 

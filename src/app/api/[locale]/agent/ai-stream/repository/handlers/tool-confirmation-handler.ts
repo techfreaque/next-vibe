@@ -22,6 +22,7 @@ import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import {
   CHAT_MESSAGE_COLUMNS,
+  chatDb,
   chatMessages,
   chatThreads,
 } from "../../../chat/db";

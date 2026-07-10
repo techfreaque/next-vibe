@@ -36,6 +36,7 @@ import {
 import { z } from "zod";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
+
 import { DefaultFolderId } from "../../config";
 import {
   ThreadStatusDB,
@@ -44,7 +45,7 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-const FolderContentsWidget = lazy(() =>
+const FolderContentsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FolderContentsWidget })),
 );
 

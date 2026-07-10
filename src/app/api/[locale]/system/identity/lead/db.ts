@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
+import { createRelationalDb } from "next-vibe/database/relational";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
@@ -392,3 +393,22 @@ export type EmailJourneyVariantRecord = z.infer<
 export type NewEmailJourneyVariantRecord = z.infer<
   typeof insertEmailJourneyVariantSchema
 >;
+
+/**
+ * Lead relational client — the only client carrying the lead schema, so the one
+ * that serves `db.query.userLeadLinks` / relational lead queries. The default
+ * `db` from `next-vibe/database` has no schema and cannot. Use `leadDb.query.*`
+ * for relational reads; keep using `db.select()` elsewhere.
+ */
+export const leadDb = createRelationalDb({
+  leads,
+  emailCampaigns,
+  leadEngagements,
+  leadLeadLinks,
+  userLeadLinks,
+  leadsRelations,
+  emailCampaignsRelations,
+  leadEngagementsRelations,
+  leadLeadLinksRelations,
+  userLeadLinksRelations,
+});

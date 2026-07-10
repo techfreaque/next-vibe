@@ -280,6 +280,10 @@ export const translations = {
         label: "Credential",
         description: "Encoded credential string",
       },
+      syncScope: {
+        label: "Sync Scope",
+        description: "Which data syncs over this connection.",
+      },
     },
     success: { title: "Signed in", description: "Credential retrieved" },
     errors: {

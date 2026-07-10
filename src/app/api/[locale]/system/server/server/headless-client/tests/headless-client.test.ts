@@ -57,6 +57,7 @@ const COMPUTER_NAME = "headless-client"; // fixed dev name, matches repository.t
 const TEST_FAVORITE: FavoriteConfig = {
   id: "headless-test-fav",
   skillId: NO_SKILL_ID,
+  variantId: null,
   modelSelection: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,

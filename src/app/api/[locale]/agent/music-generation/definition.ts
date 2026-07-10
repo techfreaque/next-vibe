@@ -30,7 +30,7 @@ import {
 import { scopedTranslation } from "./i18n";
 import { MusicGenModelId, MusicGenModelIdOptions } from "./models";
 
-const MusicGenerationContainer = lazy(() =>
+const MusicGenerationContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MusicGenerationContainer })),
 );
 

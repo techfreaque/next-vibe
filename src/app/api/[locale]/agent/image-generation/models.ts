@@ -98,11 +98,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-pro",
-        creditCostPerImage: 7.8, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 7.8, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -146,11 +146,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_2_MAX,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-2-max",
-        creditCostPerImage: 9.1, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 9.1, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -187,11 +187,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_2_KLEIN_4B,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-2-klein-4b",
-        creditCostPerImage: 1.82, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 1.82, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -226,15 +226,15 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.RIVERFLOW_V2_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "riverflow-v2-pro",
-        creditCostPerImage: 19.5, // updated: 2026-07-02 from unbottled.ai
-        supportedResolutions: ["1024px", "2048px", "4096px"],
+        creditCostPerImage: 19.5, // updated: 2026-07-10 from unbottled.ai
+        supportedResolutions: ["1024px","2048px","4096px"],
         supportedSizes: [],
         supportedQualities: [],
-        pricingByResolution: { "1024px": 19.5, "2048px": 19.5, "4096px": 42.9 }, // updated: 2026-07-02 from unbottled.ai
+        pricingByResolution: {"1024px":19.5,"2048px":19.5,"4096px":42.9}, // updated: 2026-07-10 from unbottled.ai
       },
     ],
     utilities: [
@@ -271,15 +271,15 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.RIVERFLOW_V2_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "riverflow-v2-fast",
-        creditCostPerImage: 2.6, // updated: 2026-07-02 from unbottled.ai
-        supportedResolutions: ["1024px", "2048px"],
+        creditCostPerImage: 2.6, // updated: 2026-07-10 from unbottled.ai
+        supportedResolutions: ["1024px","2048px"],
         supportedSizes: [],
         supportedQualities: [],
-        pricingByResolution: { "1024px": 2.6, "2048px": 5.2 }, // updated: 2026-07-02 from unbottled.ai
+        pricingByResolution: {"1024px":2.6,"2048px":5.2}, // updated: 2026-07-10 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -310,11 +310,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.RIVERFLOW_V2_MAX_PREVIEW,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "riverflow-v2-max-preview",
-        creditCostPerImage: 9.75, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 9.75, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -351,11 +351,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "riverflow-v2-standard-preview",
-        creditCostPerImage: 4.55, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 4.55, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -388,11 +388,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.RIVERFLOW_V2_FAST_PREVIEW,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "riverflow-v2-fast-preview",
-        creditCostPerImage: 3.9, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 3.9, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -425,11 +425,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_2_FLEX,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-2-flex",
-        creditCostPerImage: 7.8, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 7.8, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -473,11 +473,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_2_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-2-pro",
-        creditCostPerImage: 3.9, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 3.9, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -518,24 +518,15 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "seedream-4.5",
         creditCostPerImage: 6, // updated: 2026-04-04 from modelslab.com
-        supportedAspectRatios: [
-          "1:1",
-          "4:3",
-          "3:4",
-          "16:9",
-          "9:16",
-          "3:2",
-          "2:3",
-          "21:9",
-        ], // updated: 2026-07-02 from modelslab.com
+        supportedAspectRatios: ["1:1", "4:3", "3:4", "16:9", "9:16", "3:2", "2:3", "21:9"], // updated: 2026-07-10 from modelslab.com
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.SEEDREAM_4_5,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedream-4.5",
-        creditCostPerImage: 5.2, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 5.2, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -567,11 +558,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.GEN4_T2I_TURBO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gen4-t2i-turbo",
-        creditCostPerImage: 3.25, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 3.25, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -600,36 +591,16 @@ export const imageGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "gen4_image",
         creditCostPerImage: 8.8, // updated: 2026-04-04 from modelslab.com
-        supportedAspectRatios: [
-          "16:9",
-          "9:16",
-          "1:1",
-          "85:48",
-          "4:3",
-          "3:4",
-          "113:48",
-          "88:38",
-          "7:3",
-        ], // updated: 2026-07-02 from modelslab.com
+        supportedAspectRatios: ["16:9", "9:16", "1:1", "85:48", "4:3", "3:4", "113:48", "88:38", "7:3"], // updated: 2026-07-10 from modelslab.com
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.GEN4_IMAGE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gen4-image",
-        creditCostPerImage: 11.44, // updated: 2026-07-02 from unbottled.ai
-        supportedAspectRatios: [
-          "16:9",
-          "9:16",
-          "1:1",
-          "85:48",
-          "4:3",
-          "3:4",
-          "113:48",
-          "88:38",
-          "7:3",
-        ],
+        creditCostPerImage: 11.44, // updated: 2026-07-10 from unbottled.ai
+        supportedAspectRatios: ["16:9","9:16","1:1","85:48","4:3","3:4","113:48","88:38","7:3"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -661,11 +632,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.WAN_2_7_T2I,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "wan-2.7-t2i",
-        creditCostPerImage: 3.9, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 3.9, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -698,12 +669,12 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.GROK_T2I,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-t2i",
-        creditCostPerImage: 3.12, // updated: 2026-07-02 from unbottled.ai
-        supportedAspectRatios: ["1:1", "9:16", "3:4", "4:3", "16:9"],
+        creditCostPerImage: 3.12, // updated: 2026-07-10 from unbottled.ai
+        supportedAspectRatios: ["1:1","9:16","3:4","4:3","16:9"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -735,11 +706,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.Z_IMAGE_BASE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "z-image-base",
-        creditCostPerImage: 0.611, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 0.611, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -771,11 +742,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.Z_IMAGE_TURBO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "z-image-turbo",
-        creditCostPerImage: 0.611, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 0.611, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -807,11 +778,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.FLUX_PRO_1_1_ULTRA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-pro-1.1-ultra",
-        creditCostPerImage: 10.4, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 10.4, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -848,12 +819,12 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.IMAGEN_4_ULTRA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "imagen-4-ultra",
-        creditCostPerImage: 9.36, // updated: 2026-07-02 from unbottled.ai
-        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
+        creditCostPerImage: 9.36, // updated: 2026-07-10 from unbottled.ai
+        supportedAspectRatios: ["1:1","3:4","4:3","9:16","16:9"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -890,12 +861,12 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.IMAGEN_4,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "imagen-4",
-        creditCostPerImage: 5.72, // updated: 2026-07-02 from unbottled.ai
-        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
+        creditCostPerImage: 5.72, // updated: 2026-07-10 from unbottled.ai
+        supportedAspectRatios: ["1:1","3:4","4:3","9:16","16:9"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -932,12 +903,12 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.IMAGEN_4_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "imagen-4-fast",
-        creditCostPerImage: 3.12, // updated: 2026-07-02 from unbottled.ai
-        supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"],
+        creditCostPerImage: 3.12, // updated: 2026-07-10 from unbottled.ai
+        supportedAspectRatios: ["1:1","3:4","4:3","9:16","16:9"],
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -969,11 +940,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.QWEN_T2I,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-t2i",
-        creditCostPerImage: 0.611, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 0.611, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },
@@ -1005,11 +976,11 @@ export const imageGenModelDefinitions: Record<
         supportedSizes: [],
         supportedQualities: [],
       },
-      {
+          {
         id: ImageGenModelId.REALTIME_T2I,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "realtime-t2i",
-        creditCostPerImage: 0.611, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerImage: 0.611, // updated: 2026-07-10 from unbottled.ai
         supportedSizes: [],
         supportedQualities: [],
       },

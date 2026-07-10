@@ -11,6 +11,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatModelOptions } from "../../ai-stream/models";
+import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
 import { imageGenModelOptions } from "../../image-generation/models";
 import { musicGenModelOptions } from "../../music-generation/models";
 import { IntelligenceLevelDB } from "../../skills/enum";
@@ -36,6 +37,35 @@ const allModelOptions: AnyModelOption[] = [
   ...ttsModelOptions,
   ...sttModelOptions,
 ];
+
+// Lookup map: model name → richest video capabilities (aggregated across all providers)
+interface VideoCapabilities {
+  supportedDurations?: readonly string[];
+  supportedAspectRatios?: readonly string[];
+  supportedResolutions?: readonly string[];
+  supportedFrameImages?: readonly string[];
+  generateAudio?: boolean;
+  supportedSizes?: readonly string[];
+  allowedPassthroughParameters?: readonly string[];
+}
+const videoCapabilitiesByName = new Map<string, VideoCapabilities>();
+for (const def of Object.values(videoGenModelDefinitions)) {
+  const caps: VideoCapabilities = {};
+  for (const p of def.providers) {
+    if (!("creditCostPerSecond" in p)) {
+      continue;
+    }
+    const vp = p as VideoCapabilities;
+    caps.supportedDurations ??= vp.supportedDurations;
+    caps.supportedAspectRatios ??= vp.supportedAspectRatios;
+    caps.supportedResolutions ??= vp.supportedResolutions;
+    caps.supportedFrameImages ??= vp.supportedFrameImages;
+    caps.generateAudio ??= vp.generateAudio;
+    caps.supportedSizes ??= vp.supportedSizes;
+    caps.allowedPassthroughParameters ??= vp.allowedPassthroughParameters;
+  }
+  videoCapabilitiesByName.set(def.name, caps);
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -66,6 +96,7 @@ function keyToLabel(key: string): string {
 function mapDefinitionToItem(
   def: ModelDefinition,
   isAdmin: boolean,
+  t: ReturnType<typeof chatScopedTranslation.scopedT>["t"],
 ): ModelListItem {
   const visibleOptions = allModelOptions.filter((opt: AnyModelOption) => {
     if (opt.name !== def.name) {
@@ -80,12 +111,14 @@ function mapDefinitionToItem(
   const priceOption = visibleOptions[0] ?? null;
   const price = priceOption ? getModelPrice(priceOption) : 0;
 
+  const videoCaps = videoCapabilitiesByName.get(def.name);
+
   return {
     id: visibleOptions[0]?.id ?? def.name,
     name: def.name,
     provider: getProviderDisplayName(def),
     type: getModelType(def),
-    description: keyToLabel(def.description),
+    description: t(def.description as Parameters<typeof t>[0]),
     contextWindow: def.contextWindow ?? null,
     parameterCount: def.parameterCount ?? null,
     intelligence: keyToLabel(def.intelligence),
@@ -95,6 +128,25 @@ function mapDefinitionToItem(
     utilities: def.utilities.map(keyToLabel),
     inputs: def.inputs,
     outputs: def.outputs,
+    supportedDurations: videoCaps?.supportedDurations
+      ? [...videoCaps.supportedDurations]
+      : null,
+    supportedAspectRatios: videoCaps?.supportedAspectRatios
+      ? [...videoCaps.supportedAspectRatios]
+      : null,
+    supportedResolutions: videoCaps?.supportedResolutions
+      ? [...videoCaps.supportedResolutions]
+      : null,
+    supportedFrameImages: videoCaps?.supportedFrameImages
+      ? [...videoCaps.supportedFrameImages]
+      : null,
+    generateAudio: videoCaps?.generateAudio ?? null,
+    supportedSizes: videoCaps?.supportedSizes
+      ? [...videoCaps.supportedSizes]
+      : null,
+    allowedPassthroughParameters: videoCaps?.allowedPassthroughParameters
+      ? [...videoCaps.allowedPassthroughParameters]
+      : null,
   };
 }
 
@@ -213,7 +265,8 @@ export const ModelsListRepository = {
       return true;
     }).length;
 
-    const models = filtered.map((def) => mapDefinitionToItem(def, isAdmin));
+    const { t } = chatScopedTranslation.scopedT(locale);
+    const models = filtered.map((def) => mapDefinitionToItem(def, isAdmin, t));
 
     return success({
       models,

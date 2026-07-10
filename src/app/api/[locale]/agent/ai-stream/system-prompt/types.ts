@@ -89,6 +89,14 @@ export interface MediaCapabilitiesParams {
   musicGenIsSameAsChatModel: boolean;
   /** true when the chat model IS the video gen model (same model ID) - tool is redundant */
   videoGenIsSameAsChatModel: boolean;
+  /** Capabilities of the resolved video gen model */
+  videoGenCapabilities: {
+    supportedDurations?: readonly string[];
+    supportedAspectRatios?: readonly string[];
+    supportedResolutions?: readonly string[];
+    supportedFrameImages?: readonly string[];
+    allowedPassthroughParameters?: readonly string[];
+  } | null;
 }
 
 /**

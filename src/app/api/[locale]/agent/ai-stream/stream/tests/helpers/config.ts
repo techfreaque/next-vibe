@@ -23,14 +23,17 @@ export interface ModeConfig {
    *  are recorded once and replayed by both; they distinguish their THREAD
    *  folders via threadCasePrefix. */
   cachePrefix: string;
+  /** The name for this suite's THREAD folder (<root>/tests/<case>), decoupled
+   *  from the fixture cache. Defaults to cachePrefix. A suite that shares another
+   *  suite's fixtures (same cachePrefix) sets this to its OWN name so its seeded
+   *  threads never collide with the suite it shares fixtures with. */
+  threadCasePrefix?: string;
   /**
    * Cheap variant: media-gen steps swap to cortex/tool-help equivalents with
    * the same observable thread shape. Every callback mode and folder
    * assertion still runs — only the operation is cheaper.
    */
   cheapMode?: boolean;
-  /** TEMPORARY DEBUG: throw right after T1 so fixture-replay iteration is fast. */
-  stopAfterFirstCase?: boolean;
   /**
    * Queue mode: streams end in 'waiting' and a cron pulse revives them.
    * Called with the threadId after each dispatch; the helper polls revival.

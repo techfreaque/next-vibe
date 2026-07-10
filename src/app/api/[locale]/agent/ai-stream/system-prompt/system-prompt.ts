@@ -80,6 +80,7 @@ function buildMediaLine(opts: {
   nativeOutputs: string[];
   genModelName: string | null;
   isSameAsChatModel: boolean;
+  extraDetail?: string;
 }): string | null {
   const {
     label,
@@ -88,22 +89,73 @@ function buildMediaLine(opts: {
     nativeOutputs,
     genModelName,
     isSameAsChatModel,
+    extraDetail,
   } = opts;
   const hasNative = nativeOutputs.includes(modality);
+  const detail = extraDetail ? ` ${extraDetail}` : "";
 
   if (isSameAsChatModel) {
-    return `- ${label}: native (you output ${modality} directly - no tool needed)`;
+    return `- \`${toolAlias}\` — ${label} (native, no tool needed)${detail}`;
   }
-  if (genModelName) {
-    if (hasNative) {
-      return `- ${label}: You can produce ${modality} natively, but the user prefers ${genModelName}. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`. Use native output only if explicitly asked.`;
-    }
-    return `- ${label}: ${genModelName} available. Use \`tool-help\` with \`toolName="${toolAlias}"\` to get the full schema, then call it via \`execute-tool\`.`;
+  if (hasNative && genModelName) {
+    return `- \`${toolAlias}\` — ${label} via ${genModelName} (native also available, use tool unless asked otherwise)${detail}`;
   }
   if (hasNative) {
-    return `- ${label}: native (model outputs ${modality} directly without a separate tool)`;
+    return `- \`${toolAlias}\` — ${label} (native)${detail}`;
   }
-  return null;
+  const model = genModelName ?? `user default`;
+  return `- \`${toolAlias}\` — ${label} via ${model}${detail}`;
+}
+
+function buildVideoCapabilityDetail(
+  caps: {
+    supportedDurations?: readonly string[];
+    supportedAspectRatios?: readonly string[];
+    supportedResolutions?: readonly string[];
+    supportedFrameImages?: readonly string[];
+    allowedPassthroughParameters?: readonly string[];
+  } | null,
+): string {
+  if (!caps) {
+    return "";
+  }
+  const parts: string[] = [];
+  if (caps.supportedDurations?.length) {
+    const nums = caps.supportedDurations
+      .map(Number)
+      .filter((n) => !isNaN(n))
+      .toSorted((a, b) => a - b);
+    if (nums.length > 0) {
+      const min = nums[0];
+      const max = nums[nums.length - 1];
+      parts.push(
+        min === max
+          ? `duration: ${String(min)}s`
+          : `duration: ${String(min)}–${String(max)}s`,
+      );
+    }
+  }
+  if (caps.supportedAspectRatios?.length) {
+    parts.push(`ratios: ${caps.supportedAspectRatios.join(", ")}`);
+  }
+  if (caps.supportedResolutions?.length) {
+    parts.push(`resolutions: ${caps.supportedResolutions.join(", ")}`);
+  }
+  if (caps.supportedFrameImages?.length) {
+    parts.push(`frame inputs: ${caps.supportedFrameImages.join(", ")}`);
+  }
+  if (caps.allowedPassthroughParameters?.length) {
+    const relevant = caps.allowedPassthroughParameters.filter((p) =>
+      ["negative_prompt", "negativePrompt"].includes(p),
+    );
+    if (relevant.length > 0) {
+      parts.push("supports: negative_prompt");
+    }
+  }
+  if (parts.length === 0) {
+    return "";
+  }
+  return `[${parts.join(" | ")}]`;
 }
 
 // ─── Core context fragments (priority 10–90) ─────────────────────────────────
@@ -323,7 +375,7 @@ export const toolExecutionControlFragment: SystemPromptFragment = {
 - **\`"detach"\`** — fire-and-forget, returns \`{taskId}\`, use \`await-task\` later if needed
 - **\`"wakeUp"\`** — fire-and-forget, result auto-injected when ready, do NOT call \`await-task\`
 - **\`"wait"\`** — block for a remote task
-- **\`"endLoop"\`** — end the entire turn after this batch (use ONLY when fully done)
+- **\`"endLoop"\`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending
 - **\`"approve"\`** — pause for user confirmation
 
 Fast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.`,
@@ -335,42 +387,46 @@ export const mediaCapabilitiesFragment: SystemPromptFragment = {
   priority: 75,
   build: async (params) => {
     const mc = params.mediaCapabilities;
-    if (!mc) {
-      return null;
-    }
 
-    const lines = [
-      buildMediaLine({
-        label: "Images",
-        toolAlias: "generate_image",
-        modality: "image",
-        nativeOutputs: mc.nativeOutputs,
-        genModelName: mc.imageGenModelName,
-        isSameAsChatModel: mc.imageGenIsSameAsChatModel,
-      }),
-      buildMediaLine({
-        label: "Music/audio",
-        toolAlias: "generate_music",
-        modality: "audio",
-        nativeOutputs: mc.nativeOutputs,
-        genModelName: mc.musicGenModelName,
-        isSameAsChatModel: mc.musicGenIsSameAsChatModel,
-      }),
-      buildMediaLine({
-        label: "Video",
-        toolAlias: "generate_video",
-        modality: "video",
-        nativeOutputs: mc.nativeOutputs,
-        genModelName: mc.videoGenModelName,
-        isSameAsChatModel: mc.videoGenIsSameAsChatModel,
-      }),
-    ].filter((line): line is string => line !== null);
+    const genLines = mc
+      ? [
+          buildMediaLine({
+            label: "Images",
+            toolAlias: "generate_image",
+            modality: "image",
+            nativeOutputs: mc.nativeOutputs,
+            genModelName: mc.imageGenModelName,
+            isSameAsChatModel: mc.imageGenIsSameAsChatModel,
+          }),
+          buildMediaLine({
+            label: "Music/audio",
+            toolAlias: MUSIC_GEN_ALIAS,
+            modality: "audio",
+            nativeOutputs: mc.nativeOutputs,
+            genModelName: mc.musicGenModelName,
+            isSameAsChatModel: mc.musicGenIsSameAsChatModel,
+          }),
+          buildMediaLine({
+            label: "Video",
+            toolAlias: "generate_video",
+            modality: "video",
+            nativeOutputs: mc.nativeOutputs,
+            genModelName: mc.videoGenModelName,
+            isSameAsChatModel: mc.videoGenIsSameAsChatModel,
+            extraDetail: buildVideoCapabilityDetail(mc.videoGenCapabilities),
+          }),
+        ].filter((line): line is string => line !== null)
+      : [];
 
-    if (lines.length === 0) {
-      return null;
-    }
+    const inputLines = [
+      `- \`${DESCRIBE_IMAGE_ALIAS}\` — analyse/describe an image`,
+      `- \`${DESCRIBE_VIDEO_ALIAS}\` — analyse/describe a video`,
+      `- \`${TRANSCRIBE_AUDIO_ALIAS}\` — speech-to-text from audio`,
+      `- \`${TEXT_TO_SPEECH_ALIAS}\` — convert text to spoken audio`,
+    ];
 
-    return `## Media capabilities\n${lines.join("\n")}`;
+    const allLines = [...genLines, ...inputLines];
+    return `## Media tools (use \`tool-help\` for schema before calling)\n${allLines.join("\n")}`;
   },
 };
 

@@ -30,6 +30,7 @@ import {
   type Plugin,
   type PluginOption,
 } from "vite";
+import type { EvaluatedModules } from "vite/module-runner";
 
 import type { BuildProfile, FileToCompile } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";

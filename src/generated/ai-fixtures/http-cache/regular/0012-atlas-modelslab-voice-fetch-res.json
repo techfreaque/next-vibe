@@ -1,0 +1,37 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v7/voice/fetch/4283871",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a190800f4b5cd369-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:11:19 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=EwEWdLOihEuBzy%2FyTLhgTTQFpfVu7uSMs3%2FrozKv6EOtCvfxe9dQuyZ7wjUvotAywOJWk9nmRj3KpyJ3Mz605p7inFWV1Kx2xjbVO%2FwVagkcPfB9PMWXJ12bQ8MexkA%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "8026e4a6175991ef5d6f29fbfc7a3ca8",
+    "x-request-time": "0.235",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "success",
+    "generationTime": 39.82,
+    "id": 4283871,
+    "output": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/33e4717b-c1b9-4683-8b39-759cd4b32eb4.mp3"
+    ],
+    "proxy_links": [
+      "https://cdn2.stablediffusionapi.com/generations/33e4717b-c1b9-4683-8b39-759cd4b32eb4.mp3"
+    ]
+  }
+}

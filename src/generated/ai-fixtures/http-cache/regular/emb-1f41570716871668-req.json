@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The contact form submitted successfully after user confirmation. The result returned a clean success message: \"Thank you for contacting us! We've received your message and will get back to you soon.\"\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -40,6 +40,11 @@ import { generateVideoWithModelsLab } from "./providers/modelslab";
 import { generateVideoWithOpenRouter } from "./providers/openrouter";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
 
+function parseAspectRatio(r: string): number {
+  const [w, h] = r.split(":").map(Number);
+  return (w ?? 1) / (h ?? 1);
+}
+
 export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
@@ -74,7 +79,10 @@ export class VideoGenerationRepository {
     // (hiddenForPlatforms), so nobody upstream can correct a t2v default for
     // an i2v request. Resolve to the cheapest image-capable model instead of
     // letting the provider fail with a misleading init_image error.
-    if (data.inputMediaUrl && !videoModel.inputs.includes("image")) {
+    if (
+      (data.firstFrameUrl ?? data.lastFrameUrl) &&
+      !videoModel.inputs.includes("image")
+    ) {
       const { getVideoGenModelsByInputModality } = await import("./models");
       const imageCapable = getVideoGenModelsByInputModality("image");
       const substitute = imageCapable.toSorted(
@@ -95,7 +103,7 @@ export class VideoGenerationRepository {
     if (
       videoModel.inputs.includes("image") &&
       !videoModel.inputs.includes("text") &&
-      !data.inputMediaUrl
+      !data.firstFrameUrl
     ) {
       return fail({
         message: t("post.errors.inputMediaRequired"),
@@ -130,21 +138,22 @@ export class VideoGenerationRepository {
       }
     }
 
-    // Validate aspect ratio
+    // Snap aspect ratio to nearest supported
+    let aspectRatio = data.aspectRatio;
     if (
-      data.aspectRatio &&
+      aspectRatio &&
       videoModel.supportedAspectRatios &&
       videoModel.supportedAspectRatios.length > 0 &&
-      !videoModel.supportedAspectRatios.includes(data.aspectRatio)
+      !videoModel.supportedAspectRatios.includes(aspectRatio)
     ) {
-      return fail({
-        message: t("post.errors.unsupportedAspectRatio", {
-          model: data.model,
-          aspectRatio: data.aspectRatio,
-          supported: videoModel.supportedAspectRatios.join(", "),
-        }),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+      const target = parseAspectRatio(aspectRatio);
+      const nearest = videoModel.supportedAspectRatios.reduce((prev, curr) =>
+        Math.abs(parseAspectRatio(curr) - target) <
+        Math.abs(parseAspectRatio(prev) - target)
+          ? curr
+          : prev,
+      );
+      aspectRatio = nearest as typeof aspectRatio;
     }
 
     // Validate resolution
@@ -209,9 +218,9 @@ export class VideoGenerationRepository {
           providerModel: videoModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
-          aspectRatio: data.aspectRatio,
+          aspectRatio: aspectRatio,
           resolution: data.resolution,
-          inputImageUrl: data.inputMediaUrl,
+          inputImageUrl: data.firstFrameUrl,
           logger,
           locale,
           fetchImpl,
@@ -234,9 +243,16 @@ export class VideoGenerationRepository {
           providerModel: videoModel.providerModel,
           prompt: data.prompt,
           durationSeconds: durationSeconds,
-          aspectRatio: data.aspectRatio,
+          aspectRatio: aspectRatio,
           resolution: data.resolution,
-          inputImageUrl: data.inputMediaUrl,
+          firstFrameUrl: data.firstFrameUrl,
+          lastFrameUrl: data.lastFrameUrl,
+          negativePrompt: data.negativePrompt,
+          cfgScale: data.cfgScale,
+
+          generateAudio: videoModel.generateAudio ?? false,
+          supportedFrameImages: videoModel.supportedFrameImages,
+          allowedPassthroughParameters: videoModel.allowedPassthroughParameters,
           logger,
           locale,
           fetchImpl,
@@ -351,5 +367,36 @@ export class VideoGenerationRepository {
       creditCost: finalCreditCost,
       durationSeconds: finalDurationSeconds,
     });
+  }
+
+  static async getRequestDefaults(ctx: {
+    user: JwtPayloadType;
+    streamContext: ToolExecutionContext;
+  }): Promise<Partial<VideoGenerationPostRequestInput>> {
+    const { getInstanceAvailability } = await import("../env-availability");
+    const availability = await getInstanceAvailability();
+    const userId =
+      ctx.user && !ctx.user.isPublic && "id" in ctx.user
+        ? ctx.user.id
+        : undefined;
+    let sel: VideoGenModelSelection | undefined;
+    if (userId) {
+      const { resolveSkillFavoriteContext } =
+        await import("@/app/api/[locale]/agent/skills/resolver");
+      const { ModalityResolver } =
+        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+      const { favorite, skill } = await resolveSkillFavoriteContext({
+        favoriteId: ctx.streamContext.favoriteId ?? null,
+        skillId: ctx.streamContext.skillId ?? null,
+        userId,
+      });
+      sel = ModalityResolver.resolveVideoGenSelection({ favorite, skill });
+    }
+    sel ??= ctx.streamContext.resolvedMediaSelections?.videoGenModelSelection;
+    const model = filterVideoGenModels(sel, ctx.user, availability)[0]?.id;
+    if (!model) {
+      return {};
+    }
+    return { model };
   }
 }

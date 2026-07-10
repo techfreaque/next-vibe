@@ -635,9 +635,9 @@ export function ToolsConfigEdit({
                                           </Span>
                                         </Div>
                                         <Div className="divide-y">
-                                          {subTools.map((tool) => (
+                                          {subTools.map((tool, idx) => (
                                             <ToolConfigRow
-                                              key={tool.id ?? tool.name}
+                                              key={`${tool.id ?? tool.name}-${idx}`}
                                               tool={tool}
                                               effectiveEnabledTools={
                                                 effectiveEnabledTools
@@ -659,9 +659,9 @@ export function ToolsConfigEdit({
                                   )
                                 ) : (
                                   <Div className="divide-y">
-                                    {tools.map((tool) => (
+                                    {tools.map((tool, idx) => (
                                       <ToolConfigRow
-                                        key={tool.id ?? tool.name}
+                                        key={`${tool.id ?? tool.name}-${idx}`}
                                         tool={tool}
                                         effectiveEnabledTools={
                                           effectiveEnabledTools

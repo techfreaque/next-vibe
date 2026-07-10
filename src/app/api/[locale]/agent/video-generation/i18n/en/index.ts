@@ -50,6 +50,17 @@ export const translations = {
         "Image to use as the last frame. The model animates backward to this.",
       placeholder: "https://example.com/last-frame.jpg",
     },
+    negativePrompt: {
+      label: "Negative Prompt",
+      description: "Describe what to exclude from the video.",
+      placeholder: "blurry, low quality, distorted...",
+    },
+    cfgScale: {
+      label: "CFG Scale",
+      description:
+        "How strictly the model follows the prompt (0–30). Higher = more literal.",
+    },
+
     download: "Download",
     generatingNote: "Video generation can take 1–3 minutes",
     backButton: {

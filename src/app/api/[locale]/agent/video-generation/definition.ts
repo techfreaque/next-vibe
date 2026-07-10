@@ -26,7 +26,7 @@ import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";
 
-const VideoGenerationContainer = lazy(() =>
+const VideoGenerationContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.VideoGenerationContainer })),
 );
 
@@ -106,7 +106,19 @@ const { POST } = createEndpoint({
         columns: 12,
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        schema: z.string().optional(),
+        schema: z
+          .enum([
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4",
+            "3:2",
+            "2:3",
+            "21:9",
+            "9:21",
+          ])
+          .optional(),
       }),
       resolution: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -118,15 +130,35 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.string().optional(),
       }),
-      inputMediaUrl: requestField(scopedTranslation, {
+      firstFrameUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.inputMediaUrl.label",
-        description: "post.inputMediaUrl.description",
+        label: "post.firstFrameUrl.label",
+        description: "post.firstFrameUrl.description",
         columns: 12,
-        placeholder: "post.inputMediaUrl.placeholder",
+        placeholder: "post.firstFrameUrl.placeholder",
         schema: z.string().url().optional(),
       }),
+      lastFrameUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.lastFrameUrl.label",
+        description: "post.lastFrameUrl.description",
+        columns: 12,
+        placeholder: "post.lastFrameUrl.placeholder",
+        schema: z.string().url().optional(),
+      }),
+      negativePrompt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "post.negativePrompt.label",
+        description: "post.negativePrompt.description",
+        columns: 12,
+        placeholder: "post.negativePrompt.placeholder",
+        hiddenForPlatforms: [Platform.AI, Platform.MCP],
+        schema: z.string().max(1000).optional(),
+      }),
+
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
         icon: "arrow-left",

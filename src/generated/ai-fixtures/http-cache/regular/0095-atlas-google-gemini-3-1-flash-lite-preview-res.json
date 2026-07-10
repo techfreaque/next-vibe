@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a190abdfef4423d4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:41:17 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783698074-U9xUwVDqirCbVxJppkkX"
+  },
+  "body": {
+    "id": "gen-1783698074-U9xUwVDqirCbVxJppkkX",
+    "object": "chat.completion",
+    "created": 1783698074,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a high-production, cinematic-style video clip showcasing a close-up, first-person perspective (POV) of hands solving a Rubik’s Cube against a dense, out-of-focus background of dozens of other cubes.\n\n### Visual Content\n*   **Central Subject:** A human pair of hands holds a standard 3x3 Rubik’s cube in the center of the frame. The cube is partially scrambled, primarily showing white, red, blue, and orange faces, with a distinctive black-and-white icon logo (a stylized \"X\" or geometric emblem) printed on the white center square. \n*   **Background:** The background is entirely filled with dozens of other Rubik’s cubes, many partially turned or scrambled. They are intentionally blurred (shallow depth of field), creating a textural, colorful \"sea\" of plastic grid patterns that draws the viewer’s eye toward the clear, sharp cube in the hands.\n*   **Action:** The hands expertly and rapidly rotate the sides of the cube, clicking pieces into place. The movement is fluid, precise, and rhythmic, characteristic of a \"speedcuber.\"\n*   **Camera Work:** The camera is positioned in a static, eye-level close-up or macro shot. There is no zooming or panning; it remains locked focused on the cube being manipulated.\n*   **Text/UI:** There is no text, watermarks, or UI elements on the screen.\n\n### Audio\n*   **Sound Effects:** The dominant audio is the crisp, tactile, mechanical clicking/tapping of the Rubik’s cube plastic pieces shifting. It is high-fidelity and ASMR-like in nature.\n*   **Background Music:** There is no music present. The audio is purely ambient sound derived from the mechanical manipulation of the object.\n\n### Style and Production\n*   **Production Quality:** High-end professional. The lighting is soft and even, highlighting the textures of the plastic cubes. The shallow depth of field suggests the use of a wide-aperture lens, likely a 50mm or 85mm prime.\n*   **Style:** Realistic, \"lifestyle\" or commercial aesthetic. It feels like an excerpt from a social media aesthetic reel, a product advertisement, or a high-quality hobbyist video.\n\n### Mood and Arc\n*   **Mood:** The emotional tone is focused, calm, and satisfying. The repetitive, rhythmic clicking creates a meditative, orderly impression. \n*   **Arc:** There is no specific narrative arc; the clip is a demonstration of skill and mechanical precision. It starts with the hands actively solving the cube and concludes as they continue to manipulate it, maintaining a consistent pace of activity.\n\n### Duration and Pacing\n*   **Duration:** The clip is approximately 5 seconds long.\n*   **Pacing:** The pacing is rapid and rhythmic, matching the fast-paced, fluid turns of the cube. The speed is constant throughout the short duration.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "signature": "EjQKMgERTTIPjPawtOZBohZQYlWS084828DQEM1BQsawymC5GIf4mci3Fokw9wLZX+0At8wJ",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 620,
+      "total_tokens": 1029,
+      "cost": 0.00103225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00103225,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.00093
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

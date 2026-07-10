@@ -125,7 +125,7 @@ export function CompactingMessage({
             {isStreaming && !content ? (
               <Div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <Span className="text-sm">Summarizing conversation...</Span>
+                <Span className="text-sm">{t("compacting.summarizing")}</Span>
               </Div>
             ) : content ? (
               <Markdown content={content} messageId="compacting" />

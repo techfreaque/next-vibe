@@ -263,7 +263,11 @@ export async function resolveModelSkill(params: {
     if (favoriteConfig) {
       const skillVariant = await resolveSkillVariant(
         undefined,
-        parseSkillId(favoriteConfig.skillId).variantId,
+        // Prefer the favorite's own variantId column; fall back to a variant
+        // merged into its skillId. A bare (config-loaded) skillId carries no
+        // variant, so parsing alone picked the skill's DEFAULT variant.
+        favoriteConfig.variantId ??
+          parseSkillId(favoriteConfig.skillId).variantId,
       );
       const resolvedModel = resolveChatModelId(
         favoriteConfig.modelSelection ?? undefined,
@@ -427,8 +431,8 @@ export class ModalityResolver {
   /** Resolve image gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveImageGenSelection(ctx: BridgeContext): ImageGenModelSelection {
     return (
-      ctx.skill?.imageGenModelSelection ??
       ctx.favorite?.imageGenModelSelection ??
+      ctx.skill?.imageGenModelSelection ??
       DEFAULT_IMAGE_GEN_MODEL_SELECTION
     );
   }
@@ -436,8 +440,8 @@ export class ModalityResolver {
   /** Resolve music gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveMusicGenSelection(ctx: BridgeContext): MusicGenModelSelection {
     return (
-      ctx.skill?.musicGenModelSelection ??
       ctx.favorite?.musicGenModelSelection ??
+      ctx.skill?.musicGenModelSelection ??
       DEFAULT_MUSIC_GEN_MODEL_SELECTION
     );
   }
@@ -445,8 +449,8 @@ export class ModalityResolver {
   /** Resolve video gen selection via cascade without resolving to a model (favorite → skill → default). */
   static resolveVideoGenSelection(ctx: BridgeContext): VideoGenModelSelection {
     return (
-      ctx.skill?.videoGenModelSelection ??
       ctx.favorite?.videoGenModelSelection ??
+      ctx.skill?.videoGenModelSelection ??
       DEFAULT_VIDEO_GEN_MODEL_SELECTION
     );
   }

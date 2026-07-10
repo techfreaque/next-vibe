@@ -25,8 +25,8 @@ import {
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-
 import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
+
 import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import {
@@ -42,7 +42,7 @@ import {
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const MessagesWidget = lazy(() =>
+const MessagesWidget = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
 );
 

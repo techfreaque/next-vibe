@@ -254,16 +254,27 @@ export async function resolveSkillFavoriteContext(params: {
           params.userId,
         );
 
-  if (!params.skillId) {
+  // The skill to resolve: an explicit skillId wins, else the FAVORITE's own skill
+  // (a favorite is a skill+variant pointer). Without this fallback, a favorite
+  // whose own media-selection columns are empty resolved `skill: null` and its
+  // variant's media models (e.g. the QA fav's gpt-5-image-MINI) were never read —
+  // media-gen then fell back to the platform DEFAULT (gpt-5-image, non-mini).
+  const effectiveSkillId = params.skillId ?? favorite?.skillId ?? null;
+  if (!effectiveSkillId) {
     return { favorite, skill: null, customSkill: null };
   }
 
-  // Variant fallback comes from the favorite's merged skillId ("slug__variant")
+  // The favorite's variant: prefer its own `variantId` column, then fall back to
+  // a variant merged into its skillId ("slug__variant"). resolveFavoriteConfig
+  // returns the bare skillId (= character_id, NO variant suffix), so parsing it
+  // alone yielded null → the skill's DEFAULT variant (budget → deepseek) instead
+  // of THIS favorite's variant (native-image → gemini). Reading the column fixes
+  // the divergence from the model the stream actually resolves.
   const favoriteVariantId = favorite
-    ? parseSkillId(favorite.skillId).variantId
+    ? (favorite.variantId ?? parseSkillId(favorite.skillId).variantId)
     : null;
   const { skill, customSkillRow } = await resolveSkillInternal(
-    params.skillId,
+    effectiveSkillId,
     favoriteVariantId,
   );
 

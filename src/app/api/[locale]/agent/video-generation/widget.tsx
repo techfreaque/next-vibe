@@ -45,6 +45,24 @@ import {
   VideoGenModelId,
 } from "./models";
 
+type AspectRatioValue = NonNullable<
+  VideoGenerationPostRequestOutput["aspectRatio"]
+>;
+const ASPECT_RATIO_VALUES: AspectRatioValue[] = [
+  "16:9",
+  "9:16",
+  "1:1",
+  "4:3",
+  "3:4",
+  "3:2",
+  "2:3",
+  "21:9",
+  "9:21",
+];
+function toAspectRatio(v: string): AspectRatioValue | undefined {
+  return ASPECT_RATIO_VALUES.find((r) => r === v);
+}
+
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
@@ -125,7 +143,10 @@ export function VideoGenerationContainer({
   const currentDuration = form?.watch("duration") ?? 5;
   const currentAspectRatio = form?.watch("aspectRatio");
   const currentResolution = form?.watch("resolution");
-  const currentInputMediaUrl = form?.watch("inputMediaUrl") ?? "";
+  const currentFirstFrameUrl = form?.watch("firstFrameUrl") ?? "";
+  const currentLastFrameUrl = form?.watch("lastFrameUrl") ?? "";
+  const currentNegativePrompt = form?.watch("negativePrompt") ?? "";
+  const currentCfgScale = form?.watch("cfgScale");
 
   const modelSelection = useMemo((): VideoGenModelSelection | undefined => {
     if (!currentModelId) {
@@ -167,6 +188,13 @@ export function VideoGenerationContainer({
     : undefined;
   const resolvedVideoBased = resolvedModel;
   const isI2VModel = resolvedModel?.inputs.includes("image") ?? false;
+  const supportsLastFrame =
+    resolvedVideoBased?.supportedFrameImages?.includes("last_frame") ?? false;
+  const passthrough = resolvedVideoBased?.allowedPassthroughParameters ?? [];
+  const supportsNegativePrompt =
+    passthrough.includes("negative_prompt") ||
+    passthrough.includes("negativePrompt");
+  const supportsCfgScale = passthrough.includes("cfg_scale");
 
   // Build dynamic duration presets from model capabilities
   const durationPresets = useMemo(
@@ -176,7 +204,10 @@ export function VideoGenerationContainer({
 
   // Aspect ratio options from model capabilities - memoized to avoid stale deps in useEffect
   const aspectRatioOptions = useMemo(
-    () => resolvedVideoBased?.supportedAspectRatios ?? [],
+    () =>
+      (resolvedVideoBased?.supportedAspectRatios ?? []).flatMap(
+        (r) => toAspectRatio(r) ?? [],
+      ),
     [resolvedVideoBased],
   );
   const resolutionOptions = useMemo(
@@ -273,24 +304,86 @@ export function VideoGenerationContainer({
       <Div className="flex flex-col gap-4 px-4 pb-4">
         <FormAlertWidget field={{}} />
 
-        {/* Input image URL - only for I2V models */}
+        {/* First frame URL - only for I2V models */}
         {isI2VModel && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.inputMediaUrl.label")}
+              {t("post.firstFrameUrl.label")}
             </Span>
             <Input
               type="url"
-              placeholder={t("post.inputMediaUrl.placeholder")}
-              value={currentInputMediaUrl}
+              placeholder={t("post.firstFrameUrl.placeholder")}
+              value={currentFirstFrameUrl}
               disabled={isDisabled}
               onChange={(e) =>
-                form?.setValue("inputMediaUrl", e.target.value || undefined)
+                form?.setValue("firstFrameUrl", e.target.value || undefined)
               }
             />
             <Span className="text-[10px] text-muted-foreground/70">
-              {t("post.inputMediaUrl.description")}
+              {t("post.firstFrameUrl.description")}
             </Span>
+          </Div>
+        )}
+
+        {/* Last frame URL - only for models that support last_frame */}
+        {isI2VModel && supportsLastFrame && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.lastFrameUrl.label")}
+            </Span>
+            <Input
+              type="url"
+              placeholder={t("post.lastFrameUrl.placeholder")}
+              value={currentLastFrameUrl}
+              disabled={isDisabled}
+              onChange={(e) =>
+                form?.setValue("lastFrameUrl", e.target.value || undefined)
+              }
+            />
+            <Span className="text-[10px] text-muted-foreground/70">
+              {t("post.lastFrameUrl.description")}
+            </Span>
+          </Div>
+        )}
+
+        {/* Negative prompt - only when model supports it */}
+        {supportsNegativePrompt && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.negativePrompt.label")}
+            </Span>
+            <Textarea
+              className="w-full min-h-[60px] resize-none"
+              placeholder={t("post.negativePrompt.placeholder")}
+              value={currentNegativePrompt}
+              disabled={isDisabled}
+              onChange={(e) =>
+                form?.setValue("negativePrompt", e.target.value || undefined)
+              }
+            />
+            <Span className="text-[10px] text-muted-foreground/70">
+              {t("post.negativePrompt.description")}
+            </Span>
+          </Div>
+        )}
+
+        {supportsCfgScale && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.cfgScale.label")}
+            </Span>
+            <Input
+              type="number"
+              min={0}
+              max={30}
+              step={0.5}
+              value={currentCfgScale}
+              disabled={isDisabled}
+              onChange={(e) => {
+                const v = e.target.value;
+                form?.setValue("cfgScale", isNaN(v) ? undefined : v);
+              }}
+            />
           </Div>
         )}
 

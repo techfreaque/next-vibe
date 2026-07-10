@@ -98,10 +98,10 @@ async function teardownDirectConnection(
         forceSystemProvider: false,
         // Coding-agent test — exercises NO sync domain.
         syncScope: {
-          memories: true,
-          documents: true,
-          skills: true,
-          favorites: true,
+          memories: false,
+          documents: false,
+          skills: false,
+          favorites: false,
           threads: false,
         },
       },

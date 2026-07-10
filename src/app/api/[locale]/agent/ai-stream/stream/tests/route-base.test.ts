@@ -81,6 +81,7 @@ import { ContactSubject } from "@/app/api/[locale]/contact/enum";
 import { env } from "@/config/env";
 
 import type { ImageGenModelId } from "../../../image-generation/models";
+import type { MusicGenModelId } from "../../../music-generation/models";
 import type { ChatModelId } from "../../models";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
@@ -327,6 +328,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     let mainFavoriteId: string;
     /** The chat model the budget favorite RESOLVES to (asserted, never hardcoded). */
     let budgetChatModelId: ChatModelId;
+    /** The image/music-gen models the budget favorite resolves to — asserted on
+     *  every media-gen tool call so the fav's model is actually used (never the
+     *  platform default). Resolved via the SAME filters the stream uses. */
+    let budgetImageGenModelId: ImageGenModelId | null;
+    let budgetMusicGenModelId: MusicGenModelId | null;
     /** Native-image favorite: quality-tester__native-image variant (native image-output chat). */
     let nativeImageFavoriteId: string;
     /** The chat model the native-image favorite resolves to (asserted, never hardcoded). */
@@ -427,6 +433,39 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       );
       mainFavoriteId = budgetFav.id;
       budgetChatModelId = budgetFav.chatModelId;
+      budgetImageGenModelId = budgetFav.imageGenModelId;
+      budgetMusicGenModelId = budgetFav.musicGenModelId;
+
+      // Clean slate for the shared favorite's tool config: T7a sets
+      // availableTools to gate the approve tool and T7b restores it, but a run
+      // that bails between them (or is killed) leaves the whitelist on the
+      // favorite — which then blocks housekeeping (rename-thread →
+      // not_in_whitelist) in the NEXT run's T1. Reset to null (unrestricted /
+      // role based) at suite start so no prior run can poison T1. The favorite
+      // is ONLY ever restricted for the duration of the T7 block.
+      {
+        const favByIdResetDef = (
+          await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+        ).default;
+        const favResetGet = await sendTestRequest({
+          streamContext: rootlessStreamContext(),
+          endpoint: favByIdResetDef.GET,
+          urlPathParams: { id: mainFavoriteId },
+          user: testUser,
+        });
+        await sendTestRequest({
+          streamContext: rootlessStreamContext(),
+          endpoint: favByIdResetDef.PATCH,
+          data: {
+            modelSelection: favResetGet.success
+              ? favResetGet.data.modelSelection
+              : null,
+            availableTools: null,
+          },
+          urlPathParams: { id: mainFavoriteId },
+          user: testUser,
+        });
+      }
 
       const nativeImageFav = await ensureVariantFavorite(
         testUser,
@@ -445,20 +484,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           sql`(${cronTasks.id} LIKE 'local-bg-%' OR ${cronTasks.id} LIKE 'local-wu-%' OR ${cronTasks.routeId} LIKE 'resume-stream%')`,
         );
 
-      // Local suites KEEP a live hermes connection when one exists: private
-      // threads never relay their loop, so costs/assertions are unaffected,
-      // and thread/chat sync mirrors every test thread live to the peer's
-      // REMOTE/<us>/tests/<case> — that mirroring IS a feature under test.
-      // Only favorites sync is forced off (it would LWW-overwrite the
-      // suite's quality-tester favorite mid-run).
-      if (!cfg.setup) {
-        const { normalizeHermesSyncScope } =
-          await import("../../testing/remote-setup");
-        await normalizeHermesSyncScope();
-      }
+      // A LOCAL suite (no cfg.setup) runs ZERO remote code — it never touches a
+      // hermes connection. Only the explicit remote suites (cfg.setup set) do any
+      // remote bootstrapping. Normalizing a lingering hermes connection here made
+      // a purely-local run dispatch a settings-mirror to an absent peer
+      // (callToolDirect network error / "Tool Not Found"); a local test must not
+      // reach the wire at all.
 
+      // Thread folder name is DECOUPLED from the fixture cache: a suite that
+      // shares another's fixtures (same cachePrefix) still lands its threads in
+      // its OWN folder via threadCasePrefix. Defaults to cachePrefix.
+      const threadCasePrefix = cfg.threadCasePrefix ?? cfg.cachePrefix;
       const testCaseName =
-        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        threadCasePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
         "regular";
 
       // Per-mode setup (remote connections, credential patching, etc.)
@@ -790,13 +828,12 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           ).toBe(budgetChatModelId);
           expect(firstAi.isCompacting).toBe(false);
 
-          // ── Thread title + description (auto-title MUST have happened) ────
-          // Auto-titling is a post-turn BACKGROUND summarizer awaited inside the
-          // stream's finalize (see runBackgroundAutoTitle) — NOT a live-model
-          // tool call. By the end of T1 the thread MUST carry a real, generated
-          // title AND description — never the placeholder "New Chat" and never a
-          // null description. Fetched via the thread GET endpoint (never DB) so
-          // it holds cross-instance too.
+          // ── Thread title + description (rename MUST have happened) ─────────
+          // The per-turn housekeeping fragment instructs the model to call
+          // rename-thread this turn. By the end of T1 the thread MUST carry a
+          // real, model-authored title AND description — never the placeholder
+          // "New Chat" and never a null description. Fetched via the thread GET
+          // endpoint (never DB) so it holds cross-instance too.
           {
             const meta = await getThreadMeta(threadId);
             const defaultTitle = chatScopedTranslation
@@ -810,15 +847,15 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               meta.title,
               "T1: thread title must not be the raw i18n key",
             ).not.toContain("common.newChat");
-            // Auto-title MUST have run: the title is no longer the placeholder
-            // default. A still-default title means the post-turn background
-            // titler never completed — a hard failure, not an accepted state.
+            // The model MUST have renamed the thread: the title is no longer the
+            // placeholder default. A still-default title means rename-thread was
+            // never executed this turn — a hard failure, not an accepted state.
             expect(
               meta.title,
               `T1: thread was never renamed — title is still the placeholder "${defaultTitle}". The model must call rename-thread this turn.`,
             ).not.toBe(defaultTitle);
-            // description MUST be a real, concrete sentence generated by the
-            // titler — never null, never the raw i18n key, never a restatement.
+            // description MUST be a real, concrete sentence written by the model —
+            // never null, never the raw i18n key, never a trivial restatement.
             expect(
               typeof meta.description === "string" &&
                 meta.description.trim().length > 0,
@@ -1177,16 +1214,6 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         );
       }
 
-      // TEMPORARY DEBUG: stop the suite right after T1 (bail-fast fixture iteration).
-      if (cfg.stopAfterFirstCase) {
-        fit("TEMP stop-after-first-case", () => {
-          // oxlint-disable-next-line restricted-syntax -- temporary bail marker
-          throw new Error(
-            "stopAfterFirstCase: T1 done - bailing intentionally",
-          );
-        });
-      }
-
       // (T1a's "tool-help all modes" is now folded into T1's creation turn —
       //  tool-help's category/query/detail shaping is exercised once, on the
       //  thread-creation turn.)
@@ -1299,6 +1326,22 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             expect(toolRes!["imageUrl"]).toBeTruthy();
 
             expect(toolRes!["creditCost"] as number).toBeGreaterThan(0);
+
+            // ── model MUST equal the favorite's resolved image-gen model ──
+            // requestDefaults fills `model` from the favorite/skill cascade; the
+            // recorded call input must reflect it (never the platform default).
+            // execute-tool wraps the sub-tool args under `input`; direct calls
+            // put them at the top level.
+            const imgArgs = toolResultRecord(toolMsg!.toolCall?.args);
+            const imgModel =
+              (imgArgs?.["model"] as string | undefined) ??
+              (toolResultRecord(imgArgs?.["input"] as WidgetData)?.["model"] as
+                | string
+                | undefined);
+            expect(
+              imgModel,
+              `T2: generate_image must run on the favorite's resolved image model (${budgetImageGenModelId}), got ${imgModel} — args: ${JSON.stringify(imgArgs)}`,
+            ).toBe(budgetImageGenModelId);
           }
 
           // ── Final AI has token metadata ──
@@ -1600,15 +1643,25 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             branchRetryAiMsgId,
             "T3b chain-2 (retry)",
           );
+          // T-SYS is a real main-chain turn (T1 → T-SYS → T2) but it only RUNS
+          // in topologies that assert the system-prompt/tool-exec instance
+          // (direct / remote-folder / inference — same gate as its fit()). In a
+          // plain regular suite T-SYS is skipped, so it contributes no user
+          // message to the shared prefix. The path user count is therefore
+          //   t1 user + (T-SYS user IF it ran) + this branch's own user.
+          const tSysRan = Boolean(
+            cfg.assertSystemPromptFromLocal || cfg.systemPromptInstanceId,
+          );
+          const expectedPathUsers = tSysRan ? 3 : 2;
           expect(
             retryAudit.userCount,
-            "T3b chain-2 (retry): path carries t1 user + T-SYS user + retry user = 3 on the path",
-          ).toBe(3);
+            `T3b chain-2 (retry): path carries t1 user${tSysRan ? " + T-SYS user" : ""} + retry user = ${expectedPathUsers} on the path`,
+          ).toBe(expectedPathUsers);
           const t2Audit = auditChain(lastMainAiMsgId, "T3b chain-1 (T2)");
           expect(
             t2Audit.userCount,
-            "T3b chain-1 (T2): path carries t1 user + T-SYS user + t2 user = 3 on the path",
-          ).toBe(3);
+            `T3b chain-1 (T2): path carries t1 user${tSysRan ? " + T-SYS user" : ""} + t2 user = ${expectedPathUsers} on the path`,
+          ).toBe(expectedPathUsers);
 
           // T3b: expectedLeaf = branchForkAiMsgId; lastMainAiMsgId + T3a retry end are allowed leaves
           assertNoOrphans(branchMsgs, new Set([branchParentId]), {
@@ -1652,7 +1705,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
           prompt: cfg.cheapMode
             ? `[T4a credits-balance] Call ${toolInstr(cfg, "credits-balance")} to read the wallet balance. Check that the result has a numeric total. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
-            : `[T4a music-gen] Call ${toolInstrWithArgs(cfg, "generate_music", "prompt='upbeat piano melody'")}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
+            : `[T4a music-gen] Call ${toolInstrWithArgs(cfg, "generate_music", "prompt='upbeat electronic remix', inputMediaUrl='https://d.uguu.se/YwXTDQyH.mp3'")}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
           threadId,
           favoriteId: mainFavoriteId,
           explicitParentMessageId: branchForkAiMsgId,
@@ -1718,6 +1771,17 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           expect(typeof musicRes!["durationSeconds"]).toBe("number");
           expect((musicRes!["durationSeconds"] as number) >= 8).toBe(true);
           expect((musicRes!["durationSeconds"] as number) <= 120).toBe(true);
+
+          // ── model MUST equal the favorite's resolved music-gen model ──
+          const musicModel =
+            (musicArgs?.["model"] as string | undefined) ??
+            (toolResultRecord(musicArgs?.["input"] as WidgetData)?.["model"] as
+              | string
+              | undefined);
+          expect(
+            musicModel,
+            `[T4a] generate_music must run on the favorite's resolved music model (${budgetMusicGenModelId}), got ${musicModel} — args: ${JSON.stringify(musicArgs)}`,
+          ).toBe(budgetMusicGenModelId);
         }
 
         // Tool parent is assistant, shares sequenceId
@@ -2266,7 +2330,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             const initialState = await getStreamingState(tid);
             if (initialState === "waiting") {
               const REVIVAL_TIMEOUT_MS = 30_000;
-              const REVIVAL_POLL_INTERVAL_MS = 500;
+              const REVIVAL_POLL_INTERVAL_MS = 100;
               const revivalStart = Date.now();
               let revivalState: string | undefined = "waiting";
               while (
@@ -2499,7 +2563,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // We poll for the deferred message (definitive signal that revival landed)
             // rather than just thread state (which may be idle while goroutine is in-flight).
             const REVIVAL_TIMEOUT_MS = 120_000;
-            const REVIVAL_POLL_INTERVAL_MS = 1_000;
+            const REVIVAL_POLL_INTERVAL_MS = 100;
             const revivalStart = Date.now();
             let revivalLanded = t6aInlineDelivery;
             while (
@@ -2591,7 +2655,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // allow more — but stay INSIDE the test timeout so a dead revival
             // fails with the clean assertion below, not a vitest timeout.
             const WAKEUP_TIMEOUT_MS = cfg.remoteInstanceId ? 90_000 : 30_000;
-            const WAKEUP_POLL_MS = 500;
+            const WAKEUP_POLL_MS = 100;
             let messages: SlimMessage[] = [];
             const deadline = Date.now() + WAKEUP_TIMEOUT_MS;
             let deferredTool: SlimMessage | undefined;
@@ -2906,7 +2970,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
             // Poll for deferred + revival AI + idle
             const REVIVAL_TIMEOUT_MS = 120_000;
-            const REVIVAL_POLL_MS = 500;
+            const REVIVAL_POLL_MS = 100;
             const deadline = Date.now() + REVIVAL_TIMEOUT_MS;
             let messages: SlimMessage[] = [];
             let deferredTool: SlimMessage | undefined;
@@ -3051,6 +3115,36 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         let approveToolMsgId: string;
         let approveToolParentId: string | null;
 
+        // T7a sets the favorite's availableTools (to gate the approve tool's
+        // confirmation) and T7b restores it. If a case BETWEEN them bails, the
+        // whitelist would leak into the NEXT run's T1 and block housekeeping
+        // (rename-thread → not_in_whitelist). Always reset it here so a failed
+        // run never poisons the shared favorite. The favorite is only ever
+        // restricted for the duration of this T7 block.
+        afterAll(async () => {
+          const favByIdDef = (
+            await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+          ).default;
+          const favGet = await sendTestRequest({
+            streamContext: rootlessStreamContext(),
+            endpoint: favByIdDef.GET,
+            urlPathParams: { id: mainFavoriteId },
+            user: testUser,
+          });
+          await sendTestRequest({
+            streamContext: rootlessStreamContext(),
+            endpoint: favByIdDef.PATCH,
+            data: {
+              modelSelection: favGet.success
+                ? favGet.data.modelSelection
+                : null,
+              availableTools: null,
+            },
+            urlPathParams: { id: mainFavoriteId },
+            user: testUser,
+          });
+        });
+
         fit(
           `T7a: approve phase1 - parallel tools: tool-help runs, ${approveTool.name} awaits confirmation, no assistant message after`,
           async () => {
@@ -3081,14 +3175,36 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             const t7ModelSelection = t7FavGet.success
               ? t7FavGet.data.modelSelection
               : null;
+            // The favorite's availableTools carries the per-tool
+            // requiresConfirmation flag. It is a WHITELIST — setting it to just
+            // the approve tool would collapse the callable set to one tool and
+            // block every other tool the turn legitimately uses (tool-help, the
+            // rename-thread housekeeping the system prompt instructs, etc). So set
+            // the WHOLE role/folder tool list as available, flipping ONLY the
+            // approve tool's confirmation flag; T7a-restore clears it to null.
+            const { getDefaultToolIdsForFolder } =
+              await import("@/app/api/[locale]/agent/chat/constants");
+            const fullToolList = getDefaultToolIdsForFolder(
+              testUser,
+              suiteRootFolderId,
+            ).map((toolId) => ({
+              toolId,
+              requiresConfirmation: toolId === confirmToolId,
+            }));
+            // The approve tool may not be in the folder defaults — ensure it is
+            // present (with confirmation) so the gate has something to gate.
+            if (!fullToolList.some((t) => t.toolId === confirmToolId)) {
+              fullToolList.push({
+                toolId: confirmToolId,
+                requiresConfirmation: true,
+              });
+            }
             await sendTestRequest({
               streamContext: rootlessStreamContext(),
               endpoint: favByIdDefT7.PATCH,
               data: {
                 modelSelection: t7ModelSelection,
-                availableTools: [
-                  { toolId: confirmToolId, requiresConfirmation: true },
-                ],
+                availableTools: fullToolList,
               },
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -5721,7 +5837,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           // Incognito streams run in the background (no thread state to poll) - poll
           // balance until it drops or the timeout expires. 30s budget for fixture-speed.
           const C2_TIMEOUT_MS = 30_000;
-          const C2_POLL_MS = 300;
+          const C2_POLL_MS = 100;
           const c2Start = Date.now();
           let afterIncognito = await getBalance(testUser);
           while (

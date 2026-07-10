@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I received the video description. Here's what I can see:\n\nThe video is a **10-second close-up, professional stock-style clip** of a pair of tan-skinned hands rapidly solving a Rubik's Cube on a tabletop surrounded by dozens of scattered cubes. The depth of field is shallow, keeping the focus on the cube and hands while the background cubes blur into a colorful mosaic. The fingers move with expert speed, twisting rows and columns — a small \"Y\" or cross symbol is visible on the white center tile. The lighting is bright and even, highlighting the glossy plastic texture. Audio consists only of crisp, amplified ASMR-like clicking and snapping sounds of the cube mechanism — no speech or music. The mood is focused, methodical, and precise.\n\nVideo content was present and processed ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

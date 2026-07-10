@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "baai/bge-m3",
-    "input": "/threads/private/tool-help-qa-suite-23a86f26-912f-4be4-9e87-22043aa25a0d.md\n\n# Tool Help QA Suite\nFolder: private\nDescription: Running quality gate verification on tool-help across search, category, and detail modes.",
+    "input": "/threads/private/tool-help-qa-suite-9fd7f117-bdfb-4cae-822c-a2e970d385fa.md\n\n# Tool Help QA Suite\nFolder: private\nDescription: Running quality gate verification on tool-help across search, category, and detail modes.",
     "encoding_format": "float"
   }
 }

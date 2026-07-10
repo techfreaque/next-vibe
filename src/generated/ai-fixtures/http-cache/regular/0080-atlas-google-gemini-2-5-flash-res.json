@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a190aa2cac8523d4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:40:05 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783698004-tTnCEuZ1Ig0ybCAEfthT"
+  },
+  "body": {
+    "id": "gen-1783698004-tTnCEuZ1Ig0ybCAEfthT",
+    "object": "chat.completion",
+    "created": 1783698004,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip, approximately 30 seconds in length, featuring instrumental music. The sound quality is good, indicating a studio recording.\n\nThe music is an instrumental, upbeat funk-jazz track.\n- **Tempo:** Approximately 110 BPM.\n- **Instruments:**\n    - **Drums:** Provide a steady, driving rhythm. Features a prominent hi-hat pattern, a clear snare drum, and kick drum, creating a typical funk beat.\n    - **Electric Guitar:** Plays a clean, rhythmic riff with a distinct wah-wah effect, contributing significantly to the funk feel. It's not a lead melody but rather a rhythmic accompaniment.\n    - **Bass Guitar:** Plays a walking bass line, syncopated and groovy, providing the harmonic and rhythmic foundation.\n    - **Electric Piano (Rhodes or Wurlitzer type sound):** Plays chords that fill out the harmony, often punctuating the funk rhythm. \n\n- **Structure:** The clip seems to be a continuous loop or a segment of a larger instrumental piece. It maintains a consistent groove throughout without significant dynamic changes or melodic developments within this short duration.\n\n- **Production:** The production style is clean and polished, with clear separation between instruments. The wah-wah effect on the guitar is a prominent characteristic.\n\n- **Mood:** The mood is funky, groovy, and generally uplifting. It could be suitable as background music for various settings or as a segment within a larger funk-jazz composition.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 307,
+      "total_tokens": 1379,
+      "cost": 0.0016141,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016141,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0007675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

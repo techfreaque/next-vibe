@@ -447,9 +447,17 @@ export async function connectToHermes(
      *   • route.regular.mirror.cheap → { threads: true } (it tests the pull-sync
      *     reconciliation itself).
      */
-    syncThreads?: boolean;
+    syncScope?: Partial<SyncScope>;
   },
 ): Promise<void> {
+  const effectiveSyncScope: SyncScope = {
+    memories: false,
+    documents: false,
+    skills: false,
+    favorites: false,
+    threads: false,
+    ...options?.syncScope,
+  };
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
 
@@ -473,17 +481,8 @@ export async function connectToHermes(
       remoteUrl,
       email: env.VIBE_ADMIN_USER_EMAIL,
       password: env.VIBE_ADMIN_USER_PASSWORD,
-      // Full mirror scope except favorites: live favorite sync would
-      // LWW-overwrite the suite's quality-tester favorite mid-run. Threads
-      // pull-sync only when the caller opts in (mirror suite); placement always
-      // rides remote events regardless.
-      syncScope: {
-        memories: true,
-        documents: true,
-        skills: true,
-        favorites: true,
-        threads: options?.syncThreads ?? false,
-      },
+      // EXACTLY the domains this suite tests (all-off by default) — see options.
+      syncScope: effectiveSyncScope,
     },
     user,
   });
@@ -513,16 +512,10 @@ export async function connectToHermes(
     data: {
       transportMode: "direct-http",
       ...(options?.loopLocation ? { loopLocation: options.loopLocation } : {}),
-      syncScope: {
-        favorites: true,
-        documents: true,
-        memories: true,
-        skills: true,
-        // Placement mirrors LIVE via remote events (origin-aware, column-gated)
-        // regardless of this flag. Threads PULL-sync (offline reconcile) only
-        // when the caller opts in — the mirror suite is the sole opt-in.
-        threads: options?.syncThreads ?? false,
-      },
+      // Placement mirrors LIVE via remote events (origin-aware, column-gated)
+      // regardless of scope. The pull-sync domains are EXACTLY what the suite
+      // opts into (all-off by default) — see options.syncScope.
+      syncScope: effectiveSyncScope,
     },
     urlPathParams: { instanceId: connectedInstanceId },
     user,
@@ -616,10 +609,24 @@ export async function connectToHermes(
 export async function connectToHermesLocalAi(
   user: JwtPrivatePayloadType,
   remoteUrl: string = LOCAL_DEV_URL,
-  options?: { loopLocation?: "target" | "caller" },
+  options?: {
+    loopLocation?: "target" | "caller";
+    syncScope?: Partial<SyncScope>;
+  },
 ): Promise<void> {
   // Full connect flow (registers both sides, syncs capabilities + pre-cleans internally).
   await connectToHermes(user, remoteUrl, options);
+
+  // Re-send the SAME per-suite scope on the transport PATCH below (syncScope is
+  // required) so it doesn't clobber what connectToHermes just set.
+  const effectiveSyncScope: SyncScope = {
+    memories: false,
+    documents: false,
+    skills: false,
+    favorites: false,
+    threads: false,
+    ...options?.syncScope,
+  };
 
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
@@ -636,7 +643,10 @@ export async function connectToHermesLocalAi(
   const localPatch = await sendTestRequest({
     streamContext: rootlessStreamContext(),
     endpoint: connByIdDef.PATCH,
-    data: { transportMode: "reverse-ws" },
+    data: {
+      transportMode: "reverse-ws",
+      syncScope: effectiveSyncScope,
+    },
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
     user,
   });
@@ -784,10 +794,10 @@ export async function normalizeHermesSyncScope(): Promise<void> {
         // suite's scope can't leak in and mutate this run's state.
         data: {
           syncScope: {
-            favorites: true,
-            documents: true,
-            memories: true,
-            skills: true,
+            memories: false,
+            documents: false,
+            skills: false,
+            favorites: false,
             threads: false,
           },
         },
@@ -952,7 +962,16 @@ async function triggerHermesReconnect(): Promise<void> {
   const resp = await sendTestRequest({
     streamContext: rootlessStreamContext(),
     endpoint: connByIdDef.PATCH,
-    data: { reconnectNow: true },
+    data: {
+      reconnectNow: true,
+      syncScope: {
+        memories: true,
+        documents: true,
+        skills: true,
+        favorites: true,
+        threads: false,
+      },
+    },
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
     user: adminUser,
     instanceId: HERMES_INSTANCE_ID,

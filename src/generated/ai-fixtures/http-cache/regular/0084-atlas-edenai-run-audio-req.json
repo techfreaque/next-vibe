@@ -1,0 +1,8 @@
+{
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async/e6755acb-79ee-462c-b43d-e47db666c615",
+  "method": "GET",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": ""
+}

@@ -58,6 +58,7 @@ const vector1024 = customType<{
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { createRelationalDb } from "next-vibe/database/relational";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
 import { leads } from "next-vibe/identity/lead/db";
 import { type UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
@@ -821,3 +822,20 @@ export type NewChatMessage = z.infer<typeof insertChatMessageSchema>;
 
 export type ThreadShareLink = z.infer<typeof selectThreadShareLinkSchema>;
 export type NewThreadShareLink = z.infer<typeof insertThreadShareLinkSchema>;
+
+/**
+ * Chat relational client — the only client that carries the chat schema, so it
+ * is the one that serves `db.query.chatMessages` / relational chat queries.
+ * The default `db` from `next-vibe/database` has no schema and cannot. Use
+ * `chatDb.query.*` for relational reads; keep using `db.select()` elsewhere.
+ */
+export const chatDb = createRelationalDb({
+  chatFolders,
+  chatThreads,
+  chatMessages,
+  threadShareLinks,
+  chatFoldersRelations,
+  chatThreadsRelations,
+  chatMessagesRelations,
+  threadShareLinksRelations,
+});

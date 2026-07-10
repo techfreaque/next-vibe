@@ -52,6 +52,17 @@ export const translations: typeof enTranslations = {
         "Bild für den letzten Frame. Das Modell animiert rückwärts zu diesem Bild.",
       placeholder: "https://beispiel.de/letzter-frame.jpg",
     },
+    negativePrompt: {
+      label: "Negativer Prompt",
+      description: "Beschreibe, was das Video nicht enthalten soll.",
+      placeholder: "unscharf, schlechte Qualität, verzerrt...",
+    },
+    cfgScale: {
+      label: "CFG-Skala",
+      description:
+        "Wie streng das Modell dem Prompt folgt (0–30). Höher = wörtlicher.",
+    },
+
     download: "Herunterladen",
     generatingNote: "Videogenerierung kann 1–3 Minuten dauern",
     backButton: {

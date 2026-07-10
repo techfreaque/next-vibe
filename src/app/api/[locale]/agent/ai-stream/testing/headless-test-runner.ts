@@ -445,7 +445,11 @@ export async function waitForThreadIdle(
   maxWaitMs = 90_000,
   rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
-  const pollIntervalMs = 500;
+  // Tight poll: a thread is usually already idle (the loop checks up-front, so an
+  // idle thread returns with zero sleep) or becomes idle within a few ms of the
+  // stream returning under fixture replay. 25ms picks up the transition fast with
+  // negligible DB load; the old 100ms added dead wait on every not-yet-idle step.
+  const pollIntervalMs = 25;
   const start = Date.now();
   const msgsDef = (
     await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
@@ -589,9 +593,14 @@ export async function fetchFavoriteConfigAndModel(
     );
   }
   const data = getResult.data;
+  // The favorites GET merges the variant into skillId ("slug__variant"); split
+  // it back out so the config carries the same variantId the DB row has.
+  const { parseSkillId: parseSkillIdForVariant } =
+    await import("@/app/api/[locale]/agent/chat/slugify");
   const favoriteConfig: FavoriteConfig = {
     id: favoriteId,
     skillId: data.skillId,
+    variantId: parseSkillIdForVariant(data.skillId).variantId,
     modelSelection: data.modelSelection ?? null,
     voiceModelSelection: data.voiceModelSelection ?? null,
     sttModelSelection: data.sttModelSelection ?? null,
@@ -639,7 +648,9 @@ export async function fetchFavoriteConfigAndModel(
     );
     if (skillResult.success) {
       const variants = skillResult.data.variants;
-      const { variantId } = parseSkillId(favoriteConfig.skillId);
+      const variantId =
+        favoriteConfig.variantId ??
+        parseSkillId(favoriteConfig.skillId).variantId;
       const variant = variants
         ? variantId
           ? variants.find((v) => v.id === variantId)

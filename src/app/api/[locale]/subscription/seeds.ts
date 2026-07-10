@@ -7,12 +7,13 @@ import { eq as eqOp } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { leadDb } from "next-vibe/identity/lead/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contactClientRepository } from "../contact/repository-client";
-import { creditPacks } from "../credits/db";
+import { creditPacks, creditsDb } from "../credits/db";
 import { scopedTranslation as creditsScopedTranslation } from "../credits/i18n";
 import { CreditRepository } from "../credits/repository";
 import { PaymentProvider } from "../payment/enum";
@@ -140,7 +141,7 @@ export async function dev(
     }
 
     if (subscription) {
-      const userLead = await db.query.userLeadLinks.findFirst({
+      const userLead = await leadDb.query.userLeadLinks.findFirst({
         where: (userLeads, { eq }) => eq(userLeads.userId, demoUser.id),
       });
 
@@ -262,7 +263,7 @@ export async function dev(
       }
 
       if (adminSubscriptionData) {
-        const userLead = await db.query.userLeadLinks.findFirst({
+        const userLead = await leadDb.query.userLeadLinks.findFirst({
           where: (userLeads, { eq }) => eq(userLeads.userId, adminUser.id),
         });
 
@@ -272,7 +273,7 @@ export async function dev(
         }
 
         // Check if there are actual credit packs (not just stale wallet balance)
-        const adminWallet = await db.query.creditWallets.findFirst({
+        const adminWallet = await creditsDb.query.creditWallets.findFirst({
           where: (w, { eq }) => eq(w.userId, adminUser.id),
         });
         const hasPacks = adminWallet

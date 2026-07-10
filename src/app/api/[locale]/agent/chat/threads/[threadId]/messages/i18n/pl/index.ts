@@ -56,6 +56,7 @@ export const translations: typeof enTranslations = {
   compacting: {
     title: "Historia skompresowana",
     loading: "Kompresowanie historii...",
+    summarizing: "Podsumowywanie rozmowy...",
     failed: "Kompresowanie nie powiodło się",
   },
   get: {

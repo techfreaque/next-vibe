@@ -28,12 +28,12 @@ import { CortexNodeTypeDB, CortexSyncPolicyDB, CortexViewTypeDB } from "./enum";
  * Stores float[] as vector(1024) in PostgreSQL (requires pgvector extension).
  * NULL when not yet embedded.
  */
-const vector3072 = customType<{
+const vector1024 = customType<{
   data: number[];
   driverData: string;
 }>({
   dataType() {
-    return "vector(3072)";
+    return "vector(1024)";
   },
   toDriver(value: number[]): string {
     return `[${value.join(",")}]`;
@@ -82,7 +82,7 @@ export const cortexNodes = pgTable(
     sortOrder: integer("sort_order").default(0).notNull(),
 
     // Embedding for semantic search (pgvector)
-    embedding: vector3072("embedding"),
+    embedding: vector1024("embedding"),
 
     // SHA-256 hash of text-to-embed (path + content) - skip redundant API calls
     contentHash: text("content_hash"),
@@ -130,6 +130,18 @@ export const cortexNodesRelations = relations(cortexNodes, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+/**
+ * Platform key-value store for instance-level config.
+ * Single-row entries keyed by a short string (e.g. "embedding_model").
+ * Used to detect when a config value changes across restarts (e.g. model swap)
+ * so the system can trigger re-indexing without user credit deduction.
+ */
+export const platformKv = pgTable("platform_kv", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 /**
  * Schema for selecting Cortex nodes

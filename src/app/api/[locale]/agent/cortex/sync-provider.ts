@@ -6,7 +6,10 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { z } from "zod";
 
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import type {
+  StandardSyncCursor,
+  SyncDomain,
+} from "@/app/api/[locale]/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,
@@ -59,7 +62,7 @@ function nodeFilter(
 
 function makeCortexNodeSyncProvider(
   pathPrefix: string,
-  key: string,
+  key: SyncDomain,
   labelKey: string,
 ): SyncProvider {
   const filter = (userId: string): ReturnType<typeof nodeFilter> =>

@@ -56,6 +56,7 @@ export const translations: typeof enTranslations = {
   compacting: {
     title: "Verlauf komprimiert",
     loading: "Verlauf wird komprimiert...",
+    summarizing: "Unterhaltung wird zusammengefasst...",
     failed: "Komprimierung fehlgeschlagen",
   },
   get: {

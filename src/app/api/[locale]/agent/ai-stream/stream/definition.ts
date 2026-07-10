@@ -48,7 +48,7 @@ import {
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const AiStreamWidget = lazy(() =>
+const AiStreamWidget = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.AiStreamWidget })),
 );
 

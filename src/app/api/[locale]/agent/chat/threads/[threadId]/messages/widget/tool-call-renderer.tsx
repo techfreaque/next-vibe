@@ -23,6 +23,7 @@ import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { cn } from "next-vibe/core/utils/utils";
+import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { endpoints as cancelCallEndpoints } from "next-vibe/execute-tool/call-control/cancel/definition";
 import { endpoints as detachCallEndpoints } from "next-vibe/execute-tool/call-control/detach/definition";
 import { endpoints as resumeWhenDoneEndpoints } from "next-vibe/execute-tool/call-control/resume-when-done/definition";
@@ -368,8 +369,23 @@ export function ToolCallRenderer({
       ? (toolCall.args as { [key: string]: WidgetData })
       : null;
   const innerToolNameRaw = innerToolArgs?.toolName;
+
+  // When the outer tool is await-task, the inner tool name comes from the response
+  const awaitTaskResult =
+    definition?.aliases?.includes(AWAIT_TASK_ALIAS) &&
+    toolCall.result &&
+    typeof toolCall.result === "object" &&
+    !Array.isArray(toolCall.result)
+      ? (toolCall.result as { [key: string]: WidgetData })
+      : null;
+  const awaitTaskInnerToolNameRaw = awaitTaskResult?.originalToolName;
+
   const innerToolName =
-    typeof innerToolNameRaw === "string" ? innerToolNameRaw : undefined;
+    typeof innerToolNameRaw === "string"
+      ? innerToolNameRaw
+      : typeof awaitTaskInnerToolNameRaw === "string"
+        ? awaitTaskInnerToolNameRaw
+        : undefined;
 
   useEffect((): (() => void) => {
     if (!innerToolName) {
@@ -430,6 +446,36 @@ export function ToolCallRenderer({
     toolCall.waitingForConfirmation,
     toolCall.status,
     toolCall.callbackMode,
+  ]);
+
+  // For wakeUp/detach tools with defaultExpanded: the initial load keeps them collapsed because
+  // isBackground=true. Re-evaluate open state when the result arrives.
+  const isWakeUp = toolCall.callbackMode === CallbackMode.WAKE_UP;
+  useEffect(() => {
+    if (!isWakeUp || !innerToolDefinition?.defaultExpanded) {
+      return;
+    }
+    const hasResult = Boolean(toolCall.result);
+    if (!hasResult) {
+      return;
+    }
+    const hasUserOverride =
+      collapseState &&
+      messageId !== undefined &&
+      collapseState.isCollapsed(
+        { messageId, sectionType: "tool", sectionIndex: toolIndex },
+        false,
+      ) !== false;
+    if (!hasUserOverride) {
+      setIsOpen(true);
+    }
+  }, [
+    isWakeUp,
+    innerToolDefinition,
+    toolCall.result,
+    collapseState,
+    messageId,
+    toolIndex,
   ]);
 
   const isPartial = Boolean(toolCall.isPartial);

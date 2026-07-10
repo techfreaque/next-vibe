@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The imageUrl from the previous `generate_image` call (T9 setup) is:\n\n`http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/5a7d99fe-6722-4072-ab44-c43b94084a9d/d44725c0-6018-4ae5-abef-ceaf31aef7fa.png`\n\nThis starts with `http://` ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

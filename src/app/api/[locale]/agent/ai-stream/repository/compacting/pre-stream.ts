@@ -133,8 +133,8 @@ export class CompactingHandler {
     const compactingMessages: ModelMessage[] = [
       ...historyMessages,
       { role: "system" as const, content: compactingModeContext },
-      { role: "user" as const, content: compactingInstructions },
       { role: "system" as const, content: finalContextMessage },
+      { role: "user" as const, content: compactingInstructions },
     ];
 
     // Check if any message being compacted has generated media or variants

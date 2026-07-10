@@ -34,7 +34,7 @@ export function DomainEnrichment({
     [match],
   );
 
-  if (!match || !LazyWidget) {
+  if (!match || !LazyWidget || !responsePath) {
     return null;
   }
 

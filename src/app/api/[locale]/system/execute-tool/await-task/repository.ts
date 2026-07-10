@@ -366,65 +366,68 @@ export class AwaitTaskRepository {
         });
       }
 
-      const modelId = await TaskCompletion.resolveStreamModelId(
+      // Suppress the goroutine's own wakeUp/parked-revival for this task: await-task
+      // is taking over delivery by blocking inline. If the goroutine ALSO revived the
+      // stream (enableAndFireParkedResumeTask), the revived turn would re-issue
+      // await-task on the now-completed task — the duplicate T5b message. We do NOT
+      // park a resume-stream task here: the inline block below IS the wait, and a
+      // parked task racing the goroutine's enable+fire is exactly that double-fire.
+      AwaitTaskRepository.suppressWakeUp(
         streamContext,
-        user,
+        effectiveToolMessageId ?? null,
       );
 
-      // Pre-create a disabled resume-stream task with the full revival context
-      // in its taskInput. When the original task completes, complete/local.ts
-      // enables this task by flipping enabled=true — no wakeUp columns needed.
-      await TaskCompletion.parkResumeStreamTask({
-        taskId,
-        callbackMode: CallbackMode.WAIT,
-        threadId: effectiveThreadId,
-        toolMessageId: effectiveToolMessageId ?? null,
-        leafMessageId: streamContext.leafMessageId ?? null,
-        modelId,
-        skillId: streamContext.skillId ?? null,
-        favoriteId: streamContext.favoriteId ?? null,
-        subAgentDepth: streamContext.subAgentDepth ?? 0,
-        ownerUserId: !user.isPublic ? user.id : (task.userId ?? null),
-        selfInstanceId: null,
-        logger,
-      });
-
-      // Bounded inline wait. The dispatched task usually completes within a
-      // second or two (fixture replay; or a fast tool). Delivering the result
-      // INLINE — letting the current, still-alive stream continue past the
-      // await-task call with the result injected — is the correct, race-free
-      // path: it matches the already-terminal branch above and the regular-mode
-      // behaviour. It also avoids the pause→resume-stream revival, whose revived
-      // turn would RE-ISSUE the await-task call on a now-deleted task (a
-      // duplicate, second "failed" await-task tool message — the direct-mode
-      // T5b regression). We only fall through to the WAIT pause+revival below
-      // for genuinely long-running tasks that don't finish within this window.
+      // await-task BLOCKS until the result is in, then delivers it INLINE — the
+      // current, still-alive stream continues past the await-task call with the
+      // result injected. It must NEVER return "pending"/"waiting": that made the
+      // model re-poll (it treats pending as "call await-task again"), producing
+      // duplicate await-task tool messages (the T5b regression — 3 messages
+      // instead of 1). Inline delivery also avoids the pause→resume-stream
+      // revival, whose revived turn would RE-ISSUE await-task on a now-deleted
+      // task (a second, failed tool message).
       //
-      // Event-driven: block on the goroutine's completion signal, then read the
-      // row ONCE. The single read also closes the original race: the goroutine
-      // may have flipped the task terminal with callbackMode=DETACH (firing no
-      // revival) before our WAIT upgrade landed — the read still observes the
-      // terminal state and delivers inline. 15s is long enough that ordinary
-      // detaches resolve inline; genuinely long-running tasks fall through to
-      // the WAIT pause + revival below.
-      await PendingCalls.waitForTaskCompletion(taskId, 15_000);
-      const [afterUpgrade] = await db
-        .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
-        .from(cronTasks)
-        .where(eq(cronTasks.id, taskId))
-        .limit(1);
-      if (
-        afterUpgrade &&
-        AwaitTaskRepository.isTerminal(afterUpgrade.lastExecutionStatus)
-      ) {
+      // The wait budget is the TASK's real completion time, not an arbitrary
+      // short cutoff: a live media-gen detach can take ~30s+, far past the old
+      // 15s window — exceeding it wrongly returned pending. Block on the
+      // goroutine's completion signal (event-driven, no busy-poll), re-reading
+      // the authoritative DB row on each tick (the signal can fire early, be
+      // missed on a registration race, or wake before the row is visibly
+      // terminal). 10-min backstop covers a genuinely runaway task.
+      const inlineDeadline = Date.now() + 600_000;
+      let afterUpgradeStatus: typeof CronTaskStatusValue | null = null;
+      while (afterUpgradeStatus === null) {
+        const [row] = await db
+          .select({ lastExecutionStatus: cronTasks.lastExecutionStatus })
+          .from(cronTasks)
+          .where(eq(cronTasks.id, taskId))
+          .limit(1);
+        if (row && AwaitTaskRepository.isTerminal(row.lastExecutionStatus)) {
+          afterUpgradeStatus = row.lastExecutionStatus;
+          break;
+        }
+        // Task row vanished (cleaned up by a sibling await or thread delete):
+        // stop blocking — nothing left to wait for.
+        if (!row) {
+          break;
+        }
+        if (Date.now() >= inlineDeadline) {
+          break;
+        }
+        const remaining = inlineDeadline - Date.now();
+        await PendingCalls.waitForTaskCompletion(
+          taskId,
+          Math.min(remaining, 500),
+        );
+      }
+      if (afterUpgradeStatus !== null) {
         logger.info(
           "[AwaitTask] Task completed during inline wait — delivering inline",
-          { taskId, status: afterUpgrade.lastExecutionStatus },
+          { taskId, status: afterUpgradeStatus },
         );
         const inlineResult = await AwaitTaskRepository.readStoredResult(taskId);
         await AwaitTaskRepository.cleanupTask(taskId, logger);
         return success<AwaitTaskResponseOutput>({
-          status: afterUpgrade.lastExecutionStatus,
+          status: afterUpgradeStatus,
           result: inlineResult,
           waiting: false,
           originalToolName,
@@ -432,24 +435,22 @@ export class AwaitTaskRepository {
         });
       }
 
-      logger.info("[AwaitTask] Registered thread as waiter on pending task", {
-        taskId,
-        threadId: effectiveThreadId,
-        toolMessageId: effectiveToolMessageId,
-      });
-
-      // Suppress any existing wakeUp revival that may have been queued.
-      AwaitTaskRepository.suppressWakeUp(
-        streamContext,
-        effectiveToolMessageId ?? null,
+      // Only reached if the 10-min backstop elapsed on a genuinely runaway task
+      // OR the row vanished mid-wait. Deliver whatever terminal result exists (a
+      // sibling await may have settled + cleaned it), never "pending".
+      logger.warn(
+        "[AwaitTask] Inline wait ended without a terminal row — delivering best-effort",
+        { taskId, threadId: effectiveThreadId },
       );
-
-      streamContext.waitingForRemoteResult = true;
-      streamContext.pendingTimeoutMs = 90_000;
-
+      const fallbackResult = await AwaitTaskRepository.readStoredResult(taskId);
+      await AwaitTaskRepository.cleanupTask(taskId, logger);
       return success<AwaitTaskResponseOutput>({
-        status: CronTaskStatus.PENDING,
-        waiting: true,
+        status:
+          fallbackResult !== undefined
+            ? CronTaskStatus.COMPLETED
+            : CronTaskStatus.FAILED,
+        result: fallbackResult,
+        waiting: false,
         originalToolName,
         originalArgs,
       });

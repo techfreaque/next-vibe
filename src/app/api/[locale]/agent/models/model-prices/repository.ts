@@ -57,6 +57,7 @@ export type { PriceFetcher, ProviderPriceResult };
 const BASE_FETCHERS: PriceFetcher[] = [
   new OpenRouterTokenPriceFetcher(),
   new OpenRouterImagePriceFetcher(),
+  new OpenRouterVideoPriceFetcher(),
   new ReplicatePriceFetcher(),
   new OpenAiImagePriceFetcher(),
   new FalAiPriceFetcher(),
@@ -152,8 +153,9 @@ function applyPriceUpdate(
   let changed = false;
   const updated = content.replace(
     blockRegex,
-    // eslint-disable-next-line no-unused-vars
-    (_: string, prefix: string, priceLine: string) => {
+    (fullMatch: string, prefix: string, priceLine: string) => {
+      // fullMatch === prefix + priceLine by regex definition; prefix used to reconstruct
+      void fullMatch;
       // Skip if value matches and line already has a valid update comment
       if (isAlreadyUpToDate(priceLine, field, newValue)) {
         return prefix + priceLine;
@@ -195,8 +197,8 @@ function applyCacheCostUpdate(
     let changed = false;
     const updated = content.replace(
       updateRegex,
-      // eslint-disable-next-line no-unused-vars
-      (_: string, prefix: string, priceLine: string) => {
+      (fullMatch: string, prefix: string, priceLine: string) => {
+        void fullMatch;
         // Skip if value matches and line already has a valid update comment
         if (isAlreadyUpToDate(priceLine, field, newValue)) {
           return prefix + priceLine;
@@ -240,43 +242,69 @@ function applySettingsUpdate(
   content: string,
   update: SettingsUpdate,
 ): { content: string; changed: boolean } {
-  const escaped = update.providerModel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const comment = buildUpdateComment(update.source);
 
-  // Try to update existing field (handles arrays [...], objects {...}, or plain values like numbers)
-  const existingRegex = new RegExp(
-    `(providerModel:\\s*"${escaped}"[\\s\\S]*?)(${update.field}:\\s*(?:\\[[^\\]]*\\]|\\{[^}]*\\}|[\\d.]+)[,]?(?:\\s*//[^\n]*)?)`,
+  // Scope all matching to within the single provider block containing this providerModel.
+  // Find the block: from `providerModel: "..."` to the next `      },` (6-space closing brace).
+  const pmIdx = content.indexOf(`providerModel: "${update.providerModel}"`);
+  if (pmIdx === -1) {
+    return { content, changed: false };
+  }
+  const blockEndIdx = content.indexOf("\n      },", pmIdx);
+  if (blockEndIdx === -1) {
+    return { content, changed: false };
+  }
+  const blockContent = content.slice(pmIdx, blockEndIdx);
+
+  const fieldRegex = new RegExp(
+    `(${update.field}:\\s*(?:\\[[^\\]]*\\]|\\{[^}]*\\}|true|false|[\\d.]+)[,]?(?:\\s*//[^\n]*)?)`,
   );
-  if (existingRegex.test(content)) {
+  if (fieldRegex.test(blockContent)) {
+    // Field exists — update in place
     let changed = false;
-    const updated = content.replace(
-      existingRegex,
-      // eslint-disable-next-line no-unused-vars
-      (_: string, prefix: string, fieldLine: string) => {
+    const newBlock = blockContent.replace(
+      fieldRegex,
+      (fullMatch: string, fieldLine: string) => {
+        void fullMatch;
         const newLine = `${update.field}: ${update.tsLiteral}, ${comment}`;
         if (
           fieldLine.includes(update.tsLiteral) &&
           fieldLine.includes("updated:")
         ) {
-          return prefix + fieldLine;
+          return fieldLine;
         }
         changed = true;
-        return prefix + newLine;
+        return newLine;
       },
     );
-    return { content: updated, changed };
+    if (!changed) {
+      return { content, changed: false };
+    }
+    return {
+      content:
+        content.slice(0, pmIdx) +
+        newBlock +
+        content.slice(pmIdx + blockContent.length),
+      changed: true,
+    };
   }
 
-  // Insert after the cost field (creditCostPerSecond, creditCostPerImage, creditCostPerClip)
-  const insertRegex = new RegExp(
-    `(providerModel:\\s*"${escaped}"[\\s\\S]*?(?:creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
+  // Field doesn't exist — insert after the cost field within the block
+  const costRegex = new RegExp(
+    `((?:creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
   );
-  if (insertRegex.test(content)) {
-    const updated = content.replace(
-      insertRegex,
-      `$1\n        ${update.field}: ${update.tsLiteral}, ${comment}$2`,
+  if (costRegex.test(blockContent)) {
+    const newBlock = blockContent.replace(
+      costRegex,
+      `$1$2        ${update.field}: ${update.tsLiteral}, ${comment}\n`,
     );
-    return { content: updated, changed: true };
+    return {
+      content:
+        content.slice(0, pmIdx) +
+        newBlock +
+        content.slice(pmIdx + blockContent.length),
+      changed: true,
+    };
   }
 
   return { content, changed: false };

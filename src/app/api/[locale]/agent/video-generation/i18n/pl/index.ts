@@ -52,6 +52,17 @@ export const translations: typeof enTranslations = {
         "Obraz dla ostatniej klatki. Model animuje wstecz do tego obrazu.",
       placeholder: "https://przyklad.pl/ostatnia-klatka.jpg",
     },
+    negativePrompt: {
+      label: "Prompt negatywny",
+      description: "Opisz, czego nie chcesz w filmie.",
+      placeholder: "rozmazane, niska jakość, zniekształcone...",
+    },
+    cfgScale: {
+      label: "Skala CFG",
+      description:
+        "Jak ściśle model stosuje się do promptu (0–30). Wyżej = dosłowniej.",
+    },
+
     download: "Pobierz",
     generatingNote: "Generowanie wideo może zająć 1–3 minuty",
     backButton: {

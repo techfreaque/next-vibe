@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a190ab7ddb8623d4-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:41:00 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783698058-ga1hgwlKJ1YucXHcwScU"
+  },
+  "body": {
+    "id": "gen-1783698058-ga1hgwlKJ1YucXHcwScU",
+    "object": "chat.completion",
+    "created": 1783698058,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short, upbeat musical interlude lasting 21 seconds. The sound quality is clear and polished, suggesting a studio recording environment.\n\nThe music features:\n- **Genre:** Electronic, possibly chillwave or synth-pop.\n- **Tempo:** Approximately 110-120 BPM, with a moderate, steady groove.\n- **Instruments:**\n    - **Synthesizer:** Playing a bright, arpeggiated melody with a slightly retro feel. The arpeggiation is continuous and forms the main melodic drive.\n    - **Kick Drum:** Providing a consistent, understated four-on-the-floor beat.\n    - **Snare Drum:** Lightly played, often on the off-beats, creating a subtle rhythmic accent.\n    - **Hi-Hat:** Contributing a crisp, regular eighth-note rhythm, adding to the overall forward momentum.\n    - **Synth Bass:** A smooth, sustained bass line that underpins the melody, providing harmonic support without being overly prominent.\n\n- **Structure:** The interlude appears to be a continuous loop or a short segment of a larger track. There's no distinct verse/chorus structure within this snippet, but rather a consistent melodic and rhythmic pattern that repeats.\n- **Production:** The production style is clean and well-balanced, with a degree of reverb on the synths to give them a spacious feel. There are no dramatic drops or builds, maintaining a steady, pleasant energy.\n- **Mood:** The overall mood is positive, light, and somewhat nostalgic, evoking feelings of calm and pleasant background activity.\n\nThere are no vocals or speech present in this audio clip.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 345,
+      "total_tokens": 1417,
+      "cost": 0.0017091,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0017091,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0008625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

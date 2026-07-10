@@ -117,7 +117,7 @@ export function EntityPickerFieldWidget<
 
   const name: string = fieldName;
   const labelField = field.labelField ?? "name";
-  const valueField = field.valueField ?? "id";
+  const valueField = fieldName;
 
   const handleOpen = (): void => {
     void resolveListEndpoint(field.listEndpoint).then((ep) => {

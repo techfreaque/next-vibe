@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { leadDb } from "next-vibe/identity/lead/db";
 import { UserRoleDB } from "next-vibe/identity/roles/enum";
 import { userRoles } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -40,7 +41,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
   const user = result.data;
 
   const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
+    leadDb.query.userLeadLinks.findFirst({
       where: (ul, { eq: eql }) => eql(ul.userId, user.id),
     }),
     db.select().from(userRoles).where(eq(userRoles.userId, user.id)),

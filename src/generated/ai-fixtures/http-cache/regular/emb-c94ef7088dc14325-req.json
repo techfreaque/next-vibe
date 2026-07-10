@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Phase 2 check: the deferred result contains an `imageUrl` (`\"http://localhost:3000/.../47728048-...png\"`) — present and non-empty ✅\n\n**WAKEUP_OK**",
+    "encoding_format": "float"
+  }
+}

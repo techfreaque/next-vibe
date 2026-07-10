@@ -38,7 +38,7 @@ import {
 import { CHAT_THREADS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const ThreadsListContainer = lazy(() =>
+const ThreadsListContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.ThreadsListContainer })),
 );
 

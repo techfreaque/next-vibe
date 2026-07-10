@@ -1,80 +1,34 @@
 import "server-only";
 
-import { PGlite } from "@electric-sql/pglite";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import {
-  drizzle as drizzlePglite,
-  type PgliteDatabase,
-} from "drizzle-orm/pglite";
+import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import * as vibeSenseSchema from "next-vibe/dataflow/db";
-import * as leadsSchema from "next-vibe/identity/lead/db";
-import * as userSchema from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import * as cronTasksSchema from "next-vibe/tasks/cron/db";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 
-import * as agentChatSchema from "@/app/api/[locale]/agent/chat/db";
-import * as chartOfAccountsSchema from "@/app/api/[locale]/chart-of-accounts/db";
-import * as companiesSchema from "@/app/api/[locale]/companies/db";
-import * as creditSchema from "@/app/api/[locale]/credits/db";
-import * as inventorySchema from "@/app/api/[locale]/inventory/db";
-import * as paymentSchema from "@/app/api/[locale]/payment/db";
-import * as posSchema from "@/app/api/[locale]/pos/db";
-import * as catalogProductsSchema from "@/app/api/[locale]/products/db";
-import * as purchasingSchema from "@/app/api/[locale]/purchasing/db";
-import * as referralSchema from "@/app/api/[locale]/referral/db";
-import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
-import * as sshSchema from "@/app/api/[locale]/ssh/db";
-import * as taxSchema from "@/app/api/[locale]/tax/db";
-import { env } from "@/config/env";
+import {
+  isPglite,
+  pgliteAsNodePg,
+  pgliteClient,
+  pool,
+  recreatePool,
+} from "./client";
+
+export { isPglite, pgliteClient } from "./client";
 
 /**
- * Database URL — resolved at module load time before the env singleton is ready.
- * If the URL starts with "file:" it selects the PGlite embedded driver;
- * everything else uses the standard pg connection pool.
+ * Default database client — registered with NO schema.
+ *
+ * `.select()/.insert()/.update()/.delete()/.execute()/.transaction()` do not
+ * need a registered schema (table types come from the imported table objects),
+ * so the vast majority of callers use this bare client with full type safety.
+ *
+ * The relational query API (`db.query.<table>...`) is NOT available here — it
+ * lives on per-domain clients built via `./relational.ts` (`createRelationalDb`)
+ * and exported from each domain's `db.ts`. This is deliberate: it keeps the
+ * 20-domain schema fan-out out of this module, so importing `db` no longer
+ * transitively references every domain's table definitions.
  */
-const DATABASE_URL = process.env["DATABASE_URL"] ?? env.DATABASE_URL;
-
-/**
- * True when running against a local PGlite file database (headless-client mode).
- * Detected purely from the DATABASE_URL prefix — no extra env var needed.
- */
-export const isPglite = DATABASE_URL.startsWith("file:");
-
-/**
- * PostgreSQL connection pool configuration (ignored in PGlite mode).
- */
-const poolConfig = {
-  connectionString: DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 30_000,
-};
-
-const schema = {
-  ...userSchema,
-  ...remoteConnectionSchema,
-  ...agentChatSchema,
-  ...chartOfAccountsSchema,
-  ...companiesSchema,
-  ...creditSchema,
-  ...paymentSchema,
-  ...cronTasksSchema,
-  ...leadsSchema,
-  ...referralSchema,
-  ...sshSchema,
-  ...taxSchema,
-  ...catalogProductsSchema,
-  ...posSchema,
-  ...inventorySchema,
-  ...purchasingSchema,
-  ...vibeSenseSchema,
-};
-
-function createPool(): Pool {
-  return new Pool(poolConfig);
-}
 
 /**
  * PGlite shim that satisfies the Pool interface used by ping/health.
@@ -91,36 +45,18 @@ interface RawPoolShim {
   end(): Promise<void>;
 }
 
-let pool: Pool | null = isPglite ? null : createPool();
-
-// PGlite is API-compatible with NodePgDatabase at runtime (same pg-core query builders).
-// The types diverge only in their HKT; this bridge function hides the cast in one place
-// so callers see NodePgDatabase and get correct .returning()/.execute() overloads.
-function pgliteAsNodePg(
-  client: PgliteDatabase<typeof schema>,
-): NodePgDatabase<typeof schema> {
-  // @ts-expect-error — PgliteDatabase and NodePgDatabase share identical pg-core APIs
-  // at runtime; only their HKT type params differ. Cast is safe for this use.
-  return client;
-}
-
 /**
- * Underlying PGlite instance — only set in PGlite mode.
- * Exposed so the headless-client migration runner can call exec() directly.
- */
-export let pgliteClient: PGlite | null = null;
-
-/**
- * Drizzle ORM database client with schema registration.
+ * Drizzle ORM database client (no schema registered).
  * PGlite mode: embedded in-process Postgres stored at the file: path.
  * Standard mode: pg connection pool.
  */
-export let db: NodePgDatabase<typeof schema> = (() => {
+export let db: NodePgDatabase<Record<string, never>> = (() => {
   if (isPglite) {
-    pgliteClient = new PGlite(DATABASE_URL);
-    return pgliteAsNodePg(drizzlePglite(pgliteClient, { schema }));
+    return pgliteAsNodePg(
+      drizzlePglite(pgliteClient as NonNullable<typeof pgliteClient>),
+    );
   }
-  return drizzle(pool as Pool, { schema });
+  return drizzle(pool as Pool);
 })();
 
 /**
@@ -138,7 +74,7 @@ export let rawPool: RawPoolShim = isPglite
       ended: false,
       end: () => Promise.resolve(),
     }
-  : (pool as Pool); // pool is non-null here: isPglite=false branch initialises pool above
+  : (pool as Pool); // pool is non-null here: isPglite=false branch initialises pool in ./client.ts
 
 /**
  * Track if database has been closed to prevent double-close errors
@@ -173,8 +109,8 @@ export function reopenDatabase(): void {
   if (isPglite) {
     return;
   }
-  pool = createPool();
-  db = drizzle(pool, { schema });
-  rawPool = pool;
+  const newPool = recreatePool();
+  db = drizzle(newPool as Pool);
+  rawPool = newPool as Pool;
   databaseClosed = false;
 }

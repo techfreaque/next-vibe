@@ -284,6 +284,10 @@ export const translations: typeof enTranslations = {
         label: "Dane logowania",
         description: "Zakodowany ciąg uwierzytelniający",
       },
+      syncScope: {
+        label: "Zakres synchronizacji",
+        description: "Które dane synchronizują się przez to połączenie.",
+      },
     },
     success: { title: "Zalogowano", description: "Dane logowania pobrane" },
     errors: {

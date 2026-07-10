@@ -14,7 +14,7 @@ import { z } from "zod";
 import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
-const LeadMagnetCapturesWidget = lazy(() =>
+const LeadMagnetCapturesWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadMagnetCapturesWidget })),
 );
 

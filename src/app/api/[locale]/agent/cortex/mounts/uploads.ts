@@ -434,13 +434,26 @@ export async function searchUploads(
 export async function getUploadCounts(
   userId: string,
 ): Promise<{ total: number; byType: Record<string, number> }> {
-  const allAttachments = await loadUserAttachments(userId);
+  // COUNT in SQL — sum the attachment-array lengths directly. The previous impl
+  // loaded up to 1000 FULL message rows (metadata carries base64 attachment
+  // bytes — megabytes) just to take `.length`, and this runs on EVERY turn to
+  // render one "uploads: N" number in the system prompt. The aggregate transfers
+  // a single integer. byType is unused by callers (only `.total` is read), so it
+  // is left empty rather than paying the full-row scan to bucket by MIME.
+  const [row] = await db
+    .select({
+      total: sql<number>`COALESCE(SUM(jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb)), 0)`,
+    })
+    .from(chatMessages)
+    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
+    .where(
+      and(
+        eq(chatThreads.userId, userId),
+        isNotNull(chatMessages.metadata),
+        sql`${chatMessages.metadata}->'attachments' IS NOT NULL`,
+        sql`jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
+      ),
+    );
 
-  const byType: Record<string, number> = {};
-  for (const att of allAttachments) {
-    const folder = getMimeTypeFolder(att.mimeType);
-    byType[folder] = (byType[folder] ?? 0) + 1;
-  }
-
-  return { total: allAttachments.length, byType };
+  return { total: Number(row?.total ?? 0), byType: {} };
 }

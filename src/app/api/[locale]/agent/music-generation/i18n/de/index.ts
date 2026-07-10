@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
     },
     model: {
       label: "Modell",
-      description: "Musikgenerierungsmodell. Leer lassen, um das konfigurierte Standardmodell zu verwenden.",
+      description:
+        "Musikgenerierungsmodell. Leer lassen, um das konfigurierte Standardmodell zu verwenden.",
     },
     duration: {
       label: "Dauer",

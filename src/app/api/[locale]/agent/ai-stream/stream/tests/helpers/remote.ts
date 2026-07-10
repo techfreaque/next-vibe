@@ -148,17 +148,26 @@ function makeRemoteSetup(
         const syncKey = `${testUser.id}:${remoteSetup.HERMES_INSTANCE_ID}`;
         const settleStart = Date.now();
         let sawBusy = false;
+        // Short grace window to let a sync slot APPEAR (connect kicks the pull
+        // asynchronously). If none shows up within the grace, the pull already
+        // finished before we started polling — exit immediately instead of
+        // burning a fixed 20s. Once we DO see a busy slot, wait for it to clear.
+        const GRACE_MS = 1_500;
         for (;;) {
           const busy = isSyncSlotBusy(syncKey);
           sawBusy = sawBusy || busy;
-          if (!busy && (sawBusy || Date.now() - settleStart > 20_000)) {
-            break;
+          if (!busy) {
+            // Idle now: done if we ever saw it busy (it just cleared) OR the
+            // grace window elapsed with no sync ever starting (already settled).
+            if (sawBusy || Date.now() - settleStart > GRACE_MS) {
+              break;
+            }
           }
           if (Date.now() - settleStart > 120_000) {
             break;
           }
           await new Promise<void>((resolve) => {
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 100);
           });
         }
       }

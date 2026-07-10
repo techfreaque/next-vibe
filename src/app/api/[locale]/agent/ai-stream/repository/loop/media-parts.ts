@@ -102,6 +102,7 @@ export async function onFilePart(
         mediaType,
         mediaUrl,
         creditCost,
+        model,
       );
       await ctx.dbWriter.emitSyntheticToolMessage({
         messageId: crypto.randomUUID(),
@@ -166,6 +167,7 @@ export async function onFilePart(
         mediaType,
         mediaUrl,
         creditCost,
+        model,
       );
       await ctx.dbWriter.emitSyntheticToolMessage({
         messageId: syntheticToolMessageId,

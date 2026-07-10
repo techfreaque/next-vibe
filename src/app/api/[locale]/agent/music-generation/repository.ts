@@ -28,12 +28,17 @@ import {
   deductMediaCredits,
 } from "../shared/media-generation";
 import {
+  type MusicGenerationPostRequestInput,
   type MusicGenerationPostRequestOutput,
   type MusicGenerationPostResponseOutput,
 } from "./definition";
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
-import { getMusicGenModelById } from "./models";
+import {
+  filterMusicGenModels,
+  getMusicGenModelById,
+  type MusicGenModelSelection,
+} from "./models";
 import { generateMusicWithFalAi } from "./providers/fal-ai";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
 import { generateMusicWithReplicate } from "./providers/replicate";
@@ -282,5 +287,36 @@ export class MusicGenerationRepository {
       creditCost: finalCreditCost,
       durationSeconds: finalDurationSeconds,
     });
+  }
+
+  static async getRequestDefaults(ctx: {
+    user: JwtPayloadType;
+    streamContext: ToolExecutionContext;
+  }): Promise<Partial<MusicGenerationPostRequestInput>> {
+    const { getInstanceAvailability } = await import("../env-availability");
+    const availability = await getInstanceAvailability();
+    const userId =
+      ctx.user && !ctx.user.isPublic && "id" in ctx.user
+        ? ctx.user.id
+        : undefined;
+    let sel: MusicGenModelSelection | undefined;
+    if (userId) {
+      const { resolveSkillFavoriteContext } =
+        await import("@/app/api/[locale]/agent/skills/resolver");
+      const { ModalityResolver } =
+        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+      const { favorite, skill } = await resolveSkillFavoriteContext({
+        favoriteId: ctx.streamContext.favoriteId ?? null,
+        skillId: ctx.streamContext.skillId ?? null,
+        userId,
+      });
+      sel = ModalityResolver.resolveMusicGenSelection({ favorite, skill });
+    }
+    sel ??= ctx.streamContext.resolvedMediaSelections?.musicGenModelSelection;
+    const model = filterMusicGenModels(sel, ctx.user, availability)[0]?.id;
+    if (!model) {
+      return {};
+    }
+    return { model };
   }
 }

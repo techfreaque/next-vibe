@@ -54,7 +54,7 @@ import {
 } from "../enum";
 import { scopedTranslation } from "../i18n";
 
-const SkillCreateContainer = lazy(() =>
+const SkillCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
 );
 

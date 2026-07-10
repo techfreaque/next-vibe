@@ -24,7 +24,7 @@ import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { LeadMagnetProviderDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-const LeadMagnetConfigContainer = lazy(() =>
+const LeadMagnetConfigContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadMagnetConfigContainer })),
 );
 

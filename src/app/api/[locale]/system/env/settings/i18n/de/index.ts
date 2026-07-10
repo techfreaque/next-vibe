@@ -286,6 +286,11 @@ export const translations: typeof enTranslations = {
         label: "Zugangsdaten",
         description: "Kodierter Anmelde-String",
       },
+      syncScope: {
+        label: "Sync-Umfang",
+        description:
+          "Welche Daten über diese Verbindung synchronisiert werden.",
+      },
     },
     success: {
       title: "Angemeldet",

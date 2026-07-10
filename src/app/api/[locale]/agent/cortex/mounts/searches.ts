@@ -358,13 +358,26 @@ export async function searchSearches(
 export async function getSearchCounts(
   userId: string,
 ): Promise<{ total: number; byMonth: Record<string, number> }> {
-  const allSearches = await loadUserSearches(userId);
+  // COUNT in SQL — the previous impl loaded up to 500 FULL metadata rows just to
+  // take `.length` for a per-turn "searches: N" system-prompt number. Callers
+  // only read `.total`; byMonth is left empty rather than paying the row scan.
+  const [row] = await db
+    .select({ total: sql<number>`COUNT(*)` })
+    .from(chatMessages)
+    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
+    .where(
+      and(
+        eq(chatThreads.userId, userId),
+        isNotNull(chatMessages.metadata),
+        or(
+          ...SEARCH_TOOL_NAMES.map(
+            (name) =>
+              sql`TRIM(${chatMessages.metadata}->'toolCall'->>'toolName') = ${name}`,
+          ),
+        ),
+        sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
+      ),
+    );
 
-  const byMonth: Record<string, number> = {};
-  for (const s of allSearches) {
-    const month = toMonthFolder(s.searchedAt);
-    byMonth[month] = (byMonth[month] ?? 0) + 1;
-  }
-
-  return { total: allSearches.length, byMonth };
+  return { total: Number(row?.total ?? 0), byMonth: {} };
 }

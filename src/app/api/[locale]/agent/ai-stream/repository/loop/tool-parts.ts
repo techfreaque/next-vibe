@@ -22,6 +22,73 @@ import type { PendingToolData } from "../core/stream";
 import { isValidToolResult, sortObjectKeys } from "./helpers";
 import type { StreamLoopState } from "./state";
 
+function isPlainRecord(
+  v: WidgetData | undefined,
+): v is { [key: string]: WidgetData } {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+/**
+ * Run the TARGET tool's `requestDefaults` on the args the AI emitted and fold the
+ * server-authoritative fields it resolves (e.g. a media-gen `model` from the
+ * favorite/skill cascade) back into the recorded args — so the tool message shows
+ * what actually ran, not just the AI's partial input. For `execute-tool` the
+ * target is the WRAPPED tool and its input is nested under `input`. Never fatal:
+ * a resolver hiccup just leaves the recorded args as the AI sent them.
+ */
+async function enrichToolArgsWithRequestDefaults(
+  outerToolName: string,
+  toolCallArgs: WidgetData,
+  state: StreamLoopState,
+  logger: StreamLoopState["p"]["logger"],
+): Promise<WidgetData> {
+  if (!isPlainRecord(toolCallArgs)) {
+    return toolCallArgs;
+  }
+  const isExecuteWrapper = outerToolName === "execute-tool";
+  const targetToolName = isExecuteWrapper
+    ? typeof toolCallArgs["toolName"] === "string"
+      ? toolCallArgs["toolName"]
+      : null
+    : outerToolName;
+  const targetInput = isExecuteWrapper ? toolCallArgs["input"] : toolCallArgs;
+  if (!targetToolName || !isPlainRecord(targetInput)) {
+    return toolCallArgs;
+  }
+  try {
+    const { getRouteHandler } = await import("@/generated/routes/handlers");
+    const handler = await getRouteHandler(targetToolName).catch(() => null);
+    if (!handler?.requestDefaults) {
+      return toolCallArgs;
+    }
+    const patch = await handler.requestDefaults(
+      {
+        user: state.p.user,
+        locale: state.p.locale,
+        platform: Platform.AI,
+        streamContext: state.p.streamContext,
+      },
+      { requestData: targetInput, urlPathParams: {} },
+    );
+    if (!patch || Object.keys(patch).length === 0) {
+      return toolCallArgs;
+    }
+    const enrichedInput: { [key: string]: WidgetData } = {
+      ...targetInput,
+      ...(patch as { [key: string]: WidgetData }),
+    };
+    return isExecuteWrapper
+      ? { ...toolCallArgs, input: enrichedInput }
+      : enrichedInput;
+  } catch (err) {
+    logger.warn("[AI Stream] requestDefaults enrich failed (non-fatal)", {
+      targetToolName,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return toolCallArgs;
+  }
+}
+
 /** Return type for onToolCall */
 export interface ToolCallResult {
   currentAssistantMessageId: string | null;
@@ -54,7 +121,21 @@ export async function onToolCall(
   const { sequenceId, dbWriter } = ctx;
 
   // Get tool arguments from the AI SDK part.input
-  const toolCallArgs = part.input || {};
+  let toolCallArgs: WidgetData = part.input ?? {};
+
+  // The AI only emits the args it chose (e.g. { prompt }); server-authoritative
+  // request fields (like a media-gen `model` resolved from the favorite/skill
+  // cascade) are filled in by the target tool's requestDefaults at execution
+  // time and were NEVER reflected back into the recorded call — so the tool
+  // message showed no model. Resolve them here and fold them into the recorded
+  // input so the call reflects what actually ran. For execute-tool the resolved
+  // fields belong to the WRAPPED tool and go into its nested `input`.
+  toolCallArgs = await enrichToolArgsWithRequestDefaults(
+    part.toolName,
+    toolCallArgs,
+    state,
+    logger,
+  );
 
   // Read callbackMode from tool args - any tool can pass this to control loop behavior
   const callbackModeArg =
@@ -275,8 +356,7 @@ export async function onToolResult(
         typeof errObj.message === "string" ? errObj.message : "";
       toolError = errDetail
         ? fail({
-            message: t("errors.toolExecutionErrorDetail"),
-            messageParams: { error: errDetail },
+            message: t("errors.toolExecutionErrorDetail", { error: errDetail }),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           })
         : fail({
@@ -359,23 +439,15 @@ export async function onToolResult(
   // handleTaskCompletion → resume-stream when the background task completes.
   // Do NOT emit any result now; leave the message as-is in DB.
   // Only on cancel will a "failed/cancelled" result be written (by cancel/repository.ts).
-  if (isWaitingForRemote && !effectiveIsError) {
-    logger.debug(
-      "[AI Stream] Skipping tool result emit - tool is waiting for remote task",
-      { toolMessageId, toolName: part.toolName },
-    );
-    return { currentParentId: toolMessageId };
-  }
-
-  // Confirmation-gate marker: execute-tool's requiresConfirmation gate returns
-  // { result: { status: "waiting_for_confirmation", toolName } } WITHOUT
-  // executing. The gate also mutates the pendingToolMessages entry, but the AI
-  // SDK may run execute() before the tool-call event registers that entry
-  // (spin-wait race) — then the mutation lands nowhere and the message would
-  // finalize as an ordinary completed result, silently skipping the approval
-  // UI. The marker in the output is authoritative: force the parked shape.
-  const gateParked =
-    !effectiveIsError &&
+  // A `waiting_for_confirmation` placeholder is NOT a remote-pending result — it
+  // is the confirmation gate's/APPROVE mode's authoritative "halt, await user"
+  // marker that MUST be written to the tool message (the abort at finish-step +
+  // the phase-2 re-execution both key off it). When this tool runs in a PARALLEL
+  // batch alongside a genuinely remote-pending sibling, streamContext's shared
+  // `waitingForRemoteResult` flag leaks onto it and would wrongly skip the write,
+  // leaving the approve tool message result-less. Never skip a confirmation
+  // placeholder.
+  const isConfirmationPlaceholder =
     output !== null &&
     typeof output === "object" &&
     !Array.isArray(output) &&
@@ -391,6 +463,23 @@ export async function onToolResult(
             "waiting_for_confirmation")
       );
     })();
+  if (isWaitingForRemote && !effectiveIsError && !isConfirmationPlaceholder) {
+    logger.debug(
+      "[AI Stream] Skipping tool result emit - tool is waiting for remote task",
+      { toolMessageId, toolName: part.toolName },
+    );
+    return { currentParentId: toolMessageId };
+  }
+
+  // Confirmation-gate marker: execute-tool's requiresConfirmation gate returns
+  // { result: { status: "waiting_for_confirmation", toolName } } WITHOUT
+  // executing. The gate also mutates the pendingToolMessages entry, but the AI
+  // SDK may run execute() before the tool-call event registers that entry
+  // (spin-wait race) — then the mutation lands nowhere and the message would
+  // finalize as an ordinary completed result, silently skipping the approval
+  // UI. The marker in the output is authoritative: force the parked shape.
+  // (Same detection as the isWaitingForRemote-skip guard above — reuse it.)
+  const gateParked = !effectiveIsError && isConfirmationPlaceholder;
 
   const toolCallWithResult: ToolCall = {
     ...toolCallData.toolCall,
@@ -822,7 +911,9 @@ async function emitOriginalToolError(
 
   const error: ErrorResponseType = sdkErrorMessage
     ? fail({
-        message: t("errors.toolExecutionError", { error: sdkErrorMessage }),
+        message: t("errors.toolExecutionErrorDetail", {
+          error: sdkErrorMessage,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       })
     : fail({

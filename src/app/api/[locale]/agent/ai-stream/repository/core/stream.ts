@@ -16,10 +16,10 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 
+import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { DefaultFolderId } from "../../../chat/config";
 import {
-  chatFolders,
   chatThreads,
   type MessageMetadata,
   type ToolCall,
@@ -484,12 +484,9 @@ export async function clearStreamingState(
     )
     .returning({ folderId: chatThreads.folderId });
 
-  // Bubble last-activity to parent folder so it sorts correctly in sidebar
+  // Bubble last-activity up the full ancestor chain so nested folders sort correctly in sidebar
   if (thread?.folderId) {
-    await db
-      .update(chatFolders)
-      .set({ updatedAt: now })
-      .where(eq(chatFolders.id, thread.folderId));
+    await bubbleFolderActivity(thread.folderId, now);
   }
 
   // Fan the terminal transition out on ALL three channels, routed to the
@@ -538,12 +535,9 @@ export async function setStreamingStateWaiting(
       rootFolderId: chatThreads.rootFolderId,
     });
 
-  // Bubble last-activity to parent folder so it sorts correctly in sidebar
+  // Bubble last-activity up the full ancestor chain so nested folders sort correctly in sidebar
   if (thread?.folderId) {
-    await db
-      .update(chatFolders)
-      .set({ updatedAt: now })
-      .where(eq(chatFolders.id, thread.folderId));
+    await bubbleFolderActivity(thread.folderId, now);
   }
 
   // Fan the WAITING transition out so the sidebar shows the stop button — this

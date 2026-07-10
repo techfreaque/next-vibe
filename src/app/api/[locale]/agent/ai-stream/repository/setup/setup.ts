@@ -121,17 +121,23 @@ async function loadFavoriteOnce(
     }
 
     if (effectiveFavoriteId) {
+      const favIdCondition = isUuid(effectiveFavoriteId)
+        ? eq(chatFavorites.id, effectiveFavoriteId)
+        : isSkillVariantId(effectiveFavoriteId)
+          ? ((): ReturnType<typeof and> => {
+              const { skillId, variantId } = parseSkillId(effectiveFavoriteId);
+              return and(
+                eq(chatFavorites.skillId, skillId),
+                variantId !== null
+                  ? eq(chatFavorites.variantId, variantId)
+                  : sql`${chatFavorites.variantId} IS NULL`,
+              );
+            })()
+          : eq(chatFavorites.slug, effectiveFavoriteId);
       const [favRow] = await db
         .select(FAVORITE_CONFIG_COLUMNS)
         .from(chatFavorites)
-        .where(
-          and(
-            isUuid(effectiveFavoriteId)
-              ? eq(chatFavorites.id, effectiveFavoriteId)
-              : eq(chatFavorites.slug, effectiveFavoriteId),
-            eq(chatFavorites.userId, userId),
-          ),
-        )
+        .where(and(favIdCondition, eq(chatFavorites.userId, userId)))
         .limit(1);
 
       if (favRow) {
@@ -224,6 +230,9 @@ function resolveBridgeModelSelections(params: {
   effectiveImageGenModel: ReturnType<typeof getBestImageGenModel>;
   effectiveMusicGenModel: ReturnType<typeof getBestMusicGenModel>;
   effectiveVideoGenModel: ReturnType<typeof getBestVideoGenModel>;
+  effectiveImageGenSelection: ImageGenModelSelection;
+  effectiveMusicGenSelection: MusicGenModelSelection;
+  effectiveVideoGenSelection: VideoGenModelSelection;
 } {
   const { bridgeContext, mediaModelOverrides, user, availability, logger } =
     params;
@@ -972,6 +981,11 @@ export async function setupAiStream(params: {
     // favoriteId: from headless override OR favorite config - lets resume-stream reload full context
     favoriteId:
       params.favoriteIdOverride ?? resolvedFavoriteConfig?.id ?? undefined,
+    resolvedMediaSelections: {
+      musicGenModelSelection: effectiveMusicGenSelection,
+      imageGenModelSelection: effectiveImageGenSelection,
+      videoGenModelSelection: effectiveVideoGenSelection,
+    },
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
     callerCallbackMode: undefined,

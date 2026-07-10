@@ -23,7 +23,7 @@ import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
 import { DESCRIBE_IMAGE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const DescribeImageContainer = lazy(() =>
+const DescribeImageContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.DescribeImageContainer })),
 );
 

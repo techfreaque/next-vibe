@@ -27,7 +27,7 @@ import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-const PublicFeedContainer = lazy(() =>
+const PublicFeedContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.PublicFeedContainer })),
 );
 

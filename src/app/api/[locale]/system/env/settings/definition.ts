@@ -28,6 +28,7 @@ import { z } from "zod";
 import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
 import { type EnvFieldType } from "@/generated/env/keys";
 
+import { SyncScopeSchema } from "../../../remote-connection/db";
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
 
 const SystemSettingsWidget = lazyWidget(() =>
@@ -432,6 +433,15 @@ export const { POST } = createEndpoint({
           .min(1)
           .url()
           .transform((v) => v.replace(/\/+$/, "")),
+      }),
+      syncScope: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.fields.syncScope.label" as const,
+        description: "post.fields.syncScope.description" as const,
+        // Optional: absent → the connect repository applies the default scope
+        // (SyncScopeSchema field defaults).
+        schema: SyncScopeSchema,
       }),
       connected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

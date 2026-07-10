@@ -1,0 +1,11 @@
+{
+  "url": "https://openrouter.ai/api/v1/videos/zimgnB7SJtQdDuVDq3pe",
+  "method": "GET",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": ""
+}

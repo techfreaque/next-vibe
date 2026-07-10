@@ -6,7 +6,7 @@
 "use client";
 
 import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
 import { Mail } from "next-vibe/ui/ui/icons/Mail";
@@ -47,7 +47,7 @@ export function ContactFormWidget({
   const hasEmail = Boolean(email && String(email).trim().length > 0);
 
   const handleSubmitClick = useCallback(
-    (e: React.MouseEvent) => {
+    (e: DivMouseEvent) => {
       if (!hasEmail && !showNoEmailWarning) {
         e.preventDefault();
         e.stopPropagation();

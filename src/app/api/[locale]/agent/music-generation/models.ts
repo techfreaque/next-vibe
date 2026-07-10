@@ -61,7 +61,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "meta/musicgen",
-        creditCostPerClip: 10, // updated: 2026-07-02 from replicate-html-p50
+        creditCostPerClip: 7.1, // updated: 2026-07-10 from replicate-html-p50
         defaultDurationSeconds: 8,
         supportedDurations: ALL_DURATIONS,
       },
@@ -69,7 +69,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "musicgen-stereo",
-        creditCostPerClip: 13, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerClip: 9.23, // updated: 2026-07-10 from unbottled.ai
         defaultDurationSeconds: 8,
         supportedDurations: [
           "post.duration.short",
@@ -111,7 +111,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.MUSIC_GEN,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "music-gen",
-        creditCostPerClip: 27.3, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerClip: 27.3, // updated: 2026-07-10 from unbottled.ai
         defaultDurationSeconds: 30,
         minDurationSeconds: 30,
         supportedDurations: ["post.duration.long"],
@@ -128,14 +128,15 @@ export const musicGenModelDefinitions: Record<
   },
 
   [MusicGenModelId.CASSETTE_MUSIC]: {
+    enabled: false, // auto-disabled: price not verified
     name: "CassetteAI Music",
     by: "cassetteAi",
     description: "chat.models.descriptions.cassetteMusic",
     parameterCount: undefined,
     contextWindow: 0,
     icon: "music",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-07-10 from music-gen-deterministic
+    outputs: ["audio"], // updated: 2026-07-10 from music-gen-deterministic
     providers: [
       {
         id: MusicGenModelId.CASSETTE_MUSIC,
@@ -144,6 +145,18 @@ export const musicGenModelDefinitions: Record<
         creditCostPerClip: 12, // estimate — verify via model-prices sync
         defaultDurationSeconds: 30,
         supportedDurations: ALL_DURATIONS,
+      },
+      {
+        id: MusicGenModelId.CASSETTE_MUSIC,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "cassette-music",
+        creditCostPerClip: 15.6, // updated: 2026-07-10 from unbottled.ai
+        defaultDurationSeconds: 30,
+        supportedDurations: [
+          "post.duration.short",
+          "post.duration.medium",
+          "post.duration.long",
+        ],
       },
     ],
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
@@ -178,7 +191,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.ELEVENLABS_MUSIC,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-music",
-        creditCostPerClip: 27.3, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerClip: 27.3, // updated: 2026-07-10 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: [
           "post.duration.short",
@@ -219,7 +232,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.SONAUTO_SONG,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "sonauto-song",
-        creditCostPerClip: 10.4, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerClip: 10.4, // updated: 2026-07-10 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: [
           "post.duration.short",
@@ -260,7 +273,7 @@ export const musicGenModelDefinitions: Record<
         id: MusicGenModelId.LYRIA_3,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "lyria-3",
-        creditCostPerClip: 6.5, // updated: 2026-07-02 from unbottled.ai
+        creditCostPerClip: 6.5, // updated: 2026-07-10 from unbottled.ai
         defaultDurationSeconds: 30,
         supportedDurations: ["post.duration.long"],
       },

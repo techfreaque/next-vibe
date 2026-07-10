@@ -137,11 +137,6 @@ export class LocalExecution {
     // Resolve the callable tool set (pinned ∪ available) + denied via THE central
     // cascade (favorite → skill → NO_SKILL/role defaults). Uses the streamContext's
     // favoriteId/skillId set by the AI loop that called us; folder blocks fold in.
-    logger.debug("[RouteExecute] PROBE resolving permissions", {
-      toolName,
-      favoriteId: streamContext.favoriteId ?? null,
-      skillId: streamContext.skillId ?? null,
-    });
     const permissions = await ExecuteToolGuards.resolveToolPermissions({
       favoriteId: streamContext.favoriteId,
       skillId: streamContext.skillId,
@@ -150,19 +145,17 @@ export class LocalExecution {
       logger,
     });
 
-    logger.debug("[RouteExecute] PROBE permissions resolved", { toolName });
     const permissionBlock = ExecuteToolGuards.checkToolPermission(
       toolName,
       permissions,
     );
     if (permissionBlock !== null) {
-      logger.warn("[TOOL-BLOCK] execute-tool denied by permission cascade", {
+      logger.warn("[RouteExecute] execute-tool denied by permission cascade", {
         toolName,
         reason: permissionBlock,
         rootFolderId: streamContext.rootFolderId,
         deniedToolIds: [...permissions.deniedToolIds],
         whitelistSize: permissions.availableTools?.length ?? null,
-        whitelist: permissions.availableTools?.map((x) => x.toolId) ?? null,
       });
       return fail({
         message: t("executeTool.post.errors.forbidden.title"),
@@ -227,11 +220,6 @@ export class LocalExecution {
           callerCallbackMode: callbackMode ?? undefined,
           abortSignal: perCallAbort.signal,
         };
-
-    logger.debug("[RouteExecute] PROBE calling generic handler", {
-      toolName,
-      hasPreloaded: preloadedHandler !== undefined,
-    });
 
     const execPromise =
       RouteExecutionExecutor.executeGenericHandler<WidgetData>({

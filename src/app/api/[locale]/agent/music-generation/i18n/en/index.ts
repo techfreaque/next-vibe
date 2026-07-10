@@ -20,7 +20,8 @@ export const translations = {
     },
     model: {
       label: "Model",
-      description: "Music generation model. Leave blank to use the user's configured default.",
+      description:
+        "Music generation model. Leave blank to use the user's configured default.",
     },
     duration: {
       label: "Duration",

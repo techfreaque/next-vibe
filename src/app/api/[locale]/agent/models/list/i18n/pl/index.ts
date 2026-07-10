@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
     title: "Modele",
     titleShort: "Modele AI",
     description:
-      "Przeglądaj i wyszukuj wszystkie dostępne modele AI. Filtruj według typu, poziomu treści, inteligencji, ceny lub możliwości.",
+      "Przeglądaj wszystkie modele AI. Filtruj według typu (text/image/video/audio), poziomu treści, inteligencji. Dla modeli wideo: supportedDurations = obsługiwane długości klipu w sekundach, supportedAspectRatios = obsługiwane proporcje, supportedFrameImages = akceptowane ramki (first_frame = obraz-do-wideo, last_frame = animacja do obrazu końcowego), allowedPassthroughParameters = dodatkowe opcje (np. negative_prompt, cfg_scale), generateAudio = model generuje audio w wideo. Przekaż id modelu jako parametr model w generate_video.",
     dynamicTitle: "{{count}} modeli",
 
     fields: {
@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
         supportedResolutions: "Rozdzielczości",
         supportedFrameImages: "Typy klatek",
         generateAudio: "Generuje audio",
+        supportedSizes: "Dokładne rozmiary",
+        allowedPassthroughParameters: "Dodatkowe parametry",
       },
     },
 

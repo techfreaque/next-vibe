@@ -85,7 +85,7 @@ function buildTrailingSystemMessage(params: {
     // as ignorable old state. Present it as the current context + duties for THIS
     // turn so they are acted on, not dismissed.
     allParts.push(
-      `[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n${stateParts.join("\n\n")}`,
+      `[Current context and required actions for THIS turn — reflects live state right now]\n\n${stateParts.join("\n\n")}`,
     );
   }
 

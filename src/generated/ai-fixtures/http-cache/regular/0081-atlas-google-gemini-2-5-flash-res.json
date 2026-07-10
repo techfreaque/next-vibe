@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a190aa2cb9453727-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:40:06 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783698004-eocpUwpOmTPeK9Xxrr4O"
+  },
+  "body": {
+    "id": "gen-1783698004-eocpUwpOmTPeK9Xxrr4O",
+    "object": "chat.completion",
+    "created": 1783698004,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This audio clip features a lively electronic music piece with a clear, polished production style. It appears to be a full track or at least a substantial segment, with a duration of 35 seconds.\n\n**Music Description:**\n\n*   **Genre:** Electronic, possibly Deep House or Nu-Disco.\n*   **Tempo:** Approximately 110-120 BPM, giving it a moderate, danceable pace.\n*   **Key/Scale:** Indiscernible without further harmonic information, but it likely sits in a major or minor key with a feel-good vibe.\n*   **Time Signature:** 4/4.\n\n*   **Instrumentation and Interaction:**\n    *   **Drums:** The track features a steady, driving drum beat introduced right from the start. It includes a clear kick drum, a crisp snare on the 2 and 4, and high-hats providing a consistent rhythmic pulse.\n    *   **Bass:** A prominent deep synth bass provides a groovy, walking bassline, contributing significantly to the track's rhythmic foundation and energy.\n    *   **Synthesizer Melody:** A bright, playful synthesizer plays a catchy, repeating melody, giving the track its main melodic hook. The synth has a slightly retro, arpeggiated quality.\n    *   **Pad/Atmosphere:** A subtle, sustained synth pad provides a warm, ethereal background, adding depth and fullness to the sound.\n    *   **Percussion:** There are additional percussive elements, possibly shakers or similar light percussion, adding texture and reinforcing the rhythmic drive.\n    *   **Guitar Simulation/Synth:** There's a distinct sound reminiscent of a clean, funky electric guitar riff, likely created with a synthesizer, adding a bright, almost reggae or ska-influenced feel to the groove at times. This element provides a pleasant counter-melody or rhythmic motif.\n\n*   **Song Structure:**\n    *   The clip begins with all instruments already in full swing, suggesting it's either mid-song or an intro that immediately establishes the full sound.\n    *   The instrumentation remains consistent throughout the 35 seconds, indicating a steady groove characteristic of electronic dance music. There are no sudden drops or buildups within this segment.\n\n*   **Production Style:** The production is clean, polished, and well-mixed. There's a moderate amount of reverb on some elements, particularly the synth melody, which gives it a spacious feel without sounding overly washed out. The overall sound is bright and clear.\n\n*   **Mood and Emotional Arc:** The music evokes a positive, energetic, and slightly nostalgic mood. It feels suitable for a relaxed dance setting, a lounge, or as background music in an optimistic context. The consistent rhythm and bright melody create a sustained cheerful feeling.\n\n**Non-Musical Audio Events:**\nNo speech, sound effects, or ambient noises are present. The audio consists solely of the described music.\n\n**Sound Quality and Recording Environment:**\nThe sound quality is excellent, indicating a professional studio recording environment with high fidelity source material. It sounds like a finished, mastered track.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 647,
+      "total_tokens": 1719,
+      "cost": 0.0024641,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0024641,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0016175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

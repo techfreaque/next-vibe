@@ -1,0 +1,42 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v7/voice/music-gen",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a190839c3e46a01c-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:13:46 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=vCPiDk8MJd%2BCyhyG2H8jGEM%2F%2FX1Y%2BhhTyemxD1erOxMbHwvLu1X81RY5DZPxSVEbiNLpO1gMrJRmlrEzRJdi3aRcDFnjRn%2Fh2D6RRwhqTGTSFSsUZFSl527A7aavsEU%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "716430a9930821837464442b55b6cd74",
+    "x-request-time": "1.646",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.001",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Your audio is processing in background, you can get this image using fetch API",
+    "eta": 5,
+    "message": "Try to fetch request after seconds estimated",
+    "fetch_result": "https://modelslab.com/api/v7/voice/fetch/4284667",
+    "id": 4284667,
+    "output": [],
+    "meta": {
+      "prompt": "upbeat electronic remix",
+      "model_id": "sonauto_song"
+    },
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/1b237798-8e58-44d4-8553-105615b29f1a.mp3"
+    ]
+  }
+}

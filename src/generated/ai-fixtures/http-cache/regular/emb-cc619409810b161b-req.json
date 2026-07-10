@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I received the system-injected audio description. The track is a **lively electronic music piece** (~110-120 BPM, 35 seconds) in a Deep House/Nu-Disco style. It features:\n\n- Steady 4/4 drum beat with kick, snare, and hi-hats\n- Groovy synth bassline\n- Bright, catchy arpeggiated synth melody (main hook)\n- Warm synth pad atmosphere\n- Additional shaker percussion and a funky guitar-like synth riff\n- Clean, polished production with moderate reverb\n\nThe mood is positive, energetic, and slightly nostalgic — no speech or sound effects, just a mastered instrumental track.\n\nAudio content was present and processed ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

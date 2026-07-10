@@ -36,6 +36,8 @@ export interface ResolvedVariantFavorite {
   chatModelId: ChatModelId;
   /** The concrete image-gen model the favorite resolves to, when it configures one. */
   imageGenModelId: ImageGenModelId | null;
+  /** The concrete music-gen model the favorite resolves to, when it configures one. */
+  musicGenModelId: MusicGenModelId | null;
 }
 
 const DEFAULT_LOCALE: CountryLanguage = "en-US" as CountryLanguage;
@@ -123,15 +125,22 @@ export async function resolveVariantFavoriteModels(
       `resolveVariantFavoriteModels: favorite ${favoriteId} did not resolve to a model`,
     );
   }
-  // Image-gen model: resolved through the same filter the stream uses.
+  // Media gen models: resolved through the same filters the stream uses.
+  const availability = await getInstanceAvailability();
   const imageGenSelection = resolved.favoriteConfig.imageGenModelSelection;
-  let imageGenModelId: ImageGenModelId | null = null;
-  if (imageGenSelection) {
-    const availability = await getInstanceAvailability();
-    imageGenModelId =
-      getBestImageGenModel(imageGenSelection, user, availability)?.id ?? null;
-  }
-  return { id: favoriteId, chatModelId: resolved.model, imageGenModelId };
+  const imageGenModelId = imageGenSelection
+    ? (getBestImageGenModel(imageGenSelection, user, availability)?.id ?? null)
+    : null;
+  const musicGenSelection = resolved.favoriteConfig.musicGenModelSelection;
+  const musicGenModelId = musicGenSelection
+    ? (getBestMusicGenModel(musicGenSelection, user, availability)?.id ?? null)
+    : null;
+  return {
+    id: favoriteId,
+    chatModelId: resolved.model,
+    imageGenModelId,
+    musicGenModelId,
+  };
 }
 
 /**

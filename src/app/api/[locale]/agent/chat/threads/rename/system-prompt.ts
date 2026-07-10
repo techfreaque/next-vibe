@@ -53,17 +53,20 @@ export const threadRenameFragment: SystemPromptFragment = {
     const isNew = !row.description;
     const desc = row.description ? ` / "${row.description}"` : "";
     const callShape = `execute-tool toolName="${THREAD_RENAME_ALIAS}" (title ≤8 words no quotes; description one concrete sentence, not a restatement)`;
-    // endLoop only when rename is the last call — it runs the rename and ends the
-    // turn, sparing the empty follow-up turn (see the Tool Execution fragment).
-    const endLoopRule = `Set \`callbackMode:"endLoop"\` only if the rename is the last call of the turn; otherwise fire it in parallel with your other calls.`;
+    // Housekeeping — NEVER pre-empts the user's actual work and NEVER ends the turn.
+    // It rides in the SAME parallel batch as the real tool calls. Deliberately no
+    // endLoop: granting endLoop here makes the model treat rename as the whole turn
+    // and stop before doing the user's request (observed: T1 rename+endLoop hijack).
+    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never use it to end the turn early — keep working until the user's request is fully done.`;
 
     if (isNew) {
-      // Urgent + unconditional: fire the rename IN THIS SAME response, not "later"
-      // or "after the task". Framed as a standing duty so a task-focused persona
-      // (e.g. quality-tester) does not drop it as narration.
-      return `[MANDATORY THIS TURN] This thread still has no title ("${row.title}" is a placeholder). In THIS SAME response — regardless of what else the user asked — you MUST call ${callShape} to name it from the conversation so far. Required every turn until the thread is titled; not optional: do it silently (never mention it), never skip it. No clear topic yet → still pick a sensible short title + description. ${endLoopRule}`;
+      // Urgent + unconditional, but SUBORDINATE to the user's task: fire the rename
+      // in this same response — as a side-action, not by hijacking the turn. Framed
+      // as a standing duty so a task-focused persona (e.g. quality-tester) does not
+      // drop it as narration, yet cannot use it to short-circuit the real work.
+      return `[MANDATORY THIS TURN, ALONGSIDE YOUR ANSWER] This thread still has no title ("${row.title}" is a placeholder). While answering whatever the user asked — not instead of it — you MUST also call ${callShape} to name it from the conversation so far. Required every turn until titled; do it silently (never mention it), never skip it, never let it displace the user's request. No clear topic yet → still pick a sensible short title + description. ${rideRule}`;
     }
 
-    return `[RENAME IF STALE] Current title "${row.title}"${desc}. If the topic has shifted or the description no longer fits, silently call ${callShape} this response (never announce it). Otherwise leave it. ${endLoopRule}`;
+    return `[RENAME IF STALE] Current title "${row.title}"${desc}. If the topic has shifted or the description no longer fits, silently call ${callShape} this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. ${rideRule}`;
   },
 };

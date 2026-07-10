@@ -20,7 +20,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-const SpeechToTextContainer = lazy(() =>
+const SpeechToTextContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SpeechToTextContainer })),
 );
 

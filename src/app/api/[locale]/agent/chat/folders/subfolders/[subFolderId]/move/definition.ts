@@ -18,9 +18,10 @@ import {
 import { z } from "zod";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
+
 import { scopedTranslation } from "./i18n";
 
-const FolderMoveContainer = lazy(() =>
+const FolderMoveContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FolderMoveContainer })),
 );
 

@@ -1813,33 +1813,6 @@
     "titleShort": "Folder Contents",
     "description": "Retrieve merged list of folders and threads for a given folder level",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "noFormElement": true,
       "usage": {
         "response": true,
@@ -4215,33 +4188,6 @@
     "titleShort": "Folders",
     "description": "Retrieve all folders for the current root folder",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "noFormElement": true,
       "usage": {
         "response": true,
@@ -6274,33 +6220,6 @@
     "titleShort": "Move Folder",
     "description": "Move a folder to a different parent",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data&urlPathParams",
         "response": true
@@ -9186,33 +9105,6 @@
     "titleShort": "Community Feed",
     "description": "Public threads shared with the community",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -16514,33 +16406,6 @@
     "titleShort": "Messages",
     "description": "Retrieve all messages in a chat thread",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data&urlPathParams",
         "response": true
@@ -23496,33 +23361,6 @@
     "titleShort": "Threads",
     "description": "Retrieve a paginated list of chat threads with filtering options",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -30680,33 +30518,6 @@
     "titleShort": "Describe Image",
     "description": "Describe the contents of an image using a vision AI model",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -30845,33 +30656,6 @@
     "titleShort": "Describe Video",
     "description": "Describe the contents of a video using a vision AI model",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -31257,33 +31041,6 @@
     "titleShort": "Generate Image",
     "description": "Generate an image from a text prompt using AI",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -31808,33 +31565,6 @@
     "titleShort": "Generate Music",
     "description": "Generate music from a text prompt using AI",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -88341,33 +88071,6 @@
     "titleShort": "Create Skill",
     "description": "Create a new custom skill",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -128683,33 +128386,6 @@
             "subCategory": "chatFavorites",
             "tags": ["tags.favorites"],
             "fields": {
-              "render": {
-                "_payload": {
-                  "_status": -1,
-                  "_ioInfo": {
-                    "name": "lazy",
-                    "start": -1,
-                    "end": -1,
-                    "value": null,
-                    "owner": null,
-                    "debugStack": {},
-                    "debugTask": null
-                  }
-                },
-                "_debugInfo": [
-                  {
-                    "awaited": {
-                      "name": "lazy",
-                      "start": -1,
-                      "end": -1,
-                      "value": null,
-                      "owner": null,
-                      "debugStack": {},
-                      "debugTask": null
-                    }
-                  }
-                ]
-              },
               "usage": {
                 "request": "data&urlPathParams",
                 "response": true
@@ -194741,33 +194417,6 @@
     "titleShort": "Update Favorite",
     "description": "Update an existing favorite configuration",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data&urlPathParams",
         "response": true
@@ -215320,33 +214969,6 @@
     "titleShort": "Add Favorite",
     "description": "Create a new favorite character configuration",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -230239,33 +229861,6 @@
     "titleShort": "Generate Video",
     "description": "Generate a video from a text prompt using AI",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -230475,12 +230070,42 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "enum",
+                  "entries": {
+                    "16:9": "16:9",
+                    "9:16": "9:16",
+                    "1:1": "1:1",
+                    "4:3": "4:3",
+                    "3:4": "3:4",
+                    "3:2": "3:2",
+                    "2:3": "2:3",
+                    "21:9": "21:9",
+                    "9:21": "9:21"
+                  }
                 },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
+                "type": "enum",
+                "enum": {
+                  "16:9": "16:9",
+                  "9:16": "9:16",
+                  "1:1": "1:1",
+                  "4:3": "4:3",
+                  "3:4": "3:4",
+                  "3:2": "3:2",
+                  "2:3": "2:3",
+                  "21:9": "21:9",
+                  "9:21": "9:21"
+                },
+                "options": [
+                  "16:9",
+                  "9:16",
+                  "1:1",
+                  "4:3",
+                  "3:4",
+                  "3:2",
+                  "2:3",
+                  "21:9",
+                  "9:21"
+                ]
               }
             },
             "type": "optional"
@@ -230518,13 +230143,13 @@
           },
           "schemaType": "primitive"
         },
-        "inputMediaUrl": {
+        "firstFrameUrl": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Input Image URL",
-          "description": "Image to animate. The model will generate motion from this frame.",
+          "label": "First Frame URL",
+          "description": "Image to use as the first frame. The model animates forward from this.",
           "columns": 12,
-          "placeholder": "https://example.com/image.jpg",
+          "placeholder": "https://example.com/first-frame.jpg",
           "schema": {
             "def": {
               "type": "optional",
@@ -230550,6 +230175,106 @@
                 "format": "url",
                 "minLength": null,
                 "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "lastFrameUrl": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Last Frame URL",
+          "description": "Image to use as the last frame. The model animates backward to this.",
+          "columns": 12,
+          "placeholder": "https://example.com/last-frame.jpg",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "url",
+                        "check": "string_format",
+                        "abort": false
+                      },
+                      "type": "string",
+                      "format": "url",
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  ]
+                },
+                "type": "string",
+                "format": "url",
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "negativePrompt": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Negative Prompt",
+          "description": "Describe what to exclude from the video.",
+          "columns": 12,
+          "placeholder": "blurry, low quality, distorted...",
+          "hiddenForPlatforms": ["ai", "mcp"],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": 1000
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "cfgScale": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "CFG Scale",
+          "description": "How strictly the model follows the prompt (0–30). Higher = more literal.",
+          "columns": 12,
+          "hiddenForPlatforms": ["ai", "mcp"],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [{}, {}]
+                },
+                "type": "number",
+                "minValue": 0,
+                "maxValue": 30,
+                "isInt": false,
+                "isFinite": true,
+                "format": null
               }
             },
             "type": "optional"
@@ -236253,33 +235978,6 @@
     "titleShort": "Captured Leads",
     "description": "Everyone who submitted your lead magnet form",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "response": true
       },
@@ -236519,33 +236217,6 @@
     "titleShort": "LM Config",
     "description": "View your current lead magnet configuration",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "response": true
       },
@@ -239282,33 +238953,6 @@
     "titleShort": "Google Sheets",
     "description": "Append a row to your Google Spreadsheet each time a lead signs up",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "request": "data",
         "response": true
@@ -254969,33 +254613,6 @@
     "titleShort": "My Profile",
     "description": "Retrieve current user profile information",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "usage": {
         "response": true
       },
@@ -256992,33 +256609,6 @@
     "titleShort": "Update Profile",
     "description": "Update current user profile information",
     "fields": {
-      "render": {
-        "_payload": {
-          "_status": -1,
-          "_ioInfo": {
-            "name": "lazy",
-            "start": -1,
-            "end": -1,
-            "value": null,
-            "owner": null,
-            "debugStack": {},
-            "debugTask": null
-          }
-        },
-        "_debugInfo": [
-          {
-            "awaited": {
-              "name": "lazy",
-              "start": -1,
-              "end": -1,
-              "value": null,
-              "owner": null,
-              "debugStack": {},
-              "debugTask": null
-            }
-          }
-        ]
-      },
       "noFormElement": true,
       "usage": {
         "request": "data",

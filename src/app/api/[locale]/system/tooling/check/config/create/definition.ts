@@ -18,11 +18,12 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
+
 import { lazyWidget } from "../../../../unified-ui/_shared/lazy-widget";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
-const ConfigCreateWidget = React.lazy(() =>
+const ConfigCreateWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
     default: m.ConfigCreateWidget,
   })),

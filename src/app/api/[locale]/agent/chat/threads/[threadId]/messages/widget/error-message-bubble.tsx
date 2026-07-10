@@ -15,13 +15,14 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
 import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { ContactRequest } from "@/app/api/[locale]/contact/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointsPage";
 import { useUser } from "@/app/api/[locale]/user/private/me/hooks";
 
 import { scopedTranslation } from "../i18n";
@@ -267,7 +268,7 @@ export function ErrorMessageBubble({
                 locale={locale}
                 user={user}
                 endpointOptions={{
-                  create: { autoPrefillData: contactPrefill as never },
+                  create: { autoPrefillData: contactPrefill ?? undefined },
                 }}
                 className="mt-2"
               />

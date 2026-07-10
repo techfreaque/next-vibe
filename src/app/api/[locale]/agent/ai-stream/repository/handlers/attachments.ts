@@ -190,6 +190,7 @@ export class FileUploadEventHandler {
             );
 
             dbWriter.emitFilesUploaded({
+              threadId,
               messageId: result.userMessageId,
               attachments: result.attachments,
             });

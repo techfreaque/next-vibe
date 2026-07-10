@@ -20,6 +20,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createRelationalDb } from "next-vibe/database/relational";
 import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
@@ -387,3 +388,18 @@ export type CreditTransaction = z.infer<typeof selectCreditTransactionSchema>;
 export type NewCreditTransaction = z.infer<
   typeof insertCreditTransactionSchema
 >;
+
+/**
+ * Credits relational client — the only client carrying the credit schema, so
+ * the one that serves `db.query.creditWallets` / relational credit queries.
+ * The default `db` from `next-vibe/database` has no schema and cannot. Use
+ * `creditsDb.query.*` for relational reads; keep using `db.select()` elsewhere.
+ */
+export const creditsDb = createRelationalDb({
+  creditWallets,
+  creditPacks,
+  creditTransactions,
+  creditWalletsRelations,
+  creditPacksRelations,
+  creditTransactionsRelations,
+});

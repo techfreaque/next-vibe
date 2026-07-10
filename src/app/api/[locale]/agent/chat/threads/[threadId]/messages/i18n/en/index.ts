@@ -54,6 +54,7 @@ export const translations = {
   compacting: {
     title: "History Compacted",
     loading: "Compacting history...",
+    summarizing: "Summarizing conversation...",
     failed: "Compacting failed",
   },
   get: {

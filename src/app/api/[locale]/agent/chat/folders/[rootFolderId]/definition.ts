@@ -31,10 +31,11 @@ import {
 import { z } from "zod";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
+
 import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";
 
-const FoldersListContainer = lazy(() =>
+const FoldersListContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.FoldersListContainer })),
 );
 

@@ -37,7 +37,12 @@ const hooks = makeReverseWsSetup(_resolvedRemoteUrl);
 if (_resolvedRemoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream Integration - Direct tools-remote (cheap, reverse-WS) (${_resolvedRemoteUrl}, loop LOCAL, tools via execute-tool→hermes over reverse-ws)`,
-    cachePrefix: "direct-rws-cheap-",
+    // SHARE the direct-http suite's fixtures: same conversation + same model
+    // calls, only the transport differs (reverse-ws vs direct-http). The AI /
+    // embedding fixtures are recorded once by route.direct.cheap and replayed
+    // here. Threads land in this suite's OWN folder via threadCasePrefix.
+    cachePrefix: "direct-cheap-",
+    threadCasePrefix: "direct-rws-cheap-",
     cheapMode: true,
     // Loop runs locally; every tool executes on hermes via the execute-tool
     // meta-tool — dispatched over the reverse-ws leg.

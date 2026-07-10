@@ -1,0 +1,25 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/videos/zimgnB7SJtQdDuVDq3pe",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19086031928db0b-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:15:22 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff"
+  },
+  "body": {
+    "id": "zimgnB7SJtQdDuVDq3pe",
+    "generation_id": "gen-vid-1783696490-LBO0MaUIw3sYzy7FzvnD",
+    "polling_url": "https://openrouter.ai/api/v1/videos/zimgnB7SJtQdDuVDq3pe",
+    "status": "pending"
+  }
+}

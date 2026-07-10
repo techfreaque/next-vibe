@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a190a95a3ca23727-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 15:39:35 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783697970-lPpuyH2cbkWxuQOeaEyS"
+  },
+  "body": {
+    "id": "gen-1783697970-lPpuyH2cbkWxuQOeaEyS",
+    "object": "chat.completion",
+    "created": 1783697970,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This image is a minimalist graphic composition featuring a single, solid red circle centered upon a plain white square background. The circle is completely filled with a vibrant, saturated shade of red and has sharp, clean edges. The white background is uniform and unmarked. There is no text, texture, shading, or any other element present; the image consists purely of the red circle and the white field. The composition is symmetrical that the circle is perfectly centered horizontally and vertically within the frame.",
+          "refusal": null,
+          "reasoning": "**Describing Elements**\n\nMy focus is on detailing the visual components. I've identified a singular, dominant red circle set against an unadorned backdrop, noting the absence of any textual elements.\n\n**Detailing Visuals**\n\nI am refining the description to capture the stark simplicity. The core focus remains on the solitary, vibrant red circle, precisely centered against an unblemished white expanse. My current effort is to meticulously articulate the absence of any supplementary details, such as text or complex shading, ensuring a clear and direct representation of the visual elements.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Describing Elements**\n\nMy focus is on detailing the visual components. I've identified a singular, dominant red circle set against an unadorned backdrop, noting the absence of any textual elements.\n\n**Detailing Visuals**\n\nI am refining the description to capture the stark simplicity. The core focus remains on the solitary, vibrant red circle, precisely centered against an unblemished white expanse. My current effort is to meticulously articulate the absence of any supplementary details, such as text or complex shading, ensuring a clear and direct representation of the visual elements.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "Co8HAY89a1/T7ljWBNFTwYKHMY4tXamZ3X03imY8voTg8Hnrg0nBOrf36YzuYDMWz9svaAk9t3lX8rNpwVO4XmHeqHZ20qrGMYRpayle5RY6BoU7DAo9NwXM6JwHzfigco6kRyA4ym0uZCFgF2t1sJVjgkS6ks9nT30EOaOWaIzP2A3puV8T0JjtKuWgPXbRDWtEyhShl2s3iSrfOeoVEKaJPQ33irF54wXjtg0DV2pkLg+p6TA63x16g4+OKn+63ZcvQuCb9WnPzTwnjWcG2tifFidjd78bftHetBp7zfSYIsULh02EJ8wLhFU3ZP9hORZaYAY76IdBG5A5Z1coMl3t4kFT7i6XNM1gHidt8T2BkzLe+r2nPoYuV2faX33kch7yrmoUHGmQnZPFQkR+6qBoTr/BPM/fDWgnTzG1QVqLTmwHTJOmCe7V6OZRNUPKA/3cdyMGAqjM+Fivj64LNO+AQ/NabexyKWPFqCmjKXprJvZvWYv6MM9GD7dM/mE//WVLq9dkpJfHqXzfc7lApL3d8OCN/IUMANITQfQIzaB+nKW2R1GV47aBAeH83XDMEvpKkojU5cJHb0r4Js6RUJSLhe5e6LwpEaOT7nvWPqKDv+AnooG/Jw2/Bhz51/8UMTIAlsS7zzmM05eJXQFYxBktVN6MS3G8+8xBD4T37TVCVgj87Ki0s5GVUOWMb4w6P0ZsAvvPs0JXxd4imhPfX80vyfKC+1MC6f4ovLZElE9sLcyJc+miIJ5ENhTXK6pRWc4wG2CmOfgF6TOm/9zRDiQsIypR9oAsW4KIeyWjOAslwXcXoAxxmL8u1Ul4EKyZRdDPZmuB1rwckGy1APBJhGLspE6iMX/bLUqlWPCquPD0GuJyXuYDOoNZut5ABNNToq7+AbziEKh7WmUtiA9BTK3D7QElduefSSx/3zLBGruyUKWHGNYs3V3ipa4jGwpi2grXuBXBTD6ylKJujBM4Rk6eCBaioGVnsKaNQbBjySTU9qcbZU9y0pQAhs3/rZCDd5eH43wTXVELtOzSB96BKgn2k9R9CfwGMUG2ERpg8IE4kImgA4eJ4NURHEIBZM13WwrGGWy3tPmL/jSTxGgnLkDaK/A4pxMRUiDZr4F1Of09swZGDNq+xR2j+ZqXEyQ1Hqbb8z55+SoJ9Y/R1sdUIqa0Rw6RyiNZElB6nvBWxawBK6bS05+IqHe9cauFGm66tBI="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 286,
+      "total_tokens": 1123,
+      "cost": 0.005106,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005106,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.003432
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 191,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

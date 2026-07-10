@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I received both descriptions:\n\n**Image:** A minimalist composition with a solid, vibrant red circle perfectly centered on a plain white square background. Clean edges, no textures or text — reminiscent of a simple flag design.\n\n**Audio:** A ~20-second Hip Hop/Trap instrumental at 90-100 BPM with electronic drums (trap beat, 808 bass, hi-hats, snare), a synth/bell melody, and polished studio production. Steady, confident mood.\n\nBoth image content and audio content were present and processed ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

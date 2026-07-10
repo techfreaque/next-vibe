@@ -27,7 +27,7 @@ export const translations = {
     title: "Models",
     titleShort: "AI Models",
     description:
-      "Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.",
+      "Browse all AI models. Filter by type (text/image/video/audio), content level, intelligence. For video models: supportedDurations lists valid clip lengths in seconds, supportedAspectRatios lists valid ratios, supportedFrameImages shows accepted frame inputs (first_frame = image-to-video, last_frame = animate toward an end image), allowedPassthroughParameters lists extra options the model accepts (e.g. negative_prompt, cfg_scale), generateAudio indicates the model produces audio in the video. Pass model id as the model parameter when calling generate_video.",
     dynamicTitle: "{{count}} models",
 
     fields: {
@@ -92,6 +92,8 @@ export const translations = {
         supportedResolutions: "Resolutions",
         supportedFrameImages: "Frame Image Types",
         generateAudio: "Generates Audio",
+        supportedSizes: "Exact Sizes",
+        allowedPassthroughParameters: "Extra Parameters",
       },
     },
 

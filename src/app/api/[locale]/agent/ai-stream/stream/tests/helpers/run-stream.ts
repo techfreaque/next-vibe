@@ -205,7 +205,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           break;
         }
         await new Promise<void>((resolve) => {
-          setTimeout(resolve, 500);
+          setTimeout(resolve, 100);
         });
       }
       await waitForThreadIdle(
@@ -390,7 +390,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
             break;
           }
           await new Promise<void>((resolve) => {
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 100);
           });
         }
       }
@@ -444,7 +444,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
             break;
           }
           await new Promise<void>((resolve) => {
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 100);
           });
         }
       }
@@ -516,7 +516,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         if (revivalPending) {
           for (let i = 0; i < 20 && threadStreamingState !== "waiting"; i++) {
             await new Promise<void>((resolve) => {
-              setTimeout(resolve, 300);
+              setTimeout(resolve, 100);
             });
             threadStreamingState = await getStreamingState(tid);
             if (threadStreamingState === "idle" && !(await hasPendingWork())) {
@@ -567,7 +567,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         const REVIVAL_TIMEOUT_MS = cfg.pulse
           ? 30_000
           : Math.max(120_000, params.settleTimeoutMs ?? 0);
-        const REVIVAL_POLL_INTERVAL_MS = 500;
+        const REVIVAL_POLL_INTERVAL_MS = 100;
         const MAX_PULSE_RETRIES = 3;
         let pulseRetries = 0;
         let lastPulsedAt = Date.now();
@@ -681,7 +681,8 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         // accounting assert then compared against a single-turn ledger window and
         // failed. Matches the settledTurnCredits / headless-runner semantics.
         const totalCredits = revivedMessages.reduce(
-          (sum, m) => sum + (m.creditCost ?? 0),
+          (sum, m) =>
+            preStreamMessageIds.has(m.id) ? sum : sum + (m.creditCost ?? 0),
           0,
         );
         // Use the leaf id as the anchor for the next turn (headless runner
@@ -805,8 +806,12 @@ async function assertCasePlacement(
   if (!threadId) {
     return;
   }
+  // Thread folder name is decoupled from the fixture cache (threadCasePrefix) —
+  // a suite sharing another's fixtures still lands its threads in its OWN folder.
+  const threadCasePrefix = cfg.threadCasePrefix ?? cfg.cachePrefix;
   const testCaseName =
-    cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") || "regular";
+    threadCasePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+    "regular";
   const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
     await import("../../../testing/remote-setup");
   // The ORIGIN's title is the parity anchor: it must derive from the first
@@ -889,7 +894,7 @@ async function assertCasePlacement(
           throw err;
         }
         await new Promise((resolve) => {
-          setTimeout(resolve, 500);
+          setTimeout(resolve, 100);
         });
       }
     }

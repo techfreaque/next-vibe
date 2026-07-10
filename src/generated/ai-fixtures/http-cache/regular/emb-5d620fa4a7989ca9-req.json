@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T9 setup] Call the generate_image tool with prompt='mountain landscape at golden hour' to generate an image. End your reply with STEP_OK once the image is generated.",
+    "encoding_format": "float"
+  }
+}

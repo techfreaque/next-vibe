@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
     title: "Modelle",
     titleShort: "KI-Modelle",
     description:
-      "Alle verfügbaren KI-Modelle durchsuchen und filtern. Nach Typ, Inhaltsstufe, Intelligenz, Preis oder Fähigkeiten filtern.",
+      "Alle KI-Modelle durchsuchen. Nach Typ (text/image/video/audio), Inhaltsstufe, Intelligenz filtern. Für Videomodelle: supportedDurations = gültige Cliplängen in Sekunden, supportedAspectRatios = gültige Seitenverhältnisse, supportedFrameImages = akzeptierte Frame-Eingaben (first_frame = Bild-zu-Video, last_frame = Animation zu einem Endbild), allowedPassthroughParameters = weitere Optionen (z.B. negative_prompt, cfg_scale), generateAudio = Modell erzeugt Audio im Video. Model-ID als model-Parameter bei generate_video übergeben.",
     dynamicTitle: "{{count}} Modelle",
 
     fields: {
@@ -93,6 +93,8 @@ export const translations: typeof enTranslations = {
         supportedResolutions: "Auflösungen",
         supportedFrameImages: "Einzelbild-Typen",
         generateAudio: "Erzeugt Audio",
+        supportedSizes: "Exakte Größen",
+        allowedPassthroughParameters: "Zusätzliche Parameter",
       },
     },
 

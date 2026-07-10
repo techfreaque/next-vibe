@@ -69,7 +69,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
       },
-          {
+      {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-alloy",
@@ -109,7 +109,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
       },
-          {
+      {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-nova",
@@ -149,7 +149,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "openai",
         creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
       },
-          {
+      {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-onyx",
@@ -183,7 +183,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "echo",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
-          {
+      {
         id: TtsModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-echo",
@@ -217,7 +217,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "shimmer",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
-          {
+      {
         id: TtsModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-shimmer",
@@ -251,7 +251,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "fable",
         creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
       },
-          {
+      {
         id: TtsModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-fable",
@@ -286,7 +286,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "21m00Tcm4TlvDq8ikWAM",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
-          {
+      {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-rachel",
@@ -321,7 +321,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "TxGEqnHWrfWFTfGW9XjX",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
-          {
+      {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-josh",
@@ -356,7 +356,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "EXAVITQu4vr4xnSDxMaL",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
-          {
+      {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-bella",
@@ -391,7 +391,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "pNInz6obpgDQGcFmaJgB",
         creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
       },
-          {
+      {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-adam",

@@ -166,6 +166,15 @@ export async function generateVideoWithModelsLab(params: {
         eta: result.eta,
       });
 
+      // After ~ETA seconds the asset is usually ready even if the poll `status`
+      // stays "processing" (a ModelsLab video quirk); from that point we HEAD the
+      // future_links URL each poll. Guarded so a tiny/absent ETA still waits at
+      // least a couple polls before hammering HEAD.
+      const etaAttempts = Math.max(
+        2,
+        Math.ceil((result.eta ?? 60) / (POLL_INTERVAL_MS / 1000)),
+      );
+
       let lastResponse: Response = submitResponse;
       for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
         if (signal?.aborted) {
@@ -212,6 +221,28 @@ export async function generateVideoWithModelsLab(params: {
             }),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
+        }
+
+        // ModelsLab's /fetch endpoint sometimes NEVER flips `status` to "success"
+        // for video jobs — it stays "processing" indefinitely even after the asset
+        // is fully generated and live at future_links. Relying on `status` alone
+        // then burns the whole poll budget and fails a video that actually exists.
+        // So once we're past the provider's ETA, HEAD the future_links URL each
+        // poll: the moment the file is really there (200), return it as success.
+        if (futureUrl && attempt + 1 >= etaAttempts) {
+          try {
+            const head = await fetchImpl(futureUrl, { method: "HEAD", signal });
+            lastResponse = head;
+            if (head.ok) {
+              logger.debug(
+                "[ModelsLab Video] future_links ready mid-poll (status stuck on processing)",
+                { futureUrl, attempt: attempt + 1 },
+              );
+              return success({ videoUrl: futureUrl });
+            }
+          } catch {
+            // File not ready yet — keep polling.
+          }
         }
 
         logger.debug("[ModelsLab Video] Still processing", {

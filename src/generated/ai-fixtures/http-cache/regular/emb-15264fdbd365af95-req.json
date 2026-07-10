@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I can see the image content via the injected vision description. The image is a simple minimalist composition: a **solid red circle** perfectly centered on a **plain white square background**. The circle is a vibrant, saturated red with clean, sharp edges. No text, textures, shading, or other elements are present — just a pure, symmetrical red-on-white design.\n\nImage content is present (via injected description) and I've described it ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

@@ -100,7 +100,9 @@ function FileAttachmentItem({
 }: {
   attachment: FileAttachment;
 }): JSX.Element {
-  const [displayUrl, setDisplayUrl] = useState<string>(attachment.url);
+  const [displayUrl, setDisplayUrl] = useState<string | null>(
+    attachment.url || null,
+  );
 
   // Generate blob URL from base64 for incognito mode
   useEffect(() => {
@@ -124,6 +126,9 @@ function FileAttachmentItem({
     }
   }, [attachment.data, attachment.url, attachment.mimeType]);
 
+  if (!displayUrl) {
+    return <GenericAttachment attachment={attachment} displayUrl={null} />;
+  }
   if (isImage(attachment.mimeType)) {
     return <ImageAttachment attachment={attachment} displayUrl={displayUrl} />;
   }
@@ -141,18 +146,18 @@ function ImageAttachment({
   displayUrl,
 }: {
   attachment: FileAttachment;
-  displayUrl: string;
+  displayUrl: string | null;
 }): JSX.Element {
   return (
     <Div className="rounded-xl overflow-hidden bg-muted/20 border border-border/50">
       <ExternalLink
-        href={displayUrl}
+        href={displayUrl ?? ""}
         target="_blank"
         rel="noopener noreferrer"
         className="block"
       >
         <Image
-          src={displayUrl}
+          src={displayUrl ?? ""}
           alt={attachment.filename}
           width={800}
           height={600}
@@ -170,12 +175,12 @@ function VideoAttachment({
   displayUrl,
 }: {
   attachment: FileAttachment;
-  displayUrl: string;
+  displayUrl: string | null;
 }): JSX.Element {
   return (
     <Div className="rounded-xl overflow-hidden bg-black/80 border border-border/50">
       <Video
-        src={displayUrl}
+        src={displayUrl ?? ""}
         controls
         preload="metadata"
         className="w-full max-h-72 object-contain"
@@ -191,7 +196,7 @@ function AudioAttachment({
   displayUrl,
 }: {
   attachment: FileAttachment;
-  displayUrl: string;
+  displayUrl: string | null;
 }): JSX.Element {
   return (
     <Div className="rounded-xl bg-muted/30 border border-border/50 px-3 py-2.5">
@@ -216,7 +221,7 @@ function AudioAttachment({
         )}
       </Div>
       <Audio
-        src={displayUrl}
+        src={displayUrl ?? ""}
         controls
         preload="metadata"
         className="w-full h-9"
@@ -231,7 +236,7 @@ function GenericAttachment({
   displayUrl,
 }: {
   attachment: FileAttachment;
-  displayUrl: string;
+  displayUrl: string | null;
 }): JSX.Element {
   return (
     <Div className="rounded-xl bg-muted/30 border border-border/50">
@@ -246,7 +251,7 @@ function FileFooter({
   showIcon = false,
 }: {
   attachment: FileAttachment;
-  displayUrl: string;
+  displayUrl: string | null;
   showIcon?: boolean;
 }): JSX.Element {
   return (

@@ -489,18 +489,23 @@ export class AiStreamRepository {
       let overrideFavoriteConfig: FavoriteConfig | null = null;
       const userId = user.isPublic ? undefined : user.id;
       if (favoriteIdOverride && userId) {
+        const favoriteIdCondition = isUuid(favoriteIdOverride)
+          ? eq(chatFavorites.id, favoriteIdOverride)
+          : isSkillVariantId(favoriteIdOverride)
+            ? ((): ReturnType<typeof and> => {
+                const { skillId, variantId } = parseSkillId(favoriteIdOverride);
+                return and(
+                  eq(chatFavorites.skillId, skillId),
+                  variantId !== null
+                    ? eq(chatFavorites.variantId, variantId)
+                    : sql`${chatFavorites.variantId} IS NULL`,
+                );
+              })()
+            : eq(chatFavorites.slug, favoriteIdOverride);
         const [invokingFavorite] = await db
           .select({ subAgentFavoriteId: chatFavorites.subAgentFavoriteId })
           .from(chatFavorites)
-          .where(
-            and(
-              or(
-                eq(chatFavorites.id, favoriteIdOverride),
-                eq(chatFavorites.slug, favoriteIdOverride),
-              ),
-              eq(chatFavorites.userId, userId),
-            ),
-          )
+          .where(and(favoriteIdCondition, eq(chatFavorites.userId, userId)))
           .limit(1);
 
         if (invokingFavorite?.subAgentFavoriteId) {
@@ -1083,6 +1088,7 @@ export class AiStreamRepository {
       });
       if (data.rootFolderId) {
         createFolderContentsEmitter(logger, user, data.rootFolderId, {
+          subFolderId: data.subFolderId ?? undefined,
           resolvedRelayContext,
         })("thread-title-updated", {
           responseData: {

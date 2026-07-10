@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T6c#3 wakeUp-repeat] Call the generate_image tool with prompt='wakeup-stress-test' and callbackMode='wakeUp'. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.",
+    "encoding_format": "float"
+  }
+}

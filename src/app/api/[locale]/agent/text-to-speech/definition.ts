@@ -23,7 +23,7 @@ import { DEFAULT_TTS_VOICE_ID, TEXT_TO_SPEECH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { TtsModelId, TtsModelIdOptions } from "./models";
 
-const TextToSpeechContainer = lazy(() =>
+const TextToSpeechContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TextToSpeechContainer })),
 );
 
