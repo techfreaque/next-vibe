@@ -36,6 +36,14 @@ import {
   RESOLUTION_MS,
 } from "next-vibe/dataflow/shared/fields";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
+import {
+  addDocumentListener,
+  getDocumentBody,
+  getElementById,
+  observeRootMutations,
+} from "next-vibe/ui/lib/dom";
+import { getLocalItem, setLocalItem } from "next-vibe/ui/lib/storage";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -381,9 +389,8 @@ function getChartColors(): {
   borderColor: string;
   bgColor: string;
 } {
-  const style = getComputedStyle(document.documentElement);
-  const fg = style.getPropertyValue("--foreground").trim();
-  const border = style.getPropertyValue("--border").trim();
+  const fg = getRootCssVar("--foreground");
+  const border = getRootCssVar("--border");
   return {
     textColor: fg ? `hsl(${fg})` : "#888",
     borderColor: border ? `hsl(${border})` : "#333",
@@ -603,7 +610,7 @@ function useMultiPaneRenderer(
 
   const panesRef = useRef<Map<number, PaneState>>(new Map());
   const LineSeriesCtorRef = useRef<SeriesDefinition<"Line"> | null>(null);
-  const themeObserverRef = useRef<MutationObserver | null>(null);
+  const themeObserverRef = useRef<{ disconnect: () => void } | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const onPanBackRef = useRef(onPanBack);
   onPanBackRef.current = onPanBack;
@@ -896,7 +903,7 @@ function useMultiPaneRenderer(
       }
 
       // Theme observer (shared for all panes)
-      const themeObserver = new MutationObserver(() => {
+      const themeCallback = (): void => {
         const updated = getChartColors();
         for (const [, pane] of panesRef.current) {
           pane.chart.applyOptions({
@@ -913,12 +920,12 @@ function useMultiPaneRenderer(
             leftPriceScale: { borderColor: updated.borderColor },
           });
         }
-      });
-      themeObserver.observe(document.documentElement, {
+      };
+      const disconnectTheme = observeRootMutations(themeCallback, {
         attributes: true,
         attributeFilter: ["class", "style", "data-theme"],
       });
-      themeObserverRef.current = themeObserver;
+      themeObserverRef.current = { disconnect: disconnectTheme };
 
       // Resize observer
       const resizeObserver = new ResizeObserver(() => {
@@ -1100,7 +1107,7 @@ function PaneLegend({
 
   const legendId = `vs-legend-${String(paneNum)}`;
   useEffect(() => {
-    const el = document.getElementById(legendId);
+    const el = getElementById(legendId);
     if (!el) {
       return;
     }
@@ -1243,7 +1250,7 @@ function PaneActions({
 }): React.JSX.Element {
   const actionsId = `vs-pane-actions-${String(paneNum)}`;
   useEffect(() => {
-    const el = document.getElementById(actionsId);
+    const el = getElementById(actionsId);
     if (!el) {
       return;
     }
@@ -1539,11 +1546,13 @@ function PaneDragHandle({
         }
       };
 
+      let removeMove: (() => void) | undefined;
+      let removeUp: (() => void) | undefined;
       const onMouseUp = (): void => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-        document.body.style.cursor = "";
-        document.body.style.userSelect = "";
+        removeMove?.();
+        removeUp?.();
+        getDocumentBody().style.cursor = "";
+        getDocumentBody().style.userSelect = "";
         // Force time scale visible on the last pane (it may have been hidden by lwc during resize)
         // Find the highest pane number (last in the layout) and force its time scale visible
         let lastPaneNum = -1;
@@ -1561,10 +1570,10 @@ function PaneDragHandle({
         syncScaleWidths(panesRef);
       };
 
-      document.body.style.cursor = "row-resize";
-      document.body.style.userSelect = "none";
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      getDocumentBody().style.cursor = "row-resize";
+      getDocumentBody().style.userSelect = "none";
+      removeMove = addDocumentListener("mousemove", onMouseMove);
+      removeUp = addDocumentListener("mouseup", onMouseUp);
     };
     el.addEventListener("mousedown", handler);
     return (): void => el.removeEventListener("mousedown", handler);
@@ -1662,8 +1671,7 @@ function ResolutionPicker({
         setOverflowOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return (): void => document.removeEventListener("mousedown", handler);
+    return addDocumentListener("mousedown", handler);
   }, [overflowOpen]);
 
   const { visible, hidden } = getVisibleOptions(
@@ -1860,7 +1868,7 @@ export function GraphChartView(): React.JSX.Element {
     }
     // Overlay localStorage toggles (user clicked eye without saving)
     try {
-      const stored = localStorage.getItem(`vs-hidden-${graph.id}`);
+      const stored = getLocalItem(`vs-hidden-${graph.id}`);
       if (stored !== null) {
         const parsed = JSON.parse(stored) as string[];
         if (Array.isArray(parsed)) {
@@ -2172,14 +2180,7 @@ export function GraphChartView(): React.JSX.Element {
           next.add(nodeId);
         }
         // Persist to localStorage keyed to graph ID so it survives reload
-        try {
-          localStorage.setItem(
-            `vs-hidden-${graph.id}`,
-            JSON.stringify([...next]),
-          );
-        } catch {
-          // ignore quota errors
-        }
+        setLocalItem(`vs-hidden-${graph.id}`, JSON.stringify([...next]));
         return next;
       });
     },

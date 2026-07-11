@@ -135,7 +135,6 @@ describe("POST /user/private/me/password", () => {
           newPassword: "NewSecure456!",
           confirmPassword: "NewSecure456!",
         },
-        twoFactorCode: "12",
       },
       user: adminUser,
     });

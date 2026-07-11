@@ -63,6 +63,12 @@ export class RemoteConnectionRegisterRepository {
     const { status, networkError } = await RemoteTransport.callEndpointDirect({
       connection: { remoteUrl: localUrl, token, leadId },
       definition: healthDef.default.GET,
+      input: {
+        detailed: false,
+        includeDatabase: false,
+        includeTasks: false,
+        includeSystem: false,
+      },
       locale,
     });
     if (networkError) {

@@ -192,7 +192,7 @@ export class RemoteTransport {
       return {
         response: fail({
           message: t("error.message"),
-          errorType: ErrorResponseTypes.NETWORK_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         }) as ResponseType<TDef["types"]["ResponseOutput"]>,
         status: 0,
         networkError: true,

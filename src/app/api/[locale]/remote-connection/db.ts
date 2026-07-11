@@ -272,7 +272,7 @@ export const remoteConnections = pgTable(
     /**
      * Which data providers sync over this connection.
      */
-    syncScope: jsonb("sync_scope").$type<SyncScope>(),
+    syncScope: jsonb("sync_scope").$type<SyncScope>().notNull(),
 
     /**
      * Thread mirroring policy for this connection — OVERRIDES thread-domain

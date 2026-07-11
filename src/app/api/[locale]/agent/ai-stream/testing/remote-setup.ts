@@ -1113,6 +1113,7 @@ export async function resolveProdAdminToken(
       input: {
         email: env.VIBE_ADMIN_USER_EMAIL,
         password: env.VIBE_ADMIN_USER_PASSWORD,
+        rememberMe: true,
       },
       locale: defaultLocale,
       timeoutMs: 10_000,

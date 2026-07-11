@@ -24,7 +24,6 @@
 import { and, eq } from "drizzle-orm";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -41,7 +40,6 @@ import {
   ThreadsSyncCursorSchema,
 } from "@/app/api/[locale]/remote-connection/db";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import type { SyncResponseOutput } from "@/app/api/[locale]/remote-connection/sync/definition";
 import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
 import { env } from "@/config/env";
 

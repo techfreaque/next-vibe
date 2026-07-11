@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ALTER COLUMN "sync_scope" SET NOT NULL;

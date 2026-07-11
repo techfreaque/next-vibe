@@ -18,8 +18,7 @@ export const translations = {
       street: "Bachstrasse 1",
       city: "84359 Simbach am Inn",
       country: "Germany",
-      addressIn1Line:
-        "Bachstrasse 1, 84359 Simbach am Inn, Germany",
+      addressIn1Line: "Bachstrasse 1, 84359 Simbach am Inn, Germany",
     },
     responsiblePerson: {
       name: "Marcus Brandstätter",
