@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    back: "Wstecz",
     loading: "Ładowanie…",
     pitch: {
       headline: "Zamień odwiedzających w subskrybentów",

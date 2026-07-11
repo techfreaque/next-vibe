@@ -471,7 +471,7 @@ export const translations: typeof enTranslations = {
     },
     nav: {
       logout: "Abmelden",
-      back: "←",
+      back: "Zurück",
     },
     sections: {
       account: "Konto",

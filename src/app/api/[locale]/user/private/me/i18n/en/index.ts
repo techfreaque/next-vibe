@@ -465,7 +465,7 @@ export const translations = {
     },
     nav: {
       logout: "Log out",
-      back: "←",
+      back: "Back",
     },
     sections: {
       account: "Account",

@@ -280,7 +280,7 @@ export const chatMessageTolerantSchema = z
  * Never throws.
  */
 export function parseMessageHistory(
-  items: readonly unknown[] | null | undefined,
+  items: readonly ChatMessage[] | null | undefined,
 ): ChatMessage[] {
   if (!items) {
     return [];
@@ -290,3 +290,14 @@ export function parseMessageHistory(
     return parsed.success ? [parsed.data] : [];
   });
 }
+
+/**
+ * Request-schema form of the tolerant history parse. The array item is an
+ * input-side placeholder only — parseMessageHistory revalidates every item
+ * and skips the ones that don't parse.
+ */
+export const messageHistoryTolerantSchema = z
+  .array(z.custom<ChatMessage>(() => true))
+  .optional()
+  .nullable()
+  .transform((items): ChatMessage[] => parseMessageHistory(items));

@@ -10,6 +10,7 @@ export const translations = {
       addresses: "Addresses",
     },
     widget: {
+      back: "Back",
       addAddress: "Add Address",
       edit: "Edit",
       delete: "Delete",

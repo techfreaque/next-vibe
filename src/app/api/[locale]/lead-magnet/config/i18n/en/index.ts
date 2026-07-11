@@ -46,6 +46,7 @@ export const translations = {
     },
   },
   widget: {
+    back: "Back",
     loading: "Loading…",
     pitch: {
       headline: "Turn visitors into subscribers",

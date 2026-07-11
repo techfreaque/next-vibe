@@ -5,6 +5,7 @@
 
 "use client";
 
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -55,13 +56,49 @@ export function SubscriptionOverviewContainer(_props: {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const router = useRouter();
   const portal = useCustomerPortal(logger, user);
 
   if (!subscription) {
     return <Div />;
   }
 
-  const isCanceled = subscription.status === SubscriptionStatus.CANCELED;
+  const { status, billingInterval, currentPeriodStart } = subscription;
+
+  if (!subscription.hasSubscription || !status || !billingInterval) {
+    return (
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Card className="border-2 border-dashed">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <Div className="p-2 rounded-lg bg-primary/10">
+                <CreditCard className="h-6 w-6 text-primary" />
+              </Div>
+              {t("noSubscription.title")}
+            </CardTitle>
+            <CardDescription>{t("noSubscription.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              type="button"
+              onClick={() => {
+                router.push(`/${locale}/subscription/buy`);
+              }}
+              className="w-full"
+            >
+              {t("noSubscription.cta")}
+            </Button>
+          </CardContent>
+        </Card>
+      </MotionDiv>
+    );
+  }
+
+  const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && subscription.cancelAt;
 
   const getProviderIcon = (provider?: string): JSX.Element => {
@@ -130,10 +167,10 @@ export function SubscriptionOverviewContainer(_props: {
                 }
               >
                 {isCanceled
-                  ? t(subscription.status)
+                  ? t(status)
                   : isCanceling
                     ? t("enums.status.canceling")
-                    : t(subscription.status)}
+                    : t(status)}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 {getProviderIcon(subscription.provider)}
@@ -177,7 +214,7 @@ export function SubscriptionOverviewContainer(_props: {
                   {t("billingInterval")}
                 </Div>
                 <Div className="text-lg font-semibold capitalize">
-                  {t(subscription.billingInterval)}
+                  {t(billingInterval)}
                 </Div>
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
@@ -185,7 +222,9 @@ export function SubscriptionOverviewContainer(_props: {
                   {t("currentPeriodStart")}
                 </Div>
                 <Div className="text-lg font-semibold">
-                  {formatDate(subscription.currentPeriodStart, locale)}
+                  {currentPeriodStart
+                    ? formatDate(currentPeriodStart, locale)
+                    : t("notAvailable")}
                 </Div>
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">

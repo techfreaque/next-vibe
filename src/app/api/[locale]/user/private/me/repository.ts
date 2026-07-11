@@ -6,41 +6,45 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
+import { leads } from "next-vibe/identity/lead/db";
+import { userRoles, users } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+import { modelProviders } from "@/app/api/[locale]/agent/models/models";
+import { customSkills } from "@/app/api/[locale]/agent/skills/db";
 import {
   SkillOwnershipType,
   SkillStatus,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
-import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+} from "@/app/api/[locale]/agent/skills/enum";
 
 import { creditWallets } from "../../../credits/db";
-import { leads } from "../../../leads/db";
 import { csvImportJobs, importBatches } from "../../../leads/import/db";
 import { messengerAccounts } from "../../../messenger/accounts/db";
 import { payoutRequests } from "../../../referral/db";
 import { subscriptions } from "../../../subscription/db";
 import { SubscriptionRepository } from "../../../subscription/repository";
-import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
-import { userRoles, users } from "../../db";
-import { UserDetailLevel } from "../../enum";
 import { passwordResets } from "../../public/reset-password/db";
-import { UserRepository } from "../../repository";
 import type {
   MeDeleteResponseOutput,
   MeGetResponseOutput,
@@ -50,7 +54,9 @@ import type {
 import type { MeT } from "./i18n";
 
 /** Fetch public skills for a user, enriched with model display info */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred from complex mapped return
 async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
+  const viewerAvailability = await getInstanceAvailability();
   const skillRows = await db
     .select({
       id: customSkills.id,
@@ -74,8 +80,9 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
     );
 
   return skillRows.flatMap((row) => {
-    const variants = row.variants;
-    const expandedVariants = variants && variants.length > 1 ? variants : null;
+    const variants = row.variants ?? [];
+    const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
+    const expandedVariants = variants.length > 1 ? variants : null;
     const rows = expandedVariants
       ? expandedVariants.map((variant) => ({
           modelSelection: variant.modelSelection,
@@ -86,7 +93,7 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
         }))
       : [
           {
-            modelSelection: variants?.[0]?.modelSelection,
+            modelSelection: defaultVariant?.modelSelection ?? null,
             variantId: null,
             variantName: null,
             isVariant: false,
@@ -96,12 +103,20 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
     return rows.map(
       ({ modelSelection, variantId, variantName, isVariant, isDefault }) => {
         const selection = modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-        const bestModel = getBestChatModel(selection, viewer);
+        const bestModel = getBestChatModel(
+          selection,
+          viewer,
+          viewerAvailability,
+        );
         const modelId = bestModel?.id ?? null;
         const modelRow = bestModel
           ? {
               modelIcon: bestModel.icon,
-              modelInfo: getModelDisplayName(bestModel, false),
+              modelInfo: getModelDisplayName(
+                bestModel,
+                false,
+                viewerAvailability,
+              ),
               modelProvider:
                 modelProviders[bestModel.provider]?.name ?? bestModel.provider,
             }
@@ -153,19 +168,7 @@ export class UserProfileRepository {
     t: MeT,
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
-      if (user.isPublic) {
-        logger.debug("Getting public user JWT payload", {
-          leadId: user.leadId,
-        });
-        return success({
-          isPublic: true,
-          leadId: user.leadId,
-          skills: [],
-        });
-      }
-
-      // Handle private users - return full profile
-      if (!user.id) {
+      if (!user.id || user.isPublic) {
         return fail({
           message: t("get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,

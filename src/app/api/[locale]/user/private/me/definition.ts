@@ -38,11 +38,15 @@ import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { USER_ME_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-const MeUpdateWidget = lazy(() =>
+const MeGetWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.MeGetWidget })),
+);
+
+const MeUpdateWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MeUpdateWidget })),
 );
 
-const MeDeleteWidget = lazy(() =>
+const MeDeleteWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MeDeleteWidget })),
 );
 
@@ -56,6 +60,7 @@ const { GET } = createEndpoint({
   path: ["user", "private", "me"],
   aliases: [USER_ME_ALIAS] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "user",
   category: "account",
@@ -74,330 +79,305 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: objectUnionField(
-    scopedTranslation,
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
+  fields: customWidgetObject({
+    render: MeGetWidget,
+    usage: { response: true } as const,
+    children: {
+      isPublic: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.isPublic" as const,
+        schema: z.literal(false),
+      }),
+      id: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.id" as const,
+        schema: z.uuid(),
+      }),
+      leadId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.leadId" as const,
+        schema: z.uuid().nullable(),
+      }),
+      email: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.email" as const,
+        schema: z.email({
+          message: "validationErrors.user.profile.email_invalid",
+        }),
+      }),
+      privateName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.privateName" as const,
+        schema: z.string(),
+      }),
+      publicName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.publicName" as const,
+        schema: z.string(),
+      }),
+      locale: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.locale" as const,
+        schema: z.string() as z.ZodType<CountryLanguage>,
+      }),
+      isActive: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.isActive" as const,
+        schema: z.boolean().nullable(),
+      }),
+      emailVerified: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.emailVerified" as const,
+        schema: z.boolean().nullable(),
+      }),
+      requireTwoFactor: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.requireTwoFactor" as const,
+        schema: z.boolean().optional(),
+      }),
+      marketingConsent: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.marketingConsent" as const,
+        schema: z.boolean().optional(),
+      }),
+      userRoles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.userRoles" as const,
+        schema: z.array(
+          z.object({
+            id: z.uuid(),
+            role: z.enum(UserRole),
+          }),
+        ),
+      }),
+      roles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.roles" as const,
+        schema: z.array(z.enum(UserRoleDB)),
+      }),
+      createdAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.createdAt" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.updatedAt" as const,
+        schema: dateSchema,
+      }),
+      stripeCustomerId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.stripeCustomerId" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      bio: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.bio" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      websiteUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.websiteUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      twitterUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.twitterUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      youtubeUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.youtubeUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      instagramUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.instagramUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      tiktokUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.tiktokUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      githubUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.githubUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      facebookUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.facebookUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      discordUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.discordUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      tribeUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.tribeUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      rumbleUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.rumbleUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      odyseeUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.odyseeUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      nostrUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.nostrUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      gabUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.gabUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      creatorSlug: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.creatorSlug" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      creatorAccentColor: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.creatorAccentColor" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      creatorHeaderImageUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.creatorHeaderImageUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      avatarUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.avatarUrl" as const,
+        schema: z.string().nullable().optional(),
+      }),
+      skills: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "4",
+          alignItems: "start",
+          noCard: true,
+          usage: { response: true },
+          children: {
+            id: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string(),
+            }),
+            internalId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
+            skillId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string(),
+            }),
+            category: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillCategoryDB),
+            }),
+            variantName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
+            isVariant: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.boolean(),
+            }),
+            isDefault: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.boolean(),
+            }),
+            modelId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(ChatModelId).nullable(),
+            }),
+            icon: responseField(scopedTranslation, {
+              type: WidgetType.ICON,
+              containerSize: "lg",
+              iconSize: "base",
+              borderRadius: "lg",
+              schema: iconSchema,
+            }),
+            name: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "base",
+              emphasis: "bold",
+              inline: true,
+              schema: z.string(),
+            }),
+            tagline: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              inline: true,
+              schema: z.string(),
+            }),
+            description: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              schema: z.string(),
+            }),
+            modelIcon: responseField(scopedTranslation, {
+              type: WidgetType.ICON,
+              iconSize: "xs",
+              inline: true,
+              noHover: true,
+              schema: iconSchema,
+            }),
+            modelInfo: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              inline: true,
+              variant: "muted",
+              schema: z.string(),
+            }),
+            modelProvider: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              inline: true,
+              schema: z.string(),
+            }),
+            ownershipType: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillOwnershipTypeDB),
+            }),
+            trustLevel: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(SkillTrustLevelDB).nullable(),
+            }),
+            voteCount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.number().int().nonnegative().nullable(),
+            }),
+          },
+        }),
+      }),
     },
-    { response: true },
-    "isPublic",
-    [
-      // Public user variant (JWT payload only)
-      objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.user.title" as const,
-        description: "get.response.user.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          isPublic: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.isPublic" as const,
-            schema: z.literal(true),
-          }),
-          leadId: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.leadId" as const,
-            schema: leadId,
-          }),
-        },
-      }),
-      // Private user variant (full profile)
-      objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.user.title" as const,
-        description: "get.response.user.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          isPublic: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.isPublic" as const,
-            schema: z.literal(false),
-          }),
-          id: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.id" as const,
-            schema: z.uuid(),
-          }),
-          leadId: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.leadId" as const,
-            schema: leadId.nullable(),
-          }),
-          email: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.email" as const,
-            schema: z.email({
-              message: "validationErrors.user.profile.email_invalid",
-            }),
-          }),
-          privateName: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.privateName" as const,
-            schema: z.string(),
-          }),
-          publicName: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.publicName" as const,
-            schema: z.string(),
-          }),
-          locale: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.locale" as const,
-            schema: z.string() as z.ZodType<CountryLanguage>,
-          }),
-          isActive: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.isActive" as const,
-            schema: z.boolean().nullable(),
-          }),
-          emailVerified: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.emailVerified" as const,
-            schema: z.boolean().nullable(),
-          }),
-          requireTwoFactor: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.requireTwoFactor" as const,
-            schema: z.boolean(),
-          }),
-          marketingConsent: responseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.marketingConsent" as const,
-            schema: z.boolean(),
-          }),
-          userRoles: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.userRoles" as const,
-            schema: z.array(userRoleResponseSchema),
-          }),
-          createdAt: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.createdAt" as const,
-            schema: dateSchema,
-          }),
-          updatedAt: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.updatedAt" as const,
-            schema: dateSchema,
-          }),
-          stripeCustomerId: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.stripeCustomerId" as const,
-            schema: z.string().nullable(),
-          }),
-          bio: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.bio" as const,
-            schema: z.string().nullable(),
-          }),
-          websiteUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.websiteUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          twitterUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.twitterUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          youtubeUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.youtubeUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          instagramUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.instagramUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          tiktokUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.tiktokUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          githubUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.githubUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          facebookUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.facebookUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          discordUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.discordUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          tribeUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.tribeUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          rumbleUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.rumbleUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          odyseeUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.odyseeUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          nostrUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.nostrUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          gabUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.gabUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          creatorSlug: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.creatorSlug" as const,
-            schema: z.string().nullable().optional(),
-          }),
-          creatorAccentColor: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.creatorAccentColor" as const,
-            schema: z.string().nullable(),
-          }),
-          creatorHeaderImageUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.creatorHeaderImageUrl" as const,
-            schema: z.string().nullable(),
-          }),
-          avatarUrl: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.avatarUrl" as const,
-            schema: z.string().nullable().optional(),
-          }),
-          skills: responseArrayField(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            child: objectField(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.INLINE,
-              gap: "4",
-              alignItems: "start",
-              noCard: true,
-              usage: { response: true },
-              children: {
-                id: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.string(),
-                }),
-                internalId: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.string().nullable(),
-                }),
-                skillId: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.string(),
-                }),
-                category: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.enum(SkillCategoryDB),
-                }),
-                variantName: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.string().nullable(),
-                }),
-                isVariant: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.boolean(),
-                }),
-                isDefault: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.boolean(),
-                }),
-                modelId: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.enum(ChatModelId).nullable(),
-                }),
-                icon: responseField(scopedTranslation, {
-                  type: WidgetType.ICON,
-                  containerSize: "lg",
-                  iconSize: "base",
-                  borderRadius: "lg",
-                  schema: iconSchema,
-                }),
-                name: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  size: "base",
-                  emphasis: "bold",
-                  inline: true,
-                  schema: z.string(),
-                }),
-                tagline: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  size: "xs",
-                  variant: "muted",
-                  inline: true,
-                  schema: z.string(),
-                }),
-                description: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  size: "xs",
-                  variant: "muted",
-                  schema: z.string(),
-                }),
-                modelIcon: responseField(scopedTranslation, {
-                  type: WidgetType.ICON,
-                  iconSize: "xs",
-                  inline: true,
-                  noHover: true,
-                  schema: iconSchema,
-                }),
-                modelInfo: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  size: "xs",
-                  inline: true,
-                  variant: "muted",
-                  schema: z.string(),
-                }),
-                modelProvider: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  size: "xs",
-                  variant: "muted",
-                  inline: true,
-                  schema: z.string(),
-                }),
-                ownershipType: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.enum(SkillOwnershipTypeDB),
-                }),
-                trustLevel: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.enum(SkillTrustLevelDB).nullable(),
-                }),
-                voteCount: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  hidden: true,
-                  schema: z.number().int().nonnegative().nullable(),
-                }),
-              },
-            }),
-          }),
-        },
-      }),
-    ] as const,
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
@@ -449,8 +429,20 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        isPublic: true,
+        isPublic: false,
+        id: "550e8400-e29b-41d4-a716-446655440000",
         leadId: "550e8400-e29b-41d4-a716-446655440001",
+        email: "customer@example.com",
+        privateName: "John Doe",
+        publicName: "JD",
+        locale: "en-GLOBAL",
+        isActive: true,
+        emailVerified: true,
+        userRoles: [],
+        roles: [],
+        createdAt: "",
+        updatedAt: "",
+        skills: [],
       },
     },
   },
@@ -464,6 +456,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "private", "me"],
   title: "update.title" as const,
+  titleShort: "update.titleShort" as const,
   description: "update.description" as const,
   icon: "user-check" as const,
   category: "account",
@@ -759,19 +752,19 @@ const { POST } = createEndpoint({
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.message" as const,
+            label: "update.response.message" as const,
             schema: z.string().describe("Human-readable update status message"),
           }),
           // === USER FIELDS (FLATTENED) ===
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.id" as const,
+            label: "update.response.id" as const,
             schema: z.uuid(),
           }),
           leadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.leadId" as const,
-            schema: leadId.nullable(),
+            label: "update.response.leadId" as const,
+            schema: z.uuid().nullable(),
           }),
           isPublic: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
@@ -780,24 +773,24 @@ const { POST } = createEndpoint({
           }),
           email: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.email" as const,
+            label: "update.response.email" as const,
             schema: z.email({
               message: "validationErrors.user.profile.email_invalid",
             }),
           }),
           privateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.privateName" as const,
+            label: "update.response.privateName" as const,
             schema: z.string(),
           }),
           publicName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.publicName" as const,
+            label: "update.response.publicName" as const,
             schema: z.string(),
           }),
           locale: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.locale" as const,
+            label: "update.response.locale" as const,
             schema: z.string() as z.ZodType<CountryLanguage>,
           }),
           isActive: responseField(scopedTranslation, {
@@ -822,107 +815,112 @@ const { POST } = createEndpoint({
           }),
           userRoles: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.userRoles" as const,
-            schema: z.array(userRoleResponseSchema),
+            label: "update.response.userRoles" as const,
+            schema: z.array(
+              z.object({
+                id: z.uuid(),
+                role: z.enum(UserRole),
+              }),
+            ),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.createdAt" as const,
+            label: "update.response.createdAt" as const,
             schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.updatedAt" as const,
+            label: "update.response.updatedAt" as const,
             schema: dateSchema,
           }),
           stripeCustomerId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.stripeCustomerId" as const,
+            label: "update.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
           bio: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.bio" as const,
+            label: "update.response.bio" as const,
             schema: z.string().nullable().optional(),
           }),
           websiteUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.websiteUrl" as const,
+            label: "update.response.websiteUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           twitterUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.twitterUrl" as const,
+            label: "update.response.twitterUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           youtubeUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.youtubeUrl" as const,
+            label: "update.response.youtubeUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           instagramUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.instagramUrl" as const,
+            label: "update.response.instagramUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           tiktokUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.tiktokUrl" as const,
+            label: "update.response.tiktokUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           githubUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.githubUrl" as const,
+            label: "update.response.githubUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           facebookUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.facebookUrl" as const,
+            label: "update.response.facebookUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           discordUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.discordUrl" as const,
+            label: "update.response.discordUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           tribeUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.tribeUrl" as const,
+            label: "update.response.tribeUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           rumbleUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.rumbleUrl" as const,
+            label: "update.response.rumbleUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           odyseeUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.odyseeUrl" as const,
+            label: "update.response.odyseeUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           nostrUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.nostrUrl" as const,
+            label: "update.response.nostrUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           gabUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.gabUrl" as const,
+            label: "update.response.gabUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           creatorSlug: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.creatorSlug" as const,
+            label: "update.response.creatorSlug" as const,
             schema: z.string().nullable().optional(),
           }),
           creatorAccentColor: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.creatorAccentColor" as const,
+            label: "update.response.creatorAccentColor" as const,
             schema: z.string().nullable().optional(),
           }),
           creatorHeaderImageUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.creatorHeaderImageUrl" as const,
+            label: "update.response.creatorHeaderImageUrl" as const,
             schema: z.string().nullable().optional(),
           }),
           skills: responseArrayField(scopedTranslation, {
@@ -1051,7 +1049,7 @@ const { POST } = createEndpoint({
             children: {
               totalChanges: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "update.response.changesSummary.totalChanges" as const,
+                label: "update.response.changesSummary.totalChanges" as const,
                 schema: z.coerce.number().describe("Number of fields updated"),
               }),
               changedFields: responseField(scopedTranslation, {
@@ -1071,7 +1069,7 @@ const { POST } = createEndpoint({
               }),
               lastUpdated: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "update.response.changesSummary.lastUpdated" as const,
+                label: "update.response.changesSummary.lastUpdated" as const,
                 schema: z
                   .string()
                   .describe(
@@ -1082,7 +1080,7 @@ const { POST } = createEndpoint({
           }),
           nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "update.response.nextSteps" as const,
+            label: "update.response.nextSteps" as const,
             schema: z
               .array(z.string())
               .describe("Recommended actions after profile update"),
@@ -1208,6 +1206,7 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["user", "private", "me"],
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "user-x" as const,
   category: "account",
@@ -1225,7 +1224,7 @@ const { DELETE } = createEndpoint({
     children: {
       exists: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.title" as const,
+        label: "delete.response.title" as const,
         schema: z.boolean(),
       }),
     },

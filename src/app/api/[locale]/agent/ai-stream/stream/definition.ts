@@ -31,9 +31,8 @@ import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-gen
 import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
-import type { ChatMessage } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import { parseMessageHistory } from "../../chat/message-schema";
+import { messageHistoryTolerantSchema } from "../../chat/message-schema";
 import {
   ChatModelId,
   ChatModelIdOptions,
@@ -324,11 +323,7 @@ const { POST } = createEndpoint({
         // Tolerant parse: incognito localStorage carries years of legacy
         // message shapes. Valid messages parse into typed ChatMessage; the
         // rest are skipped — a bad message must never fail the request.
-        schema: z
-          .array(z.unknown())
-          .optional()
-          .nullable()
-          .transform((items): ChatMessage[] => parseMessageHistory(items)),
+        schema: messageHistoryTolerantSchema,
       }),
 
       // === INCOGNITO THREAD META (for incognito mode) ===

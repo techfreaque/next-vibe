@@ -9494,7 +9494,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-11T14:29:00.957Z",
+          createdAt: "2026-07-11T15:24:02.422Z",
         },
       },
     },
@@ -9519,7 +9519,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-11T14:29:00.957Z",
+          updatedAt: "2026-07-11T15:24:02.423Z",
         },
       },
     },
@@ -16942,6 +16942,7 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       responses: {
         default: {
+          hasSubscription: true,
           id: "123e4567-e89b-12d3-a456-426614174000",
           plan: "enums.plan.subscription",
           billingInterval: "enums.billing.monthly",
@@ -16954,6 +16955,7 @@ export const endpointsMeta: EndpointMeta[] = [
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
         },
+        noSubscription: { hasSubscription: false },
       },
     },
   },

@@ -17,7 +17,9 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -26,6 +28,10 @@ import { z } from "zod";
 
 import { USER_SESSIONS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const UserSessionsContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserSessionsContainer })),
+);
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,
@@ -89,12 +95,9 @@ const { GET } = createEndpoint({
   tags: ["list.tag"],
   allowedRoles: ALLOWED_ROLES,
   defaultWebPinned: ALLOWED_ROLES,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "list.title",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: UserSessionsContainer,
+    usage: { response: true } as const,
     children: {
       sessions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -429,6 +429,7 @@ export const translations = {
   response: {
     checkoutUrl: "Checkout URL",
     sessionId: "Session ID",
+    hasSubscription: "Has Subscription",
     id: "Subscription ID",
     userId: "User ID",
     status: "Subscription Status",
@@ -674,6 +675,12 @@ export const translations = {
     title: "Subscription Ended",
     description:
       "Your subscription has ended. Renew to regain access to all features.",
+  },
+  noSubscription: {
+    title: "No Subscription Yet",
+    description:
+      "Subscribe to unlock monthly credits and access to every model.",
+    cta: "View Plans",
   },
   manage: {
     nowpayments: {

@@ -52,40 +52,45 @@ const { GET } = createEndpoint({
     render: SubscriptionOverviewContainer,
     usage: { response: true } as const,
     children: {
+      hasSubscription: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.hasSubscription",
+        schema: z.boolean(),
+      }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.id",
-        schema: z.uuid(),
+        schema: z.uuid().optional(),
       }),
       plan: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.planId",
-        schema: z.enum(SubscriptionPlan),
+        schema: z.enum(SubscriptionPlan).optional(),
       }),
       billingInterval: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.billingInterval",
-        schema: z.enum(BillingInterval),
+        schema: z.enum(BillingInterval).optional(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.status",
-        schema: z.enum(SubscriptionStatus),
+        schema: z.enum(SubscriptionStatus).optional(),
       }),
       currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.currentPeriodStart",
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
       currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.currentPeriodEnd",
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
       cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.cancelAtPeriodEnd",
-        schema: z.boolean(),
+        schema: z.boolean().optional(),
       }),
       cancelAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -105,7 +110,7 @@ const { GET } = createEndpoint({
       provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.provider",
-        schema: z.enum(PaymentProviderDB),
+        schema: z.enum(PaymentProviderDB).optional(),
       }),
       providerSubscriptionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -115,12 +120,12 @@ const { GET } = createEndpoint({
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.createdAt",
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.updatedAt",
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
     },
   }),
@@ -172,6 +177,7 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
+        hasSubscription: true,
         id: "123e4567-e89b-12d3-a456-426614174000",
         plan: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
@@ -183,6 +189,9 @@ const { GET } = createEndpoint({
         providerSubscriptionId: "sub_123456789",
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-01T00:00:00Z",
+      },
+      noSubscription: {
+        hasSubscription: false,
       },
     },
   },

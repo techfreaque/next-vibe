@@ -248913,21 +248913,41 @@
         "response": true
       },
       "children": {
+        "hasSubscription": {
+          "type": "text",
+          "label": "Abo vorhanden",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "id": {
           "type": "text",
           "label": "Abonnement-ID",
           "schema": {
             "def": {
-              "type": "string",
-              "format": "uuid",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string",
+                "format": "uuid",
+                "minLength": null,
+                "maxLength": null
+              }
             },
-            "type": "string",
-            "format": "uuid",
-            "minLength": null,
-            "maxLength": null
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -248939,16 +248959,22 @@
           "label": "Plan-ID",
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "SUBSCRIPTION": "enums.plan.subscription"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "SUBSCRIPTION": "enums.plan.subscription"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "SUBSCRIPTION": "enums.plan.subscription"
+                },
+                "options": ["enums.plan.subscription"]
               }
             },
-            "type": "enum",
-            "enum": {
-              "SUBSCRIPTION": "enums.plan.subscription"
-            },
-            "options": ["enums.plan.subscription"]
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -248960,18 +248986,24 @@
           "label": "Abrechnungsintervall",
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "MONTHLY": "enums.billing.monthly",
-                "YEARLY": "enums.billing.yearly"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "MONTHLY": "enums.billing.monthly",
+                    "YEARLY": "enums.billing.yearly"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "MONTHLY": "enums.billing.monthly",
+                  "YEARLY": "enums.billing.yearly"
+                },
+                "options": ["enums.billing.monthly", "enums.billing.yearly"]
               }
             },
-            "type": "enum",
-            "enum": {
-              "MONTHLY": "enums.billing.monthly",
-              "YEARLY": "enums.billing.yearly"
-            },
-            "options": ["enums.billing.monthly", "enums.billing.yearly"]
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -248983,39 +249015,45 @@
           "label": "Abonnement-Status",
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "INCOMPLETE": "enums.status.incomplete",
-                "INCOMPLETE_EXPIRED": "enums.status.incompleteExpired",
-                "TRIALING": "enums.status.trialing",
-                "ACTIVE": "enums.status.active",
-                "PAST_DUE": "enums.status.pastDue",
-                "CANCELED": "enums.status.canceled",
-                "UNPAID": "enums.status.unpaid",
-                "PAUSED": "enums.status.paused"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "INCOMPLETE": "enums.status.incomplete",
+                    "INCOMPLETE_EXPIRED": "enums.status.incompleteExpired",
+                    "TRIALING": "enums.status.trialing",
+                    "ACTIVE": "enums.status.active",
+                    "PAST_DUE": "enums.status.pastDue",
+                    "CANCELED": "enums.status.canceled",
+                    "UNPAID": "enums.status.unpaid",
+                    "PAUSED": "enums.status.paused"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "INCOMPLETE": "enums.status.incomplete",
+                  "INCOMPLETE_EXPIRED": "enums.status.incompleteExpired",
+                  "TRIALING": "enums.status.trialing",
+                  "ACTIVE": "enums.status.active",
+                  "PAST_DUE": "enums.status.pastDue",
+                  "CANCELED": "enums.status.canceled",
+                  "UNPAID": "enums.status.unpaid",
+                  "PAUSED": "enums.status.paused"
+                },
+                "options": [
+                  "enums.status.incomplete",
+                  "enums.status.incompleteExpired",
+                  "enums.status.trialing",
+                  "enums.status.active",
+                  "enums.status.pastDue",
+                  "enums.status.canceled",
+                  "enums.status.unpaid",
+                  "enums.status.paused"
+                ]
               }
             },
-            "type": "enum",
-            "enum": {
-              "INCOMPLETE": "enums.status.incomplete",
-              "INCOMPLETE_EXPIRED": "enums.status.incompleteExpired",
-              "TRIALING": "enums.status.trialing",
-              "ACTIVE": "enums.status.active",
-              "PAST_DUE": "enums.status.pastDue",
-              "CANCELED": "enums.status.canceled",
-              "UNPAID": "enums.status.unpaid",
-              "PAUSED": "enums.status.paused"
-            },
-            "options": [
-              "enums.status.incomplete",
-              "enums.status.incompleteExpired",
-              "enums.status.trialing",
-              "enums.status.active",
-              "enums.status.pastDue",
-              "enums.status.canceled",
-              "enums.status.unpaid",
-              "enums.status.paused"
-            ]
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249027,9 +249065,124 @@
           "label": "Aktuelle Periode Start",
           "schema": {
             "def": {
-              "type": "pipe",
-              "in": {
+              "type": "optional",
+              "innerType": {
                 "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date",
+                          "minDate": null,
+                          "maxDate": null
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
                   "type": "union",
                   "options": [
                     {
@@ -249064,124 +249217,15 @@
                     }
                   ]
                 },
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
+                "out": {
+                  "def": {
+                    "type": "transform"
                   },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "out": {
-                "def": {
                   "type": "transform"
-                },
-                "type": "transform"
+                }
               }
             },
-            "type": "pipe",
-            "in": {
-              "def": {
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
-                  },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "type": "union",
-              "options": [
-                {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                {
-                  "def": {
-                    "type": "date"
-                  },
-                  "type": "date",
-                  "minDate": null,
-                  "maxDate": null
-                },
-                {
-                  "def": {
-                    "type": "number",
-                    "coerce": true,
-                    "checks": []
-                  },
-                  "type": "number",
-                  "minValue": null,
-                  "maxValue": null,
-                  "isInt": false,
-                  "isFinite": true,
-                  "format": null
-                }
-              ]
-            },
-            "out": {
-              "def": {
-                "type": "transform"
-              },
-              "type": "transform"
-            }
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249193,9 +249237,124 @@
           "label": "Aktuelle Periode Ende",
           "schema": {
             "def": {
-              "type": "pipe",
-              "in": {
+              "type": "optional",
+              "innerType": {
                 "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date",
+                          "minDate": null,
+                          "maxDate": null
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
                   "type": "union",
                   "options": [
                     {
@@ -249230,124 +249389,15 @@
                     }
                   ]
                 },
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
+                "out": {
+                  "def": {
+                    "type": "transform"
                   },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "out": {
-                "def": {
                   "type": "transform"
-                },
-                "type": "transform"
+                }
               }
             },
-            "type": "pipe",
-            "in": {
-              "def": {
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
-                  },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "type": "union",
-              "options": [
-                {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                {
-                  "def": {
-                    "type": "date"
-                  },
-                  "type": "date",
-                  "minDate": null,
-                  "maxDate": null
-                },
-                {
-                  "def": {
-                    "type": "number",
-                    "coerce": true,
-                    "checks": []
-                  },
-                  "type": "number",
-                  "minValue": null,
-                  "maxValue": null,
-                  "isInt": false,
-                  "isFinite": true,
-                  "format": null
-                }
-              ]
-            },
-            "out": {
-              "def": {
-                "type": "transform"
-              },
-              "type": "transform"
-            }
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249359,9 +249409,15 @@
           "label": "Am Periodenende kündigen",
           "schema": {
             "def": {
-              "type": "boolean"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
             },
-            "type": "boolean"
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249442,21 +249498,27 @@
           "label": "Zahlungsanbieter",
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                },
+                "options": [
+                  "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments"
+                ]
               }
             },
-            "type": "enum",
-            "enum": {
-              "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-              "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
-            },
-            "options": [
-              "enums.paymentProvider.stripe",
-              "enums.paymentProvider.nowpayments"
-            ]
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249491,9 +249553,124 @@
           "label": "Erstellt am",
           "schema": {
             "def": {
-              "type": "pipe",
-              "in": {
+              "type": "optional",
+              "innerType": {
                 "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date",
+                          "minDate": null,
+                          "maxDate": null
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
                   "type": "union",
                   "options": [
                     {
@@ -249528,124 +249705,15 @@
                     }
                   ]
                 },
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
+                "out": {
+                  "def": {
+                    "type": "transform"
                   },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "out": {
-                "def": {
                   "type": "transform"
-                },
-                "type": "transform"
+                }
               }
             },
-            "type": "pipe",
-            "in": {
-              "def": {
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
-                  },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "type": "union",
-              "options": [
-                {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                {
-                  "def": {
-                    "type": "date"
-                  },
-                  "type": "date",
-                  "minDate": null,
-                  "maxDate": null
-                },
-                {
-                  "def": {
-                    "type": "number",
-                    "coerce": true,
-                    "checks": []
-                  },
-                  "type": "number",
-                  "minValue": null,
-                  "maxValue": null,
-                  "isInt": false,
-                  "isFinite": true,
-                  "format": null
-                }
-              ]
-            },
-            "out": {
-              "def": {
-                "type": "transform"
-              },
-              "type": "transform"
-            }
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -249657,9 +249725,124 @@
           "label": "Aktualisiert am",
           "schema": {
             "def": {
-              "type": "pipe",
-              "in": {
+              "type": "optional",
+              "innerType": {
                 "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date",
+                          "minDate": null,
+                          "maxDate": null
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date",
+                        "minDate": null,
+                        "maxDate": null
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      }
+                    ]
+                  },
                   "type": "union",
                   "options": [
                     {
@@ -249694,124 +249877,15 @@
                     }
                   ]
                 },
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
+                "out": {
+                  "def": {
+                    "type": "transform"
                   },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "out": {
-                "def": {
                   "type": "transform"
-                },
-                "type": "transform"
+                }
               }
             },
-            "type": "pipe",
-            "in": {
-              "def": {
-                "type": "union",
-                "options": [
-                  {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string",
-                    "format": null,
-                    "minLength": null,
-                    "maxLength": null
-                  },
-                  {
-                    "def": {
-                      "type": "date"
-                    },
-                    "type": "date",
-                    "minDate": null,
-                    "maxDate": null
-                  },
-                  {
-                    "def": {
-                      "type": "number",
-                      "coerce": true,
-                      "checks": []
-                    },
-                    "type": "number",
-                    "minValue": null,
-                    "maxValue": null,
-                    "isInt": false,
-                    "isFinite": true,
-                    "format": null
-                  }
-                ]
-              },
-              "type": "union",
-              "options": [
-                {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string",
-                  "format": null,
-                  "minLength": null,
-                  "maxLength": null
-                },
-                {
-                  "def": {
-                    "type": "date"
-                  },
-                  "type": "date",
-                  "minDate": null,
-                  "maxDate": null
-                },
-                {
-                  "def": {
-                    "type": "number",
-                    "coerce": true,
-                    "checks": []
-                  },
-                  "type": "number",
-                  "minValue": null,
-                  "maxValue": null,
-                  "isInt": false,
-                  "isFinite": true,
-                  "format": null
-                }
-              ]
-            },
-            "out": {
-              "def": {
-                "type": "transform"
-              },
-              "type": "transform"
-            }
+            "type": "optional"
           },
           "usage": {
             "response": true

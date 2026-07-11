@@ -1,6 +1,7 @@
 "use client";
 
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -66,9 +67,9 @@ import skillsDef from "@/app/api/[locale]/agent/skills/definition";
 import { SkillOwnershipType } from "@/app/api/[locale]/agent/skills/enum";
 import creditsDef from "@/app/api/[locale]/credits/definition";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
-import referralDef from "@/app/api/[locale]/referral/definition";
 import subscriptionDef from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
 import logoutDef from "@/app/api/[locale]/user/private/logout/definition";
 import addressesDef from "@/app/api/[locale]/user/private/me/addresses/definition";
 import passwordDef from "@/app/api/[locale]/user/private/me/password/definition";
@@ -82,10 +83,97 @@ import type meDefinition from "./definition";
 import type { MeGetResponseOutput, MePostRequestOutput } from "./definition";
 import { useUser } from "./hooks";
 
+/** Compact tappable row used throughout the account hub */
+function HubRow({
+  icon,
+  title,
+  subtitle,
+  badge,
+  onClick,
+}: {
+  icon: string;
+  title: string;
+  subtitle?: string;
+  badge?: React.ReactNode;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        width: "100%",
+        padding: "10px 12px",
+        borderRadius: 10,
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.07)",
+        marginBottom: 4,
+        textAlign: "left",
+        height: "auto",
+        justifyContent: "flex-start",
+      }}
+    >
+      <Span
+        style={{ fontSize: 18, flexShrink: 0, width: 28, textAlign: "center" }}
+      >
+        {icon}
+      </Span>
+      <Div style={{ flex: 1, minWidth: 0 }}>
+        <Span
+          style={{
+            fontSize: 14,
+            fontWeight: 500,
+            color: "rgba(255,255,255,0.85)",
+            display: "block",
+          }}
+        >
+          {title}
+        </Span>
+        {subtitle && (
+          <Span
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.4)",
+              display: "block",
+              marginTop: 1,
+            }}
+          >
+            {subtitle}
+          </Span>
+        )}
+      </Div>
+      {badge && <Div style={{ flexShrink: 0 }}>{badge}</Div>}
+      <ChevronRight className="h-4 w-4 shrink-0 text-white/25" />
+    </Button>
+  );
+}
+
+/**
+ * MeGetWidget - entry point for the GET card in the admin panel.
+ * Immediately replaces itself with the full profile widget (POST endpoint).
+ */
+export function MeGetWidget(): JSX.Element {
+  const { push: navigate } = useWidgetNavigation();
+
+  useEffect(() => {
+    void (async (): Promise<void> => {
+      const meDef = await import("./definition");
+      navigate(meDef.default.POST, {});
+    })();
+  }, [navigate]);
+
+  return <Div style={{ background: "#0f0520", minHeight: "100vh" }} />;
+}
+
 export function MeDeleteWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const t = useWidgetTranslation<typeof meDefinition.DELETE>();
   const { pop } = useWidgetNavigation();
   const [confirmText, setConfirmText] = useState("");
@@ -116,13 +204,13 @@ export function MeDeleteWidget(): JSX.Element {
     if (result.success) {
       setDeleted(true);
       setTimeout(() => {
-        window.location.href = `/${locale}`;
+        assignUrl(`/${locale}`);
       }, 1500);
     } else {
       setIsDeleting(false);
       setDeleteError(result.message ?? t("delete.errors.internal.title"));
     }
-  }, [user, logger, locale, canDelete, isDeleting, t]);
+  }, [user, logger, locale, availability, canDelete, isDeleting, t]);
 
   const deletedItems = [
     t("widget.deleteAccount.items.profile"),
@@ -295,9 +383,35 @@ export function MeDeleteWidget(): JSX.Element {
   );
 }
 
+function profileFormValues(profile: MeGetResponseOutput): MePostRequestOutput {
+  return {
+    basicInfo: {
+      privateName: profile.privateName,
+      publicName: profile.publicName,
+      email: profile.email,
+    },
+    profileInfo: {
+      bio: profile.bio,
+      websiteUrl: profile.websiteUrl,
+      twitterUrl: profile.twitterUrl,
+      youtubeUrl: profile.youtubeUrl,
+      instagramUrl: profile.instagramUrl,
+      tiktokUrl: profile.tiktokUrl,
+      githubUrl: profile.githubUrl,
+      discordUrl: profile.discordUrl,
+      creatorSlug: profile.creatorSlug,
+      creatorAccentColor: profile.creatorAccentColor,
+      creatorHeaderImageUrl: profile.creatorHeaderImageUrl,
+    },
+    privacySettings: {
+      marketingConsent: profile.marketingConsent,
+    },
+  };
+}
+
 interface MeUpdateWidgetProps {
   field: {
-    value: MePostResponseOutput | null | undefined;
+    value: MePostRequestOutput | null | undefined;
   } & (typeof meDefinition.POST)["fields"];
 }
 
@@ -328,6 +442,7 @@ function AvatarUploadButton({
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -355,7 +470,7 @@ function AvatarUploadButton({
         }
       })();
     },
-    [user, logger, locale, onUploaded],
+    [user, logger, locale, availability, onUploaded],
   );
 
   const displayUrl = previewUrl ?? avatarUrl;
@@ -405,6 +520,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof meDefinition.POST>();
   const roleT = userRoleScopedTranslation.scopedT(locale).t;
+  const subscriptionT = subscriptionScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof meDefinition.POST>();
   const onSubmit = useWidgetOnSubmit();
   const { user: profileRaw, refetch } = useUser(user, logger);
@@ -412,69 +528,67 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
 
   const [editing, setEditing] = useState(false);
   const [liveAvatarUrl, setLiveAvatarUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // Skills come from the me GET endpoint response (server-side enriched)
-  const mySkills = useMemo(() => {
-    if (!profile) {
-      return [];
-    }
-    return profile.skills.filter(
-      (s: { ownershipType: string }) =>
-        s.ownershipType === SkillOwnershipType.PUBLIC,
-    );
-  }, [profile]);
+  const mySkills = useMemo(
+    () =>
+      profile?.skills.filter(
+        (s) => s.ownershipType === SkillOwnershipType.PUBLIC,
+      ) ?? [],
+    [profile],
+  );
 
   // Skills list context - reuse the real components from skills/widget.tsx
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const router = useRouter();
 
-  const handleDeleteAccount = useCallback(async (): Promise<void> => {
-    const meDef = await import("./definition");
-    navigate(meDef.default.DELETE, {
-      renderInModal: true,
+  const handleLogout = useCallback((): void => {
+    navigate(logoutDef.POST, {});
+  }, [navigate]);
+
+  const handleAddAddress = useCallback((): void => {
+    navigate(addressesDef.POST, { popNavigationOnSuccess: 1 });
+  }, [navigate]);
+
+  const handleDeleteAccount = useCallback((): void => {
+    void import("./definition").then((meDef) => {
+      navigate(meDef.default.DELETE, { renderInModal: true });
+      return undefined;
     });
   }, [navigate]);
 
-  const isTouch = useTouchDevice();
-  const skillsT = skillsScopedTranslation.scopedT(locale).t;
-  const skillsFieldChildren = skillsDef.GET.fields.children;
-
-  // Favorites for skill status indicators
-  const { settings } = useChatSettings(user, logger);
-  const settingsActiveFavoriteId = settings?.activeFavoriteId ?? null;
-  const { favorites } = useChatFavorites(logger, {
-    activeFavoriteId: settingsActiveFavoriteId,
+  const { data: addressesResponse } = useApiQuery({
+    endpoint: addressesDef.GET,
+    logger,
+    user,
+    options: { enabled: !user.isPublic },
   });
-  const activeFavoriteId = settingsActiveFavoriteId;
+  const addresses = addressesResponse?.addresses ?? [];
 
-  const favoritesBySkill = useMemo(() => {
-    const map: Record<string, string[]> = {};
-    if (favorites) {
-      for (const fav of favorites) {
-        if (!map[fav.skillId]) {
-          map[fav.skillId] = [];
+  const { data: subscriptionResponse } = useApiQuery({
+    endpoint: subscriptionDef.GET,
+    logger,
+    user,
+    options: { enabled: !user.isPublic },
+  });
+  const subscription =
+    subscriptionResponse?.hasSubscription &&
+    subscriptionResponse.plan &&
+    subscriptionResponse.status
+      ? {
+          plan: subscriptionResponse.plan,
+          status: subscriptionResponse.status,
+          currentPeriodEnd: subscriptionResponse.currentPeriodEnd,
         }
-        map[fav.skillId].push(fav.id);
-      }
-    }
-    return map;
-  }, [favorites]);
+      : null;
 
-  const favoritesByVariant = useMemo(() => {
-    const map: Record<string, string[]> = {};
-    if (favorites) {
-      for (const fav of favorites) {
-        if (parseSkillId(fav.skillId).variantId) {
-          const key = fav.skillId;
-          if (!map[key]) {
-            map[key] = [];
-          }
-          map[key].push(fav.id);
-        }
-      }
-    }
-    return map;
-  }, [favorites]);
+  const { data: creditsResponse } = useApiQuery({
+    endpoint: creditsDef.GET,
+    logger,
+    user,
+    options: { enabled: !user.isPublic },
+  });
+  const credits = creditsResponse ?? null;
 
   useEffect(() => {
     if (profile?.avatarUrl) {
@@ -494,57 +608,13 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     if (!profile) {
       return;
     }
-    form.reset({
-      basicInfo: {
-        privateName: profile.privateName,
-        publicName: profile.publicName,
-        email: profile.email,
-      },
-      profileInfo: {
-        bio: profile.bio,
-        websiteUrl: profile.websiteUrl,
-        twitterUrl: profile.twitterUrl,
-        youtubeUrl: profile.youtubeUrl,
-        instagramUrl: profile.instagramUrl,
-        tiktokUrl: profile.tiktokUrl,
-        githubUrl: profile.githubUrl,
-        discordUrl: profile.discordUrl,
-        creatorSlug: profile.creatorSlug,
-        creatorAccentColor: profile.creatorAccentColor,
-        creatorHeaderImageUrl: profile.creatorHeaderImageUrl,
-      },
-      privacySettings: {
-        marketingConsent: profile.marketingConsent,
-      },
-    });
+    form.reset(profileFormValues(profile));
   }, [profile, form]);
 
   const handleCancelEdit = useCallback((): void => {
     setEditing(false);
     if (profile) {
-      form.reset({
-        basicInfo: {
-          privateName: profile.privateName,
-          publicName: profile.publicName,
-          email: profile.email,
-        },
-        profileInfo: {
-          bio: profile.bio,
-          websiteUrl: profile.websiteUrl,
-          twitterUrl: profile.twitterUrl,
-          youtubeUrl: profile.youtubeUrl,
-          instagramUrl: profile.instagramUrl,
-          tiktokUrl: profile.tiktokUrl,
-          githubUrl: profile.githubUrl,
-          discordUrl: profile.discordUrl,
-          creatorSlug: profile.creatorSlug,
-          creatorAccentColor: profile.creatorAccentColor,
-          creatorHeaderImageUrl: profile.creatorHeaderImageUrl,
-        },
-        privacySettings: {
-          marketingConsent: profile.marketingConsent,
-        },
-      });
+      form.reset(profileFormValues(profile));
     }
   }, [profile, form]);
 
@@ -593,15 +663,6 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     [profile, liveAvatarUrl],
   );
 
-  // Avatar node: upload button in edit mode, plain avatar in view mode
-  const avatarNode = (
-    <AvatarUploadButton
-      avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
-      initials={initials}
-      onUploaded={handleAvatarUploaded}
-    />
-  );
-
   // Resolved slug for public profile links (null if no profile loaded yet)
   const profileSlug = profile?.creatorSlug ?? null;
   const profilePath = profileSlug
@@ -613,459 +674,497 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     ? `${envClient.NEXT_PUBLIC_APP_URL}${profilePath}`
     : null;
 
-  // Top-right action buttons inside the hero
-  const topRightActions = (
-    <>
-      {profileHref && (
-        <Link
-          href={profileHref}
-          className="inline-flex items-center gap-1.5 text-xs bg-black/50 text-white/70 rounded-md px-2.5 py-1.5 hover:bg-black/70 hover:text-white/90 transition-colors backdrop-blur-sm no-underline"
-        >
-          <ExternalLink className="h-3 w-3" />
-          {t("widget.viewPublicProfile")}
-        </Link>
-      )}
-      {editing ? (
-        <>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="bg-black/50 text-white/75 backdrop-blur-sm text-xs h-[30px] hover:bg-black/70 hover:text-white/90"
-            onClick={handleCancelEdit}
-          >
-            {t("widget.cancelEdit")}
-          </Button>
-          <Button
-            type="submit"
-            size="sm"
-            className="text-xs h-[30px] gap-1.5"
-            disabled={form.formState.isSubmitting}
-          >
-            <Save className="h-3 w-3" />
-            {form.formState.isSubmitting
-              ? t("widget.saving")
-              : t("widget.save")}
-          </Button>
-        </>
-      ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="bg-black/50 text-white/75 backdrop-blur-sm text-xs h-[30px] gap-1.5 hover:bg-black/70 hover:text-white/90"
-          onClick={(): void => setEditing(true)}
-        >
-          <Pencil className="h-3 w-3" />
-          {t("widget.editProfile")}
-        </Button>
-      )}
-    </>
-  );
-
-  // Name subline: email (private info only visible to owner)
-  const nameSubline = profile?.email ? (
-    <>
-      <Mail className="h-3 w-3 inline mr-1" />
-      {profile.email}
-    </>
-  ) : undefined;
-
-  // Below the avatar row: view content or edit form
-  const belowAvatarRow = editing ? (
-    <Div className="flex flex-col gap-5">
-      {/* Role badges */}
-      {profile?.userRoles && profile.userRoles.length > 0 && (
-        <Div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {profile.userRoles.map((r) => (
-            <Badge
-              key={r.id}
-              variant="outline"
-              style={{
-                borderColor: `${accent}50`,
-                color: accent,
-                fontSize: 11,
-              }}
-            >
-              {roleT(r.role)}
-            </Badge>
-          ))}
-        </Div>
-      )}
-
-      {/* Name + email */}
-      <Div className="grid grid-cols-2 gap-4">
-        <TextFieldWidget
-          fieldName="basicInfo.privateName"
-          field={basicInfo.privateName}
-        />
-        <TextFieldWidget
-          fieldName="basicInfo.publicName"
-          field={basicInfo.publicName}
-        />
-      </Div>
-
-      <TextFieldWidget fieldName="basicInfo.email" field={basicInfo.email} />
-
-      <BooleanFieldWidget
-        fieldName="privacySettings.marketingConsent"
-        field={privacySettings.marketingConsent}
-      />
-
-      {/* Bio - markdown editor */}
-      <MarkdownTextareaFieldWidget
-        fieldName="profileInfo.bio"
-        field={profileInfo.bio}
-      />
-
-      {/* Profile URL slug - editable with link-break warning */}
-      <Div
-        style={{ display: "flex", flexDirection: "column" as const, gap: 6 }}
-      >
-        <TextFieldWidget
-          fieldName="profileInfo.creatorSlug"
-          field={profileInfo.creatorSlug}
-        />
-        <Div
-          style={{
-            background: "rgba(251,191,36,0.07)",
-            border: "1px solid rgba(251,191,36,0.22)",
-            borderRadius: 8,
-            padding: "10px 14px",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 10,
-          }}
-        >
-          <Div
-            style={{ color: "rgb(251,191,36)", flexShrink: 0, paddingTop: 1 }}
-          >
-            <AlertTriangle className="h-4 w-4" />
-          </Div>
-          <Span
-            style={{
-              fontSize: 12,
-              color: "rgba(251,191,36,0.9)",
-              lineHeight: 1.6,
-            }}
-          >
-            {t("widget.slugWarning")}
-          </Span>
-        </Div>
-      </Div>
-
-      {/* Accent color + header image */}
-      <Div className="grid grid-cols-2 gap-4">
-        <ColorFieldWidget
-          fieldName="profileInfo.creatorAccentColor"
-          field={profileInfo.creatorAccentColor}
-        />
-        <FileFieldWidget
-          fieldName="profileInfo.creatorHeaderImageUrl"
-          field={profileInfo.creatorHeaderImageUrl}
-        />
-      </Div>
-
-      {/* Social links */}
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {(
-          [
-            { key: "websiteUrl", icon: <Globe className="h-4 w-4" /> },
-            { key: "twitterUrl", icon: <Twitter className="h-4 w-4" /> },
-            { key: "youtubeUrl", icon: <Youtube className="h-4 w-4" /> },
-            { key: "instagramUrl", icon: <Instagram className="h-4 w-4" /> },
-            { key: "tiktokUrl", icon: <Music className="h-4 w-4" /> },
-            { key: "githubUrl", icon: <SiGithub className="h-4 w-4" /> },
-            { key: "discordUrl", icon: <SiDiscord className="h-4 w-4" /> },
-          ] as { key: SocialKey; icon: JSX.Element }[]
-        ).map(({ key, icon }) => (
-          <Div key={key} className="flex items-center gap-2">
-            <Div style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>
-              {icon}
-            </Div>
-            <UrlFieldWidget
-              fieldName={`profileInfo.${key}`}
-              field={profileInfo[key]}
-            />
-          </Div>
-        ))}
-      </Div>
-    </Div>
-  ) : (
-    <>
-      {/* Role badges */}
-      {profile?.userRoles && profile.userRoles.length > 0 && (
-        <Div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            marginBottom: 12,
-          }}
-        >
-          {profile.userRoles.map((r) => (
-            <Badge
-              key={r.id}
-              variant="outline"
-              style={{
-                borderColor: `${accent}50`,
-                color: accent,
-                fontSize: 11,
-              }}
-            >
-              {roleT(r.role)}
-            </Badge>
-          ))}
-        </Div>
-      )}
-      {profile?.bio && <ProfileBio bio={profile.bio} />}
-      <ProfileSocialPills profile={profileData} />
-      {/* Current public URL */}
-      {profileHref && (
-        <Div
-          style={{
-            marginTop: 12,
-            padding: "8px 12px",
-            background: "rgba(255,255,255,0.04)",
-            borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.08)",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <Span
-            style={{
-              fontSize: 11,
-              color: "rgba(255,255,255,0.35)",
-              flexShrink: 0,
-            }}
-          >
-            {t("widget.profileUrl")}
-          </Span>
-          <Span
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.6)",
-              fontFamily: "monospace",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              flex: 1,
-            }}
-          >
-            {profileHref}
-          </Span>
-          <Button
-            variant="ghost"
-            size="sm"
-            style={{
-              flexShrink: 0,
-              height: 24,
-              width: 24,
-              padding: 0,
-              color: copied ? "rgba(134,239,172,0.9)" : "rgba(255,255,255,0.4)",
-            }}
-            onClick={(): void => {
-              void navigator.clipboard.writeText(profileHref).then(() => {
-                setCopied(true);
-                setTimeout(() => {
-                  setCopied(false);
-                }, 2000);
-                return undefined;
-              });
-            }}
-          >
-            {copied ? (
-              <Check className="h-3.5 w-3.5" />
-            ) : (
-              <Copy className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </Div>
-      )}
-    </>
-  );
-
   const scopedPaletteStyle = useMemo(
     () => buildScopedPaletteStyle(accent, true),
     [accent],
   );
 
+  // Icon constants defined outside JSX to satisfy i18n linting rules
+  const iconSkills = "🧠";
+  const iconSubscription = "💳";
+  const iconCredits = "⚡";
+  const iconAddresses = "📍";
+  const iconPassword = "🔒";
+  const iconSessions = "📱";
+  const iconEmail = "📧";
+  const iconReferral = "🔗";
+
   return (
-    <Div
-      style={{
-        background: "#0f0520",
-        color: "#fff",
-        fontFamily: "inherit",
-        ...scopedPaletteStyle,
-      }}
+    <WidgetShell
+      scroll
+      padding="none"
+      style={{ background: "#0f0520", ...scopedPaletteStyle }}
     >
+      {/* ── NAV BAR ── */}
+      <WidgetHeader
+        title=""
+        backButton={
+          canGoBack ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={(): void => {
+                pop();
+              }}
+              className="gap-1.5 -ml-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("widget.nav.back")}
+            </Button>
+          ) : undefined
+        }
+        actions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="gap-1.5 text-muted-foreground"
+          >
+            <LogOut className="h-4 w-4" />
+            {t("widget.nav.logout")}
+          </Button>
+        }
+      />
+
+      {/* ── IDENTITY CARD ── */}
       <Form form={form} onSubmit={onSubmit}>
         <FormAlertWidget field={emptyField} />
 
-        {/* ── HERO (identical structure to creator page) ── */}
-        <ProfileHero
-          profile={profileData}
-          avatarNode={avatarNode}
-          nameSubline={nameSubline}
-          topRightActions={topRightActions}
-          belowAvatarRow={belowAvatarRow}
-        />
-
-        {/* ── SKILLS GRID ── */}
+        {/* Avatar + name + edit toggle */}
         <Div
           style={{
-            maxWidth: 720,
-            margin: "0 auto",
-            padding: "0 24px 48px",
+            position: "relative",
+            background: `radial-gradient(ellipse at 50% -10%, ${accent}50 0%, transparent 70%)`,
+            padding: "24px 24px 20px",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 16,
           }}
         >
-          {/* Skills section header */}
-          {mySkills.length > 0 && (
+          {/* Avatar */}
+          <Div style={{ flexShrink: 0 }}>
+            <AvatarUploadButton
+              avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
+              initials={initials}
+              onUploaded={handleAvatarUploaded}
+            />
+          </Div>
+
+          {/* Name / email / roles */}
+          <Div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
             <Div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                marginBottom: 12,
+                flexWrap: "wrap",
               }}
             >
-              <H2
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  color: "rgba(255,255,255,0.3)",
-                  margin: 0,
-                }}
-              >
-                {t("widget.skills.title")}
-              </H2>
               <Span
                 style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "rgba(255,255,255,0.2)",
-                  background: "rgba(255,255,255,0.06)",
-                  borderRadius: 4,
-                  padding: "1px 6px",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.95)",
+                  lineHeight: 1.2,
                 }}
               >
-                {mySkills.length}
+                {profile?.publicName ?? profile?.privateName ?? "—"}
+              </Span>
+              {profile?.userRoles?.map((r) => (
+                <Badge
+                  key={r.id}
+                  variant="outline"
+                  style={{
+                    borderColor: `${accent}60`,
+                    color: accent,
+                    fontSize: 10,
+                    padding: "1px 6px",
+                  }}
+                >
+                  {roleT(r.role)}
+                </Badge>
+              ))}
+            </Div>
+            <Div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 3,
+              }}
+            >
+              <Mail className="h-3 w-3 text-white/40" />
+              <Span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
+                {profile?.email}
               </Span>
             </Div>
-          )}
-          <CollapsibleSkillSection
-            skills={mySkills}
-            idx={0}
-            navigate={navigate}
-            logger={logger}
-            user={user}
-            locale={locale}
-            isTouch={isTouch}
-            t={skillsT}
-            favoritesBySkill={favoritesBySkill}
-            favoritesByVariant={favoritesByVariant}
-            activeFavoriteId={activeFavoriteId}
+          </Div>
+
+          {/* Edit / Save / Cancel + public profile link */}
+          <Div
+            style={{
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 6,
+            }}
           >
-            {skillsFieldChildren}
-          </CollapsibleSkillSection>
+            {profileHref && (
+              <Link
+                href={profileHref}
+                className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 no-underline transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {t("widget.viewPublicProfile")}
+              </Link>
+            )}
+            {editing ? (
+              <Div style={{ display: "flex", gap: 6 }}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="bg-white/10 text-white/70 hover:bg-white/20 text-xs h-7"
+                  onClick={handleCancelEdit}
+                >
+                  {t("widget.cancelEdit")}
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="text-xs h-7 gap-1"
+                  disabled={form.formState.isSubmitting}
+                >
+                  <Save className="h-3 w-3" />
+                  {form.formState.isSubmitting
+                    ? t("widget.saving")
+                    : t("widget.save")}
+                </Button>
+              </Div>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="bg-white/10 text-white/70 hover:bg-white/20 text-xs h-7 gap-1"
+                onClick={(): void => {
+                  setEditing(true);
+                }}
+              >
+                <Pencil className="h-3 w-3" />
+                {t("widget.editProfile")}
+              </Button>
+            )}
+          </Div>
         </Div>
+
+        {/* Bio + socials (view mode) */}
+        {!editing && profile?.bio && (
+          <Div style={{ padding: "0 24px 8px" }}>
+            <ProfileBio bio={profile.bio} />
+          </Div>
+        )}
+        {!editing && (
+          <Div style={{ padding: "0 24px 16px" }}>
+            <ProfileSocialPills profile={profileData} />
+          </Div>
+        )}
+
+        {/* Edit form (expanded inline) */}
+        {editing && (
+          <Div
+            style={{
+              padding: "16px 24px 24px",
+              borderTop: "1px solid rgba(255,255,255,0.07)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <Div className="grid grid-cols-2 gap-4">
+              <TextFieldWidget
+                fieldName="basicInfo.privateName"
+                field={basicInfo.privateName}
+              />
+              <TextFieldWidget
+                fieldName="basicInfo.publicName"
+                field={basicInfo.publicName}
+              />
+            </Div>
+            <TextFieldWidget
+              fieldName="basicInfo.email"
+              field={basicInfo.email}
+            />
+            <BooleanFieldWidget
+              fieldName="privacySettings.marketingConsent"
+              field={privacySettings.marketingConsent}
+            />
+            <MarkdownTextareaFieldWidget
+              fieldName="profileInfo.bio"
+              field={profileInfo.bio}
+            />
+            <Div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <TextFieldWidget
+                fieldName="profileInfo.creatorSlug"
+                field={profileInfo.creatorSlug}
+              />
+              <Div
+                style={{
+                  background: "rgba(251,191,36,0.07)",
+                  border: "1px solid rgba(251,191,36,0.22)",
+                  borderRadius: 8,
+                  padding: "10px 14px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                }}
+              >
+                <Div
+                  style={{
+                    color: "rgb(251,191,36)",
+                    flexShrink: 0,
+                    paddingTop: 1,
+                  }}
+                >
+                  <AlertTriangle className="h-4 w-4" />
+                </Div>
+                <Span
+                  style={{
+                    fontSize: 12,
+                    color: "rgba(251,191,36,0.9)",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {t("widget.slugWarning")}
+                </Span>
+              </Div>
+            </Div>
+            <Div className="grid grid-cols-2 gap-4">
+              <ColorFieldWidget
+                fieldName="profileInfo.creatorAccentColor"
+                field={profileInfo.creatorAccentColor}
+              />
+              <FileFieldWidget
+                fieldName="profileInfo.creatorHeaderImageUrl"
+                field={profileInfo.creatorHeaderImageUrl}
+              />
+            </Div>
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {(
+                [
+                  { key: "websiteUrl", icon: <Globe className="h-4 w-4" /> },
+                  { key: "twitterUrl", icon: <Twitter className="h-4 w-4" /> },
+                  { key: "youtubeUrl", icon: <Youtube className="h-4 w-4" /> },
+                  {
+                    key: "instagramUrl",
+                    icon: <Instagram className="h-4 w-4" />,
+                  },
+                  { key: "tiktokUrl", icon: <Music className="h-4 w-4" /> },
+                  { key: "githubUrl", icon: <SiGithub className="h-4 w-4" /> },
+                  {
+                    key: "discordUrl",
+                    icon: <SiDiscord className="h-4 w-4" />,
+                  },
+                ] as { key: SocialKey; icon: JSX.Element }[]
+              ).map(({ key, icon }) => (
+                <Div key={key} className="flex items-center gap-2">
+                  <Div
+                    style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }}
+                  >
+                    {icon}
+                  </Div>
+                  <UrlFieldWidget
+                    fieldName={`profileInfo.${key}`}
+                    field={profileInfo[key]}
+                  />
+                </Div>
+              ))}
+            </Div>
+          </Div>
+        )}
       </Form>
 
-      {/* ── EMAIL LIST ── */}
-      <Div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 24px 48px",
-        }}
-      >
-        <H2
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.12em",
-            color: "rgba(255,255,255,0.3)",
-            margin: "0 0 14px",
-          }}
-        >
-          {t("widget.emailCard.title")}
-        </H2>
-        <P
-          style={{
-            fontSize: 13,
-            color: "rgba(255,255,255,0.45)",
-            margin: "0 0 16px",
-          }}
-        >
-          {t("widget.emailCard.description")}
-        </P>
-        <EndpointsPage endpoint={configDef} user={user} locale={locale} />
-      </Div>
+      {/* ── SKILLS ── */}
+      {mySkills.length > 0 && (
+        <Div style={{ padding: "0 16px" }}>
+          <HubRow
+            icon={iconSkills}
+            title={`${t("widget.skills.title")} (${mySkills.length.toString()})`}
+            subtitle={t("widget.skills.hubSubtitle", {
+              count: mySkills.length,
+            })}
+            onClick={(): void => {
+              navigate(skillsDef.GET, {});
+            }}
+          />
+        </Div>
+      )}
 
-      {/* ── DANGER ZONE ── */}
+      {/* ── ACCOUNT ── */}
       <Div
         style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 24px 64px",
+          padding: "16px 16px 0",
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
         }}
       >
         <Div
           style={{
-            border: "1px solid rgba(239,68,68,0.2)",
-            borderRadius: 10,
-            padding: "16px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
+            fontSize: 11,
+            fontWeight: 600,
+            color: "rgba(255,255,255,0.3)",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            padding: "0 4px 8px",
           }}
         >
-          <Div>
-            <Span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                color: "rgba(239,68,68,0.6)",
-              }}
-            >
-              {t("widget.deleteAccount.dangerZone")}
-            </Span>
-            <P
-              style={{
-                fontSize: 12,
-                color: "rgba(255,255,255,0.35)",
-                margin: "4px 0 0",
-              }}
-            >
-              {t("widget.deleteAccount.confirmDescription")}
-            </P>
-          </Div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={(): void => {
-              void handleDeleteAccount();
-            }}
-            style={{
-              flexShrink: 0,
-              border: "1px solid rgba(239,68,68,0.35)",
-              color: "rgba(239,68,68,0.75)",
-              fontSize: 12,
-              height: 32,
-              padding: "0 14px",
-            }}
-          >
-            {t("widget.deleteAccount.button")}
-          </Button>
+          {t("widget.sections.account")}
         </Div>
+
+        <HubRow
+          icon={iconSubscription}
+          title={
+            subscription?.plan
+              ? subscriptionT(subscription.plan)
+              : t("widget.sections.noSubscription")
+          }
+          subtitle={
+            subscription?.currentPeriodEnd
+              ? new Date(subscription.currentPeriodEnd).toLocaleDateString(
+                  locale,
+                )
+              : t("widget.sections.subscriptionHint")
+          }
+          badge={
+            subscription?.status ? (
+              <StatusPill
+                status={subscriptionT(subscription.status)}
+                variant={
+                  subscription.status === SubscriptionStatus.ACTIVE
+                    ? "success"
+                    : "warning"
+                }
+              />
+            ) : (
+              <Span
+                style={{
+                  fontSize: 11,
+                  color: accent,
+                  fontWeight: 600,
+                  background: `${accent}20`,
+                  padding: "2px 8px",
+                  borderRadius: 99,
+                }}
+              >
+                {t("widget.sections.upgrade")}
+              </Span>
+            )
+          }
+          onClick={(): void => {
+            router.push(`/${locale}/subscription/buy`);
+          }}
+        />
+
+        <HubRow
+          icon={iconCredits}
+          title={t("widget.sections.credits")}
+          subtitle={
+            credits
+              ? `${credits.total.toLocaleString()} ${t("widget.sections.creditsAvailable")}`
+              : "—"
+          }
+          onClick={(): void => {
+            router.push(`/${locale}/subscription/overview`);
+          }}
+        />
+
+        <HubRow
+          icon={iconAddresses}
+          title={t("widget.sections.addresses")}
+          subtitle={
+            addresses.length > 0
+              ? t("widget.sections.addressCount", { count: addresses.length })
+              : t("widget.sections.noAddresses")
+          }
+          onClick={handleAddAddress}
+        />
+
+        <HubRow
+          icon={iconPassword}
+          title={t("widget.sections.password")}
+          subtitle={t("widget.sections.passwordHint")}
+          onClick={(): void => {
+            navigate(passwordDef.POST, {});
+          }}
+        />
+
+        <HubRow
+          icon={iconSessions}
+          title={t("widget.sections.sessions")}
+          subtitle={t("widget.sections.sessionsHint")}
+          onClick={(): void => {
+            navigate(sessionsDef.GET, {});
+          }}
+        />
       </Div>
-    </Div>
+
+      {/* ── CREATOR ── */}
+      <Div
+        style={{
+          padding: "16px 16px 0",
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
+        <Div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: "rgba(255,255,255,0.3)",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            padding: "0 4px 8px",
+          }}
+        >
+          {t("widget.sections.creator")}
+        </Div>
+
+        <HubRow
+          icon={iconEmail}
+          title={t("widget.emailCard.title")}
+          subtitle={t("widget.emailCard.description")}
+          onClick={(): void => {
+            navigate(configDef.GET, {});
+          }}
+        />
+
+        <HubRow
+          icon={iconReferral}
+          title={t("widget.sections.referral")}
+          subtitle={t("widget.sections.referralHint")}
+          onClick={(): void => {
+            router.push(`/${locale}/user/referral`);
+          }}
+        />
+      </Div>
+
+      {/* ── DANGER ── */}
+      <Div style={{ padding: "24px 16px 32px" }}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleDeleteAccount}
+          className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 border border-destructive/20 hover:border-destructive/40 transition-all"
+        >
+          {t("widget.deleteAccount.button")}
+        </Button>
+      </Div>
+    </WidgetShell>
   );
 }

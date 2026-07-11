@@ -468,7 +468,7 @@ export const translations: typeof enTranslations = {
     },
     nav: {
       logout: "Wyloguj się",
-      back: "←",
+      back: "Wstecz",
     },
     sections: {
       account: "Konto",

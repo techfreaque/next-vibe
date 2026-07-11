@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
       addresses: "Adressen",
     },
     widget: {
+      back: "Zurück",
       addAddress: "Adresse hinzufügen",
       edit: "Bearbeiten",
       delete: "Löschen",

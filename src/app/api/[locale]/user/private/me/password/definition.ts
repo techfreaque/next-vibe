@@ -108,18 +108,6 @@ const { POST } = createEndpoint({
         },
       }),
 
-      // === TWO-FACTOR AUTHENTICATION (OPTIONAL) ===
-      twoFactorCode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "twoFactorCode.label",
-        description: "twoFactorCode.description",
-        placeholder: "twoFactorCode.placeholder",
-        columns: 12,
-        helpText: "twoFactorCode.description",
-        schema: z.string().length(6).optional(),
-      }),
-
       // === RESPONSE FIELD ===
       response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,

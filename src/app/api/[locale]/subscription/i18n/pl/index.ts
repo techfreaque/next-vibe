@@ -432,6 +432,7 @@ export const translations: typeof enTranslations = {
   response: {
     checkoutUrl: "URL płatności",
     sessionId: "ID sesji",
+    hasSubscription: "Aktywna subskrypcja",
     id: "ID subskrypcji",
     userId: "ID użytkownika",
     status: "Status subskrypcji",
@@ -678,6 +679,12 @@ export const translations: typeof enTranslations = {
     title: "Subskrypcja zakończona",
     description:
       "Twoja subskrypcja dobiegła końca. Odnów ją, aby odzyskać dostęp do wszystkich funkcji.",
+  },
+  noSubscription: {
+    title: "Brak subskrypcji",
+    description:
+      "Subskrybuj i odbieraj co miesiąc kredyty oraz dostęp do wszystkich modeli.",
+    cta: "Zobacz plany",
   },
   manage: {
     nowpayments: {

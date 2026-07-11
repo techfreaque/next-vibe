@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    back: "Zurück",
     loading: "Wird geladen…",
     pitch: {
       headline: "Aus Besuchern werden Abonnenten",

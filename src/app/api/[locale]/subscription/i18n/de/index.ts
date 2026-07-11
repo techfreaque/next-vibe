@@ -450,6 +450,7 @@ export const translations: typeof enTranslations = {
   response: {
     checkoutUrl: "Checkout-URL",
     sessionId: "Session-ID",
+    hasSubscription: "Abo vorhanden",
     id: "Abonnement-ID",
     userId: "Benutzer-ID",
     status: "Abonnement-Status",
@@ -700,6 +701,12 @@ export const translations: typeof enTranslations = {
     title: "Abonnement beendet",
     description:
       "Ihr Abonnement wurde beendet. Erneuern Sie es, um wieder Zugriff auf alle Funktionen zu erhalten.",
+  },
+  noSubscription: {
+    title: "Noch kein Abo",
+    description:
+      "Hol dir monatliche Credits und Zugriff auf alle Modelle - mit einem Abo.",
+    cta: "Pläne ansehen",
   },
   manage: {
     nowpayments: {

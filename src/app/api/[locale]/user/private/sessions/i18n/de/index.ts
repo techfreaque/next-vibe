@@ -2,6 +2,20 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Benutzer",
 
+  widget: {
+    back: "Zurück",
+    loading: "Sitzungen werden geladen…",
+    empty: "Keine aktiven Sitzungen",
+    emptyHint: "Eine Sitzung wird bei jedem Login erstellt",
+    browserSession: "Browser-Sitzung",
+    revoke: "Widerrufen",
+    revoking: "Wird widerrufen…",
+    currentSession: "Aktuell",
+    created: "Erstellt",
+    expires: "Läuft ab",
+    never: "Nie",
+  },
+
   list: {
     title: "Meine Sitzungen",
     titleShort: "Meine Sitzungen",

@@ -191,10 +191,9 @@ export class SubscriptionRepository {
         .limit(1);
 
       if (results.length === 0) {
-        return fail({
-          message: t("errors.not_found"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
+        // No subscription is a valid state, not an error - the widget renders
+        // a subscribe CTA from this response.
+        return success({ hasSubscription: false });
       }
 
       let subscription = results[0];
@@ -467,6 +466,7 @@ export class SubscriptionRepository {
       }
 
       return success({
+        hasSubscription: true,
         id: subscription.id,
         plan: SubscriptionRepository.normalizePlanId(),
         billingInterval: subscription.billingInterval,

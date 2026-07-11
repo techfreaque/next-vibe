@@ -1,6 +1,20 @@
 export const translations = {
   category: "Users",
 
+  widget: {
+    back: "Back",
+    loading: "Loading sessions…",
+    empty: "No active sessions",
+    emptyHint: "A session is created each time you log in",
+    browserSession: "Browser session",
+    revoke: "Revoke",
+    revoking: "Revoking…",
+    currentSession: "Current",
+    created: "Created",
+    expires: "Expires",
+    never: "Never",
+  },
+
   list: {
     title: "My Sessions",
     titleShort: "My Sessions",

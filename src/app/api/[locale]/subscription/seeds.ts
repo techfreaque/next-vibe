@@ -99,7 +99,10 @@ export async function dev(
 
     let subscription: SubscriptionGetResponseOutput | undefined = undefined;
 
-    if (existingSubscription.success && existingSubscription.data) {
+    if (
+      existingSubscription.success &&
+      existingSubscription.data.hasSubscription
+    ) {
       logger.debug("Demo user already has a subscription, skipping creation");
       subscription = existingSubscription.data;
     } else {
@@ -120,6 +123,7 @@ export async function dev(
           `✅ Created development subscription for demo user: ${createdSubscription.id}`,
         );
         subscription = {
+          hasSubscription: true,
           id: createdSubscription.id,
           plan: createdSubscription.planId,
           billingInterval: createdSubscription.billingInterval,
@@ -215,7 +219,10 @@ export async function dev(
       let adminSubscriptionData: SubscriptionGetResponseOutput | undefined =
         undefined;
 
-      if (!adminSubscription.success || !adminSubscription.data) {
+      if (
+        !adminSubscription.success ||
+        !adminSubscription.data.hasSubscription
+      ) {
         // Create premium subscription for admin user
         const adminSubscriptionSeed = createLocalSubscriptionSeed(
           adminUser.id,
@@ -236,6 +243,7 @@ export async function dev(
             `✅ Created premium subscription for admin user: ${adminCreatedSubscription.id}`,
           );
           adminSubscriptionData = {
+            hasSubscription: true,
             id: adminCreatedSubscription.id,
             plan: adminCreatedSubscription.planId,
             billingInterval: adminCreatedSubscription.billingInterval,
@@ -402,7 +410,10 @@ export async function test(
             locale,
           );
 
-        if (!existingSubscription.success || !existingSubscription.data) {
+        if (
+          !existingSubscription.success ||
+          !existingSubscription.data.hasSubscription
+        ) {
           const [createdSubscription] = await db
             .insert(subscriptions)
             .values(subscriptionData)
@@ -468,7 +479,10 @@ export async function prod(
         locale,
       );
 
-      if (!adminSubscription.success || !adminSubscription.data) {
+      if (
+        !adminSubscription.success ||
+        !adminSubscription.data.hasSubscription
+      ) {
         // Create enterprise subscription for production admin
         const adminSubscriptionData = createLocalSubscriptionSeed(
           adminUser.id,

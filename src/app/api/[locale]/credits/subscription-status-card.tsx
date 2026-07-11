@@ -49,7 +49,13 @@ export function SubscriptionStatusCard({
   const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
   const portal = useCustomerPortal(logger, user);
 
-  const isCanceled = initialSubscription.status === SubscriptionStatus.CANCELED;
+  const { status, billingInterval, currentPeriodStart } = initialSubscription;
+
+  if (!initialSubscription.hasSubscription || !status || !billingInterval) {
+    return <Div />;
+  }
+
+  const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && initialSubscription.cancelAt;
 
   const getProviderIcon = (provider?: string): JSX.Element => {
@@ -112,10 +118,10 @@ export function SubscriptionStatusCard({
               }
             >
               {isCanceled
-                ? subscriptionT(initialSubscription.status)
+                ? subscriptionT(status)
                 : isCanceling
                   ? subscriptionT("enums.status.canceling")
-                  : subscriptionT(initialSubscription.status)}
+                  : subscriptionT(status)}
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">
               {getProviderIcon(initialSubscription.provider)}
@@ -171,7 +177,7 @@ export function SubscriptionStatusCard({
                 {t("subscription.billingInterval")}
               </Div>
               <Div className="text-lg font-semibold capitalize">
-                {subscriptionT(initialSubscription.billingInterval)}
+                {subscriptionT(billingInterval)}
               </Div>
             </Div>
             <Div className="p-4 rounded-lg bg-accent border">
@@ -179,10 +185,9 @@ export function SubscriptionStatusCard({
                 {t("subscription.currentPeriodStart")}
               </Div>
               <Div className="text-lg font-semibold">
-                {formatSimpleDate(
-                  new Date(initialSubscription.currentPeriodStart),
-                  locale,
-                )}
+                {currentPeriodStart
+                  ? formatSimpleDate(new Date(currentPeriodStart), locale)
+                  : appT("common.notAvailable")}
               </Div>
             </Div>
             <Div className="p-4 rounded-lg bg-accent border">

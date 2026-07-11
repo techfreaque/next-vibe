@@ -142,6 +142,23 @@ function deltaCoalesceKey(envelope: AnyEndpointEventEnvelope): string | null {
   return typeof id === "string" ? `${name}:${id}` : null;
 }
 
+/**
+ * `content-done` carries the AUTHORITATIVE full text and SETs it (not append).
+ * It MUST apply strictly AFTER every preceding delta for the same message —
+ * otherwise, relayed fire-and-forget, it can overtake the still-draining delta
+ * tail: content-done SETs the full text, then a late delta APPENDS onto it →
+ * scrambled/duplicated content. So it rides the SAME per-connection tail as the
+ * deltas, as a non-coalescing BARRIER (seals any open delta, then WAIT-posts).
+ * Returns the message id for a done event, else null.
+ */
+function doneMessageId(envelope: AnyEndpointEventEnvelope): string | null {
+  if (envelope.eventName !== "content-done") {
+    return null;
+  }
+  const id = envelope.responseData?.["messages"]?.[0]?.id;
+  return typeof id === "string" ? id : null;
+}
+
 export class RemoteEventBridgeRepository {
   /**
    * Relay a route's remoteEvent to every connected peer that has its domain
@@ -402,17 +419,34 @@ export class RemoteEventBridgeRepository {
         });
       };
       const coalesceKey = deltaCoalesceKey(envelope);
-      if (coalesceKey === null) {
-        // Non-delta: fire-and-forget, no ordering needed.
+      const doneMsgId = doneMessageId(envelope);
+      if (coalesceKey === null && doneMsgId === null) {
+        // Not delta nor content-done: fire-and-forget, no ordering needed.
         void doPost(wire, "DETACH");
+      } else if (coalesceKey === null) {
+        // content-done: rides the per-connection tail so it is SENT strictly
+        // after every preceding delta (its authoritative SET must not overtake a
+        // still-queued append), but it POSTs DETACH — a terminal event whose apply
+        // re-emits a mirror event that relays BACK, so WAITing on it would deadlock
+        // (mutual cross-instance WAIT). Ordering the SEND is enough: deltas already
+        // applied (WAIT) before content-done is dispatched.
+        const queues = getDeltaRelayQueues();
+        const qk = `${userId}:${relayInstanceId}`;
+        const state = queues.get(qk) ?? { tail: Promise.resolve(), open: null };
+        queues.set(qk, state);
+        state.open = null; // seal any open delta — the barrier follows it
+        const doneWire = wire;
+        state.tail = state.tail
+          .then(() => doPost(doneWire, "DETACH"))
+          .catch(() => undefined);
       } else {
         // Delta: enqueue onto the per-connection tail (serializes ALL deltas —
         // content + reasoning, every message — in emit order → no scramble).
-        // COALESCING optimization: the `open` holder is the delta currently at
-        // the END of the tail that has NOT started draining. A new delta with the
-        // SAME coalesceKey merges its increment into `open.wire` instead of
-        // enqueuing another POST. A different key SEALS `open` (nulls it) and
-        // enqueues a fresh task — so cross-type deltas never merge out of order.
+        // COALESCING optimization: the `open` holder is the delta currently at the
+        // END of the tail that has NOT started draining. A new delta with the SAME
+        // coalesceKey merges its increment into `open.wire` instead of enqueuing
+        // another POST. A different key SEALS `open` (nulls it) and enqueues a
+        // fresh task — so cross-type deltas never merge out of order.
         const queues = getDeltaRelayQueues();
         const qk = `${userId}:${relayInstanceId}`;
         const state = queues.get(qk) ?? {

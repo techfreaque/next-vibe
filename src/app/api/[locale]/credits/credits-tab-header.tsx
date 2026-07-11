@@ -249,7 +249,7 @@ export function CreditsTabHeader({
       </Div>
 
       {/* Subscription status card */}
-      {currentSubscription && (
+      {currentSubscription?.hasSubscription && (
         <Div className="px-6 pb-4">
           <SubscriptionStatusCard
             locale={locale}
