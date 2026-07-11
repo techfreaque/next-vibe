@@ -338,7 +338,7 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sh
 # /app/.next-prod/cache mounted directly - Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v2,sharing=locked \
-    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
+    bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 
 
@@ -350,4 +350,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Start the application using vibe CLI (skipPre=true by default: migrations ran at build time)
-CMD ["bun", "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts", "start"]
+CMD ["bun", "src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts", "start"]

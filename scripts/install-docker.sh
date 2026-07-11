@@ -4,8 +4,8 @@ set -e
 compose() { docker compose -f docker-compose.prod.yml "$@" 2>/dev/null; }
 COMPOSE=compose
 
-git stash
-git pull
+git fetch origin
+git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
 
 # Build postgres image first (includes plv8 + pgvector via Dockerfile.postgres)
 $COMPOSE build postgres

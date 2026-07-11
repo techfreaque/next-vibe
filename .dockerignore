@@ -77,3 +77,8 @@ docker-compose*.yml
 tmp
 temp
 *.tmp
+.next-prod
+.next
+.dist
+.tanstack
+./memory
