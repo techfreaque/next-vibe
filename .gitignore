@@ -36,4 +36,4 @@ code-server
 mcp.json
 
 # admin user cortex
-data
+./data

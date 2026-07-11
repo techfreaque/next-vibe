@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
@@ -25,6 +26,7 @@ import { useState } from "react";
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/platforms/react/hooks/store";
 
+import revokeEndpoints from "./[id]/definition";
 import type definition from "./definition";
 
 type Session = NonNullable<
@@ -41,13 +43,14 @@ export function UserSessionsContainer(): JSX.Element {
   const logger = useWidgetLogger();
   const availability = useProviderAvailability();
   const [revoking, setRevoking] = useState<string | null>(null);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
 
   const handleRevoke = (session: Session): void => {
     setRevoking(session.id);
+    setRevokeError(null);
     void (async (): Promise<void> => {
-      const revokeDef = await import("./[id]/definition");
-      await apiClient.mutate(
-        revokeDef.default.DELETE,
+      const result = await apiClient.mutate(
+        revokeEndpoints.DELETE,
         logger,
         user,
         undefined,
@@ -56,6 +59,10 @@ export function UserSessionsContainer(): JSX.Element {
         availability,
       );
       setRevoking(null);
+      if (!result.success) {
+        setRevokeError(result.message ?? "Failed to revoke session");
+        return;
+      }
       endpointMutations?.read?.refetch?.();
     })();
   };
@@ -87,6 +94,12 @@ export function UserSessionsContainer(): JSX.Element {
           ) : undefined
         }
       />
+
+      {revokeError ? (
+        <Alert variant="destructive" className="mx-1">
+          <AlertDescription>{revokeError}</AlertDescription>
+        </Alert>
+      ) : undefined}
 
       {sessions.length === 0 ? (
         <EmptyBlock
