@@ -4,7 +4,7 @@
   "description": "Test project for vibe check system",
   "scripts": {
     "check": "v c",
-    "cc": "bun ../../unified-interface/cli/vibe-runtime.ts config-create",
+    "cc": "bun ../../../platforms/cli/vibe-runtime.ts config-create",
     "check-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js check",
     "cc-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js config-create",
     "check-r": "v check",

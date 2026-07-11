@@ -9494,7 +9494,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-11T15:30:19.957Z",
+          createdAt: "2026-07-11T16:20:20.594Z",
         },
       },
     },
@@ -9519,7 +9519,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-11T15:30:19.957Z",
+          updatedAt: "2026-07-11T16:20:20.594Z",
         },
       },
     },

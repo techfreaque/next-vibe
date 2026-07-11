@@ -722,14 +722,15 @@ class WsConnection {
       // no execute()/dispatch re-entry (this runs inside the connector itself).
       // ONE attempt: pull-on-connect either works or it doesn't. No retry loop —
       // a retry masks the real failure and stalls the run.
-      const syncResult: ResponseType<SyncResponseOutput> =
-        await RemoteTransport.callEndpointDirect({
+      const { response: syncResult } = await RemoteTransport.callEndpointDirect(
+        {
           connection: { remoteUrl, token, leadId },
           definition: syncEndpoints.POST,
           input: body,
           locale: defaultLocale,
           timeoutMs: 60_000,
-        });
+        },
+      );
       if (!syncResult.success) {
         this.logger.warn("[WsConnection] pull-on-connect sync failed", {
           instanceId: this.instanceId,

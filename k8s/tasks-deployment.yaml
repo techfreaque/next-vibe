@@ -29,7 +29,7 @@ spec:
           image: next-vibe:latest
           command:
             - bun
-            - src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts
+            - src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts
             - start
             - --mode=tasks
           envFrom:

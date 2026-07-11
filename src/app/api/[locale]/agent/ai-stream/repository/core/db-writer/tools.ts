@@ -48,6 +48,13 @@ export async function emitToolCall(
     toolCall,
   } = params;
 
+  // ONE authoritative creation time, shared by the SSE wire AND the DB insert.
+  // Parallel tool siblings in a single step are emitted back-to-back; a separate
+  // now() in the wire vs the DB row can order two siblings differently, and a
+  // mirror healing from the wire time would then invert the parent chain
+  // (assertParentTimeOrder). Stamping once keeps wire == DB == origin order.
+  const createdAt = new Date();
+
   // SSE: MESSAGE_CREATED for tool message
   w.deps.wsEmit("message-created", {
     urlPathParams: { threadId },
@@ -64,6 +71,7 @@ export async function emitToolCall(
           model: model ?? null,
           skill: skill ?? null,
           metadata: { toolCall },
+          createdAt,
         }),
       ],
     },
@@ -82,6 +90,7 @@ export async function emitToolCall(
       skill: skill,
       logger: w.deps.logger,
       locale: w.deps.locale,
+      createdAt,
     });
     if (!createResult.success) {
       w.deps.logger.error("[MessageDbWriter] Failed to create tool message", {
@@ -154,11 +163,23 @@ export async function emitToolResult(
   });
 
   // DB: update tool message with result/error.
-  // Skip for wakeUp: handleTaskCompletion already backfilled the real result inline
-  // (before execute-tool returned the stub). Writing the stub here would clobber it.
-  // For detach: write the {hint, taskId} stub now — handleTaskCompletion will
-  // replace it with the final result when the goroutine completes.
-  if (!w.deps.isIncognito && toolCall.callbackMode !== "wakeUp") {
+  // wakeUp: the DISPATCH acknowledgement ({taskId, hint}, status pending) IS the
+  // phase-1 result the model must see — its two-phase judgement keys off "the
+  // dispatch returned a taskId and no responsePath yet". Write it. The final
+  // output never flows through THIS call for wakeUp (it lands on a separate
+  // deferred message via revival), so there is nothing to clobber. Only skip when
+  // the wakeUp result is NOT a taskId dispatch (defensive: a non-dispatch write
+  // here would be the stale/final shape that resume-stream owns).
+  const wakeUpResultRec =
+    toolCall.result && typeof toolCall.result === "object"
+      ? (toolCall.result as Record<string, WidgetData>)
+      : undefined;
+  const isWakeUpDispatch =
+    toolCall.callbackMode === "wakeUp" &&
+    typeof wakeUpResultRec?.["taskId"] === "string";
+  const skipWakeUpClobber =
+    toolCall.callbackMode === "wakeUp" && !isWakeUpDispatch;
+  if (!w.deps.isIncognito && !skipWakeUpClobber) {
     const updateResult = await db
       .update(chatMessages)
       .set({ metadata: { toolCall }, updatedAt: new Date() })

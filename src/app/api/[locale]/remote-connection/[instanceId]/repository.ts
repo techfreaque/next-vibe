@@ -31,6 +31,7 @@ import type {
   RemoteConnectionByIdPatchRequestOutput,
   RemoteConnectionByIdPatchResponseOutput,
 } from "./definition";
+import definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
 export class RemoteConnectionInstanceRepository {
@@ -432,8 +433,9 @@ export class RemoteConnectionInstanceRepository {
     // "disconnected" is the absence of the remoteConnections row, and a
     // reconnect converges on the same folder (find-or-create by name).
 
-    // Fire-and-forget: notify remote to remove its record of us
-    if (row.token && row.remoteUrl) {
+    // Fire-and-forget: notify remote to remove its record of us.
+    // Reverse entries are system-managed — skip the back-notify to avoid a ping-pong loop.
+    if (!row.isReverseEntry && row.token && row.remoteUrl) {
       const plainToken = RemoteConnectionRepository.decryptToken(row.token);
       // Bounded retries (background): a missed DELETE leaves an orphaned
       // reverse entry on the remote holding a token that no longer rotates.
@@ -445,36 +447,40 @@ export class RemoteConnectionInstanceRepository {
               setTimeout(resolve, delayMs);
             });
           }
-          const res = await RemoteTransport.callRaw({
-            remoteUrl: row.remoteUrl,
-            apiPath: `${locale}/user/remote-connection/${instanceId}`,
-            method: Methods.DELETE,
-            token: plainToken,
-            leadId: row.leadId ?? undefined,
-            timeoutMs: 10_000,
-          });
-          if (res.networkError) {
+          const { status, networkError } =
+            await RemoteTransport.callEndpointDirect({
+              connection: {
+                remoteUrl: row.remoteUrl,
+                token: plainToken,
+                leadId: row.leadId ?? undefined,
+              },
+              definition: definitions.DELETE,
+              urlPathParams: { instanceId },
+              locale,
+              timeoutMs: 10_000,
+            });
+          if (networkError) {
             logger.warn("Remote disconnect request errored — retrying", {
               instanceId,
             });
             continue;
           }
-          if (res.ok) {
+          if (status >= 200 && status < 300) {
             logger.info("Remote disconnect acknowledged", { instanceId });
             return;
           }
           // 401/404: the remote no longer accepts or knows us — its reverse
           // entry is already unusable, retrying can't improve anything.
-          if (res.status === 401 || res.status === 404) {
+          if (status === 401 || status === 404) {
             logger.warn(
               "Remote disconnect rejected — remote record unusable anyway",
-              { instanceId, status: res.status },
+              { instanceId, status },
             );
             return;
           }
           logger.warn("Remote disconnect notification failed — retrying", {
             instanceId,
-            status: res.status,
+            status,
           });
         }
         logger.error(
@@ -507,29 +513,33 @@ export class RemoteConnectionInstanceRepository {
     {
       const loginEndpoints =
         await import("@/app/api/[locale]/user/public/login/definition");
-      const loginResult = await RemoteTransport.callRaw({
-        remoteUrl,
-        apiPath: `${locale}/${loginEndpoints.default.POST.path.join("/")}`,
-        method: Methods.POST,
-        body: { email, password, rememberMe: true },
+      const {
+        response: loginResult,
+        status: loginStatus,
+        networkError: loginNetworkError,
+      } = await RemoteTransport.callEndpointDirect({
+        connection: { remoteUrl, token: "" },
+        definition: loginEndpoints.default.POST,
+        input: { email, password, rememberMe: true },
+        locale,
         timeoutMs: 15_000,
       });
 
-      if (loginResult.networkError) {
+      if (loginNetworkError) {
         logger.error("[REAUTH] Remote login error (network)");
         return fail({
           message: t("get.errors.network.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      if (!loginResult.ok) {
-        if (loginResult.status === 401) {
+      if (!loginResult.success) {
+        if (loginStatus === 401) {
           return fail({
             message: t("get.errors.unauthorized.title"),
             errorType: ErrorResponseTypes.UNAUTHORIZED,
           });
         }
-        if (loginResult.status === 403) {
+        if (loginStatus === 403) {
           return fail({
             message: t("get.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
@@ -541,21 +551,17 @@ export class RemoteConnectionInstanceRepository {
         });
       }
 
-      const loginData = loginResult.body?.["data"] as
-        | { token?: string; leadId?: string }
-        | undefined;
-
-      if (!loginData?.token) {
+      if (!loginResult.data.token) {
         return fail({
           message: t("get.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
-      token = loginData.token;
+      token = loginResult.data.token;
       // An empty leadId from login must never overwrite a stored one — every
       // later Bearer header would carry a broken `token|` auth pair.
-      newLeadId = loginData.leadId ?? row.leadId;
+      newLeadId = loginResult.data.leadId ?? row.leadId;
       logger.debug("[REAUTH] Logged into remote", { remoteUrl, instanceId });
     }
 
@@ -567,22 +573,20 @@ export class RemoteConnectionInstanceRepository {
     if (localUrl) {
       const loginEndpoints =
         await import("@/app/api/[locale]/user/public/login/definition");
-      const localLoginResp = await RemoteTransport.callRaw({
-        remoteUrl: localUrl,
-        apiPath: `${locale}/${loginEndpoints.default.POST.path.join("/")}`,
-        method: Methods.POST,
-        body: { email, password, rememberMe: true },
-        timeoutMs: 15_000,
-      });
-      if (localLoginResp.ok) {
-        const localLoginData = localLoginResp.body?.["data"] as
-          | { token?: string; leadId?: string }
-          | undefined;
-        if (localLoginData?.token) {
-          reverseToken = localLoginData.token;
-          reverseLeadId = localLoginData.leadId ?? undefined;
+      const { response: localLoginResp, networkError: localLoginNetworkError } =
+        await RemoteTransport.callEndpointDirect({
+          connection: { remoteUrl: localUrl, token: "" },
+          definition: loginEndpoints.default.POST,
+          input: { email, password, rememberMe: true },
+          locale,
+          timeoutMs: 15_000,
+        });
+      if (localLoginResp.success) {
+        if (localLoginResp.data.token) {
+          reverseToken = localLoginResp.data.token;
+          reverseLeadId = localLoginResp.data.leadId ?? undefined;
         }
-      } else if (localLoginResp.networkError) {
+      } else if (localLoginNetworkError) {
         logger.warn("[REAUTH] Self-login error for reverse token (non-fatal)");
       }
     }
@@ -606,11 +610,8 @@ export class RemoteConnectionInstanceRepository {
     // Bounded retries — if all fail, the remote's reverse entry keeps the
     // expired token and every cloud→local call will 401 until the next reauth.
     if (reverseToken) {
-      const registerEndpoints =
-        await import("@/app/api/[locale]/remote-connection/connect-reverse/definition");
       const selfInstanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-      const registerApiPath = `${locale}/${registerEndpoints.default.POST.path.join("/")}`;
 
       let pushed = false;
       const RETRY_DELAYS_MS = [0, 1000, 3000];
@@ -620,13 +621,16 @@ export class RemoteConnectionInstanceRepository {
             setTimeout(resolve, delayMs);
           });
         }
-        const resp = await RemoteTransport.callRaw({
-          remoteUrl,
-          apiPath: registerApiPath,
-          method: Methods.POST,
-          token,
-          leadId: newLeadId,
-          body: {
+        const registerEndpoints =
+          await import("@/app/api/[locale]/remote-connection/connect-reverse/definition");
+        const {
+          response: resp,
+          status: respStatus,
+          networkError: respNetworkError,
+        } = await RemoteTransport.callEndpointDirect({
+          connection: { remoteUrl, token, leadId: newLeadId },
+          definition: registerEndpoints.default.POST,
+          input: {
             instanceId: selfInstanceId,
             localUrl,
             reverseToken,
@@ -637,15 +641,16 @@ export class RemoteConnectionInstanceRepository {
             // token and cloud→local calls 401'd).
             syncScope: row.syncScope,
           },
+          locale,
           timeoutMs: 15_000,
         });
-        if (resp.networkError) {
+        if (respNetworkError) {
           logger.warn("[REAUTH] reverseToken push failed — retrying", {
             instanceId,
           });
           continue;
         }
-        if (resp.ok) {
+        if (resp.success) {
           pushed = true;
           logger.info("[REAUTH] Pushed reverseToken to remote", {
             instanceId,
@@ -654,7 +659,7 @@ export class RemoteConnectionInstanceRepository {
         }
         logger.warn("[REAUTH] reverseToken push rejected — retrying", {
           instanceId,
-          status: resp.status,
+          status: respStatus,
         });
       }
       if (!pushed) {

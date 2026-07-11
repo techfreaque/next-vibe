@@ -22,7 +22,6 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Methods } from "next-vibe/core/definition/enums";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -887,22 +886,22 @@ export async function restoreHermesIdentity(
   const selfRenameDef = (
     await import("@/app/api/[locale]/remote-connection/self/rename/definition")
   ).default;
-  const resp = await RemoteTransport.callRaw({
-    remoteUrl,
-    apiPath: `en-US/${selfRenameDef.PATCH.path.join("/")}`,
-    method: Methods.PATCH,
-    body: { newInstanceId: HERMES_INSTANCE_ID, propagate: false },
-    token,
-    timeoutMs: 15_000,
-  });
-  if (!resp.ok || resp.body?.["success"] !== true) {
+  const { response: resp, status: respStatus } =
+    await RemoteTransport.callEndpointDirect({
+      connection: { remoteUrl, token },
+      definition: selfRenameDef.PATCH,
+      input: { newInstanceId: HERMES_INSTANCE_ID, propagate: false },
+      locale: defaultLocale,
+      timeoutMs: 15_000,
+    });
+  if (!resp.success) {
     // 404 = no self-identity row yet (fresh DB) — nothing to restore.
-    if (resp.status === 404) {
+    if (respStatus === 404) {
       return;
     }
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `restoreHermesIdentity: self-rename failed ${String(resp.status)} ${JSON.stringify(resp.body)}`,
+      `restoreHermesIdentity: self-rename failed ${String(respStatus)} ${JSON.stringify(resp)}`,
     );
   }
 }
@@ -1096,41 +1095,41 @@ export async function resolveProdAdminToken(
   // pre-handler {"unhandled":true} 500 before the login handler even runs —
   // side-effect-free, so a short bounded retry rides over the flake instead
   // of failing the whole suite in beforeAll.
+  const loginDef = (
+    await import("@/app/api/[locale]/user/public/login/definition")
+  ).default;
   let lastFailure = "";
   for (let attempt = 1; attempt <= 4; attempt++) {
     if (attempt > 1) {
       await sleep(750 * attempt);
     }
-    const response = await RemoteTransport.callRaw({
-      remoteUrl,
-      apiPath: "en-US/user/public/login",
-      method: Methods.POST,
-      body: {
+    const {
+      response,
+      status: responseStatus,
+      networkError,
+    } = await RemoteTransport.callEndpointDirect({
+      connection: { remoteUrl, token: "" },
+      definition: loginDef.POST,
+      input: {
         email: env.VIBE_ADMIN_USER_EMAIL,
         password: env.VIBE_ADMIN_USER_PASSWORD,
       },
+      locale: defaultLocale,
       timeoutMs: 10_000,
     });
-    if (!response.ok) {
-      lastFailure = `login failed ${String(response.status)} ${JSON.stringify(response.body)}`;
-      const unhandled =
-        (response.body as { unhandled?: boolean } | undefined)?.unhandled ===
-        true;
+    if (!response.success) {
+      lastFailure = `login failed ${String(responseStatus)} ${JSON.stringify(response)}`;
       // status 0 = network error (connection reset after WS teardown) — always retry
-      if (
-        response.status === 0 ||
-        (response.status >= 500 && (unhandled || attempt < 4))
-      ) {
+      if (networkError || (responseStatus >= 500 && attempt < 4)) {
         continue;
       }
       break;
     }
-    const data = response.body?.["data"] as { token?: string } | undefined;
-    if (!response.body?.["success"] || !data?.token) {
+    if (!response.data.token) {
       lastFailure = "no token in login response";
       break;
     }
-    return data.token;
+    return response.data.token;
   }
   // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
   throw new Error(`resolveProdAdminToken: ${lastFailure}`);

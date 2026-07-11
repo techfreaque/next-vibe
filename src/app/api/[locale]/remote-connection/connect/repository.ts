@@ -15,7 +15,6 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -149,15 +148,16 @@ export class RemoteConnectionConnectRepository {
     const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
 
     // Register runs during connection bootstrap — no remoteConnections row exists
-    // yet, so this cannot use runInProcessTyped({ instanceId }). It goes through
-    // the single sanctioned raw remote primitive with an authenticated bearer.
-    const result = await RemoteTransport.callRaw({
-      remoteUrl,
-      apiPath: `${locale}/${registerEndpoints.POST.path.join("/")}`,
-      method: Methods.POST,
-      token,
-      leadId,
-      body: {
+    // yet, so this cannot use runInProcessTyped({ instanceId }). callEndpointDirect
+    // is the typed bootstrap primitive for exactly this case.
+    const {
+      response: result,
+      status: resultStatus,
+      networkError: resultNetworkError,
+    } = await RemoteTransport.callEndpointDirect({
+      connection: { remoteUrl, token, leadId },
+      definition: registerEndpoints.POST,
+      input: {
         instanceId,
         localUrl,
         selfUserId,
@@ -166,9 +166,10 @@ export class RemoteConnectionConnectRepository {
         ...(reverseToken ? { reverseToken } : {}),
         ...(reverseLeadId ? { reverseLeadId } : {}),
       },
+      locale,
     });
 
-    if (result.networkError) {
+    if (resultNetworkError) {
       logger.error("[CONNECT] Remote registration error (network)");
       return {
         ok: false,
@@ -179,7 +180,7 @@ export class RemoteConnectionConnectRepository {
       };
     }
 
-    if (result.status === 409) {
+    if (resultStatus === 409) {
       logger.warn("[CONNECT] Instance ID already registered on remote", {
         instanceId,
       });
@@ -191,12 +192,10 @@ export class RemoteConnectionConnectRepository {
       };
     }
 
-    if (result.status === 403) {
+    if (resultStatus === 403) {
       logger.warn(
         "[CONNECT] Remote rejected registration (not a cloud instance or missing permissions)",
-        {
-          instanceId,
-        },
+        { instanceId },
       );
       return {
         ok: false,
@@ -207,9 +206,9 @@ export class RemoteConnectionConnectRepository {
       };
     }
 
-    if (!result.ok) {
+    if (!result.success) {
       logger.warn("[CONNECT] Remote registration failed", {
-        status: result.status,
+        status: resultStatus,
         instanceId,
       });
       return {
@@ -220,14 +219,11 @@ export class RemoteConnectionConnectRepository {
       };
     }
 
-    const data = result.body?.["data"] as
-      | { remoteInstanceId?: string; remoteUserId?: string }
-      | undefined;
     return {
       ok: true,
       conflict: false,
-      remoteInstanceId: data?.remoteInstanceId ?? null,
-      remoteUserId: data?.remoteUserId ?? null,
+      remoteInstanceId: result.data.remoteInstanceId ?? null,
+      remoteUserId: result.data.remoteUserId ?? null,
     };
   }
 
@@ -280,35 +276,38 @@ export class RemoteConnectionConnectRepository {
 
     let token: string;
     let effectiveLeadId: string;
-    const loginResult = await RemoteTransport.callRaw({
-      remoteUrl,
-      apiPath: `${locale}/${loginEndpoints.POST.path.join("/")}`,
-      method: Methods.POST,
-      leadId: remotePingLeadId,
-      body: { email, password, rememberMe: true },
+    const {
+      response: loginResult,
+      status: loginStatus,
+      networkError: loginNetworkError,
+    } = await RemoteTransport.callEndpointDirect({
+      connection: { remoteUrl, token: "", leadId: remotePingLeadId },
+      definition: loginEndpoints.POST,
+      input: { email, password, rememberMe: true },
+      locale,
     });
 
-    if (loginResult.networkError) {
+    if (loginNetworkError) {
       logger.error("[CONNECT] Remote login error (network)");
       return fail({
         message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
-    if (!loginResult.ok) {
-      if (loginResult.status === 401) {
+    if (!loginResult.success) {
+      if (loginStatus === 401) {
         return fail({
           message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
-      if (loginResult.status === 403) {
+      if (loginStatus === 403) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
-      if (loginResult.status === 404) {
+      if (loginStatus === 404) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -320,10 +319,8 @@ export class RemoteConnectionConnectRepository {
       });
     }
 
-    const loginData = loginResult.body?.["data"] as
-      | LoginPostResponseOutput
-      | undefined;
-    if (!loginData?.token) {
+    const loginData: LoginPostResponseOutput = loginResult.data;
+    if (!loginData.token) {
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -353,28 +350,29 @@ export class RemoteConnectionConnectRepository {
         const localPingLeadId = await RemoteTransport.fetchLeadId(localUrl);
 
         // Login to ourselves to get a session-backed token.
-        const localLoginResp = await RemoteTransport.callRaw({
-          remoteUrl: localUrl,
-          apiPath: `${locale}/${loginEndpoints.POST.path.join("/")}`,
-          method: Methods.POST,
-          leadId: localPingLeadId,
-          body: { email, password, rememberMe: true },
-          timeoutMs: 15_000,
-        });
-        if (localLoginResp.ok) {
-          const localLoginData = localLoginResp.body?.["data"] as
-            | LoginPostResponseOutput
-            | undefined;
-          if (localLoginData?.token) {
-            reverseToken = localLoginData.token;
-            reverseLeadId = localLoginData.leadId ?? undefined;
+        const { response: localLoginResp, status: localLoginStatus } =
+          await RemoteTransport.callEndpointDirect({
+            connection: {
+              remoteUrl: localUrl,
+              token: "",
+              leadId: localPingLeadId,
+            },
+            definition: loginEndpoints.POST,
+            input: { email, password, rememberMe: true },
+            locale,
+            timeoutMs: 15_000,
+          });
+        if (localLoginResp.success) {
+          if (localLoginResp.data.token) {
+            reverseToken = localLoginResp.data.token;
+            reverseLeadId = localLoginResp.data.leadId ?? undefined;
             logger.debug(
               "[CONNECT] Obtained reverse session token via self-login",
             );
           }
         } else {
           logger.warn("[CONNECT] Self-login for reverse token failed", {
-            status: localLoginResp.status,
+            status: localLoginStatus,
           });
         }
       } catch (reverseErr) {

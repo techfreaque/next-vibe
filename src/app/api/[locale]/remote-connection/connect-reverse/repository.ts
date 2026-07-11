@@ -15,7 +15,6 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -58,18 +57,15 @@ export class RemoteConnectionRegisterRepository {
       return false;
     }
     const healthDef = await import("next-vibe/server/server/health/definition");
-    const path = healthDef.default.GET.path.join("/");
     // Deliberate over-the-wire reachability probe — the point is to prove the URL
     // is directly reachable, so it must go over HTTP (not runInProcessTyped, which
-    // runs in-process and proves nothing). Uses the sanctioned raw remote primitive.
-    const result = await RemoteTransport.callRaw({
-      remoteUrl: localUrl,
-      apiPath: `${locale}/${path}`,
-      method: Methods.GET,
-      token,
-      leadId,
+    // runs in-process and proves nothing).
+    const { status, networkError } = await RemoteTransport.callEndpointDirect({
+      connection: { remoteUrl: localUrl, token, leadId },
+      definition: healthDef.default.GET,
+      locale,
     });
-    if (result.networkError) {
+    if (networkError) {
       logger.debug(
         "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
         { localUrl },
@@ -77,7 +73,7 @@ export class RemoteConnectionRegisterRepository {
       return false;
     }
     // Any HTTP answer (even an error status) proves direct reachability.
-    return result.status > 0;
+    return status > 0;
   }
   static async registerLocalInstance(
     data: RemoteRegisterPostRequestInput,

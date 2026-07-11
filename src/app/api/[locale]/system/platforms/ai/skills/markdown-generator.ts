@@ -339,7 +339,7 @@ async function loadMetaForLocale(
   };
   const file = localeFileMap[locale] ?? "en";
 
-  const mod = (await import(`@/generated/endpoints-meta/${file}`)) as {
+  const mod = (await import(`@/generated/endpoints/meta/${file}`)) as {
     endpointsMeta: SkillEndpointInfo[];
   };
 

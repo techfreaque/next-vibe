@@ -68,7 +68,7 @@ export class BuildRepository {
       output.push(t("post.repository.messages.buildStart"));
 
       // Generate API endpoints first - package build (vibe-runtime) bundles
-      // interactive.cli.tsx which statically imports generated/endpoints-meta/en,
+      // interactive.cli.tsx which statically imports generated/endpoints/meta/en,
       // so generated files must exist before the package build runs.
       if (!data.generate) {
         output.push(t("post.repository.messages.skipGeneration"));

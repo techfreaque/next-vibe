@@ -39,7 +39,9 @@ export class RemoteTransport {
    * cookie; a pre-login call sends only the lead_id Cookie; an authenticated
    * bootstrap call (register) sends the `Bearer token####leadId` header.
    */
-  static async callRaw(params: RemoteCallParams): Promise<RemoteCallResult> {
+  private static async callRaw(
+    params: RemoteCallParams,
+  ): Promise<RemoteCallResult> {
     const {
       remoteUrl,
       apiPath,
@@ -132,8 +134,11 @@ export class RemoteTransport {
    * connection — no DB lookup, no execute()/dispatch re-entry. For callers that
    * already hold the connection (remoteUrl + token + leadId) and must not route
    * back through the connection machinery (e.g. the WS connector's own pull,
-   * which runs while the connection is being established). Returns a typed
-   * ResponseType parsed from the endpoint's response.
+   * which runs while the connection is being established).
+   *
+   * Returns `{ response, status, networkError }` so callers that need raw HTTP
+   * status for retry/error discrimination can access it alongside the typed
+   * ResponseType.
    *
    * Everything that CAN resolve by (user, instanceId) should use
    * RouteExecuteRepository.runInProcessTyped instead — this is the escape hatch
@@ -141,38 +146,79 @@ export class RemoteTransport {
    */
   static async callEndpointDirect<TDef extends CreateApiEndpointAny>(
     params: {
-      connection: { remoteUrl: string; token: string; leadId: string };
+      connection: { remoteUrl: string; token: string; leadId?: string };
       definition: TDef;
       locale: CountryLanguage;
       timeoutMs?: number;
-    } & (TDef["types"]["RequestOutput"] extends never
-      ? { input?: never }
-      : { input: TDef["types"]["RequestOutput"] }),
-  ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
+    } & (TDef["types"]["UrlVariablesOutput"] extends never
+      ? { urlPathParams?: never }
+      : { urlPathParams: TDef["types"]["UrlVariablesOutput"] }) &
+      (TDef["types"]["RequestOutput"] extends never
+        ? { input?: never }
+        : { input: TDef["types"]["RequestOutput"] }),
+  ): Promise<{
+    response: ResponseType<TDef["types"]["ResponseOutput"]>;
+    status: number;
+    networkError: boolean;
+  }> {
     const { connection, definition, locale, input, timeoutMs } = params;
+    const rawUrlPathParams = (
+      params as { urlPathParams?: Record<string, string> }
+    ).urlPathParams;
+    const parsedPathParams = rawUrlPathParams
+      ? (definition.requestUrlPathParamsSchema.parse(
+          rawUrlPathParams,
+        ) as Record<string, string>)
+      : undefined;
+    const resolvedPath = (definition.path as string[])
+      .map((segment) =>
+        parsedPathParams && segment.startsWith("[") && segment.endsWith("]")
+          ? (parsedPathParams[segment.slice(1, -1)] ?? segment)
+          : segment,
+      )
+      .join("/");
     const raw = await RemoteTransport.callRaw({
       remoteUrl: connection.remoteUrl,
-      apiPath: `${locale}/${definition.path.join("/")}`,
+      apiPath: `${locale}/${resolvedPath}`,
       method: definition.method,
       token: connection.token,
       leadId: connection.leadId,
       body: input as Record<string, WidgetData> | undefined,
       timeoutMs,
     });
+    if (raw.networkError) {
+      const { scopedTranslation } = await import("@/app/[locale]/shared/i18n");
+      const { t } = scopedTranslation.scopedT(locale);
+      return {
+        response: fail({
+          message: t("error.message"),
+          errorType: ErrorResponseTypes.NETWORK_ERROR,
+        }) as ResponseType<TDef["types"]["ResponseOutput"]>,
+        status: 0,
+        networkError: true,
+      };
+    }
     if (raw.body !== null) {
-      const launder: ResponseType<TDef["types"]["ResponseOutput"]> = JSON.parse(
-        JSON.stringify(raw.body),
-      );
-      return launder;
+      return {
+        response: JSON.parse(JSON.stringify(raw.body)) as ResponseType<
+          TDef["types"]["ResponseOutput"]
+        >,
+        status: raw.status,
+        networkError: false,
+      };
     }
     const { scopedTranslation } = await import("@/app/[locale]/shared/i18n");
     const { t } = scopedTranslation.scopedT(locale);
-    return fail({
-      message: t("error.message"),
-      errorType:
-        raw.status === 401
-          ? ErrorResponseTypes.UNAUTHORIZED
-          : ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-    }) as ResponseType<TDef["types"]["ResponseOutput"]>;
+    return {
+      response: fail({
+        message: t("error.message"),
+        errorType:
+          raw.status === 401
+            ? ErrorResponseTypes.UNAUTHORIZED
+            : ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      }) as ResponseType<TDef["types"]["ResponseOutput"]>,
+      status: raw.status,
+      networkError: false,
+    };
   }
 }

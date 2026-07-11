@@ -51,6 +51,11 @@ export async function emitMessageCreated(
   w.lastAssistantMessageId = messageId;
   w.lastThreadId = threadId;
 
+  // ONE authoritative creation time, shared by the SSE wire AND the DB insert —
+  // see createToolMessage.createdAt: wire and DB must agree so a mirror healing
+  // from the wire reproduces the origin's message order.
+  const createdAt = new Date();
+
   // Emit MESSAGE_CREATED (always - even incognito needs this for the UI)
   w.deps.wsEmit("message-created", {
     urlPathParams: { threadId },
@@ -67,6 +72,7 @@ export async function emitMessageCreated(
           sequenceId: sequenceId ?? null,
           model: model ?? null,
           skill: skill ?? null,
+          createdAt,
         }),
       ],
     },
@@ -90,6 +96,7 @@ export async function emitMessageCreated(
       sequenceId,
       logger: w.deps.logger,
       locale: w.deps.locale,
+      createdAt,
     });
     if (!result.success) {
       w.deps.logger.warn(

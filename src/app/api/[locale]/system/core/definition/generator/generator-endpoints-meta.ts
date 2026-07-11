@@ -2,7 +2,7 @@
  * Endpoints Meta Generator Repository
  *
  * Generates per-locale static metadata files for the tools modal.
- * Output: src/generated/endpoints-meta/{locale}.ts
+ * Output: src/generated/endpoints/meta/{locale}.ts
  *
  * Each file exports a typed `endpointsMeta` array with pre-translated display
  * fields (title, description, category, tags) plus raw structural data

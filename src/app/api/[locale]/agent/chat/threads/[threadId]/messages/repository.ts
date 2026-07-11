@@ -62,6 +62,17 @@ import type { MessagesWsEmit } from "./emitter";
 import { type MessagesT, scopedTranslation } from "./i18n";
 
 /**
+ * Sentinel createdAt for a mirror STUB row (a message materialized by a relayed
+ * content-delta / content-done / tool-result before its authoritative
+ * message-created arrived). Epoch guarantees the stub always LOSES the createdAt
+ * race: the real message-created carries the origin createdAt and heals it
+ * forward on conflict, and an unbackfilled stub never looks newer than a
+ * real-timed sibling — so a parent relayed later than its child can't invert the
+ * chain (assertParentTimeOrder).
+ */
+const STUB_CREATED_AT = new Date(0);
+
+/**
  * Messages Repository Implementation
  */
 export class MessagesRepository {
@@ -555,6 +566,9 @@ export class MessagesRepository {
     sequenceId: string | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
+    /** Authoritative creation time shared with the message-created wire — see
+     *  createToolMessage.createdAt for why wire and DB must agree. */
+    createdAt?: Date;
   }): Promise<ResponseType<void>> {
     try {
       await db.insert(chatMessages).values({
@@ -568,6 +582,9 @@ export class MessagesRepository {
         isAI: true,
         model: params.model,
         skill: params.skill,
+        ...(params.createdAt
+          ? { createdAt: params.createdAt, updatedAt: params.createdAt }
+          : {}),
       });
 
       params.logger.debug("Created text message", {
@@ -619,6 +636,15 @@ export class MessagesRepository {
     skill: string;
     logger: EndpointLogger;
     locale: CountryLanguage;
+    /**
+     * Authoritative creation time. When emitting the message-created SSE, the
+     * caller stamps ONE timestamp and passes it here AND into the wire row, so
+     * the DB createdAt matches the relayed wire createdAt exactly — a mirror
+     * healing from the wire then reproduces the origin's sibling ORDER (a fresh
+     * now() here vs a fresh now() in the wire can diverge for parallel tools and
+     * invert the mirror chain).
+     */
+    createdAt?: Date;
   }): Promise<ResponseType<void>> {
     const metadata: Record<
       string,
@@ -645,6 +671,9 @@ export class MessagesRepository {
         model: params.model,
         skill: params.skill,
         metadata,
+        ...(params.createdAt
+          ? { createdAt: params.createdAt, updatedAt: params.createdAt }
+          : {}),
       });
 
       params.logger.debug("Created TOOL message", {
@@ -1174,10 +1203,27 @@ async function upsertRemoteToolCallMetadata(
       isAI: true,
       content: "",
       metadata: { toolCall },
+      // Stub time: EPOCH. A relayed tool-result carries no createdAt, so a now()
+      // default (mirror-insert time) would make this row look NEWER than a sibling
+      // that was created earlier on the origin but relayed sooner — inverting the
+      // parent chain (assertParentTimeOrder). Epoch guarantees the real
+      // message-created (which carries the authoritative origin createdAt) always
+      // heals it forward on conflict, and an unbackfilled stub never looks newer
+      // than any real-timed message.
+      createdAt: STUB_CREATED_AT,
+      updatedAt: STUB_CREATED_AT,
     })
     .onConflictDoUpdate({
       target: chatMessages.id,
-      set: { metadata: mergedMetadata },
+      // Heal a mis-typed stub: an out-of-order child message-created may have
+      // materialized this id as an empty ASSISTANT parent stub. A tool-result is
+      // authoritative that this row is a TOOL message — flip the role (and mark
+      // isAI) so the mirror shows the tool call, not a phantom empty assistant.
+      set: {
+        metadata: mergedMetadata,
+        role: ChatMessageRole.TOOL,
+        isAI: true,
+      },
     })
     .catch(() => undefined);
 }
@@ -1298,6 +1344,13 @@ export class MessagesRemoteRepository {
     // permanently. Materialize a minimal parent stub first (the parent's own
     // event backfills role/content/structure on conflict).
     if (raw.parentId) {
+      // Stub time: EPOCH (see STUB_CREATED_AT). The mirror inserts this parent
+      // stub LATER than the origin created the real parent, so a now() default
+      // would make the parent look newer than its child and break
+      // assertParentTimeOrder. Epoch always loses to the parent's real
+      // message-created (which heals createdAt forward on conflict). Role is left
+      // ASSISTANT only as a placeholder; the real message-created / tool-result
+      // backfills the correct role.
       await db
         .insert(chatMessages)
         .values({
@@ -1307,6 +1360,8 @@ export class MessagesRemoteRepository {
           isAI: true,
           content: "",
           metadata: {},
+          createdAt: STUB_CREATED_AT,
+          updatedAt: STUB_CREATED_AT,
         })
         .onConflictDoNothing()
         .catch(() => undefined);
@@ -1316,6 +1371,21 @@ export class MessagesRemoteRepository {
     // stub lacks (parent chain, model, author) and merge metadata — but never
     // clobber already-delivered final content with the (empty) creation
     // snapshot.
+    //
+    // createdAt heal: a single tool message emits message-created TWICE on the
+    // origin — once at CREATE (authoritative time) and again at RESULT (later
+    // time, when the result is written). Both relay here. Taking the LATER one
+    // would push the mirror row forward and invert the parent chain vs a sibling
+    // whose result landed sooner. So: if the existing row is an EPOCH stub, adopt
+    // the incoming time; otherwise keep the EARLIER of {existing, incoming} — the
+    // create-phase time always wins over the result-phase time. When no wire time
+    // is present, keep whatever is stored.
+    const healCreatedAt = raw.createdAt
+      ? sql`CASE
+            WHEN ${chatMessages.createdAt} = ${STUB_CREATED_AT} THEN ${new Date(raw.createdAt)}
+            ELSE LEAST(${chatMessages.createdAt}, ${new Date(raw.createdAt)})
+          END`
+      : sql`${chatMessages.createdAt}`;
     await db
       .insert(chatMessages)
       .values({
@@ -1330,7 +1400,7 @@ export class MessagesRemoteRepository {
         skill: raw.skill ?? null,
         metadata,
         sequenceId: raw.sequenceId ?? null,
-        createdAt: raw.createdAt ? new Date(raw.createdAt) : new Date(),
+        createdAt: raw.createdAt ? new Date(raw.createdAt) : STUB_CREATED_AT,
         updatedAt,
       })
       .onConflictDoUpdate({
@@ -1352,9 +1422,7 @@ export class MessagesRemoteRepository {
                 content: sql`CASE WHEN ${chatMessages.content} = '' OR ${chatMessages.content} IS NULL THEN excluded.content ELSE ${chatMessages.content} END`,
                 parentId: sql`COALESCE(${chatMessages.parentId}, excluded.parent_id)`,
                 authorId: sql`COALESCE(${chatMessages.authorId}, excluded.author_id)`,
-                createdAt: raw.createdAt
-                  ? new Date(raw.createdAt)
-                  : sql`${chatMessages.createdAt}`,
+                createdAt: healCreatedAt,
                 metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(excluded.metadata)`,
                 updatedAt,
               }
@@ -1368,12 +1436,7 @@ export class MessagesRemoteRepository {
                 sequenceId: raw.sequenceId ?? null,
                 content: sql`CASE WHEN excluded.content = '' THEN ${chatMessages.content} ELSE excluded.content END`,
                 metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(excluded.metadata)`,
-                // Stub rows (parent stubs, content-done/tokens-updated
-                // arrivals) were inserted with NOW() — adopt the AUTHORITATIVE
-                // creation time so parent-chain chronology holds.
-                createdAt: raw.createdAt
-                  ? new Date(raw.createdAt)
-                  : sql`${chatMessages.createdAt}`,
+                createdAt: healCreatedAt,
                 updatedAt,
               },
       })
@@ -1487,6 +1550,8 @@ export class MessagesRemoteRepository {
         isAI: true,
         content: msg.content,
         metadata: msg.metadata ?? {},
+        createdAt: STUB_CREATED_AT,
+        updatedAt: STUB_CREATED_AT,
       })
       .onConflictDoUpdate({
         target: chatMessages.id,
@@ -1534,6 +1599,8 @@ export class MessagesRemoteRepository {
         isAI: true,
         content: msg.content,
         metadata: {},
+        createdAt: STUB_CREATED_AT,
+        updatedAt: STUB_CREATED_AT,
       })
       .onConflictDoUpdate({
         target: chatMessages.id,
@@ -1573,6 +1640,8 @@ export class MessagesRemoteRepository {
         isAI: true,
         content: msg.content,
         metadata: {},
+        createdAt: STUB_CREATED_AT,
+        updatedAt: STUB_CREATED_AT,
       })
       .onConflictDoUpdate({
         target: chatMessages.id,
