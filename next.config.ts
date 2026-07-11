@@ -14,7 +14,12 @@ const nextConfig: NextConfig = {
           ? undefined
           : 1
         : undefined,
-    webpackBuildWorker: true,
+    // Disable in prod Docker builds: the worker spawns a separate process that
+    // NODE_OPTIONS cannot cap, causing SIGKILL on low-RAM VPS. In-process build
+    // respects --max-old-space-size set in repository.ts.
+    webpackBuildWorker:
+      process.env.NODE_ENV !== "production" ||
+      process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
     webpackMemoryOptimizations: true,
     // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
     // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
