@@ -6,8 +6,8 @@ export const translations = {
   websiteUrl: "https://unbottled.ai",
   group: {
     name: "Unbottled.ai",
-    legalForm: "Limited Liability Company (LLC)",
-    registrationNumber: "REG-2024-UNBOTTLED-AI",
+    legalForm: "Marcus Brandstätter",
+    registrationNumber: "",
     foundedYear: 2024,
     jurisdiction: {
       country: "Switzerland",
@@ -15,14 +15,14 @@ export const translations = {
     },
     address: {
       title: "Address",
-      street: "123 AI Innovation Drive",
-      city: "San Francisco, CA 94105",
-      country: "United States",
+      street: "Bachstrasse 1",
+      city: "84359 Simbach am Inn",
+      country: "Germany",
       addressIn1Line:
-        "123 AI Innovation Drive, San Francisco, CA 94105, United States",
+        "Bachstrasse 1, 84359 Simbach am Inn, Germany",
     },
     responsiblePerson: {
-      name: "Chief Executive Officer",
+      name: "Marcus Brandstätter",
     },
     contact: {
       phone: "+1 (555) 123-4567",
